@@ -5,11 +5,11 @@ require "caboose/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "caboosecms"
+  s.name        = "caboose-cms"
   s.version     = Caboose::VERSION
   s.authors     = ["William Barry"]
   s.email       = ["william@nine.is"]
-  s.homepage    = "http://github.com/williambarry007/caboosecms"
+  s.homepage    = "http://github.com/williambarry007/caboose-cms"
   s.summary     = "CMS built on rails."
   s.description = "CMS built on rails."
 
@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 3.2.13"
   s.add_dependency "jquery-rails"
   s.add_dependency "activesupport"
+  s.add_dependency "modeljs"
     
   s.add_development_dependency "mysql2"
 end

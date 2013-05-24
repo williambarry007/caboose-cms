@@ -1,0 +1,5 @@
+<h1>Admin</h1>
+
+<% @mods.each do |mod| %>
+  <p><a href='<%= mod['href'] %>'><%= mod['text'] %></a></p>
+<% end %>

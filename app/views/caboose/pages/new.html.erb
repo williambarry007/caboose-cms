@@ -1,0 +1,23 @@
+
+<h1>New Page</h1>
+<div id='page_new_container'></div>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var page = false;
+$(document).ready(function() {
+
+  page = new Model({
+    name: 'Page',
+    id: 'new',
+    attributes: [
+      { name: 'parent_id' , type: 'select'  , value: <%= @parent_id %>, options_url: '/pages/sitemap-options' },
+      { name: 'title'     , type: 'text'    , value: '' }
+    ]
+  });
+  
+});
+
+</script>
+<% end %>

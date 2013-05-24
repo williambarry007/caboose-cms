@@ -1,0 +1,24 @@
+
+<%= content_for :js do %>
+<%= javascript_include_tag "caboose/application" %>
+<%= yield :caboose_js %>
+<% end %>
+
+<%= content_for :css do %>
+<%= stylesheet_link_tag "caboose/application", :media => "all" %>
+<%= yield :caboose_css %>
+<% end %>
+
+<% if (@page.nil?) %>
+  <%= render :file => 'layouts/layout_default' %>
+<% else %>
+
+  <% if (File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.id}.html.erb")) %>
+  <%= render :file => "layouts/layout_#{@page.id}" %>
+  <% elsif (!@page.layout.nil? && @page.layout.length > 0 && File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.layout}.html.erb")) %>
+  <%= render :file => "layouts/layout_#{@page.layout}" %>
+  <% else %>
+  <%= render :file => "layouts/layout_default" %>
+  <% end %>
+  
+<% end %>

@@ -1,0 +1,22 @@
+
+<h1>New user</h1>
+<div id='user_new_container'></div>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var user = false;
+$(document).ready(function() {
+
+  user = new Model({
+    name: 'User',
+    id: 'new',
+    attributes: [
+      { name: 'username', type: 'text', value: '' }
+    ]
+  });
+  
+});
+
+</script>
+<% end %>

@@ -1,0 +1,34 @@
+<h1>Users</h1>
+
+<p><a href='/users/new'>New User</a></p>
+
+<form action='/users' method='get'>
+<table cellpadding='4' cellspacing='0' border='0'>
+<tr><td>First name: 	</td><td><input type='text' name='first_name' value='<%= @gen.params['first_name'] %>' style='width: 200px;' /></td></tr>
+<tr><td>Last name: 	  </td><td><input type='text' name='last_name' 	value='<%= @gen.params['last_name']  %>' style='width: 200px;' /></td></tr>
+<tr><td>Username: 		</td><td><input type='text' name='username' 	value='<%= @gen.params['username'] 	 %>' style='width: 200px;' /></td></tr>
+</table><br />
+<p><input type='submit' value='Search' /></p>
+</form>
+
+<table class='data'>
+  <tr>
+    <%= raw @gen.sortable_table_headings({
+				'first_name' => 'First Name',
+				'last_name, first_name'	=> 'Last Name',
+				'username' => 'Username',
+				'email'	=> 'Email'
+			})
+		%>
+  </tr>
+<% @users.each do |user| %>
+  <tr onclick="window.location='/users/<%= user.id %>/edit';">
+    <td><%= user.first_name %></td>
+    <td><%= user.last_name %></td>
+    <td><%= user.username %></td>
+    <td><%= user.email %></td>
+  </tr>
+<% end %>
+</table>
+
+<p><%= raw @gen.generate %></p>

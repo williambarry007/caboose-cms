@@ -1,0 +1,45 @@
+<%
+  
+def json(obj, defaultvalue = "")
+  return defaultvalue.to_json if obj.nil?
+  return obj.to_json
+end
+
+%>
+<h1>Edit Page</h1>
+
+<div id='page_<%= @page.id %>_container'></div>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  var page = new Model({
+    name: 'Page',
+    id: <%= @page.id %>,
+    attributes: [
+      { name: 'title'                 , type: 'text'              , value: <%= raw json(@page.title                ) %> },
+      { name: 'content'               , type: 'textarea'          , value: <%= raw json(@page.content              ) %> },
+      { name: 'parent_id'             , type: 'select'            , value: <%= raw json(@page.parent_id, -1        ) %>, text: <%= raw (@page.parent_id == -1 ? "[No Parent]" : @page.parent.title).to_json %>, options_url: '/pages/sitemap-options' },  
+      { name: 'menu_title'            , type: 'text'              , value: <%= raw json(@page.menu_title           ) %> },     
+      { name: 'slug'                  , type: 'text'              , value: <%= raw json(@page.slug                 ) %> }, 
+      { name: 'alias'                 , type: 'text'              , value: <%= raw json(@page.alias                ) %> }, 
+      { name: 'redirect_url'          , type: 'text'              , value: <%= raw json(@page.redirect_url         ) %> }, 
+      { name: 'hide'                  , type: 'checkbox'          , value: <%= raw @page.hide %> }, 
+      { name: 'content_format'        , type: 'select'            , value: <%= raw json(@page.content_format       ) %> }, 
+      { name: 'custom_css'            , type: 'textarea'          , value: <%= raw json(@page.custom_css           ) %> }, 
+      { name: 'custom_js'             , type: 'textarea'          , value: <%= raw json(@page.custom_js            ) %> }, 
+      { name: 'layout'                , type: 'text'              , value: <%= raw json(@page.layout               ) %> }, 
+      { name: 'custom_sort_children'  , type: 'select'            , value: <%= raw json(@page.custom_sort_children ) %>, text: "" },      
+      { name: 'seo_title'             , type: 'text'              , value: <%= raw json(@page.seo_title            ) %> },
+      { name: 'meta_description'      , type: 'text'              , value: <%= raw json(@page.meta_description     ) %> },
+      { name: 'meta_robots'           , type: 'checkbox-multiple' , value: <%= raw (@page.meta_robots.nil? ? [] : @page.meta_robots.split(', ')).to_json %>, text: <%= raw (@page.meta_robots.nil? ? "[Empty]" : @page.meta_robots).to_json %>, options_url: '/pages/robots-options' },
+      { name: 'canonical_url'         , type: 'text'              , value: <%= raw json(@page.canonical_url        ) %> },
+      { name: 'fb_description'        , type: 'text'              , value: <%= raw json(@page.fb_description       ) %> },
+      { name: 'gp_description'        , type: 'text'              , value: <%= raw json(@page.gp_description       ) %> }
+    ]
+  });
+});
+
+</script>
+<% end %>

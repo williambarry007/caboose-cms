@@ -1,0 +1,17 @@
+<h1>Roles</h1>
+
+<p><a href='/roles/new'>New Role</a></p>
+
+<table class='data'>
+  <tr>
+    <th>Name</th>
+  </tr>
+<% @roles.each do |arr| %> 
+  <tr onclick="window.location=/roles/<%= arr['value'] %>/edit';">
+    <td><%= arr['text'] %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+

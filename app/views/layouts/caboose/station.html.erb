@@ -1,0 +1,28 @@
+<div id='caboose_station'>
+  <a href='/admin' class='logo'><span>Caboose</span></a>
+  
+<% if (@user.nil? || @user.id == Caboose::User::LOGGED_OUT_USER_ID) %>
+
+  <a href='/login' class='login'>Login</a>
+
+<% else %>
+  
+  <ul>        
+    <li><a href='/users/<%= @user.id %>/edit'>My Account</a></li>
+    <li><a href='/logout'>Logout</a></li>
+    <% if (@user.is_allowed('admin', 'view')) %> 
+  	  <li><a href='/admin'>Admin</a></li>
+  	<% end %>
+  	<%
+  	uru = session['use_redirect_urls'].nil? ? true : session['use_redirect_urls']
+  	%>
+  	<li><a href="javascript:setServerVar('use_redirect_urls', <%= uru ? '0' : '1' %>, 'redirect_message');"><%= uru ? 'Disable' : 'Enable' %> Redirect Urls</a><span id='redirect_message'></span></li>
+  	<% if (!@tasks.nil?) %>
+  	  <% @tasks.each do |href, task| %>
+  	    <li><a href='<%= href %>'><%= task %></a></li>
+  	  <% end %>
+  	<% end %>
+  </ul>
+  
+<% end %>
+</div>

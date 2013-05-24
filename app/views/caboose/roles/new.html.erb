@@ -1,0 +1,16 @@
+
+<h1>New role</h1>
+
+<form action='/roles' method='post' id='new_role_form' onsubmit='return false;'>
+<p>Parent:  <input type='text' name='parent_id' style='width: 200px;' /></p>
+<p>Name:    <input type='text' name='name' style='width: 200px;' /></p>
+<div id='message'></div>
+<p>
+<input type='submit' value='Add Role' onclick='Caboose.Role.add();' />
+<input type='button' value='Back' onclick="window.location='/roles';" />
+</p>
+</form>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/roles" %>
+<% end %>

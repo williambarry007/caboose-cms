@@ -1,0 +1,26 @@
+
+<%
+# Purposefully call the host app's stylesheet
+%>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag "login", :media => "all" %>
+<% end %>
+
+<%
+# But call caboose's javascript
+%>
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/login" %>
+<% end %>
+
+<h1>Login</h1>
+
+<form action='/login' method='post' id='login_form'>
+<input type='hidden' name='return_url' value='<%= @return_url %>' />
+<dl>
+  <dt>Username:</dt><dd><input type='text'      name='username' style='width: 200px;' /></dd>
+  <dt>Password:</dt><dd><input type='password'  name='password' style='width: 200px;' /></dd>
+<div id='message'></div>
+<p><input type='submit' value='Login' onclick='login(); return false;' /></p>
+</dl>
+</form>

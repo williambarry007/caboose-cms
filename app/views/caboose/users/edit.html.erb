@@ -1,0 +1,45 @@
+ 
+<h1>Edit User</h1>
+<div id='user_<%= @user.id %>_container'></div>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  var user = new Model({
+    name: 'User',
+    id: <%= @user.id %>,
+    attributes: [
+      { name: 'first_name' , type: 'text', value: "<%= @user.first_name %>" },
+      { name: 'last_name'  , type: 'text', value: "<%= @user.last_name  %>" },
+      { name: 'username'   , type: 'text', value: "<%= @user.username   %>" },
+      { name: 'email'      , type: 'text', value: "<%= @user.email      %>" },
+      { name: 'password'   , type: 'password' },
+      {
+        name: 'roles', 
+        type: 'checkbox-multiple',  
+        value: <%= @roles.collect{|r| r.id}.to_json %>, 
+        text: "<%= @roles.collect{|r| r.name}.join(', ') %>",
+        empty_text: '[No roles]',
+        multiple: true,
+        loading_message: 'Getting roles...',
+        options_url: '/roles/options'
+      },
+      {
+        name: 'pic', 
+        type: 'image',  
+        value: '',
+        update_url: '/users/<%= @user.id %>/update-pic'
+      },
+      {
+        name: 'resume', 
+        type: 'file',  
+        value: '',
+        update_url: '/users/<%= @user.id %>/update-resume'
+      }
+    ]
+  });
+});
+
+</script>
+<% end %>

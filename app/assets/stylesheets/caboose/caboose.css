@@ -1,0 +1,28 @@
+
+body {
+  font-family: Helvetica, Tahoma, Arial;  
+}
+
+#wrapper {
+  width: 960px; 
+}
+
+.page_links {
+  
+}
+
+.page_links a {
+  display: inline-block;
+  padding: 4px 8px;
+  border: #efefef 1px solid;
+}
+
+.page_links .middle_links a {
+  
+}
+
+.page_links span.current_page {
+  display: inline-block;
+  padding: 4px 8px;
+  font-weight: bold;
+}

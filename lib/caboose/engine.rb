@@ -1,10 +1,17 @@
 module Caboose
   
   def Caboose.log(message, title = nil)
-    Rails.logger.debug("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    Rails.logger.debug(title.to_s) unless title.nil?
-    Rails.logger.debug(message)
-    Rails.logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")    
+    if (Rails.logger.nil?)
+      puts "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+      puts title.to_s unless title.nil?
+      puts message
+      puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
+    else
+      Rails.logger.debug("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+      Rails.logger.debug(title.to_s) unless title.nil?
+      Rails.logger.debug(message)
+      Rails.logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
+    end
   end
   
   def Caboose.plugin_hook(tag, args = nil)
@@ -19,6 +26,6 @@ module Caboose
   end
   
   class Engine < ::Rails::Engine
-    isolate_namespace Caboose    
+    isolate_namespace Caboose
   end
 end

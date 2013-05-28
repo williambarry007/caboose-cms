@@ -9,7 +9,7 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require caboose_before
- *= require model
+ *= require modeljs
  *= require caboose/caboose
  *= require caboose_after
  */

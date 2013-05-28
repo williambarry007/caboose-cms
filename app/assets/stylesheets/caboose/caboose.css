@@ -26,3 +26,40 @@ body {
   padding: 4px 8px;
   font-weight: bold;
 }
+
+#caboose_station {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 100%;
+  background: #333;
+  border: #000 2px solid;
+}
+
+#caboose_station ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;  
+}
+
+#caboose_station ul li {
+  margin: 0;
+  padding: 0;
+  list-style: none;  
+}
+
+#caboose_station a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  margin: 1px 0 0 0;
+  padding: 8px 10px;
+  background: #444;
+}
+
+#caboose_station a:hover {
+  background: #555;  
+}
+
+#caboose_station 

@@ -1,5 +1,6 @@
 
 require 'tinymce-rails'
+require 'modeljs'
 
 module Caboose
   

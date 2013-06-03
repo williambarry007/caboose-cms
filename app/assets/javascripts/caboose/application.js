@@ -13,7 +13,7 @@
 //= require caboose_before
 //= require jquery
 //= require jquery_ujs
-//= require jquery-ui
+//= require jquery.ui.all
 //= require tinymce-jquery
 //= require class
 //= require model

@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 3.2.13"
   s.add_dependency "jquery-rails"
+  s.add_dependency "jquery-ui-rails"
   s.add_dependency "activesupport"
   s.add_dependency "mysql2"
   s.add_dependency "modeljs", "= 0.0.2"

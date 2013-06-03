@@ -1,6 +1,7 @@
 
 class Caboose::Role < ActiveRecord::Base
-  self.table_name = "roles"  
+  self.table_name = "roles"
+  belongs_to :parent, :class_name => "Caboose::Role"  
   has_and_belongs_to_many :users
   has_and_belongs_to_many :permissions
   has_many :page_permissions
@@ -45,6 +46,23 @@ class Caboose::Role < ActiveRecord::Base
   
   def self.tree
     return self.where(:parent_id => -1).reorder("name").all
+  end
+  
+  def is_ancestor_of?(role)    
+    if (role.is_a?(Integer) || role.is_a?(String))
+      role_id = role.to_i
+      return false if role_id = -1
+      role = Caboose::Role.find(role)
+    end
+    return false if role.parent_id == -1
+    return false if role.parent.nil?
+    return true  if role.parent.id == id
+    return is_ancestor_of?(role.parent)      
+  end
+  
+  def is_child_of?(role)    
+    role = Role.find(role) if role.is_a?(Integer)
+    return role.is_ancestor_of?(self)      
   end
 	
 end

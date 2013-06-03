@@ -15,7 +15,6 @@ module Caboose
       
       # Find the page with an exact URI match 
       page = Page.page_with_uri(request.fullpath, false)
-      Caboose.log(page)
       
 		  if (!page)
 		  	asset
@@ -41,22 +40,8 @@ module Caboose
 		  page.content = Caboose.plugin_hook('page_content', page.content)
 		  @page = page
 		  @user = user
-		  is_admin = @user.is_allowed('all', 'all')
-		  
 		  @crumb_trail = Caboose::Page.crumb_trail(@page)
 		  @subnav = Caboose::Page.subnav(@page, session['use_redirect_urls'], @user)
-      @actions = Caboose::Page.permissible_actions(@user.id, @page.id)
-      @tasks = {}
-      @page_tasks = {}
-      
-      if (@actions.include?('edit') || is_admin)
-      	@page_tasks["/pages/#{@page.id}/sitemap"]       = 'Site Map This Page'
-      	@page_tasks["/pages/#{@page.id}/edit"]          = 'Edit Page Content'
-      	@page_tasks["/pages/#{@page.id}/edit-settings"] = 'Edit Page Settings'
-      end
-      if (@user.is_allowed('pages', 'add') || is_admin)
-        @page_tasks["/pages/new?parent_id=#{@page.id}"] = 'New Page'
-      end
       
       #@subnav.links = @tasks.collect {|href, task| {'href' => href, 'text' => task, 'is_current' => uri == href}}
   
@@ -86,9 +71,9 @@ module Caboose
 		    return
 		  end
 		  
-		  Caboose.log(Caboose::assets_path, 'Caboose::assets_path')
+		  #Caboose.log(Caboose::assets_path, 'Caboose::assets_path')
 		  path = Caboose::assets_path.join("#{asset.id}.#{asset.extension}")
-		  Caboose.log("Sending asset #{path}")
+		  #Caboose.log("Sending asset #{path}")
 		  #send_file(path)
 		  #send_file(path, :filename => "your_document.pdf", :type => "application/pdf")
 		  		    
@@ -110,14 +95,37 @@ module Caboose
       return if !user_is_allowed('pages', 'add')
       @pages = Page.new
       @parent_id = params[:parent_id].nil? ? params[:parent_id] : -1
-      render :layout => 'caboose/caboose'
+      render :layout => 'caboose/admin'
+    end
+    
+    # GET /pages/1/redirect
+    def redirect
+      @page = Page.find(params[:id])
+      redirect_to "/#{@page.uri}"
     end
     
     # GET /pages/1/edit
     def edit
       return if !user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/caboose'
+      
+      session['caboose_station_state'] = 'left'
+      session['caboose_station_open_tabs'] = ['pages']
+      session['caboose_station_return_url'] = "/#{@page.uri}"
+      
+      render :layout => 'caboose/admin'
+    end
+    
+    # GET /pages/1/edit-settings
+    def edit_settings
+      return if !user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      
+      session['caboose_station_state'] = 'left'
+      session['caboose_station_open_tabs'] = ['pages']
+      session['caboose_station_return_url'] = "/#{@page.uri}"
+      
+      render :layout => 'caboose/admin'
     end
     
     # POST /pages
@@ -260,6 +268,22 @@ module Caboose
       })
       render json: resp
     end
+    
+    def sitemap
+      parent_id = params[:parent_id]
+		  top_page = Page.index_page
+		  p = !parent_id.nil? ? Page.find(parent_id) : top_page
+		  options = []
+		  sitemap_helper2(top_page, options)		 	
+		  @options = options
+    end
+    
+    def sitemap_helper2(page, options, prefix = '')
+		  options << { 'value' => page.id, 'text' => prefix + page.title }
+		  page.children.each do |kid|
+		    sitemap_helper(kid, options, prefix + ' - ')
+		  end
+		end
     
     def sitemap_options
 		  parent_id = params[:parent_id]

@@ -1,36 +1,49 @@
 
 <h1>Edit Role</h1>
-
-<table>
-<tr><td>Parent:       </td><td id='parent_id_container'></td></tr>
-<tr><td>Name:         </td><td id='name_container'></td></tr>
-<tr><td>Description:  </td><td id='description_container'></td></tr>
-<tr><td>Members:      </td><td id='members_container'></td></tr>
-</table>
-<div id='message'></div>
-<p>
-<input type='button' value='Back'         onclick="window.location='/roles';" />
-<input type='button' value='Delete Role'  onclick="Caboose.Role.delete(<%= @role.id %>);" />
-</p>
+<div id='role_<%= @role.id %>_container'></div>
 
 <% content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/roles" %>
 <script type="text/javascript">
+
 $(document).ready(function() {
-  var fields = [
-    <%
-    membersValue = @users.collect{|u| u.id}.to_json
-    membersText = @users.collect{|u| r.first_name + " " u.last_name}.join('<br />')
-    %>
-    { id: 'name'          , field_type: 'text'  , value: "<%= @role.name %>" },
-    { id: 'description'   , field_type: 'text'  , value: "<%= @role.description %>" },
-    { id: 'parent_id'     , field_type: 'select', value: <%= @role.parent_id %> , text: "<%= @role.parent.name %>", empty_text: '[Empty]'   , loading_message: 'Getting roles...', options_url: '/roles/options' },
-    { id: 'members'       , field_type: 'select', value: <%= membersValue %>    , text: "<%= membersText %>"      , empty_text: '[No roles]', loading_message: 'Getting users...', options_url: '/users/options', multiple: true }
-  ];
-  var params = {
-    update_url: '/roles/<%= @role.id %>'		
-	};
-	$.quickEdit.init(fields, params);
+  var user = new Model({
+    name: 'Role',
+    id: <%= @role.id %>,
+    listing_url: 'get /admin/roles',
+    update_url: 'put /admin/roles/<%= @role.id %>',
+    delete_url: 'delete /admin/roles/<%= @role.id %>',
+    attributes: [
+      { 
+        name: 'parent_id',
+        nice_name: 'Parent',
+        type: 'select',
+        value: <%= @role.parent_id %>,
+        text: "<%= @role.parent.nil? ? '[No parent]' : @role.parent.name %>",
+        show_controls: true,
+        loading_message: 'Getting roles...',
+        options_url: '/admin/roles/options' 
+      },    
+      { name: 'name'          , type: 'text'  , value: "<%= @role.name %>" },
+      { name: 'description'   , type: 'text'  , value: "<%= @role.description %>" },
+      { 
+        name: 'members',
+        type: 'checkbox-multiple',
+        value: <%= @role.users.collect{|u| u.id}.to_json %>,
+        text: "<%= raw @role.users.order('last_name, first_name').collect{|u| "#{u.first_name} #{u.last_name}"}.join('<br />') %>",
+        loading_message: 'Getting users...',
+        options_url: '/admin/users/options',
+      },
+      { 
+        name: 'permissions',
+        type: 'checkbox-multiple',
+        value: <%= @role.permissions.collect{|p| p.id}.to_json %>,
+        text: "<%= raw @role.permissions.order('resource, action').collect{|p| "#{p.resource}_#{p.action}"}.join('<br />') %>",
+        loading_message: 'Getting permissions...',
+        options_url: '/admin/permissions/options',
+      }
+    ]
+  });
 });
+
 </script>
 <% end %>

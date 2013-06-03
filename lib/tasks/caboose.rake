@@ -1,3 +1,4 @@
+require "caboose/version"
 
 namespace :caboose do
 
@@ -6,6 +7,7 @@ namespace :caboose do
     init_config
     init_routes
     init_assets
+    init_tinymce
     init_session
     init_schema
     init_data
@@ -15,7 +17,9 @@ namespace :caboose do
   desc "Configures the host application to use caboose for routing"
   task :init_routes => :environment do init_routes end
   desc "Initializes all the required caboose js, css and layout files in the host application"
-  task :init_assets => :environment do init_assets end  
+  task :init_assets => :environment do init_assets end
+  desc "Initializes the tinymce config file in the host application"
+  task :init_tinymce => :environment do init_tinymce end  
   desc "Configures the host application to use active record session storing"
   task :init_session => :environment do init_session end
   desc "Initializes the caboose database schema"
@@ -74,6 +78,11 @@ namespace :caboose do
     init_file('app/views/layouts/layout_default.html.erb')
   end
   
+  def init_tinymce
+    puts "Adding the tinymce config file..."
+    init_file('config/tinymce.yml')
+  end
+  
   def init_session
     puts "Setting the session config..."    
     
@@ -106,6 +115,7 @@ namespace :caboose do
     c.drop_table :pages                if c.table_exists?('pages')
     c.drop_table :page_permissions     if c.table_exists?('page_permissions')
     c.drop_table :sessions             if c.table_exists?('sessions')
+    c.drop_table :settings             if c.table_exists?('settings')
   end
 
   def create_tables  
@@ -197,6 +207,10 @@ namespace :caboose do
     c.add_index :sessions, :updated_at
     c.change_column :sessions, :created_at, :datetime, :null => true
     c.change_column :sessions, :updated_at, :datetime, :null => true
+    c.create_table :settings do |t|
+      t.string    :name
+      t.text      :value
+    end
 		
   end
   
@@ -245,6 +259,12 @@ namespace :caboose do
     login_page = Caboose::Page.create(title: 'Login' , parent_id: home_page.id, hide: 0, layout: 'login', alias: 'login', slug: 'login', uri: 'login')
     Caboose::PagePermission.create(role_id: elo_role.id, page_id: home_page.id, action: 'view') 
     Caboose::PagePermission.create(role_id: elo_role.id, page_id: login_page.id, action: 'view')
+    
+    # Create the required settings
+    Caboose::Setting.create(name: 'version'     , value: Caboose::VERSION)
+    Caboose::Setting.create(name: 'site_name'   , value: 'New Caboose Site')
+    Caboose::Setting.create(name: 'site_url'    , value: 'www.mycaboosesite.com')
+    Caboose::Setting.create(name: 'admin_email' , value: 'william@nine.is')
     
   end
 end

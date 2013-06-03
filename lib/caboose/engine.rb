@@ -1,3 +1,6 @@
+
+require 'tinymce-rails'
+
 module Caboose
   
   def Caboose.log(message, title = nil)
@@ -14,15 +17,21 @@ module Caboose
     end
   end
   
-  def Caboose.plugin_hook(tag, args = nil)
+  def Caboose.plugin_hook(*args)
+    resp = nil
+    args[0] = args[0].to_sym 
     Caboose.plugins.each do |mod|
-      func = "#{tag}_hook"  
-      if (mod.constantize.respond_to?(func))
-        args = mod.constantize.send(func.to_sym, args)
+      #resp = mod.constantize.send(*args)
+      if (mod.constantize.respond_to?(args[0]))
+        resp = mod.constantize.send(*args)
       end
-      #args = mod.send(func.to_sym, args)
     end
-    return args
+    return resp
+  end
+  
+  def Caboose.json(obj, defaultvalue = "")
+    return defaultvalue.to_json if obj.nil?
+    return obj.to_json
   end
   
   class Engine < ::Rails::Engine

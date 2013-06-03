@@ -1,16 +1,35 @@
 
 <h1>New role</h1>
-
-<form action='/roles' method='post' id='new_role_form' onsubmit='return false;'>
-<p>Parent:  <input type='text' name='parent_id' style='width: 200px;' /></p>
-<p>Name:    <input type='text' name='name' style='width: 200px;' /></p>
-<div id='message'></div>
-<p>
-<input type='submit' value='Add Role' onclick='Caboose.Role.add();' />
-<input type='button' value='Back' onclick="window.location='/roles';" />
-</p>
-</form>
+<div id='role_new_container'></div>
 
 <% content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/roles" %>
+<script type='text/javascript'>
+
+var role = false;
+$(document).ready(function() {
+
+  role = new Model({
+    name: 'Role',
+    id: 'new',
+    listing_url: 'get /admin/roles',
+    create_url: 'post /admin/roles',
+    attributes: [
+      {
+        name: 'parent_id',
+        type: 'select',
+        value: -1,
+        text: "[No Parent]",
+        options_url: '/admin/roles/options' 
+      },
+      { 
+        name: 'name', 
+        type: 'text',
+        value: '' 
+      }
+    ]
+  });
+  
+});
+
+</script>
 <% end %>

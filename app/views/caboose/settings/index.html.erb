@@ -1,0 +1,33 @@
+<h1>Settings</h1>
+
+<form action='/admin/settings' method='get'>
+<table cellpadding='4' cellspacing='0' border='0'>
+<tr><td>Name: 	</td><td><input type='text' name='name' value='<%= @gen.params['name'] %>' style='width: 200px;' /></td></tr>
+</table>
+<p><input type='submit' value='Search' /></p>
+</form>
+
+<% if (@settings.count > 0) %>
+
+  <table class='data'>
+    <tr>
+      <%= raw @gen.sortable_table_headings({
+  				'name'  => 'Name',
+  				'value'	=> 'Value'
+  			})
+  		%>
+    </tr>
+  <% @settings.each do |setting| %>
+    <tr onclick="window.location='/admin/settings/<%= setting.id %>/edit';">
+      <td><%= setting.name  %></td>
+      <td><%= setting.value %></td>    
+    </tr>
+  <% end %>
+  </table>
+  <p><%= raw @gen.generate %></p>
+
+<% else %>
+
+  <p>There are no settings.</p>
+
+<% end %>

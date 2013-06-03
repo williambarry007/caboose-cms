@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <title>Caboose</title>	
-<%= stylesheet_link_tag "caboose/application", :media => "all" %>
+<%= stylesheet_link_tag "caboose/admin", :media => "all" %>
 <%= yield :caboose_css %>
 <%= csrf_meta_tags %>
 </head>
@@ -19,7 +19,7 @@
 </div>
 <div class="footer"></div>
 <%= render :partial => 'layouts/caboose/station' %>
-<%= javascript_include_tag "caboose/application" %>
+<%= javascript_include_tag "caboose/admin" %>
 <%= yield :caboose_js %>
 </body>
 </html>

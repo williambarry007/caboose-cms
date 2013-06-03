@@ -9,7 +9,7 @@ module Caboose
   @@assets_path = "assets"
   
   mattr_accessor :plugins
-  @@plugins = []
+  @@plugins = ['Caboose::UserPlugin', 'Caboose::RolePlugin', 'Caboose::PermissionPlugin', 'Caboose::PagePlugin', 'Caboose::SettingsPlugin']
 
   # Any paths to modeljs javascript files  
   mattr_accessor :modeljs_js_files

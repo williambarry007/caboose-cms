@@ -22,10 +22,11 @@ module Caboose
   		# base_url, page, itemCount, itemsPerPage
   		@params = {}
   		@options = {
+  		  'model'           => '',
   			'sort' 			      => '',
   			'desc' 			      => false,
   			'base_url'		    => '',
-  			'page'			      => 0,
+  			'page'			      => 1,
   			'item_count'		  => 0,
   			'items_per_page'  => 10
   		}      
@@ -33,6 +34,7 @@ module Caboose
   		options.each  { |key, val| @options[key] = val }
   		@params.each  { |key, val| @params[key]  = post_get[key].nil? ? val : post_get[key] }			
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] } 
+  		@options['item_count'] = @options['model'].constantize.where(where).count
   		
   	end
   	
@@ -49,6 +51,10 @@ module Caboose
       return false if val == ""
       return true
   	end
+  	
+  	def items
+    	return @options['model'].constantize.where(where).limit(limit).offset(offset).reorder(reorder).all
+  	end
   		
   	def generate
   	    	  
@@ -58,53 +64,56 @@ module Caboose
   		
   		# Set default parameter values if not present
   		@options['items_per_page'] = 10  if @options["items_per_page"].nil?
-  		@options['page']           = 0   if @options["page"].nil?		
+  		@options['page']           = 1   if @options["page"].nil?		
   		
   		# Variables to make the search form work 
   		vars = get_vars()
-  		page = @options["page"]
+  		page = @options["page"].to_i
+  		
+  		Caboose.log(@options)
   				
   		# Max links to show (must be odd) 
-  		total_links = 9
-  		prev_page = page - 1            
+  		total_links = 5
+  		prev_page = page - 1
   		next_page = page + 1
   		total_pages = (@options['item_count'].to_f / @options['items_per_page'].to_f).ceil
   		
   		if (total_pages < total_links)
-  			start = 0
+  			start = 1
   			stop = total_pages			
   		else
   			start = page - (total_links/2).floor			
-  			start = 0 if start < 0
-  			stop = start + total_links
+  			start = 1 if start < 1
+  			stop = start + total_links - 1
   			
   			if (stop > total_pages)
   				stop = total_pages				
   				start = stop - total_links  				
-  				start = 0 if start < 0
+  				start = 1 if start < 1
   			end
   		end
   		
   		base_url = @params['base_url']
   		str = ''
-  		str << "<p>Results Pages: showing page " + (page+1).to_s + " of #{total_pages}</p>\n"
-  		str << "<div class='page_links'>\n"
-  		if (page > 0)
-  		  str << "<a href='#{base_url}?#{vars}&page=#{prev_page}'>Previous</a>"
-  	  end  		
+  		str << "<p>Results: showing page #{page} of #{total_pages}</p>\n"
   		
-  		for i in start..(stop-1)
-  			if (page != i)
-  			  str << "<a href='#{base_url}?#{vars}&page=#{i}'>" + (i+1).to_s + "</a>"
-  			else
-  				str << "<span class='current_page'>" + (i+1).to_s + "</span>"
-  			end
-  		end
-  		
-  		if (page < (total_pages-1))
-  			str << "<a href='#{base_url}?#{vars}&page=#{next_page}'>Next</a>"
-  		end
-  		str << "</div>\n"
+  		if (total_pages > 1)
+  		  str << "<div class='page_links'>\n"
+  		  if (page > 1)
+  		    str << "<a href='#{base_url}?#{vars}&page=#{prev_page}'>Previous</a>"
+  	    end
+  		  for i in start..stop
+  		  	if (page != i)
+  		  	  str << "<a href='#{base_url}?#{vars}&page=#{i}'>#{i}</a>"
+  		  	else
+  		  		str << "<span class='current_page'>#{i}</span>"
+  		  	end
+  		  end
+  		  if (page < total_pages)
+  		  	str << "<a href='#{base_url}?#{vars}&page=#{next_page}'>Next</a>"
+  		  end
+  		  str << "</div>\n"
+      end
       
   		return str
   	end
@@ -140,11 +149,11 @@ module Caboose
     end
     
     def limit
-      return @options['items_per_page']
+      return @options['items_per_page'].to_i
     end
     
     def offset
-      return @options['page'] * @options['items_per_page']
+      return (@options['page'].to_i - 1) * @options['items_per_page'].to_i
     end
     
     def reorder

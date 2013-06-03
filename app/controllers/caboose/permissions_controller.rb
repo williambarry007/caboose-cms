@@ -1,83 +1,101 @@
-class PermissionsController < ApplicationController
-  # GET /permissions
-  # GET /permissions.json
-  def index
-    @permissions = Permission.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @permissions }
+module Caboose
+  class PermissionsController < ApplicationController
+    layout 'caboose/admin'
+    
+    def before_action
+      @page = Page.page_with_uri('/admin')
     end
-  end
-
-  # GET /permissions/1
-  # GET /permissions/1.json
-  def show
-    @permission = Permission.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @permission }
+    
+    # GET /admin/permissions
+    def index
+      return if !user_is_allowed('permissions', 'view')
+      
+      @gen = PageBarGenerator.new(params, {
+    		  'resource'  => nil
+    		},{
+    		  'model'       => 'Caboose::Permission',
+    	    'sort'			  => 'resource, action',
+    		  'desc'			  => false,
+    		  'base_url'		=> '/admin/permissions'
+    	})
+    	@permissions = @gen.items    	
     end
-  end
-
-  # GET /permissions/new
-  # GET /permissions/new.json
-  def new
-    @permission = Permission.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @permission }
+  
+    # GET /admin/permissions/new
+    def new
+      return if !user_is_allowed('permissions', 'add')
+      @permission = Permission.new
     end
-  end
-
-  # GET /permissions/1/edit
-  def edit
-    @permission = Permission.find(params[:id])
-  end
-
-  # POST /permissions
-  # POST /permissions.json
-  def create
-    @permission = Permission.new(params[:permission])
-
-    respond_to do |format|
-      if @permission.save
-        format.html { redirect_to @permission, notice: 'Permission was successfully created.' }
-        format.json { render json: @permission, status: :created, location: @permission }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @permission.errors, status: :unprocessable_entity }
+  
+    # GET /admin/permissions/1/edit
+    def edit
+      return if !user_is_allowed('permissions', 'edit')
+      @permission = Permission.find(params[:id])
+    end
+  
+    # POST /admin/permissions
+    def create
+      return if !user_is_allowed('permissions', 'add')
+      
+      resp = StdClass.new({
+          'error' => nil,
+          'redirect' => nil
+      })
+      
+      perm = Permission.new()
+      perm.resource = params[:resource]
+      perm.action   = params[:action2]
+      
+      if (perm.resource.strip.length == 0)
+        resp.error = "The resource is required."
+      elsif (perm.action.strip.length == 0)
+        resp.error = "The action is required."
+      else      
+        perm.save
+        resp.redirect = "/admin/permissions/#{perm.id}/edit"
       end
+      render json: resp
     end
-  end
+  
+    # PUT /admin/permissions/1
+    def update
+      return if !user_is_allowed('permissions', 'edit')
 
-  # PUT /permissions/1
-  # PUT /permissions/1.json
-  def update
-    @permission = Permission.find(params[:id])
-
-    respond_to do |format|
-      if @permission.update_attributes(params[:permission])
-        format.html { redirect_to @permission, notice: 'Permission was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: "edit" }
-        format.json { render json: @permission.errors, status: :unprocessable_entity }
-      end
+      resp = StdClass.new     
+      perm = Permission.find(params[:id])
+    
+      save = true
+      params.each do |name,value|
+        case name
+    	  	when "resource"
+    	  	  perm.resource = value
+    	  	when "action2"
+    	  	  perm.action = value
+    	  end
+    	end
+    	
+    	resp.success = save && perm.save
+    	render json: resp
     end
-  end
-
-  # DELETE /permissions/1
-  # DELETE /permissions/1.json
-  def destroy
-    @permission = Permission.find(params[:id])
-    @permission.destroy
-
-    respond_to do |format|
-      format.html { redirect_to permissions_url }
-      format.json { head :no_content }
+  
+    # DELETE /admin/permissions/1
+    def destroy
+      return if !user_is_allowed('permissions', 'delete')
+      perm = Permission.find(params[:id])
+      perm.destroy
+      
+      resp = StdClass.new({
+        'redirect' => '/admin/permissions'
+      })
+      render json: resp
+    end
+    
+    # GET /admin/permissions/options
+    def options
+      return if !user_is_allowed('permissions', 'view')
+      perms = Permission.reorder('resource, action').all
+      options = perms.collect { |p| { 'value' => p.id, 'text' => "#{p.resource}_#{p.action}"}}
+      render json: options
     end
   end
 end

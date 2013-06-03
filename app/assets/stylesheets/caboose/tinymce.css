@@ -1,0 +1,25 @@
+
+body, td, pre {
+    color: #000000;
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+    font-size: inherit;
+}
+body {
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+body.mceForceColors {
+    background: none repeat scroll 0 0 #FFFFFF;
+    color: #000000;
+}
+body.mceBrowserDefaults {
+    background: none repeat scroll 0 0 transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+}
+h1 { font-size: inherit; }
+h2 { font-size: inherit; }
+h3 { font-size: inherit; }
+h4 { font-size: inherit; }
+h5 { font-size: inherit; }
+h6 { font-size: inherit; }

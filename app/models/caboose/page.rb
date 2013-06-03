@@ -256,12 +256,12 @@ class Caboose::Page < ActiveRecord::Base
 			parent = self.find_with_fields(page.parent_id, [:title, :menu_title, :custom_sort_children])
 			return block if parent.nil? # If we happen to be at the top page
 			
-			block.title = parent.menu_title.length > 0 ? parent.menu_title : parent.title
+			block.title = !parent.menu_title.nil? && parent.menu_title.length > 0 ? parent.menu_title : parent.title
 			block.title_id = parent.id
 			
-			pages = self.select(
+			pages = self.select([
 			    :id, :title, :menu_title, :alias, :slug, :uri, :redirect_url, :sort_order
-			  ).where(:parent_id => page.parent_id, :hide => 0)
+			  ]).where(:parent_id => page.parent_id, :hide => 0)
 			if (parent.custom_sort_children)
 			  pages.sort! {|x,y| x.sort_order <=> y.sort_order }
 			else

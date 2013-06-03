@@ -1,8 +1,6 @@
 <h1>Users</h1>
 
-<p><a href='/users/new'>New User</a></p>
-
-<form action='/users' method='get'>
+<form action='/admin/users' method='get'>
 <table cellpadding='4' cellspacing='0' border='0'>
 <tr><td>First name: 	</td><td><input type='text' name='first_name' value='<%= @gen.params['first_name'] %>' style='width: 200px;' /></td></tr>
 <tr><td>Last name: 	  </td><td><input type='text' name='last_name' 	value='<%= @gen.params['last_name']  %>' style='width: 200px;' /></td></tr>
@@ -22,7 +20,7 @@
 		%>
   </tr>
 <% @users.each do |user| %>
-  <tr onclick="window.location='/users/<%= user.id %>/edit';">
+  <tr onclick="window.location='/admin/users/<%= user.id %>/edit';">
     <td><%= user.first_name %></td>
     <td><%= user.last_name %></td>
     <td><%= user.username %></td>

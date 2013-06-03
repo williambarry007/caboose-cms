@@ -1,7 +1,12 @@
 module Caboose
   class RolesController < ApplicationController
+    layout 'caboose/admin'
     
-    # GET /roles
+    def before_action
+      @page = Page.page_with_uri('/admin')
+    end
+    
+    # GET /admin/roles
     def index
       return if !user_is_allowed('roles', 'view')
       top_roles = Role.tree
@@ -10,20 +15,19 @@ module Caboose
       @roles = arr        
     end
     
-    # GET /roles/new
+    # GET /admin/roles/new
     def new
       return if !user_is_allowed('roles', 'add')
       @role = Role.new
     end
     
-    # GET /roles/1/edit
+    # GET /admin/roles/1/edit
     def edit
       return if !user_is_allowed('roles', 'edit')
       @role = Role.find(params[:id])
-      @users = User.users_with_role(@role.id)
     end
     
-    # POST /roles
+    # POST /admin/roles
     def create
       return if !user_is_allowed('roles', 'add')
       
@@ -37,65 +41,73 @@ module Caboose
       role.name = params[:name]    
       role.save
       
-      resp.redirect = "/roles/#{role.id}/edit"
+      resp.redirect = "/admin/roles/#{role.id}/edit"
       render json: resp
     end
     
-    # PUT /roles/1
+    # PUT /admin/roles/1
     def update
       return if !user_is_allowed('roles', 'edit')
       
       resp = StdClass.new     
       role = Role.find(params[:id])
-      name = params[:name]
-      value = params[:value]
       
       save = true
-      case name
-    		when "name"
-    		  role.name = value
-    		when "parent_id"			  
-    		  if (role.id == value)
-    		    resp.error = "You can't set the parent to be this role."
-    		    save = false
-    			#elsif (role.is_parent_of(value))
-    			#  resp.error = "You can't set the parent to be one of the child roles."
-    			#  save = false
-    			else
-    			  role.parent_id = value
-    			end
-    		when "users"
-    		  role.users = []
-    		  value.each { |uid| role.users << User.find(uid) } unless value.nil?
-    		  resp.attribute = { 'text' => role.users.collect{ |u| "#{u.first_name} #{u.last_name}" }.join(', ') }    		  
+      params.each do |name,value|
+        case name
+    	  	when "name"
+    	  	  role.name = value
+    	  	when "description"
+    	  	  role.description = value
+    	  	when "parent_id"
+    	  	  value = value.to_i
+    	  	  if (role.id == value)
+    	  	    resp.error = "You can't set the parent to be this role."
+    	  	    save = false
+    	  		elsif (role.is_ancestor_of?(value))
+    	  		  resp.error = "You can't set the parent to be one of the child roles."
+    	  		  save = false
+    	  		else
+    	  		  role.parent_id = value
+    	  		  if (value == -1)
+    	  		    resp.attributes = { 'parent_id' => { 'text' => '[No parent]' }}
+    	  		  else
+    	  		    p = Role.find(value)
+    	  		    resp.attributes = { 'parent_id' => { 'text' => p.name }}
+    	  		  end
+    	  		end    	  		
+    	  	when "members"
+    	  	  value = [] if value.nil? || value.length == 0
+    	  	  role.users = value.collect { |uid| User.find(uid) }
+    	  	  resp.attributes = { 'members' => { 'text' => role.users.collect{ |u| "#{u.first_name} #{u.last_name}" }.join('<br />') }}
+    	  end
     	end
     	
-    	resp.success = save && user.save
+    	resp.success = save && role.save
     	render json: resp
     end
     
-    # DELETE /roles/1
+    # DELETE /admin/roles/1
     def destroy
       return if !user_is_allowed('roles', 'delete')
       @role = Role.find(params[:id])
       @role.destroy
-    
-      respond_to do |format|
-        format.html { redirect_to roles_url }
-        format.json { head :no_content }
-      end
+      render json: { 'redirect' => '/admin/roles' }
     end
     
-    # GET /roles/options
+    # GET /admin/roles/options
     def options
       return if !user_is_allowed('roles', 'view')
       @top_roles = Role.tree
-      arr = []
-      @top_roles.each { |r| arr += add_role_options(r, 0) }
+      arr = [{ 
+        "value" => -1, 
+        "text" => 'Top Level'
+      }]
+      @top_roles.each { |r| arr += add_role_options(r, 1) }
       render json: arr.to_json    
     end
     
-    def add_role_options(role, level) 
+    def add_role_options(role, level)
       arr = [{ 
         "value" => role.id, 
         "text" => (" - " * level) + role.name 

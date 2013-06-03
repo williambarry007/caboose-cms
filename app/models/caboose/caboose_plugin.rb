@@ -1,14 +1,10 @@
 class Caboose::CaboosePlugin
  
-  def self.page_content_hook(str)
+  def self.page_content(str)
     return str    
   end
   
-  def self.admin_nav_hook(arr)
-    return arr
-  end
-  
-  def self.admin_subnav_hook(arr)
+  def self.admin_nav(arr)
     return arr
   end
   

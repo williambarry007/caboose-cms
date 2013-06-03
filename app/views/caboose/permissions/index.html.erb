@@ -1,25 +1,33 @@
-<h1>Listing permissions</h1>
+<h1>Permissions</h1>
 
-<table>
-  <tr>
-    <th>Resource</th>
-    <th>Action</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<% @permissions.each do |permission| %>
-  <tr>
-    <td><%= permission.resource %></td>
-    <td><%= permission.action %></td>
-    <td><%= link_to 'Show', permission %></td>
-    <td><%= link_to 'Edit', edit_permission_path(permission) %></td>
-    <td><%= link_to 'Destroy', permission, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-  </tr>
-<% end %>
+<form action='/admin/permissions' method='get'>
+<table cellpadding='4' cellspacing='0' border='0'>
+<tr><td>Resource: 	</td><td><input type='text' name='resource' value='<%= @gen.params['resource'] %>' style='width: 200px;' /></td></tr>
 </table>
+<p><input type='submit' value='Search' /></p>
+</form>
 
-<br />
+<% if (@permissions.count > 0) %>
 
-<%= link_to 'New Permission', new_permission_path %>
+  <table class='data'>
+    <tr>
+      <%= raw @gen.sortable_table_headings({
+  				'resource' => 'Resource',
+  				'action'	 => 'Action'
+  			})
+  		%>
+    </tr>
+  <% @permissions.each do |perm| %>
+    <tr onclick="window.location='/admin/permissions/<%= perm.id %>/edit';">
+      <td><%= perm.resource %></td>
+      <td><%= perm.action   %></td>    
+    </tr>
+  <% end %>
+  </table>
+  <p><%= raw @gen.generate %></p>
+
+<% else %>
+
+  <p>There are no permissions.</p>
+
+<% end %>

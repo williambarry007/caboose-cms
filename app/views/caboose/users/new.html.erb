@@ -11,6 +11,8 @@ $(document).ready(function() {
   user = new Model({
     name: 'User',
     id: 'new',
+    listing_url: 'get /admin/users',
+    create_url: 'post /admin/users',
     attributes: [
       { name: 'username', type: 'text', value: '' }
     ]

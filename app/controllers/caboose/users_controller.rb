@@ -1,8 +1,13 @@
 
 module Caboose
   class UsersController < ApplicationController
+    layout 'caboose/admin'    
       
-    # GET /users
+    def before_action
+      @page = Page.page_with_uri('/admin')
+    end
+    
+    # GET /admin/users
     def index
       return if !user_is_allowed('users', 'view')
       
@@ -12,32 +17,29 @@ module Caboose
     		  'username'	  => '',
     		  'email' 		  => '',
     		},{
+    		  'model'       => 'Caboose::User',
     	    'sort'			  => 'last_name, first_name',
     		  'desc'			  => false,
-    		  'base_url'		=> '/users'
+    		  'base_url'		=> '/admin/users'
     	})
-    	
-    	if (@gen.options['page'] == 0) 
-    		@gen.options['item_count'] = User.where(@gen.where).count
-    	end
-    	@users = User.where(@gen.where).limit(@gen.limit).offset(@gen.offset).reorder(@gen.reorder).all
+    	@users = @gen.items
     end
     
-    # GET /users/new
+    # GET /admin/users/new
     def new
       return if !user_is_allowed('users', 'add')
-      @user = User.new
+      @newuser = User.new
     end
     
-    # GET /users/1/edit
+    # GET /admin/users/1/edit
     def edit
       return if !user_is_allowed('users', 'edit')
-      @user = User.find(params[:id])    
+      @edituser = User.find(params[:id])    
       @all_roles = Role.tree
-      @roles = Role.roles_with_user(@user.id)
+      @roles = Role.roles_with_user(@edituser.id)
     end
     
-    # POST /users
+    # POST /admin/users
     def create
       return if !user_is_allowed('users', 'add')
       
@@ -53,65 +55,70 @@ module Caboose
         resp.error = "Your username is required."
       elsif      
         user.save
-        resp.redirect = "/users/#{user.id}/edit"
+        resp.redirect = "/admin/users/#{user.id}/edit"
       end
       render json: resp
     end
     
-    # PUT /users/1
+    # PUT /admin/users/1
     def update
       return if !user_is_allowed('users', 'edit')
-      
+
       resp = StdClass.new     
       user = User.find(params[:id])
-      name = params[:name]
-      value = params[:value]
     
       save = true
-      case name
-    		when "first_name", "last_name", "username", "email"
-    		  user[name.to_sym] = value
-    		when "password"			  
-    		  confirm = params[:confirm]
-    			if (value != confirm)			
-    			  resp.error = "Passwords do not match.";
-    			  save = false
-    			elsif (value.length < 8)
-    			  resp.error = "Passwords must be at least 8 characters.";
-    			  save = false
-    			else
-    			  user.password = Digest::SHA1.hexdigest(Caboose::salt + value)
-    			end
-    		when "roles"
-    		  user.roles = [];
-    		  value.each { |rid| user.roles << Role.find(rid) } unless value.nil?
-    		  resp.attribute = { 'text' => user.roles.collect{ |r| r.name }.join(', ') }    		  
+      params.each do |name,value|
+        case name
+    	  	when "first_name", "last_name", "username", "email"
+    	  	  user[name.to_sym] = value
+    	  	when "password"			  
+    	  	  confirm = params[:confirm]
+    	  		if (value != confirm)			
+    	  		  resp.error = "Passwords do not match.";
+    	  		  save = false
+    	  		elsif (value.length < 8)
+    	  		  resp.error = "Passwords must be at least 8 characters.";
+    	  		  save = false
+    	  		else
+    	  		  user.password = Digest::SHA1.hexdigest(Caboose::salt + value)
+    	  		end
+    	  	when "roles"
+    	  	  user.roles = [];
+    	  	  value.each { |rid| user.roles << Role.find(rid) } unless value.nil?
+    	  	  resp.attribute = { 'text' => user.roles.collect{ |r| r.name }.join(', ') }    		  
+    	  end
     	end
     	
     	resp.success = save && user.save
     	render json: resp
     end
     
+    # POST /admin/users/1/update-pic
     def update_pic
-      @user = User.find(params[:id])
-      @new_value = "Testing"
-    end
-    
-    def update_resume
-      @user = User.find(params[:id])
+      @edituser = User.find(params[:id])
       @new_value = "Testing"
     end
       
-    # DELETE /users/1
+    # DELETE /admin/users/1
     def destroy
       return if !user_is_allowed('users', 'delete')
       user = User.find(params[:id])
       user.destroy
       
       resp = StdClass.new({
-        'redirect' => '/users'
+        'redirect' => '/admin/users'
       })
       render json: resp
     end
+    
+    # GET /admin/users/options
+    def options
+      return if !user_is_allowed('users', 'view')
+      @users = User.reorder('last_name, first_name').all
+      options = @users.collect { |u| { 'value' => u.id, 'text' => "#{u.first_name} #{u.last_name}"}}
+      render json: options
+    end
+    
   end
 end

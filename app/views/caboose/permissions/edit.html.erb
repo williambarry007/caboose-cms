@@ -1,6 +1,23 @@
-<h1>Editing permission</h1>
+ 
+<h1>Edit Permission</h1>
+<div id='permission_<%= @permission.id %>_container'></div>
 
-<%= render 'form' %>
+<% content_for :caboose_js do %>
+<script type="text/javascript">
 
-<%= link_to 'Show', @permission %> |
-<%= link_to 'Back', permissions_path %>
+$(document).ready(function() {
+  var permission = new Model({
+    name: 'Permission',
+    id: <%= @permission.id %>,
+    listing_url: 'get /admin/permissions',
+    update_url: 'put /admin/permissions/<%= @permission.id %>',
+    delete_url: 'delete /admin/permissions/<%= @permission.id %>',
+    attributes: [
+      { name: 'resource' , type: 'text', value: "<%= @permission.resource %>" },
+      { name: 'action2'  , type: 'text', value: "<%= @permission.action   %>", nice_name: 'Action' }
+    ]
+  });
+});
+
+</script>
+<% end %>

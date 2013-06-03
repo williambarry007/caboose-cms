@@ -1,23 +1,52 @@
+<%
 
-<div id='caboose_station'>
+@nav = Caboose.plugin_hook('admin_nav', [], @user, @page)
+
+initial_state = session[:caboose_station_state].nil?      ? 'min' : session[:caboose_station_state] 
+open_tabs     = session[:caboose_station_open_tabs].nil?  ? []    : session[:caboose_station_open_tabs] 
+return_url    = session[:caboose_station_return_url].nil? ? '/'   : session[:caboose_station_return_url]
+return_url = '/' if return_url.starts_with?('/admin/') || return_url == '/admin'
+
+style = ''
+if (initial_state == 'left')
+  style = " style='display: block; left: 0;'"
+elsif (initial_state == 'right')
+  style = " style='display: block; right: 0;'"
+end
+
+%>
+<div id='caboose_station' class='state_<%= initial_state %>'<%= raw style %>>
+  
   <% if (@user.nil? || @user.id == Caboose::User::LOGGED_OUT_USER_ID) %>
+    <h2>Caboose Station</h2>
     <a href='/login' class='login'>Login</a>
   <% else %>
-    <ul>        
+    <ul class='account'>        
       <li class='my_account'><a href='/users/<%= @user.id %>/edit'>My Account</a></li>
       <li class='logout'><a href='/logout'>Logout</a></li>
-      <% if (@user.is_allowed('admin', 'view')) %> 
-    	<li class='admin'><a href='/admin'>Admin</a></li>
-    	<% end %>
-    	<%
-    	uru = session['use_redirect_urls'].nil? ? true : session['use_redirect_urls']
-    	%>
-    	<li><a href="javascript:setServerVar('use_redirect_urls', <%= uru ? '0' : '1' %>, 'redirect_message');"><%= uru ? 'Disable' : 'Enable' %> Redirect Urls</a><span id='redirect_message'></span></li>
-    	<% if (!@tasks.nil?) %>
-    	  <% @tasks.each do |href, task| %>
-    	<li><a href='<%= href %>'><%= task %></a></li>
-    	  <% end %>
-    	<% end %>
     </ul>
+    <h2>Caboose Station</h2>
+    <ul class='admin'>
+      <% i = 0 %>
+      <% @nav.each do |item| %>
+        <% id = item['id'].nil? ? i.to_s : item['id'] %>
+        <li id='nav_item_<%= id %>'><a href='#' class='top_level'><%= item['text'] %></a>
+        <% if (!item['children'].nil? && item['children'].count > 0) %>
+          <%
+          visible = open_tabs.include?(id) || (!item['show_children_default'].nil? && item['show_children_default'])
+          style = visible ? '' : " style='display: none;'"
+          %>
+          <ul id='subnav_<%= id %>' class='<%= visible ? 'visible' : 'hidden' %>'<%= raw style %>>
+            <% item['children'].each do |item2| %>
+              <li><a href='<%= item2['href'] %>'><%= item2['text'] %></a></li>
+            <% end %>
+          </ul>
+        <% end %>
+        </li>
+        <% i + 1 %>
+      <% end %>
+    </ul>
+    <a href='<%= return_url %>' class='close'>Close</a>
   <% end %>
+  
 </div>

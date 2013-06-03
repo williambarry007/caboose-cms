@@ -50,11 +50,11 @@ namespace :caboose do
     
     str = ""
     str << "# Salt to ensure passwords are encrypted securely\n"
-    str << "Caboose::salt = '#{Caboose::salt}'\n\n""
+    str << "Caboose::salt = '#{Caboose::salt}'\n\n"
     str << "# Where page asset files will be uploaded\n"
-    str << "Caboose::assets_path = Rails.root.join('app', 'assets', 'caboose')\n\n""
+    str << "Caboose::assets_path = Rails.root.join('app', 'assets', 'caboose')\n\n"
     str << "# Register any caboose plugins\n"
-    str << "#Caboose::plugins + ['MyCaboosePlugin']\n\n""
+    str << "#Caboose::plugins + ['MyCaboosePlugin']\n\n"
 
     filename = Rails.root.join('config','initializers','caboose.rb')
     if (!File.exists?(filename))

@@ -29,7 +29,7 @@ when 'help'
 
 when 'new'
   
-  if (ARGV.count != 1)
+  if (ARGV.count != 2)
     puts "Usage: caboose new <app_path>\n"
     exit
   end

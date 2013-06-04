@@ -55,7 +55,7 @@ class CabooseHelper
   
   # Removes the public/index.html file from the rails app
   def remove_public_index
-    print "Removing the public/index.html file... "
+    puts "Removing the public/index.html file... "
     
     filename = File.join(@app_path,'public','index.html')
     return if !File.exists?(filename)

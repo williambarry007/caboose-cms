@@ -18,7 +18,6 @@ case action
 when 'v', 'version'
   puts "Caboose CMS Version #{Caboose::VERSION}\n"
   exit
-end
 
 when 'help'
   puts "Usage:"
@@ -27,7 +26,6 @@ when 'help'
   puts "Initialize an existing rails app as a new caboose app:"
   puts "  caboose init [<app_path>]"
   exit
-end
 
 when 'new'
   

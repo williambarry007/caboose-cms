@@ -9,10 +9,13 @@ def is_rails_app?(path)
   File.exists?(environment_path)
 end
 
-puts "Rails.root = #{Rails.root}\n\n"
-
 action = false
 action = ARGV[0] if ARGV.count > 0
+
+if (action == '-v' || action == '--version')
+  puts "Caboose CMS Version #{Caboose::VERSION}\n\n"
+  exit
+end
 
 path = Dir.pwd
 path = ARGV[1] if ARGV.count > 1

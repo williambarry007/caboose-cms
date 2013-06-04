@@ -1,0 +1,3 @@
+
+PigConfig.vfile = 'lib/caboose/version.rb'
+PigConfig.repo  = 'https://github.com/williambarry007/caboose-cms.git'

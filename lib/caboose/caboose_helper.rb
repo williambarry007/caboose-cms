@@ -26,7 +26,7 @@ class CabooseHelper
     file.close
     str2 = ""
     str.each_line do |line|
-      if (!line.strip.starts_with?('#') && (!line.index("gem 'caboose'").nil? || !line.index('gem "caboose"').nil?))
+      if (!line.strip.start_with?('#') && (!line.index("gem 'caboose'").nil? || !line.index('gem "caboose"').nil?))
         str2 << "##{line}"
       else
         str2 << line
@@ -128,8 +128,8 @@ class CabooseHelper
     str = File.open(File.join(@app_path,'config','initializers','session_store.rb')).read 
     str.gsub!(/\r\n?/, "\n")
     str.each_line do |line|
-      line = '#' + line if !line.index(':cookie_store').nil?        && !line.starts_with?('#')
-      line[0] = ''      if !line.index(':active_record_store').nil? && line.starts_with?('#')
+      line = '#' + line if !line.index(':cookie_store').nil?        && !line.start_with?('#')
+      line[0] = ''      if !line.index(':active_record_store').nil? && line.start_with?('#')
       lines << line.strip
     end
     str = lines.join("\n")

@@ -2,6 +2,8 @@
 
 require 'rails/all'
 require 'caboose'
+require 'caboose/engine'
+require 'caboose/version'
 require 'caboose/caboose_helper'
 
 def is_rails_app?(path)

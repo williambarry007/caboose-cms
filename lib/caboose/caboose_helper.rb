@@ -37,13 +37,13 @@ class CabooseHelper
     file.close
     str2 = ""
     str.each_line do |line|
-      if (!line.strip.start_with?('#') && (!line.index("gem 'caboose'").nil? || !line.index('gem "caboose"').nil?))
+      if (!line.strip.start_with?('#') && (!line.index("gem 'caboose-cms'").nil? || !line.index('gem "caboose-cms"').nil?))
         str2 << "##{line}"
       else
         str2 << line
       end
     end
-    str2 << "gem 'caboose', '= #{Caboose::VERSION}'\n"
+    str2 << "gem 'caboose-cms', '= #{Caboose::VERSION}'\n"
     File.open(filename, 'w') {|file| file.write(str2) }
   end
     

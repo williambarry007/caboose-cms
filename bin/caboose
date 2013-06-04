@@ -2,6 +2,7 @@
 
 require 'rails/all'
 require 'caboose'
+require 'caboose/caboose_helper'
 
 def is_rails_app?(path)
   environment_path = File.join(path, 'config', 'environment.rb')

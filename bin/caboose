@@ -19,6 +19,8 @@ if (action == '-v' || action == '--version')
   exit
 end
 
+puts "Rails.root = #{Rails.root}\n\n"
+
 path = Dir.pwd
 path = ARGV[1] if ARGV.count > 1
 

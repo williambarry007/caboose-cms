@@ -5,6 +5,17 @@ class CabooseHelper
     @app_path = app_path
   end
   
+  def init_all
+    init_gem
+    init_app_config    
+    init_initializer
+    init_routes
+    init_assets
+    init_tinymce
+    init_session
+    remove_public_index
+  end
+  
   def init_file(filename)
     gem_root = Gem::Specification.find_by_name('caboose-cms').gem_dir
     filename = File.join(@app_path, filename)  

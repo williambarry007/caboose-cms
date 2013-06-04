@@ -78,7 +78,7 @@ class CabooseHelper
     puts "Adding the caboose initializer file..."
     
     filename = File.join(@app_path,'config','initializers','caboose.rb')
-    return if !File.exists?(filename)
+    return if File.exists?(filename)
     
     Caboose::salt = Digest::SHA1.hexdigest(DateTime.now.to_s)
     str = ""

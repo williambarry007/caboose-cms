@@ -33,6 +33,7 @@ when 'new'
     puts "Usage: caboose new <app_path>\n\n"
     exit
   end
+  puts "Creating the new rails app..."
   `rails new #{path} -d=mysql`  
   helper.init_all
   

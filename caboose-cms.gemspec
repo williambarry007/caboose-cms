@@ -24,4 +24,6 @@ Gem::Specification.new do |s|
   s.add_dependency "modeljs", "= 0.0.4"
   s.add_dependency "tinymce-rails"
   
+  s.executables = ["bin/caboose"] 
+    
 end

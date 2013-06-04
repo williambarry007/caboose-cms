@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+require 'caboose'
+
+action = false
+action ARGV[0] if ARGV.count > 0
+
+case action
+  when 'init'
+    app_path = Dir.pwd
+    app_path = ARGV[1] if ARGV.count > 1
+
+    # Add the gem to the Gemfile
+    puts "Adding the caboose gem to the Gemfile..."
+    if (File.exists?("#{app_path}/Gemfile"))
+      open("#{app_path}/Gemfile", 'a') { |f| f.puts "gem 'caboose', '= #{Caboose::VERSION}'\n" }
+      puts "done\n"
+    else
+      puts "file doesn't exist\n"
+    end
+    
+    # Require caboose in the application config
+    puts "Requiring caboose in the application config..."
+    if (File.exists?("#{app_path}/config/application.rb"))      
+      file = File.open("#{app_path}/config/application.rb"), 'rb')
+      contents = file.read
+      file.close    
+      if (contents.index("require 'caboose'").nil?)
+        arr = contents.split("require 'rails/all'", -1)
+        str = arr[0] + "\nrequire 'rails/all'\nrequire 'caboose'\n" + arr[1]
+        File.open("#{app_path}/config/application.rb", 'w') { |file| file.write(str) }
+      end
+      
+      puts "done\n"
+    else
+      puts "file doesn't exist\n"
+    end
+    
+    # Remove the public/index.html file
+    puts "Removing the public/index.html file..."
+    if (File.exists?("#{app_path}/public/index.html"))
+      File.delete("#{app_path}/public/index.html")
+      puts "done\n"
+    else
+      puts "file doesn't exist\n"
+    end
+    
+  end
+end

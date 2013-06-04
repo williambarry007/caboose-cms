@@ -13,13 +13,23 @@ class CabooseHelper
   
   # Add the gem to the Gemfile
   def init_gem
-    print "Adding the caboose gem to the Gemfile... "
-    if (File.exists?("#{app_path}/Gemfile"))
-      File.open("#{app_path}/Gemfile", 'a') { |f| f.print "gem 'caboose', '= #{Caboose::VERSION}'\n" }
-      print "done\n"
-    else
-      print "file doesn't exist\n"
+    puts "Adding the caboose gem to the Gemfile... "
+    filename = Rails.root.join('Gemfile')
+    return if !File.exists?(filename)
+    
+    file = File.open(filename, 'rb')
+    str = file.read
+    file.close
+    str2 = ""
+    str.each_line do |line|
+      if (!line.strip.starts_with?('#') && (!line.index("gem 'caboose'").nil? || !line.index('gem "caboose"').nil?))
+        str2 << "##{line}"
+      else
+        str2 << line
+      end
     end
+    str2 << "gem 'caboose', '= #{Caboose::VERSION}'\n"
+    File.open(filename, 'w') {|file| file.write(str2) }
   end
     
   # Require caboose in the application config
@@ -29,13 +39,13 @@ class CabooseHelper
     filename = Rails.root.join('config','application.rb')
     return if !File.exists?(filename)    
           
-    file = File.open("#{app_path}/config/application.rb", 'rb')
+    file = File.open(filename, 'rb')
     contents = file.read
     file.close    
     if (contents.index("require 'caboose'").nil?)
       arr = contents.split("require 'rails/all'", -1)
       str = arr[0] + "\nrequire 'rails/all'\nrequire 'caboose'\n" + arr[1]
-      File.open("#{app_path}/config/application.rb", 'w') { |file| file.write(str) }
+      File.open(filename, 'w') { |file| file.write(str) }
     end
   end
   

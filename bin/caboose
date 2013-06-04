@@ -9,6 +9,8 @@ def is_rails_app?(path)
   File.exists?(environment_path)
 end
 
+puts "Rails.root = #{Rails.root}\n\n"
+
 action = false
 action = ARGV[0] if ARGV.count > 0
 

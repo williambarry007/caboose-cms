@@ -22,7 +22,7 @@ case action
     # Require caboose in the application config
     puts "Requiring caboose in the application config..."
     if (File.exists?("#{app_path}/config/application.rb"))      
-      file = File.open("#{app_path}/config/application.rb"), 'rb')
+      file = File.open("#{app_path}/config/application.rb", 'rb')
       contents = file.read
       file.close    
       if (contents.index("require 'caboose'").nil?)

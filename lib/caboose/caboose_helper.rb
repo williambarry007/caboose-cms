@@ -1,9 +1,13 @@
 
 class CabooseHelper
   
+  def initialize(app_path)
+    @app_path = app_path
+  end
+  
   def init_file(filename)
     gem_root = Gem::Specification.find_by_name('caboose-cms').gem_dir
-    filename = Rails.root.join(filename)  
+    filename = File.join(@app_path, filename)  
     copy_from = File.join(gem_root,'lib','sample_files', Pathname.new(filename).basename)
     
     if (!File.exists?(filename))
@@ -14,7 +18,7 @@ class CabooseHelper
   # Add the gem to the Gemfile
   def init_gem
     puts "Adding the caboose gem to the Gemfile... "
-    filename = Rails.root.join('Gemfile')
+    filename = File.join(@app_path,'Gemfile')
     return if !File.exists?(filename)
     
     file = File.open(filename, 'rb')
@@ -36,7 +40,7 @@ class CabooseHelper
   def init_app_config
     puts "Requiring caboose in the application config..."
     
-    filename = Rails.root.join('config','application.rb')
+    filename = File.join(@app_path,'config','application.rb')
     return if !File.exists?(filename)    
           
     file = File.open(filename, 'rb')
@@ -53,7 +57,7 @@ class CabooseHelper
   def remove_public_index
     print "Removing the public/index.html file... "
     
-    filename = Rails.root.join('public','index.html')
+    filename = File.join(@app_path,'public','index.html')
     return if !File.exists?(filename)
     File.delete(filename)
   end
@@ -62,7 +66,7 @@ class CabooseHelper
   def init_initializer
     puts "Adding the caboose initializer file..."
     
-    filename = Rails.root.join('config','initializers','caboose.rb')
+    filename = File.join(@app_path,'config','initializers','caboose.rb')
     return if !File.exists?(filename)
     
     Caboose::salt = Digest::SHA1.hexdigest(DateTime.now.to_s)
@@ -70,7 +74,7 @@ class CabooseHelper
     str << "# Salt to ensure passwords are encrypted securely\n"
     str << "Caboose::salt = '#{Caboose::salt}'\n\n"
     str << "# Where page asset files will be uploaded\n"
-    str << "Caboose::assets_path = Rails.root.join('app', 'assets', 'caboose')\n\n"
+    str << "Caboose::assets_path = File.join(@app_path,'app', 'assets', 'caboose')\n\n"
     str << "# Register any caboose plugins\n"
     str << "#Caboose::plugins + ['MyCaboosePlugin']\n\n"
     
@@ -81,7 +85,7 @@ class CabooseHelper
   def init_routes
     puts "Adding the caboose routes..."
     
-    filename = Rails.root.join('config','routes.rb')
+    filename = File.join(@app_path,'config','routes.rb')
     return if !File.exists?(filename)
     
     str = "" 
@@ -121,7 +125,7 @@ class CabooseHelper
     puts "Setting the session config..."    
     
     lines = []
-    str = File.open(Rails.root.join('config','initializers','session_store.rb')).read 
+    str = File.open(File.join(@app_path,'config','initializers','session_store.rb')).read 
     str.gsub!(/\r\n?/, "\n")
     str.each_line do |line|
       line = '#' + line if !line.index(':cookie_store').nil?        && !line.starts_with?('#')
@@ -129,7 +133,7 @@ class CabooseHelper
       lines << line.strip
     end
     str = lines.join("\n")
-    File.open(Rails.root.join('config','initializers','session_store.rb'), 'w') {|file| file.write(str) }
+    File.open(File.join(@app_path,'config','initializers','session_store.rb'), 'w') {|file| file.write(str) }
   end
   
   def init_schema

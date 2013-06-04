@@ -19,8 +19,6 @@ if (action == '-v' || action == '--version')
   exit
 end
 
-puts "Rails.root = #{Rails.root}\n\n"
-
 path = Dir.pwd
 path = ARGV[1] if ARGV.count > 1
 
@@ -36,7 +34,7 @@ end
 case action
 when 'init'
   
-  helper = CabooseHelper.new
+  helper = CabooseHelper.new(path)
   helper.init_gem
   helper.init_app_config    
   helper.init_initializer

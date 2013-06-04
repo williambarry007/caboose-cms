@@ -16,7 +16,7 @@ helper = CabooseHelper.new(path)
 case action
   
 when 'v', 'version'
-  puts "Caboose CMS Version #{Caboose::VERSION}\n"
+  puts "Caboose CMS Version #{Caboose::VERSION}\n\n"
   exit
 
 when 'help'
@@ -24,13 +24,13 @@ when 'help'
   puts "Create a new caboose app:"
   puts "  caboose new <app_path>"
   puts "Initialize an existing rails app as a new caboose app:"
-  puts "  caboose init [<app_path>]"
+  puts "  caboose init [<app_path>]\n\n"
   exit
 
 when 'new'
   
   if (ARGV.count != 2)
-    puts "Usage: caboose new <app_path>\n"
+    puts "Usage: caboose new <app_path>\n\n"
     exit
   end
   `rails new #{path} -d=mysql`  
@@ -41,9 +41,9 @@ when 'init'
   is_rails_app = File.exists(File.join(path, 'config', 'environment.rb'))  
   if (!is_rails_app)
     if (ARGV.count == 1)
-      puts "Error: You don't seem to be in a rails app.\n"
+      puts "Error: You don't seem to be in a rails app.\n\n"
     else
-      puts "Error: The supplied path (#{path}) doesn't seem to be a rails app.\n"
+      puts "Error: The supplied path (#{path}) doesn't seem to be a rails app.\n\n"
     end
     exit 
   end

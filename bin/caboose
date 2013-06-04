@@ -20,7 +20,7 @@ if (!is_rails_app?(path))
   else
     puts "Error: The supplied path doesn't seem to be a rails app.\n"
   end
-  return
+  return 0
 end
 
 case action

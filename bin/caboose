@@ -26,7 +26,7 @@ if (!is_rails_app?(path))
   if (ARGV.count == 1)
     puts "Error: You don't seem to be in a rails app.\n"
   else
-    puts "Error: The supplied path doesn't seem to be a rails app.\n"
+    puts "Error: The supplied path (#{path}) doesn't seem to be a rails app.\n"
   end
   exit 
 end
@@ -42,10 +42,10 @@ when 'init'
   helper.init_assets
   helper.init_tinymce
   helper.init_session
-  helper.drop_tables
-  helper.create_tables  
-  helper.init_data
   helper.remove_public_index
+  #helper.drop_tables
+  #helper.create_tables  
+  #helper.init_data
   
 else
 end

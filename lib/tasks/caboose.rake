@@ -2,120 +2,20 @@ require "caboose/version"
 
 namespace :caboose do
 
-  desc "Initialize a caboose installation"
-  task :setup => :environment do
-    init_config
-    init_routes
-    init_assets
-    init_tinymce
-    init_session
-    init_schema
-    init_data
+  desc "Initializes the database for a caboose installation"
+  task :db => :environment do
+    drop_tables
+    create_tables
+    load_data
   end
-  desc "Initializes the caboose config file"
-  task :init_config => :environment do init_config end
-  desc "Configures the host application to use caboose for routing"
-  task :init_routes => :environment do init_routes end
-  desc "Initializes all the required caboose js, css and layout files in the host application"
-  task :init_assets => :environment do init_assets end
-  desc "Initializes the tinymce config file in the host application"
-  task :init_tinymce => :environment do init_tinymce end  
-  desc "Configures the host application to use active record session storing"
-  task :init_session => :environment do init_session end
-  desc "Initializes the caboose database schema"
-  task :init_schema => :environment do init_schema end
-  desc "Loads data into caboose tables"
-  task :init_data => :environment do init_data end
   desc "Drops all caboose tables"
   task :drop_tables => :environment do drop_tables end
   desc "Creates all caboose tables"
   task :create_tables => :environment do create_tables end
+  desc "Loads data into caboose tables"
+  task :load_data => :environment do load_data end
  
   #=============================================================================
-  
-  def init_file(filename)
-    gem_root = Gem::Specification.find_by_name('caboose-cms').gem_dir
-    filename = Rails.root.join(filename)  
-    copy_from = File.join(gem_root,'lib','sample_files', Pathname.new(filename).basename)
-    
-    if (!File.exists?(filename))
-      FileUtils.cp(copy_from, filename)
-    end  
-  end
-    
-  def init_config
-    puts "Adding the caboose initializer file..."
-    
-    Caboose::salt = Digest::SHA1.hexdigest(DateTime.now.to_s)
-    
-    str = ""
-    str << "# Salt to ensure passwords are encrypted securely\n"
-    str << "Caboose::salt = '#{Caboose::salt}'\n\n"
-    str << "# Where page asset files will be uploaded\n"
-    str << "Caboose::assets_path = Rails.root.join('app', 'assets', 'caboose')\n\n"
-    str << "# Register any caboose plugins\n"
-    str << "#Caboose::plugins + ['MyCaboosePlugin']\n\n"
-
-    filename = Rails.root.join('config','initializers','caboose.rb')
-    if (!File.exists?(filename))
-      File.open(filename, 'w') {|file| file.write(str) }
-    end
-  end
-
-  def init_routes
-    puts "Adding the caboose routes..."    
-    str = "" 
-    str << "\t# Catch everything with caboose\n"  
-    str << "\tmount Caboose::Engine => '/'\n"
-    str << "\tmatch '*path' => 'caboose/pages#show'\n"
-    str << "\troot :to      => 'caboose/pages#show'\n"    
-    file = File.open(Rails.root.join('config','routes.rb'), 'rb')
-    contents = file.read
-    file.close    
-    if (contents.index(str).nil?)
-      arr = contents.split('end', -1)
-      str2 = arr[0] + "\n" + str + "\nend" + arr[1]
-      File.open(Rails.root.join('config','routes.rb'), 'w') {|file| file.write(str2) }
-    end    
-  end
-  
-  def init_assets
-    puts "Adding the javascript files..."
-    init_file('app/assets/javascripts/caboose_before.js')
-    init_file('app/assets/javascripts/caboose_after.js')
-    
-    puts "Adding the stylesheet files..."
-    init_file('app/assets/stylesheets/caboose_before.css')
-    init_file('app/assets/stylesheets/caboose_after.css')
-    
-    puts "Adding the layout files..."
-    init_file('app/views/layouts/layout_default.html.erb')
-  end
-  
-  def init_tinymce
-    puts "Adding the tinymce config file..."
-    init_file('config/tinymce.yml')
-  end
-  
-  def init_session
-    puts "Setting the session config..."    
-    
-    lines = []
-    str = File.open(Rails.root.join('config','initializers','session_store.rb')).read 
-    str.gsub!(/\r\n?/, "\n")
-    str.each_line do |line|
-      line = '#' + line if !line.index(':cookie_store').nil?        && !line.starts_with?('#')
-      line[0] = ''      if !line.index(':active_record_store').nil? && line.starts_with?('#')
-      lines << line.strip
-    end
-    str = lines.join("\n")
-    File.open(Rails.root.join('config','initializers','session_store.rb'), 'w') {|file| file.write(str) }
-  end
-  
-  def init_schema
-    drop_tables
-    create_tables
-  end
   
   def drop_tables
     puts "Dropping any existing caboose tables..."

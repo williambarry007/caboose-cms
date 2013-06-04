@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email       = ["william@nine.is"]
   s.homepage    = "http://github.com/williambarry007/caboose-cms"
   s.summary     = "CMS built on rails."
-  s.description = "CMS built on rails."
+  s.description = "CMS built on rails with love."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]

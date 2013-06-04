@@ -13,7 +13,7 @@ case action
     # Add the gem to the Gemfile
     puts "Adding the caboose gem to the Gemfile..."
     if (File.exists?("#{app_path}/Gemfile"))
-      open("#{app_path}/Gemfile", 'a') { |f| f.puts "gem 'caboose', '= #{Caboose::VERSION}'\n" }
+      File.open("#{app_path}/Gemfile", 'a') { |f| f.puts "gem 'caboose', '= #{Caboose::VERSION}'\n" }
       puts "done\n"
     else
       puts "file doesn't exist\n"
@@ -44,6 +44,8 @@ case action
     else
       puts "file doesn't exist\n"
     end
+    
+  else
     
   end
 end

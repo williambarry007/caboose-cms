@@ -1,10 +1,11 @@
 PATH
   remote: .
   specs:
-    caboose-cms (0.0.7)
+    caboose-cms (0.1.8)
       activesupport
       jquery-rails
-      modeljs
+      jquery-ui-rails
+      modeljs (= 0.0.4)
       mysql2
       rails (~> 3.2.13)
       tinymce-rails
@@ -48,12 +49,15 @@ GEM
     jquery-rails (2.2.1)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
+    jquery-ui-rails (4.0.3)
+      jquery-rails
+      railties (>= 3.1.0)
     json (1.7.7)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.23)
-    modeljs (0.0.1)
+    modeljs (0.0.4)
       activesupport
       jquery-rails
       rails (~> 3.2.13)
@@ -105,5 +109,6 @@ PLATFORMS
 DEPENDENCIES
   caboose-cms!
   jquery-rails
-  modeljs
+  jquery-ui-rails
+  modeljs (= 0.0.4)
   tinymce-rails

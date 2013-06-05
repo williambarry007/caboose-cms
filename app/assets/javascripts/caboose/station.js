@@ -12,21 +12,21 @@ CabooseStation = Class.extend({
       $('body').css('overflow', 'scroll-y'); 
       //alert(this.open_tabs);
 
-      if ($('#caboose_station').hasClass('state_left'))
+      if ($('#caboose_station_wrapper').hasClass('state_left'))
       {
-        $('#caboose_station').css('left', 0);
-        $('#caboose_station').show();
+        $('#caboose_station_wrapper').css('left', 0);
+        $('#caboose_station_wrapper').show();
         this.state = 'left';
       }
-      else if ($('#caboose_station').hasClass('state_right'))
+      else if ($('#caboose_station_wrapper').hasClass('state_right'))
       {
-        $('#caboose_station').css('right', 0);
-        $('#caboose_station').show();
+        $('#caboose_station_wrapper').css('right', 0);
+        $('#caboose_station_wrapper').show();
         this.state = 'right';
       }
       else
       {
-        $('#caboose_station').css('right', 0);
+        $('#caboose_station_wrapper').css('right', 0);
         $('#caboose_station').hide();
         this.state = 'min';
       }
@@ -85,8 +85,8 @@ CabooseStation = Class.extend({
         func_after = function() {};
       
       // Assume you never go from left to min
-      $('#caboose_station').removeClass('state_left state_right').addClass('state_min');
-      $('#caboose_station').hide('slide', { direction: 'right' }, 300);
+      $('#caboose_station_wrapper').removeClass('state_left state_right').addClass('state_min');
+      $('#caboose_station_wrapper').animate({ width: 0 }, 300);
       this.state = 'min';
     },
     
@@ -98,8 +98,8 @@ CabooseStation = Class.extend({
         func_after = function() {};
 
       // Assume you never go from min to left
-      $('#caboose_station').removeClass('state_min state_right').addClass('state_left');      
-      $('#caboose_station').animate({ left: 0 }, 300, func_after);
+      $('#caboose_station_wrapper').removeClass('state_min state_right').addClass('state_left');      
+      $('#caboose_station_wrapper').animate({ left: 0 }, 300, func_after);
       this.state = 'left'; 
     },
     
@@ -110,14 +110,14 @@ CabooseStation = Class.extend({
       if (!func_after)
         func_after = function() {};
       
-      $('#caboose_station').removeClass('state_min state_left').addClass('state_right');
+      $('#caboose_station_wrapper').removeClass('state_min state_left').addClass('state_right');
       if (this.state == 'left')
       {
-        $('#caboose_station').animate({ right: 0 }, 300, func_after);
+        $('#caboose_station_wrapper').animate({ right: 0 }, 300, func_after);
       }
       else if (this.state == 'min')
       {        
-        $('#caboose_station').show('slide', { direction: 'right' }, 300);
+        $('#caboose_station_wrapper').animate({ width: 208 }, 300, func_after);
       }
       this.state = 'right'; 
     },
@@ -144,7 +144,7 @@ CabooseStation = Class.extend({
           var w = $(window).width() - $('#caboose_station').width();
           var h = $(window).height();
           
-          $('#caboose_station').after(
+          $('#caboose_station_wrapper').after(
             $('<div/>')
               .attr('id', 'caboose_white')
               .css({
@@ -156,8 +156,8 @@ CabooseStation = Class.extend({
                 background: 'url(/assets/loading.gif) 40px 40px no-repeat #fff'
               })
             );
-          $('#caboose_station').removeClass('state_right').addClass('state_left');
-          $('#caboose_station').animate({ left: 0 }, 300, function() { window.location = url; });
+          $('#caboose_station_wrapper').removeClass('state_right').addClass('state_left');
+          $('#caboose_station_wrapper').animate({ left: 0 }, 300, function() { window.location = url; });
           $('#caboose_white').animate({ width: '+=' + w }, 300);
         }
       });
@@ -177,9 +177,9 @@ CabooseStation = Class.extend({
         },
         success: function() {
           var w = $(window).width() - $('#caboose_station').width();
-          $('#caboose_station').removeClass('state_left').addClass('state_right');
+          $('#caboose_station_wrapper').removeClass('state_left').addClass('state_right');
           $('#content_wrapper').animate({ marginLeft: '+=' + w }, 300);
-          $('#caboose_station').animate({ left: w }, 300, function() { window.location = url; })
+          $('#caboose_station_wrapper').animate({ left: w }, 300, function() { window.location = url; })
         }
       }); 
     }

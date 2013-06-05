@@ -44,8 +44,8 @@ body {
 #caboose_white {
   z-index: 99;
 }
-
-#caboose_station {
+                
+#caboose_station_wrapper {
   display: none;
   position: absolute;
   top: 0;
@@ -53,6 +53,11 @@ body {
   z-index: 100;
   width: 208px;
   height: 100%;
+  overflow-x: hidden;
+}
+
+#caboose_station {
+  width: 208px;
   background: #e1e1e1;
   border: #aaa 1px solid;
 }
@@ -177,9 +182,9 @@ body {
 #caboose_station ul.admin li#nav_item_pages       a.top_level:active { background-position: -424px -275px; }
 #caboose_station ul.admin li#nav_item_settings    a.top_level:active { background-position: -424px -328px; }
 
-#caboose_station.state_min a.close,
-#caboose_station.state_left a.close, 
-#caboose_station.state_right a.close {
+#caboose_station_wrapper.state_min a.close,
+#caboose_station_wrapper.state_left a.close, 
+#caboose_station_wrapper.state_right a.close {
   display: block;
   background-image: url('/assets/caboose/caboose_nav.png');
   background-repeat: no-repeat;
@@ -193,12 +198,12 @@ body {
   overflow: hidden;
 }
 
-#caboose_station.state_left  a.close        { background-position:    0px -422px; }
-#caboose_station.state_right a.close        { background-position:    0px -380px; }
-#caboose_station.state_min   a.close        { background-position:    0px -380px; }
-#caboose_station.state_left  a.close:hover  { background-position: -212px -422px; }
-#caboose_station.state_right a.close:hover  { background-position: -212px -380px; }
-#caboose_station.state_min   a.close:hover  { background-position: -212px -380px; }
-#caboose_station.state_left  a.close:active { background-position: -424px -422px; }
-#caboose_station.state_right a.close:active { background-position: -424px -380px; }
-#caboose_station.state_min   a.close:active { background-position: -424px -380px; }
+#caboose_station_wrapper.state_left  a.close        { background-position:    0px -422px; }
+#caboose_station_wrapper.state_right a.close        { background-position:    0px -380px; }
+#caboose_station_wrapper.state_min   a.close        { background-position:    0px -380px; }
+#caboose_station_wrapper.state_left  a.close:hover  { background-position: -212px -422px; }
+#caboose_station_wrapper.state_right a.close:hover  { background-position: -212px -380px; }
+#caboose_station_wrapper.state_min   a.close:hover  { background-position: -212px -380px; }
+#caboose_station_wrapper.state_left  a.close:active { background-position: -424px -422px; }
+#caboose_station_wrapper.state_right a.close:active { background-position: -424px -380px; }
+#caboose_station_wrapper.state_min   a.close:active { background-position: -424px -380px; }

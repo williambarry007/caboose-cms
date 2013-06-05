@@ -14,6 +14,8 @@ namespace :caboose do
   task :create_tables => :environment do create_tables end
   desc "Loads data into caboose tables"
   task :load_data => :environment do load_data end
+  desc "Resets the admin password to 'caboose'"
+  task :reset_admin_pass => :environment do reset_admin_pass end
  
   #=============================================================================
   
@@ -180,5 +182,11 @@ namespace :caboose do
     Caboose::Setting.create(name: 'site_url'    , value: 'www.mycaboosesite.com')
     Caboose::Setting.create(name: 'admin_email' , value: 'william@nine.is')
     
+  end
+  
+  def reset_admin_pass
+    admin_user = Caboose::User.where(username: 'admin').first
+    admin_user.password = Digest::SHA1.hexdigest(Caboose::salt + 'caboose')
+    admin_user.save
   end
 end

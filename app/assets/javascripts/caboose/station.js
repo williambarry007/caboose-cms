@@ -15,19 +15,21 @@ CabooseStation = Class.extend({
       if ($('#caboose_station').hasClass('state_left'))
       {
         $('#caboose_station').css('left', 0);
+        $('#caboose_station').show();
         this.state = 'left';
       }
       else if ($('#caboose_station').hasClass('state_right'))
       {
         $('#caboose_station').css('right', 0);
+        $('#caboose_station').show();
         this.state = 'right';
       }
       else
       {
-        $('#caboose_station').css('left', $(window).width());
+        $('#caboose_station').css('right', 0);
+        $('#caboose_station').hide();
         this.state = 'min';
       }
-      $('#caboose_station').show();
     },
     
     attach_dom: function()
@@ -82,9 +84,9 @@ CabooseStation = Class.extend({
       if (!func_after)
         func_after = function() {};
       
-      var w = $(window).width();
+      // Assume you never go from left to min
       $('#caboose_station').removeClass('state_left state_right').addClass('state_min');
-      $('#caboose_station').animate({ left: w }, 300);
+      $('#caboose_station').hide('slide', { direction: 'left' }, 300);
       this.state = 'min';
     },
     
@@ -95,6 +97,7 @@ CabooseStation = Class.extend({
       if (!func_after)
         func_after = function() {};
 
+      // Assume you never go from min to left
       $('#caboose_station').removeClass('state_min state_right').addClass('state_left');      
       $('#caboose_station').animate({ left: 0 }, 300, func_after);
       this.state = 'left'; 
@@ -108,7 +111,14 @@ CabooseStation = Class.extend({
         func_after = function() {};
       
       $('#caboose_station').removeClass('state_min state_left').addClass('state_right');
-      $('#caboose_station').animate({ right: 0 }, 300, func_after);
+      if (this.state == 'left')
+      {
+        $('#caboose_station').animate({ right: 0 }, 300, func_after);
+      }
+      else if (this.state == 'min')
+      {
+        $('#caboose_station').show('slide', { direction: 'left' }, 300);
+      }
       this.state = 'right'; 
     },
     

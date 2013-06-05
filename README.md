@@ -53,29 +53,29 @@ You must include the following:</p>
 <ul>
   <li>
     <p>CSS and CSRF in the head:</p>
-    <pre>
-    &lt;%= yield :css %&gt;
-    &lt;%= csrf_meta_tags %&gt;
-    </pre>
+<pre>
+&lt;%= yield :css %&gt;
+&lt;%= csrf_meta_tags %&gt;
+</pre>
   </li>
   <li>
     <p>The top nav login/control panel link:</p>
-    <pre>
-    &lt;%= render :partial => 'layouts/caboose/top_nav' %&gt;
-    </pre>
+<pre>
+&lt;%= render :partial => 'layouts/caboose/top_nav' %&gt;
+</pre>
   </li>
   <li>
     <p>The top nav login/control panel link:</p>
-    <pre>
-    &lt;%= render :partial => 'layouts/caboose/top_nav' %&gt;
-    </pre>
+<pre>
+&lt;%= render :partial => 'layouts/caboose/top_nav' %&gt;
+</pre>
   </li>
   <li>
     <p>The station and javascript in the footer:</p>
-    <pre>
-    &lt;%= render :partial => 'layouts/caboose/station' %&gt;
-    &lt;%= yield :js %&gt;
-    </pre>
+<pre>
+&lt;%= render :partial => 'layouts/caboose/station' %&gt;
+&lt;%= yield :js %&gt;
+</pre>
   </li>
 </ul>
 <p>You have access to the <code>@page</code> object in the layout.  Here's a bare-bones example of all the elements:
@@ -107,7 +107,7 @@ are the following:</p>
 
 <dl>
   <dt><code>String page_content(String str)</code></dt>
-  <dd>Given the page content string, manipulate and return.</dd>  
+  <dd>Manipulate the page content before it's shown on the screen.</dd>  
   <dt><code>Array admin_nav(Array arr)</code></dt>
   <dd>Add items to the navigation that appears in the caboose station.</dd>
 </dl>

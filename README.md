@@ -15,11 +15,11 @@ allows a developer to easily customize the look and feel of each page.</p>
 <pre>
 $ gem install caboose-cms
 </pre>
-<p>Create a new rails app configured to use caboose:</p>
+<p>Create a new rails app configured to use Caboose:</p>
 <pre>
 $ caboose new my_caboose_app
 </pre>
-<p>Now go create a local MySQL database called <code>my_caboose_app_development</code>. Then let caboose install the database:</p>
+<p>Now go create a local MySQL database called <code>my_caboose_app_development</code>. Then let Caboose install the database:</p>
 <pre>
 $ cd my_caboose_app
 $ rake caboose:db
@@ -101,7 +101,7 @@ You must include the following:</p>
 </pre>
 
 <a name='plugins'><h2>Plugins</h2>
-<p>To add new functionality to the Caboose station, extend the CaboosePlugin
+<p>To add new functionality to the Caboose station, extend the Caboose::CaboosePlugin
 object and override the methods you'd like to implement.  The existing hooks
 are the following:</p>
 
@@ -109,5 +109,5 @@ are the following:</p>
   <dt><code>String page_content(String str)</code></dt>
   <dd>Manipulate the page content before it's shown on the screen.</dd>  
   <dt><code>Array admin_nav(Array arr)</code></dt>
-  <dd>Add items to the navigation that appears in the caboose station.</dd>
+  <dd>Add items to the navigation that appears in the Caboose station.</dd>
 </dl>

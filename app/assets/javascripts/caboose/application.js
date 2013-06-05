@@ -10,7 +10,6 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require caboose_before
 //= require jquery
 //= require jquery_ujs
 //= require jquery.ui.all
@@ -32,7 +31,8 @@
 //= require attribute/select
 //= require attribute/texarea
 //= require attribute/textjs
+//= require attribute/h1
 //= require attribute/time
 //= require attribute/video
 //= require caboose/station
-//= require caboose_after
+//= require application

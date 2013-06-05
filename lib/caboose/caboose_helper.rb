@@ -1,8 +1,9 @@
 
 class CabooseHelper
   
-  def initialize(app_path)
+  def initialize(app_path, force = false)
     @app_path = app_path
+    @force = false
   end
   
   def init_all
@@ -21,7 +22,7 @@ class CabooseHelper
     filename = File.join(@app_path, filename)  
     copy_from = File.join(gem_root,'lib','sample_files', Pathname.new(filename).basename)
     
-    if (!File.exists?(filename))
+    if (!File.exists?(filename) || @force)
       FileUtils.cp(copy_from, filename)
     end  
   end
@@ -30,7 +31,8 @@ class CabooseHelper
   def init_gem
     puts "Adding the caboose gem to the Gemfile... "
     filename = File.join(@app_path,'Gemfile')
-    return if !File.exists?(filename)
+    return if !File.exists?(filename)    
+    return if !@force
     
     file = File.open(filename, 'rb')
     str = file.read
@@ -78,7 +80,7 @@ class CabooseHelper
     puts "Adding the caboose initializer file..."
     
     filename = File.join(@app_path,'config','initializers','caboose.rb')
-    return if File.exists?(filename)
+    return if File.exists?(filename) && !@force
     
     Caboose::salt = Digest::SHA1.hexdigest(DateTime.now.to_s)
     str = ""
@@ -98,6 +100,7 @@ class CabooseHelper
     
     filename = File.join(@app_path,'config','routes.rb')
     return if !File.exists?(filename)
+    return if !@force
     
     str = "" 
     str << "\t# Catch everything with caboose\n"  

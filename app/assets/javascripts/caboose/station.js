@@ -9,7 +9,7 @@ CabooseStation = Class.extend({
     
     init: function()
     {       
-      this.wrapper_width = $('caboose_station_wrapper').width();
+      this.wrapper_width = $('#caboose_station_wrapper').width();
       this.attach_dom();
       $('body').css('overflow', 'scroll-y'); 
       //alert(this.open_tabs);

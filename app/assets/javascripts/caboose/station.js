@@ -27,7 +27,8 @@ CabooseStation = Class.extend({
       else
       {
         $('#caboose_station_wrapper').css('right', 0);
-        $('#caboose_station').hide();
+        $('#caboose_station_wrapper').css('width', 0);
+        $('#caboose_station_wrapper').show();
         this.state = 'min';
       }
     },

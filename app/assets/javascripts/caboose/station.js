@@ -110,6 +110,7 @@ CabooseStation = Class.extend({
       if (!func_after)
         func_after = function() {};
       
+      alert(this.state);
       $('#caboose_station').removeClass('state_min state_left').addClass('state_right');
       if (this.state == 'left')
       {

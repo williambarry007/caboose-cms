@@ -61,7 +61,7 @@ when 'init'
     exit
   end
   
-  helper = CabooseHelper.new(path, opt.force)
+  helper = CabooseHelper.new(path, opts.force)
   helper.init_all
   
 else

@@ -3,7 +3,7 @@ class CabooseHelper
   
   def initialize(app_path, force = false)
     @app_path = app_path
-    @force = false
+    @force = force
   end
   
   def init_all

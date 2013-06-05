@@ -58,6 +58,7 @@ body {
 
 #caboose_station {
   width: 208px;
+  height: 100%;
   background: #e1e1e1;
   border: #aaa 1px solid;
 }

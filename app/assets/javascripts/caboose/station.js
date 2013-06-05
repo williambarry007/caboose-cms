@@ -117,7 +117,7 @@ CabooseStation = Class.extend({
       }
       else if (this.state == 'min')
       {
-        $('#caboose_station').show('slide', { direction: 'left' }, 300);
+        $('#caboose_station').show('slide', { direction: 'right' }, 300);
       }
       this.state = 'right'; 
     },

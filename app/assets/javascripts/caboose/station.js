@@ -38,7 +38,7 @@ CabooseStation = Class.extend({
         this2.open_tabs[this2.open_tabs.length] = id;
       });
       
-      $('#caboose_conductor').click(function() { this2.open(); });  
+      $('#caboose_conductor').click(function() { this2.right(); });  
       $('#caboose_station ul.hidden').hide();
       $('#caboose_station li a.top_level').click(function() {
         ul = $(this).parent().children("ul.hidden:first");
@@ -97,18 +97,10 @@ CabooseStation = Class.extend({
       if (this.state == 'left')
         return;
       if (!func_after)
-        func_after = function() {};      
-      if (this.state == 'right')
-      {
-        var w = $(window).width() - $('#caboose_station').width();
-        $('#caboose_station').animate({ left: '-=' + w }, 300, func_after);
-      }
-      else if (this.state == 'min')
-      {
-        var w = $(window).width();
-        $('#caboose_station').animate({ left: '+=' + w }, 300, func_after);
-      }
-      $('#caboose_station').removeClass('state_min state_right').addClass('state_left');
+        func_after = function() {};
+
+      $('#caboose_station').removeClass('state_min state_right').addClass('state_left');      
+      $('#caboose_station').animate({ left: 0 }, 300, func_after);
       this.state = 'left'; 
     },
     
@@ -118,35 +110,10 @@ CabooseStation = Class.extend({
         return;
       if (!func_after)
         func_after = function() {};
-      if (this.state == 'left')
-      {
-        var w = $(window).width() - $('#caboose_station').width();
-        $('#caboose_station').animate({ left: '+=' + w }, 300, func_after);
-      }
-      else if (this.state == 'min')
-      {
-        $('#caboose_station').show('slide', { direction: 'right' }, 300, func_after);        
-      }
+      
       $('#caboose_station').removeClass('state_min state_left').addClass('state_right');
+      $('#caboose_station').animate({ right: 0 }, 300, func_after);
       this.state = 'right'; 
-    },
-    
-    open: function() 
-    {
-      if (this.state == 'min')
-        this.right();
-      else if (this.state == 'right')
-        this.left();
-    },
-    
-    close: function() 
-    {
-      if (this.state == 'min')
-        return;
-      if (this.state == 'left')
-        this.right();
-      else if (this.state == 'right');
-        this.min();      
     },
     
     open_url: function(url)
@@ -206,7 +173,7 @@ CabooseStation = Class.extend({
           var w = $(window).width() - $('#caboose_station').width();
           $('#caboose_station').removeClass('state_left').addClass('state_right');
           $('#content_wrapper').animate({ marginLeft: '+=' + w }, 300);
-          $('#caboose_station').animate({ left: '+=' + w }, 300, function() { window.location = url; })
+          $('#caboose_station').animate({ right: 0 }, 300, function() { window.location = url; })
         }
       }); 
     }

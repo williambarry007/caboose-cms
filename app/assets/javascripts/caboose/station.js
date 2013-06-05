@@ -88,6 +88,7 @@ CabooseStation = Class.extend({
         var w = $(window).width();
         $('#caboose_station').animate({ left: '+=' + w }, 300);
       }
+      $('#caboose_station').removeClass('state_left state_right').addClass('state_min');
       this.state = 'min';
     },
     
@@ -107,6 +108,7 @@ CabooseStation = Class.extend({
         var w = $(window).width();
         $('#caboose_station').animate({ left: '+=' + w }, 300, func_after);
       }
+      $('#caboose_station').removeClass('state_min state_right').addClass('state_left');
       this.state = 'left'; 
     },
     
@@ -125,6 +127,7 @@ CabooseStation = Class.extend({
       {
         $('#caboose_station').show('slide', { direction: 'right' }, 300, func_after);        
       }
+      $('#caboose_station').removeClass('state_min state_left').addClass('state_right');
       this.state = 'right'; 
     },
     

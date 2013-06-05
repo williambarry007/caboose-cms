@@ -19,7 +19,7 @@ $ gem install caboose-cms
 <pre>
 $ caboose new my_caboose_app
 </pre>
-<p>Now go create a local MySQL database called my_caboose_app_development. Then let caboose install the database:</p>
+<p>Now go create a local MySQL database called <code>my_caboose_app_development</code>. Then let caboose install the database:</p>
 <pre>
 $ cd my_caboose_app
 $ rake caboose:db

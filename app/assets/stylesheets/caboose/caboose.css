@@ -172,6 +172,7 @@ body {
 #caboose_station ul.admin li#nav_item_pages       a.top_level:active { background-position: -424px -275px; }
 #caboose_station ul.admin li#nav_item_settings    a.top_level:active { background-position: -424px -328px; }
 
+#caboose_station.state_min a.close,
 #caboose_station.state_left a.close, 
 #caboose_station.state_right a.close {
   display: block;
@@ -187,9 +188,12 @@ body {
   overflow: hidden;
 }
 
-#caboose_station.state_left  a.close        { background-position:    0px -422px; } /* Back  */
-#caboose_station.state_right a.close        { background-position:    0px -380px; } /* Close */
-#caboose_station.state_left  a.close:hover  { background-position: -212px -422px; } /* Back  */
-#caboose_station.state_right a.close:hover  { background-position: -212px -380px; } /* Close */
-#caboose_station.state_left  a.close:active { background-position: -424px -422px; } /* Back  */
-#caboose_station.state_right a.close:active { background-position: -424px -380px; } /* Close */
+#caboose_station.state_left  a.close        { background-position:    0px -422px; }
+#caboose_station.state_right a.close        { background-position:    0px -380px; }
+#caboose_station.state_min   a.close        { background-position:    0px -380px; }
+#caboose_station.state_left  a.close:hover  { background-position: -212px -422px; }
+#caboose_station.state_right a.close:hover  { background-position: -212px -380px; }
+#caboose_station.state_min   a.close:hover  { background-position: -212px -380px; }
+#caboose_station.state_left  a.close:active { background-position: -424px -422px; }
+#caboose_station.state_right a.close:active { background-position: -424px -380px; }
+#caboose_station.state_min   a.close:active { background-position: -424px -380px; }

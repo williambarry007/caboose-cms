@@ -53,7 +53,7 @@ body {
   z-index: 100;
   width: 208px;
   height: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 #caboose_station {

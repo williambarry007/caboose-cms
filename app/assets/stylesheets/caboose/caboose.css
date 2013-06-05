@@ -41,11 +41,16 @@ body {
   text-decoration: none;
 }
 
+#caboose_white {
+  z-index: 99;
+}
+
 #caboose_station {
   display: none;
   position: absolute;
   top: 0;
   right: 0;
+  z-index: 100;
   width: 208px;
   height: 100%;
   background: #e1e1e1;

@@ -184,13 +184,7 @@ CabooseStation = Class.extend({
               })
             );
           $('#caboose_station').removeClass('state_right').addClass('state_left');
-          $('#caboose_station').animate({ left: '-=' + w }, 300, function() {
-            //$.ajax({
-            //  url: url,
-            //  success: function(html) { window.location = url; }
-            //});
-            window.location = url; 
-          });
+          $('#caboose_station').animate({ left: 0 }, 300, function() { window.location = url; });
           $('#caboose_white').animate({ width: '+=' + w }, 300);
         }
       });

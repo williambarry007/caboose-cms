@@ -10,11 +10,15 @@ allows a developer to easily customize the look and feel of each page.</p>
 <li><a href='#plugins'>Plugins</a></li>
 
 <a name='installation'></a><h2>Installation</h2>
+<p>Install the caboose-cms gem:</p>
 <pre>
 $ gem install caboose-cms
+</pre>
+<p>Create a new rails app configured to use caboose:</p>
+<pre>
 $ caboose new my_caboose_app
 </pre>
-<p>Now go create a local MySQL database called my_caboose_app_development. Then:</p>
+<p>Now go create a local MySQL database called my_caboose_app_development. Then let caboose install the database:</p>
 <pre>
 $ cd my_caboose_app
 $ rake caboose:db
@@ -48,34 +52,34 @@ You must include the following:</p>
 <ul>
   <li>
     <p>CSS and CSRF in the head:</p>
-    <pre><code>
+    <pre>
     &lt;%= yield :css %&gt;
     &lt;%= csrf_meta_tags %&gt;
-    </code></pre>
+    </pre>
   </li>
   <li>
     <p>The top nav login/control panel link:</p>
-    <pre><code>
+    <pre>
     &lt;%= render :partial => 'layouts/caboose/top_nav' %&gt;
-    </code></pre>
+    </pre>
   </li>
   <li>
     <p>The top nav login/control panel link:</p>
-    <pre><code>
+    <pre>
     &lt;%= render :partial => 'layouts/caboose/top_nav' %&gt;
-    </code></pre>
+    </pre>
   </li>
   <li>
     <p>The station and javascript in the footer:</p>
-    <pre><code>
+    <pre>
     &lt;%= render :partial => 'layouts/caboose/station' %&gt;
     &lt;%= yield :js %&gt;
-    </code></pre>
+    </pre>
   </li>
 </ul>
 <p>You have access to the <code>@page</code> object in the layout.  Here's a bare-bones example of all the elements:
 
-<pre><code>
+<pre>
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
@@ -93,7 +97,7 @@ You must include the following:</p>
 &lt;%= yield :js %&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-</code></pre>
+</pre>
 
 <a name='plugins'><h2>Plugins</h2>
 <p>To add new functionality to the Caboose station, extend the CaboosePlugin

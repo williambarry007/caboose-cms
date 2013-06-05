@@ -78,6 +78,11 @@ CabooseStation = Class.extend({
         else if (this2.state == 'right')
           this2.min();
       });
+      
+      $('#caboose_station li.my_account a').click(function(event) {
+        event.preventDefault();
+        this2.open_url($(this).attr('href'));
+      });
     },
     
     min: function(func_after)
@@ -126,7 +131,7 @@ CabooseStation = Class.extend({
     },
     
     open_url: function(url)
-    {      
+    {
       // Send the station settings first
       var this2 = this;
       $.ajax({

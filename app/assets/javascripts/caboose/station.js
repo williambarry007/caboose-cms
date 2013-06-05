@@ -5,9 +5,11 @@ CabooseStation = Class.extend({
     conductor: false,
     state: 'min', // left, right, or min
     open_tabs: [], // Currently open tabs
+    wrapper_width: 0,
     
     init: function()
     {       
+      this.wrapper_width = $('caboose_station_wrapper').width();
       this.attach_dom();
       $('body').css('overflow', 'scroll-y'); 
       //alert(this.open_tabs);
@@ -118,7 +120,7 @@ CabooseStation = Class.extend({
       }
       else if (this.state == 'min')
       {        
-        $('#caboose_station_wrapper').animate({ width: 208 }, 300, func_after);
+        $('#caboose_station_wrapper').animate({ width: this.wrapper_width }, 300, func_after);
       }
       this.state = 'right'; 
     },

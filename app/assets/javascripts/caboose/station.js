@@ -179,7 +179,7 @@ CabooseStation = Class.extend({
           var w = $(window).width() - $('#caboose_station').width();
           $('#caboose_station').removeClass('state_left').addClass('state_right');
           $('#content_wrapper').animate({ marginLeft: '+=' + w }, 300);
-          $('#caboose_station').animate({ right: 0 }, 300, function() { window.location = url; })
+          $('#caboose_station').animate({ left: w }, 300, function() { window.location = url; })
         }
       }); 
     }

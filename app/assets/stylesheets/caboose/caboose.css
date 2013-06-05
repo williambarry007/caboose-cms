@@ -4,7 +4,8 @@ body {
 }
 
 #wrapper {
-  width: 960px; 
+  width: 960px;
+  position: relative;
 }
 
 .page_links {

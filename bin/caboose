@@ -14,23 +14,23 @@ require 'trollop'
 #puts "  caboose init [<app_path>]\n\n"
 #exit
   
-SUB_COMMANDS = %w(version, init, new)
 global_opts = Trollop::options do
   banner <<-EOS
 --------------------------------------------------------------------------------  
 Caboose CMS
 A content management system built on top of Ruby on Rails.
 --------------------------------------------------------------------------------
+Usage:
+caboose new <path>
+caboose init [<path>] [--force]
+--------------------------------------------------------------------------------
 EOS
-  stop_on SUB_COMMANDS
+  version "Caboose CMS Version #{Caboose::VERSION}\n\n"
+  stop_on ['version', 'new', 'init']
 end
 
 cmd = ARGV.shift
 case cmd
-
-when 'version'
-  puts "Caboose CMS Version #{Caboose::VERSION}\n\n"
-  exit
 
 when 'new'
   

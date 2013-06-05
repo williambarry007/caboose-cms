@@ -14,20 +14,19 @@ CabooseStation = Class.extend({
       if ($('#caboose_station').hasClass('state_left'))
       {
         $('#caboose_station').css('left', 0);
-        $('#caboose_station').show();
         this.state = 'left';
       }
       else if ($('#caboose_station').hasClass('state_right'))
       {
         $('#caboose_station').css('right', 0);
-        $('#caboose_station').show();
         this.state = 'right';
       }
       else
       {
-        $('#caboose_station').hide();
+        $('#caboose_station').css(left: $(window).width());
         this.state = 'min';
       }
+      $('#caboose_station').show();
     },
     
     attach_dom: function()

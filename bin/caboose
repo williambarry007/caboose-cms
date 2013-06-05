@@ -22,7 +22,7 @@ A content management system built on top of Ruby on Rails.
 --------------------------------------------------------------------------------
 Usage:
 caboose new <path>
-caboose init [<path>] [--force]
+caboose init [--force] [<path>]
 --------------------------------------------------------------------------------
 EOS
   version "Caboose CMS Version #{Caboose::VERSION}\n\n"
@@ -48,16 +48,17 @@ when 'new'
   
 when 'init'
   
+  opts = Trollop::options do
+    opt :force, 'Force re-installation of all caboose files.', :default => false
+  end
+  
   path = ARGV.shift
   path = Dir.pwd if path.nil?  
   is_rails_app = File.exists(File.join(path, 'config', 'environment.rb'))  
   if (!is_rails_app)
     puts "Error: Not a rails app.\n\n"
     global_opts.help
-    exit 
-  end
-  opts = Trollop::options do
-    opt :force, 'Force re-installation of all caboose files.', :default => false
+    exit
   end
   
   helper = CabooseHelper.new(path, opt.force)

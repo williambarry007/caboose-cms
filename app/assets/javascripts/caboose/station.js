@@ -9,7 +9,7 @@ CabooseStation = Class.extend({
     init: function()
     {       
       this.attach_dom();
-      $('body').css('overflow', 'scroll-y');
+      $('body').css('overflow', 'scroll-y'); 
       //alert(this.open_tabs);
 
       if ($('#caboose_station').hasClass('state_left'))

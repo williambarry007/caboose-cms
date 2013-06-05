@@ -23,7 +23,7 @@ CabooseStation = Class.extend({
       }
       else
       {
-        $('#caboose_station').css(left: $(window).width());
+        $('#caboose_station').css('left', $(window).width());
         this.state = 'min';
       }
       $('#caboose_station').show();
@@ -74,20 +74,16 @@ CabooseStation = Class.extend({
       });
     },
     
-    min: function()
+    min: function(func_after)
     {
       if (this.state == 'min')
         return;
-      if (this.state == 'right')
-      {
-        $('#caboose_station').hide('slide', { direction: 'right' }, 300);
-      }
-      else if (this.state == 'left')
-      {
-        var w = $(window).width();
-        $('#caboose_station').animate({ left: '+=' + w }, 300);
-      }
+      if (!func_after)
+        func_after = function() {};
+      
+      var w = $(window).width();
       $('#caboose_station').removeClass('state_left state_right').addClass('state_min');
+      $('#caboose_station').animate({ left: w }, 300);
       this.state = 'min';
     },
     

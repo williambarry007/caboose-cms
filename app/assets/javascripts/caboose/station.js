@@ -86,7 +86,7 @@ CabooseStation = Class.extend({
       
       // Assume you never go from left to min
       $('#caboose_station').removeClass('state_left state_right').addClass('state_min');
-      $('#caboose_station').hide('slide', { direction: 'left' }, 300);
+      $('#caboose_station').hide('slide', { direction: 'right' }, 300);
       this.state = 'min';
     },
     

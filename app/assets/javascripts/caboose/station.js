@@ -152,9 +152,9 @@ CabooseStation = Class.extend({
               .attr('id', 'caboose_white')
               .css({
                 position: 'absolute',
-                right: -1,
+                right: 0,
                 top: 0,
-                width: 1,
+                width: 0,
                 height: h,
                 background: 'url(/assets/loading.gif) 40px 40px no-repeat #fff'
               })

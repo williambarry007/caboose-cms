@@ -53,7 +53,8 @@ when 'init'
   end
   
   path = ARGV.shift
-  path = Dir.pwd if path.nil?  
+  path = Dir.pwd if path.nil?
+  puts "path = #{path}\n"  
   is_rails_app = File.exists(File.join(path, 'config', 'environment.rb'))  
   if (!is_rails_app)
     puts "Error: Not a rails app.\n\n"

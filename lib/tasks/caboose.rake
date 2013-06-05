@@ -128,7 +128,7 @@ namespace :caboose do
 		
   end
   
-  def init_data
+  def load_data
     puts "Loading data into caboose tables..."
     
     admin_user = Caboose::User.create(first_name: 'Admin', last_name: 'User', username: 'admin', email: 'william@nine.is')

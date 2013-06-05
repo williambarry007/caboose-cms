@@ -110,15 +110,16 @@ CabooseStation = Class.extend({
       if (!func_after)
         func_after = function() {};
       
-      alert(this.state);
-      $('#caboose_station').removeClass('state_min state_left').addClass('state_right');
       if (this.state == 'left')
       {
+        $('#caboose_station').removeClass('state_min state_left').addClass('state_right');
         $('#caboose_station').animate({ right: 0 }, 300, func_after);
       }
       else if (this.state == 'min')
       {
-        $('#caboose_station').show('slide', { direction: 'right' }, 300);
+        $('#caboose_station').show('slide', { direction: 'right' }, 300, function() {
+          $('#caboose_station').removeClass('state_min state_left').addClass('state_right');   
+        });
       }
       this.state = 'right'; 
     },

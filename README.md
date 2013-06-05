@@ -8,6 +8,7 @@ allows a developer to easily customize the look and feel of each page.</p>
 <li><a href='#installation'>Installation</a></li>
 <li><a href='#layouts'>Layouts</a></li>
 <li><a href='#plugins'>Plugins</a></li>
+</ul>
 
 <a name='installation'></a><h2>Installation</h2>
 <p>Install the caboose-cms gem:</p>

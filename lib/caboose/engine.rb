@@ -4,7 +4,7 @@ require 'jquery-ui-rails'
 require 'modeljs'
 
 module Caboose
-  
+
   def Caboose.log(message, title = nil)
     if (Rails.logger.nil?)
       puts "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"

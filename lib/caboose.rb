@@ -1,7 +1,7 @@
 require "caboose/engine"
 
 module Caboose
-  
+      
   mattr_accessor :salt
   @@salt = "This needs to be changed pronto."
 

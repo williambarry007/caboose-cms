@@ -8,18 +8,12 @@
 <body>
 <div id='wrapper'>
   <div id='header'>
-    <div id='top_nav'>
-      <% if (@user.nil? || @user.id == Caboose::User::LOGGED_OUT_USER_ID) %>
-        <%= link_to "Login", "/login?return_url=#{request.fullpath}", :id => 'caboose_login' %>
-      <% else %>
-        <%= link_to "Control Panel", '#', :id => 'caboose_conductor' %>
-      <% end %>
-    </div>
+    <%= render :partial => 'layouts/caboose/top_nav' %>
   </div>
   <div id='content_wrapper'>
     <div id='content'>
 
-<% if (yield) %>
+<% if (yield && yield.strip.length > 0) %>
 <%= yield %>
 <% elsif (!@page.nil?) %>
 <h1><%= @page.title %></h1>

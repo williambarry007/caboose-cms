@@ -43,7 +43,7 @@ CabooseStation = Class.extend({
         this2.open_tabs[this2.open_tabs.length] = id;
       });
       
-      $('#caboose_conductor').click(function() { 
+      $('#caboose_conductor').click(function(event) { 
         event.preventDefault();
         this2.right(); 
       });  

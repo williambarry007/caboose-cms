@@ -1,0 +1,64 @@
+ 
+<h1>Edit Workout</h1>
+
+<p><select name='day' onchange="window.location='/workouts/'+this.value+'/edit';">
+<% @workouts.each do |w| %>
+  <% 
+  text = "Day #{w.day}" + (w.name.nil? ? "" : " - #{w.name}")
+  selected = w.day == @workout.day ? " selected='true'" : ''
+  %>
+  <option value="<%= w.day %>"<%= selected %>><%= text %></option>
+<% end %>
+</select></p>
+<hr />
+<div id='workout_<%= @workout.id %>_container'></div>
+
+<h2>Sets</h2>        
+<div id='set_listing_container'></div>
+<h2>New Set</h2>
+<div id='set_new_container'></div>
+
+<% content_for :css do %>
+<%= stylesheet_link_tag "workouts", :media => "all" %>
+<% end %>
+<% content_for :js do %>
+<%= javascript_include_tag "model.form.set" %>
+<script type="text/javascript">    
+$(document).ready(function() {
+
+new Controller({
+
+  init: function()
+  {
+    var workout = new Model({
+      name: 'Workout',
+      id: <%= @workout.id %>,
+      attributes: [
+        { name: 'name'            , type: 'text'      , value: <%= raw @workout.name.to_json %> },
+        { name: 'description'     , type: 'textarea'  , value: <%= raw @workout.description.to_json %>, width: 400, height: 200 }
+      ]
+    });
+    
+  var set = new Model({
+    name: 'Set',
+    id: 'new',
+    form: 'Model.Form.Set',
+    post_add: function() { 
+      set.listing();
+      $('#'+set.message).empty();
+    },    
+    listing_url: '/sets/listing?workout_id=<%= @workout.id %>',
+    attributes: [
+      { name: 'workout_id'  , type: 'hidden' , value: <%= @workout.id %> }, 
+      { name: 'category_id' , type: 'select' , value: -1, options_url: '/workouts/category-options' },
+      { name: 'movement_id' , type: 'select' , value: -1, options_url: '/movements/options' },
+      { name: 'qty'         , type: 'text'   , value:  1, show_reminder: false, css: { width: 40, textAlign: 'right' } },
+      { name: 'reps'        , type: 'text'   , value: 10, show_reminder: false, css: { width: 40, textAlign: 'right' } },
+      { name: 'per_unit'    , type: 'text'   , value: '', show_reminder: false, css: { width: 40, textAlign: 'right' } },
+      { name: 'hold_time'   , type: 'text'   , value: '', show_reminder: false, css: { width: 40, textAlign: 'right' } }
+    ]
+  });
+
+});
+</script>
+<% end %>

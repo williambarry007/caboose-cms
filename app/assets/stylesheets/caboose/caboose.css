@@ -62,6 +62,7 @@ body {
   height: 100%;
   background: #e1e1e1;
   border: #aaa 1px solid;
+  font-family: BigNoodleTitling, Tahoma; 
 }
 
 #caboose_station h2 {
@@ -73,9 +74,12 @@ body {
   border-bottom: #aaa 1px solid;
   
   /* Hide the text. */
+  /*
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
+  */
+  font-family: BigNoodleTitling, Tahoma;
 }
 
 #caboose_station ul.account {
@@ -104,9 +108,12 @@ body {
   background-position: 0 0;
   
   /* Hide the text. */
+  /*
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
+  */
+  font-family: BigNoodleTitling, Tahoma;
 }
 
 #caboose_station ul.account li.my_account a { width: 103px; background-position:    0px 0px; border-right: #828181 1px solid; }
@@ -195,9 +202,12 @@ body {
   height: 50px;
   
   /* Hide the text. */
+  /*
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
+  */
+  font-family: BigNoodleTitling, Tahoma;
 }
 
 #caboose_station_wrapper.state_left  a.close        { background-position:    0px -422px; }

@@ -43,7 +43,7 @@ when 'new'
   
   puts "Creating the new rails app..."
   `rails new #{path} -d=mysql`  
-  helper = CabooseHelper.new(path)  
+  helper = CabooseHelper.new(path, true)
   helper.init_all
   
 when 'init'

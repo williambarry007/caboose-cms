@@ -217,21 +217,21 @@ body {
 #caboose_station ul.admin li#nav_item_settings    a.top_level { background-position: 0px -300px; }
 #caboose_station ul.admin li#nav_item_star        a.top_level { background-position: 0px -350px; }
 
-#caboose_station ul.admin li                      a.top_level:hover { background-position: -100px -350px; }
-#caboose_station ul.admin li#nav_item_users       a.top_level:hover { background-position: -100px -100px; }
-#caboose_station ul.admin li#nav_item_roles       a.top_level:hover { background-position: -100px -150px; }
-#caboose_station ul.admin li#nav_item_permissions a.top_level:hover { background-position: -100px -200px; }
-#caboose_station ul.admin li#nav_item_pages       a.top_level:hover { background-position: -100px -250px; }
-#caboose_station ul.admin li#nav_item_settings    a.top_level:hover { background-position: -100px -300px; }
-#caboose_station ul.admin li#nav_item_star        a.top_level:hover { background-position: -100px -350px; }
+#caboose_station ul.admin li                      a.top_level:hover { background-position: -250px -350px; }
+#caboose_station ul.admin li#nav_item_users       a.top_level:hover { background-position: -250px -100px; }
+#caboose_station ul.admin li#nav_item_roles       a.top_level:hover { background-position: -250px -150px; }
+#caboose_station ul.admin li#nav_item_permissions a.top_level:hover { background-position: -250px -200px; }
+#caboose_station ul.admin li#nav_item_pages       a.top_level:hover { background-position: -250px -250px; }
+#caboose_station ul.admin li#nav_item_settings    a.top_level:hover { background-position: -250px -300px; }
+#caboose_station ul.admin li#nav_item_star        a.top_level:hover { background-position: -250px -350px; }
 
-#caboose_station ul.admin li                      a.top_level:active { background-position: -200px -350px; }
-#caboose_station ul.admin li#nav_item_users       a.top_level:active { background-position: -200px -100px; }
-#caboose_station ul.admin li#nav_item_roles       a.top_level:active { background-position: -200px -150px; }
-#caboose_station ul.admin li#nav_item_permissions a.top_level:active { background-position: -200px -200px; }
-#caboose_station ul.admin li#nav_item_pages       a.top_level:active { background-position: -200px -250px; }
-#caboose_station ul.admin li#nav_item_settings    a.top_level:active { background-position: -200px -300px; }
-#caboose_station ul.admin li#nav_item_star        a.top_level:active { background-position: -200px -350px; }
+#caboose_station ul.admin li                      a.top_level:active { background-position: -500px -350px; }
+#caboose_station ul.admin li#nav_item_users       a.top_level:active { background-position: -500px -100px; }
+#caboose_station ul.admin li#nav_item_roles       a.top_level:active { background-position: -500px -150px; }
+#caboose_station ul.admin li#nav_item_permissions a.top_level:active { background-position: -500px -200px; }
+#caboose_station ul.admin li#nav_item_pages       a.top_level:active { background-position: -500px -250px; }
+#caboose_station ul.admin li#nav_item_settings    a.top_level:active { background-position: -500px -300px; }
+#caboose_station ul.admin li#nav_item_star        a.top_level:active { background-position: -500px -350px; }
 
 #caboose_station_wrapper.state_min a.close,
 #caboose_station_wrapper.state_left a.close, 
@@ -262,9 +262,9 @@ body {
 #caboose_station_wrapper.state_left  a.close        { background-position:    0px -450px; }
 #caboose_station_wrapper.state_right a.close        { background-position:    0px -400px; }
 #caboose_station_wrapper.state_min   a.close        { background-position:    0px -400px; }
-#caboose_station_wrapper.state_left  a.close:hover  { background-position: -100px -450px; }
-#caboose_station_wrapper.state_right a.close:hover  { background-position: -100px -400px; }
-#caboose_station_wrapper.state_min   a.close:hover  { background-position: -100px -400px; }
-#caboose_station_wrapper.state_left  a.close:active { background-position: -200px -450px; }
-#caboose_station_wrapper.state_right a.close:active { background-position: -200px -400px; }
-#caboose_station_wrapper.state_min   a.close:active { background-position: -200px -400px; }
+#caboose_station_wrapper.state_left  a.close:hover  { background-position: -250px -450px; }
+#caboose_station_wrapper.state_right a.close:hover  { background-position: -250px -400px; }
+#caboose_station_wrapper.state_min   a.close:hover  { background-position: -250px -400px; }
+#caboose_station_wrapper.state_left  a.close:active { background-position: -500px -450px; }
+#caboose_station_wrapper.state_right a.close:active { background-position: -500px -400px; }
+#caboose_station_wrapper.state_min   a.close:active { background-position: -500px -400px; }

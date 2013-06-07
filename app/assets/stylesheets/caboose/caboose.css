@@ -154,7 +154,7 @@ body {
 }
 
 #caboose_station ul.admin a {
-  display: block;
+  display: block !important;
   margin: 1px 0 0 0;
   padding: 8px 10px;
   color: #505050;
@@ -189,7 +189,7 @@ body {
 }
 
 #caboose_station ul.admin li a.top_level span {
-  display: block;
+  display: block !important;
   margin: 0 0 0 60px;
   padding: 16px 0 0 0;
   height: 34px;

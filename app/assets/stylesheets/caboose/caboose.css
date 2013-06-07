@@ -65,7 +65,17 @@ body {
   font-family: BigNoodleTitling, Tahoma; 
 }
 
+#caboose_station .caboose_logo {
+  height: 100px;
+  background-image: url('/assets/caboose/caboose_nav.png');
+  background-position: 64px 0;
+  margin: 0;
+  padding: 0;
+  border-bottom: #aaa 1px solid;
+}
+
 #caboose_station h2 {
+  display: none;
   height: 40px;
   background-image: url('/assets/caboose/caboose_nav.png');
   background-position: 64px 0;
@@ -110,8 +120,8 @@ body {
 #caboose_station ul.account li a {
   display: block;
   margin: 0;
-  padding: 8px 0 0 0;
-  height: 25px;
+  padding: 0;
+  height: 33px;
  
   /* Hide the text. */
   /*
@@ -126,6 +136,9 @@ body {
   text-decoration: none;
   text-align: center;
   border-bottom: #cecece 1px solid;
+}
+#caboose_station ul.account li a span {
+  padding-top: 8px;
 }
 
 #caboose_station ul.account li.my_account a { width: 103px; border-right: #828181 1px solid; }
@@ -198,16 +211,8 @@ body {
   font-family: BigNoodleTitling, Tahoma;
   font-size: 16px;
 }
-
-#caboose_station ul.admin li a.top_level:hover span {
-  background: #e1e1e1;
-  color: #941403;
-}
-
-#caboose_station ul.admin li a.top_level:active span {
-  background: #d2d2d2;
-  color: #941403;
-}
+#caboose_station ul.admin li a.top_level:hover  span { color: #941403; }
+#caboose_station ul.admin li a.top_level:active span { color: #941403; }
 
 #caboose_station ul.admin li                      a.top_level { background-position: 0px -350px; }
 #caboose_station ul.admin li#nav_item_users       a.top_level { background-position: 0px -100px; }

@@ -23,15 +23,15 @@ end
     <a href='/login' class='login'>Login</a>
   <% else %>
     <ul class='account'>        
-      <li class='my_account'><a href='/admin/users/<%= @user.id %>/edit'>My Account</a></li>
+      <li class='my_account'><a href='/admin/users/<%= @user.id %>/edit'>Account</a></li>
       <li class='logout'><a href='/logout'>Logout</a></li>
     </ul>
-    <h2>Caboose Station</h2>
+    <h2><span>Caboose Station</span></h2>
     <ul class='admin'>
       <% i = 0 %>
       <% @nav.each do |item| %>
         <% id = item['id'].nil? ? i.to_s : item['id'] %>
-        <li id='nav_item_<%= id %>'><a href='#' class='top_level'><%= item['text'] %></a>
+        <li id='nav_item_<%= id %>'><a href='#' class='top_level'><span><%= item['text'] %></span></a>
         <% if (!item['children'].nil? && item['children'].count > 0) %>
           <%
           visible = open_tabs.include?(id) || (!item['show_children_default'].nil? && item['show_children_default'])
@@ -47,7 +47,7 @@ end
         <% i + 1 %>
       <% end %>
     </ul>
-    <a href='<%= return_url %>' class='close'>Close</a>
+    <a href='<%= return_url %>' class='close'><span>Close</span></a>
   <% end %>
 </div>
 </div>

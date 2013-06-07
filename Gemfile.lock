@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    caboose-cms (0.1.85)
+    caboose-cms (0.1.86)
       activesupport
       jquery-rails
       jquery-ui-rails

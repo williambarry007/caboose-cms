@@ -66,11 +66,11 @@ body {
 }
 
 #caboose_station h2 {
-  height: 86px;
+  height: 40px;
   background-image: url('/assets/caboose/caboose_nav.png');
-  background-position: 0 -33px;
+  background-position: 64px 0;
   margin: 0;
-  padding: 0;
+  padding: 80px 0 0 0;
   border-bottom: #aaa 1px solid;
   
   /* Hide the text. */
@@ -79,7 +79,16 @@ body {
   white-space: nowrap;
   overflow: hidden;
   */
-  font-family: BigNoodleTitling, Tahoma;
+}
+
+#caboose_station h2 span {
+  display: block;
+  color: #941403;
+  text-align: center;
+  font-size: 20px;
+  font-weight: normal;
+  background: #e1e1e1;
+  height: 40px;
 }
 
 #caboose_station ul.account {
@@ -101,12 +110,9 @@ body {
 #caboose_station ul.account li a {
   display: block;
   margin: 0;
-  padding: 0;
-  height: 33px;
-  background-image: url(/assets/caboose/caboose_nav.png);
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  
+  padding: 8px 0 0 0;
+  height: 25px;
+ 
   /* Hide the text. */
   /*
   text-indent: 100%;
@@ -114,13 +120,16 @@ body {
   overflow: hidden;
   */
   font-family: BigNoodleTitling, Tahoma;
+  font-size: 16px;
+  color: #505050;
+  background: #aaa;
+  text-decoration: none;
+  text-align: center;
+  border-bottom: #cecece 1px solid;
 }
 
-#caboose_station ul.account li.my_account a { width: 103px; background-position:    0px 0px; border-right: #828181 1px solid; }
-#caboose_station ul.account li.logout     a { width: 103px; background-position: -106px 0px; border-left:  #cecece 1px solid; }
-
-#caboose_station ul.account li.my_account a:hover { background-position: -212px 0px; }
-#caboose_station ul.account li.logout     a:hover { background-position: -318px 0px; }
+#caboose_station ul.account li.my_account a { width: 103px; border-right: #828181 1px solid; }
+#caboose_station ul.account li.logout     a { width: 103px; border-left:  #cecece 1px solid; }
 
 #caboose_station ul.account li a:hover {
   color: #941403;
@@ -156,40 +165,73 @@ body {
   color: #941403;
 }
 
-#caboose_station ul.admin a.top_level {
+#caboose_station ul.admin li a.top_level {
   background-image: url('/assets/caboose/caboose_nav.png');
   background-repeat: no-repeat;
   background-position: 0 0;
+  
   width: 208px;
   height: 50px;
   margin: 0;
   padding: 0;
   border-top: #f7f7f7 1px solid;
   border-bottom: #aaa 1px solid;
+  position: relative;
   
   /* Hide the text. */
+  /*
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
+  */
+  font-family: BigNoodleTitling, Tahoma;
+  font-size: 16px;
 }
 
-#caboose_station ul.admin li#nav_item_users       a.top_level { background-position: 0px -119px; }
-#caboose_station ul.admin li#nav_item_roles       a.top_level { background-position: 0px -171px; }
-#caboose_station ul.admin li#nav_item_permissions a.top_level { background-position: 0px -222px; }
-#caboose_station ul.admin li#nav_item_pages       a.top_level { background-position: 0px -275px; }
-#caboose_station ul.admin li#nav_item_settings    a.top_level { background-position: 0px -328px; }
+#caboose_station ul.admin li a.top_level span {
+  display: block;
+  margin: 0 0 0 60px;
+  padding: 16px 0 0 0;
+  height: 34px;
+  background: #e1e1e1;
+  vertical-align: middle;
+  font-family: BigNoodleTitling, Tahoma;
+  font-size: 16px;
+}
 
-#caboose_station ul.admin li#nav_item_users       a.top_level:hover { background-position: -212px -119px; }
-#caboose_station ul.admin li#nav_item_roles       a.top_level:hover { background-position: -212px -171px; }
-#caboose_station ul.admin li#nav_item_permissions a.top_level:hover { background-position: -212px -222px; }
-#caboose_station ul.admin li#nav_item_pages       a.top_level:hover { background-position: -212px -275px; }
-#caboose_station ul.admin li#nav_item_settings    a.top_level:hover { background-position: -212px -328px; }
+#caboose_station ul.admin li a.top_level:hover span {
+  background: #e1e1e1;
+  color: #941403;
+}
 
-#caboose_station ul.admin li#nav_item_users       a.top_level:active { background-position: -424px -119px; }
-#caboose_station ul.admin li#nav_item_roles       a.top_level:active { background-position: -424px -171px; }
-#caboose_station ul.admin li#nav_item_permissions a.top_level:active { background-position: -424px -222px; }
-#caboose_station ul.admin li#nav_item_pages       a.top_level:active { background-position: -424px -275px; }
-#caboose_station ul.admin li#nav_item_settings    a.top_level:active { background-position: -424px -328px; }
+#caboose_station ul.admin li a.top_level:active span {
+  background: #d2d2d2;
+  color: #941403;
+}
+
+#caboose_station ul.admin li                      a.top_level { background-position: 0px -350px; }
+#caboose_station ul.admin li#nav_item_users       a.top_level { background-position: 0px -100px; }
+#caboose_station ul.admin li#nav_item_roles       a.top_level { background-position: 0px -150px; }
+#caboose_station ul.admin li#nav_item_permissions a.top_level { background-position: 0px -200px; }
+#caboose_station ul.admin li#nav_item_pages       a.top_level { background-position: 0px -250px; }
+#caboose_station ul.admin li#nav_item_settings    a.top_level { background-position: 0px -300px; }
+#caboose_station ul.admin li#nav_item_star        a.top_level { background-position: 0px -350px; }
+
+#caboose_station ul.admin li                      a.top_level:hover { background-position: -100px -350px; }
+#caboose_station ul.admin li#nav_item_users       a.top_level:hover { background-position: -100px -100px; }
+#caboose_station ul.admin li#nav_item_roles       a.top_level:hover { background-position: -100px -150px; }
+#caboose_station ul.admin li#nav_item_permissions a.top_level:hover { background-position: -100px -200px; }
+#caboose_station ul.admin li#nav_item_pages       a.top_level:hover { background-position: -100px -250px; }
+#caboose_station ul.admin li#nav_item_settings    a.top_level:hover { background-position: -100px -300px; }
+#caboose_station ul.admin li#nav_item_star        a.top_level:hover { background-position: -100px -350px; }
+
+#caboose_station ul.admin li                      a.top_level:active { background-position: -200px -350px; }
+#caboose_station ul.admin li#nav_item_users       a.top_level:active { background-position: -200px -100px; }
+#caboose_station ul.admin li#nav_item_roles       a.top_level:active { background-position: -200px -150px; }
+#caboose_station ul.admin li#nav_item_permissions a.top_level:active { background-position: -200px -200px; }
+#caboose_station ul.admin li#nav_item_pages       a.top_level:active { background-position: -200px -250px; }
+#caboose_station ul.admin li#nav_item_settings    a.top_level:active { background-position: -200px -300px; }
+#caboose_station ul.admin li#nav_item_star        a.top_level:active { background-position: -200px -350px; }
 
 #caboose_station_wrapper.state_min a.close,
 #caboose_station_wrapper.state_left a.close, 
@@ -199,23 +241,30 @@ body {
   background-repeat: no-repeat;
   background-position: 0 0;
   width: 208px;
-  height: 50px;
-  
-  /* Hide the text. */
-  /*
-  text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  */
+  height: 50px;  
   font-family: BigNoodleTitling, Tahoma;
+  text-decoration: none;
 }
 
-#caboose_station_wrapper.state_left  a.close        { background-position:    0px -422px; }
-#caboose_station_wrapper.state_right a.close        { background-position:    0px -380px; }
-#caboose_station_wrapper.state_min   a.close        { background-position:    0px -380px; }
-#caboose_station_wrapper.state_left  a.close:hover  { background-position: -212px -422px; }
-#caboose_station_wrapper.state_right a.close:hover  { background-position: -212px -380px; }
-#caboose_station_wrapper.state_min   a.close:hover  { background-position: -212px -380px; }
-#caboose_station_wrapper.state_left  a.close:active { background-position: -424px -422px; }
-#caboose_station_wrapper.state_right a.close:active { background-position: -424px -380px; }
-#caboose_station_wrapper.state_min   a.close:active { background-position: -424px -380px; }
+#caboose_station_wrapper a.close span {
+  display: block;
+  margin: 0 0 0 60px;
+  padding: 16px 0 0 0;
+  height: 34px;
+  
+  font-family: BigNoodleTitling, Tahoma;
+  font-size: 16px;
+}
+#caboose_station_wrapper a.close        span { background: #e1e1e1; color: #505050; }
+#caboose_station_wrapper a.close:hover  span { background: #e1e1e1; color: #941403; }
+#caboose_station_wrapper a.close:active span { background: #d2d2d2; color: #941403; }
+
+#caboose_station_wrapper.state_left  a.close        { background-position:    0px -450px; }
+#caboose_station_wrapper.state_right a.close        { background-position:    0px -400px; }
+#caboose_station_wrapper.state_min   a.close        { background-position:    0px -400px; }
+#caboose_station_wrapper.state_left  a.close:hover  { background-position: -100px -450px; }
+#caboose_station_wrapper.state_right a.close:hover  { background-position: -100px -400px; }
+#caboose_station_wrapper.state_min   a.close:hover  { background-position: -100px -400px; }
+#caboose_station_wrapper.state_left  a.close:active { background-position: -200px -450px; }
+#caboose_station_wrapper.state_right a.close:active { background-position: -200px -400px; }
+#caboose_station_wrapper.state_min   a.close:active { background-position: -200px -400px; }

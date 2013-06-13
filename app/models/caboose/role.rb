@@ -51,7 +51,7 @@ class Caboose::Role < ActiveRecord::Base
   def is_ancestor_of?(role)    
     if (role.is_a?(Integer) || role.is_a?(String))
       role_id = role.to_i
-      return false if role_id = -1
+      return false if role_id == -1
       role = Caboose::Role.find(role)
     end
     return false if role.parent_id == -1

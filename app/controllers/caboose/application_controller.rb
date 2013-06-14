@@ -57,7 +57,7 @@ module Caboose
     # Returns the currently logged in user
     def logged_in_user
       if (!logged_in?)
-        return User.where('username' => 'elo').first
+        return User.logged_out_user
       end
       #return nil if !logged_in?
       return session["app_user"]

@@ -8,11 +8,31 @@ class Caboose::Role < ActiveRecord::Base
 
   attr_accessible :name, :description, :parent_id
   attr_accessor :children
+     
+  def self.admin_role
+    return self.where('name' => 'Admin').first
+  end
   
-  ADMIN_ROLE_ID = 1
-  LOGGED_OUT_ROLE_ID = 2
-  LOGGED_IN_ROLE_ID = 3
-   
+  def self.admin_role_id
+    return self.where('name' => 'Admin').limit(1).pluck(:id)[0]
+  end
+  
+  def self.logged_out_role
+    return self.where('name' => 'Everyone Logged Out').first
+  end
+  
+  def self.logged_out_role_id
+    return self.where('name' => 'Everyone Logged Out').limit(1).pluck(:id)[0]
+  end
+  
+  def self.logged_in_role
+    return self.where('name' => 'Everyone Logged In').first
+  end
+  
+  def self.logged_in_role_id
+    return self.where('name' => 'Everyone Logged In').limit(1).pluck(:id)[0]
+  end
+  
   def is_allowed(resource, action)
     
     # Check for the admin permission

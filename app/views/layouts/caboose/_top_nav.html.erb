@@ -1,6 +1,6 @@
 
 <div id='top_nav'>
-  <% if (@user.nil? || @user.id == Caboose::User::LOGGED_OUT_USER_ID) %>
+  <% if (@user.nil? || @user == Caboose::User.logged_out_user) %>
     <%= link_to "Login", "/login?return_url=#{request.fullpath}", :id => 'caboose_login' %>
   <% else %>
     <%= link_to "Control Panel", '#', :id => 'caboose_conductor' %>

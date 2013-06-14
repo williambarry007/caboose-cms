@@ -18,7 +18,7 @@ end
 <div id='caboose_station_wrapper' class='state_<%= initial_state %>'<%= raw style %>>
 <div id='caboose_station'>
   
-  <% if (@user.nil? || @user.id == Caboose::User::LOGGED_OUT_USER_ID) %>
+  <% if (@user.nil? || @user == Caboose::User.logged_out_user) %>
     <h2>Caboose Station</h2>
     <a href='/login' class='login'>Login</a>
   <% else %>

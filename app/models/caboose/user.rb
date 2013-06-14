@@ -4,7 +4,13 @@ class Caboose::User < ActiveRecord::Base
   has_and_belongs_to_many :roles
   attr_accessible :email, :first_name, :last_name, :username, :token, :password
   
-  LOGGED_OUT_USER_ID = 2
+  def self.logged_out_user
+    return self.where('username' => 'elo').first
+  end
+  
+  def self.logged_out_user_id
+    return self.where('username' => 'elo').limit(1).pluck(:id)[0]
+  end
   
   def is_allowed(resource, action)
     for role in roles

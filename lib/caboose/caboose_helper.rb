@@ -90,7 +90,23 @@ class CabooseHelper
     str << "Caboose::assets_path = Rails.root.join('app', 'assets', 'caboose')\n\n"
     str << "# Register any caboose plugins\n"
     str << "#Caboose::plugins + ['MyCaboosePlugin']\n\n"
-    
+    str << "# Tell the host app about the caboose assets\n"
+    str << "Rails.application.config.assets.paths << Rails.root.join('vendor','gems','caboose-cms','app','assets','javascripts')\n"
+    str << "Rails.application.config.assets.paths << Rails.root.join('vendor','gems','caboose-cms','app','assets','stylesheets')\n"
+    str << "Rails.application.config.assets.precompile += [\n"
+    str << "  'login.css',\n"
+    str << "  'caboose/admin.js',\n"
+    str << "  'caboose/application.js',\n"
+    str << "  'caboose/login.js',\n"
+    str << "  'caboose/model.form.page.js',\n"
+    str << "  'caboose/station.js',\n"
+    str << "  'caboose/admin.css',\n"
+    str << "  'caboose/application.css',\n"
+    str << "  'caboose/caboose.css',\n"
+    str << "  'caboose/fonts.css',\n"
+    str << "  'caboose/tinymce.css'\n"
+    str << "]\n\n"
+
     File.open(filename, 'w') {|file| file.write(str) }
   end
 

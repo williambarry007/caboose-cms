@@ -120,6 +120,8 @@ class CabooseHelper
   def init_assets
     puts "Adding the layout files..."
     init_file('app/views/layouts/layout_default.html.erb')
+    puts "Adding the layout files..."
+    init_file('app/assets/stylesheets/login.css')
   end
   
   def init_tinymce

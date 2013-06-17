@@ -11,3 +11,4 @@ gem 'jquery-ui-rails'
 gem 'modeljs', '= 0.0.4'
 gem 'tinymce-rails'
 gem 'trollop'
+

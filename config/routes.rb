@@ -6,7 +6,7 @@ Caboose::Engine.routes.draw do
   get     "login"           => "login#index"
   post    "login"           => "login#login"
   get     "logout"          => "logout#index"
-  
+
   get     "admin/users"                   => "users#index"
   get     "admin/users/options"           => "users#options"
   get     "admin/users/new"               => "users#new"

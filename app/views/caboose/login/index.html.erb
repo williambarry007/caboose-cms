@@ -20,7 +20,10 @@
 <dl>
   <dt>Username:</dt><dd><input type='text'      name='username' style='width: 200px;' /></dd>
   <dt>Password:</dt><dd><input type='password'  name='password' style='width: 200px;' /></dd>
-<div id='message'></div>
-<p><input type='submit' value='Login' onclick='login(); return false;' /></p>
 </dl>
+<div id='message'></div>
+<p>
+	<input type='submit' value='Login' onclick='login(); return false;' />
+	<input type='button' value='Forgot Password' onclick="window.location='/users/forgot-password';" />
+</p>
 </form>

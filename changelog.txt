@@ -1,0 +1,4 @@
+Version 0.2.1
+
+0.2.1 Changed to modal dialogs for admin pages.
+

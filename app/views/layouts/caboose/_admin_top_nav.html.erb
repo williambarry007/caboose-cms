@@ -5,6 +5,7 @@
   <% if (@user.nil? || @user == Caboose::User.logged_out_user) %>
     <li><a href='/login?return_url=#{request.fullpath}' id='caboose_login'><span>Login</span></a></li>
   <% else %>
+    <li class='back'    ><a href='/'><span><< Back to Site</span></a></li>
     <li class='cpanel'  ><a href='/station' id='caboose_station'><span>Control Panel</span></a></li>
     <li class='account' ><a href='/admin/users/<%= @user.id %>/edit'><span>Account</span></a></li>
     <li class='logout'  ><a href='/logout'><span>Logout</span></a></li>

@@ -1,5 +1,6 @@
 module Caboose
   class LoginController < Caboose::ApplicationController
+    layout 'caboose/modal'
     
     # GET /login
     def index
@@ -25,6 +26,9 @@ module Caboose
           
           @password = Digest::SHA1.hexdigest(Caboose::salt + @password)
           user = User.where(:username => @username, :password => @password).first
+          if (user.nil?)
+            user = User.where(:email => @username, :password => @password).first
+          end
           
           if (user.nil?)
             @resp.error = "Invalid credentials"

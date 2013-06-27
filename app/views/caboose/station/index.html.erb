@@ -1,0 +1,40 @@
+
+<%= content_for :caboose_js do %>
+<script type='text/javascript'>
+var plugin_count = <%= Caboose::plugins.count %>;
+</script>
+<%= javascript_include_tag "caboose/station_modal" %>
+<% end %>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag "caboose/station_modal", :media => "all" %>
+<% end %>
+
+<%
+@nav = Caboose.plugin_hook('admin_nav', [], @user, @page)
+return_url = session[:caboose_station_return_url].nil? ? '/' : session[:caboose_station_return_url]
+return_url = '/' if return_url.starts_with?('/admin/') || return_url == '/admin'
+%>
+
+<% if (@user.nil? || @user == Caboose::User.logged_out_user) %>
+  <h2>Caboose Station</h2>
+  <a href='/login' class='login'>Login</a>
+<% else %>
+<div id='station'>
+  <ul>
+    <% i = 0 %>
+    <% @nav.each do |item| %>
+      <% id = item['id'].nil? ? i.to_s : item['id'] %>
+      <li id='nav_item_<%= id %>'><a href='#'><span class='icon'></span><span class='text'><%= item['text'] %></span></a>
+      <% if (!item['children'].nil? && item['children'].count > 0) %>
+        <ul style='display: none;'>
+          <% item['children'].each do |item2| %>
+            <li><a href='<%= item2['href'] %>'><%= item2['text'] %></a></li>
+          <% end %>
+        </ul>
+      <% end %>
+      </li>
+      <% i + 1 %>
+    <% end %>
+  </ul>
+</div>
+<% end %>

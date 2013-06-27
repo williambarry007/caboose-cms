@@ -30,3 +30,9 @@
 </table>
 
 <p><%= raw @gen.generate %></p>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+parent.$.fn.colorbox.resize({ 'innerWidth': 600, 'innerHeight': 400 });
+</script>
+<% end %>

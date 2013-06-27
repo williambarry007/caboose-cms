@@ -25,5 +25,6 @@ Gem::Specification.new do |s|
   s.add_dependency "modeljs", "= 0.0.8"
   s.add_dependency "tinymce-rails"
   s.add_dependency "trollop"
+  s.add_dependency "colorbox-rails"
   
 end

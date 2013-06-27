@@ -1,0 +1,23 @@
+
+#login_form .other_options {
+  position: absolute;
+  top: -4px;
+  right: 0;
+}
+
+input#username,
+input#password {
+  font-size: 18px;
+  width: 95%;
+  margin: 0 0 8px 0;
+  padding: 7px;  
+}
+
+input#btn_login {
+  font-size: 18px;
+}
+
+input#btn_cancel {
+  font-size: 18px;
+}
+

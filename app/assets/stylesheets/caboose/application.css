@@ -7,9 +7,13 @@
  *
  * You're free to add application-wide styles to this file and they'll appear at the top of the
  * compiled file, but it's generally better to create a new file per style scope.
- *
- *= require modeljs
+ * 
+ *= require colorbox-rails
+ *= require modeljs 
  *= require caboose/fonts
+ *= require caboose/page_bar_generator
  *= require caboose/caboose 
  *= require application
  */
+
+#cboxLoadedContent { margin-bottom: 0; }

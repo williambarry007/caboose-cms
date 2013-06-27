@@ -1,0 +1,32 @@
+
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/register" %>
+<% end %>
+
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag "caboose/register", :media => "all" %>
+<% end %>
+
+<form action='/register' method='post' id='register_form'>
+<p class='other_options'>
+<a href='/login'>Already a member?</a>
+</p>
+<h1>Register</h1>
+<input type='text'      name='first_name' id='first_name' placeholder='First name' />
+<input type='text'      name='last_name'  id='last_name'  placeholder='Last name' />
+<input type='text'      name='email'      id='email'      placeholder='Email address' />
+<input type='password'  name='pass1'      id='pass1'      placeholder='Password' />
+<input type='password'  name='pass2'      id='pass2'      placeholder='Confirm password' />
+<div id='message'></div>
+<p>
+  <input type='button' id='btn_cancel'   value='Cancel'   onclick="parent.$.fn.colorbox.close();" />
+	<input type='submit' id='btn_register' value='Register' onclick='register(); return false;' />
+</p>
+</form>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+if (parent.$.fn.colorbox)
+  parent.$.fn.colorbox.resize({ 'innerWidth': 400, 'innerHeight': 324 });
+</script>
+<% end %>

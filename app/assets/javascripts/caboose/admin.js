@@ -12,6 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require colorbox-rails
+//= require caboose/modal_integration
 //= require jquery.ui.all
 //= require tinymce-jquery
 //= require class
@@ -34,4 +36,3 @@
 //= require attribute/h1
 //= require attribute/time
 //= require attribute/video
-//= require caboose/station

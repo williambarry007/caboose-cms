@@ -1,11 +1,15 @@
 Caboose::Engine.routes.draw do
   
-  get     "admin"           => "admin#index"
-  put     "admin/station"   => "station#index"
+  get     "admin"                 => "admin#index"
+  put     "admin/station"         => "station#index_admin"
+  get     "station"               => "station#index"
+  get     "station/plugin-count"  => "station#plugin_count"
   
-  get     "login"           => "login#index"
-  post    "login"           => "login#login"
-  get     "logout"          => "logout#index"
+  get     "login"                 => "login#index"
+  post    "login"                 => "login#login"
+  get     "logout"                => "logout#index"
+  get     "register"              => "register#index"
+  post    "register"              => "register#register"
 
   get     "admin/users"                   => "users#index"
   get     "admin/users/options"           => "users#options"

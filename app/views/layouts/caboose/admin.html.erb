@@ -9,7 +9,8 @@
 </head>
 <body>
 <div id='header'>
-<%= render :partial => 'layouts/caboose/top_nav' %>
+<%= render :partial => 'layouts/caboose/admin_top_nav' %>
+</div>
 <div id='content_wrapper'>
   <div id='content'>
   
@@ -18,7 +19,6 @@
   </div>
 </div>
 <div class="footer"></div>
-<%= render :partial => 'layouts/caboose/station' %>
 <%= javascript_include_tag "caboose/admin" %>
 <%= yield :caboose_js %>
 </body>

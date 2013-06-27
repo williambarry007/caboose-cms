@@ -1,0 +1,68 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+ *= require colorbox-rails
+ *= require modeljs
+ *= require caboose/fonts
+ *= require caboose/caboose
+ */
+
+body {
+  background: #111111;
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  width: 100%;  
+  font-family: Helvetica, Arial;
+}
+
+#modal_wrapper {
+  width: 100%;
+  position: relative;
+}
+
+#modal_content {
+  width: 100%;
+}
+
+#modal_content h1 {
+  margin: 0 0 12px 0;
+  padding: 0;
+  font-weight: normal;  
+}
+
+#modal_content a {
+  color: #ccc;
+  text-decoration: none;
+  border-bottom: #999 1px dotted;  
+}
+
+#modal_content p.loading {
+  background-image: url('/assets/caboose/loading_white_on_black.gif');
+  background-position: 0 center;
+  background-repeat: no-repeat;
+  color: #ccc;  
+  font-weight: normal;
+  font-size: 16pt;
+  padding: 10px 10px 10px 40px;
+}
+
+div.model_attribute_text {
+  color: #000;
+}
+
+input {
+  border: 1px solid #ccc;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  font-size: 20px;
+  padding: 4px 8px;
+}

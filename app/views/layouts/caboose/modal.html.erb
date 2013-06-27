@@ -1,0 +1,21 @@
+<!DOCTYPE html> 
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Modal Caboose</title>	
+<%= stylesheet_link_tag "caboose/modal", :media => "all" %>
+<%= yield :caboose_css %>
+<%= csrf_meta_tags %>
+</head>
+<body>
+<div id='modal_wrapper'>
+  <div id='modal_content'>
+  
+<%= yield %>
+
+  </div>
+</div>
+<%= javascript_include_tag "caboose/modal" %>
+<%= yield :caboose_js %>
+</body>
+</html>

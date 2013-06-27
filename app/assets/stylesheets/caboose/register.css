@@ -1,0 +1,25 @@
+
+#register_form .other_options {
+  position: absolute;
+  top: -4px;
+  right: 0;
+}
+
+input#first_name,
+input#last_name,
+input#email,
+input#pass1,
+input#pass2 {
+  font-size: 18px;
+  width: 95%;
+  margin: 0 0 8px 0;
+  padding: 7px;  
+}
+
+input#btn_register {
+  font-size: 18px;
+}
+
+input#btn_cancel {
+  font-size: 18px;
+}

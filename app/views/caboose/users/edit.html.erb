@@ -3,10 +3,12 @@
 <div id='user_<%= @edituser.id %>_container'></div>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model.form.user" %>
 <script type="text/javascript">
 
 $(document).ready(function() {
   var user = new Model({
+    form: 'Model.Form.User',
     name: 'User',
     id: <%= @edituser.id %>,
     listing_url: 'get /admin/users',
@@ -38,5 +40,12 @@ $(document).ready(function() {
   });
 });
 
+</script>
+<% end %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+if (parent.$.fn.colorbox)
+  parent.$.fn.colorbox.resize({ 'innerWidth': 600, 'innerHeight': 400 });
 </script>
 <% end %>

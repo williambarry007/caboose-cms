@@ -12,13 +12,13 @@ $(document).ready(function() {
   });  
   
   // Make the subnav links take over the entire page instead of just the iframe
-  //$('#station ul li ul li a').each(function(i, a) {
-  //  var href = $(a).attr('href');
-  //  $(a).click(function(event) {
-  //    event.preventDefault();
-  //    parent.window.location = href;
-  //  })
-  //});
+  $('#station ul li ul li a').each(function(i, a) {
+    var href = $(a).attr('href');
+    $(a).click(function(event) {
+      event.preventDefault();
+      parent.window.location = href;
+    })
+  });
   
 });
 

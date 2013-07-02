@@ -1,7 +1,7 @@
 
 module Caboose
   class UsersController < ApplicationController
-    layout 'caboose/admin'    
+    layout 'caboose/modal'
       
     def before_action
       @page = Page.page_with_uri('/admin')
@@ -37,6 +37,12 @@ module Caboose
       @edituser = User.find(params[:id])    
       @all_roles = Role.tree
       @roles = Role.roles_with_user(@edituser.id)
+    end
+    
+    # GET /admin/users/1/edit-password
+    def edit_password
+      return if !user_is_allowed('users', 'edit')
+      @edituser = User.find(params[:id])
     end
     
     # POST /admin/users

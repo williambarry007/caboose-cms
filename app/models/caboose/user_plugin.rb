@@ -12,13 +12,15 @@ class Caboose::UserPlugin < Caboose::CaboosePlugin
     if (user.is_allowed('users', 'view'))
       item['children'] << {
         'href' => '/admin/users', 
-        'text' => 'View All Users'
+        'text' => 'View All Users',
+        'modal' => true,
       }
     end
     if (user.is_allowed('users', 'add'))
       item['children'] << {
         'href' => '/admin/users/new', 
-        'text' => 'New User'
+        'text' => 'New User',
+        'modal' => true,
       }
     end
     nav << item

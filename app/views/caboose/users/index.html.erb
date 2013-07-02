@@ -1,15 +1,10 @@
 <h1>Users</h1>
 
-<form action='/admin/users' method='get'>
-<table cellpadding='4' cellspacing='0' border='0'>
-<tr><td>First name: 	</td><td><input type='text' name='first_name' value='<%= @gen.params['first_name'] %>' style='width: 200px;' /></td></tr>
-<tr><td>Last name: 	  </td><td><input type='text' name='last_name' 	value='<%= @gen.params['last_name']  %>' style='width: 200px;' /></td></tr>
-<tr><td>Username: 		</td><td><input type='text' name='username' 	value='<%= @gen.params['username'] 	 %>' style='width: 200px;' /></td></tr>
-</table><br />
-<p><input type='submit' value='Search' /></p>
+<form action='/admin/users' method='get' class='search_form'>
+<input type='text' name='search' placeholder='Search' />
 </form>
 
-<table class='data'>
+<table class='data' id='users_table'>
   <tr>
     <%= raw @gen.sortable_table_headings({
 				'first_name' => 'First Name',
@@ -33,6 +28,8 @@
 
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
-parent.$.fn.colorbox.resize({ 'innerWidth': 600, 'innerHeight': 400 });
+$(document).ready(function() { 
+  var modal = new CabooseModal(500);
+});
 </script>
 <% end %>

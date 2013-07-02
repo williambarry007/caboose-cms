@@ -30,12 +30,14 @@ body {
 
 #modal_content {
   width: 100%;
+  padding: 0;
 }
 
 #modal_content h1 {
   margin: 0 0 12px 0;
   padding: 0;
-  font-weight: normal;  
+  font-weight: normal;
+  background: #111111;   
 }
 
 #modal_content a {
@@ -63,6 +65,71 @@ input {
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
   border-radius: 2px;
-  font-size: 20px;
   padding: 4px 8px;
+  height: 34px;
+  font-size: 20px;
+  z-index: 20;
+}
+
+#modal_content .bound_input_check a,
+#modal_content .bound_input_cancel a {
+  border: 1px solid #ccc;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  
+  font-size: 28px;
+  text-align: center;
+  background: #00cc00;
+  color: #fff;
+  
+  display: block;
+  padding: 4px 0;
+  height: 34px;
+}
+
+#modal_content .bound_input_check a.loading {
+  background-image: url(/assets/caboose/loading_green.gif);
+  background-color: #00cc00;
+  background-repeat: no-repeat;
+  background-position: 6px 5px;
+  color: rgba(255, 255, 255, 0.0);
+}
+
+#modal_content .search_form {
+  position: absolute;
+  top: 0;
+  right: 0;  
+}
+
+#modal_content table.data th {
+  background: #222222;
+  border: #333 1px solid;
+  color: #fff;
+}
+
+#modal_content table.data td {
+  background: #111111;
+  border: #333 1px solid;
+  color: #fff;
+}
+
+/*******************************************************************************
+Modeljs
+*******************************************************************************/
+
+#modal_content div.model_attribute_text {
+    color: #fff;
+}
+
+#modal_content .model_attribute {
+    background: none repeat scroll 0 0 transparent;
+    display: block;
+    padding: 2px 4px;
+    text-decoration: none;
+}
+
+#modal_content .clear {
+  clear: both;
+  line-height: 0;  
 }

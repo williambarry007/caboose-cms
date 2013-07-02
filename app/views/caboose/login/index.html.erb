@@ -1,12 +1,4 @@
 
-<%= content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/login" %>
-<% end %>
-
-<%= content_for :caboose_css do %>
-<%= stylesheet_link_tag "caboose/login", :media => "all" %>
-<% end %>
-
 <form action='/login' method='post' id='login_form'>
 <p class='other_options'>
 <a href='/register'>Need to register?</a>
@@ -24,7 +16,29 @@
 
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
-if (parent.$.fn.colorbox)
-  parent.$.fn.colorbox.resize({ 'innerWidth': 400, 'innerHeight': 200 });
+var modal = new CabooseModal(400);
+function login()
+{
+  modal.autosize("<p class='loading'>Logging in...</p>");
+	$.ajax({
+		url: '/login',
+		type: 'post',
+		data: $('#login_form').serialize(),
+		success: function(resp) {
+		  if (resp.error)
+		    modal.autosize("<p class='note error'>" + resp.error + "</p>");
+			else if (resp.redirect != false)
+			  parent.window.location = resp.redirect;
+			else
+			  parent.location.reload(true);
+		},
+		error: function() {	
+			modal.autosize("<p class='note error'>Error</p>");			
+		}
+	});
+}
 </script>
+<% end %>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag "caboose/login", :media => "all" %>
 <% end %>

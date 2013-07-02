@@ -5,7 +5,11 @@ module Caboose
     
     # GET /station
     def index
-      @user = logged_in_user  
+      @user = logged_in_user
+      
+      if (@user.nil? || @user == Caboose::User.logged_out_user)
+        redirect_to "/login"
+      end
     end
     
     # GET /station/plugin-count

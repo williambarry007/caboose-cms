@@ -44,5 +44,9 @@ CabooseModal.prototype = {
       innerWidth:  '' + this.width + 'px', 
       innerHeight: '' + this.height + 'px' 
     }); 
+  },
+  
+  close: function() {
+    parent.$.fn.colorbox.close();
   }
 };

@@ -9,9 +9,9 @@
 <%= yield :caboose_css %>
 <% end %>
 
-<% if (File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.id}.html.erb")) %>
+<% if (File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.id}.html.erb") || File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.id}.html.haml")) %>
 <%= render :file => "layouts/layout_#{@page.id}" %>
-<% elsif (!@page.layout.nil? && @page.layout.length > 0 && File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.layout}.html.erb")) %>
+<% elsif (!@page.layout.nil? && @page.layout.length > 0 && (File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.layout}.html.erb") || File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.layout}.html.haml"))) %>
 <%= render :file => "layouts/layout_#{@page.layout}" %>
 <% else %>
 <%= render :file => "layouts/layout_default" %>

@@ -6,6 +6,9 @@ module Caboose
     # GET /station
     def index
       @user = logged_in_user
+      page_id = params['page_id'].nil? ? 1 : params['page_id']
+      @page = Page.find(page_id)
+      @tab = params['tab']
       
       if (@user.nil? || @user == Caboose::User.logged_out_user)
         redirect_to "/login"

@@ -1,15 +1,15 @@
 
-var CabooseStation = function(m) {
-  this.modal = m;
-  this.init();
+var CabooseStation = function(m, initial_tab) {
+  this.init(m, initial_tab);
 };
 
 CabooseStation.prototype = {
-  
+ 
   modal: false,
   
-  init: function()
+  init: function(m, initial_tab)
   {
+    this.modal = m;
     var this2 = this;
     // Handle main nav items with subnav
     $('#station > ul > li > a').click(function(event) {
@@ -34,6 +34,8 @@ CabooseStation.prototype = {
         parent.window.location = $(this).attr('href');
       }
     });
+    if (initial_tab)
+      $('#station > ul > li#nav_item_' + initial_tab + ' > a').trigger('click');
   },
   
   subnav: function(id, href)

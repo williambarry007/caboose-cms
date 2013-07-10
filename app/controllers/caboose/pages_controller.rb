@@ -40,6 +40,7 @@ module Caboose
 		  page.content = Caboose.plugin_hook('page_content', page.content)
 		  @page = page
 		  @user = user
+		  @editmode = !params['edit'].nil? && user.is_allowed('pages', 'edit') ? true : false
 		  @crumb_trail = Caboose::Page.crumb_trail(@page)
 		  @subnav = Caboose::Page.subnav(@page, session['use_redirect_urls'], @user)
       
@@ -108,24 +109,48 @@ module Caboose
     def edit
       return if !user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      
-      session['caboose_station_state'] = 'left'
-      session['caboose_station_open_tabs'] = ['pages']
-      session['caboose_station_return_url'] = "/#{@page.uri}"
-      
-      render :layout => 'caboose/admin'
+    end
+    
+    # GET /pages/1/edit-title
+    def edit_title
+      return if !user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/modal'
+    end
+    
+    # GET /pages/1/edit-content
+    def edit_content
+      return if !user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/modal'
     end
     
     # GET /pages/1/edit-settings
     def edit_settings
       return if !user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      
-      session['caboose_station_state'] = 'left'
-      session['caboose_station_open_tabs'] = ['pages']
-      session['caboose_station_return_url'] = "/#{@page.uri}"
-      
-      render :layout => 'caboose/admin'
+      render :layout => 'caboose/modal'
+    end
+    
+    # GET /pages/1/edit-css
+    def edit_css
+      return if !user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/modal'
+    end
+    
+    # GET /pages/1/edit-js
+    def edit_js
+      return if !user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/modal'
+    end
+    
+    # GET /pages/1/edit-seo
+    def edit_seo
+      return if !user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/modal'
     end
     
     # POST /pages
@@ -210,11 +235,15 @@ module Caboose
 		    			resp.attributes['parent_id'] = { 'text' => parent.title }
 		    		end
 		    		
-		    	when 'title', 'menu_title', 'alias', 'redirect_url', 'hide', 
-		    	  'content_format', 'custom_css', 'custom_js', 'layout',
+		    	when 'title', 'menu_title', 'alias', 'hide', 
+		    	  'custom_css', 'custom_js', 'layout', 'redirect_url',
 		    	  'seo_title', 'meta_description', 'fb_description', 'gp_description', 'canonical_url'
 		    	  
 		    	  page[name.to_sym] = value
+		    	  
+		    	when 'content_format'
+		    	  page.content_format = value
+		    	  resp.attributes['content_format'] = { 'text' => value }
 		    	  
 		    	when 'meta_robots'
 		    	  if (value.include?('index') && value.include?('noindex'))

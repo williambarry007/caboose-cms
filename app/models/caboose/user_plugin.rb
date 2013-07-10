@@ -1,6 +1,6 @@
 class Caboose::UserPlugin < Caboose::CaboosePlugin
 
-  def self.admin_nav(nav, user, page)
+  def self.admin_nav(nav, user = nil, page = nil)
     return nav if user.nil? || !user.is_allowed('users', 'view')
     
     item = {

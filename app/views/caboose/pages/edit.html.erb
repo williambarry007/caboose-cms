@@ -1,25 +1,12 @@
-
-<h1>Edit Page Content</h1>
-<p class='current_page_editing'>Currently editing: /<%= @page.uri %></p>
-
-<div id='page_<%= @page.id %>_container'></div>
-
+<% content_for :page_title   do %><%= raw "<span id='editmode_title_container'>#{@page.title}</span>"   %><% end %>
+<% content_for :page_content do %><%= raw "<div id='editmode_content_container'>#{@page.content}</div>" %><% end %>
 <% content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/model.form.page" %>
-<script type="text/javascript">
+<script type='text/javascript'>
 
 $(document).ready(function() {
-  var page = new Model({
-    name: 'Page',
-    id: <%= @page.id %>,
-    form: 'Model.Form.Page',
-    attributes: [
-      { name: 'title'                 , type: 'h1'                , value: <%= raw Caboose.json(@page.title   ) %>, width: '500px' },
-      { name: 'content'               , type: 'rich-text'         , value: <%= raw Caboose.json(@page.content ) %> }
-    ]
-  });
+  $('#editmode_title_container'  ).click(function() { $.colorbox({ href: '/pages/<%= @page.id %>/edit-title'   , iframe: true, initialWidth: 500, initialHeight:  80, innerWidth: 500, innerHeight:  80, scrolling: false, transition: 'fade', closeButton: false, onComplete: fix_colorbox, opacity: 0.50 }); });
+  $('#editmode_content_container').click(function() { $.colorbox({ href: '/pages/<%= @page.id %>/edit-content' , iframe: true, initialWidth: 600, initialHeight: 400, innerWidth: 600, innerHeight: 400, scrolling: false, transition: 'fade', closeButton: false, onComplete: fix_colorbox, opacity: 0.50 }); });
 });
 
 </script>
-<%= tinymce :caboose %>
 <% end %>

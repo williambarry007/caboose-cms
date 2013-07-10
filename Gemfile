@@ -12,4 +12,3 @@ gem 'modeljs', '= 0.0.10'
 gem 'tinymce-rails'
 gem 'trollop'
 gem 'colorbox-rails'
-

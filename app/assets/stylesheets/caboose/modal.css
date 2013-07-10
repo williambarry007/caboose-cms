@@ -56,11 +56,42 @@ body {
   padding: 10px 10px 10px 40px;
 }
 
+#modal_content div.yesnobox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 22;
+  background-color: rgba(0, 0, 0, 0.9);
+  font-size: 20px;
+  text-align: center;
+}
+
+#modal_content div.yesnobox div {
+  padding: 20px;
+}
+  
+#modal_content div.yesnobox input {
+  width: auto;  
+}
+
 div.model_attribute_text {
   color: #000;
 }
 
-input {
+#modal_content div.top_right_controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#modal_content div.top_right_controls a {
+  display: inline-block;
+  margin: 0;
+  padding: 4px 8px;
+}
+
+input, select, textarea {
+  font-family: Helvetica, arial;
   border: 1px solid #ccc;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
@@ -69,6 +100,33 @@ input {
   height: 34px;
   font-size: 20px;
   z-index: 20;
+}
+
+input.dirty,
+textarea.dirty {
+  background: #fff799;  
+}
+
+select {
+  padding: 0;
+  height: 44px;
+}
+
+option {
+  
+}
+
+select.fake {
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: transparent;
+}
+
+select.fake option {
+  background: #fff;
+  color: #000;
 }
 
 #modal_content .bound_input_check a,
@@ -94,6 +152,53 @@ input {
   background-repeat: no-repeat;
   background-position: 6px 5px;
   color: rgba(255, 255, 255, 0.0);
+}
+
+#modal_content .bound_textarea_controls a {
+  display: inline-block;
+  margin: 3px 0 0 1px;
+  padding: 8px 0 6px 0;
+  background: #ccc;
+  color: #000;
+  text-align: center;
+  border: #666 1px solid;
+}
+
+#modal_content .bound_textarea_controls a.save    { width: 60px; }
+#modal_content .bound_textarea_controls a.discard { width: 80px; }
+  
+#modal_content .note,
+#modal_content .error {
+  margin: 0;
+}
+
+#modal_content .placeholder {
+  display: block;
+  margin: 0;
+  padding: 0 5px 0 0;
+  height: 34px;
+  
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  z-index: 19;
+}
+
+#modal_content .placeholder span {
+  display: block;
+  font-size: 20px;
+  color: #757575;
+}
+
+#modal_content input[type='checkbox'] {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  z-index: 19;
+  
+  margin: 0;
+  padding: 0;
+  width: 20px;
 }
 
 #modal_content .search_form {

@@ -2,6 +2,9 @@
 @nav = Caboose.plugin_hook('admin_nav', [], @user, @page)
 return_url = session[:caboose_station_return_url].nil? ? '/' : session[:caboose_station_return_url]
 return_url = '/' if return_url.starts_with?('/admin/') || return_url == '/admin'
+
+width = 200
+@nav.each {|item| width = 400 if item['id'] == @tab } if @tab
 %>
 
 <%= content_for :caboose_js do %>
@@ -10,8 +13,8 @@ return_url = '/' if return_url.starts_with?('/admin/') || return_url == '/admin'
 var modal = false;
 var station = false;
 $(document).ready(function() {
-  modal = new CabooseModal(200);
-  station = new CabooseStation(modal);
+  modal = new CabooseModal(<%= width %>);
+  station = new CabooseStation(modal<%= raw @tab ? ", '#{@tab}'" : '' %>);
 });
 </script>
 <% end %>

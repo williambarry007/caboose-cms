@@ -1,0 +1,29 @@
+<p><div id='page_<%= @page.id %>_title'></div></p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+var modal = false;
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Page',
+    id: <%= @page.id %>,
+    update_url: '/pages/<%= @page.id %>',
+    attributes: [{ 
+      name: 'title',
+      nice_name: 'Title',
+      type: 'text',
+      value: <%= raw Caboose.json(@page.title) %>,
+      width: 480
+    }],
+    success: function(control) {
+      parent.$.fn.colorbox.close();
+      parent.$('#editmode_title_container').html(control.attribute.value);
+    }
+  });  
+  modal = new CabooseModal(500, 80);
+});
+
+</script>
+<% end %>

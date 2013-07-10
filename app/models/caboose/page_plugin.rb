@@ -15,7 +15,7 @@ class Caboose::PagePlugin < Caboose::CaboosePlugin
     if (actions.include?('edit') || is_admin)
     	item['children'] << { 'href' => "/pages/#{page.id}/sitemap"       , 'text' => 'Site Map This Page'  }
     	item['children'] << { 'href' => "/pages/#{page.id}/edit"          , 'text' => 'Edit Page Content'   }
-    	item['children'] << { 'href' => "/pages/#{page.id}/edit-settings" , 'text' => 'Edit Page Settings'  }
+    	item['children'] << { 'href' => "/pages/#{page.id}/edit-settings" , 'text' => 'Edit Page Settings', 'modal' => true }
 
     	#uru = session['use_redirect_urls'].nil? ? true : session['use_redirect_urls']
     	#item['children'] << { 'id' => 'use_redirect_urls', 'href' => '#', 'text' => '' + (uru ? 'Disable' : 'Enable') + ' Redirect Urls' }

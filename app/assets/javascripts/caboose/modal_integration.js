@@ -23,3 +23,13 @@ function fix_colorbox() {
   //h = $('#cboxLoadedContent').height();
   //$('#cboxLoadedContent').css('height', ''+(h+28)+'px'); 
 }
+
+//lastkeys = "";
+//$(document).keyup(function(e) {
+//  if (e.keyCode == 13 && (lastkeys == "caboose" || lastkeys == "CABOOSE")) 
+//    $.colorbox({ href: '/station', iframe: true, initialWidth: 200, initialHeight: 50,  innerWidth: 200, innerHeight:  50, scrolling: false, transition: 'fade', closeButton: false, onComplete: fix_colorbox, opacity: 0.50 });
+//
+//  lastkeys += String.fromCharCode(e.keyCode);  
+//  if (lastkeys.length > 7)
+//    lastkeys = lastkeys.substr(1);  
+//});

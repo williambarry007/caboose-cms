@@ -6,6 +6,7 @@ ModelBinder.prototype = {
   controls: [],
   //active_control: false,
   success: false,
+  authenticity_token: false,
   
   init: function(params) {
     this.model = new Model({        
@@ -14,8 +15,9 @@ ModelBinder.prototype = {
       attributes: [],
       attributes_clean: []
     });
-    if (params['update_url']) this.model.update_url = params['update_url'];
-    if (params['success'])    this.success = params['success'];
+    if (params['update_url'])         this.model.update_url = params['update_url'];
+    if (params['success'])            this.success = params['success'];
+    if (params['authenticity_token']) this.authenticity_token = params['authenticity_token'];
       
     var m = this.model;
     $.each(params['attributes'], function(i, attrib) {
@@ -35,6 +37,7 @@ ModelBinder.prototype = {
       else if (attrib.type == 'select')   control = new BoundSelect(opts);
       else if (attrib.type == 'checkbox') control = new BoundCheckbox(opts);
       else if (attrib.type == 'textarea') control = new BoundTextarea(opts);
+      else if (attrib.type == 'image')    control = new BoundImage(opts);
 
       this2.controls.push();    
     });

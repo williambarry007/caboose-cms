@@ -28,7 +28,7 @@ function login()
 		  if (resp.error)
 		    modal.autosize("<p class='note error'>" + resp.error + "</p>");
 			else if (resp.redirect != false)
-			  parent.window.location = resp.redirect;
+			  <%= @modal ? "" : "parent." %>window.location = resp.redirect;
 			else
 			  parent.location.reload(true);
 		},

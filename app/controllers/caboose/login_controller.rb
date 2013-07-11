@@ -4,7 +4,8 @@ module Caboose
     
     # GET /login
     def index
-      @return_url = params[:return_url].nil? ? "/" : params[:return_url];
+      @return_url = params[:return_url].nil? ? "/" : params[:return_url]
+      @modal = params[:modal].nil? ? false : params[:modal]
       redirect_to @return_url if logged_in?
     end
     

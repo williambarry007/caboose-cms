@@ -34,9 +34,7 @@ BoundCheckbox = BoundControl.extend({
       .attr('type', 'checkbox')
       .css('left', $('#'+this.placeholder).outerWidth() + 10)
       .attr('checked', this.attribute.value)
-      .on('change', function() {
-        this2.binder.cancel_active();
-        this2.binder.active_control = this;
+      .on('change', function() {        
         this2.save(); 
       })
     );
@@ -67,7 +65,6 @@ BoundCheckbox = BoundControl.extend({
       if (resp.error) this2.error(resp.error);
       else
       {
-        this2.binder.active_control = this2;
         if (this2.binder.success)
           this2.binder.success(this2);
         this2.view();

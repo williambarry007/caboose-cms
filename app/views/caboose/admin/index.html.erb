@@ -1,1 +1,38 @@
 <h1>Admin</h1>
+
+<%= content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  open_colorbox();  
+});
+
+function open_colorbox() {
+  $.colorbox({
+    href: '/login?modal=1&return_url=/station',
+    iframe: true,
+    innerWidth: 200,
+    innerHeight:  50,
+    scrolling: false,
+    transition: 'fade',
+    closeButton: false,
+    onComplete: fix_colorbox,
+    opacity: 0.50,
+    onClosed: function() { open_colorbox(); }   
+  });
+}
+
+function fix_colorbox() {
+  $("#cboxTopLeft"      ).css('background', '#111');
+  $("#cboxTopRight"     ).css('background', '#111');
+  $("#cboxBottomLeft"   ).css('background', '#111');
+  $("#cboxBottomRight"  ).css('background', '#111');
+  $("#cboxMiddleLeft"   ).css('background', '#111');
+  $("#cboxMiddleRight"  ).css('background', '#111');
+  $("#cboxTopCenter"    ).css('background', '#111');
+  $("#cboxBottomCenter" ).css('background', '#111');
+  $("#cboxClose"        ).hide(); 
+}
+
+</script>
+<% end %>

@@ -7,6 +7,7 @@ BoundText = BoundControl.extend({
   //binder: false,
   
   width: false,
+  save_attempts: 0,
  
   init: function(params) {
     for (var thing in params)
@@ -32,7 +33,13 @@ BoundText = BoundControl.extend({
       else
         $('#'+this2.el).removeClass('dirty');
     });                             
-    $('#'+this.el).on('blur', function() { this2.save(); });
+    $('#'+this.el).on('blur', function() {
+      if (this2.save_attempts < 1)
+      {
+        this2.save_attempts++;
+        this2.save();
+      }      
+    });
   },
   
   save: function() {
@@ -43,6 +50,7 @@ BoundText = BoundControl.extend({
     this.show_loader();        
     var this2 = this;
     this.model.save(this.attribute, function(resp) {
+      this2.save_attempts = 0;
       if (resp.error)
       {
         this2.hide_loader();

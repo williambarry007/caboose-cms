@@ -4,7 +4,7 @@ module Caboose
       
     # GET /admin
     def index
-      return if !user_is_allowed('admin', 'view')      
+
     end
     
     # GET /station

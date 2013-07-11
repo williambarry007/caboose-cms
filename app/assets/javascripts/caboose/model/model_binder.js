@@ -4,7 +4,7 @@ var ModelBinder = function(params) { this.init(params); };
 ModelBinder.prototype = {
   model: false,
   controls: [],
-  //active_control: false,
+  on_load: false,
   success: false,
   authenticity_token: false,
   
@@ -42,23 +42,7 @@ ModelBinder.prototype = {
       this2.controls.push();    
     });
     
-    //$(document).keyup(function(e) {
-    //  if (e.keyCode == 27) this2.cancel_active(); // Escape
-    //  //if (e.keyCode == 13) this2.save_active();   // Enter
-    //});
+    if (this.on_load)
+      this.on_load();
   },
-  
-  //cancel_active: function() {
-  //  if (!this.active_control)
-  //    return;
-  //  this.active_control.cancel();
-  //  this.active_control = false;    
-  //},
-  
-  //save_active: function() {
-  //  if (!this.active_control)
-  //    return;
-  //  this.active_control.save();      
-  //  this.active_control = false;    
-  //},
 };

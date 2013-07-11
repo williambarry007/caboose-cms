@@ -25,12 +25,12 @@ function login()
 		type: 'post',
 		data: $('#login_form').serialize(),
 		success: function(resp) {
-		  if (resp.error)
-		    modal.autosize("<p class='note error'>" + resp.error + "</p>");
-			else if (resp.redirect != false)
-			  <%= @modal ? "" : "parent." %>window.location = resp.redirect;
-			else
-			  parent.location.reload(true);
+		  //if (resp.error)
+		  //  modal.autosize("<p class='note error'>" + resp.error + "</p>");
+			//else if (resp.redirect != false)
+			//  <%= @modal ? "" : "parent." %>window.location = resp.redirect;
+			//else
+			//  parent.location.reload(true);
 		},
 		error: function() {	
 			modal.autosize("<p class='note error'>Error</p>");			

@@ -4,16 +4,42 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 %>
 <h1>Edit User</h1>
 <p id='gravatar'><img src='<%= pic %>' /><a href='http://gravatar.com'>Update on gravatar</a></p>
-<p><input type='text' id='user_<%= @edituser.id %>_first_name' value="<%= @edituser.first_name %>" placeholder='First name' /></p>
-<p><input type='text' id='user_<%= @edituser.id %>_last_name'  value="<%= @edituser.last_name  %>" placeholder='Last name'  /></p>
-<p><input type='text' id='user_<%= @edituser.id %>_username'   value="<%= @edituser.username   %>" placeholder='Username'   /></p>
-<p><input type='text' id='user_<%= @edituser.id %>_email'      value="<%= @edituser.email      %>" placeholder='Email'      /></p>
+<p><div id='user_<%= @edituser.id %>_first_name' ></div></p>
+<p><div id='user_<%= @edituser.id %>_last_name'  ></div></p>
+<p><div id='user_<%= @edituser.id %>_username'   ></div></p>
+<p><div id='user_<%= @edituser.id %>_email'      ></div></p>
 <div id='message'></div>
 <div id='controls'>
 <input type='button' value='Back'           onclick="window.location='/admin/users';" />
 <input type='button' value='Reset Password' onclick="window.location='/admin/users/<%= @edituser.id %>/edit-password';" />
 <input type='button' value='Delete User'    onclick="deleteUser();" />
 </div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+var modal = false;
+$(window).load(function() {  
+  modal = new CabooseModal(500);
+});
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'User',
+    id: <%= @edituser.id %>,
+    update_url: '/admin/users/<%= @edituser.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'first_name' , nice_name: 'First name', type: 'text', value: <%= raw Caboose.json(@edituser.first_name) %>, width: 280 },
+      { name: 'last_name'  , nice_name: 'Last name' , type: 'text', value: <%= raw Caboose.json(@edituser.last_name)  %>, width: 280 },
+      { name: 'username'   , nice_name: 'Username'  , type: 'text', value: <%= raw Caboose.json(@edituser.username)   %>, width: 280 },
+      { name: 'email'      , nice_name: 'Email'     , type: 'text', value: <%= raw Caboose.json(@edituser.email)      %>, width: 280 }
+    ],
+    on_load: function() { modal.autosize(); }
+  });  
+});
+</script>
+<% end %>
 
 <% content_for :caboose_css do %>
 <style type='text/css'>
@@ -28,59 +54,4 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
   border: #fff 2px solid;
 }
 </style>
-<% end %>
-
-<% content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/model_binder.js" %>
-<script type="text/javascript">
-
-var model = false;
-$(document).ready(function() {
-
-  m = new ModelBinder({
-    name: 'User',
-    id: <%= @edituser.id %>,
-    update_url: '/admin/users/<%= @edituser.id %>',
-    attributes: ['first_name', 'last_name', 'username', 'email']
-  });  
-  
-  modal = new CabooseModal(500);
-});
-
-//  var user = new Model({
-//    form: 'Model.Form.User',
-//    finished_loading: function() {
-//      modal = new CabooseModal(500);
-//    },
-//    name: 'User',
-//    id: <%= @edituser.id %>,
-//    listing_url: 'get /admin/users',
-//    update_url: 'put /admin/users/<%= @edituser.id %>',
-//    delete_url: 'delete /admin/users/<%= @edituser.id %>',
-//    attributes: [
-//      { name: 'first_name' , type: 'text', value: "<%= @edituser.first_name %>", show_reminder: false },
-//      { name: 'last_name'  , type: 'text', value: "<%= @edituser.last_name  %>", show_reminder: false },
-//      { name: 'username'   , type: 'text', value: "<%= @edituser.username   %>", show_reminder: false },
-//      { name: 'email'      , type: 'text', value: "<%= @edituser.email      %>", show_reminder: false },
-//      { name: 'password'   , type: 'password' },
-//      {
-//        name: 'roles', 
-//        type: 'checkbox-multiple',  
-//        value: <%= @roles.collect{|r| r.id}.to_json %>, 
-//        text: "<%= @roles.collect{|r| r.name}.join(', ') %>",
-//        empty_text: '[No roles]',
-//        multiple: true,
-//        loading_message: 'Getting roles...',
-//        options_url: '/admin/roles/options'
-//      },
-//      {
-//        name: 'pic', 
-//        type: 'image',  
-//        value: '',
-//        update_url: '/admin/users/<%= @edituser.id %>/update-pic'
-//      }
-//    ]
-//  });
-
-</script>
 <% end %>

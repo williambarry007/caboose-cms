@@ -73,8 +73,7 @@ BoundSelect = BoundControl.extend({
   },
     
   edit: function() {
-    this.binder.cancel_active();
-    this.binder.active_control = this;
+    
   },
   
   save: function() {
@@ -85,7 +84,6 @@ BoundSelect = BoundControl.extend({
       if (resp.error) this2.error(resp.error);
       else
       {
-        this2.binder.active_control = this2;
         if (this2.binder.success)
           this2.binder.success(this2);
         this2.view();

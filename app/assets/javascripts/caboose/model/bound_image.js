@@ -15,6 +15,9 @@ BoundImage = BoundControl.extend({
       this[thing] = params[thing];
     
     this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;
+    
+    if (!this.attribute.update_url)
+      this.attribute.update_url = this.model.update_url;
          
     var this2 = this;
     $('#'+this.el).wrap($('<div/>').attr('id', this.el + '_container').css('position', 'relative'));
@@ -37,7 +40,9 @@ BoundImage = BoundControl.extend({
          $('#'+this2.el+'_iframe').on('load', function() { this2.post_upload(); });  
       })
       .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(this.binder.authenticity_token))
-      .append($('<input/>').attr('type', 'button').val('Update').click(function() { $('#'+this2.el+'_container input[type="file"]').click(); }))
+      .append($('<input/>').attr('type', 'button').val('Update ' + this.attribute.nice_name).click(function() { 
+        $('#'+this2.el+'_container input[type="file"]').click(); 
+      }))
       .append($('<input/>')
         .attr('type', 'file')
         .attr('name', this.attribute.name)
@@ -54,6 +59,9 @@ BoundImage = BoundControl.extend({
       .css('width', 0)
       .css('height', 0)
       .css('border', 0)
+      //.css('width', '100%')
+      //.css('height', 600)
+      //.css('background', '#fff')      
     );
     $('#'+this.el+'_container').append($('<br/>')
       .css('clear', 'both')
@@ -64,15 +72,22 @@ BoundImage = BoundControl.extend({
     $('#'+this.el+'_message').empty();
     
     var str = frames[this.el+'_iframe'].document.documentElement.innerHTML;
-    str = str.replace(/<body>(.*?)<\/body>/, '$1');
-    str = str.replace(/<html>(.*?)<\/html>/, '$1');
-    str = str.replace(/<head>.*?<\/head>(.*?)/, '$1');
+    str = str.replace(/.*?{(.*?)/, '{$1');
+    str = str.substr(0, str.lastIndexOf('}')+1);
     
-    var resp = $.parseJSON(str);
+    var resp = $.parseJSON(str);    
+    if (resp.success)
+		{
+		  if (resp.attributes && resp.attributes[this.attribute.name])
+		    for (var thing in resp.attributes[this.attribute.name])
+		      this.attribute[thing] = resp.attributes[this.attribute.name][thing];
+		  this.attribute.value_clean = this.attribute.value;
+		}
+				
     if (resp.error)
       this.error(resp.error);
-    else if (resp.url)
-      $('#'+this.el+'_container img').attr('src', resp.url);
+    else
+      $('#'+this.el+'_container img').attr('src', this.attribute.value);
   },
     
   error: function(str) {

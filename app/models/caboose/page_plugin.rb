@@ -21,7 +21,7 @@ class Caboose::PagePlugin < Caboose::CaboosePlugin
     	#item['children'] << { 'id' => 'use_redirect_urls', 'href' => '#', 'text' => '' + (uru ? 'Disable' : 'Enable') + ' Redirect Urls' }
     end
     if (user.is_allowed('pages', 'add') || is_admin)
-      item['children'] << { 'href' => "/pages/new?parent_id=#{page.id}"  , 'text' => 'New Page' }
+      item['children'] << { 'href' => "/pages/new?parent_id=#{page.id}"  , 'text' => 'New Page', 'modal' => true }
     end    
     nav << item
     return nav

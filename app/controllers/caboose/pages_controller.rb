@@ -94,9 +94,9 @@ module Caboose
     # GET /pages/new
     def new
       return if !user_is_allowed('pages', 'add')
-      @pages = Page.new
-      @parent_id = params[:parent_id].nil? ? params[:parent_id] : -1
-      render :layout => 'caboose/admin'
+      @parent_id = params[:parent_id].nil? ? params[:parent_id] : 1
+      @parent = Page.find(@parent_id)
+      render :layout => 'caboose/modal'
     end
     
     # GET /pages/1/redirect

@@ -1,23 +1,37 @@
 
 <h1>New Page</h1>
-<div id='page_new_container'></div>
+<p>Parent: <%= @parent ? @parent.title : "Home" %></p>
+<input type='hidden' id='parent_id' name='parent_id' value='<%= @parent_id %>' />
+<p><input type='text' id='title' name='title' placeholder='Title' style="width: 400px;" /></p>
+<p><input type='submit' value='Add Page' onclick='add_page();' /></p>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
 <script type='text/javascript'>
 
-var page = false;
+var modal = false;
 $(document).ready(function() {
-
-  page = new Model({
-    name: 'Page',
-    id: 'new',
-    attributes: [
-      { name: 'parent_id' , type: 'select'  , value: <%= @parent_id %>, options_url: '/pages/sitemap-options' },
-      { name: 'title'     , type: 'text'    , value: '' }
-    ]
-  });
-  
+  modal = new CabooseModal(420);
 });
+
+function add_page()
+{
+  modal.autosize("<p class='loading'>Adding page...</p>");
+  $.ajax({
+    url: '/pages',
+    type: 'post',
+    data: {
+      parent_id: $('#parent_id').val(),
+      title: $('#title').val()
+    },
+    success: function(resp) {
+      if (resp.error)
+        modal.autosize("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect)
+        parent.window.location = resp.redirect
+    }
+  });
+}
 
 </script>
 <% end %>

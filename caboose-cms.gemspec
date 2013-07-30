@@ -38,12 +38,11 @@ Gem::Specification.new do |s|
   s.test_files = Dir["test/**/*"]
   s.executables = ["caboose"]
 
-  s.add_dependency "rails", "~> 3.2.13"
+  s.add_dependency "rails", "~> 3.2.12"
   s.add_dependency "jquery-rails"
   s.add_dependency "jquery-ui-rails"
   s.add_dependency "activesupport"
   s.add_dependency "mysql2"
-  s.add_dependency "modeljs", "= 0.0.10"
   s.add_dependency "tinymce-rails"
   s.add_dependency "trollop"
   s.add_dependency "colorbox-rails"

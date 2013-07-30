@@ -8,7 +8,6 @@ gemspec
 # jquery-rails is used by the dummy application
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
-gem 'modeljs', '= 0.0.10'
 gem 'tinymce-rails'
 gem 'trollop'
 gem 'colorbox-rails'

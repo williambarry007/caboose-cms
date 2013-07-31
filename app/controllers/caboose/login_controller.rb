@@ -11,8 +11,6 @@ module Caboose
     
     # POST /login
     def login
-      Caboose.log("PodioConfig.api_key = #{PodioConfig.api_key}")
-      
       resp = StdClass.new('error' => '', 'redirect' => '')
       return_url = params[:return_url].nil? ? "/" : params[:return_url]
       

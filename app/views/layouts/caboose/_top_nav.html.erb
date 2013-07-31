@@ -2,12 +2,6 @@
 <div id='top_nav'>
   <div class='caboose_logo'></div>
   <ul>
-  <% if (@user.nil? || @user == Caboose::User.logged_out_user) %>
-    <li><a href='/login?return_url=#{request.fullpath}' id='caboose_login'><span>Login</span></a></li>
-  <% else %>
-    <li class='cpanel'  ><a href='/station?page_id=<%= @page.id %>' id='caboose_station'><span>Control Panel</span></a></li>
-    <li class='account' ><a href='/admin/users/<%= @user.id %>/edit'><span>Account</span></a></li>
-    <li class='logout'  ><a href='/logout'><span>Logout</span></a></li>
-  <% end %>
+    <li><%= render :partial => 'layouts/caboose/station_link' %></li>  
   </ul>
 </div>

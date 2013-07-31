@@ -21,6 +21,9 @@ module Caboose
   # Any modeljs stylesheets
   mattr_accessor :modeljs_css_files
   @@modeljs_css_files = []
+  
+  # The login authenticator
+  mattr_accessor :authenticator_class
+  @@authenticator_class = 'Caboose::Authenticator'
 
 end
-

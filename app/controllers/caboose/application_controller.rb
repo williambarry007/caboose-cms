@@ -35,9 +35,8 @@ module Caboose
     
     # Returns whether or not a user is logged in
     def logged_in?
-      #return true if !session["app_user"].nil? && session["app_user"].id != -1
       validate_token
-      return true if !session["app_user"].nil? && session["app_user"].id != -1    
+      return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1    
       return false
     end
     

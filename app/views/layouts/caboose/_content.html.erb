@@ -1,0 +1,6 @@
+<% if (yield && yield.strip.length > 0) %>
+<%= yield %>
+<% elsif (!@page.nil?) %>
+<h1><%= @page.title %></h1>
+<%= raw @page.content %>  
+<% end %>

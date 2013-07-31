@@ -1,0 +1,7 @@
+<%
+if (@user.nil? || @user == Caboose::User.logged_out_user)
+%><a href='/login?return_url=<%= request.fullpath %>' id='caboose_login'><span>Login</span></a><%
+else
+%><a href='/station?page_id=<%= @page.id %>' id='caboose_station'><span>Control Panel</span></a><%
+end 
+%>

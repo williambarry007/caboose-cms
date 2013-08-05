@@ -52,7 +52,7 @@ BoundSelect = BoundControl.extend({
         .css('width', $('#'+this2.el).outerWidth())
         .on('change', function() {
           $('#'+this2.el).val($('#'+this2.el+'_select').val());
-          this2.save(); 
+          this2.save();                     
         });
         
       $.each(this2.attribute.options, function(i, option) {
@@ -80,6 +80,8 @@ BoundSelect = BoundControl.extend({
     this.attribute.value = $('#'+this.el).val();
     var this2 = this;
     this.model.save(this.attribute, function(resp) {
+      if (this2.attribute.text)
+        $('#'+this2.el).val(this2.attribute.text);        
       $('#'+this2.el+'_check a').removeClass('loading');
       if (resp.error) this2.error(resp.error);
       else

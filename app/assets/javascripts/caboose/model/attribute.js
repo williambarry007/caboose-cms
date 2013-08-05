@@ -28,7 +28,7 @@ Attribute.prototype = {
 				{
 				  if (resp.attributes && resp.attributes[this2.name])
 				    for (var thing in resp.attributes[this2.name])
-				      this2[thing] = resp.attributes[this2.name][thing];
+				      this2[thing] = resp.attributes[this2.name][thing];				  
 				  this2.value_clean = this2.value;
 				}
 				if (after) after(resp);

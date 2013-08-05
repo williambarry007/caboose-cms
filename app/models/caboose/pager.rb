@@ -1,5 +1,5 @@
 module Caboose
-  class PageBarGenerator  
+  class Pager  
     #
     # Parameters:
     #	params:	array of key/value pairs that must include the following:
@@ -141,27 +141,11 @@ module Caboose
     end
     
     def where
-      sql = []
-      values = []
-  	  @params.each do |k,v|
-        next if v.nil? || v.length == 0
-        if k.ends_with?('_gte')
-          sql << "`#{k[0..-5]}` >= ?"
-        elsif k.ends_with?('_gt')
-          sql << "`#{k[0..-4]}` > ?"
-        elsif k.ends_with?('_lte')
-          sql << "`#{k[0..-5]}` <= ?"
-        elsif k.ends_with?('_lt')
-          sql << "`#{k[0..-4]}` < ?"
-        else
-          sql << "`#{k}` = ?"
-        end        
-        values << v
+      vars = {}
+  	  @params.each do |k,v|  	    
+  	    vars[k] = v if !v.nil? && v.length > 0 
   	  end
-  	  sql_str = sql.join(' and ')
-  	  sql = [sql_str]  	   	  
-  	  values.each { |v| sql << v }
-  	  return sql
+  	  return vars
     end
     
     def limit

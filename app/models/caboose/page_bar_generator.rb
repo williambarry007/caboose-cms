@@ -153,9 +153,18 @@ module Caboose
           sql << "#{k[0..-5]} <= ?"
         elsif k.ends_with?('_lt')
           sql << "#{k[0..-4]} < ?"
+        elsif k.ends_with?('_bw')
+          sql << "upper(#{k[0..-4]}) like ?"
+          v = "#{v}%".upcase
+        elsif k.ends_with?('_ew')
+          sql << "upper(#{k[0..-4]}) like ?"
+          v = "%#{v}".upcase
+        elsif k.ends_with?('_like')
+          sql << "upper(#{k[0..-6]}) like ?"
+          v = "%#{v}%".upcase
         else
           sql << "#{k} = ?"
-        end        
+        end
         values << v
   	  end
   	  sql_str = sql.join(' and ')

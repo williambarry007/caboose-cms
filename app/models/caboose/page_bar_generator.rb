@@ -146,21 +146,22 @@ module Caboose
   	  @params.each do |k,v|
         next if v.nil? || v.length == 0
         if k.ends_with?('_gte')
-          sql << "`#{k[0..-5]}` >= ?"
+          sql << "#{k[0..-5]} >= ?"
         elsif k.ends_with?('_gt')
-          sql << "`#{k[0..-4]}` > ?"
+          sql << "#{k[0..-4]} > ?"
         elsif k.ends_with?('_lte')
-          sql << "`#{k[0..-5]}` <= ?"
+          sql << "#{k[0..-5]} <= ?"
         elsif k.ends_with?('_lt')
-          sql << "`#{k[0..-4]}` < ?"
+          sql << "#{k[0..-4]} < ?"
         else
-          sql << "`#{k}` = ?"
+          sql << "#{k} = ?"
         end        
         values << v
   	  end
   	  sql_str = sql.join(' and ')
   	  sql = [sql_str]  	   	  
   	  values.each { |v| sql << v }
+  	  Caboose.log(sql)
   	  return sql
     end
     

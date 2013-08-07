@@ -12,6 +12,7 @@ Attribute.prototype = {
   value: false,
   value_clean: false,
   text: false,
+  empty_text: 'empty',
   
   update_url: false,
   options_url: false,

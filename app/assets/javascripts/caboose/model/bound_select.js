@@ -8,6 +8,7 @@ BoundSelect = BoundControl.extend({
   
   message: false,
   placeholder: false,
+  empty_text: 'empty',
  
   init: function(params) {
     
@@ -32,7 +33,7 @@ BoundSelect = BoundControl.extend({
     );
     $('#'+this.el+'_container').append($('<input/>')
       .attr('id', this.el)
-      .attr('placeholder', 'empty')
+      .attr('placeholder', this.empty_text)
       .on('focus', function() { this2.edit(); })
       .val(this.attribute.text)
     );

@@ -72,7 +72,7 @@ BoundTextarea = BoundControl.extend({
   },
   
   save: function() {
-    this.attribute.value = $('#'+this.el).val();
+    this.attribute.value = $('#'+this.el).val();    
     if (this.attribute.value == this.attribute.value_clean)
       return;
     

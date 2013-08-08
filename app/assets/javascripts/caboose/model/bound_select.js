@@ -9,8 +9,7 @@ BoundSelect = BoundControl.extend({
   message: false,
   placeholder: false,
  
-  init: function(params) {
-    
+  init: function(params) {    
     for (var thing in params)
       this[thing] = params[thing];
     
@@ -32,9 +31,9 @@ BoundSelect = BoundControl.extend({
     );
     $('#'+this.el+'_container').append($('<input/>')
       .attr('id', this.el)
-      .attr('placeholder', 'empty')
+      .attr('placeholder', this.attribute.empty_text)
       .on('focus', function() { this2.edit(); })
-      .val(this.attribute.text)
+      .val(this.attribute.text.length > 0 ? this.attribute.text : this.attribute.empty_text)
     );
     if (this.attribute.width)
       $('#'+this.el).css('width', this.attribute.width);

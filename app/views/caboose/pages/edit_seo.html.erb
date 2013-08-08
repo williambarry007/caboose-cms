@@ -1,10 +1,11 @@
 
 <h1>Page Settings</h1>
 <div class='top_right_controls'>
-<input type='button' value='General' onclick="window.location='/pages/<%= @page.id %>/edit-settings';" />
-<input type='button' value='CSS'     onclick="window.location='/pages/<%= @page.id %>/edit-css';" />
-<input type='button' value='JS'      onclick="window.location='/pages/<%= @page.id %>/edit-js';" />
-<input type='button' value='SEO'     disabled='true' onclick="window.location='/pages/<%= @page.id %>/edit-seo';" />
+<input type='button' value='General'   onclick="window.location='/pages/<%= @page.id %>/edit-settings';" />
+<input type='button' value='CSS'       onclick="window.location='/pages/<%= @page.id %>/edit-css';" />
+<input type='button' value='JS'        onclick="window.location='/pages/<%= @page.id %>/edit-js';" />
+<input type='button' value='SEO'       onclick="window.location='/pages/<%= @page.id %>/edit-seo';" disabled='true' />
+<input type='button' value='Resources' onclick="window.location='/pages/<%= @page.id %>/edit-resources';" />
 </div>
 <p><div id='page_<%= @page.id %>_seo_title'></div></p>
 <p><div id='page_<%= @page.id %>_meta_description'></div></p>

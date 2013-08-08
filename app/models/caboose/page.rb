@@ -16,7 +16,8 @@ class Caboose::Page < ActiveRecord::Base
     :hide, 
     :content_format, 
     :custom_css, 
-    :custom_js, 
+    :custom_js,
+    :linked_resources, 
     :layout,
     :seo_title, # 70 chars
     :meta_description, # 156 chars

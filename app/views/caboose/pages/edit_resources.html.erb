@@ -2,12 +2,15 @@
 <h1>Page Settings</h1>
 <div class='top_right_controls'>
 <input type='button' value='General'   onclick="window.location='/pages/<%= @page.id %>/edit-settings';" />
-<input type='button' value='CSS'       onclick="window.location='/pages/<%= @page.id %>/edit-css';" disabled='true' />
+<input type='button' value='CSS'       onclick="window.location='/pages/<%= @page.id %>/edit-css';" />
 <input type='button' value='JS'        onclick="window.location='/pages/<%= @page.id %>/edit-js';" />
 <input type='button' value='SEO'       onclick="window.location='/pages/<%= @page.id %>/edit-seo';" />
-<input type='button' value='Resources' onclick="window.location='/pages/<%= @page.id %>/edit-resources';" />
+<input type='button' value='Resources' onclick="window.location='/pages/<%= @page.id %>/edit-resources';" disabled='true' />
 </div>
-<p><div id='page_<%= @page.id %>_custom_css'></div></p>
+<p><div id='page_<%= @page.id %>_linked_resources'></div></p>
+<p>Here you can provide paths to resources to be included in your page, such as css and javascript files.</p>
+<br />
+<p>Paths should be given on separate lines</p>
                     
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
@@ -21,12 +24,12 @@ $(document).ready(function() {
     update_url: '/pages/<%= @page.id %>',
     attributes: [
       {
-        name: 'custom_css',
-        nice_name: 'Custom CSS',
+        name: 'linked_resources',
+        nice_name: 'Linked Resources',
         type: 'textarea',
         width: 580,
         height: 400,
-        value: <%= raw Caboose.json(@page.custom_css) %> 
+        value: <%= raw Caboose.json(@page.linked_resources) %> 
       }      
     ]
   });  

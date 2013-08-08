@@ -45,6 +45,16 @@ module Caboose
 		  @subnav = Caboose::Page.subnav(@page, session['use_redirect_urls'], @user)
       
       #@subnav.links = @tasks.collect {|href, task| {'href' => href, 'text' => task, 'is_current' => uri == href}}
+
+      @resources = { js: [], css: [] }
+      @page.linked_resources.each_line do |r|
+        case r
+        when /\.js$/
+          @resources[:js] += [r[0...-3]]
+        when /\.css$/
+          @resources[:css] += [r[0...-4]]
+        end
+      end
   
     end
     
@@ -109,6 +119,16 @@ module Caboose
     def edit
       return if !user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
+
+      @resources = { js: [], css: [] }
+      @page.linked_resources.each_line do |r|
+        case r
+        when /\.js$/
+          @resources[:js] += [r[0...-4]]
+        when /\.css$/
+          @resources[:css] += [r[0...-4]]
+        end
+      end
     end
     
     # GET /pages/1/edit-title
@@ -148,6 +168,13 @@ module Caboose
     
     # GET /pages/1/edit-seo
     def edit_seo
+      return if !user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/modal'
+    end
+    
+    # GET /pages/1/edit-resources
+    def edit_resources
       return if !user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/modal'
@@ -240,6 +267,40 @@ module Caboose
 		    	  'seo_title', 'meta_description', 'fb_description', 'gp_description', 'canonical_url'
 		    	  
 		    	  page[name.to_sym] = value
+
+          when 'linked_resources'
+            result = ''
+            value.each_line do |line|
+
+              line.strip!
+              next if line.empty?
+
+              comps = line.split('.')
+              if comps.length < 2
+                resp.error = "Resource '#{line}' has an unspecified file type.  (e.g. given 'myScript.js', '.js' would specify a javascript file type.)"
+                save = false
+                next
+              end
+
+              case comps.last
+              when 'js', 'css'
+                if value =~ URI::regexp()
+                  uri = URI.parse(value)
+                  if !(uri =~ URI::HTTP || uri =~ URI::HTTPS)
+                    resp.error = "Resource '#{line}' is an unrecognized URI format."
+                    save = false
+                  end
+                end
+              else
+                resp.error = "Resource '#{line}' has an unsupported file type ('#{comps.last}')."
+                save = false
+                next
+              end
+
+              result += "\n" unless result.empty?
+              result += line
+            end
+            page.linked_resources = result
 		    	  
 		    	when 'content_format'
 		    	  page.content_format = value

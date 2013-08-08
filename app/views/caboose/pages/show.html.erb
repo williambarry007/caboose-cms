@@ -1,2 +1,13 @@
+
+<% @resources[:css].each do |r| %>
+  <%= stylesheet_link_tag r %>
+<% end %>
+
+<% content_for :caboose_js do %>
+  <% @resources[:js].each do |r| %>
+    <%= javascript_include_tag r %>
+  <% end %>
+<% end %>
+
 <% content_for :page_title   do %><%= raw @page.title   %><% end %>
 <% content_for :page_content do %><%= raw @page.content %><% end %>

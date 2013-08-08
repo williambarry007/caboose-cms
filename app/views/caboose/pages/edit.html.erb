@@ -1,12 +1,50 @@
-<% content_for :page_title   do %><%= raw "<span id='editmode_title_container'>#{@page.title}</span>"   %><% end %>
-<% content_for :page_content do %><%= raw "<div id='editmode_content_container'>#{@page.content}</div>" %><% end %>
+<h1 id='editmode_title_container' ><%= @page.title %></h1>
+<div id='editmode_content_container' ><%= @page.content == nil || @page.content.length == 0 ? 'No content.' : (raw @page.content) %></div>
+
+<% content_for :caboose_css do %>
+  <% @resources[:css].each do |r| %>
+    <%= stylesheet_link_tag r %>
+  <% end %>
+<% end %>
+
 <% content_for :caboose_js do %>
-<script type='text/javascript'>
 
-$(document).ready(function() {
-  $('#editmode_title_container'  ).click(function() { $.colorbox({ href: '/pages/<%= @page.id %>/edit-title'   , iframe: true, initialWidth: 500, initialHeight:  80, innerWidth: 500, innerHeight:  80, scrolling: false, transition: 'fade', closeButton: false, onComplete: fix_colorbox, opacity: 0.50 }); });
-  $('#editmode_content_container').click(function() { $.colorbox({ href: '/pages/<%= @page.id %>/edit-content' , iframe: true, initialWidth: 600, initialHeight: 400, innerWidth: 600, innerHeight: 400, scrolling: false, transition: 'fade', closeButton: false, onComplete: fix_colorbox, opacity: 0.50 }); });
-});
+  <% @resources[:js].each do |r| %>
+    <%= javascript_include_tag r %>
+  <% end %>
 
-</script>
+  <script type='text/javascript'>
+    $(document).ready(function() {
+      $('#editmode_title_container').click(function() {
+        $.colorbox({
+          href: '/pages/<%= @page.id %>/edit-title',
+          iframe: true,
+          initialWidth: 500,
+          initialHeight: 80,
+          innerWidth: 500,
+          innerHeight: 80,
+          scrolling: false,
+          transition: 'fade',
+          closeButton: false,
+          onComplete: fix_colorbox,
+          opacity: 0.50
+        });
+      });
+      $('#editmode_content_container').click(function() {
+        $.colorbox({
+          href: '/pages/<%= @page.id %>/edit-content',
+          iframe: true,
+          initialWidth: 600,
+          initialHeight: 400,
+          innerWidth: 600,
+          innerHeight: 400,
+          scrolling: false,
+          transition: 'fade',
+          closeButton: false,
+          onComplete: fix_colorbox,
+          opacity: 0.50
+        });
+      });
+    });
+  </script>
 <% end %>

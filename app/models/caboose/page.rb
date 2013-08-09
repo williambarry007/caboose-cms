@@ -245,7 +245,7 @@ class Caboose::Page < ActiveRecord::Base
 		block.title = !page.menu_title.nil? && page.menu_title.length > 0 ? page.menu_title : page.title
 		block.title_id = page.id
 		               
-		pages = self.select([:id, :title, :menu_title, :alias, :slug, :uri, :redirect_url, :sort_order]).where(:parent_id => page.id, :hide => 0).reorder(:sort_order).all
+		pages = self.select([:id, :title, :menu_title, :alias, :slug, :uri, :redirect_url, :sort_order]).where(:parent_id => page.id, :hide => false).reorder(:sort_order).all
 		if (page.custom_sort_children)
 		  pages.sort! {|x,y| x.sort_order <=> y.sort_order }
 		else
@@ -261,7 +261,7 @@ class Caboose::Page < ActiveRecord::Base
 			
 			pages = self.select([
 			    :id, :title, :menu_title, :alias, :slug, :uri, :redirect_url, :sort_order
-			  ]).where(:parent_id => page.parent_id, :hide => 0)
+			  ]).where(:parent_id => page.parent_id, :hide => false)
 			if (parent.custom_sort_children)
 			  pages.sort! {|x,y| x.sort_order <=> y.sort_order }
 			else

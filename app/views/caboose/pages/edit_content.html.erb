@@ -1,7 +1,8 @@
 
-<textarea id='page_<%= @page.id %>_content' placeholder='Content' style='width: 600px; height: 400px;' class='tinymce'>
+<textarea id='page_<%= @page.id %>_content' placeholder='Content' style='width:595px; height:320px;' class='tinymce'>
   <%= raw @page.content %>
 </textarea>
+<br />
 <div id='message'></div>
 <div id='controls'>
 <input type='button' value='Close' onclick="modal.close();" />
@@ -11,21 +12,26 @@
 <% content_for :caboose_js do %>
 
   <%= javascript_include_tag "caboose/model/all" %>
-  <%= javascript_include_tag "tinymce/preinit.js" %>
-  <%= javascript_include_tag "tinymce/tinymce_jquery.js" %>
-  <%= javascript_include_tag "tinymce/jquery.tinymce.js" %>
-  <%= javascript_include_tag "tinymce-jquery.js" %>
+  <%= tinymce_assets %>
 
   <script type="text/javascript">
 
   var modal = false;
   $(document).ready(function() {  
     modal = new CabooseModal(600, 475);
+
+    // Hack so that editor actually changes size
+    // Couldn't get any of the official methods working...
+    $("span[class='mce-text',value='Source code']").on('click', function() {
+      $("div[aria-label='Source code']").next()
+        .width(100).height(100);
+    });
   });
 
   function updateContent()
   {
     tinymce.triggerSave();
+
     $.ajax({
       url: '/pages/<%= @page.id %>',
       type: 'put',
@@ -44,6 +50,12 @@
       }
     });
   }
+
   </script>
-  <%= tinymce :caboose %>
+  <%= tinymce :caboose,
+    width:'595px',
+    height:'320px',
+    theme_advanced_source_editor_width: '100px',
+    theme_advanced_source_editor_height: '100px'
+  %>
 <% end %>

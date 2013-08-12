@@ -10,6 +10,20 @@ module Caboose
     def index      
     end
     
+    def view_formatted_resources(page)
+      resources = { js: [], css: [] }
+      page.linked_resources.each_line do |r|
+        r.chomp!
+        case r
+        when /\.js$/
+          resources[:js] += [r]
+        when /\.css$/
+          resources[:css] += [r]
+        end
+      end
+      return resources
+    end
+
     # GET /pages/:id
     def show
       
@@ -46,15 +60,7 @@ module Caboose
       
       #@subnav.links = @tasks.collect {|href, task| {'href' => href, 'text' => task, 'is_current' => uri == href}}
 
-      @resources = { js: [], css: [] }
-      @page.linked_resources.each_line do |r|
-        case r
-        when /\.js$/
-          @resources[:js] += [r[0...-3]]
-        when /\.css$/
-          @resources[:css] += [r[0...-4]]
-        end
-      end
+      @resources = view_formatted_resources(@page)
   
     end
     
@@ -119,16 +125,7 @@ module Caboose
     def edit
       return if !user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-
-      @resources = { js: [], css: [] }
-      @page.linked_resources.each_line do |r|
-        case r
-        when /\.js$/
-          @resources[:js] += [r[0...-4]]
-        when /\.css$/
-          @resources[:css] += [r[0...-4]]
-        end
-      end
+      @resources = view_formatted_resources(@page)
     end
     
     # GET /pages/1/edit-title

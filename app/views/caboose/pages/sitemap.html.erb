@@ -6,7 +6,7 @@
 <h1>Page Sitemap</h1>
 
 <ul>
-<% @options.each do |opt| %>
-<li><a href='<%= opt.title
-this->addPageItems($p);
-</ul>\n";
+<% @options.each do |option| %>
+  <li><%= link_to option['text'], pages_path + '/' + option['value'].to_s %></li>
+<% end %>
+</ul>

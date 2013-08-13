@@ -1,10 +1,11 @@
 
 <h1>Page Settings</h1>
 <div class='top_right_controls'>
-<input type='button' value='General' disabled='true' onclick="window.location='/pages/<%= @page.id %>/edit-settings';" />
-<input type='button' value='CSS'     onclick="window.location='/pages/<%= @page.id %>/edit-css';" />
-<input type='button' value='JS'      onclick="window.location='/pages/<%= @page.id %>/edit-js';" />
-<input type='button' value='SEO'     onclick="window.location='/pages/<%= @page.id %>/edit-seo';" />
+<input type='button' value='General'   onclick="window.location='/pages/<%= @page.id %>/edit-settings';" disabled='true' />
+<input type='button' value='CSS'       onclick="window.location='/pages/<%= @page.id %>/edit-css';" />
+<input type='button' value='JS'        onclick="window.location='/pages/<%= @page.id %>/edit-js';" />
+<input type='button' value='SEO'       onclick="window.location='/pages/<%= @page.id %>/edit-seo';" />
+<input type='button' value='Resources' onclick="window.location='/pages/<%= @page.id %>/edit-resources';" />
 </div>
 <div style='float: left; width: 310px;'>
   <p><div id='page_<%= @page.id %>_parent_id'             ></div></p>
@@ -30,6 +31,7 @@ $(document).ready(function() {
     name: 'Page',
     id: <%= @page.id %>,
     update_url: '/pages/<%= @page.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'parent_id'             , nice_name: 'Parent'                   , type: 'select'     , value: <%= @page.parent_id %>                       , width: 270, text: <%= raw (@page.parent_id == -1 ? "[No Parent]" : @page.parent.title).to_json %>, options_url: '/pages/sitemap-options' },
       { name: 'menu_title'            , nice_name: 'Menu title'               , type: 'text'       , value: <%= raw Caboose.json(@page.menu_title   ) %> , width: 270 },     

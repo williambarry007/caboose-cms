@@ -1,36 +1,51 @@
 
 <h1>Page Settings</h1>
 <div class='top_right_controls'>
-<input type='button' value='General' onclick="window.location='/pages/<%= @page.id %>/edit-settings';" />
-<input type='button' value='CSS'     disabled='true' onclick="window.location='/pages/<%= @page.id %>/edit-css';" />
-<input type='button' value='JS'      onclick="window.location='/pages/<%= @page.id %>/edit-js';" />
-<input type='button' value='SEO'     onclick="window.location='/pages/<%= @page.id %>/edit-seo';" />
+<input type='button' value='General'   onclick="window.location='/pages/<%= @page.id %>/edit-settings';" />
+<input type='button' value='CSS'       onclick="window.location='/pages/<%= @page.id %>/edit-css';" disabled='true' />
+<input type='button' value='JS'        onclick="window.location='/pages/<%= @page.id %>/edit-js';" />
+<input type='button' value='SEO'       onclick="window.location='/pages/<%= @page.id %>/edit-seo';" />
+<input type='button' value='Resources' onclick="window.location='/pages/<%= @page.id %>/edit-resources';" />
 </div>
-<p><div id='page_<%= @page.id %>_custom_css'></div></p>
-                    
+
+<textarea id='page_<%= @page.id %>_custom_css' placeholder='Custom CSS' style='width:795px; height:595px;'><%= raw @page.custom_css %></textarea>
+<br />
+<div id='message'></div>
+<div id='controls'>
+<input type='button' value='Close' onclick="modal.close();" />
+<input type='button' value='Update' onclick="updateCustomCSS();" />
+</div>
+
 <% content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/model/all" %>
-<script type="text/javascript">
 
-var modal = false;
-$(document).ready(function() {
-  m = new ModelBinder({
-    name: 'Page',
-    id: <%= @page.id %>,
-    update_url: '/pages/<%= @page.id %>',
-    attributes: [
-      {
-        name: 'custom_css',
-        nice_name: 'Custom CSS',
-        type: 'textarea',
-        width: 580,
-        height: 400,
-        value: <%= raw Caboose.json(@page.custom_css) %> 
-      }      
-    ]
-  });  
-  modal = new CabooseModal(600, 460);
-});
+  <%= javascript_include_tag "caboose/model/all" %>
+  <script type="text/javascript">
 
-</script>
+  var modal = false;
+  $(document).ready(function() {  
+    modal = new CabooseModal(800, 700);
+  });
+
+  function updateCustomCSS()
+  {
+    $.ajax({
+      url: '/pages/<%= @page.id %>',
+      type: 'put',
+      data: {
+        authenticity_token: "<%= form_authenticity_token %>",
+        custom_css: $('#page_<%= @page.id %>_custom_css').val()
+      },
+      success: function(resp) {
+        if (resp.success) {
+          contentVal = $('#page_<%= @page.id %>_custom_css').val();
+          // parent.$('#editmode_content_container').html(contentVal == null || contentVal.length == 0 ? 'No content.' : contentVal);
+          modal.close();
+        }
+        if (resp.error)
+          modal.autosize("<p class='note success'>" + resp.error + "</p>");
+      }
+    });
+  }
+
+  </script>
 <% end %>

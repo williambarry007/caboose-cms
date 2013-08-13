@@ -3,10 +3,51 @@
 <div id='role_<%= @role.id %>_container'></div>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
 
 $(document).ready(function() {
-  var user = new Model({
+  new ModelBinder({
+    name: 'Role',
+    id: <%= @role.id %>,
+    listing_url: 'get /admin/roles',
+    update_url: 'put /admin/roles/<%= @role.id %>',
+    delete_url: 'delete /admin/roles/<%= @role.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { 
+        name: 'parent_id',
+        nice_name: 'Parent',
+        type: 'select',
+        value: <%= @role.parent_id %>,
+        text: "<%= @role.parent.nil? ? '[No parent]' : @role.parent.name %>",
+        show_controls: true,
+        loading_message: 'Getting roles...',
+        options_url: '/admin/roles/options' 
+      },    
+      { name: 'name'        , nice_name: 'Name'        , type: 'text' , value: "<%= @role.name %>" },
+      { name: 'description' , nice_name: 'Description' , type: 'text' , value: "<%= @role.description %>" },
+      { 
+        name: 'members',
+        type: 'checkbox-multiple',
+        value: <%= @role.users.collect{|u| u.id}.to_json %>,
+        text: "<%= raw @role.users.order('last_name, first_name').collect{|u| "#{u.first_name} #{u.last_name}"}.join('<br />') %>",
+        loading_message: 'Getting users...',
+        options_url: '/admin/users/options',
+      },
+      { 
+        name: 'permissions',
+        type: 'checkbox-multiple',
+        value: <%= @role.permissions.collect{|p| p.id}.to_json %>,
+        text: "<%= raw @role.permissions.order('resource, action').collect{|p| "#{p.resource}_#{p.action}"}.join('<br />') %>",
+        loading_message: 'Getting permissions...',
+        options_url: '/admin/permissions/options',
+      }
+    ],
+    on_load: function() { modal.autosize(); }
+  });  
+
+  /*var user = new Model({
     name: 'Role',
     id: <%= @role.id %>,
     listing_url: 'get /admin/roles',
@@ -23,8 +64,8 @@ $(document).ready(function() {
         loading_message: 'Getting roles...',
         options_url: '/admin/roles/options' 
       },    
-      { name: 'name'          , type: 'text'  , value: "<%= @role.name %>" },
-      { name: 'description'   , type: 'text'  , value: "<%= @role.description %>" },
+      { name: 'name'        , type: 'text' , value: "<%= @role.name %>" },
+      { name: 'description' , type: 'text' , value: "<%= @role.description %>" },
       { 
         name: 'members',
         type: 'checkbox-multiple',
@@ -42,7 +83,7 @@ $(document).ready(function() {
         options_url: '/admin/permissions/options',
       }
     ]
-  });
+  });*/
 });
 
 </script>

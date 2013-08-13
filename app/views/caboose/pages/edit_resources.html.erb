@@ -22,6 +22,7 @@ $(document).ready(function() {
     name: 'Page',
     id: <%= @page.id %>,
     update_url: '/pages/<%= @page.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       {
         name: 'linked_resources',

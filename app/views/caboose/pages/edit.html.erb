@@ -6,6 +6,8 @@
     <!--link type='text/css' rel='stylesheet' href="<%= r %>" /-->
     <%= stylesheet_link_tag r %>
   <% end %>
+
+  <style><%= raw @page.custom_css %></style>
 <% end %>
 
 <% content_for :caboose_js do %>
@@ -14,6 +16,8 @@
     <!--script type='text/javascript' src="<%= r %>" ></script-->
     <%= javascript_include_tag r %>
   <% end %>
+
+  <script type='text/javascript'><%= raw @page.custom_js %></script>
 
   <script type='text/javascript'>
     $(document).ready(function() {

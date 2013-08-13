@@ -31,6 +31,7 @@ $(document).ready(function() {
     name: 'Page',
     id: <%= @page.id %>,
     update_url: '/pages/<%= @page.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'parent_id'             , nice_name: 'Parent'                   , type: 'select'     , value: <%= @page.parent_id %>                       , width: 270, text: <%= raw (@page.parent_id == -1 ? "[No Parent]" : @page.parent.title).to_json %>, options_url: '/pages/sitemap-options' },
       { name: 'menu_title'            , nice_name: 'Menu title'               , type: 'text'       , value: <%= raw Caboose.json(@page.menu_title   ) %> , width: 270 },     

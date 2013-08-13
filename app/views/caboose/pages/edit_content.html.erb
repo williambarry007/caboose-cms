@@ -1,7 +1,5 @@
 
-<textarea id='page_<%= @page.id %>_content' placeholder='Content' style='width:595px; height:320px;' class='tinymce'>
-  <%= raw @page.content %>
-</textarea>
+<textarea id='page_<%= @page.id %>_content' placeholder='Content' style='width:795px; height:545px;' class='tinymce'><%= raw @page.content %></textarea>
 <br />
 <div id='message'></div>
 <div id='controls'>
@@ -18,24 +16,25 @@
 
   var modal = false;
   $(document).ready(function() {  
-    modal = new CabooseModal(600, 475);
-
-    // Hack so that editor actually changes size
-    // Couldn't get any of the official methods working...
-    $("span[class='mce-text',value='Source code']").on('click', function() {
-      $("div[aria-label='Source code']").next()
-        .width(100).height(100);
-    });
+    modal = new CabooseModal(800, 700);
   });
 
   function updateContent()
   {
     tinymce.triggerSave();
 
+    function log(msg) {
+      setTimeout(function() {
+        throw new Error(msg);
+      }, 0);
+    }
+    // log($('#page_<%= @page.id %>_content').val());
+
     $.ajax({
       url: '/pages/<%= @page.id %>',
       type: 'put',
       data: {
+        authenticity_token: "<%= form_authenticity_token %>",
         content: $('#page_<%= @page.id %>_content').val()
       },
       success: function(resp) {
@@ -53,9 +52,9 @@
 
   </script>
   <%= tinymce :caboose,
-    width:'595px',
-    height:'320px',
-    theme_advanced_source_editor_width: '100px',
-    theme_advanced_source_editor_height: '100px'
+    width:'795px',
+    height:'545px'
+    # theme_advanced_source_editor_width: '100px',
+    # theme_advanced_source_editor_height: '100px'
   %>
 <% end %>

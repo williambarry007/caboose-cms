@@ -22,17 +22,17 @@ namespace :caboose do
   desc "Resets the admin password to 'caboose'"
   task :reset_admin_pass => :environment do reset_admin_pass end
 
-  #desc "Performs caboose migrations to transition from the first to the second version. (Unsafe.)"
-  #task :migrate_between, [:from_version, :to_version] => :environment do |t, args|
-  #  args.with_defaults(from_version: nil, to_version: nil)
-  #  migrate_tables(args[:from_version], args[:to_version])
-  #end
-  #
-  #desc "Performs caboose migrations to transition from the current version to the given version"
-  #task :migrate_to, [:to_version] => :migrate_between
-  #
-  #desc "Performs caboose migrations to transition from the current version to the latest installed version"
-  #task :migrate => :migrate_between
+  desc "Performs caboose migrations to transition from the first to the second version. (Unsafe.)"
+  task :migrate_between, [:from_version, :to_version] => :environment do |t, args|
+    args.with_defaults(from_version: nil, to_version: nil)
+    migrate_tables(args[:from_version], args[:to_version])
+  end
+  
+  desc "Performs caboose migrations to transition from the current version to the given version"
+  task :migrate_to, [:to_version] => :migrate_between
+  
+  desc "Performs caboose migrations to transition from the current version to the latest installed version"
+  task :migrate => :migrate_between
 
   #=============================================================================
   
@@ -216,27 +216,27 @@ namespace :caboose do
     admin_user.save
   end
 
-  #def migrate_tables(from_version, to_version)
-  #  version_setting = Caboose::Setting.where(name: 'version').first
-  #  versions = Caboose::VERSIONS
-  #
-  #  from_version = version_setting.value if from_version.nil?
-  #  to_version = Caboose::VERSION if to_version.nil?
-  #  version_regex = /[0-9]+(\.[0-9]+)*/
-  #
-  #  raise "from_version '#{from_version}' was invalid" if not version_regex.match(from_version)
-  #  raise "to_version '#{to_version}' was invalid" if not version_regex.match(to_version)
-  #
-  #  c = ActiveRecord::Base.connection
-  #  from_to_compare = Caboose::Version.compare_version_strings(from_version, to_version)
-  #
-  #  if from_to_compare < 0
-  #    versions.select{ |v| v > from_version && v <= to_version }.each{ |v| v.up(c) }
-  #  elsif from_to_compare > 0
-  #    versions.select{ |v| v > to_version && v <= from_version }.reverse_each{ |v| v.down(c) }
-  #  end
-  #
-  #  version_setting.value = to_version
-  #  version_setting.save
-  #end
+  def migrate_tables(from_version, to_version)
+    version_setting = Caboose::Setting.where(name: 'version').first
+    versions = Caboose::VERSIONS
+  
+    from_version = version_setting.value if from_version.nil?
+    to_version = Caboose::VERSION if to_version.nil?
+    version_regex = /[0-9]+(\.[0-9]+)*/
+  
+    raise "from_version '#{from_version}' was invalid" if not version_regex.match(from_version)
+    raise "to_version '#{to_version}' was invalid" if not version_regex.match(to_version)
+  
+    c = ActiveRecord::Base.connection
+    from_to_compare = Caboose::Version.compare_version_strings(from_version, to_version)
+  
+    if from_to_compare < 0
+      versions.select{ |v| v > from_version && v <= to_version }.each{ |v| v.up(c) }
+    elsif from_to_compare > 0
+      versions.select{ |v| v > to_version && v <= from_version }.reverse_each{ |v| v.down(c) }
+    end
+  
+    version_setting.value = to_version
+    version_setting.save
+  end
 end

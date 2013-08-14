@@ -46,5 +46,6 @@ Gem::Specification.new do |s|
   s.add_dependency "tinymce-rails"
   s.add_dependency "trollop"
   s.add_dependency "colorbox-rails"
+  s.add_dependency "paperclip"
   
 end

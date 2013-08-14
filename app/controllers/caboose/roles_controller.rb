@@ -8,7 +8,7 @@ module Caboose
     
     # GET /admin/roles
     def index
-      return if !user_is_allowed('roles', 'view')
+      return unless user_is_allowed('roles', 'view')
       top_roles = Role.tree
       arr = []
       top_roles.each { |r| arr += add_role_options(r, 0) }
@@ -17,19 +17,19 @@ module Caboose
     
     # GET /admin/roles/new
     def new
-      return if !user_is_allowed('roles', 'add')
+      return unless user_is_allowed('roles', 'add')
       @role = Role.new
     end
     
     # GET /admin/roles/1/edit
     def edit
-      return if !user_is_allowed('roles', 'edit')
+      return unless user_is_allowed('roles', 'edit')
       @role = Role.find(params[:id])
     end
     
     # POST /admin/roles
     def create
-      return if !user_is_allowed('roles', 'add')
+      return unless user_is_allowed('roles', 'add')
       
       resp = StdClass.new({
           'error' => nil,
@@ -47,7 +47,7 @@ module Caboose
     
     # PUT /admin/roles/1
     def update
-      return if !user_is_allowed('roles', 'edit')
+      return unless user_is_allowed('roles', 'edit')
       
       resp = StdClass.new     
       role = Role.find(params[:id])
@@ -89,7 +89,7 @@ module Caboose
     
     # DELETE /admin/roles/1
     def destroy
-      return if !user_is_allowed('roles', 'delete')
+      return unless user_is_allowed('roles', 'delete')
       @role = Role.find(params[:id])
       @role.destroy
       render json: { 'redirect' => '/admin/roles' }
@@ -97,7 +97,7 @@ module Caboose
     
     # GET /admin/roles/options
     def options
-      return if !user_is_allowed('roles', 'view')
+      return unless user_is_allowed('roles', 'view')
       @top_roles = Role.tree
       arr = [{ 
         "value" => -1, 
@@ -113,7 +113,7 @@ module Caboose
         "text" => (" - " * level) + role.name 
       }]
       role.children.each do |kid|
-        arr += add_role_options(kid, level+1)
+        arr += add_role_options(kid, level + 1)
       end
       return arr
     end

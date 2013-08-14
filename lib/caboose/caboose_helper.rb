@@ -21,7 +21,7 @@ class CabooseHelper
     gem_root = Gem::Specification.find_by_name('caboose-cms').gem_dir
     filename = File.join(@app_path, filename)  
     copy_from = File.join(gem_root,'lib','sample_files', Pathname.new(filename).basename)
-    
+
     if (!File.exists?(filename) || @force)
       FileUtils.cp(copy_from, filename)
     end  

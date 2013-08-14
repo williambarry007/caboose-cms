@@ -29,6 +29,7 @@ namespace :caboose do
     c.drop_table :permissions_roles    if c.table_exists?('permissions_roles')
     c.drop_table :assets               if c.table_exists?('assets')
     c.drop_table :pages                if c.table_exists?('pages')
+    c.drop_table :posts                if c.table_exists?('posts')
     c.drop_table :page_permissions     if c.table_exists?('page_permissions')
     c.drop_table :sessions             if c.table_exists?('sessions')
     c.drop_table :settings             if c.table_exists?('settings')
@@ -109,6 +110,13 @@ namespace :caboose do
       t.string  :fb_description, :limit => 156
       t.string  :gp_description, :limit => 156
     end
+    create_table :posts do |t|
+	  	t.text 		 	 :title
+	  	t.text 		 	 :body
+	  	t.boolean  	 :hide
+	  	t.text 		 	 :image_url 
+	  	t.timestamps
+	  end
     c.create_table :page_permissions do |t|
       t.references  :role
       t.references  :page

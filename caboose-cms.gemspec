@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.summary     = "CMS built on rails."
   s.description = "CMS built on rails with love."
 
-  s.files = Dir["{app,bin,config,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
+  s.files = Dir["{app,bin,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]
   s.executables = ["caboose"]
 

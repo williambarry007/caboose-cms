@@ -128,7 +128,7 @@ namespace :caboose do
       t.string  :fb_description, :limit => 156
       t.string  :gp_description, :limit => 156
     end
-    create_table :posts do |t|
+    c.create_table :posts do |t|
 	  	t.text 		 	 :title
 	  	t.text 		 	 :body
 	  	t.boolean  	 :hide

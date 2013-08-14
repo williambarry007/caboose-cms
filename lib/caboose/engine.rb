@@ -3,6 +3,7 @@ require 'tinymce-rails'
 require 'jquery-ui-rails'
 #require 'modeljs'
 require 'colorbox-rails'
+require 'paperclip'
 
 module Caboose
 

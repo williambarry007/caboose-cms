@@ -39,7 +39,6 @@ namespace :caboose do
   def drop_tables
     puts "Dropping any existing caboose tables..."
     c = ActiveRecord::Base.connection  
-<<<<<<< HEAD
     c.drop_table :users                if c.table_exists?('users')
     c.drop_table :roles                if c.table_exists?('roles')
     c.drop_table :permissions          if c.table_exists?('permissions')
@@ -51,18 +50,6 @@ namespace :caboose do
     c.drop_table :page_permissions     if c.table_exists?('page_permissions')
     c.drop_table :sessions             if c.table_exists?('sessions')
     c.drop_table :settings             if c.table_exists?('settings')
-=======
-    c.drop_table :users             if c.table_exists?('users')
-    c.drop_table :roles             if c.table_exists?('roles')
-    c.drop_table :permissions       if c.table_exists?('permissions')
-    c.drop_table :roles_users       if c.table_exists?('roles_users')
-    c.drop_table :permissions_roles if c.table_exists?('permissions_roles')
-    c.drop_table :assets            if c.table_exists?('assets')
-    c.drop_table :pages             if c.table_exists?('pages')
-    c.drop_table :page_permissions  if c.table_exists?('page_permissions')
-    c.drop_table :sessions          if c.table_exists?('sessions')
-    c.drop_table :settings          if c.table_exists?('settings')
->>>>>>> 91fad24b37b250731136ae37abdd655f03b008e3
   end
 
   def create_tables  

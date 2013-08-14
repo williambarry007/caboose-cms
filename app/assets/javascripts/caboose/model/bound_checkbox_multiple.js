@@ -1,5 +1,5 @@
 
-BoundCheckbox = BoundControl.extend({
+BoundCheckboxMultiple = BoundControl.extend({
 
   //el: false,
   //model: false,
@@ -62,7 +62,7 @@ BoundCheckbox = BoundControl.extend({
       $('#'+this.el+'_container').append(
         $('<table/>').append(tbody)
       );
-    );
+    });
   },
   
   view: function() {

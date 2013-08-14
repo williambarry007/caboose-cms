@@ -11,7 +11,8 @@ class Caboose::RolePlugin < Caboose::CaboosePlugin
     if (user.is_allowed('roles', 'view'))
       item['children'] << {
         'href' => '/admin/roles', 
-        'text' => 'View All Roles'
+        'text' => 'View All Roles',
+        'modal' => true
       }
     end
     if (user.is_allowed('roles', 'add'))

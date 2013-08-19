@@ -327,4 +327,19 @@ class Caboose::Page < ActiveRecord::Base
 		return self.is_child(parent_id, pid)
 	end
 
+	def linked_resources_map
+    resources = { js: [], css: [] }
+    return resources if self.linked_resources.nil?
+    self.linked_resources.each_line do |r|
+      r.chomp!
+      case r
+      when /\.js$/
+        resources[:js] << r
+      when /\.css$/
+        resources[:css] << r
+      end
+    end
+    return resources
+	end
+
 end

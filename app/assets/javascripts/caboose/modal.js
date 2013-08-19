@@ -12,6 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require colorbox-rails
 
 var CabooseModal = function(w, h) {  
   if (!h)

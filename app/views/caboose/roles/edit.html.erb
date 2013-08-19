@@ -1,10 +1,20 @@
 
-<h1>Edit Role</h1>
-<div id='role_<%= @role.id %>_container'></div>
+<h1>Editing Role</h1>
+<div id="role_<%= @role.id %>_name"></div>
+<div id="role_<%= @role.id %>_parent_id"></div>
+<div id="role_<%= @role.id %>_description"></div>
+<div id="role_<%= @role.id %>_members"></div>
+<div id="role_<%= @role.id %>_permissions"></div>
+<div id="message"></div>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
+
+var modal = false;
+$(window).load(function() {  
+  modal = new CabooseModal(600, 600);
+});
 
 $(document).ready(function() {
   new ModelBinder({
@@ -23,29 +33,37 @@ $(document).ready(function() {
         text: "<%= @role.parent.nil? ? '[No parent]' : @role.parent.name %>",
         show_controls: true,
         loading_message: 'Getting roles...',
-        options_url: '/admin/roles/options' 
+        options_url: '/admin/roles/options',
+        width: 590,
+        message: 'message'
       },    
-      { name: 'name'        , nice_name: 'Name'        , type: 'text' , value: "<%= @role.name %>" },
-      { name: 'description' , nice_name: 'Description' , type: 'text' , value: "<%= @role.description %>" },
+      { name: 'name'        , nice_name: 'Name'        , type: 'text' , value: "<%= @role.name %>"        , width: 590 , message: 'message' },
+      { name: 'description' , nice_name: 'Description' , type: 'text' , value: "<%= @role.description %>" , width: 590 , message: 'message' },
       { 
         name: 'members',
+        nice_name: 'Members',
         type: 'checkbox-multiple',
         value: <%= @role.users.collect{|u| u.id}.to_json %>,
         text: "<%= raw @role.users.order('last_name, first_name').collect{|u| "#{u.first_name} #{u.last_name}"}.join('<br />') %>",
         loading_message: 'Getting users...',
         options_url: '/admin/users/options',
+        width: 590,
+        message: 'message'
       },
       { 
         name: 'permissions',
+        nice_name: 'Permissions',
         type: 'checkbox-multiple',
         value: <%= @role.permissions.collect{|p| p.id}.to_json %>,
         text: "<%= raw @role.permissions.order('resource, action').collect{|p| "#{p.resource}_#{p.action}"}.join('<br />') %>",
         loading_message: 'Getting permissions...',
         options_url: '/admin/permissions/options',
+        width: 590,
+        message: 'message'
       }
     ],
     on_load: function() { modal.autosize(); }
-  });  
+  });
 
   /*var user = new Model({
     name: 'Role',

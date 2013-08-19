@@ -23,7 +23,7 @@ Attribute.prototype = {
     $.ajax({
       url: this.update_url,
       type: 'put',
-      data: this.name + '=' + this.value,
+      data: this.name + '=' + encodeURIComponent(this.value),
 			success: function(resp) {			  
 				if (resp.success)
 				{

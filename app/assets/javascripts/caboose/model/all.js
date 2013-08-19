@@ -9,3 +9,4 @@
 //= require caboose/model/bound_select
 //= require caboose/model/bound_text
 //= require caboose/model/bound_textarea
+//= require caboose/model/bound_richtext

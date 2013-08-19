@@ -38,6 +38,7 @@ ModelBinder.prototype = {
       else if (attrib.type == 'checkbox')          control = new BoundCheckbox(opts);
       else if (attrib.type == 'checkbox-multiple') control = new BoundCheckboxMultiple(opts);
       else if (attrib.type == 'textarea')          control = new BoundTextarea(opts);
+      else if (attrib.type == 'richtext')          control = new BoundRichText(opts);
       else if (attrib.type == 'image')             control = new BoundImage(opts);
 
       this2.controls.push();    

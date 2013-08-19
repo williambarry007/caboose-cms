@@ -40,17 +40,19 @@ BoundCheckboxMultiple = BoundControl.extend({
     
     var this2 = this;
     this.attribute.populate_options(function() {
+
       var tbody = $('<tbody/>');
-      $.each(this2.options, function(i, option) {
+      $.each(this2.attribute.options, function(i, option) {
+
         tbody.append($('<tr/>')
           .append($('<td/>')
             .attr('id', this2.el + '_' + i)
             .attr('type', 'checkbox')
-            .attr('checked', this2.attribute.value)
+            .attr('checked', this2.attribute.value[option.value])
             .on('change', function() {
-              //this2.binder.cancel_active();
-              //this2.binder.active_control = this;
-              //this2.save(); 
+              // this2.binder.cancel_active();
+              // this2.binder.active_control = this;
+              // this2.save(); 
             })
           )
           .append($('<label/>')

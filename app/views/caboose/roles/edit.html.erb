@@ -41,6 +41,7 @@ $(document).ready(function() {
       { name: 'description' , nice_name: 'Description' , type: 'text' , value: "<%= @role.description %>" , width: 590 , message: 'message' },
       { 
         name: 'members',
+        nice_name: 'Members',
         type: 'checkbox-multiple',
         value: <%= @role.users.collect{|u| u.id}.to_json %>,
         text: "<%= raw @role.users.order('last_name, first_name').collect{|u| "#{u.first_name} #{u.last_name}"}.join('<br />') %>",
@@ -51,6 +52,7 @@ $(document).ready(function() {
       },
       { 
         name: 'permissions',
+        nice_name: 'Permissions',
         type: 'checkbox-multiple',
         value: <%= @role.permissions.collect{|p| p.id}.to_json %>,
         text: "<%= raw @role.permissions.order('resource, action').collect{|p| "#{p.resource}_#{p.action}"}.join('<br />') %>",

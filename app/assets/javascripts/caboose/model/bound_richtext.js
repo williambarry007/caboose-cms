@@ -1,5 +1,5 @@
 
-BoundTextarea = BoundControl.extend({
+BoundRichText = BoundControl.extend({
 
   //el: false,
   //model: false,
@@ -13,11 +13,11 @@ BoundTextarea = BoundControl.extend({
       this[thing] = params[thing];
     
     this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;
-         
+
     $('#'+this.el).wrap($('<div/>').attr('id', this.el + '_container').css('position', 'relative'));
     $('#'+this.el+'_container').empty();
-    $('#'+this.el+'_container').append($('<textarea/>').attr('id', this.el).attr('placeholder', 'empty').val(this.attribute.value));
-    $('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));
+    $('#'+this.el+'_container').append($('<textarea/>').attr('id', this.el).attr('class', 'tinymce').attr('placeholder', 'empty').val(this.attribute.value));
+    //$('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));
     if (this.attribute.width)  $('#'+this.el).css('width'  , this.attribute.width);
     if (this.attribute.height) $('#'+this.el).css('height' , this.attribute.height);
     var h = $('#'+this.el+'_placeholder').outerHeight();
@@ -49,7 +49,7 @@ BoundTextarea = BoundControl.extend({
       .addClass('bound_textarea_controls')
       .css('position', 'absolute')
       .css('top', 0)
-      .css('left', w-148)
+      .css('left', w - 148)
       .css('width', 148)
       .css('overflow', 'hidden')
       .append($('<div/>')
@@ -72,6 +72,8 @@ BoundTextarea = BoundControl.extend({
   },
   
   save: function() {
+
+    tinymce.triggerSave();
 
     this.attribute.value = $('#'+this.el).val();    
     if (this.attribute.value == this.attribute.value_clean)

@@ -18,8 +18,7 @@
 				'last_name, first_name'	=> 'Last Name',
 				'username' => 'Username',
 				'email'	=> 'Email'
-			})
-		%>
+			}) %>
   </tr>
 <% @users.each do |user| %>
   <tr onclick="window.location='/users/<%= user.id %>/edit';">

@@ -1,6 +1,6 @@
 module Caboose
   class RolesController < ApplicationController
-    layout 'caboose/admin'
+    layout 'caboose/modal'
     
     def before_action
       @page = Page.page_with_uri('/admin')
@@ -61,15 +61,15 @@ module Caboose
     	  	  role.description = value
     	  	when "parent_id"
     	  	  value = value.to_i
-    	  	  if (role.id == value)
+    	  	  if role.id == value
     	  	    resp.error = "You can't set the parent to be this role."
     	  	    save = false
-    	  		elsif (role.is_ancestor_of?(value))
+    	  		elsif role.is_ancestor_of?(value)
     	  		  resp.error = "You can't set the parent to be one of the child roles."
     	  		  save = false
     	  		else
     	  		  role.parent_id = value
-    	  		  if (value == -1)
+    	  		  if value == -1
     	  		    resp.attributes = { 'parent_id' => { 'text' => '[No parent]' }}
     	  		  else
     	  		    p = Role.find(value)

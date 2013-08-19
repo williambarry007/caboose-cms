@@ -9,21 +9,6 @@ module Caboose
     # GET /pages
     def index      
     end
-    
-    def view_formatted_resources(page)
-      resources = { js: [], css: [] }
-      return resources if page.linked_resources.nil?
-      page.linked_resources.each_line do |r|
-        r.chomp!
-        case r
-        when /\.js$/
-          resources[:js] += [r]
-        when /\.css$/
-          resources[:css] += [r]
-        end
-      end
-      return resources
-    end
 
     # GET /pages/:id
     def show
@@ -60,8 +45,6 @@ module Caboose
       @subnav = Caboose::Page.subnav(@page, session['use_redirect_urls'], @user)
 
       #@subnav.links = @tasks.collect {|href, task| {'href' => href, 'text' => task, 'is_current' => uri == href}}
-
-      @resources = view_formatted_resources(@page)
   
     end
     
@@ -125,7 +108,6 @@ module Caboose
     def edit
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      @resources = view_formatted_resources(@page)
     end
     
     # GET /pages/1/edit-title
@@ -268,38 +250,20 @@ module Caboose
           page[name.to_sym] = value
 
         when 'linked_resources'
-          result = ''
+          result = []
           value.each_line do |line|
-
+            line.chomp!
             line.strip!
             next if line.empty?
 
-            comps = line.split('.')
-            if comps.length < 2
-              resp.error = "Resource '#{line}' has an unspecified file type.  (e.g. given 'myScript.js', '.js' would specify a javascript file type.)"
-              save = false
-              next
-            end
-
-            case comps.last
-            when 'js', 'css'
-              if value =~ URI::regexp()
-                uri = URI.parse(value)
-                if !(uri =~ URI::HTTP || uri =~ URI::HTTPS)
-                  resp.error = "Resource '#{line}' is an unrecognized URI format."
-                  save = false
-                end
-              end
-            else
+            if !(line.ends_with('.js') || line.ends_with('.css'))
               resp.error = "Resource '#{line}' has an unsupported file type ('#{comps.last}')."
               save = false
-              next
             end
 
-            result += "\n" unless result.empty?
-            result += line
+            result << line
           end
-          page.linked_resources = result
+          page.linked_resources = result.join("\n")
           
         when 'content_format'
           page.content_format = value

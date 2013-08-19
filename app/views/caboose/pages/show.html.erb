@@ -1,13 +1,13 @@
 
 <% content_for :caboose_css do %>
-  <% @resources[:css].each do |r| %>
+  <% @page.linked_resources_map[:css].each do |r| %>
     <!--link type='text/css' rel='stylesheet' href="<%= r %>" /-->
     <%= stylesheet_link_tag r %>
   <% end %>
 <% end %>
 
 <% content_for :caboose_js do %>
-  <% @resources[:js].each do |r| %>
+  <% @page.linked_resources_map[:js].each do |r| %>
     <!--script type='text/javascript' src="<%= r %>" ></script-->
     <%= javascript_include_tag r %>
   <% end %>

@@ -33,21 +33,25 @@ CabooseModal.prototype = {
   resize: function(w, h) { this.width = w; this.height = h; this.colorbox(); },
   
   // Resizes the height of the modal based on the content height
-  autosize: function(msg) {
-    if (msg)
-      $('#message').html(msg);
+  autosize: function(msg, msg_container) {
+    if (msg)      
+      $('#' + (msg_container ? msg_container : 'message')).empty().append(msg);
     this.height = $('#modal_content').outerHeight(true);
     this.colorbox();
   },
   
-  colorbox: function() { 
-    parent.$.fn.colorbox.resize({ 
-      innerWidth:  '' + this.width + 'px', 
-      innerHeight: '' + this.height + 'px' 
-    }); 
+  colorbox: function() {
+    if (parent && parent.$.fn.colorbox)
+    {
+      parent.$.fn.colorbox.resize({ 
+        innerWidth:  '' + this.width + 'px', 
+        innerHeight: '' + this.height + 'px' 
+      });
+    }
   },
   
   close: function() {
-    parent.$.fn.colorbox.close();
+    if (parent && parent.$.fn.colorbox)
+      parent.$.fn.colorbox.close();      
   }
 };

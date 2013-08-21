@@ -13,6 +13,8 @@ Attribute.prototype = {
   value_clean: false,
   text: false,
   empty_text: 'empty',
+  fixed_placeholder: true,
+  align: 'left',
   
   update_url: false,
   options_url: false,

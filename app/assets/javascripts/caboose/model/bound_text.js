@@ -13,15 +13,25 @@ BoundText = BoundControl.extend({
     for (var thing in params)
       this[thing] = params[thing];
     
-    this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;
-         
+    this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;    
     $('#'+this.el).wrap($('<div/>').attr('id', this.el + '_container').css('position', 'relative'));
     $('#'+this.el+'_container').empty();
-    $('#'+this.el+'_container').append($('<input/>').attr('id', this.el).attr('type', 'text').attr('placeholder', 'empty').val(this.attribute.value));
-    $('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));
+    $('#'+this.el+'_container').append($('<input/>')
+      .attr('id', this.el)
+      .attr('type', 'text')
+      .attr('placeholder', this.attribute.fixed_placeholder ? 'empty' : this.attribute.nice_name)
+      .css('text-align', this.attribute.align)
+      .val(this.attribute.value)
+    );
+    
+    if (this.attribute.fixed_placeholder)      
+      $('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));
     if (this.attribute.width)  $('#'+this.el).css('width' , this.attribute.width);
-    var w = $('#'+this.el+'_placeholder').outerWidth();
-    $('#'+this.el).attr('placeholder', 'empty').css('padding-left', '+=' + w).css('width', '-=' + w);
+    if (this.attribute.fixed_placeholder)
+    {
+      var w = $('#'+this.el+'_placeholder').outerWidth();
+      $('#'+this.el).attr('placeholder', 'empty').css('padding-left', '+=' + w).css('width', '-=' + w);
+    }
     
     var this2 = this;
     $('#'+this.el).on('keyup', function(e) {

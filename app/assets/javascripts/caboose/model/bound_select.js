@@ -22,13 +22,16 @@ BoundSelect = BoundControl.extend({
       .css('position', 'relative')
     );
     $('#'+this.el+'_container').empty();
-    $('#'+this.el+'_container').append($('<div/>')
-      .attr('id', this.placeholder)
-      .addClass('placeholder')
-      .append($('<span/>')
-        .html(this.attribute.nice_name + ': ')
-      )
-    );
+    if (this.attribute.fixe_placeholder)
+    {
+      $('#'+this.el+'_container').append($('<div/>')
+        .attr('id', this.placeholder)
+        .addClass('placeholder')
+        .append($('<span/>')
+          .html(this.attribute.nice_name + ': ')
+        )
+      );
+    }
     $('#'+this.el+'_container').append($('<input/>')
       .attr('id', this.el)
       .attr('placeholder', this.attribute.empty_text)
@@ -38,10 +41,13 @@ BoundSelect = BoundControl.extend({
     if (this.attribute.width)
       $('#'+this.el).css('width', this.attribute.width);
     
-    var w = $('#'+this.placeholder).outerWidth();
-    $('#'+this.el)
-      .css('padding-left', '+=' + w)
-      .css('width', '-=' + w);
+    if (this.attribute.fixed_placeholder)
+    {
+      var w = $('#'+this.placeholder).outerWidth();
+      $('#'+this.el)
+        .css('padding-left', '+=' + w)
+        .css('width', '-=' + w);
+    }
       
     var this2 = this;
     this.attribute.populate_options(function() {

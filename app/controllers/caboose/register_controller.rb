@@ -12,6 +12,7 @@ module Caboose
     def register
       
       resp = StdClass.new('error' => '', 'redirect' => '')
+      return_url = params[:return_url].nil? ? "/" : params[:return_url];
       
       if (logged_in?)
         resp.error = "Already logged in"
@@ -42,7 +43,7 @@ module Caboose
           u.password      = Digest::SHA1.hexdigest(Caboose::salt + pass1)
           u.creation_date = DateTime.now
           u.save                    
-          resp.redirect = "/login"
+          resp.redirect = "/login?return_url=#{return_url}"
 
         end
       end

@@ -1,7 +1,7 @@
 
 <form action='/login' method='post' id='login_form'>
 <p class='other_options'>
-<a href='/register'>Need to register?</a>
+<a href='/register?return_url=<%= @return_url %>'>Need to register?</a>
 </p>
 <h1>Login</h1>
 <input type='hidden'    name='return_url' value='<%= @return_url %>' />

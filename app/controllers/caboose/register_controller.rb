@@ -42,7 +42,12 @@ module Caboose
           u.email         = email
           u.password      = Digest::SHA1.hexdigest(Caboose::salt + pass1)
           u.date_created  = DateTime.now
-          u.save                    
+          u.save
+          
+          # Go ahead and log the user in
+          u = Caboose::User.find(u.id)
+          login_user(u)
+          
           resp.redirect = "/login?return_url=#{return_url}"
 
         end

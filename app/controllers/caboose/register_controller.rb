@@ -41,7 +41,7 @@ module Caboose
           u.last_name     = last_name
           u.email         = email
           u.password      = Digest::SHA1.hexdigest(Caboose::salt + pass1)
-          u.creation_date = DateTime.now
+          u.date_created  = DateTime.now
           u.save                    
           resp.redirect = "/login?return_url=#{return_url}"
 

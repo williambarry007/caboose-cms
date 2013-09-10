@@ -66,7 +66,8 @@ namespace :caboose do
       t.string :password
       t.string :password_reset_id
       t.datetime :password_reset_sent
-      t.string :token     
+      t.string :token
+      t.datetime :date_created
     end
     c.create_table :roles do |t|
       t.integer :parent_id

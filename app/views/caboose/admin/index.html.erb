@@ -9,7 +9,7 @@ $(document).ready(function() {
 
 function open_colorbox() {
   $.colorbox({
-    href: '/login?modal=1&return_url=/station',
+    href: '/login?modal=1&return_url=<%= @return_url %>',
     iframe: true,
     innerWidth: 200,
     innerHeight:  50,

@@ -15,6 +15,7 @@ Attribute.prototype = {
   empty_text: 'empty',
   fixed_placeholder: true,
   align: 'left',
+  after_update: false,
   
   update_url: false,
   options_url: false,
@@ -35,6 +36,7 @@ Attribute.prototype = {
 				  this2.value_clean = this2.value;
 				}
 				if (after) after(resp);
+				if (this2.after_update) this2.after_update();
 			},
 			error: function() { 
 			  if (after) after(false);

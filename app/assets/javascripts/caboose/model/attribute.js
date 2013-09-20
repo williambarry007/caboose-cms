@@ -15,6 +15,7 @@ Attribute.prototype = {
   empty_text: 'empty',
   fixed_placeholder: true,
   align: 'left',
+  before_update: false,
   after_update: false,
   
   update_url: false,
@@ -22,6 +23,7 @@ Attribute.prototype = {
   options: false,
   
   save: function(after) {
+    if (this.before_update) this.before_update();    
     var this2 = this;
     $.ajax({
       url: this.update_url,

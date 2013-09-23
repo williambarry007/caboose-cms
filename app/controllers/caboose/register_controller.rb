@@ -22,6 +22,7 @@ module Caboose
         first_name  = params[:first_name]
         last_name   = params[:last_name]
         email       = params[:email]
+        phone       = params[:phone]
         pass1       = params[:pass1]
         pass2       = params[:pass2]
                           
@@ -31,6 +32,8 @@ module Caboose
           resp.error = "Your last name is required."
         elsif (email.nil? || email.strip.length == 0)
           resp.error = "Your email address is required."
+        elsif (phone.nil? || phone.strip.length < 10)
+          resp.error = "Your phone number is required."
         elsif (pass1.nil? || pass1.strip.length < 8)
           resp.error = "Your password must be at least 8 characters."
         elsif (pass2.nil? || pass1 != pass2)
@@ -41,6 +44,7 @@ module Caboose
           u.first_name    = first_name
           u.last_name     = last_name
           u.email         = email
+          u.phone         = phone
           u.password      = Digest::SHA1.hexdigest(Caboose::salt + pass1)
           u.date_created  = DateTime.now
           u.save

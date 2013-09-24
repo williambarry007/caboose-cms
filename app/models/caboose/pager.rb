@@ -131,10 +131,10 @@ module Caboose
     	str = ''
       
     	# key = sort field, value = text to display
-    	cols.each do |sort, text|
-    		desc  = @options['sort'] == sort ? (@options['desc'] ? 0 : 1) : 0
-    		arrow = @options['sort'] == sort ? (@options['desc'] ? ' &uarr;' : ' &darr;') : ''					
-    		link = @options['base_url'] + "?#{vars}&sort=#{sort}&desc=#{desc}"
+    	cols.each do |sort, text|    	  
+    	  desc  = @options['desc'] ? @options['desc'].to_i : 0
+    		arrow = @options['sort'] == sort ? (desc ? ' &uarr;' : ' &darr;') : ''					
+    		link = @options['base_url'] + "?#{vars}&sort=#{sort}&desc=" + (desc ? "0" : "1")
     		str += "<th><a href='#{link}'>#{text}#{arrow}</a></th>\n"
     	end
     	return str  	

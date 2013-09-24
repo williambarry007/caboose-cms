@@ -24,7 +24,7 @@ module Caboose
   		@options = {
   		  'model'           => '',
   			'sort' 			      => '',
-  			'desc' 			      => false,
+  			'desc' 			      => 0,
   			'base_url'		    => '',
   			'page'			      => 1,
   			'item_count'		  => 0,
@@ -33,9 +33,10 @@ module Caboose
   		params.each   { |key, val| @params[key]  = val }
   		options.each  { |key, val| @options[key] = val }
   		@params.each  { |key, val| @params[key]  = post_get[key].nil? ? val : post_get[key] }			
-  		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] } 
+  		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
+  		@options['desc'] = @options['desc'].to_i
   		@options['item_count'] = @options['model'].constantize.where(where).count
-  		
+  		  		
   	end
   	
   	def ok(val)
@@ -52,7 +53,7 @@ module Caboose
       return true
   	end
   	
-  	def items
+  	def items  	    	  
     	return @options['model'].constantize.where(where).limit(limit).offset(offset).reorder(reorder).all
   	end
   		
@@ -69,8 +70,6 @@ module Caboose
   		# Variables to make the search form work 
   		vars = get_vars()
   		page = @options["page"].to_i
-  		
-  		Caboose.log(@options)
   				
   		# Max links to show (must be odd) 
   		total_links = 5
@@ -131,10 +130,10 @@ module Caboose
     	str = ''
       
     	# key = sort field, value = text to display
-    	cols.each do |sort, text|
-    		desc  = @options['sort'] == sort ? (@options['desc'] ? 0 : 1) : 0
-    		arrow = @options['sort'] == sort ? (@options['desc'] ? ' &uarr;' : ' &darr;') : ''					
-    		link = @options['base_url'] + "?#{vars}&sort=#{sort}&desc=#{desc}"
+    	cols.each do |sort, text|    	  
+    		desc  = @options['sort'] == sort && @options['desc'] == 1 ? 1 : 0
+    		arrow = @options['sort'] == sort ? (desc == 1 ? ' &uarr;' : ' &darr;') : ''    		
+    		link = @options['base_url'] + "?#{vars}&sort=#{sort}&desc=" + (desc == 1 ? "0" : "1")
     		str += "<th><a href='#{link}'>#{text}#{arrow}</a></th>\n"
     	end
     	return str  	
@@ -169,8 +168,7 @@ module Caboose
   	  end
   	  sql_str = sql.join(' and ')
   	  sql = [sql_str]  	   	  
-  	  values.each { |v| sql << v }
-  	  Caboose.log(sql)
+  	  values.each { |v| sql << v }  	  
   	  return sql
     end
     
@@ -183,10 +181,12 @@ module Caboose
     end
     
     def reorder
+      str = "id" 
       if (!@options['sort'].nil? && @options['sort'].length > 0)
-        return @options['sort']
+        str = "#{@options['sort']}"
       end
-      return "id"
+      str << " desc" if @options['desc'] == 1       
+      return str
     end
   end
 end

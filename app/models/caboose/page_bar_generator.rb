@@ -34,7 +34,8 @@ module Caboose
   		options.each  { |key, val| @options[key] = val }
   		@params.each  { |key, val| @params[key]  = post_get[key].nil? ? val : post_get[key] }			
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
-  		@options['desc'] = @options['desc'].to_i
+  		@options['desc'] = 1 if @options['desc'] == 'true'
+  		@options['desc'] = 0 if @options['desc'] == 'false'
   		@options['item_count'] = @options['model'].constantize.where(where).count
   		  		
   	end

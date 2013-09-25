@@ -35,8 +35,12 @@ BoundRichText = BoundControl.extend({
       }
       else
         $('#'+this2.el).removeClass('dirty');
-    });                             
-    $('#'+this.el).on('blur', function() { this2.save(); });
+    });
+    
+    setTimeout(function() { 
+      var ed = tinymce.EditorManager.get(this2.el);
+      ed.on('blur', function(e) { this2.save(); }); 
+    }, 1500);    
   },
   
   show_controls: function() {
@@ -135,3 +139,7 @@ BoundRichText = BoundControl.extend({
   }
   
 });
+
+BoundRichText.test1 = function() {
+  alert('Testing');
+};

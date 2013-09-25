@@ -39,16 +39,11 @@ module Caboose
   	end
   	
   	def fix_desc
+  	  @options['desc'] = 0 and return if @options['desc'].nil?
   	  return if @options['desc'] == 1
   	  return if @options['desc'] == 0
-  	  if @options['desc'] == 'true'
-  	    @options['desc'] = 1
-  	    return
-  	  end
-  	  if @options['desc'] == 'false'
-  	    @options['desc'] = 1
-  	    return
-  	  end
+  	  @options['desc'] = 1 and return if @options['desc'] == 'true' || @options['desc'].is_a?(TrueClass)
+  	  @options['desc'] = 0 and return if @options['desc'] == 'false' || @options['desc'].is_a?(FalseClass)  	  
   	  @options['desc'] = @options['desc'].to_i 
   	end
   	
@@ -67,6 +62,7 @@ module Caboose
   	end
   	
   	def items  	    	  
+    	#return @options['model'].constantize.where(where).limit(limit).offset(offset).reorder(reorder).all
     	return @options['model'].constantize.where(where).limit(limit).offset(offset).reorder(reorder).all
   	end
   		
@@ -193,7 +189,7 @@ module Caboose
     end
     
     def reorder
-      str = "id" 
+      str = "id"
       if (!@options['sort'].nil? && @options['sort'].length > 0)
         str = "#{@options['sort']}"
       end

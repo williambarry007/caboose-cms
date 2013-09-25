@@ -14,7 +14,3 @@
 //= require jquery_ujs
 //= require colorbox-rails
 //= require caboose/modal_integration
-/* require jquery.ui.all  */
-/* require tinymce-jquery */
-/* require modeljs.all    */
-

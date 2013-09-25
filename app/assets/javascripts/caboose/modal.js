@@ -13,45 +13,4 @@
 //= require jquery
 //= require jquery_ujs
 //= require colorbox-rails
-
-var CabooseModal = function(w, h) {  
-  if (!h)
-  {
-    $('#modal_content').css('width', w);
-    h = $('#modal_content').outerHeight(true);
-  }  
-  if (parent.$.fn.colorbox)
-    this.resize(w, h);
-};
-
-CabooseModal.prototype = {
-  
-  width: 0,
-  height: 0, 
-  set_width:  function(w) { this.width = w; this.colorbox(); },
-  set_height: function(h) { this.height = h; this.colorbox(); },
-  resize: function(w, h) { this.width = w; this.height = h; this.colorbox(); },
-  
-  // Resizes the height of the modal based on the content height
-  autosize: function(msg, msg_container) {
-    if (msg)      
-      $('#' + (msg_container ? msg_container : 'message')).empty().append(msg);
-    this.height = $('#modal_content').outerHeight(true);
-    this.colorbox();
-  },
-  
-  colorbox: function() {
-    if (parent && parent.$.fn.colorbox)
-    {
-      parent.$.fn.colorbox.resize({ 
-        innerWidth:  '' + this.width + 'px', 
-        innerHeight: '' + this.height + 'px' 
-      });
-    }
-  },
-  
-  close: function() {
-    if (parent && parent.$.fn.colorbox)
-      parent.$.fn.colorbox.close();      
-  }
-};
+//= require caboose/modal_integration

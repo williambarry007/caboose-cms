@@ -34,10 +34,22 @@ module Caboose
   		options.each  { |key, val| @options[key] = val }
   		@params.each  { |key, val| @params[key]  = post_get[key].nil? ? val : post_get[key] }			
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
-  		@options['desc'] = 1 if @options['desc'] == 'true'
-  		@options['desc'] = 0 if @options['desc'] == 'false'
-  		@options['item_count'] = @options['model'].constantize.where(where).count
-  		  		
+  		fix_desc  		  		
+  		@options['item_count'] = @options['model'].constantize.where(where).count  		  		
+  	end
+  	
+  	def fix_desc
+  	  return if @options['desc'] == 1
+  	  return if @options['desc'] == 0
+  	  if @options['desc'] == 'true'
+  	    @options['desc'] = 1
+  	    return
+  	  end
+  	  if @options['desc'] == 'false'
+  	    @options['desc'] = 1
+  	    return
+  	  end
+  	  @options['desc'] = @options['desc'].to_i 
   	end
   	
   	def ok(val)
@@ -131,10 +143,9 @@ module Caboose
     	str = ''
       
     	# key = sort field, value = text to display
-    	cols.each do |sort, text|    	  
-    		desc  = @options['sort'] == sort && @options['desc'] == 1 ? 1 : 0
-    		arrow = @options['sort'] == sort ? (desc == 1 ? ' &uarr;' : ' &darr;') : ''    		
-    		link = @options['base_url'] + "?#{vars}&sort=#{sort}&desc=" + (desc == 1 ? "0" : "1")
+    	cols.each do |sort, text|    		
+    		arrow = @options['sort'] == sort ? (@options['desc'] == 1 ? ' &uarr;' : ' &darr;') : ''    		
+    		link = @options['base_url'] + "?#{vars}&sort=#{sort}&desc=" + (@options['desc'] == 1 ? "0" : "1")
     		str += "<th><a href='#{link}'>#{text}#{arrow}</a></th>\n"
     	end
     	return str  	

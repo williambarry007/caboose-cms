@@ -9,7 +9,13 @@
 </head>
 <body>
 <div id='header'>
-<%= render :partial => 'layouts/caboose/admin_top_nav' %>
+  <div id='top_nav'>
+    <div class='caboose_logo'></div>
+    <ul>
+      <li class='back'    ><a href='/'><span><< Back to Site</span></a></li>
+      <li class='cpanel'  ><a href='/station' id='caboose_station'><span>Dashboard</span></a></li>
+    </ul>
+  </div>
 </div>
 <div id='content_wrapper'>
   <div id='content'>

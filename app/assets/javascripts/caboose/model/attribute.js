@@ -17,6 +17,7 @@ Attribute.prototype = {
   align: 'left',
   before_update: false,
   after_update: false,
+  debug: false,
   
   update_url: false,
   options_url: false,

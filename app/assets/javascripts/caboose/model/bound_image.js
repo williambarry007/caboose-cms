@@ -53,16 +53,15 @@ BoundImage = BoundControl.extend({
     $('#'+this.el+'_container').append($('<div/>')
       .attr('id', this.el + '_message')
     );
-    $('#'+this.el+'_container').append($('<iframe/>')
+    iframe = $('<iframe/>')
       .attr('name', this.el + '_iframe')
-      .attr('id', this.el + '_iframe')      
-      .css('width', 0)
-      .css('height', 0)
-      .css('border', 0)
-      //.css('width', '100%')
-      //.css('height', 600)
-      //.css('background', '#fff')      
-    );
+      .attr('id', this.el + '_iframe');      
+    if (this.attribute.debug)      
+      iframe.css('width', '100%').css('height', 600).css('background', '#fff');
+    else
+      iframe.css('width', 0).css('height', 0).css('border', 0);         
+    $('#'+this.el+'_container').append(iframe);
+    
     $('#'+this.el+'_container').append($('<br/>')
       .css('clear', 'both')
     );

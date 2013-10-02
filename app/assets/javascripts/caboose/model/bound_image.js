@@ -60,11 +60,8 @@ BoundImage = BoundControl.extend({
       iframe.css('width', '100%').css('height', 600).css('background', '#fff');
     else
       iframe.css('width', 0).css('height', 0).css('border', 0);         
-    $('#'+this.el+'_container').append(iframe);
-    
-    $('#'+this.el+'_container').append($('<br/>')
-      .css('clear', 'both')
-    );
+    $('#'+this.el+'_container').append(iframe);    
+    $('#'+this.el+'_container').append($('<br/>').css('clear', 'both'));
   },
   
   post_upload: function() {

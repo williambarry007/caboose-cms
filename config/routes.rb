@@ -44,7 +44,7 @@ Caboose::Engine.routes.draw do
   post    "admin/settings"                => "settings#create"
   delete  "admin/settings/:id"            => "settings#destroy"
   
-  get     "pages"                           => "pages#index"
+  #get     "pages"                           => "pages#index"
   get     "pages/:id"                       => "pages#show"
   get     "admin/pages/sitemap-options"     => "pages#admin_sitemap_options"
   get     "admin/pages/robots-options"      => "pages#admin_robots_options"
@@ -61,6 +61,7 @@ Caboose::Engine.routes.draw do
   get     "admin/pages/:id/edit-title"      => "pages#admin_edit_title"
   get     "admin/pages/:id/edit"            => "pages#admin_edit"  
   put     "admin/pages/:id"                 => "pages#admin_update"
+  get     "admin/pages"                     => "pages#admin_index"
   post    "admin/pages"                     => "pages#admin_create"  
   delete  "admin/pages/:id"                 => "pages#admin_destroy"
   

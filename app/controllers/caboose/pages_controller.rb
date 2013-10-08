@@ -4,11 +4,7 @@ module Caboose
     
     def before_action
       @page = Page.page_with_uri('/admin')
-    end
-    
-    # GET /pages
-    def index      
-    end
+    end    
 
     # GET /pages/:id
     def show
@@ -90,77 +86,89 @@ module Caboose
 
     end
     
-    # GET /pages/new
-    def new
-      return unless user_is_allowed('pages', 'add')
-      @parent_id = params[:parent_id].nil? ? params[:parent_id] : 1
-      @parent = Page.find(@parent_id)
-      render :layout => 'caboose/modal'
-    end
-    
     # GET /pages/1/redirect
     def redirect
       @page = Page.find(params[:id])
       redirect_to "/#{@page.uri}"
     end
     
-    # GET /pages/1/edit
-    def edit
-      return unless user_is_allowed('pages', 'edit')
-      @page = Page.find(params[:id])
+    #===========================================================================
+    # Admin actions
+    #===========================================================================
+    
+    # GET /admin/pages
+    def admin_index
+      return if !user_is_allowed('pages', 'view')
+      @home_page = Page.find(1)
+      render :layout => 'caboose/admin'      
+    end
+
+    # GET /admin/pages/new
+    def admin_new
+      return unless user_is_allowed('pages', 'add')
+      @parent_id = params[:parent_id].nil? ? params[:parent_id] : 1
+      @parent = Page.find(@parent_id)
+      render :layout => 'caboose/admin'
     end
     
-    # GET /pages/1/edit-title
-    def edit_title
+    # GET /admin/pages/1/edit
+    def admin_edit
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/admin'
     end
     
-    # GET /pages/1/edit-content
-    def edit_content
+    # GET /admin/pages/1/edit-title
+    def admin_edit_title
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/admin'
     end
     
-    # GET /pages/1/edit-settings
-    def edit_settings
+    # GET /admin/pages/1/edit-content
+    def admin_edit_content
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/admin'
     end
     
-    # GET /pages/1/edit-css
-    def edit_css
+    # GET /admin/pages/1/edit-settings
+    def admin_edit_settings
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/admin'
     end
     
-    # GET /pages/1/edit-js
-    def edit_js
+    # GET /admin/pages/1/edit-css
+    def admin_edit_css
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/admin'
     end
     
-    # GET /pages/1/edit-seo
-    def edit_seo
+    # GET /admin/pages/1/edit-js
+    def admin_edit_js
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/admin'
     end
     
-    # GET /pages/1/edit-resources
-    def edit_resources
+    # GET /admin/pages/1/edit-seo
+    def admin_edit_seo
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/admin'
     end
     
-    # POST /pages
-    def create
+    # GET /admin/pages/1/edit-resources
+    def admin_edit_resources
+      return unless user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # POST /admin/pages
+    def admin_create
       return unless user_is_allowed('pages', 'add')
 
       resp = Caboose::StdClass.new({
@@ -211,8 +219,8 @@ module Caboose
       render json: resp
     end
     
-    # PUT /pages/1
-    def update
+    # PUT /admin/pages/1
+    def admin_update
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
@@ -310,8 +318,8 @@ module Caboose
       render json: resp
     end
       
-    # DELETE /pages/1
-    def destroy
+    # DELETE /admin/pages/1
+    def admin_destroy
       return unless user_is_allowed('pages', 'delete')
       user = Page.find(params[:id])
       user.destroy

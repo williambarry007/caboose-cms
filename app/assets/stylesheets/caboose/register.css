@@ -8,6 +8,7 @@
 input#first_name,
 input#last_name,
 input#email,
+input#phone,
 input#pass1,
 input#pass2 {
   font-size: 18px;

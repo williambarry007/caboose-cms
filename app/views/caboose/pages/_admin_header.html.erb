@@ -1,0 +1,28 @@
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag "caboose/pages" %>
+<% end %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/pages" %>
+<% end %>
+
+<h1>Edit Page</h1>
+<ul id='tabs'>
+<%
+tabs = {
+  "/admin/pages/#{@page.id}/edit"        => 'General',
+  "/admin/pages/#{@page.id}/content"     => 'Content',
+  "/admin/pages/#{@page.id}/css"         => 'Custom CSS',
+  "/admin/pages/#{@page.id}/js"          => 'Custom JS',
+  "/admin/pages/#{@page.id}/seo"         => 'SEO',
+  "/admin/pages/#{@page.id}/sitemap"     => 'Sitemap',
+  "/admin/pages/#{@page.id}/delete"      => 'Delete Product'
+}
+
+%>
+<% tabs.each do |href,text| %>
+<li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
+<% end %>
+<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/pages';" /></li>
+</ul>
+<div id='content2'>

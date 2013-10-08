@@ -112,56 +112,35 @@ module Caboose
     end
     
     # GET /admin/pages/1/edit
-    def admin_edit
+    def admin_edit_general
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
-    
-    # GET /admin/pages/1/edit-title
-    def admin_edit_title
-      return unless user_is_allowed('pages', 'edit')
-      @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # GET /admin/pages/1/edit-content
+     
+    # GET /admin/pages/1/content
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/1/edit-settings
-    def admin_edit_settings
-      return unless user_is_allowed('pages', 'edit')
-      @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # GET /admin/pages/1/edit-css
+    # GET /admin/pages/1/css
     def admin_edit_css
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/1/edit-js
+    # GET /admin/pages/1/js
     def admin_edit_js
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/1/edit-seo
+    # GET /admin/pages/1/seo
     def admin_edit_seo
-      return unless user_is_allowed('pages', 'edit')
-      @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # GET /admin/pages/1/edit-resources
-    def admin_edit_resources
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'

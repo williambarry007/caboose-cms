@@ -1,59 +1,30 @@
 
-<textarea id='page_<%= @page.id %>_content' placeholder='Content' style='width:795px; height:545px;' class='tinymce'><%= raw @page.content %></textarea>
-<br />
-<div id='message'></div>
-<div id='controls'>
-<input type='button' value='Close' onclick="modal.close();" />
-<input type='button' value='Update' onclick="updateContent();" />
-</div>
+<%= render :partial => 'caboose/pages/admin_header' %>
 
+<p><div id='page_<%= @page.id %>_content'></div></p>
+
+<%= render :partial => 'caboose/pages/admin_footer' %>
 <% content_for :caboose_js do %>
+<script type='text/javascript'>
 
-  <%= javascript_include_tag "caboose/model/all" %>
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
 
-  <script type="text/javascript">
-
-  var modal = false;
-  $(document).ready(function() {  
-    modal = new CabooseModal(800, 700);
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Page',
+    id: <%= @page.id %>,
+    update_url: '/admin/pages/<%= @page.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'content', nice_name: 'Page Content', type: 'richtext', value: <%= raw Caboose.json(@page.content) %>, width: 800, height: 500 }             
+    ]
   });
+});
 
-  function updateContent()
-  {
-    tinymce.triggerSave();
-
-    function log(msg) {
-      setTimeout(function() {
-        throw new Error(msg);
-      }, 0);
-    }
-    // log($('#page_<%= @page.id %>_content').val());
-
-    $.ajax({
-      url: '/pages/<%= @page.id %>',
-      type: 'put',
-      data: {
-        authenticity_token: "<%= form_authenticity_token %>",
-        content: $('#page_<%= @page.id %>_content').val()
-      },
-      success: function(resp) {
-        if (resp.success)
-        {
-          contentVal = $('#page_<%= @page.id %>_content').val();
-          parent.$('#editmode_content_container').html(contentVal == null || contentVal.length == 0 ? 'No content.' : contentVal);
-          modal.close();
-        }
-        if (resp.error)
-          modal.autosize("<p class='note success'>" + resp.error + "</p>");
-      }
-    });
-  }
-
-  </script>
-  <%= tinymce :caboose,
-    width:'795px',
-    height:'545px'
-    # theme_advanced_source_editor_width: '100px',
-    # theme_advanced_source_editor_height: '100px'
-  %>
+</script>
+<%= tinymce_assets %>
+<%= tinymce :caboose, width: '800px', height:'400px' %>
 <% end %>

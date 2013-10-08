@@ -3,10 +3,4 @@
 #content li.hidden a { color: #990000; }
 </style>
 
-<h1>Page Sitemap</h1>
-
-<ul>
-<% @options.each do |option| %>
-  <li><%= link_to option['text'], pages_path + '/' + option['value'].to_s %></li>
-<% end %>
-</ul>
+<%= raw pages_list(@page) %>

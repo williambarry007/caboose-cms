@@ -3,9 +3,7 @@ module Caboose
     
     def pages_list(page)
       str = "<ul>"
-      page.children.each do |p|
-        str << pages_list_helper(p)
-      end
+      str << pages_list_helper(page)      
       str << "</ul>"
       return str
     end

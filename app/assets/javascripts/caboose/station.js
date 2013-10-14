@@ -40,7 +40,7 @@ CabooseStation.prototype = {
   
   subnav: function(id, href)
   {
-    this.modal.set_width(400);
+    //this.modal.set_width(400);
     
     $('#station > ul > li').each(function(i, li) {
       id2 = $(li).attr('id').replace('nav_item_', '');
@@ -54,7 +54,11 @@ CabooseStation.prototype = {
     $('#station ul li#nav_item_' + id + ' ul').show();
     
     // Set the height of the selected subnav
-    var height = $('#station > ul').height();
-    $('#station ul li#nav_item_' + id + ' ul').height(height);
+    var h = $('#station ul li.selected ul').outerHeight(true);
+    var h2 = $('#station').outerHeight(true);
+    if (h2 > h) h = h2    
+    $('#station ul li#nav_item_' + id + ' ul').height(h);
+        
+    this.modal.resize(400, h);        
   }  
 };

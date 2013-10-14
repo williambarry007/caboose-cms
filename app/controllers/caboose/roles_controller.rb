@@ -1,6 +1,6 @@
 module Caboose
   class RolesController < ApplicationController
-    layout 'caboose/modal'
+    layout 'caboose/admin'
     
     def before_action
       @page = Page.page_with_uri('/admin')

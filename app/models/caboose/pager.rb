@@ -70,7 +70,7 @@ module Caboose
   		vars = get_vars()
   		page = @options["page"].to_i
   		
-  		Caboose.log(@options)
+  		#Caboose.log(@options)
   				
   		# Max links to show (must be odd) 
   		total_links = 5

@@ -1,9 +1,7 @@
 <% content_for :caboose_css do %>
-<%= stylesheet_link_tag "caboose/pages" %>
 <% end %>
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
-<%= javascript_include_tag "caboose/pages" %>
 <% end %>
 
 <h1>Edit Page</h1>
@@ -16,7 +14,7 @@ tabs = {
   "/admin/pages/#{@page.id}/js"          => 'Custom JS',
   "/admin/pages/#{@page.id}/seo"         => 'SEO',
   "/admin/pages/#{@page.id}/sitemap"     => 'Sitemap',
-  "/admin/pages/#{@page.id}/delete"      => 'Delete Product'
+  "/admin/pages/#{@page.id}/delete"      => 'Delete Page'
 }
 
 %>

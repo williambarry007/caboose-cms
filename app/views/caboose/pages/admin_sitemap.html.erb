@@ -1,6 +1,6 @@
 
-<style type='text/css'>
-#content li.hidden a { color: #990000; }
-</style>
+<%= render :partial => 'caboose/pages/admin_header' %>
 
-<%= raw pages_list(@page) %>
+<p><%= raw pages_list(@page) %></p>
+
+<%= render :partial => 'caboose/pages/admin_footer' %>

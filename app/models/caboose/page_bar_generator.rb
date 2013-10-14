@@ -34,7 +34,7 @@ module Caboose
   		options.each  { |key, val| @options[key] = val }
   		@params.each  { |key, val| @params[key]  = post_get[key].nil? ? val : post_get[key] }			
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
-  		fix_desc  		  		
+  		fix_desc
   		@options['item_count'] = @options['model'].constantize.where(where).count  		  		
   	end
   	
@@ -149,35 +149,44 @@ module Caboose
     
     def where
       sql = []
-      values = []
+      values = []      
   	  @params.each do |k,v|
         next if v.nil? || v.length == 0
+        
+        sql2 = ""
         if k.ends_with?('_gte')
-          sql << "#{k[0..-5]} >= ?"
+          sql2 = "#{k[0..-5]} >= ?"
         elsif k.ends_with?('_gt')
-          sql << "#{k[0..-4]} > ?"
+          sql2 = "#{k[0..-4]} > ?"
         elsif k.ends_with?('_lte')
-          sql << "#{k[0..-5]} <= ?"
+          sql2 = "#{k[0..-5]} <= ?"
         elsif k.ends_with?('_lt')
-          sql << "#{k[0..-4]} < ?"
+          sql2 = "#{k[0..-4]} < ?"
         elsif k.ends_with?('_bw')
-          sql << "upper(#{k[0..-4]}) like ?"
-          v = "#{v}%".upcase
+          sql2 = "upper(#{k[0..-4]}) like ?"
+          v = v.kind_of?(Array) ? v.collect{ |v2| "#{v2}%".upcase } : "#{v}%".upcase          
         elsif k.ends_with?('_ew')
-          sql << "upper(#{k[0..-4]}) like ?"
-          v = "%#{v}".upcase
+          sql2 = "upper(#{k[0..-4]}) like ?"
+          v = v.kind_of?(Array) ? v.collect{ |v2| "%#{v2}".upcase } : "%#{v}".upcase
         elsif k.ends_with?('_like')
-          sql << "upper(#{k[0..-6]}) like ?"
-          v = "%#{v}%".upcase
-        else
-          sql << "#{k} = ?"
+          sql2 = "upper(#{k[0..-6]}) like ?"
+          v = v.kind_of?(Array) ? v.collect{ |v2| "%#{v2}%".upcase } : "%#{v}%".upcase
+        else          
+          sql2 = "#{k} = ?"
         end
-        values << v
+        
+        if v.kind_of?(Array)
+          sql2 = "(" + v.collect{ |v2| "#{sql2}" }.join(" or ") + ")"
+          v.each { |v2| values << v2 }
+        else              
+          values << v
+        end
+        sql << sql2                          
   	  end
   	  sql_str = sql.join(' and ')
   	  sql = [sql_str]  	   	  
-  	  values.each { |v| sql << v }  	  
-  	  return sql
+  	  values.each { |v| sql << v }        	  
+  	  return sql        	  
     end
     
     def limit

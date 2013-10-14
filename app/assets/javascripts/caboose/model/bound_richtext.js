@@ -39,7 +39,15 @@ BoundRichText = BoundControl.extend({
     
     setTimeout(function() { 
       var ed = tinymce.EditorManager.get(this2.el);
-      ed.on('blur', function(e) { this2.save(); }); 
+      ed.on('blur', function(e) { this2.save(); });
+      ed.on('keyup', function(e) {
+        tinymce.triggerSave();        
+        if (e.keyCode == 27) this2.cancel(); // Escape              
+        if ($('#'+this2.el).val() != this2.attribute.value_clean)
+          ed.getBody().style.backgroundColor = "#fff799";
+        else
+          ed.getBody().style.backgroundColor = "#fff";
+      });
     }, 1500);    
   },
   
@@ -97,6 +105,8 @@ BoundRichText = BoundControl.extend({
         this2.show_check(500);
         $('#'+this2.el).val(this2.attribute.value);
         $('#'+this2.el).removeClass('dirty');
+        var ed = tinymce.EditorManager.get(this2.el);
+        ed.getBody().style.backgroundColor = "#fff";
 
         if (this2.binder.success)
           this2.binder.success(this2);

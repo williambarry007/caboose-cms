@@ -309,23 +309,15 @@ module Caboose
       render json: resp
     end
     
-    def sitemap
-      parent_id = params[:parent_id]
-      top_page = Page.index_page
-      p = !parent_id.nil? ? Page.find(parent_id) : top_page
-      options = []
-      sitemap_helper2(top_page, options)		 	
-      @options = options
+    # GET /admin/pages/1/sitemap
+    def admin_sitemap
+      return unless user_is_allowed('pages', 'delete')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
     end
 
-    def sitemap_helper2(page, options, prefix = '')
-      options << { 'value' => page.id, 'text' => prefix + page.title }
-      page.children.each do |kid|
-        sitemap_helper(kid, options, prefix + ' - ')
-      end
-    end
-
-    def sitemap_options
+    # GET /admin/pages/sitemap-options
+    def admin_sitemap_options
       parent_id = params[:parent_id]
       top_page = Page.index_page
       p = !parent_id.nil? ? Page.find(parent_id) : top_page
@@ -342,7 +334,8 @@ module Caboose
       end
     end
 
-    def robots_options
+    # GET /admin/pages/robots-options
+    def admin_robots_options
       options = [
         { 'value' => 'index'      , 'text' => 'index'     },
         { 'value' => 'noindex'    , 'text' => 'noindex'   },
@@ -355,7 +348,8 @@ module Caboose
       render json: options 		
     end
 
-    def content_format_options
+    # GET /admin/pages/format-options
+    def admin_content_format_options
       options = [
         { 'value' => 'html', 'text' => 'html' },
         { 'value' => 'text', 'text' => 'text' },

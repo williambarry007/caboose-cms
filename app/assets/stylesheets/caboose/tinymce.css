@@ -23,3 +23,7 @@ h3 { font-size: inherit; }
 h4 { font-size: inherit; }
 h5 { font-size: inherit; }
 h6 { font-size: inherit; }
+
+body.dirty {
+  background: #fff799;  
+}

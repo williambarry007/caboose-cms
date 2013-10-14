@@ -106,7 +106,7 @@ module Caboose
     # GET /admin/pages/new
     def admin_new
       return unless user_is_allowed('pages', 'add')
-      @parent_id = params[:parent_id].nil? ? params[:parent_id] : 1
+      @parent_id = params[:parent_id] ? params[:parent_id] : 1
       @parent = Page.find(@parent_id)
       render :layout => 'caboose/admin'
     end
@@ -194,7 +194,7 @@ module Caboose
       Caboose::Page.update_authorized_for_action(page.id, 'edit', editors)
 
       # Send back the response
-      resp.redirect = "/pages/#{page.id}/edit"
+      resp.redirect = "/admin/pages/#{page.id}/edit"
       render json: resp
     end
     
@@ -297,14 +297,21 @@ module Caboose
       render json: resp
     end
       
-    # DELETE /admin/pages/1
-    def admin_destroy
+    # GET /admin/pages/1/delete
+    def admin_delete_form
       return unless user_is_allowed('pages', 'delete')
-      user = Page.find(params[:id])
-      user.destroy
+      @page = Page.find(params[:id])      
+      render :layout => 'caboose/admin'      
+    end
+    
+    # DELETE /admin/pages/1
+    def admin_delete
+      return unless user_is_allowed('pages', 'delete')
+      p = Page.find(params[:id])
+      p.destroy
       
       resp = StdClass.new({
-        'redirect' => '/pages'
+        'redirect' => '/admin/pages'
       })
       render json: resp
     end

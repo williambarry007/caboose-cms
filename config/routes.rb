@@ -50,7 +50,8 @@ Caboose::Engine.routes.draw do
   get     "admin/pages/sitemap-options"   => "pages#admin_sitemap_options"
   get     "admin/pages/robots-options"    => "pages#admin_robots_options"
   get     "admin/pages/format-options"    => "pages#admin_content_format_options"
-  get     "admin/pages/new"               => "pages#admin_new"  
+  get     "admin/pages/new"               => "pages#admin_new"
+  get     "admin/pages/:id/delete"        => "pages#admin_delete_form"  
   get     "admin/pages/:id/sitemap"       => "pages#admin_sitemap"
   get     "admin/pages/:id/edit"          => "pages#admin_edit_general"
   get     "admin/pages/:id/css"           => "pages#admin_edit_css"
@@ -60,7 +61,7 @@ Caboose::Engine.routes.draw do
   put     "admin/pages/:id"               => "pages#admin_update"
   get     "admin/pages"                   => "pages#admin_index"
   post    "admin/pages"                   => "pages#admin_create"  
-  delete  "admin/pages/:id"               => "pages#admin_destroy"
+  delete  "admin/pages/:id"               => "pages#admin_delete"
   
   match '*path' => 'pages#show'
   root :to => 'pages#show'

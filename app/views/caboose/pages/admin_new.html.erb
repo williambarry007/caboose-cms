@@ -3,7 +3,10 @@
 <p>Parent: <%= @parent ? @parent.title : "Home" %></p>
 <input type='hidden' id='parent_id' name='parent_id' value='<%= @parent_id %>' />
 <p><input type='text' id='title' name='title' placeholder='Title' style="width: 400px;" /></p>
-<p><input type='submit' value='Add Page' onclick='add_page();' /></p>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/pages';" />
+<input type='submit' value='Add Page' onclick='add_page();' />
+</p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
@@ -18,7 +21,7 @@ function add_page()
 {
   modal.autosize("<p class='loading'>Adding page...</p>");
   $.ajax({
-    url: '/pages',
+    url: '/admin/pages',
     type: 'post',
     data: {
       parent_id: $('#parent_id').val(),

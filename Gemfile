@@ -1,3 +1,5 @@
+# Caboose CMS
+
 source "http://rubygems.org"
 
 # Declare your gem's dependencies in caboose.gemspec.

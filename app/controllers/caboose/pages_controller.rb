@@ -211,30 +211,32 @@ module Caboose
       user = logged_in_user
       params.each do |name, value|
         case name
-        when 'parent_id'      
-          if (page.id == value)
+        when 'parent_id'
+          value = value.to_i
+          if page.id == value
             resp.error = "The page's parent cannot be itself."
-          elsif (Page.is_child(page.id, value))
+          elsif Page.is_child(page.id, value)
             resp.error = "You can't set the current page's parent to be one of its child pages."
-          elsif (value != page.parent_id)
+          elsif value != page.parent_id
             p = Page.find(value)
-            if (!user.is_allowed(p, 'edit'))
+            if !user.is_allowed(p, 'edit')
               resp.error = "You don't have access to put the current page there."
             end
           end	
-          if (resp.error.length > 0)
+          if resp.error
             save = false
           else
-            parent = Page.find(value)
-            Page.update_parent(page.id, value)
-            resp.attributes['parent_id'] = { 'text' => parent.title }
+            page.parent = Page.find(value)
+            page.save
+            Page.update_uri(page)
+            resp.attributes['parent_id'] = { 'text' => page.parent.title }
           end
 
         when 'custom_css', 'custom_js'
           value.strip!
           page[name.to_sym] = value
 
-        when 'title', 'menu_title', 'alias', 'hide', 'layout', 'redirect_url',
+        when 'title', 'menu_title', 'hide', 'layout', 'redirect_url',
           'seo_title', 'meta_description', 'fb_description', 'gp_description', 'canonical_url'
           page[name.to_sym] = value
 
@@ -275,7 +277,17 @@ module Caboose
           
         when 'slug' 
           page.slug = Page.slug(value.strip.length > 0 ? value : page.title)
+          page.save
+          Page.update_uri(page)                      
           resp.attributes['slug'] = { 'value' => page.slug }
+          resp.attributes['uri'] = { 'value' => page.uri }
+          
+        when 'alias'
+          page.alias = Page.slug(value.strip)
+          page.save
+          Page.update_uri(page)
+          resp.attributes['slug'] = { 'value' => page.slug }
+          resp.attributes['uri'] = { 'value' => page.uri }
 
         when 'custom_sort_children'
           if (value == 0)
@@ -366,6 +378,13 @@ module Caboose
       ]
       render json: options 		
     end
+    
+    # GET /admin/pages/:id/uri
+    def admin_page_uri
+      return unless user_is_allowed('pages', 'view')
+      p = Page.find(params[:id])
+      render :json => { 'uri' => p.uri }
+		end
 		
   end
 end

@@ -51,6 +51,7 @@ Caboose::Engine.routes.draw do
   get     "admin/pages/robots-options"    => "pages#admin_robots_options"
   get     "admin/pages/format-options"    => "pages#admin_content_format_options"
   get     "admin/pages/new"               => "pages#admin_new"
+  get     "admin/pages/:id/uri"           => "pages#admin_page_uri"
   get     "admin/pages/:id/delete"        => "pages#admin_delete_form"  
   get     "admin/pages/:id/sitemap"       => "pages#admin_sitemap"
   get     "admin/pages/:id/edit"          => "pages#admin_edit_general"

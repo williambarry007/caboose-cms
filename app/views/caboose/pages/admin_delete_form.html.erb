@@ -2,7 +2,7 @@
 <%= render :partial => 'caboose/pages/admin_header' %>
 
 <div id='message'>
-<p class='note error'>Are you sure you want to delet the page?  This can't be undone.<br /><br />
+<p class='note error'>Are you sure you want to delete the page?  This can't be undone.<br /><br />
 <input type='button' value='Yes' onclick='delete_page(<%= @page.id %>, true);' />
 <input type='button' value='No'  onclick="window.location='/admin/pages/<%= @page.id %>/edit';" />
 </p>

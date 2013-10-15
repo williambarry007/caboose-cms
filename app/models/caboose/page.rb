@@ -87,46 +87,23 @@ class Caboose::Page < ActiveRecord::Base
 		return self.page_with_uri_helper(parts, level+1, page_ids[0])				
 	end
 	
-	def self.update_child_uris(page_id)
-		page = self.find(page_id)
-		parent = self.find(page.parent_id)
-		parent_uri = parent.nil? ? '/' : parent.uri
-		self.update_child_uris_helper(ppage, parent_uri)
-	end
-
-	def self.update_child_uris_helper(page, parent_uri)
-		return if page.redirect_url.length > 0
-		
-		slug = page.slug
-		if (slug.trim.length == 0)
-			slug = self.get_slug(page.title)
-			self.update_detail_field(page.id, 'slug', slug)
-		end
-		
-		slug = page.slug.trim.length > 0 ? page.slug : self.get_slug(page.title)
-		
-		uri= "#{parent_uri}/#{slug}"
-		if (page.alias.length > 0)
-		  uri = "/#{page.alias}" 
-		elsif (self.is_top_level(page.parent_id))
-		  uri = "/#{page.slug}"
-		end
-		self.update_detail_field(page.id, 'uri', uri)
-		
-		page.children.each do |kid|
-		  self.update_child_uris_helper(kid, uri)
-		end
+	def self.update_uri(page)
+	  #return if page.redirect_url && page.redirect_url.length > 0
+	  
+	  page.slug = self.slug(page.title) if page.slug.nil? || page.slug.strip.length == 0
+	  page.uri = page.alias && page.alias.strip.length > 0 ? page.alias : (page.parent ? "#{page.parent.uri}/#{page.slug}" : "#{page.slug}")
+    page.uri[0] = '' if page.uri.starts_with?('/')
+    page.save
+	  
+	  page.children.each { |p2| self.update_uri(p2) }	    
 	end
 	
 	def self.update_child_perms(page_id)
 		page = self.find(page_id)
 			
-		viewers 	= Role.roles_with_page_permission(page_id, 'view')
-		editors 	= Role.roles_with_page_permission(page_id, 'edit')
-		approvers	= Role.roles_with_page_permission(page_id, 'approve')		
-		viewer_ids 		= viewers.collect {|r| r.id }
-		editor_ids 		= editors.collect {|r| r.id }
-		approver_id 	= approvers.collect {|r| r.id }
+		viewers_ids 	= Role.roles_with_page_permission(page_id, 'view').collect {|r| r.id }
+		editors_ids 	= Role.roles_with_page_permission(page_id, 'edit').collect {|r| r.id }
+		approvers_ids	= Role.roles_with_page_permission(page_id, 'approve').collect {|r| r.id }		
 		
 		self.update_child_perms_helper(page, viewer_ids, editor_ids, approver_ids)
 	end
@@ -322,8 +299,8 @@ class Caboose::Page < ActiveRecord::Base
 	end
 	
 	def self.is_child(parent_id, child_id)
-	  pid = self.where(:page_id => child_id).first.pluck(:parent_id)
-		return false if pid <= 0
+	  pid = self.where(:id => child_id).limit(1).pluck(:parent_id)[0]
+		return false if pid.nil? || pid <= 0
 		return true if pid == parent_id
 		return self.is_child(parent_id, pid)
 	end

@@ -1,6 +1,5 @@
 module Caboose
   module PagesHelper
-    
     def pages_list(page)
       str = "<ul>"
       str << pages_list_helper(page)      

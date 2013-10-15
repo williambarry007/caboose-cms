@@ -2,6 +2,8 @@
 module Caboose
   class PagesController < ApplicationController
     
+    helper :application
+    
     def before_action
       @page = Page.page_with_uri('/admin')
     end    

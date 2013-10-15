@@ -3,7 +3,6 @@ module Caboose
 
     protect_from_forgery  
     before_filter :before_before_action
-    helper :all
     
     def before_before_action
       

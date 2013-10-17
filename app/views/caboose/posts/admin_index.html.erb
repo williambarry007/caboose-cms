@@ -1,0 +1,37 @@
+<h1>Posts</h1>
+<p><input type='button' value='New Post' onclick="window.location='/admin/posts/new';" /></p>
+
+<% if @posts && @posts.count > 0 %>
+  <table class='data'>
+    <tr>
+      <%= raw @gen.sortable_table_headings({
+  				'id'         => 'ID #',
+          'published'  => 'Published',
+  				'title'	     => 'Title',
+  				'body'       => 'Body',
+  				'created_at' => 'Date Created'
+  			})
+  		%>
+    </tr>
+    <% @posts.each do |p| %>
+      <tr onclick="window.location='/admin/posts/<%= p.id %>/edit';">
+        <td><%= raw p.id %></td>
+        <td><%= p.published ? "Yes" : "No" %></td>
+        <td><%= raw p.title %></td>
+        <td><%= raw truncate(p.body, :length => 80) %></td>
+        <td><%= p.created_at.strftime("%m/%d/%Y") %></td>    
+      </tr>
+    <% end %>
+  </table>
+  <p><%= raw @gen.generate %></p>
+<% else %>
+  <p>There are no posts right now.</p>
+<% end %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+$(document).ready(function() { 
+  var modal = new CabooseModal(800);
+});
+</script>
+<% end %>

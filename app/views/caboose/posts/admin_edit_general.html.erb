@@ -1,0 +1,36 @@
+
+<%= render :partial => 'caboose/posts/admin_header' %>
+    
+<p><div id='post_<%= @post.id %>_published'   ></div></p>
+<p><div id='post_<%= @post.id %>_title'       ></div></p>
+<p><div id='post_<%= @post.id %>_image'       ></div></p>
+
+<%= render :partial => 'caboose/posts/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Post',
+    id: <%= @post.id %>,
+    update_url: '/admin/posts/<%= @post.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'published'   , nice_name: 'Published'  , type: 'checkbox'  , value: <%= raw @post.published ? true : false         %>, width: 600 },      
+      { name: 'title'       , nice_name: 'Title'      , type: 'text'      , value: <%= raw Caboose.json(@post.title)              %>, width: 600 },
+      { name: 'image'       , nice_name: 'Image'      , type: 'image'     , value: <%= raw Caboose.json(@post.image.url(:thumb))  %>, width: 600 }      
+    ]
+  });
+});
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
+<%= tinymce_assets %>
+<%= tinymce :caboose, 'width'   => '575px', 'height'  => '240px' %>
+<% end %>

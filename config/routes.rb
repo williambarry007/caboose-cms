@@ -64,6 +64,23 @@ Caboose::Engine.routes.draw do
   post    "admin/pages"                   => "pages#admin_create"  
   delete  "admin/pages/:id"               => "pages#admin_delete"
   
+  get     "posts"                                 => "posts#index"
+  get     "posts/:id"                             => "posts#detail"
+  get     "admin/posts/category-options"          => "posts#admin_category_options"
+  get     "admin/posts/new"                       => "posts#admin_new"
+  get     "admin/posts/:id/delete"                => "posts#admin_delete_form"
+  get     "admin/posts/:id/edit"                  => "posts#admin_edit_general"
+  get     "admin/posts/:id/content"               => "posts#admin_edit_content"
+  get     "admin/posts/:id/categories"            => "posts#admin_edit_categories"
+  get     "admin/posts/:id/add-to-category"       => "posts#admin_add_to_category"
+  get     "admin/posts/:id/remove-from-category"  => "posts#admin_remove_from_category"
+  get     "admin/posts/:id/delete"                => "posts#admin_delete_form"
+  put     "admin/posts/:id"                       => "posts#admin_update"
+  post    "admin/posts/:id"                       => "posts#admin_update"
+  get     "admin/posts"                           => "posts#admin_index"
+  post    "admin/posts"                           => "posts#admin_add"  
+  delete  "admin/posts/:id"                       => "posts#admin_delete"
+  
   match '*path' => 'pages#show'
   root :to => 'pages#show'
   

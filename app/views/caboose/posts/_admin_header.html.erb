@@ -1,0 +1,23 @@
+<% content_for :caboose_css do %>
+<% end %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<% end %>
+
+<h1>Edit Post</h1>
+<ul id='tabs'>
+<%
+tabs = {
+  "/admin/posts/#{@post.id}/edit"        => 'General',
+  "/admin/posts/#{@post.id}/content"     => 'Content',
+  "/admin/posts/#{@post.id}/categories"  => 'Categories',  
+  "/admin/posts/#{@post.id}/delete"      => 'Delete Post'
+}
+
+%>
+<% tabs.each do |href,text| %>
+<li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
+<% end %>
+<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/posts';" /></li>
+</ul>
+<div id='content2'>

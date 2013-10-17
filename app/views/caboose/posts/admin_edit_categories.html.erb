@@ -1,0 +1,42 @@
+
+<%= render :partial => 'caboose/posts/admin_header' %>
+
+<style type='text/css'>
+#content input[type=checkbox] { position: relative; }
+</style>
+
+<% cat_ids = @post.post_categories.collect { |cat| cat.id } %>
+<% @categories.each do |cat| %>
+  <% checked = cat_ids.include?(cat.id) %>
+  <p>
+    <input type='checkbox' id='cat_<%= cat.id %>' value='<%= cat.id %>' <%= checked ? "checked='true'" : '' %> onchange="check_category(<%= @post.id %>, this.value);" /> 
+    <label for="cat_<%= cat.id %>"><%= cat.name %></label>
+  </p>
+<% end %>
+
+<%= render :partial => 'caboose/posts/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+function check_category(post_id, cat_id)
+{
+  var checked = $('#cat_' + cat_id).is(':checked');   
+
+  $.ajax({
+    url: '/admin/posts/' + post_id + '/' + (checked ? 'add-to-category' : 'remove-from-category'),
+    data: { post_category_id: cat_id },
+    success: function(resp) {}
+  });
+}
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
+<%= tinymce_assets %>
+<%= tinymce :caboose, 'width'   => '575px', 'height'  => '240px' %>
+<% end %>

@@ -1,0 +1,32 @@
+
+<%= render :partial => 'caboose/posts/admin_header' %>
+    
+<p><div id='post_<%= @post.id %>_body'        ></div></p>
+
+<%= render :partial => 'caboose/posts/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Post',
+    id: <%= @post.id %>,
+    update_url: '/admin/posts/<%= @post.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'body', nice_name: 'Body', type: 'richtext', value: <%= raw Caboose.json(@post.body) %>, width: 600, height: 400 }      
+    ]
+  });
+});
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
+<%= tinymce_assets %>
+<%= tinymce :caboose, 'width' => '575px', 'height' => '240px' %>
+<% end %>

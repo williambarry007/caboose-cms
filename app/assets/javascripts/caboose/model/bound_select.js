@@ -22,7 +22,7 @@ BoundSelect = BoundControl.extend({
       .css('position', 'relative')
     );
     $('#'+this.el+'_container').empty();
-    if (this.attribute.fixed_placeholder)
+    if (this.attribute.fixed_placeholder == true)
     {
       $('#'+this.el+'_container').append($('<div/>')
         .attr('id', this.placeholder)

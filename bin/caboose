@@ -63,6 +63,15 @@ when 'init'
   
   helper = CabooseHelper.new(path, opts.force)
   helper.init_all
+
+when 'pg_restore'
+  
+  puts "\nTo what database do you want to restore?"
+  db = gets.chomp
+  puts "\nWhere's the dump file?"
+  dump_file = gets.chomp
+  puts "\nRunning pg_restore...\n"
+  `pg_restore --verbose --clean --no-acl --no-owner -h localhost -d #{db} #{dump_file}`
   
 else
 end

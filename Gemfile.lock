@@ -1,13 +1,12 @@
 PATH
   remote: .
   specs:
-    caboose-cms (0.2.75)
-      activesupport (= 3.2.15)
+    caboose-cms (0.2.76)
       colorbox-rails
       jquery-rails
       jquery-ui-rails
       paperclip
-      rails (~> 3.2.12)
+      rails (~> 3.2.13)
       tinymce-rails
       trollop
 

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    caboose-cms (0.2.29)
+    caboose-cms (0.2.73)
       activesupport
       colorbox-rails
       jquery-rails

@@ -9,11 +9,11 @@ source "http://rubygems.org"
 gemspec
 
 # jquery-rails is used by the dummy application
-gem 'jquery-rails'
-gem 'jquery-ui-rails'
-gem 'tinymce-rails'
-gem 'trollop'
-gem 'colorbox-rails'
-gem 'paperclip'
+#gem 'jquery-rails'
+#gem 'jquery-ui-rails'
+#gem 'tinymce-rails'
+#gem 'trollop'
+#gem 'colorbox-rails'
+#gem 'paperclip'
 
 #Test

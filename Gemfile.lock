@@ -117,9 +117,3 @@ PLATFORMS
 
 DEPENDENCIES
   caboose-cms!
-  colorbox-rails
-  jquery-rails
-  jquery-ui-rails
-  paperclip
-  tinymce-rails
-  trollop

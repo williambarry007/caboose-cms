@@ -1,4 +1,3 @@
-
 class Caboose::User < ActiveRecord::Base
   self.table_name = "users"
   has_and_belongs_to_many :roles
@@ -22,7 +21,7 @@ class Caboose::User < ActiveRecord::Base
   end
   
   def self.validate_token(token)
-    user = User.where('token' => token).first
+    user = self.where('token' => token).first
     return user 
   end
   

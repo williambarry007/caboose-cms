@@ -6,11 +6,13 @@ require 'colorbox-rails'
 require 'paperclip'
 
 class ActiveRecord::Base
-  # (P)lucks a single (U)nique field, (C)ompacts it, (S)orts it
-  def self.pucs(field)    
+  # (PLU)cks a single uni(Q)ue field
+  def self.pluq(field, compact = true, sort = true)    
     arr = self.uniq.pluck(field)
     return [] if arr.nil?
-    return arr.compact.sort
+    arr = arr.compact if compact
+    arr = arr.sort if sort
+    return arr
   end  
 end
 

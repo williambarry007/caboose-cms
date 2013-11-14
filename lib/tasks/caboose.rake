@@ -85,6 +85,7 @@ namespace :caboose do
       t.string :last_name
       t.string :username
       t.string :email
+      t.string :phone
       t.string :password
       t.string :password_reset_id
       t.datetime :password_reset_sent

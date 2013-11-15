@@ -15,6 +15,7 @@ module Caboose
     def my_account
       return if !logged_in?
       @user = logged_in_user
+      render :layout => 'caboose/modal'
     end
     
     # PUT /my-account

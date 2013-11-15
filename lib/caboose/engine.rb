@@ -5,6 +5,17 @@ require 'jquery-ui-rails'
 require 'colorbox-rails'
 require 'paperclip'
 
+class ActiveRecord::Base
+  # (PLU)cks a single uni(Q)ue field
+  def self.pluq(field, compact = true, sort = true)    
+    arr = self.uniq.pluck(field)
+    return [] if arr.nil?
+    arr = arr.compact if compact
+    arr = arr.sort if sort
+    return arr
+  end  
+end
+
 module Caboose
 
   def Caboose.log(message, title = nil)

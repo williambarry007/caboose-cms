@@ -11,6 +11,9 @@ Caboose::Engine.routes.draw do
   get     "register"              => "register#index"
   post    "register"              => "register#register"
 
+  get     "my-account"                      => "users#my_account"
+  put     "my-account"                      => "users#update_my_account"
+  
   get     "admin/users"                     => "users#index"
   get     "admin/users/options"             => "users#options"
   get     "admin/users/new"                 => "users#new"

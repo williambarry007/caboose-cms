@@ -7,6 +7,50 @@ module Caboose
       @page = Page.page_with_uri('/admin')
     end
     
+    #===========================================================================
+    # Non-admin actions
+    #===========================================================================
+    
+    # GET /my-account
+    def my_account
+      return if !logged_in?
+      @user = logged_in_user
+    end
+    
+    # PUT /my-account
+    def update_my_account  
+      return if !logged_in?
+      
+      resp = StdClass.new     
+      user = logged_in_user
+    
+      save = true
+      params.each do |name,value|
+        case name
+    	  	when "first_name", "last_name", "username", "email", "phone"
+    	  	  user[name.to_sym] = value
+    	  	when "password"			  
+    	  	  confirm = params[:confirm]
+    	  		if (value != confirm)			
+    	  		  resp.error = "Passwords do not match.";
+    	  		  save = false
+    	  		elsif (value.length < 8)
+    	  		  resp.error = "Passwords must be at least 8 characters.";
+    	  		  save = false
+    	  		else
+    	  		  user.password = Digest::SHA1.hexdigest(Caboose::salt + value)
+    	  		end    	  	    		  
+    	  end
+    	end
+    	
+    	resp.success = save && user.save
+    	render json: resp
+    end
+  
+    #===========================================================================
+    # Admin actions
+    #===========================================================================
+    
     # GET /admin/users
     def index
       return if !user_is_allowed('users', 'view')

@@ -1,19 +1,27 @@
  
 <h1>Edit Permission</h1>
-<div id='permission_<%= @permission.id %>_container'></div>
+<div id="permission_<%= @permission.id %>_resource"></div>
+<div id="permission_<%= @permission.id %>_action2"></div>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
 
+var modal = false;
+$(window).load(function() {
+    modal = new CabooseModal(600,600);
+});
+
 $(document).ready(function() {
-  var permission = new Model({
+  m = new ModelBinder({
     name: 'Permission',
     id: <%= @permission.id %>,
     listing_url: 'get /admin/permissions',
     update_url: 'put /admin/permissions/<%= @permission.id %>',
     delete_url: 'delete /admin/permissions/<%= @permission.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'resource' , type: 'text', value: "<%= @permission.resource %>" },
+      { name: 'resource' , type: 'text', value: "<%= @permission.resource %>", nice_name: "Resource" },
       { name: 'action2'  , type: 'text', value: "<%= @permission.action   %>", nice_name: 'Action' }
     ]
   });

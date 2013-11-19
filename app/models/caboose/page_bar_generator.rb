@@ -61,9 +61,11 @@ module Caboose
       return true
   	end
   	
-  	def items  	    	  
-    	#return @options['model'].constantize.where(where).limit(limit).offset(offset).reorder(reorder).all
-    	return @options['model'].constantize.where(where).limit(limit).offset(offset).reorder(reorder).all
+  	def items
+    	assoc = @options['model'].constantize.where(where)
+    	if @options['items_per_page'] != -1
+    	  assoc = assoc.limit(limit).offset(offset)
+    	return assoc.reorder(reorder).all
   	end
   		
   	def generate

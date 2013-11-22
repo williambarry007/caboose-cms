@@ -65,6 +65,7 @@ module Caboose
     	assoc = @options['model'].constantize.where(where)
     	if @options['items_per_page'] != -1
     	  assoc = assoc.limit(limit).offset(offset)
+    	end
     	return assoc.reorder(reorder).all
   	end
   		

@@ -1,9 +1,16 @@
 
 class Caboose::Role < ActiveRecord::Base
   self.table_name = "roles"
-  belongs_to :parent, :class_name => "Caboose::Role"  
-  has_and_belongs_to_many :users
-  has_and_belongs_to_many :permissions
+  belongs_to :parent, :class_name => "Caboose::Role"
+
+  #has_and_belongs_to_many :users
+  has_many :role_memberships
+  has_many :users, :through => :role_memberships
+    
+  #has_and_belongs_to_many :permissions
+  has_many :role_permissions
+  has_many :permissions, :through => :role_permissions  
+  
   has_many :page_permissions
 
   attr_accessible :name, :description, :parent_id

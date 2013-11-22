@@ -1,6 +1,8 @@
 class Caboose::User < ActiveRecord::Base
-  self.table_name = "users"
-  has_and_belongs_to_many :roles
+  self.table_name = "users"  
+  #has_and_belongs_to_many :roles
+  has_many :role_memberships
+  has_many :roles, :through => :role_memberships  
   attr_accessible :email, :first_name, :last_name, :username, :token, :password
   
   def self.logged_out_user

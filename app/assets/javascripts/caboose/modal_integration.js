@@ -66,6 +66,21 @@ function caboose_modal(el)
   });  
 }
 
+function caboose_modal_url(url)
+{
+  $.colorbox({
+    href: url,
+    iframe: true,
+    innerWidth: 200,
+    innerHeight:  50,
+    scrolling: false,
+    transition: 'fade',
+    closeButton: false,
+    onComplete: caboose_fix_colorbox,
+    opacity: 0.50       
+  });
+}
+
 function caboose_fix_colorbox() {
   var padding = 21; // 21 is default
   $("#cboxTopLeft"      ).css('background', '#111');

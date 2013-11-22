@@ -1,19 +1,46 @@
 
 <%= render :partial => 'caboose/pages/admin_header' %>
 
-<p>URI: /<span id='uri'><%= @page.uri %></span></p>
-<p><div id='page_<%= @page.id %>_title'                 ></div></p>
-<p><div id='page_<%= @page.id %>_menu_title'            ></div></p>
-<p><div id='page_<%= @page.id %>_parent_id'             ></div></p>     
-<p><div id='page_<%= @page.id %>_slug'                  ></div></p>                              
-<p><div id='page_<%= @page.id %>_alias'                 ></div></p> 
-<p><div id='page_<%= @page.id %>_redirect_url'          ></div></p>
-<p><div id='page_<%= @page.id %>_hide'                  ></div></p>  
-<p><div id='page_<%= @page.id %>_layout'                ></div></p>
-<p><div id='page_<%= @page.id %>_custom_sort_children'  ></div></p>
-<p><div id='page_<%= @page.id %>_content_format'        ></div></p>
+<p class='uri'>URI: /<span id='uri'><%= @page.uri %></span></p>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_title'                 ></div><span class='explanation'>The title of the page.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_menu_title'            ></div><span class='explanation'>The menu title is an abbreviated form of the title that is used in navigation menus and crumb trails.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_parent_id'             ></div><span class='explanation'>This page's parent page.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_slug'                  ></div><span class='explanation'>The portion of the URL that this page represents.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_alias'                 ></div><span class='explanation'>Starts the URL over at the domain root.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_redirect_url'          ></div><span class='explanation'>If the redirect URL field is set, then this page will simply redirect to that URL instead of showing the page itself.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_hide'                  ></div><span class='explanation'>Whether or not this page is displayed in the menu.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_layout'                ></div><span class='explanation'>Specify a specific layout file for this page.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_custom_sort_children'  ></div><span class='explanation'>Sort child pages alphabetically or custom.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_content_format'        ></div><span class='explanation'>Specify whether or not you want to embed ruby code in your page.</span></div>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+p.uri {
+  background: #efefef;
+  border: #999 1px solid;
+  padding: 10px;
+  position: absolute;
+  top: 67px;
+  left: 0;
+  height: 16px;
+}
+
+div.field_with_explanation {
+  width: 420px;
+  background: #efefef;
+  margin-bottom: 12px;
+}
+
+span.explanation {
+  display: block;
+  padding: 8px;    
+}
+
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 

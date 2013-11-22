@@ -2,15 +2,18 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
 
   def self.admin_nav(nav, user, page)    
     return nav if user.nil?
-    
-    item = {
-      'id' => 'profile',
-      'text' => 'Profile',
-      'children' => []
-    }    
-    item['children'] << { 'id' => 'my-account'   , 'text' => 'Edit Profile' , 'href' => '/my-account' , 'modal' => false }
-    item['children'] << { 'id' => 'logout'       , 'text' => 'Logout'       , 'href' => '/logout'     , 'modal' => false }        
-    nav << item
+        
+    nav << { 'id' => 'logout'       , 'text' => 'Logout'     , 'href' => '/logout'     , 'modal' => false }    
+    nav << { 'id' => 'my-account'   , 'text' => 'My Account' , 'href' => '/my-account' , 'modal' => true }
+        
+    #item = {
+    #  'id' => 'profile',
+    #  'text' => 'Profile',
+    #  'children' => []
+    #}    
+    #item['children'] << { 'id' => 'my-account'   , 'text' => 'Edit Profile' , 'href' => '/my-account' , 'modal' => false }
+    #item['children'] << { 'id' => 'logout'       , 'text' => 'Logout'       , 'href' => '/logout'     , 'modal' => false }    
+    #nav << item
     
     item = {
       'id' => 'core',

@@ -69,7 +69,7 @@ module Caboose
     def user_is_allowed(resource, action)
       if (!logged_in?)
         redirect_to "/login?return_url=" + URI.encode(request.fullpath)
-        return
+        return false
       end
       
       @user = logged_in_user
@@ -79,6 +79,15 @@ module Caboose
         return false
       end
       
+      return true    
+    end
+    
+    # Redirects to login if not logged in.
+    def verify_logged_in
+      if (!logged_in?)
+        redirect_to "/login?return_url=" + URI.encode(request.fullpath)
+        return false
+      end      
       return true    
     end
     

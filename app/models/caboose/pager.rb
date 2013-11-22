@@ -1,2 +1,2 @@
-module Caboose::Pager < Caboose::PageBarGenerator
+class Caboose::Pager < Caboose::PageBarGenerator
 end

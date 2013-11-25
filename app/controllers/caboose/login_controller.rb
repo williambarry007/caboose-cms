@@ -17,7 +17,7 @@ module Caboose
       if (logged_in?)
         resp.redirect = return_url
       else
-        username = params[:username]
+        username = params[:username].downcase
         password = params[:password]
                            
         if (username.nil? || password.nil? || password.strip.length == 0)

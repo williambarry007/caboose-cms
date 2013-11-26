@@ -127,7 +127,7 @@ namespace :caboose do
     
     # Post categories
     c.create_table :post_categories if !c.table_exists?(:post_categories)
-    c.add_column   :posts, :name , :string if !c.column_exists?(:post_categories, :name)
+    c.add_column   :post_categories, :name , :string if !c.column_exists?(:post_categories, :name)
     
     # Post category membership
     c.create_table :post_category_memberships if !c.table_exists?(:post_category_memberships)

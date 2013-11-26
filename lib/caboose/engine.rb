@@ -49,6 +49,34 @@ module Caboose
     return obj.to_json
   end
   
+  def Caboose.create_schema(schema_file)
+    c = ActiveRecord::Base.connection
+    require schema_file    
+    @schema.each do |table, columns|
+      c.create_table table if !c.table_exists?(table)
+      columns.each do |col|
+        
+        # Skip if the column exists with the proper data type
+        next if c.column_exists?(table, col[0], col[1])
+        
+        # If the column exists, but not with the correct data type, try to change it
+        if c.column_exists?(table, col[0])
+          if col.count > 2                      
+            c.change_column table, col[0], col[1], col[2]
+          else          
+            c.change_column table, col[0], col[1] 
+          end
+        else                  
+          if col.count > 2                      
+            c.add_column table, col[0], col[1], col[2]
+          else          
+            c.add_column table, col[0], col[1] 
+          end
+        end
+      end
+    end
+  end
+  
   class Engine < ::Rails::Engine
     isolate_namespace Caboose
   end

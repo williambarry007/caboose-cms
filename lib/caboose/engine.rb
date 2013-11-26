@@ -77,6 +77,20 @@ module Caboose
     end
   end
   
+  # Strips html and returns the text that breaks closest to the given length
+  def Caboose.teaser_text(str, length = 100)
+    return "" if str.nil?    
+    str2 = ActionController::Base.helpers.strip_tags(str)
+    if str2.length > 200
+      i = str2.index(' ', 200) - 1
+      i = 200 if i.nil?
+      str2 = str2[0..i]
+      str2[str2.length-1] = "" if str2.ends_with?(",")
+      str2 = "#{str2}..."
+    end
+    return str2
+  end
+  
   class Engine < ::Rails::Engine
     isolate_namespace Caboose
   end

@@ -29,13 +29,17 @@ module Caboose
     end
     
     # Logs in a user
-    def login_user(user)
+    def login_user(user, remember = false)
       session["app_user"] = user
+      cookies.permanent[:caboose_user_id] = user.id if remember
+      Caboose.log("remember = #{remember}")
+      Caboose.log(cookies[:caboose_user_id])      
     end
     
     # Returns whether or not a user is logged in
     def logged_in?
       validate_token
+      validate_cookie
       return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1    
       return false
     end
@@ -51,6 +55,16 @@ module Caboose
      
       login_user(user)
       return true
+    end
+    
+    # Checks to see if a remember me cookie value is present.    
+    def validate_cookie
+      if cookies[:caboose_user_id] && User.exists?(cookies[:caboose_user_id])
+        user = User.find(cookies[:caboose_user_id])
+        login_user(user)
+        return true
+      end
+      return false
     end
     
     # Returns the currently logged in user

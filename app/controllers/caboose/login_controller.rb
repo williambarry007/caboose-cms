@@ -31,7 +31,8 @@ module Caboose
           if (user.nil? || user == false)
             resp.error = "Invalid credentials"
           else
-            login_user(user)
+            remember = params[:remember] && (params[:remember] == 1 || params[:remember] == "1")
+            login_user(user, remember)
             resp.redirect = return_url
           end
         end

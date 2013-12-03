@@ -132,7 +132,13 @@ module Caboose
   	def get_vars()  
   	  vars = []
   	  @params.each do |k,v|
-  	    vars.push("#{k}=#{v}") if !v.nil? && v.length > 0 
+  	    if v.kind_of?(Array)  	      
+  	      v.each do |v2| 
+  	        vars.push("#{k}[]=#{v2}") if !v2.nil? && v2.length > 0
+  	      end
+  	    else  	      
+  	      vars.push("#{k}=#{v}") if !v.nil? && v.length > 0
+  	    end  	      	    
   	  end
   	  return URI.escape(vars.join('&'))
   	end

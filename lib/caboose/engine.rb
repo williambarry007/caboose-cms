@@ -48,58 +48,6 @@ module Caboose
     return obj.to_json
   end
   
-  # Verifies (non-destructively) that the given schema exists in the database.
-  def Caboose.create_schema(schema)
-    c = ActiveRecord::Base.connection
-    schema.each do |model, columns|
-      tbl = model.table_name
-      c.create_table tbl if !c.table_exists?(tbl)
-      columns.each do |col|        
-        
-        # Skip if the column exists with the proper data type
-        next if c.column_exists?(tbl, col[0], col[1])
-        
-        # If the column doesn't exists, add it
-        if !c.column_exists?(tbl, col[0])
-          if col.count > 2                      
-            c.add_column tbl, col[0], col[1], col[2]
-          else          
-            c.add_column tbl, col[0], col[1] 
-          end
-          
-        # Column exists, but not with the correct data type, try to change it
-        else
-          
-          # Add a temp column
-          if col.count > 2
-            c.add_column tbl, "#{col[0]}_temp", col[1], col[2]
-          else
-            c.add_column tbl, "#{col[0]}_temp", col[1]
-          end
-          
-          # Copy the old column and cast with correct data type to the new column
-          model.all.each do |m|            
-            m["#{col[0]}_temp"] = case col[1]
-              when :integer  then m[col[0]].to_i
-              when :string   then m[col[0]].to_s
-              when :text     then m[col[0]].to_s
-              when :numeric  then m[col[0]].to_f
-              when :datetime then DateTime.parse(m[col[0]])
-              when :boolean  then m[col[0]].to_i == 1
-              else nil
-              end
-            m.save
-          end
-          
-          # Remove the old column and rename the new one
-          c.remove_column tbl, col[0]
-          c.rename_column tbl, "#{col[0]}_temp", col[0]        
-
-        end
-      end
-    end
-  end
-  
   # Strips html and returns the text that breaks closest to the given length
   def Caboose.teaser_text(str, length = 100)
     return "" if str.nil?    

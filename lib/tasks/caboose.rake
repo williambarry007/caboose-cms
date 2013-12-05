@@ -1,15 +1,27 @@
 require "caboose/version"
 require "caboose/migrations"
 
-namespace :caboose do
+namespace :caboose do  
+  
+  desc "Creates/verifies that all database tables and fields are correctly added."
+  task :db => :environment do
+    Caboose::Schema.create_schema
+    Caboose::Schema.load_data
+  end
 
+  desc "Creates all caboose tables"
+  task :create_schema => :environment do Caboose::Schema.create_schema end
+
+  desc "Loads data into caboose tables"
+  task :load_data => :environment do Caboose::Schema.load_data end
+
+  #=============================================================================
+  
   desc "Resets the admin password to 'caboose'"
-  task :reset_admin_pass => :environment do
-    
+  task :reset_admin_pass => :environment do  
     admin_user = Caboose::User.where(username: 'admin').first
     admin_user.password = Digest::SHA1.hexdigest(Caboose::salt + 'caboose')
-    admin_user.save
-    
+    admin_user.save    
   end
 
   desc "Sync production db to development"

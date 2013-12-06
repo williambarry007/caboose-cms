@@ -50,7 +50,7 @@ class Caboose::Utilities::Schema
           end
           
         # Column exists, but not with the correct data type, try to change it
-        else
+        else          
           
           # Add a temp column
           if col.count > 2
@@ -75,12 +75,16 @@ class Caboose::Utilities::Schema
           
           # Remove the old column and rename the new one
           c.remove_column tbl, col[0]
-          c.rename_column tbl, "#{col[0]}_temp", col[0]        
+          c.rename_column tbl, "#{col[0]}_temp", col[0]          
     
         end
       end
-    end      
+    end    
     create_indexes
+    
+    self.schema.each do |model, columns|
+      model.reset_column_information
+    end
   end
   
   # Verifies (non-destructively) that the given indexes exist in the database.

@@ -32,8 +32,6 @@ module Caboose
     def login_user(user, remember = false)
       session["app_user"] = user
       cookies.permanent[:caboose_user_id] = user.id if remember
-      Caboose.log("remember = #{remember}")
-      Caboose.log(cookies[:caboose_user_id])      
     end
     
     # Returns whether or not a user is logged in

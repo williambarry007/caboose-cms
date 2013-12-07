@@ -45,5 +45,20 @@ namespace :caboose do
     `pg_restore --verbose --clean --no-acl --no-owner -h #{ddb['host']} -U #{ddb['username']} -d #{ddb['database']} #{dump_file}`
     
   end
+
+end
+
+namespace :assets do
+
+  desc "Precompile assets, upload to S3, then remove locally"
+  task :purl => :environment do
+  
+    Rake::Task['assets:precompile'].invoke    
+    `mv #{Rails.root.join('public', 'assets', 'manifest.yml')} #{Rails.root.join('public', 'manifest.yml')}`
+    `rm -rf #{Rails.root.join('public', 'assets')}`
+    `mkdir #{Rails.root.join('public', 'assets')}`     
+    `mv #{Rails.root.join('public', 'manifest.yml')} #{Rails.root.join('public', 'assets', 'manifest.yml')}`
+
+  end
   
 end

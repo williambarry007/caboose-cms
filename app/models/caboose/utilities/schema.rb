@@ -34,8 +34,7 @@ class Caboose::Utilities::Schema
   def self.create_schema
     return if self.schema.nil?
     
-    rename_tables
-    remove_columns
+    rename_tables    
     
     c = ActiveRecord::Base.connection
     self.schema.each do |model, columns|
@@ -57,39 +56,14 @@ class Caboose::Utilities::Schema
           end
           
         # Column exists, but not with the correct data type, try to change it
-        else          
-          
+        else                    
           c.execute("alter table #{tbl} alter column #{col[0]} type #{col[1]} using cast(#{col[0]} as #{col[1]})")
-          
-          # Add a temp column
-          #c.remove_column tbl, "#{col[0]}_temp" if c.column_exists?(tbl, "#{col[0]}_temp")
-          #if col.count > 2
-          #  c.add_column tbl, "#{col[0]}_temp", col[1], col[2]
-          #else
-          #  c.add_column tbl, "#{col[0]}_temp", col[1]
-          #end
-          
-          # Copy the old column and cast with correct data type to the new column
-          #model.all.each do |m|            
-          #  m["#{col[0]}_temp"] = case col[1]
-          #    when :integer  then m[col[0]].to_i
-          #    when :string   then m[col[0]].to_s
-          #    when :text     then m[col[0]].to_s
-          #    when :numeric  then m[col[0]].to_f
-          #    when :datetime then DateTime.parse(m[col[0]])
-          #    when :boolean  then m[col[0]].to_i == 1
-          #    else nil
-          #    end
-          #  m.save
-          #end
-          
-          # Remove the old column and rename the new one
-          #c.remove_column tbl, col[0]
-          #c.rename_column tbl, "#{col[0]}_temp", col[0]          
     
         end
       end
-    end    
+    end
+    
+    remove_columns
     create_indexes
     
     self.schema.each do |model, columns|
@@ -104,7 +78,7 @@ class Caboose::Utilities::Schema
     self.indexes.each do |table, indexes|
       indexes.each do |index|
         c.add_index table, index if !c.index_exists?(table, index)
-      end
+      end             
     end
   end
   

@@ -6,6 +6,11 @@ class Caboose::Utilities::Schema
     return nil
   end
   
+  # Columns (in order) that were removed in the development of the gem.
+  def self.removed_columns
+    return nil
+  end
+  
   # Any column indexes that need to exist in the database
   def self.indexes
     return nil      
@@ -29,7 +34,9 @@ class Caboose::Utilities::Schema
   def self.create_schema
     return if self.schema.nil?
     
-    rename_tables            
+    rename_tables
+    remove_columns
+    
     c = ActiveRecord::Base.connection
     self.schema.each do |model, columns|
       tbl = model.table_name
@@ -53,6 +60,7 @@ class Caboose::Utilities::Schema
         else          
           
           # Add a temp column
+          c.remove_column tbl, "#{col[0]}_temp" if c.column_exists?(tbl, "#{col[0]}_temp")
           if col.count > 2
             c.add_column tbl, "#{col[0]}_temp", col[1], col[2]
           else
@@ -105,6 +113,17 @@ class Caboose::Utilities::Schema
     self.renamed_tables.each do |old_name, new_name|
       c.rename_table old_name, new_name if c.table_exists?(old_name)
     end
-  end    
+  end
+  
+  # Removes a set of tables 
+  def self.remove_columns
+    return if self.removed_columns.nil?
+    c = ActiveRecord::Base.connection
+    self.removed_columns.each do |model, columns|
+      columns.each do |col|
+        c.remove_column model.table_name, col if c.column_exists?(model.table_name, col)
+      end
+    end
+  end
   
 end

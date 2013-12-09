@@ -1,3 +1,13 @@
+# Note: 
+#   For includes to work with namespaces other than the root namespace, the 
+#   full namespaced class_name has to be set in the model on the association 
+#   being included.  For example:
+#
+#   class Animals::Dog
+#     has_many :friends, :class_name => 'Animals::Dog'
+#   end
+#   
+
 module Caboose
   class PageBarGenerator  
     #
@@ -28,14 +38,37 @@ module Caboose
   			'base_url'		    => '',
   			'page'			      => 1,
   			'item_count'		  => 0,
-  			'items_per_page'  => 10
+  			'items_per_page'  => 10,
+  			'includes'        => nil # Hash of association includes
+  			                         # {
+  			                         #   search_field_1 => [association_name, join_table, column_name],
+  			                         #   search_field_2 => [association_name, join_table, column_name]
+  			                         # }
   		}      
   		params.each   { |key, val| @params[key]  = val }
   		options.each  { |key, val| @options[key] = val }
   		@params.each  { |key, val| @params[key]  = post_get[key].nil? ? val : post_get[key] }			
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
   		fix_desc
-  		@options['item_count'] = @options['model'].constantize.where(where).count  		  		
+  		   		
+  		@options['item_count'] = model_with_includes.where(where).count  		  		
+  	end
+  	
+  	def model_with_includes
+  	  m = @options['model'].constantize
+  		return m if @options['includes'].nil?
+  		
+  		associations = []
+  		@options['includes'].each do |field, arr|
+  		  next if @params[field].nil? || (@params[field].kind_of?(String) && @params[field].length == 0)
+        associations << arr[0]
+      end      
+  		associations.uniq.each { |assoc| m = m.includes(assoc) }
+  		return m
+  	end
+  	
+  	def table_name_of_association(assoc)  	    	  
+  	  return @options['model'].constantize.reflect_on_association(assoc.to_sym).class_name.constantize.table_name
   	end
   	
   	def fix_desc
@@ -61,13 +94,25 @@ module Caboose
       return true
   	end
   	
-  	def items
-    	assoc = @options['model'].constantize.where(where)
+  	def items  		
+  		assoc = model_with_includes.where(where)
     	if @options['items_per_page'] != -1
     	  assoc = assoc.limit(limit).offset(offset)
     	end
     	return assoc.reorder(reorder).all
   	end
+  	
+  	def all_items
+  	  return model_with_includes.where(where).all
+    end
+  	
+  	def item_values(attribute)
+  	  arr = []
+  	  model_with_includes.where(where).all.each do |m|
+  	    arr << m[attribute]
+  	  end    	
+    	return arr.uniq
+    end  	  
   		
   	def generate
   	    	  
@@ -137,7 +182,8 @@ module Caboose
   	        vars.push("#{k}[]=#{v2}") if !v2.nil? && v2.length > 0
   	      end
   	    else  	      
-  	      vars.push("#{k}=#{v}") if !v.nil? && v.length > 0
+  	      next if v.nil? || (v.kind_of?(String) && v.length == 0)
+  	      vars.push("#{k}=#{v}")
   	    end  	      	    
   	  end
   	  return URI.escape(vars.join('&'))
@@ -158,30 +204,45 @@ module Caboose
     
     def where
       sql = []
-      values = []      
+      values = []
+      table = @options['model'].constantize.table_name      
   	  @params.each do |k,v|
-        next if v.nil? || v.length == 0
+        next if v.nil? || (v.kind_of?(String) && v.length == 0)
+        
+        col = nil        
+        if @options['includes'] && @options['includes'].include?(k)           
+          arr = @options['includes'][k]
+          col = "#{table_name_of_association(arr[0])}.#{arr[1]}"
+        end        
         
         sql2 = ""
         if k.ends_with?('_gte')
-          sql2 = "#{k[0..-5]} >= ?"
+          col = "#{table}.#{k[0..-5]}" if col.nil?
+          sql2 = "#{col} >= ?"
         elsif k.ends_with?('_gt')
-          sql2 = "#{k[0..-4]} > ?"
+          col = "#{table}.#{k[0..-4]}" if col.nil?
+          sql2 = "#{col} > ?"
         elsif k.ends_with?('_lte')
-          sql2 = "#{k[0..-5]} <= ?"
+          col = "#{table}.#{k[0..-5]}" if col.nil?
+          sql2 = "#{col} <= ?"
         elsif k.ends_with?('_lt')
-          sql2 = "#{k[0..-4]} < ?"
+          col = "#{table}.#{k[0..-4]}" if col.nil?          
+          sql2 = "#{col} < ?"
         elsif k.ends_with?('_bw')
-          sql2 = "upper(#{k[0..-4]}) like ?"
+          col = "#{table}.#{k[0..-4]}" if col.nil?
+          sql2 = "upper(#{col}) like ?"
           v = v.kind_of?(Array) ? v.collect{ |v2| "#{v2}%".upcase } : "#{v}%".upcase          
         elsif k.ends_with?('_ew')
-          sql2 = "upper(#{k[0..-4]}) like ?"
+          col = "#{table}.#{k[0..-4]}" if col.nil?
+          sql2 = "upper(#{col}) like ?"
           v = v.kind_of?(Array) ? v.collect{ |v2| "%#{v2}".upcase } : "%#{v}".upcase
         elsif k.ends_with?('_like')
-          sql2 = "upper(#{k[0..-6]}) like ?"
+          col = "#{table}.#{k[0..-6]}" if col.nil?
+          sql2 = "upper(#{col}) like ?"
           v = v.kind_of?(Array) ? v.collect{ |v2| "%#{v2}%".upcase } : "%#{v}%".upcase
-        else          
-          sql2 = "#{k} = ?"
+        else
+          col = "#{table}.#{k}" if col.nil?
+          sql2 = "#{col} = ?"
         end
         
         if v.kind_of?(Array)

@@ -5,6 +5,7 @@ class Caboose::Page < ActiveRecord::Base
   belongs_to :parent, :class_name => "Page"
   has_many :children, :class_name => "Page", :foreign_key => 'parent_id'    
   has_many :page_permissions
+  has_many :page_blocks
   attr_accessible :parent_id, 
     :title, 
     :menu_title, 

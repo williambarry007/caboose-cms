@@ -73,5 +73,18 @@ when 'pg_restore'
   puts "\nRunning pg_restore...\n"
   `pg_restore --verbose --clean --no-acl --no-owner -h localhost -d #{db} #{dump_file}`
   
+when 'sync_db'
+  
+  puts "\nCapturing production database...\n"
+  `heroku pgbackups:capture`
+  puts "\nWhere do you want to save the production database dump file?\n"  
+  dump_file = gets.chomp
+  puts "\nDownloading production database dump file...\n"
+  `curl -o #{dump_file} \`heroku pgbackups:url\``
+  puts "\nTo what database do you want to restore?"
+  db = gets.chomp  
+  puts "\nRunning pg_restore...\n"
+  `pg_restore --verbose --clean --no-acl --no-owner -h localhost -d #{db} #{dump_file}`
+  
 else
 end

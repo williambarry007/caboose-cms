@@ -85,6 +85,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :fb_description        , :string  , :limit => 156 ],
         [ :gp_description        , :string  , :limit => 156 ]
       ],
+      Caboose::PageBlock => [        
+        [ :page_id               , :integer ], 
+        [ :type                  , :string  , :default => 'p' ],
+        [ :sort_order            , :integer , :default => 0   ],
+        [ :name                  , :string  ],
+        [ :value                 , :text    ]        
+      ],      
       Caboose::Post => [  
         [ :title       , :text     ],  		 	 
         [ :body        , :text 		 ],  	 

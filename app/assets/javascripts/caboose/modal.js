@@ -14,3 +14,5 @@
 //= require jquery_ujs
 //= require colorbox-rails
 //= require caboose/modal_integration
+//= require caboose/placeholder
+

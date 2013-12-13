@@ -5,11 +5,11 @@ class Caboose::Page < ActiveRecord::Base
   belongs_to :parent, :class_name => "Page"
   has_many :children, :class_name => "Page", :foreign_key => 'parent_id'    
   has_many :page_permissions
-  has_many :page_blocks
+  has_many :page_blocks, :order => 'sort_order'
   attr_accessible :parent_id, 
     :title, 
     :menu_title, 
-    :content,
+    # :content, # Changed from column in pages to blocks
     :blocks,
     :slug, 
     :alias, 
@@ -37,6 +37,14 @@ class Caboose::Page < ActiveRecord::Base
     return menu_title unless menu_title.nil?
     return title unless title.nil?
     return ""
+  end
+  
+  def blocks
+    self.page_blocks
+  end
+  
+  def content
+    self.blocks.collect { |b| b.content }.join("\n")     
   end
     
   def self.find_with_fields(page_id, fields)

@@ -3,7 +3,7 @@ class Caboose::User < ActiveRecord::Base
   #has_and_belongs_to_many :roles
   has_many :role_memberships
   has_many :roles, :through => :role_memberships  
-  attr_accessible :email, :first_name, :last_name, :username, :token, :password
+  attr_accessible :email, :first_name, :last_name, :username, :token, :password, :phone
 
   before_save do
     self.email = self.email.downcase if self.email

@@ -1,9 +1,27 @@
 
 <%= render :partial => 'caboose/pages/admin_header' %>
 
-<p><div id='page_<%= @page.id %>_content'></div></p>
+<p><input type='button' value='Add Block' onclick="add_block_at_beginning();" /></p>
+  
+<% @page.blocks.each do |b| %>
+  <div class='page_block'>   
+    <div id='pageblock_<%= b.id %>_name'></div>
+    <div id='pageblock_<%= b.id %>_value'></div>
+    <div id='page_block_<%= b.id %>_message'></div>
+    <p><input type='button' value='Delete Block' class='delete' onclick="delete_block(<%= b.id %>);" /></p>
+  </div>
+  <p><input type='button' value='Add Block' onclick="add_block_after(<%= b.id %>);" /></p>
+<% end %>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+div.page_block { padding: 20px; border: #ccc 1px solid; background: #efefef; }
+div.page_block p { padding-bottom: 0; margin-bottom: 0; }
+
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
@@ -12,19 +30,22 @@ $(window).load(function() {
   modal = new CabooseModal(800);
 });
 
-$(document).ready(function() {
-  m = new ModelBinder({
-    name: 'Page',
-    id: <%= @page.id %>,
-    update_url: '/admin/pages/<%= @page.id %>',
-    authenticity_token: '<%= form_authenticity_token %>',
-    attributes: [
-      { name: 'content', nice_name: 'Page Content', type: 'richtext', value: <%= raw Caboose.json(@page.content) %>, width: 800, height: 500 }             
-    ]
-  });
+$(document).ready(function() {  
+  <% @page.blocks.each do |b| %>
+    m = new ModelBinder({
+      name: 'PageBlock',
+      id: <%= b.id %>,
+      update_url: '/admin/page-blocks/<%= b.id %>',
+      authenticity_token: '<%= form_authenticity_token %>',
+      attributes: [
+        { name: 'name' , nice_name: 'Name'   , type: 'text'    , value: <%= raw Caboose.json(b.name)  %>, width: 784 },
+        { name: 'value', nice_name: 'Content', type: 'richtext', value: <%= raw Caboose.json(b.value) %>, width: 800, height: 300 }             
+      ]
+    });
+  <% end %>
 });
 
 </script>
 <%= tinymce_assets %>
-<%= tinymce :caboose, width: '800px', height:'400px' %>
+<%= tinymce :caboose, width: '800px', height:'300px' %>
 <% end %>

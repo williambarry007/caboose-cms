@@ -87,7 +87,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::PageBlock => [        
         [ :page_id               , :integer ], 
-        [ :type                  , :string  , :default => 'p' ],
+        [ :block_type            , :string  , :default => 'p' ],
         [ :sort_order            , :integer , :default => 0   ],
         [ :name                  , :string  ],
         [ :value                 , :text    ]        
@@ -127,7 +127,15 @@ class Caboose::Schema < Caboose::Utilities::Schema
   end
   
   # Loads initial data into the database
-  def self.load_data    
+  def self.load_data
+
+    c = ActiveRecord::Base.connection    
+    if c.column_exists?(:pages, :content)
+      Caboose::Page.reorder(:id).all.each do |p|
+        Caboose::PageBlock.create( :page_id => p.id, :block_type => 'richtext', :value => p.content )        
+      end      
+      c.remove_column(:pages, :content)
+    end
     
     admin_user = nil
     if !Caboose::User.exists?(:username => 'admin')

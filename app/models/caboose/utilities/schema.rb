@@ -6,6 +6,11 @@ class Caboose::Utilities::Schema
     return nil
   end
   
+  # Columns (in order) that were renamed in the development of the gem.
+  def self.renamed_columns
+    return nil
+  end
+  
   # Columns (in order) that were removed in the development of the gem.
   def self.removed_columns
     return nil
@@ -34,7 +39,8 @@ class Caboose::Utilities::Schema
   def self.create_schema
     return if self.schema.nil?
     
-    rename_tables    
+    rename_tables
+    rename_columns    
     
     c = ActiveRecord::Base.connection
     self.schema.each do |model, columns|
@@ -88,6 +94,19 @@ class Caboose::Utilities::Schema
     c = ActiveRecord::Base.connection
     self.renamed_tables.each do |old_name, new_name|
       c.rename_table old_name, new_name if c.table_exists?(old_name)
+    end
+  end
+  
+  # Renames a set of columns 
+  def self.rename_columns
+    return if self.renamed_columns.nil?
+    c = ActiveRecord::Base.connection
+    self.renamed_columns.each do |model, cols|
+      next if !c.table_exists? model.table_name
+      cols.each do |old_name, new_name|
+        next if !c.column_exists? model.table_name, old_name
+        c.rename_column model.table_name, old_name, new_name
+      end
     end
   end
   

@@ -44,7 +44,7 @@ class Caboose::Page < ActiveRecord::Base
   end
   
   def content
-    self.blocks.collect { |b| b.content }.join("\n")     
+    self.blocks.collect { |b| b.render }.join("\n")     
   end
     
   def self.find_with_fields(page_id, fields)

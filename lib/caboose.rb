@@ -25,5 +25,9 @@ module Caboose
   # The login authenticator
   mattr_accessor :authenticator_class
   @@authenticator_class = 'Caboose::Authenticator'
+  
+  # Whether or not to use URL parameters (parameters embedded in the URL before the querystring)
+  mattr_accessor :use_url_params
+  @@use_url_params = true
 
 end

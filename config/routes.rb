@@ -66,6 +66,14 @@ Caboose::Engine.routes.draw do
   get     "admin/pages"                   => "pages#admin_index"
   post    "admin/pages"                   => "pages#admin_create"  
   delete  "admin/pages/:id"               => "pages#admin_delete"
+    
+  get     "admin/pages/:page_id/blocks/new"       => "page_blocks#admin_new"
+  get     "admin/pages/:page_id/blocks/:id/edit"  => "page_blocks#admin_edit"
+  get     "admin/pages/:page_id/blocks/:id"       => "page_blocks#admin_show"
+  get     "admin/pages/:page_id/blocks"           => "page_blocks#admin_index"  
+  post    "admin/pages/:page_id/blocks"           => "page_blocks#admin_create"
+  put     "admin/pages/:page_id/blocks/:id"       => "page_blocks#admin_update"
+  delete  "admin/pages/:page_id/blocks/:id"       => "page_blocks#admin_delete"
   
   get     "posts"                                 => "posts#index"
   get     "posts/:id"                             => "posts#detail"

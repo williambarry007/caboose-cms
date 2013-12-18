@@ -6,6 +6,9 @@ module Caboose
     
     def before_before_action
       
+      # Modify the built-in params array with URL params if necessary 
+      parse_url_params if Caboose.use_url_params
+      
       # Try to find the page 
       @page = Page.page_with_uri(request.fullpath)
       
@@ -22,6 +25,22 @@ module Caboose
       @logged_in_user = logged_in_user
       
       before_action
+    end
+    
+    # Parses any parameters in the URL and adds them to the params
+    def parse_url_params      
+      return if !Caboose.use_url_params      
+      url = "#{request.fullpath}"
+      url[0] = "" if url.starts_with?('/')      
+      url = url.split('?')[0] if url.include?('?')      
+      arr = url.split('/')      
+      i = arr.count - 1
+      while i >= 1 do
+        k = arr[i-1]
+        v = arr[i]
+        params[k] = v if v && v.length > 0
+        i = i-2
+      end      
     end
     
     # To be overridden by the child controllers

@@ -21,8 +21,9 @@ module Caboose
     #		itemsPerPage:	Number of items you want to show per page. Defaults to 10 if not present.
     #		page: Current page number.  Defaults to 0 if not present.
     #
-    attr_accessor :params, :options
+    attr_accessor :params, :options, :custom_url_vars
   	
+    #def initialize(post_get, params = nil, options = nil, &custom_url_vars = nil)
   	def initialize(post_get, params = nil, options = nil)
   	  
   	  params  = {} if params.nil?
@@ -38,20 +39,29 @@ module Caboose
   			'base_url'		    => '',
   			'page'			      => 1,
   			'item_count'		  => 0,
-  			'items_per_page'  => 10,
+  			'items_per_page'  => 10,  			
+  			'abbreviations'   => {},
+  			'skip'            => [], # params to skip when printing the page bar  			
   			'includes'        => nil # Hash of association includes
   			                         # {
   			                         #   search_field_1 => [association_name, join_table, column_name],
   			                         #   search_field_2 => [association_name, join_table, column_name]
-  			                         # }
+  			                         # }  			
   		}      
   		params.each   { |key, val| @params[key]  = val }
-  		options.each  { |key, val| @options[key] = val }
-  		@params.each  { |key, val| @params[key]  = post_get[key].nil? ? val : post_get[key] }			
+  		options.each  { |key, val| @options[key] = val }  		
+  		@params.each  { |key, val|
+  		  k = @options['abbreviations'].include?(key) ? @options['abbreviations'][key] : key 
+  		  @params[key] = post_get[key].nil? ? (post_get[k].nil? ? val : post_get[k]) : post_get[key] 
+  		}			
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
+  		#@custom_url_vars = custom_url_vars if !custom_url_vars.nil?
   		fix_desc
-  		   		
-  		@options['item_count'] = model_with_includes.where(where).count  		  		
+  		set_item_count  		  		  		
+  	end
+  	
+  	def set_item_count
+  	  @options['item_count'] = model_with_includes.where(where).count
   	end
   	
   	def model_with_includes
@@ -124,8 +134,6 @@ module Caboose
   		@options['items_per_page'] = 10  if @options["items_per_page"].nil?
   		@options['page']           = 1   if @options["page"].nil?		
   		
-  		# Variables to make the search form work 
-  		vars = get_vars()
   		page = @options["page"].to_i
   				
   		# Max links to show (must be odd) 
@@ -149,24 +157,28 @@ module Caboose
   			end
   		end
   		
-  		base_url = @params['base_url']
+  		base_url = url_with_vars      
+      base_url << (Caboose.use_url_params ? "/" : (base_url.include?("?") ? "&" : "?"))      
+      keyval_delim = Caboose.use_url_params ? "/" : "="
+  		var_delim    = Caboose.use_url_params ? "/" : "&"            
+  		
   		str = ''
   		str << "<p>Results: showing page #{page} of #{total_pages}</p>\n"
   		
   		if (total_pages > 1)
   		  str << "<div class='page_links'>\n"
   		  if (page > 1)
-  		    str << "<a href='#{base_url}?#{vars}&page=#{prev_page}'>Previous</a>"
+  		    str << "<a href='#{base_url}page#{keyval_delim}#{prev_page}'>Previous</a>"
   	    end
   		  for i in start..stop
   		  	if (page != i)
-  		  	  str << "<a href='#{base_url}?#{vars}&page=#{i}'>#{i}</a>"
+  		  	  str << "<a href='#{base_url}page#{keyval_delim}#{i}'>#{i}</a>"
   		  	else
   		  		str << "<span class='current_page'>#{i}</span>"
   		  	end
   		  end
   		  if (page < total_pages)
-  		  	str << "<a href='#{base_url}?#{vars}&page=#{next_page}'>Next</a>"
+  		  	str << "<a href='#{base_url}page#{keyval_delim}#{next_page}'>Next</a>"
   		  end
   		  str << "</div>\n"
       end
@@ -174,29 +186,50 @@ module Caboose
   		return str
   	end
   	
-  	def get_vars()  
+  	def url_with_vars()
+  	  if !@custom_url_vars.nil?
+  	    return @custom_url_vars.call @options['base_url'], @params
+  	  end
   	  vars = []
   	  @params.each do |k,v|
-  	    if v.kind_of?(Array)  	      
-  	      v.each do |v2| 
-  	        vars.push("#{k}[]=#{v2}") if !v2.nil? && v2.length > 0
+  	    next if @options['skip'].include?(k)
+  	    k = @options['abbreviations'].include?(k) ? @options['abbreviations'][k] : k  	      	    
+  	    if v.kind_of?(Array)
+  	      v.each do |v2|  	        
+  	        if Caboose.use_url_params
+  	          vars.push("#{k}/#{v2}") if !v2.nil?
+  	        else
+  	          vars.push("#{k}[]=#{v2}") if !v2.nil?
+  	        end
   	      end
   	    else  	      
   	      next if v.nil? || (v.kind_of?(String) && v.length == 0)
-  	      vars.push("#{k}=#{v}")
+  	      if Caboose.use_url_params
+  	        vars.push("#{k}/#{v}")
+  	      else
+  	        vars.push("#{k}=#{v}")
+  	      end  	        
   	    end  	      	    
   	  end
-  	  return URI.escape(vars.join('&'))
+  	  return "#{@options['base_url']}" if vars.length == 0
+  	  if Caboose.use_url_params
+  	    vars = URI.escape(vars.join('/'))  	    
+  	    return "#{@options['base_url']}/#{vars}"
+  	  end
+  	  vars = URI.escape(vars.join('&'))
+  	  return "#{@options['base_url']}?#{vars}"
   	end
   	
     def sortable_table_headings(cols)
-      vars = get_vars()
+      base_url = url_with_vars
+      base_url << base_url.include?("?") ? "&" : "?"
     	str = ''
       
     	# key = sort field, value = text to display
     	cols.each do |sort, text|    		
-    		arrow = @options['sort'] == sort ? (@options['desc'] == 1 ? ' &uarr;' : ' &darr;') : ''    		
-    		link = @options['base_url'] + "?#{vars}&sort=#{sort}&desc=" + (@options['desc'] == 1 ? "0" : "1")
+    		arrow = @options['sort'] == sort ? (@options['desc'] == 1 ? ' &uarr;' : ' &darr;') : ''
+    		#link = @options['base_url'] + "?#{vars}&sort=#{sort}&desc=" + (@options['desc'] == 1 ? "0" : "1")
+        link = "#{base_url}sort=#{sort}&desc=" + (@options['desc'] == 1 ? "0" : "1")            		
     		str += "<th><a href='#{link}'>#{text}#{arrow}</a></th>\n"
     	end
     	return str  	
@@ -274,6 +307,6 @@ module Caboose
       end
       str << " desc" if @options['desc'] == 1       
       return str
-    end
+    end             
   end
 end

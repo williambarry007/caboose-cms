@@ -1,0 +1,35 @@
+
+<%= render :partial => 'caboose/pages/admin_header' %>
+
+<p>Page block type: <%= @block.block_type %></p>
+<div id='pageblock_<%= @block.id %>_value'></div>  
+<p><input type='button' value='Back to page' onclick="window.location='/admin/pages/<%= @page.id %>/content';" /></p>
+
+<%= render :partial => 'caboose/pages/admin_footer' %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+$(document).ready(function() {  
+  m = new ModelBinder({
+    name: 'PageBlock',
+    id: <%= @block.id %>,
+    update_url: '/admin/pages/<%= @page.id %>/blocks/<%= @block.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [{
+      name: 'value',
+      nice_name: 'Content',
+      type: 'text',
+      value: <%= raw Caboose.json(@block.value) %>,
+      width: 800,
+      fixed_placeholder: false 
+    }]
+  });  
+});
+
+</script>
+<% end %>

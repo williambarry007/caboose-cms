@@ -5,8 +5,10 @@ class Caboose::PageBlock < ActiveRecord::Base
   belongs_to :page  
   attr_accessible :id, :page_id, :block_type, :sort_order, :name, :value
   
-  def render
-    return self["render_#{self.block_type.downcase}".to_sym]
+  def render(empty_text = nil)    
+    str = self.send("render_#{self.block_type.downcase}")
+    return empty_text if empty_text && (str.nil? || str.length == 0)
+    return str
   end
   
   def render_richtext() return self.value               end

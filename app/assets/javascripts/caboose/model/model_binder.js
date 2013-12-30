@@ -1,5 +1,30 @@
 
-var ModelBinder = function(params) { this.init(params); };
+var all_model_binders = [];
+var ModelBinder = function(params) { 
+  this.init(params);
+  all_model_binders[all_model_binders.length] = this;
+};
+
+ModelBinder.remove_from_all_model_binders = function(model_name, id) {
+  var arr = [];
+  $.each(all_model_binders, function(i, mb) {
+   if (mb.model.name != model_name || mb.model.id != id)
+     arr[arr.length] = mb;      
+  });
+  all_model_binders = arr;  
+};
+
+ModelBinder.tinymce_current_control = function() {
+  var id = tinymce.activeEditor.id.toLowerCase();
+  var control = false;
+  $.each(all_model_binders, function(i, mb) {
+    $.each(mb.controls, function(i, c) {        
+      if (id == (mb.model.name + "_" + mb.model.id + "_" + c.attribute.name).toLowerCase())
+      { control = c; return false; }
+    });
+  });
+  return control;
+};
 
 ModelBinder.prototype = {
   model: false,
@@ -40,11 +65,24 @@ ModelBinder.prototype = {
       else if (attrib.type == 'textarea')          control = new BoundTextarea(opts);
       else if (attrib.type == 'richtext')          control = new BoundRichText(opts);
       else if (attrib.type == 'image')             control = new BoundImage(opts);
-
-      this2.controls.push();    
+      this2.controls.push(control);    
     });
     
     if (this.on_load)
       this.on_load();
   },
+  
+  control_with_id: function(id)
+  {
+    attrib = false
+    var this2 = this;
+    $.each(this.controls, function(i, c) {        
+      if (id == (this2.model.name + "_" + this2.model.id + "_" + c.attribute.name).toLowerCase())
+      {        
+        attrib = c.attribute; 
+        return false;
+      }
+    });
+    return attrib;
+  }
 };

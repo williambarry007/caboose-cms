@@ -1,12 +1,18 @@
 
 <%= render :partial => 'caboose/pages/admin_header' %>
-  
-<% @page.blocks.each do |b| %>    
-  <div id='pageblock_<%= b.id %>_value'></div>  
+ 
+<% @page.blocks.each do |b| %>
+  <div id='pageblock_<%= b.id %>'></div>    
 <% end %>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/admin_page_edit_content', :media => 'all' %>
+<% end %>
+
 <% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/admin_page_edit_content' %>
 <script type='text/javascript'>
 
 var modal = false;
@@ -14,19 +20,8 @@ $(window).load(function() {
   modal = new CabooseModal(800);
 });
 
-$(document).ready(function() {  
-  <% @page.blocks.each do |b| %>
-    m = new ModelBinder({
-      name: 'PageBlock',
-      id: <%= b.id %>,
-      update_url: '/admin/page-blocks/<%= b.id %>',
-      authenticity_token: '<%= form_authenticity_token %>',
-      attributes: [
-        { name: 'name' , nice_name: 'Name'   , type: 'text'    , value: <%= raw Caboose.json(b.name)  %>, width: 784 },
-        { name: 'value', nice_name: 'Content', type: 'richtext', value: <%= raw Caboose.json(b.value) %>, width: 800, height: 300 }             
-      ]
-    });
-  <% end %>
+$(document).ready(function() {
+  var ed = new PageContentEditor(<%= @page.id %>);  
 });
 
 </script>

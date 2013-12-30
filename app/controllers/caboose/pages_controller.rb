@@ -36,8 +36,6 @@ module Caboose
       end
 
       page = Caboose.plugin_hook('page_content', page)
-      # page.content = Caboose.plugin_hook('page_content', page.content)
-      
       @page = page
       @user = user
       @editmode = !params['edit'].nil? && user.is_allowed('pages', 'edit') ? true : false

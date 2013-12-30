@@ -44,7 +44,11 @@ class Caboose::Page < ActiveRecord::Base
   end
   
   def content
+<<<<<<< HEAD
     return "" if self.blocks.empty?
+=======
+    return "" if self.blocks.nil? || self.blocks.count == 0
+>>>>>>> d633e3d05e6e04219195aee96a4edd443bcb4a3a
     self.blocks.collect { |b| b.render }.join("\n")     
   end
     

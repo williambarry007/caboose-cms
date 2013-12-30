@@ -1,0 +1,34 @@
+
+<%= render :partial => 'caboose/pages/admin_header' %>
+
+<p>Page block type: <%= @block.block_type %></p>
+<div id='pageblock_<%= @block.id %>_value'></div>  
+
+<%= render :partial => 'caboose/pages/admin_footer' %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+$(document).ready(function() {  
+  <% @page.blocks.each do |b| %>
+    m = new ModelBinder({
+      name: 'PageBlock',
+      id: <%= b.id %>,
+      update_url: '/admin/page-blocks/<%= b.id %>',
+      authenticity_token: '<%= form_authenticity_token %>',
+      attributes: [
+        { name: 'name' , nice_name: 'Name'   , type: 'text'    , value: <%= raw Caboose.json(b.name)  %>, width: 784 },
+        { name: 'value', nice_name: 'Content', type: 'richtext', value: <%= raw Caboose.json(b.value) %>, width: 800, height: 300 }             
+      ]
+    });
+  <% end %>
+});
+
+</script>
+<%= tinymce_assets %>
+<%= tinymce :caboose, width: '800px', height:'300px' %>
+<% end %>

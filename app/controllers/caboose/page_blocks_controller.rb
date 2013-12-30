@@ -1,6 +1,6 @@
 
 module Caboose
-  class PagesBlocksController < ApplicationController
+  class PageBlocksController < ApplicationController
     
     #===========================================================================
     # Admin actions
@@ -28,12 +28,19 @@ module Caboose
       render :json => block
     end
     
+    # GET /admin/pages/:page_id/blocks/:id/render
+    def admin_render
+      return unless user_is_allowed('pages', 'edit')      
+      block = PageBlock.find(params[:id])             
+      render :text => block.render(params[:empty_text])
+    end
+    
     # GET /admin/pages/:page_id/blocks/:id/edit
     def admin_edit
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:page_id])
       @block = PageBlock.find(params[:id])
-      render :layout => 'caboose/admin'
+      render "caboose/page_blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/admin'
     end
     
     # POST /admin/pages/:page_id/blocks

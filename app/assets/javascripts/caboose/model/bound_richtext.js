@@ -37,8 +37,16 @@ BoundRichText = BoundControl.extend({
         $('#'+this2.el).removeClass('dirty');
     });
     
-    setTimeout(function() { 
-      var ed = tinymce.EditorManager.get(this2.el);
+    setTimeout(function() {
+      tinymce.execCommand("mceAddEditor", false, this2.el);
+      var ed = tinymce.EditorManager.createEditor(this2.el);      
+      
+      //var ed = tinymce.EditorManager.get(this2.el);
+      //if (!ed)
+      //{        
+      //  tinymce.execCommand("mceAddEditor", false, this2.el);
+      //  ed = tinymce.EditorManager.createEditor(this2.el);
+      //}
       ed.on('blur', function(e) { this2.save(); });
       ed.on('keyup', function(e) {
         tinymce.triggerSave();        
@@ -48,7 +56,7 @@ BoundRichText = BoundControl.extend({
         else
           ed.getBody().style.backgroundColor = "#fff";
       });
-    }, 1500);    
+    }, 100);    
   },
   
   show_controls: function() {
@@ -115,7 +123,7 @@ BoundRichText = BoundControl.extend({
   },
   
   cancel: function() {
-    
+    if (this.attribute.before_cancel) this.attribute.before_cancel();
     if ($('#'+this.el).val() != this.attribute.value_clean)
     {
       if (confirm('This box has unsaved changes.  Hit OK to save changes, Cancel to discard.'))
@@ -124,13 +132,15 @@ BoundRichText = BoundControl.extend({
         this.attribute.value_clean = $('#'+this.el).val();
         this.save();
       }
-    }    
+    }        
     this.attribute.value = this.attribute.value_clean;
     $('#'+this.el).val(this.attribute.value);
     $('#'+this.el).removeClass('dirty');
     
     if ($('#'+this.el+'_check').length)
-      this.hide_check();
+      this.hide_check();    
+    tinymce.execCommand("mceRemoveEditor", false, this.el);    
+    if (this.attribute.after_cancel) this.attribute.after_cancel();
   },
     
   error: function(str) {

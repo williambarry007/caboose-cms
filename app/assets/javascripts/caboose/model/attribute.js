@@ -17,6 +17,8 @@ Attribute.prototype = {
   align: 'left',
   before_update: false,
   after_update: false,
+  before_cancel: false,
+  after_cancel: false,
   debug: false,
   
   update_url: false,
@@ -30,16 +32,16 @@ Attribute.prototype = {
       url: this.update_url,
       type: 'put',
       data: this.name + '=' + encodeURIComponent(this.value),
-			success: function(resp) {			  
+			success: function(resp) {        			  
 				if (resp.success)
 				{
 				  if (resp.attributes && resp.attributes[this2.name])
 				    for (var thing in resp.attributes[this2.name])
 				      this2[thing] = resp.attributes[this2.name][thing];				  
 				  this2.value_clean = this2.value;
-				}
-				if (after) after(resp);
-				if (this2.after_update) this2.after_update();
+				}				
+				if (after) after(resp);        				
+				if (this2.after_update) this2.after_update();				
 			},
 			error: function() { 
 			  if (after) after(false);

@@ -222,7 +222,7 @@ module Caboose
   	
     def sortable_table_headings(cols)
       base_url = url_with_vars
-      base_url << base_url.include?("?") ? "&" : "?"
+      base_url << (base_url.include?("?") ? "&" : "?")
     	str = ''
       
     	# key = sort field, value = text to display

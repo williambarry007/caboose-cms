@@ -93,6 +93,8 @@ module Caboose
       return session["app_user"]
     end
     
+    # DEPRECIATED: Use user_is_allowed_to(action, resource)
+    #
     # Checks to see if a user has permission to perform the given action 
     # on the given resource.
     # Redirects to login if not logged in.
@@ -111,6 +113,30 @@ module Caboose
       end
       
       return true    
+    end
+
+    # Checks to see if a user has permission
+    # to perform action on resource
+    #
+    # Redirects to login if not logged in
+    # Redirects to error page with message if not allowed
+    #
+    # useful for creating super-readable code, for example:
+    #   > return unless user_is_allowed_to 'edit', 'pages'
+    # Even your mom could read that code.
+    def user_is_allowed_to(action, resource)
+      unless logged_in?
+        redirect_to "/login?return_url=" + URI.encode(request.fullpath)
+        return false
+      end
+
+      @user = logged_in_user
+      unless @user.is_allowed(resource, action)
+        @error = "You don't have permission to #{action} #{resource}"
+        render :template => "caboose/extras/error"
+        return false
+      end
+      return true
     end
     
     # Redirects to login if not logged in.

@@ -1,0 +1,19 @@
+<h1>New AB Test</h1>
+<div id='ab_variant_new_container'></div>
+
+<% content_for :caboose_js do %>
+  <script type='text/javascript'>
+    var variant = false;
+    $(document).ready(function() {
+      variant = new Model({
+        name: 'AbVariant',
+        id: 'new',
+        listing_url: 'get /admin/ab-variants',
+        create_url: 'post /admin/ab-variants',
+        attributes: [
+          { name: 'Name', type: 'text', value: '' },
+        ]
+      });
+    });
+  </script>
+<% end %>

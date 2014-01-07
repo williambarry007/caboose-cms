@@ -79,13 +79,16 @@ BoundText = BoundControl.extend({
     });
   },
   
-  cancel: function() {    
+  cancel: function() {
+    if (this.attribute.before_cancel) this.attribute.before_cancel();    
     this.attribute.value = this.attribute.value_clean;
     $('#'+this.el).val(this.attribute.value);
     $('#'+this.el).removeClass('dirty');
     
     if ($('#'+this.el+'_check').length)
       this.hide_check();
+    
+    if (this.attribute.after_cancel) this.attribute.after_cancel();
   },
     
   error: function(str) {

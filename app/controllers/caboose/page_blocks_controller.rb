@@ -35,12 +35,27 @@ module Caboose
       render :text => block.render(params[:empty_text])
     end
     
+    # GET /admin/pages/:page_id/blocks/render
+    def admin_render_all
+      return unless user_is_allowed('pages', 'edit')
+      p = Page.find(params[:page_id])
+      blocks = p.blocks.collect { |b| {
+        :id => b.id,
+        :block_type => b.block_type,
+        :sort_order => b.sort_order,          
+        :name => b.name,
+        :value => b.value,
+        :html => b.render(params[:empty_text])
+      }}      
+      render :json => blocks
+    end
+    
     # GET /admin/pages/:page_id/blocks/:id/edit
     def admin_edit
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:page_id])
       @block = PageBlock.find(params[:id])
-      render "caboose/page_blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/admin'
+      render "caboose/page_blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/modal'
     end
     
     # POST /admin/pages/:page_id/blocks
@@ -53,29 +68,31 @@ module Caboose
       })
 
       b = PageBlock.new            
-      b.page_id     = params[:page_id]
+      b.page_id     = params[:page_id].to_i
       b.block_type  = params[:block_type]
-      b.sort_order  = params[:sort_order].to_i
-      b.name        = params[:name]
-      b.value       = params[:value]
-            
-      # Set the new page block order
-      p = Page.find(b.page_id)
-      if p.blocks && p.blocks.count > b.sort_order
-        i = b.sort_order + 1
-        PageBlock.where("sort_order >= ?", b.sort_order).reorder(:sort_order).each do |b2|
-          b2.sort_order = i
-          b2.save
-          i = i + 1
-        end
+      b.name        = params[:name]  if params[:name]
+      b.value       = params[:value] if params[:value]      
+                    
+      if !params[:index].nil?      
+        b.sort_order = params[:index].to_i
+      elsif params[:after_id]
+        b2 = PageBlock.find(params[:after_id].to_i)
+        b.sort_order = b2.sort_order + 1        
       end
+      
+      i = b.sort_order + 1
+      PageBlock.where("page_id = ? and sort_order >= ?", b.page_id, b.sort_order).reorder(:sort_order).each do |b2|
+        b2.sort_order = i
+        b2.save        
+        i = i + 1
+      end      
       
       # Save the block
       b.save
 
       # Send back the response
-      resp.redirect = "/admin/pages/#{page.id}/edit"
-      render json: resp
+      resp.block = b
+      render :json => resp
     end
     
     # PUT /admin/pages/:page_id/blocks/:id

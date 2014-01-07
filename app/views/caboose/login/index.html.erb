@@ -15,6 +15,11 @@
 </p>
 </form>
 
+<% content_for :caboose_css do %>
+<style type="text/css">
+#modal_content input[type="checkbox"] { position: relative; }
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 var modal = new CabooseModal(400);

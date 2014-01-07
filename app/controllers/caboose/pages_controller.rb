@@ -113,35 +113,63 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/1/edit
+    # GET /admin/pages/:id/edit
     def admin_edit_general
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
      
-    # GET /admin/pages/1/content
+    # GET /admin/pages/:id/content
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/1/css
+    # GET /admin/pages/:id/block-order
+    def admin_edit_block_order
+      return unless user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # PUT /admin/pages/:id/block-order
+    def admin_update_block_order
+      return unless user_is_allowed('pages', 'edit')
+      block_ids = params[:block_ids]
+      i = 0
+      block_ids.each do |block_id|
+        b = PageBlock.find(block_id)
+        b.sort_order = i
+        b.save
+        i = i + 1
+      end      
+      render :json => true
+    end
+    
+    # GET /admin/pages/:id/new-blocks
+    def admin_new_blocks
+      return unless user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end        
+    
+    # GET /admin/pages/:id/css
     def admin_edit_css
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/1/js
+    # GET /admin/pages/:id/js
     def admin_edit_js
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/1/seo
+    # GET /admin/pages/:id/seo
     def admin_edit_seo
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
@@ -200,7 +228,7 @@ module Caboose
       render json: resp
     end
     
-    # PUT /admin/pages/1
+    # PUT /admin/pages/:id
     def admin_update
       return unless user_is_allowed('pages', 'edit')
       
@@ -311,7 +339,7 @@ module Caboose
       render json: resp
     end
       
-    # GET /admin/pages/1/delete
+    # GET /admin/pages/:page_id/delete
     def admin_delete_form
       return unless user_is_allowed('pages', 'delete')
       @page = Page.find(params[:id])      
@@ -330,7 +358,7 @@ module Caboose
       render json: resp
     end
     
-    # GET /admin/pages/1/sitemap
+    # GET /admin/pages/:page_id/sitemap
     def admin_sitemap
       return unless user_is_allowed('pages', 'delete')
       @page = Page.find(params[:id])

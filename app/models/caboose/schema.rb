@@ -65,7 +65,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :parent_id             , :integer ], 
         [ :title                 , :string  ],
         [ :menu_title            , :string  ],
-        [ :content               , :text    ],
+        #[ :content               , :text    ],
         [ :slug                  , :string  ],
         [ :alias                 , :string  ],
         [ :uri                   , :string  ],

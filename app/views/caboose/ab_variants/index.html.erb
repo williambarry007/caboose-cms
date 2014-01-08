@@ -13,10 +13,11 @@
 <% if (@variants.count > 0) %>
 
   <table class='data'>
-    <tr><% raw @gen.sortable_table_headings({'name' => 'Variant Name'}) %></tr>
+    <tr><%= raw @gen.sortable_table_headings({'name' => 'Variant Name', 'analytics_name' => 'Analytics Name'}) %></tr>
     <% @variants.each do |v| %>
-      <tr onclick="window.location='/admin/ab-variants/:id';">
+      <tr onclick="window.location='/admin/ab-variants/<%= v.id %>';">
         <td><%= v.name %></td>
+        <td><%= v.analytics_name %></td>
       </tr>
     <% end %>
   </table>

@@ -1,19 +1,36 @@
 <h1>New AB Test</h1>
-<div id='ab_variant_new_container'></div>
+
+<form action='/admin/ab-variants' method='post' id='ab_variant_form'>
+  <input type='hidden' name='authenticity_token' value='<%=form_authenticity_token %>'>
+  <p><input type='text' name='name' id='name' placeholder='AB Variant Name' style='width: 500px;'></p>
+  <div id='message'></div>
+  <p>
+  <input type='button' value='< Back' onclick="window.location='/admin/ab-variants';">
+  <input type='submit' value='Add New A/B Variant' onclick="add_ab_variant(); return false;">
+  </p>
+</form>
 
 <% content_for :caboose_js do %>
-  <script type='text/javascript'>
-    var variant = false;
-    $(document).ready(function() {
-      variant = new Model({
-        name: 'AbVariant',
-        id: 'new',
-        listing_url: 'get /admin/ab-variants',
-        create_url: 'post /admin/ab-variants',
-        attributes: [
-          { name: 'Name', type: 'text', value: '' },
-        ]
-      });
-    });
-  </script>
+<script type='text/javascript'>
+
+function add_ab_variant() 
+{
+  $('#message').html("<p class='loading'>Adding A/B Variant...</p>");
+  $.ajax({
+    url: '/admin/ab-variants',
+    type: 'post',
+    data: $('#ab_variant_form').serialize(),
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
 <% end %>

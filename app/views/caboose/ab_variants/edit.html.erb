@@ -1,41 +1,45 @@
 <h1>Editing AB Test Variant</h1>
 
 <div id="ab_variant_<%= @variant.id %>_name"></div>
-<div id="ab_variant_<%= @variant.id %>_ga_name"></div>
+<div id="ab_variant_<%= @variant.id %>_analytics_name"></div>
 
 <div id="message"></div>
 
 <% content_for :caboose_js do %>
   <%= javascript_include_tag "caboose/model/all" %>
   <script type="text/javascript">
-    var modal = false;
-    $(window).load(function() {
-      modal = new CabooseModal(600, 600);
-    });
+
+    var options = []
+
+    <% @variant.options.each do |opt| %>
+      options.push({
+        name: 'option<%=opt.id%>',
+        id: <%= opt.id %>,
+        type: 'text',
+        value: <%= raw Caboose.json(opt.text) %>
+      });
+    <% end %>
 
     $(document).ready(function() {
-      new ModelBinder({
-        name: 'AB Test Variant'
-        id: <%= @variant.id %>
-        listing_url: 'get /admin/ab_variants',
-        update_url: 'put /admin/ab_variants/<%= @variant.id =>'
-        delete_url: 'delete /admin/ab_variants/<%= @variant.id =>'
+      m = new ModelBinder({
+        name: 'ab_variant',
+        id: <%= @variant.id %>,
+        update_url: '/admin/ab-variants/<%= @variant.id %>',
         authenticity_token: '<%= form_authenticity_token %>',
         attributes: [
           {
             name: 'name',
             nice_name: 'Variant Name',
             type: 'text',
-            value: '<%= @variant.name =>',
+            value: <%= raw Caboose.json(@variant.name) %>
           },{
             name: 'analytics_name',
-            nice_name: 'Google Analytics Name'
+            nice_name: 'Google Analytics Name',
             type: 'text',
-            value: "<%= @variant.analytics_name %>"
+            value: <%= raw Caboose.json(@variant.analytics_name) %>
           }
-        ],
-        on_load: function() { modal.autosize(); }
-      });
+        ] 
+      }); 
     });
   </script>
 <% end %>

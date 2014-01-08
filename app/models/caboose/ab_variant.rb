@@ -3,11 +3,12 @@
 # to change the button text, or images displayed, or even more
 # complicated behavior
 class Caboose::AbVariant < ActiveRecord::Base
+  self.table_name = "ab_variants"
   has_many :ab_options
 
   # name is the name of the variant
   # analytics name is a machine-readable name that will be send to GA
-  attr_accessor :name, :analytics_name
+  attr_accessible :name, :analytics_name
 
   # returns all of the variant options as an array 
   def getOptions

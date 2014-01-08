@@ -10,11 +10,11 @@ module Caboose
     def index
       return unless user_is_allowed_to 'view', 'ab_variants'
 
-      @gen = PageBarGenerator.new(params, {'name' => ''}, {
+      @gen = PageBarGenerator.new(params, {'name' => '', 'analytics_name' => ''}, {
         'model' => 'Caboose::AbVariant',
         'sort'  => 'name',
         'desc'  => 'false',
-        'base_url' => '/admin/ab_variants'
+        'base_url' => '/admin/ab-variants'
       })
       @variants = @gen.items
     end
@@ -28,7 +28,9 @@ module Caboose
     # GET /admin/ab_variants/:id
     def edit
       return unless user_is_allowed_to 'edit', 'ab_variants'
-      @variant = Variant.find(params[:id])
+      @variant = AbVariant.find(params[:id])
+      Caboose.log @variant
+      Caboose.log @variant.name
     end
 
     # POST /admin/ab_variants
@@ -48,7 +50,7 @@ module Caboose
         resp.error = "A name is required."
       elsif
         variant.save
-        resp.redirect = "/admin/ab_variants/"+variant.id
+        resp.redirect = "/admin/ab-variants/#{variant.id}"
       end
       render json: resp
     end
@@ -58,14 +60,23 @@ module Caboose
       return unless user_is_allowed_to 'edit', 'ab_variants'
 
       resp = StdClass.new
-      variant = AbVariants.find(params[:id])
+      variant = AbVariant.find(params[:id])
 
       save = true
-      params.each do |name,value|
-       user[name.to_sym] = value 
+      if params[:name]
+        variant.name = params[:name]
+      end
+      if params[:analytics_name]
+        variant.analytics_name = params[:analytics_name]
       end
 
-      resp.success = save && user.save
+      resp.success = save && variant.save
+      if resp.success
+        Caboose.log "Saved"
+      else
+        Caboose.log "Not saved"
+      end
+
       render json: resp
     end
 
@@ -77,7 +88,7 @@ module Caboose
       variant.destroy
       
       resp = StdClass.new({
-        'redirect' => '/admin/users'
+        'redirect' => '/admin/ab-variants'
       })
       render json: resp
     end

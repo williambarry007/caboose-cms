@@ -45,10 +45,10 @@ class Caboose::Utilities::Schema
     c = ActiveRecord::Base.connection
     self.schema.each do |model, columns|
       tbl = model.table_name
-      #puts "Creating table #{tbl}..."
+      puts "Creating table #{tbl}..."
       c.create_table tbl if !c.table_exists?(tbl)
       columns.each do |col|
-        #puts "Creating column #{tbl}.#{col[0]}..."                 
+        puts "Creating column #{tbl}.#{col[0]}..."                 
         
         # Skip if the column exists with the proper data type
         next if c.column_exists?(tbl, col[0], col[1])

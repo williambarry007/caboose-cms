@@ -97,6 +97,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :body        , :text 		 ],  	 
         [ :hide        , :boolean  ], 	 
         [ :image_url   , :text 		 ],
+        [ :published   , :boolean  ],
         [ :created_at  , :datetime ],
         [ :updated_at  , :datetime ]
       ],

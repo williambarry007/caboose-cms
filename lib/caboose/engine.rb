@@ -120,7 +120,6 @@ module Caboose
         'caboose/station_sidebar.css',
         'caboose/tinymce.css'
       ]      
-      end
     end   
   end
 end

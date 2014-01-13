@@ -29,11 +29,9 @@ module Caboose
     def edit
       return unless user_is_allowed_to 'edit', 'ab_variants'
       @variant = AbVariant.find(params[:id])
-      Caboose.log @variant
-      Caboose.log @variant.name
     end
 
-    # POST /admin/ab_variants
+    # POST /admin/ab-variants
     def create
       return unless user_is_allowed_to 'edit', 'ab_variants'
 
@@ -52,6 +50,26 @@ module Caboose
         variant.save
         resp.redirect = "/admin/ab-variants/#{variant.id}"
       end
+      
+      render json: resp
+    end
+
+    # POST admin/ab-variants/:id/new-option'
+    def create_option
+      return unless user_is_allowed_to 'edit','ab_variants'
+      
+      resp = StdClass.new({
+        'error' => nil,
+        'redirect' => nil
+      })
+
+      Caboose.log params[:option_name]
+
+      variant = AbVariant.find(params[:id])
+      variant.ab_options.build(text: params[:option_name]).save
+      variant.save
+      resp.redirect = "/admin/ab-variants/#{variant.id}"
+      
       render json: resp
     end
 
@@ -68,6 +86,15 @@ module Caboose
       end
       if params[:analytics_name]
         variant.analytics_name = params[:analytics_name]
+      end
+
+      params.each do |name,value|
+        Caboose.log name.slice(0,6)
+        if name.slice(0,6) == "option"
+          option = AbOption.find(name.to_s.scan(/\d+$/).first)
+          option.text = value
+          option.save
+        end
       end
 
       resp.success = save && variant.save

@@ -13,6 +13,7 @@ module Caboose
       @page = Page.page_with_uri(request.fullpath)
       
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
+      assign_ab_variants
       
       @crumb_trail  = Caboose::Page.crumb_trail(@page)
 		  @subnav       = {}
@@ -23,8 +24,19 @@ module Caboose
       
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user
+
+      Caboose.log session
       
       before_action
+    end
+
+    # sets the ab_variants for the user's session
+    def assign_ab_variants
+      AbVariant.find_each do |var|
+        unless session[var.analytics_name]
+          session[var.analytics_name] = var.get_session_option
+        end
+      end
     end
     
     # Parses any parameters in the URL and adds them to the params
@@ -93,7 +105,7 @@ module Caboose
       return session["app_user"]
     end
     
-    # DEPRECIATED: Use user_is_allowed_to(action, resource)
+    # DEPRECATED: Use user_is_allowed_to(action, resource)
     #
     # Checks to see if a user has permission to perform the given action 
     # on the given resource.
@@ -138,7 +150,7 @@ module Caboose
       end
       return true
     end
-    
+
     # Redirects to login if not logged in.
     def verify_logged_in
       if (!logged_in?)
@@ -157,6 +169,8 @@ module Caboose
       url2 += "?" + qs.join('&') if qs.count > 0 
       return url2
     end
+
+
     
     #def auth_or_error(message)
     #  if (!logged_in?)

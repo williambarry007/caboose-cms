@@ -10,19 +10,9 @@ class Caboose::AbVariant < ActiveRecord::Base
   # analytics name is a machine-readable name that will be send to GA
   attr_accessible :name, :analytics_name
 
-  # returns all of the variant options as an array 
-  def getOptions
-    @ab_options 
+  def get_session_option
+    return self.ab_options.sample.text if self.ab_options
+    return ""
   end
 
-  # adds a new option with the text "text"
-  # option is given an id 
-  def addOption(text)
-    @ab_options.create(text: text, ab_variant: self)
-  end
-
-  # removes the option with option_id
-  def removeOption(option_id)
-    @ab_options.delete @ab_options.find(option_id)
-  end
 end

@@ -98,6 +98,7 @@ Caboose::Engine.routes.draw do
   get     "admin/ab-variants/:id"                 => "ab_variants#edit"
   put     "admin/ab-variants/:id"                 => "ab_variants#update"
   post    "admin/ab-variants"                     => "ab_variants#create"
+  post    "admin/ab-variants/:id/new-option"   => "ab_variants#create_option"
   delete  "admin/ab-variants/:id/delete"          => "ab_variants#delete"
 
   

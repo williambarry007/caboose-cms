@@ -63,6 +63,64 @@ module Caboose
   end
   
   class Engine < ::Rails::Engine
-    isolate_namespace Caboose
+    isolate_namespace Caboose    
+    initializer 'caboose.add_assets', :after=> :set_load_path do |app|            
+      app.config.assets.precompile += [      
+        # Images
+        'caboose/caboose_logo_small.png',
+        'caboose/caboose_nav_black.png',
+        'caboose/caboose_nav.png',
+        'caboose/default_user_pic.png',
+        'caboose/loading_black_on_white.gif',
+        'caboose/loading_green.gif',
+        'caboose/loading_small_black_on_white.gif',
+        'caboose/loading_small_white_on_black.gif',
+        'caboose/loading_white_on_black.gif',
+        'caboose/search.png',
+        # Javascript
+        'caboose/admin_page_edit_content.js',
+        'caboose/admin_page_new_blocks.js',
+        'caboose/admin.js',
+        'caboose/application.js',
+        'caboose/modal_integration.js',
+        'caboose/modal.js',
+        'caboose/model/all.js',
+        'caboose/model/attribute.js',
+        'caboose/model/bound_checkbox_multiple.js',
+        'caboose/model/bound_checkbox.js',
+        'caboose/model/bound_control.js',
+        'caboose/model/bound_image.js',
+        'caboose/model/bound_richtext.js',
+        'caboose/model/bound_select.js',
+        'caboose/model/bound_text.js',
+        'caboose/model/bound_textarea.js',
+        'caboose/model/class.js',
+        'caboose/model/model_binder.js',
+        'caboose/model/model.js',
+        'caboose/model.form.page.js',
+        'caboose/model.form.user.js',
+        'caboose/placeholder.js',
+        'caboose/shortcut.js',
+        'caboose/station.js',
+        'caboose/tinymce/plugins/caboose/plugin.js',
+        # CSS
+        'caboose/admin_page_edit_content.css',
+        'caboose/admin.css',
+        'caboose/application.css',
+        'caboose/bound_input.css',
+        'caboose/caboose.css',
+        'caboose/fonts/big_noodle_titling_oblique.ttf',
+        'caboose/fonts/big_noodle_titling.ttf',
+        'caboose/fonts.css',
+        'caboose/login.css',
+        'caboose/modal.css',
+        'caboose/page_bar_generator.css',
+        'caboose/register.css',
+        'caboose/station_modal.css',
+        'caboose/station_sidebar.css',
+        'caboose/tinymce.css'
+      ]      
+      end
+    end   
   end
 end

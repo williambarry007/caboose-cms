@@ -64,7 +64,7 @@ module Caboose
   
   class Engine < ::Rails::Engine
     isolate_namespace Caboose    
-    initializer 'caboose.add_assets', :after=> :set_load_path do |app|            
+    initializer 'caboose.assets.precompile' do |app|            
       app.config.assets.precompile += [      
         # Images
         'caboose/caboose_logo_small.png',

@@ -1,0 +1,24 @@
+<h1>Page Block Types</h1>
+
+<p><a href='/admin/page-block-types/new'>New Block Type</a></p>
+
+<% if (@block_types.count > 0) %>
+
+  <table class='data'>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>      
+    </tr>
+  <% @block_types.each do |bt| %>
+    <tr onclick="window.location='/admin/page-block-types/<%= bt.id %>/edit';">
+      <td><%= bt.name        %></td>
+      <td><%= bt.description %></td>    
+    </tr>
+  <% end %>
+  </table>  
+
+<% else %>
+
+  <p>There are no block types.</p>
+
+<% end %>

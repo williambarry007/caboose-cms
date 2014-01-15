@@ -35,7 +35,7 @@ module Caboose
     resp = nil
     args[0] = args[0].to_sym 
     Caboose.plugins.each do |mod|
-      #resp = mod.constantize.send(*args)
+      #resp = mod.constantize.send(*args)      
       if (mod.constantize.respond_to?(args[0]))
         resp = mod.constantize.send(*args)
       end

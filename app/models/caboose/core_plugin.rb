@@ -21,10 +21,11 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
       'children' => []
     }
     
-    item['children'] << { 'id' => 'users'        , 'text' => 'Users'       , 'href' => '/admin/users'        , 'modal' => false } if user.is_allowed('users'       , 'view')
-    item['children'] << { 'id' => 'roles'        , 'text' => 'Roles'       , 'href' => '/admin/roles'        , 'modal' => false } if user.is_allowed('roles'       , 'view')
-    item['children'] << { 'id' => 'permissions'  , 'text' => 'Permissions' , 'href' => '/admin/permissions'  , 'modal' => false } if user.is_allowed('permissions' , 'view')
-    item['children'] << { 'id' => 'variables'    , 'text' => 'Variables'   , 'href' => '/admin/settings'     , 'modal' => false } if user.is_allowed('settings'    , 'view')
+    item['children'] << { 'id' => 'users'        , 'text' => 'Users'            , 'href' => '/admin/users'            , 'modal' => false } if user.is_allowed('users'          , 'view')
+    item['children'] << { 'id' => 'roles'        , 'text' => 'Roles'            , 'href' => '/admin/roles'            , 'modal' => false } if user.is_allowed('roles'          , 'view')
+    item['children'] << { 'id' => 'permissions'  , 'text' => 'Permissions'      , 'href' => '/admin/permissions'      , 'modal' => false } if user.is_allowed('permissions'    , 'view')
+    item['children'] << { 'id' => 'variables'    , 'text' => 'Variables'        , 'href' => '/admin/settings'         , 'modal' => false } if user.is_allowed('settings'       , 'view')
+    item['children'] << { 'id' => 'blocktypes'   , 'text' => 'Page Block Types' , 'href' => '/admin/page-block-types' , 'modal' => false } if user.is_allowed('pageblocktypes' , 'view')
         
     nav << item if item['children'].count > 0
     
@@ -53,5 +54,24 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
   #      });
   #    });"
   #end
-  
+
+  def self.block_types(block_types)
+    block_types << {
+      :id => 'heading',
+      :name => "Heading",
+      :attributes => [        
+        { name: 'text' , nice_name: 'Text' , type: 'text'  , default: '', width: 800, fixed_placeholder: false },
+        { name: 'size' , nice_name: 'Size' , type: 'select', default: 1, width: 800, fixed_placeholder: false, options: ["1 - Largest", "2", "3", "4", "5", "6"]}        
+      ]
+    }
+    block_types << {
+      :id => 'richtext',
+      :name => "Rich Text",
+      :attributes => [        
+        { name: 'text' , nice_name: 'Text' , type: 'richtext', default: '', width: 800, height: 400, fixed_placeholder: false }                
+      ]
+    }
+    return block_types
+  end
+
 end

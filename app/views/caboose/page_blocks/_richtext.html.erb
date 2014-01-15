@@ -1,0 +1,8 @@
+<%
+text = block.field_value('text')
+Caboose.log("text = #{text}")
+if text.nil? || text == ""
+  text = (empty_text ? "<p>#{empty_text}</p>" : "") 
+end
+
+%><%= raw text %>

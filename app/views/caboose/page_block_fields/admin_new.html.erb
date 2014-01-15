@@ -1,0 +1,30 @@
+
+<h1>New Field</h1>
+<p><input type='text' id='name' name='name' placeholder='Field name' /></p>
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/page-block-types/<%= @block_type.id %>/edit';" />
+<input type='button' value='Add Field' onclick="add_field();" />
+</p>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+function add_field()
+{
+  $('#message').empty().append($('<p/>').addClass('loading').html('Adding field...'));
+  $.ajax({
+    url: '/admin/page-block-types/<%= @block_type.id %>/fields',
+    type: 'post',
+    data: {
+      name: $('#name').val()
+    },      
+    success: function(resp) {
+      if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

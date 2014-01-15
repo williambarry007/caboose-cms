@@ -4,7 +4,7 @@ var PageContentController = function(page_id) { this.init(page_id); };
 PageContentController.prototype = {
 
   page_id: false,    
-  new_block_type: false,
+  new_block_type_id: false,
   
   init: function(page_id)
   {
@@ -23,18 +23,18 @@ PageContentController.prototype = {
       placeholder: 'sortable-placeholder',
       handle: '.sort_handle',
       receive: function(e, ui) {      
-        that.new_block_type = ui.item.attr('id').replace('new_block_', '');    
+        that.new_block_type_id = ui.item.attr('id').replace('new_block_', '');    
       },
       update: function(e, ui) {        
-        if (that.new_block_type)
+        if (that.new_block_type_id)
         {
           $.ajax({
             url: '/admin/pages/' + that.page_id + '/blocks',
             type: 'post',
-            data: { block_type: that.new_block_type, index: ui.item.index() },
+            data: { page_block_type_id: that.new_block_type_id, index: ui.item.index() },
             success: function(resp) { that.render_blocks(function() { that.edit_block(resp.block.id); }); }
           });                    
-          that.new_block_type = false;
+          that.new_block_type_id = false;
         }
         else
         {        
@@ -126,7 +126,7 @@ PageContentController.prototype = {
   },
   
   render_block_html: function(block_id, html)
-  {
+  {        
     var that = this;    
     $('#pageblock_' + block_id).empty().html(html);
     $('#pageblock_' + block_id).attr('onclick','').unbind('click');    

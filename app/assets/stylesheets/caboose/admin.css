@@ -9,6 +9,7 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require colorbox-rails
+ *= require jquery.ui.all
  *= require caboose/fonts
  *= require caboose/caboose  
  */
@@ -99,10 +100,10 @@ p.current_page_editing {
 }
 
 #content p.loading {
-  background-image: url('/assets/caboose/loading_white_on_black.gif');
+  background-image: url('/assets/caboose/loading_black_on_white.gif');
   background-position: 0 center;
   background-repeat: no-repeat;
-  color: #ccc;  
+  color: #000;  
   font-weight: normal;
   font-size: 16pt;
   padding: 10px 10px 10px 40px;

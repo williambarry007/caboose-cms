@@ -1,24 +1,38 @@
 <% content_for :caboose_css do %>
 <% end %>
 <% content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/model/all" %>
+<%
+#javascript_include_tag "caboose/model/all" 
+%>
+<%= javascript_include_tag "caboose/model/class" %>
+<%= javascript_include_tag "caboose/model/model" %>
+<%= javascript_include_tag "caboose/model/attribute" %>
+<%= javascript_include_tag "caboose/model/model_binder" %>
+<%= javascript_include_tag "caboose/model/bound_control" %>
+<%= javascript_include_tag "caboose/model/bound_checkbox" %>
+<%= javascript_include_tag "caboose/model/bound_checkbox_multiple" %>
+<%= javascript_include_tag "caboose/model/bound_image" %>
+<%= javascript_include_tag "caboose/model/bound_select" %>
+<%= javascript_include_tag "caboose/model/bound_text" %>
+<%= javascript_include_tag "caboose/model/bound_textarea" %>
+<%= javascript_include_tag "caboose/model/bound_richtext" %>
 <% end %>
 
 <h1>Edit Page</h1>
 <ul id='tabs'>
 <%
 tabs = {
-  "/admin/pages/#{@page.id}/edit"        => 'General',
-  "/admin/pages/#{@page.id}/content"     => 'Content',
-  "/admin/pages/#{@page.id}/css"         => 'Custom CSS',
-  "/admin/pages/#{@page.id}/js"          => 'Custom JS',
-  "/admin/pages/#{@page.id}/seo"         => 'SEO',
-  "/admin/pages/#{@page.id}/sitemap"     => 'Sitemap',
-  "/admin/pages/#{@page.id}/delete"      => 'Delete Page'
+  'General'         => "/admin/pages/#{@page.id}/edit",
+  'Content'         => "/admin/pages/#{@page.id}/content",     
+  'Custom CSS'      => "/admin/pages/#{@page.id}/css", 
+  'Custom JS'       => "/admin/pages/#{@page.id}/js", 
+  'SEO'             => "/admin/pages/#{@page.id}/seo", 
+  'Sitemap'         => "/admin/pages/#{@page.id}/sitemap", 
+  'Delete Page'     => "/admin/pages/#{@page.id}/delete" 
 }
 
 %>
-<% tabs.each do |href,text| %>
+<% tabs.each do |text, href| %>
 <li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
 <% end %>
 <li class='back'><input type='button' value='< Back' onclick="window.location='/admin/pages';" /></li>

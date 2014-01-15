@@ -84,5 +84,12 @@ ModelBinder.prototype = {
       }
     });
     return attrib;
+  },
+  
+  cancel: function()
+  {
+    $(this.controls).each(function(i, control) { 
+      control.cancel(); 
+    });    
   }
 };

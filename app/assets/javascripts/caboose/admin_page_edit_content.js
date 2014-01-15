@@ -1,22 +1,114 @@
 
-var PageContentEditor = function(page_id, auth_token) {
-  this.page_id = page_id;
-  this.auth_token = auth_token;
-  this.render_blocks();
-};
+var PageContentController = function(page_id) { this.init(page_id); };
 
-PageContentEditor.prototype = {
+PageContentController.prototype = {
 
-  page_id: false,
-  current_block_id: false,
+  page_id: false,    
+  new_block_type: false,
   
-  render_blocks: function()
+  init: function(page_id)
   {
+    this.page_id = page_id;
     var that = this;
+    this.render_blocks(function() {
+      that.sortable_blocks();
+      that.draggable_blocks();
+    });
+  },
+  
+  sortable_blocks: function()
+  { 
+    var that = this;
+    $('#pageblocks').sortable({      
+      placeholder: 'sortable-placeholder',
+      handle: '.sort_handle',
+      receive: function(e, ui) {      
+        that.new_block_type = ui.item.attr('id').replace('new_block_', '');    
+      },
+      update: function(e, ui) {        
+        if (that.new_block_type)
+        {
+          $.ajax({
+            url: '/admin/pages/' + that.page_id + '/blocks',
+            type: 'post',
+            data: { block_type: that.new_block_type, index: ui.item.index() },
+            success: function(resp) { that.render_blocks(function() { that.edit_block(resp.block.id); }); }
+          });                    
+          that.new_block_type = false;
+        }
+        else
+        {        
+          $.ajax({
+            url: '/admin/pages/' + that.page_id + '/block-order',
+            type: 'put',
+            data: $('#pageblocks').sortable('serialize', { key: "block_ids[]" }),
+            success: function(resp) {}
+          });
+        }
+      }
+    });
+  },
+  
+  draggable_blocks: function() 
+  {
+    $('#new_blocks li').draggable({
+      dropOnEmpty: true,
+      connectToSortable: "#pageblocks",
+      helper: "clone",
+      revert: "invalid"    
+    });    
+  },
+    
+  edit_block: function(block_id)
+  {
+    caboose_modal_url('/admin/pages/' + this.page_id + '/blocks/' + block_id + '/edit');    
+  },
+  
+  delete_block: function(block_id, confirm)
+  {
+    var that = this;        
+    if (!confirm)
+    {
+      var p = $('<p/>')
+        .addClass('note warning')
+        .append("Are you sure you want to delete the block? ")
+        .append($('<input/>').attr('type', 'button').val('Yes').click(function() { that.delete_block(block_id, true); })).append(" ")
+        .append($('<input/>').attr('type', 'button').val('No').click(function() { that.render_block(block_id); }));
+      $('#pageblock_' + block_id).attr('onclick','').unbind('click');
+      $('#pageblock_' + block_id).empty().append(p);
+      return;
+    }
     $.ajax({
-      url: '/admin/pages/' + this.page_id + '/blocks',
+      url: '/admin/pages/' + this.page_id + '/blocks/' + block_id,
+      type: 'delete',
+      success: function(resp) {
+        that.render_blocks();      
+      }
+    });    
+  },
+    
+  /*****************************************************************************
+  Block Rendering
+  *****************************************************************************/
+
+  render_blocks: function(after)
+  {
+    $('#pageblocks').empty();    
+    var that = this;
+    $.ajax({      
+      url: '/admin/pages/' + this.page_id + '/blocks/render?empty_text=[Empty, click to edit]',
       success: function(blocks) {
-        $(blocks).each(function(i,b) { that.render_block(b.id); });                
+        $(blocks).each(function(i,b) {
+          $('#pageblocks')
+            .append($('<li/>')
+              .attr('id', 'pageblock_container_' + b.id)                                          
+              .append($('<a/>').attr('id', 'pageblock_' + b.id + '_sort_handle'  ).addClass('sort_handle'  ).append($('<span/>').addClass('ui-icon ui-icon-arrow-2-n-s')))
+              .append($('<a/>').attr('id', 'pageblock_' + b.id + '_delete_handle').addClass('delete_handle').append($('<span/>').addClass('ui-icon ui-icon-close')).click(function(e) { e.preventDefault(); that.delete_block(b.id); }))
+              .append($('<div/>').attr('id', 'pageblock_' + b.id).addClass('page_block'))
+            );
+        });                
+        $(blocks).each(function(i,b) { that.render_block_html(b.id, b.html); });                        
+        if (after) after();
       }
     });    
   },
@@ -27,97 +119,17 @@ PageContentEditor.prototype = {
     $.ajax({
       url: '/admin/pages/' + this.page_id + '/blocks/' + block_id + '/render?empty_text=[Empty, click to edit]',
       success: function(html) {
-        $('#pageblock_' + block_id).empty().html(html);
-        $('#pageblock_' + block_id).attr('onclick','').unbind('click');
-        $('#pageblock_' + block_id).click(function(e) { that.edit_block(block_id); });
-        if (that.current_block_id == block_id) that.current_block_id = false;
+        that.render_block_html(block_id, html);
         if (after) after();
       }
     });
   },
   
-  edit_block: function(block_id)
+  render_block_html: function(block_id, html)
   {
-    var that = this;
-    if (this.current_block_id && this.current_block_id != block_id)
-    {
-      this.render_block(this.current_block_id, function() { that.edit_block(block_id); });
-      return;
-    }
-      
-    this.current_block_id = block_id;
-    $('#pageblock_' + block_id).attr('onclick','').unbind('click');  
-    $.ajax({
-      url: '/admin/pages/' + this.page_id + '/blocks/' + block_id,
-      success: function(block) {
-        $('#pageblock_' + block.id).empty().append($('<div/>').attr('id', 'pageblock_' + block.id + '_value'));
-        that["edit_" + block.block_type + "_block"](block);
-      }            
-    });
-  },
-
-  edit_h1_block: function(block) { return this.edit_text_block(block); },
-  edit_h2_block: function(block) { return this.edit_text_block(block); },
-  edit_h3_block: function(block) { return this.edit_text_block(block); },
-  edit_h4_block: function(block) { return this.edit_text_block(block); },
-  edit_h5_block: function(block) { return this.edit_text_block(block); },
-  edit_h6_block: function(block) { return this.edit_text_block(block); },
-  
-  edit_text_block: function(block) {
-    var that = this;
-    m = new ModelBinder({
-      name: 'PageBlock',
-      id: block.id,
-      update_url: '/admin/pages/' + this.page_id + '/blocks/' + block.id,
-      authenticity_token: this.auth_token,
-      attributes: [{ 
-        name: 'value', 
-        nice_name: 'Content', 
-        type: 'text', 
-        value: block.value, 
-        width: 800, 
-        fixed_placeholder: false,
-        after_update: this.after_block_update,          
-        after_cancel: this.after_block_cancel
-      }],    
-    });  
-  },
-  
-  edit_richtext_block: function(block) {
-    var that = this;
-    m = new ModelBinder({
-      name: 'PageBlock',
-      id: block.id,
-      update_url: '/admin/pages/' + this.page_id + '/blocks/' + block.id,
-      authenticity_token: this.auth_token,
-      attributes: [{ 
-        name: 'value', 
-        nice_name: 'Content', 
-        type: 'richtext', 
-        value: block.value, 
-        width: 800, 
-        height: 300,
-        fixed_placeholder: false,
-        after_update: function() { 
-          //that.after_block_update(that);
-          that.render_block(that.current_block_id);
-          ModelBinder.remove_from_all_model_binders('PageBlock', that.current_block_id);
-          that.current_block_id = false;
-        },          
-        after_cancel: function() { that.after_block_cancel(that); }
-      }],    
-    });  
-  },
-  
-  after_block_update: function(pce) {
-    pce.render_block(pce.current_block_id);
-    ModelBinder.remove_from_all_model_binders('PageBlock', pce.current_block_id);
-    pce.current_block_id = false;
-  },
-
-  after_block_cancel: function(pce) {
-    pce.render_block(pce.current_block_id);
-    ModelBinder.remove_from_all_model_binders('PageBlock', pce.current_block_id);
-    pce.current_block_id = false;            
-  }
-}
+    var that = this;    
+    $('#pageblock_' + block_id).empty().html(html);
+    $('#pageblock_' + block_id).attr('onclick','').unbind('click');    
+    $('#pageblock_' + block_id).click(function(e) { that.edit_block(block_id); });
+  }        
+};

@@ -199,8 +199,8 @@ class Caboose::Page < ActiveRecord::Base
     return ids.uniq
   end
   
-  def self.crumb_trail(page)
-    page_id = page.is_a?(Integer) ? page : page.id
+  def self.crumb_trail(page)    
+    page_id = page.nil? || !page ? 1 : (page.is_a?(Integer) ? page : page.id)
     
     arr = []
     self.crumb_trail_helper(page_id, arr)

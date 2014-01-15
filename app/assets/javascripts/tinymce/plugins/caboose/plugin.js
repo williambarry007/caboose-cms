@@ -5,21 +5,16 @@ tinymce.PluginManager.add('caboose', function(editor, url) {
     text: 'Save',
     icon: false,
     onclick: function() {
-      tinymce.activeEditor.plugins.autosave.storeDraft();
-              
       var control = ModelBinder.tinymce_current_control();  
       if (!control) return;
-      control.save();
-      control.cancel();
+      control.save();      
     }
   });
   
   editor.addButton('caboose_cancel', {
     text: 'Cancel',
     icon: false,
-    onclick: function() {
-      tinymce.activeEditor.plugins.autosave.storeDraft();
-      
+    onclick: function() {            
       var control = ModelBinder.tinymce_current_control();  
       if (!control) return;  
       control.cancel();                      

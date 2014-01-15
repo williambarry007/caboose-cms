@@ -1,12 +1,8 @@
 
-<%= render :partial => 'caboose/pages/admin_header' %>
-
-<p>Page block type: <%= @block.block_type %></p>
 <div id='pageblock_<%= @block.id %>_value'></div>
-<p><input type='button' value='Back to page' onclick="window.location='/admin/pages/<%= @page.id %>/content';" /></p>
 
-<%= render :partial => 'caboose/pages/admin_footer' %>
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
 <script type='text/javascript'>
 
 var modal = false;
@@ -26,7 +22,9 @@ $(document).ready(function() {
       type: 'richtext',
       value: <%= raw Caboose.json(@block.value) %>,
       width: 800,
-      fixed_placeholder: false 
+      fixed_placeholder: false,
+      after_update: function() { parent.controller.render_blocks(); modal.close(); },
+      after_cancel: function() { parent.controller.render_blocks(); modal.close(); }
     }]
   });
 });

@@ -65,7 +65,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :parent_id             , :integer ], 
         [ :title                 , :string  ],
         [ :menu_title            , :string  ],
-        [ :content               , :text    ],
+        #[ :content               , :text    ],
         [ :slug                  , :string  ],
         [ :alias                 , :string  ],
         [ :uri                   , :string  ],
@@ -97,6 +97,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :body        , :text 		 ],  	 
         [ :hide        , :boolean  ], 	 
         [ :image_url   , :text 		 ],
+        [ :published   , :boolean  ],
         [ :created_at  , :datetime ],
         [ :updated_at  , :datetime ]
       ],

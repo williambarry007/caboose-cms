@@ -61,6 +61,9 @@ Caboose::Engine.routes.draw do
   get     "admin/pages/:id/css"           => "pages#admin_edit_css"
   get     "admin/pages/:id/js"            => "pages#admin_edit_js"
   get     "admin/pages/:id/seo"           => "pages#admin_edit_seo" 
+  get     "admin/pages/:id/block-order"   => "pages#admin_edit_block_order"
+  put     "admin/pages/:id/block-order"   => "pages#admin_update_block_order"
+  get     "admin/pages/:id/new-blocks"    => "pages#admin_new_blocks"
   get     "admin/pages/:id/content"       => "pages#admin_edit_content"  
   put     "admin/pages/:id"               => "pages#admin_update"
   get     "admin/pages"                   => "pages#admin_index"
@@ -68,6 +71,7 @@ Caboose::Engine.routes.draw do
   delete  "admin/pages/:id"               => "pages#admin_delete"
     
   get     "admin/pages/:page_id/blocks/new"        => "page_blocks#admin_new"
+  get     "admin/pages/:page_id/blocks/render"     => "page_blocks#admin_render_all"
   get     "admin/pages/:page_id/blocks/:id/render" => "page_blocks#admin_render"
   get     "admin/pages/:page_id/blocks/:id/edit"   => "page_blocks#admin_edit"
   get     "admin/pages/:page_id/blocks/:id"        => "page_blocks#admin_show"

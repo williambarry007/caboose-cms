@@ -24,22 +24,19 @@ BoundRichText = BoundControl.extend({
     $('#'+this.el).attr('placeholder', 'empty').css('padding-top', '+=' + h).css('height', '-=' + h);
     
     var this2 = this;
-    $('#'+this.el).on('keyup', function(e) {
-      if (e.keyCode == 27) this2.cancel(); // Escape 
-      //if (e.keyCode == 13) this2.save();   // Enter
-      
-      if ($('#'+this2.el).val() != this2.attribute.value_clean)
-      {
-        this2.show_controls();
-        $('#'+this2.el).addClass('dirty');
-      }
-      else
-        $('#'+this2.el).removeClass('dirty');
-    });
+    //$('#'+this.el).on('keyup', function(e) {
+    //  if (e.keyCode == 27) this2.cancel(); // Escape 
+    //  //if (e.keyCode == 13) this2.save();   // Enter
+    //  
+    //  if ($('#'+this2.el).val() != this2.attribute.value_clean)
+    //    $('#'+this2.el).addClass('dirty');
+    //  else
+    //    $('#'+this2.el).removeClass('dirty');
+    //});
     
-    setTimeout(function() {
+    setTimeout(function() {      
       tinymce.execCommand("mceAddEditor", false, this2.el);
-      var ed = tinymce.EditorManager.createEditor(this2.el);      
+      var ed = tinymce.EditorManager.createEditor(this2.el);            
       
       //var ed = tinymce.EditorManager.get(this2.el);
       //if (!ed)
@@ -47,60 +44,31 @@ BoundRichText = BoundControl.extend({
       //  tinymce.execCommand("mceAddEditor", false, this2.el);
       //  ed = tinymce.EditorManager.createEditor(this2.el);
       //}
-      ed.on('blur', function(e) { this2.save(); });
-      ed.on('keyup', function(e) {
-        tinymce.triggerSave();        
-        if (e.keyCode == 27) this2.cancel(); // Escape              
-        if ($('#'+this2.el).val() != this2.attribute.value_clean)
-          ed.getBody().style.backgroundColor = "#fff799";
-        else
-          ed.getBody().style.backgroundColor = "#fff";
-      });
+      
+      //ed.on('blur', function(e) { this2.save(); });
+      //ed.on('keyup', function(e) {
+      //  tinymce.triggerSave();        
+      //  if (e.keyCode == 27) this2.cancel(); // Escape              
+      //  if ($('#'+this2.el).val() != this2.attribute.value_clean)
+      //    ed.getBody().style.backgroundColor = "#fff799";
+      //  else
+      //    ed.getBody().style.backgroundColor = "#fff";
+      //});
     }, 100);    
   },
   
-  show_controls: function() {
-    if ($('#'+this.el+'_controls').length)
-      return;    
-    var w = $('#'+this.el).outerWidth();
-    var this2 = this;
-    $('#'+this.el+'_container').prepend($('<div/>')
-      .attr('id', this.el + '_controls')
-      .addClass('bound_textarea_controls')
-      .css('position', 'absolute')
-      .css('top', 0)
-      .css('left', w - 148)
-      .css('width', 148)
-      .css('overflow', 'hidden')
-      .append($('<div/>')
-        .css('width', 148)
-        .css('margin-left', 148)
-        .append($('<a/>').html('Save'   ).addClass('save'   ).css('width', 60).attr('href', '#').click(function(event) { event.preventDefault(); this2.save();   }))
-        .append($('<a/>').html('Discard').addClass('discard').css('width', 80).attr('href', '#').click(function(event) { event.preventDefault(); this2.cancel(); }))
-      )
-    );  
-    $('#'+this.el+'_controls div').animate({ 'margin-left': 0 }, 300); 
-  },
-    
-  hide_controls: function() {
-    if (!$('#'+this.el+'_controls').length)
-      return;
-    var this2 = this;
-    $('#'+this.el+'_controls div').animate({ 'margin-left': 100 }, 300, function() { 
-      $('#'+this2.el+'_controls').remove(); 
-    });
-  },
-  
   save: function() {
-
-    tinymce.triggerSave();
-
+    var ed = tinymce.activeEditor;
+    el = ed.getElement();
+    $(el).val(ed.getContent());
+    
+    //ed.remove();      
+    //tinymce.triggerSave();
+                   
     this.attribute.value = $('#'+this.el).val();    
     if (this.attribute.value == this.attribute.value_clean)
       return;
-
-    this.hide_controls();
-    this.show_loader();        
+            
     var this2 = this;
     this.model.save(this.attribute, function(resp) {
       if (resp.error)
@@ -110,11 +78,12 @@ BoundRichText = BoundControl.extend({
       }
       else
       {
+        tinymce.activeEditor.remove();
         this2.show_check(500);
         $('#'+this2.el).val(this2.attribute.value);
         $('#'+this2.el).removeClass('dirty');
-        var ed = tinymce.EditorManager.get(this2.el);
-        ed.getBody().style.backgroundColor = "#fff";
+        //var ed = tinymce.EditorManager.get(this2.el);
+        //ed.getBody().style.backgroundColor = "#fff";
 
         if (this2.binder.success)
           this2.binder.success(this2);
@@ -122,24 +91,16 @@ BoundRichText = BoundControl.extend({
     });
   },
   
-  cancel: function() {
-    if (this.attribute.before_cancel) this.attribute.before_cancel();
-    if ($('#'+this.el).val() != this.attribute.value_clean)
-    {
-      if (confirm('This box has unsaved changes.  Hit OK to save changes, Cancel to discard.'))
-      { 
-        this.attribute.value       = $('#'+this.el).val();
-        this.attribute.value_clean = $('#'+this.el).val();
-        this.save();
-      }
-    }        
+  cancel: function() {    
+    if (this.attribute.before_cancel) this.attribute.before_cancel();            
     this.attribute.value = this.attribute.value_clean;
     $('#'+this.el).val(this.attribute.value);
     $('#'+this.el).removeClass('dirty');
     
     if ($('#'+this.el+'_check').length)
-      this.hide_check();    
-    tinymce.execCommand("mceRemoveEditor", false, this.el);    
+      this.hide_check();
+
+    tinymce.activeEditor.remove();        
     if (this.attribute.after_cancel) this.attribute.after_cancel();
   },
     

@@ -38,6 +38,9 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'posts'        , 'text' => 'Posts'       , 'href' => '/admin/posts'        , 'modal' => false } if user.is_allowed('posts'       , 'view')
     
     nav << item if item['children'].count > 0    
+    if user.is_allowed('ab-variants','view')
+      nav << { 'id' => 'ab_variants', 'text' => 'AB Testing', 'href' => '/admin/ab-variants', 'modal' => false }
+    end
     return nav
   end
   

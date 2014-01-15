@@ -32,10 +32,16 @@ module Caboose
 
     # sets the ab_variants for the user's session
     def assign_ab_variants
+      unless session['ab_variants']
+        session['ab_variants'] = Hash.new()
+      end
+      session['analytics_string'] = "|"
       AbVariant.find_each do |var|
-        unless session[var.analytics_name]
-          session[var.analytics_name] = var.get_session_option
+        opt = var.get_session_option
+        unless session['ab_variants'][var.analytics_name]
+          session['ab_variants'][var.analytics_name] = opt[:text]
         end
+        session['analytics_string'] = session['analytics_string'] + "#{var.analytics_name}=#{opt[:id]}|"
       end
     end
     

@@ -11,8 +11,9 @@ class Caboose::AbVariant < ActiveRecord::Base
   attr_accessible :name, :analytics_name
 
   def get_session_option
-    return self.ab_options.sample.text if self.ab_options
-    return ""
+    return "" unless self.ab_options
+    opt = self.ab_options.sample
+    return {text: opt.text, id: opt.id}
   end
 
 end

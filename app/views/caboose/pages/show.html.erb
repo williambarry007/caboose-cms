@@ -15,5 +15,5 @@
 
 <% content_for :page_title   do %><%= raw @page.title   %><% end %>
 <% content_for :page_content do %><% @page.blocks.each do |b| %>
-<%= render :partial => "caboose/page_blocks/#{b.block_type}", :locals => { :block => b, :empty_text => "" } %>
+<%= render :partial => "caboose/page_blocks/#{b.page_block_type.name}", :locals => { :block => b, :empty_text => "" } %>
 <% end %><% end %>

@@ -50,9 +50,9 @@ module Caboose
   		}      
   		params.each   { |key, val| @params[key]  = val }
   		options.each  { |key, val| @options[key] = val }  		
-  		@params.each  { |key, val|
-  		  k = @options['abbreviations'].include?(key) ? @options['abbreviations'][key] : key 
-  		  @params[key] = post_get[key].nil? ? (post_get[k].nil? ? val : post_get[k]) : post_get[key] 
+  		@params.each  { |key, val|  		  
+  		  k = @options['abbreviations'].include?(key) ? @options['abbreviations'][key] : nil  		  
+  		  @params[key] = post_get[key].nil? ? (k && !post_get[k].nil? ? post_get[k] : val) : post_get[key]  		   
   		}			
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
   		#@custom_url_vars = custom_url_vars if !custom_url_vars.nil?
@@ -247,6 +247,21 @@ module Caboose
           arr = @options['includes'][k]
           col = "#{table_name_of_association(arr[0])}.#{arr[1]}"
         end        
+        if k.include?('_concat_')
+          arr = k.split('_concat_')
+          col1 = arr[0]
+          col2 = arr[1]           
+          
+          col2 = col2[0..-5] if col2.ends_with?('_gte')
+          col2 = col2[0..-4] if col2.ends_with?('_gt')                        
+          col2 = col2[0..-5] if col2.ends_with?('_lte')                        
+          col2 = col2[0..-4] if col2.ends_with?('_lt')                                  
+          col2 = col2[0..-4] if col2.ends_with?('_bw')                                              
+          col2 = col2[0..-4] if col2.ends_with?('_ew')
+          col2 = col2[0..-6] if col2.ends_with?('_like')
+                                            
+          col = "concat(#{col1}, ' ', #{col2})"                   
+        end
         
         sql2 = ""
         if k.ends_with?('_gte')
@@ -288,7 +303,7 @@ module Caboose
   	  end
   	  sql_str = sql.join(' and ')
   	  sql = [sql_str]  	   	  
-  	  values.each { |v| sql << v }        	  
+  	  values.each { |v| sql << v }  	  
   	  return sql        	  
     end
     

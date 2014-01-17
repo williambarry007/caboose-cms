@@ -36,7 +36,7 @@ namespace :caboose do
     end
     
     puts "Capturing production database..."
-    `heroku pgbackups:capture`
+    `heroku pgbackups:capture --expire`
     
     puts "Downloading production database dump file..."
     `curl -o #{dump_file} \`heroku pgbackups:url\``

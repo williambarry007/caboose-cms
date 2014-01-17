@@ -80,6 +80,25 @@ Caboose::Engine.routes.draw do
   put     "admin/pages/:page_id/blocks/:id"        => "page_blocks#admin_update"
   delete  "admin/pages/:page_id/blocks/:id"        => "page_blocks#admin_delete"
   
+  put     "admin/page-block-field-values/:id"     => "page_block_field_values#admin_update"
+    
+  get     "admin/page-block-types/new"            => "page_block_types#admin_new"    
+  get     "admin/page-block-types/:id/edit"       => "page_block_types#admin_edit"
+  get     "admin/page-block-types/:id"            => "page_block_types#admin_show"
+  get     "admin/page-block-types"                => "page_block_types#admin_index"
+  post    "admin/page-block-types"                => "page_block_types#admin_create"  
+  put     "admin/page-block-types/:id"            => "page_block_types#admin_update"
+  delete  "admin/page-block-types/:id"            => "page_block_types#admin_delete"
+  
+  get     "admin/page-block-fields/field-type-options"            => "page_block_fields#admin_field_type_options"
+  get     "admin/page-block-fields/:id/options"                   => "page_block_fields#admin_field_options"
+  get     "admin/page-block-types/:block_type_id/fields/new"      => "page_block_fields#admin_new"    
+  get     "admin/page-block-types/:block_type_id/fields/:id/edit" => "page_block_fields#admin_edit"
+  get     "admin/page-block-types/:block_type_id/fields/:id"      => "page_block_fields#admin_index"
+  post    "admin/page-block-types/:block_type_id/fields"          => "page_block_fields#admin_create"  
+  put     "admin/page-block-types/:block_type_id/fields/:id"      => "page_block_fields#admin_update"
+  delete  "admin/page-block-types/:block_type_id/fields/:id"      => "page_block_fields#admin_delete"
+  
   get     "posts"                                 => "posts#index"
   get     "posts/:id"                             => "posts#detail"
   get     "admin/posts/category-options"          => "posts#admin_category_options"

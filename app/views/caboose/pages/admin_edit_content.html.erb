@@ -5,13 +5,7 @@
 <div id='new_blocks_container2'>
 <p class='note'>Drag a new block onto the page:</p>
 <ul id='new_blocks'>
-<li id='new_block_h1'>H1</li>
-<li id='new_block_h2'>H2</li>
-<li id='new_block_h3'>H3</li>
-<li id='new_block_h4'>H4</li>
-<li id='new_block_h5'>H5</li>
-<li id='new_block_h6'>H6</li>
-<li id='new_block_richtext'>Rich Text</li>
+<% @block_types.each do |block_type| %><li id='new_block_<%= block_type.id %>'><%= block_type.description %></li><% end %>
 </ul>
 </div>
 </div>

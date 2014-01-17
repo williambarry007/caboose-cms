@@ -122,8 +122,9 @@ module Caboose
      
     # GET /admin/pages/:id/content
     def admin_edit_content
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
+      @block_types = Caboose::PageBlockType.reorder(:name).all
       render :layout => 'caboose/admin'
     end
     

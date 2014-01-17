@@ -9,6 +9,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
     }
   end
   
+  def self.removed_columns
+    {
+      Caboose::PageBlock => [:block_type, :value, :name],      
+      Caboose::PageBlockField => [:model_binder_options]      
+    }
+  end
+  
   # Any column indexes that need to exist in the database
   def self.indexes
     {    
@@ -86,11 +93,34 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :gp_description        , :string  , :limit => 156 ]
       ],
       Caboose::PageBlock => [        
-        [ :page_id               , :integer ], 
-        [ :block_type            , :string  , :default => 'p' ],
+        [ :page_id               , :integer ],         
+        [ :page_block_type_id    , :integer ],
         [ :sort_order            , :integer , :default => 0   ],
         [ :name                  , :string  ],
         [ :value                 , :text    ]        
+      ],
+      Caboose::PageBlockType => [        
+        [ :name                  , :string  ],
+        [ :description           , :string  ],
+        [ :use_render_function   , :boolean , :default => false ],
+        [ :render_function       , :text    ] 
+      ],
+      Caboose::PageBlockField => [
+        [ :page_block_type_id   , :integer ],      
+        [ :name                 , :string  ],
+        [ :field_type           , :string  ],
+        [ :nice_name            , :string  ],
+        [ :default              , :text    ],
+        [ :width                , :integer ],
+        [ :height               , :integer ],
+        [ :fixed_placeholder    , :boolean ],
+        [ :options              , :text    ],
+        [ :options_url          , :string  ]
+      ],
+      Caboose::PageBlockFieldValue => [
+        [ :page_block_id        , :integer ],
+        [ :page_block_field_id  , :integer ],
+        [ :value                , :text    ]                
       ],      
       Caboose::Post => [  
         [ :title       , :text     ],  		 	 
@@ -139,11 +169,22 @@ class Caboose::Schema < Caboose::Utilities::Schema
   def self.load_data
 
     c = ActiveRecord::Base.connection    
-    if c.column_exists?(:pages, :content)
-      Caboose::Page.reorder(:id).all.each do |p|
-        Caboose::PageBlock.create( :page_id => p.id, :block_type => 'richtext', :value => p.content )        
-      end      
-      c.remove_column(:pages, :content)
+    #if c.column_exists?(:pages, :content)
+    #  Caboose::Page.reorder(:id).all.each do |p|
+    #    Caboose::PageBlock.create( :page_id => p.id, :block_type => 'richtext', :value => p.content )        
+    #  end      
+    #  c.remove_column(:pages, :content)
+    #end
+      
+    if !Caboose::PageBlockType.where(:name => 'heading').exists?
+      bt = Caboose::PageBlockType.create(:name => 'heading', :description => 'Heading')
+      Caboose::PageBlockField.create(:page_block_type_id => bt.id, :name => 'text', :field_type => 'text', :nice_name => 'Text', :default => '', :width => 800, :fixed_placeholder => false)
+      Caboose::PageBlockField.create(:page_block_type_id => bt.id, :name => 'size', :field_type => 'text', :nice_name => 'Size', :default =>  1, :width => 800, :fixed_placeholder => false, :options => "1|2|3|4|5|6")
+    end
+    
+    if !Caboose::PageBlockType.where(:name => 'richtext').exists?
+      bt = Caboose::PageBlockType.create(:name => 'richtext', :description => 'Rich Text')
+      Caboose::PageBlockField.create(:page_block_type_id => bt.id, :name => 'text', :field_type => 'richtext', :nice_name => 'Text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
     end
     
     admin_user = nil

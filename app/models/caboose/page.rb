@@ -43,10 +43,10 @@ class Caboose::Page < ActiveRecord::Base
     self.page_blocks
   end
   
-  def content
-    return "" if self.blocks.nil? || self.blocks.count == 0
-    self.blocks.collect { |b| b.render }.join("\n")     
-  end
+  #def content
+  #  return "" if self.blocks.nil? || self.blocks.count == 0
+  #  self.blocks.collect { |b| b.render }.join("\n")     
+  #end
     
   def self.find_with_fields(page_id, fields)
     return self.where(:id => page_id).select(fields).first

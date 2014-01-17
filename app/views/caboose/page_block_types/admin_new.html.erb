@@ -1,0 +1,30 @@
+
+<h1>New Block Type</h1>
+<p><input type='text' id='name' name='name' placeholder='Name' /></p>
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/page-block-types';" />
+<input type='button' value='Add Field' onclick="add_block_type();" />
+</p>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+function add_block_type()
+{
+  $('#message').empty().append($('<p/>').addClass('loading').html('Adding block type...'));
+  $.ajax({
+    url: '/admin/page-block-types',
+    type: 'post',
+    data: {
+      name: $('#name').val()
+    },      
+    success: function(resp) {
+      if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

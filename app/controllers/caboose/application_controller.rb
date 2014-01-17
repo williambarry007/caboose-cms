@@ -73,8 +73,11 @@ module Caboose
       i = arr.count - 1
       while i >= 1 do
         k = arr[i-1]
-        v = arr[i]
-        params[k] = v if v && v.length > 0
+        v = arr[i]    
+        if v && v.length > 0
+          v = v.gsub('%20', ' ')
+          params[k] = v
+        end
         i = i-2
       end      
     end

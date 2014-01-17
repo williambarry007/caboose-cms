@@ -31,22 +31,46 @@ module Caboose
     # GET /admin/pages/:page_id/blocks/:id/render
     def admin_render
       return unless user_is_allowed('pages', 'edit')      
-      block = PageBlock.find(params[:id])             
-      render :text => block.render(params[:empty_text])
+      b = PageBlock.find(params[:id])
+      bt = b.page_block_type
+      html = nil
+      
+      if bt.use_render_function && bt.render_function
+        html = b.render_from_function(params[:empty_text])        
+      else        
+        html = render_to_string({
+          :partial => "caboose/page_blocks/#{b.page_block_type.name}",
+          :locals => { 
+            :block => b,
+            :empty_text => params[:empty_text] 
+          }
+        })
+      end
+      render :json => html            
     end
     
     # GET /admin/pages/:page_id/blocks/render
     def admin_render_all
       return unless user_is_allowed('pages', 'edit')
       p = Page.find(params[:page_id])
-      blocks = p.blocks.collect { |b| {
-        :id => b.id,
-        :block_type => b.block_type,
-        :sort_order => b.sort_order,          
-        :name => b.name,
-        :value => b.value,
-        :html => b.render(params[:empty_text])
-      }}      
+      blocks = p.page_blocks.collect do |b|
+        bt = b.page_block_type
+        html = nil        
+        if bt.use_render_function && bt.render_function
+          html = b.render_from_function(params[:empty_text])        
+        else        
+          html = render_to_string({
+            :partial => "caboose/page_blocks/#{bt.name}",
+            :locals => { :block => b, :empty_text => params[:empty_text] }
+          })
+        end                     
+        {
+          :id => b.id,
+          :page_block_type_id => bt.id,
+          :sort_order => b.sort_order,
+          :html => html        
+        }
+      end
       render :json => blocks
     end
     
@@ -54,8 +78,10 @@ module Caboose
     def admin_edit
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:page_id])
-      @block = PageBlock.find(params[:id])
-      render "caboose/page_blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/modal'
+      PageBlock.create_field_values(params[:id])
+      @block = PageBlock.find(params[:id])              
+      #render "caboose/page_blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/modal'
+      render :layout => 'caboose/modal'
     end
     
     # POST /admin/pages/:page_id/blocks
@@ -68,10 +94,8 @@ module Caboose
       })
 
       b = PageBlock.new            
-      b.page_id     = params[:page_id].to_i
-      b.block_type  = params[:block_type]
-      b.name        = params[:name]  if params[:name]
-      b.value       = params[:value] if params[:value]      
+      b.page_id = params[:page_id].to_i
+      b.page_block_type_id = params[:page_block_type_id]
                     
       if !params[:index].nil?      
         b.sort_order = params[:index].to_i
@@ -101,28 +125,16 @@ module Caboose
       
       resp = StdClass.new({'attributes' => {}})
       b = PageBlock.find(params[:id])
+      obj = b.object      
       
       save = true
-      user = logged_in_user
-      params.each do |name, value|
-        case name          
-        when 'block_type'
-          b.block_type = value
-        when 'sort_order'          
-          b.sort_order = value.to_i
-          i = b.sort_order + 1
-          PageBlock.where("page_id = ? and sort_order >= ?", b.page_id, b.sort_order).reorder(:sort_order).each do |b2|
-            b2.sort_order = i
-            b2.save
-            i = i + 1          
-          end        
-        when 'name'
-          b.name = value          
-        when 'value'    
-          b.value = value      
-        end
-      end
-    
+      user = logged_in_user      
+      
+      b.block_type_definition[:attributes].each do |attrib|        
+        obj[attrib[:name]] = params[attrib[:name]] if params[attrib[:name]]
+      end      
+      
+      b.value = JSON.generate(obj)    
       resp.success = save && b.save
       render :json => resp
     end
@@ -138,4 +150,5 @@ module Caboose
     end
 		
   end
+  
 end

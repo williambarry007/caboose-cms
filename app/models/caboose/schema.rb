@@ -143,6 +143,14 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :page_id , :integer  ],
         [ :action  , :string   ]
       ],
+      Caboose::AbVariant => [
+        [ :name           , :string ],
+        [ :analytics_name , :string ],
+      ],
+      Caboose::AbOption => [
+        [ :text , :string ],
+        [ :ab_variant_id , :integer ]
+      ],
       Caboose::DatabaseSession => [
         [ :session_id  , :string   , :null => false ],
         [ :data        , :text                      ],

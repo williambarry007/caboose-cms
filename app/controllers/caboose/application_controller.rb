@@ -13,6 +13,7 @@ module Caboose
       @page = Page.page_with_uri(request.fullpath)
       
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
+      assign_ab_variants
       
       @crumb_trail  = Caboose::Page.crumb_trail(@page)
 		  @subnav       = {}
@@ -23,8 +24,43 @@ module Caboose
       
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user
+
+      Caboose.log session
       
       before_action
+    end
+
+    # sets the ab_variants for the user's session
+    def assign_ab_variants
+      unless session['ab_variants']
+        session['ab_variants'] = Hash.new()
+        session['analytics_string'] = "|"
+        AbVariant.find_each do |var|
+          opt = var.get_session_option
+          session['ab_variants'][var.analytics_name] = opt[:text]
+          session['analytics_string'] = session['analytics_string'] + "#{var.analytics_name}=#{opt[:id]}|"
+        end
+      end
+    end
+
+    # finds and returns the variant option for the session. if 
+    # no variant option is found (for example, if new variants were
+    # added during a user's session), create a variant option for 
+    # the session
+    def get_ab_option_for(analytics_name)
+      # we don't need a new variant if it's been assigned.
+      unless session['ab_variants'][variant_name]
+        # get the variant
+        var = AbVariant.find(analytics_name: variant_name).first
+        # get an option for it
+        opt = var.get_session_option
+        # set the variants hash to the text
+        session['ab_variants'][var.analytics_name] = opt[:text]
+        # add to the analytics string
+        session['analytics_string'] = session['analytics_string'] + "#{var.analytics_name}=#{opt[:id]}|"
+      end
+
+      return session['ab_variants'][variant_name]
     end
     
     # Parses any parameters in the URL and adds them to the params
@@ -96,6 +132,8 @@ module Caboose
       return session["app_user"]
     end
     
+    # DEPRECATED: Use user_is_allowed_to(action, resource)
+    #
     # Checks to see if a user has permission to perform the given action 
     # on the given resource.
     # Redirects to login if not logged in.
@@ -115,7 +153,31 @@ module Caboose
       
       return true    
     end
-    
+
+    # Checks to see if a user has permission
+    # to perform action on resource
+    #
+    # Redirects to login if not logged in
+    # Redirects to error page with message if not allowed
+    #
+    # useful for creating super-readable code, for example:
+    #   > return unless user_is_allowed_to 'edit', 'pages'
+    # Even your mom could read that code.
+    def user_is_allowed_to(action, resource)
+      unless logged_in?
+        redirect_to "/login?return_url=" + URI.encode(request.fullpath)
+        return false
+      end
+
+      @user = logged_in_user
+      unless @user.is_allowed(resource, action)
+        @error = "You don't have permission to #{action} #{resource}"
+        render :template => "caboose/extras/error"
+        return false
+      end
+      return true
+    end
+
     # Redirects to login if not logged in.
     def verify_logged_in
       if (!logged_in?)
@@ -134,6 +196,8 @@ module Caboose
       url2 += "?" + qs.join('&') if qs.count > 0 
       return url2
     end
+
+
     
     #def auth_or_error(message)
     #  if (!logged_in?)

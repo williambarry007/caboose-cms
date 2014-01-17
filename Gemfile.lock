@@ -1,7 +1,11 @@
 PATH
   remote: .
   specs:
+<<<<<<< HEAD
+    caboose-cms (0.3.6)
+=======
     caboose-cms (0.3.9)
+>>>>>>> fe1985374f8505b1c1ed55edad321f64d69e901b
       colorbox-rails
       jquery-rails
       jquery-ui-rails

@@ -34,15 +34,33 @@ module Caboose
     def assign_ab_variants
       unless session['ab_variants']
         session['ab_variants'] = Hash.new()
-      end
-      session['analytics_string'] = "|"
-      AbVariant.find_each do |var|
-        opt = var.get_session_option
-        unless session['ab_variants'][var.analytics_name]
+        session['analytics_string'] = "|"
+        AbVariant.find_each do |var|
+          opt = var.get_session_option
           session['ab_variants'][var.analytics_name] = opt[:text]
+          session['analytics_string'] = session['analytics_string'] + "#{var.analytics_name}=#{opt[:id]}|"
         end
+      end
+    end
+
+    # finds and returns the variant option for the session. if 
+    # no variant option is found (for example, if new variants were
+    # added during a user's session), create a variant option for 
+    # the session
+    def get_ab_option_for(analytics_name)
+      # we don't need a new variant if it's been assigned.
+      unless session['ab_variants'][variant_name]
+        # get the variant
+        var = AbVariant.find(analytics_name: variant_name).first
+        # get an option for it
+        opt = var.get_session_option
+        # set the variants hash to the text
+        session['ab_variants'][var.analytics_name] = opt[:text]
+        # add to the analytics string
         session['analytics_string'] = session['analytics_string'] + "#{var.analytics_name}=#{opt[:id]}|"
       end
+
+      return session['ab_variants'][variant_name]
     end
     
     # Parses any parameters in the URL and adds them to the params

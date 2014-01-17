@@ -1,0 +1,72 @@
+<h1>Editing AB Test Variant</h1>
+
+<div id="ab_variant_<%= @variant.id %>_name"></div>
+<div id="ab_variant_<%= @variant.id %>_analytics_name"></div>
+<% @variant.ab_options.sort_by{|o| [o.id]}.each do |opt| %>
+  <div id=<%="ab_variant_#{@variant.id}_option#{opt.id}"%>></div>
+<% end %>
+<div id="new_ab_option">
+  <input type='text' name='option_name' id='option_name' value='New Option Text'>
+  <input type='button' value='Add New Option' onclick="new_option();" >
+<div id="message"></div>
+
+<div id='controls'>
+  <input type='button' value='Back' onclick="window.location='/admin/ab-variants';" >
+</div>
+
+<% content_for :caboose_js do %>
+  <%= javascript_include_tag "caboose/model/all" %>
+  <script type="text/javascript">
+    
+
+    function new_option() {
+      $('#message').html("<p class='loading'>Adding new A/B Option...</p>");
+      $.ajax({
+        url: '/admin/ab-variants/<%= @variant.id %>/new-option',
+        type: 'post',
+        data: $('#option_name').serialize(),
+        success: function(resp) {
+          if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+          if (resp.redirect) window.location = resp.redirect;
+        }
+      });
+    }
+
+    // make a new array to hold our options
+    var options = []
+
+    // add a new element for each option
+    <% @variant.ab_options.each do |opt| %>
+      options.push({
+        name: 'option<%=opt.id%>',
+        nice_name: 'Option <%= opt.id %>',
+        type: 'text',
+        value: <%= raw Caboose.json(opt.text) %>
+      });
+    <% end %>
+
+    $(document).ready(function() {
+      m = new ModelBinder({
+        name: 'ab_variant',
+        id: <%= @variant.id %>,
+        update_url: '/admin/ab-variants/<%= @variant.id %>',
+        authenticity_token: '<%= form_authenticity_token %>',
+        attributes: [
+          {
+            name: 'name',
+            nice_name: 'Variant Name',
+            type: 'text',
+            value: <%= raw Caboose.json(@variant.name) %>
+          },{
+            name: 'analytics_name',
+            nice_name: 'Google Analytics Name',
+            type: 'text',
+            value: <%= raw Caboose.json(@variant.analytics_name) %>
+          }
+          // add the variant options array to the end of the ModelBinder.
+        ].concat(options)
+      }); 
+    });
+  </script>
+<% end %>
+

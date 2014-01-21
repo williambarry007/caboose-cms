@@ -4,10 +4,8 @@
 # complicated behavior
 class Caboose::AbVariant < ActiveRecord::Base
   self.table_name = "ab_variants"
-  has_many :ab_options
-
-  # name is the name of the variant
-  # analytics name is a machine-readable name that will be send to GA
+  
+  has_many :ab_options, :order => 'id', :dependent => :destroy
   attr_accessible :name, :analytics_name
 
   def get_session_option
@@ -15,5 +13,10 @@ class Caboose::AbVariant < ActiveRecord::Base
     opt = self.ab_options.sample
     return {text: opt.text, id: opt.id}
   end
+  
+  #def random_option
+  #  return nil self.ab_options.nil? || self.ab_options.count == 0
+  #  return self.ab_options.sample    
+  #end
 
 end

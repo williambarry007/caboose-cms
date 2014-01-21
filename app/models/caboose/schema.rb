@@ -148,7 +148,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :analytics_name , :string ],
       ],
       Caboose::AbOption => [
-        [ :text , :string ],
+        [ :text          , :string  ],
         [ :ab_variant_id , :integer ]
       ],
       Caboose::DatabaseSession => [

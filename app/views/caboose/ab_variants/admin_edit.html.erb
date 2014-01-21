@@ -1,0 +1,99 @@
+<h1>Editing AB Test Variant</h1>
+
+<div id="abvariant_<%= @variant.id %>_name"></div>
+<div id="abvariant_<%= @variant.id %>_analytics_name"></div>
+
+<p>Google analytics search term: <code>caboose_ab_variants="*|<%= @variant.analytics_name %>=1|*"</code></p>
+<h2>Options</h2>
+<% if @variant.ab_options && @variant.ab_options.count > 0 %>  
+  <table>
+  <% @variant.ab_options.each do |opt| %>
+    <tr>
+      <td><div id="aboption_<%= opt.id %>_text"></div></td>
+      <td><input type='button' value='Delete' onclick="delete_option(<%= opt.id %>);" /></td>
+    </tr>
+  <% end %>
+  </table>
+<% else %>
+  <p>This variant doesn't have any options.</p>
+<% end %>
+
+<div id="message"></div>
+<p>
+<input type='button' value='Back' onclick="window.location='/admin/ab-variants';" >
+<input type='button' value='Add New Option' onclick="add_option();" >
+</p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+function delete_option(option_id, confirm) 
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append("Are you sure you want to delete the option? ")
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_option(option_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));      
+    $('#message').empty().append(p);
+    return;
+  }  
+  $('#message').empty().html($('<p/>').addClass('loading').html("Deleting option..."));
+  $.ajax({
+    url: '/admin/ab-options/' + option_id,
+    type: 'delete',    
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      else window.location.reload(true);
+    }
+  });
+}
+
+function add_option() {
+  $('#message').html("<p class='loading'>Adding new A/B Option...</p>");
+  $.ajax({
+    url: '/admin/ab-variants/<%= @variant.id %>/options',
+    type: 'post',
+    data: {
+      text: ""
+    },
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location.reload(true);
+    }
+  });
+}
+
+$(document).ready(function() {
+
+  m = new ModelBinder({
+    name: 'abvariant',
+    id: <%= @variant.id %>,
+    update_url: '/admin/ab-variants/<%= @variant.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'name'           , nice_name: 'Variant Name'          , type: 'text', value: <%= raw Caboose.json(@variant.name) %>           , width: 800 },
+      { name: 'analytics_name' , nice_name: 'Google Analytics Name' , type: 'text', value: <%= raw Caboose.json(@variant.analytics_name) %> , width: 800 }      
+    ]
+  });
+
+  <% if @variant.ab_options && @variant.ab_options.count > 0 %>
+    <% i = 1 %>
+    <% @variant.ab_options.each do |opt| %>
+      m = new ModelBinder({
+        name: 'aboption',
+        id: <%= opt.id %>,
+        update_url: '/admin/ab-options/<%= opt.id %>',
+        authenticity_token: '<%= form_authenticity_token %>',
+        attributes: [
+          { name: 'text', nice_name: 'Option <%= i %>', type: 'text', value: <%= raw Caboose.json(opt.text) %> , width: 800 }            
+        ]
+      });
+      <% i = i + 1 %>
+    <% end %>
+  <% end %>
+});
+
+</script>
+<% end %>

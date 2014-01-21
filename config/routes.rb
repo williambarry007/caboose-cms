@@ -116,14 +116,17 @@ Caboose::Engine.routes.draw do
   post    "admin/posts"                           => "posts#admin_add"  
   delete  "admin/posts/:id"                       => "posts#admin_delete"
 
-  get     "admin/ab-variants"                     => "ab_variants#index"
-  get     "admin/ab-variants/new"                 => "ab_variants#new"
-  get     "admin/ab-variants/:id"                 => "ab_variants#edit"
-  put     "admin/ab-variants/:id"                 => "ab_variants#update"
-  post    "admin/ab-variants"                     => "ab_variants#create"
-  post    "admin/ab-variants/:id/new-option"   => "ab_variants#create_option"
-  delete  "admin/ab-variants/:id/delete"          => "ab_variants#delete"
-
+  get     "admin/ab-variants"                     => "ab_variants#admin_index"
+  get     "admin/ab-variants/new"                 => "ab_variants#admin_new"
+  get     "admin/ab-variants/:id"                 => "ab_variants#admin_edit"
+  put     "admin/ab-variants/:id"                 => "ab_variants#admin_update"
+  post    "admin/ab-variants"                     => "ab_variants#admin_create"  
+  delete  "admin/ab-variants/:id"                 => "ab_variants#admin_delete"
+  
+  get     "admin/ab-variants/:variant_id/options" => "ab_options#admin_index"    
+  put     "admin/ab-options/:id"                  => "ab_options#admin_update"
+  post    "admin/ab-variants/:variant_id/options" => "ab_options#admin_create"
+  delete  "admin/ab-options/:id"                  => "ab_options#admin_delete"
   
   match '*path' => 'pages#show'
   root :to => 'pages#show'

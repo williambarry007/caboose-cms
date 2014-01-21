@@ -20,12 +20,13 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
       'text' => 'Settings',
       'children' => []
     }
-    
+        
     item['children'] << { 'id' => 'users'        , 'text' => 'Users'            , 'href' => '/admin/users'            , 'modal' => false } if user.is_allowed('users'          , 'view')
     item['children'] << { 'id' => 'roles'        , 'text' => 'Roles'            , 'href' => '/admin/roles'            , 'modal' => false } if user.is_allowed('roles'          , 'view')
     item['children'] << { 'id' => 'permissions'  , 'text' => 'Permissions'      , 'href' => '/admin/permissions'      , 'modal' => false } if user.is_allowed('permissions'    , 'view')
+    item['children'] << { 'id' => 'blocktypes'   , 'text' => 'AB Test Variants' , 'href' => '/admin/ab-variants'      , 'modal' => false } if user.is_allowed('abvariants'     , 'view')
     item['children'] << { 'id' => 'variables'    , 'text' => 'Variables'        , 'href' => '/admin/settings'         , 'modal' => false } if user.is_allowed('settings'       , 'view')
-    item['children'] << { 'id' => 'blocktypes'   , 'text' => 'Page Block Types' , 'href' => '/admin/page-block-types' , 'modal' => false } if user.is_allowed('pageblocktypes' , 'view')
+    item['children'] << { 'id' => 'blocktypes'   , 'text' => 'Page Block Types' , 'href' => '/admin/page-block-types' , 'modal' => false } if user.is_allowed('pageblocktypes' , 'view')    
         
     nav << item if item['children'].count > 0
     

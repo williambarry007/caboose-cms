@@ -13,7 +13,7 @@ module Caboose
       @page = Page.page_with_uri(request.fullpath)
       
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
-      assign_ab_variants
+      assign_ab_variants      
       
       @crumb_trail  = Caboose::Page.crumb_trail(@page)
 		  @subnav       = {}
@@ -25,44 +25,9 @@ module Caboose
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user
 
-      Caboose.log session
-      
       before_action
     end
 
-    # sets the ab_variants for the user's session
-    def assign_ab_variants
-      unless session['ab_variants']
-        session['ab_variants'] = Hash.new()
-        session['analytics_string'] = "|"
-        AbVariant.find_each do |var|
-          opt = var.get_session_option
-          session['ab_variants'][var.analytics_name] = opt[:text]
-          session['analytics_string'] = session['analytics_string'] + "#{var.analytics_name}=#{opt[:id]}|"
-        end
-      end
-    end
-
-    # finds and returns the variant option for the session. if 
-    # no variant option is found (for example, if new variants were
-    # added during a user's session), create a variant option for 
-    # the session
-    def get_ab_option_for(analytics_name)
-      # we don't need a new variant if it's been assigned.
-      unless session['ab_variants'][variant_name]
-        # get the variant
-        var = AbVariant.find(analytics_name: variant_name).first
-        # get an option for it
-        opt = var.get_session_option
-        # set the variants hash to the text
-        session['ab_variants'][var.analytics_name] = opt[:text]
-        # add to the analytics string
-        session['analytics_string'] = session['analytics_string'] + "#{var.analytics_name}=#{opt[:id]}|"
-      end
-
-      return session['ab_variants'][variant_name]
-    end
-    
     # Parses any parameters in the URL and adds them to the params
     def parse_url_params      
       return if !Caboose.use_url_params      
@@ -196,8 +161,6 @@ module Caboose
       url2 += "?" + qs.join('&') if qs.count > 0 
       return url2
     end
-
-
     
     #def auth_or_error(message)
     #  if (!logged_in?)
@@ -211,5 +174,44 @@ module Caboose
         return "" if v.nil?    
       return v.val
     end
+    
+    #===========================================================================
+    # AB Testing
+    #===========================================================================
+    
+    # Sets the ab_variants for the user's session
+    def assign_ab_variants
+      return if session['ab_variants']
+            
+      h = {}
+      arr = []
+      AbVariant.find_each do |var|
+        next if var.ab_options.nil? || var.ab_options.count == 0
+        i = rand(var.ab_options.count)
+        h[var.analytics_name] = var.ab_options[i].text
+        arr << "#{var.analytics_name}=#{i+1}"
+      end
+      session['ab_variants'] = h
+      session['ab_variants_analytics_string'] = "|#{arr.join('|')}|"
+    end
+
+    # Get the variant option text for the given variant name.     
+    def ab_option_for(analytics_name)
+      assign_ab_variants if session['ab_variants'].nil?
+      return session['ab_variants'][analytics_name] if !session['ab_variants'][analytics_name].nil?
+
+      # Otherwise, add the new variant to the session
+      var = AbVariant.find(:analytics_name => analytics_name).first
+      i = rand(var.ab_options.count)        
+      session['ab_variants'][var.analytics_name] = var.ab_options[i].text      
+      session['ab_variants_analytics_string'] << "#{var.analytics_name}=#{i+1}|"
+    end
+    
+    # Gets the string to be sent to google analytics
+    def analytics_string
+      assign_ab_variants if session['ab_variants_analytics_string'].nil?
+      return "#{session['ab_variants_analytics_string']}"
+    end      
+      
   end
 end

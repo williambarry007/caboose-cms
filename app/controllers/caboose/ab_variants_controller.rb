@@ -7,7 +7,7 @@ module Caboose
     end
 
     # GET /admin/ab_variants
-    def index
+    def admin_index
       return unless user_is_allowed_to 'view', 'ab_variants'
 
       @gen = PageBarGenerator.new(params, {'name' => '', 'analytics_name' => ''}, {
@@ -20,19 +20,19 @@ module Caboose
     end
 
     # GET /admin/ab_variants/new
-    def new
+    def admin_new
       return unless user_is_allowed_to 'add', 'ab_variants'
       @variant = AbVariant.new
     end
 
     # GET /admin/ab_variants/:id
-    def edit
+    def admin_edit
       return unless user_is_allowed_to 'edit', 'ab_variants'
       @variant = AbVariant.find(params[:id])
     end
 
     # POST /admin/ab-variants
-    def create
+    def admin_create
       return unless user_is_allowed_to 'edit', 'ab_variants'
 
       resp = StdClass.new({
@@ -42,82 +42,46 @@ module Caboose
 
       variant = AbVariant.new
       variant.name = params[:name]
-      variant.analytics_name = params[:name].parameterize
+      variant.analytics_name = params[:name].gsub(' ', '_').downcase
 
       if (variant.name.length == 0)
         resp.error = "A name is required."
-      elsif
-        variant.save
+      elsif variant.save
         resp.redirect = "/admin/ab-variants/#{variant.id}"
       end
       
       render json: resp
     end
 
-    # POST admin/ab-variants/:id/new-option'
-    def create_option
-      return unless user_is_allowed_to 'edit','ab_variants'
-      
-      resp = StdClass.new({
-        'error' => nil,
-        'redirect' => nil
-      })
-
-      Caboose.log params[:option_name]
-
-      variant = AbVariant.find(params[:id])
-      variant.ab_options.build(text: params[:option_name]).save
-      variant.save
-      resp.redirect = "/admin/ab-variants/#{variant.id}"
-      
-      render json: resp
-    end
-
     # PUT /admin/ab_variants/:id
-    def update
+    def admin_update
       return unless user_is_allowed_to 'edit', 'ab_variants'
 
       resp = StdClass.new
       variant = AbVariant.find(params[:id])
 
       save = true
-      if params[:name]
-        variant.name = params[:name]
-      end
-      if params[:analytics_name]
-        variant.analytics_name = params[:analytics_name]
-      end
-
-      params.each do |name,value|
-        Caboose.log name.slice(0,6)
-        if name.slice(0,6) == "option"
-          option = AbOption.find(name.to_s.scan(/\d+$/).first)
-          option.text = value
-          option.save
+      params.each do |k,v|
+        case k
+          when 'name'
+            variant.name = v
+            break
+          when 'analytics_name'
+            variant.analytics_name = v
+            break
         end
       end
 
       resp.success = save && variant.save
-      if resp.success
-        Caboose.log "Saved"
-      else
-        Caboose.log "Not saved"
-      end
-
-      render json: resp
+      render :json => resp
     end
 
     # DELETE /admin/ab_variants/:id
-    def destroy
-      return unless user_is_allowed_to 'delete', 'ab_variants'
-      
-      variant = AbVariants.find(params[:id])
-      variant.destroy
-      
-      resp = StdClass.new({
-        'redirect' => '/admin/ab-variants'
-      })
-      render json: resp
+    def admin_destroy
+      return unless user_is_allowed_to 'delete', 'ab_variants'      
+      AbVariants.find(params[:id]).destroy
+      resp = StdClass.new('redirect' => '/admin/ab-variants')
+      render :json => resp
     end
 
   end

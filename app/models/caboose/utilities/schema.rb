@@ -48,8 +48,14 @@ class Caboose::Utilities::Schema
       puts "Creating table #{tbl}..."
       c.create_table tbl if !c.table_exists?(tbl)
       columns.each do |col|
-        puts "Creating column #{tbl}.#{col[0]}..."                 
+        puts "Creating column #{tbl}.#{col[0]}..."
         
+        # Special case for attachments
+        if col[1] == :attachment          
+          c.add_attachment tbl, col[1] if !c.column_exists?(tbl, "#{col[1]}_file_size")            
+          next
+        end
+                
         # Skip if the column exists with the proper data type
         next if c.column_exists?(tbl, col[0], col[1])
         

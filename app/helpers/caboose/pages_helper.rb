@@ -19,10 +19,9 @@ module Caboose
       str << "</li>"
       return str
     end
-    
-    def ab_variants_analytics_code
-      str = session['ab_variants_analytics_string']
-      return "var _gaq = _gaq || [];\n_gaq.push(['_setCustomVar', 1, 'caboose_ab_variants', #{Caboose.json(str)}]);"            
+
+    def ab_testing_analytics_code
+      return "var _gaq = _gaq || [];\n_gaq.push(['_setCustomVar', 1, 'caboose_ab_variants', #{Caboose.json(AbTesting.analytics_string)}]);"            
     end
     
   end

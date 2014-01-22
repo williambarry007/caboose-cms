@@ -13,7 +13,9 @@ module Caboose
       @page = Page.page_with_uri(request.fullpath)
       
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
-      assign_ab_variants      
+      
+      # Initialize AB Testing
+      AbTesting.init(request.session_options[:id])      
       
       @crumb_trail  = Caboose::Page.crumb_trail(@page)
 		  @subnav       = {}
@@ -174,44 +176,6 @@ module Caboose
         return "" if v.nil?    
       return v.val
     end
-    
-    #===========================================================================
-    # AB Testing
-    #===========================================================================
-    
-    # Sets the ab_variants for the user's session
-    def assign_ab_variants
-      return if session['ab_variants']
-            
-      h = {}
-      arr = []
-      AbVariant.find_each do |var|
-        next if var.ab_options.nil? || var.ab_options.count == 0
-        i = rand(var.ab_options.count)
-        h[var.analytics_name] = var.ab_options[i].text
-        arr << "#{var.analytics_name}=#{i+1}"
-      end
-      session['ab_variants'] = h
-      session['ab_variants_analytics_string'] = "|#{arr.join('|')}|"
-    end
-
-    # Get the variant option text for the given variant name.     
-    def ab_option_for(analytics_name)
-      assign_ab_variants if session['ab_variants'].nil?
-      return session['ab_variants'][analytics_name] if !session['ab_variants'][analytics_name].nil?
-
-      # Otherwise, add the new variant to the session
-      var = AbVariant.find(:analytics_name => analytics_name).first
-      i = rand(var.ab_options.count)        
-      session['ab_variants'][var.analytics_name] = var.ab_options[i].text      
-      session['ab_variants_analytics_string'] << "#{var.analytics_name}=#{i+1}|"
-    end
-    
-    # Gets the string to be sent to google analytics
-    def analytics_string
-      assign_ab_variants if session['ab_variants_analytics_string'].nil?
-      return "#{session['ab_variants_analytics_string']}"
-    end      
       
   end
 end

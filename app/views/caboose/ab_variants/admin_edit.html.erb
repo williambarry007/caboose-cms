@@ -9,7 +9,7 @@
   <table>
   <% @variant.ab_options.each do |opt| %>
     <tr>
-      <td><div id="aboption_<%= opt.id %>_text"></div></td>
+      <td><div id="aboption_<%= opt.id %>_value"></div></td>
       <td><input type='button' value='Delete' onclick="delete_option(<%= opt.id %>);" /></td>
     </tr>
   <% end %>
@@ -55,9 +55,7 @@ function add_option() {
   $.ajax({
     url: '/admin/ab-variants/<%= @variant.id %>/options',
     type: 'post',
-    data: {
-      text: ""
-    },
+    data: { value: "" },
     success: function(resp) {
       if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
       if (resp.redirect) window.location.reload(true);
@@ -87,7 +85,7 @@ $(document).ready(function() {
         update_url: '/admin/ab-options/<%= opt.id %>',
         authenticity_token: '<%= form_authenticity_token %>',
         attributes: [
-          { name: 'text', nice_name: 'Option <%= i %>', type: 'text', value: <%= raw Caboose.json(opt.text) %> , width: 800 }            
+          { name: 'value', nice_name: 'Option <%= i %>', type: 'text', value: <%= raw Caboose.json(opt.value) %> , width: 800 }            
         ]
       });
       <% i = i + 1 %>

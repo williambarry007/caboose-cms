@@ -33,6 +33,11 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')      
       b = PageBlock.find(params[:id])
       bt = b.page_block_type
+      if bt.nil?
+        bt = PageBlockType.where(:name => 'richtext').first 
+        b.page_block_type_id = bt.id
+        b.save
+      end
       html = nil
       
       if bt.use_render_function && bt.render_function
@@ -55,6 +60,11 @@ module Caboose
       p = Page.find(params[:page_id])
       blocks = p.page_blocks.collect do |b|
         bt = b.page_block_type
+        if bt.nil?
+          bt = PageBlockType.where(:name => 'richtext').first 
+          b.page_block_type_id = bt.id
+          b.save
+        end
         html = nil        
         if bt.use_render_function && bt.render_function
           html = b.render_from_function(params[:empty_text])        

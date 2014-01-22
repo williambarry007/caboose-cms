@@ -36,8 +36,8 @@ module Caboose
       save = true
       params.each do |k,v|
         case k
-          when 'text'
-            opt.text = v
+          when 'value'
+            opt.value = v
             break
         end
       end      

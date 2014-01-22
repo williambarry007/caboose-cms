@@ -12,7 +12,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
   def self.removed_columns
     {
       Caboose::PageBlock => [:block_type, :value, :name],      
-      Caboose::PageBlockField => [:model_binder_options]      
+      Caboose::PageBlockField => [:model_binder_options],
+      Caboose::AbValue => [:i, :text],
+      Caboose::AbOption => [:text]
     }
   end
   
@@ -147,9 +149,14 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name           , :string ],
         [ :analytics_name , :string ],
       ],
-      Caboose::AbOption => [
-        [ :text          , :string  ],
-        [ :ab_variant_id , :integer ]
+      Caboose::AbOption => [        
+        [ :ab_variant_id , :integer ],
+        [ :value         , :string  ]
+      ],
+      Caboose::AbValue => [
+        [ :session_id    , :string  ],
+        [ :ab_variant_id , :integer ],
+        [ :ab_option_id  , :integer ]
       ],
       Caboose::DatabaseSession => [
         [ :session_id  , :string   , :null => false ],

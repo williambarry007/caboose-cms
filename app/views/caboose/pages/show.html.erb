@@ -15,7 +15,12 @@
 
 <% content_for :page_title   do %><%= raw @page.title   %><% end %>
 <% content_for :page_content do %><% @page.blocks.each do |b|
-  bt = b.page_block_type       
+  bt = b.page_block_type
+  if bt.nil?
+    bt = PageBlockType.where(:name => 'heading').first 
+    b.page_block_type_id = bt.id
+    b.save
+  end
   if bt.use_render_function && bt.render_function
     %><%= raw b.render_from_function(params[:empty_text]) %><%        
   else        

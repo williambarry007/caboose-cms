@@ -45,6 +45,9 @@ $(document).ready(function() {
 </script>
 <% if use_tinymce %>
 <%= tinymce_assets %>
+<script type='textjavascript'>
+document.domain = "<%= Rails.application.config.action_controller.asset_host %>";
+</script>
 <%= tinymce :caboose, width: '800px', height:'300px' %>
 <% end %>
 <% end %>

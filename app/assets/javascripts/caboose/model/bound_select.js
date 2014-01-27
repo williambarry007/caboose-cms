@@ -48,7 +48,14 @@ BoundSelect = BoundControl.extend({
         .css('padding-left', '+=' + w)
         .css('width', '-=' + w);
     }
+    
+    //this.update_options();
       
+    //var this2 = this;
+    //this.attribute.populate_options(function() {
+    //  this2.print_options(this2);
+    //});    
+    
     var this2 = this;
     this.attribute.populate_options(function() {
       var select = $('<select/>')
@@ -72,6 +79,35 @@ BoundSelect = BoundControl.extend({
       $('#'+this2.el+'_select').css('width', $('#'+this2.el).outerWidth());      
     });
   },
+             
+  //update_options: function() {    
+  //  var that = this;
+  //  this.attribute.populate_options(function() {          
+  //    var select = $('<select/>')
+  //      .attr('id', that.el + '_select')
+  //      .addClass('fake')
+  //      .css('width', $('#'+that.el).outerWidth())
+  //      .on('change', function() {
+  //        $('#'+that.el).val($('#'+that.el+'_select').val());
+  //        that.save();                     
+  //      });
+  //          
+  //    $.each(that.attribute.options, function(i, option) {      
+  //      var opt = $('<option/>')
+  //        .val(option.value)
+  //        .html(option.text);
+  //      if (option.value == that.attribute.value)
+  //        opt.attr('selected', 'true');
+  //      select.append(opt);
+  //    });
+  //    
+  //    if ($('#' + that.el + '_select').length) 
+  //      $('#' + that.el + '_select').remove();
+  //    
+  //    $('#'+that.el+'_container').append(select);    
+  //    $('#'+that.el+'_select').css('width', $('#'+that.el).outerWidth());
+  //  });
+  //},
   
   view: function() {
     

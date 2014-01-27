@@ -23,7 +23,7 @@ Attribute.prototype = {
   
   update_url: false,
   options_url: false,
-  options: false,
+  options: false, 
   
   save: function(after) {
     if (this.before_update) this.before_update();    
@@ -51,7 +51,7 @@ Attribute.prototype = {
   
   populate_options: function(after) {
     if (!this.options_url)
-      return;
+      return;    
     if (this.options)
     {
       if (after) after();

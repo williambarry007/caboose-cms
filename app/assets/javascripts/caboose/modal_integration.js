@@ -42,18 +42,15 @@ CabooseModal.prototype = {
 };
 
 $(document).ready(function() {
-  caboose_modal('caboose_login');
-  caboose_modal('caboose_register');
-  caboose_modal('caboose_station');  
-  //$('#caboose_login'    ).colorbox({ iframe: true, initialWidth: 400, initialHeight: 200, innerWidth: 400, innerHeight: 200, scrolling: false, transition: 'fade', closeButton: false, onComplete: fix_colorbox, opacity: 0.50 });
-  //$('#caboose_register' ).colorbox({ iframe: true, initialWidth: 400, initialHeight: 324, innerWidth: 400, innerHeight: 324, scrolling: false, transition: 'fade', closeButton: false, onComplete: fix_colorbox, opacity: 0.50 });
-  //$('#caboose_station'  ).colorbox({ iframe: true, initialWidth: 200, initialHeight: 50,  innerWidth: 200, innerHeight:  50, scrolling: false, transition: 'fade', closeButton: false, onComplete: fix_colorbox, opacity: 0.50 });
-  $('a.caboose_modal').each(function(i, a) { caboose_modal(a); });  
+  //caboose_modal('caboose_login');
+  //caboose_modal('caboose_register');
+  //caboose_modal('caboose_station');    
+  $('a.caboose_modal').each(function(i, a) { caboose_modal($(a)); });  
 });
 
 function caboose_modal(el)
 {
-  $(typeof(el) == 'String' ? '#'+el : el).colorbox({ 
+  var options = { 
     iframe: true, 
     initialWidth: 400, 
     initialHeight: 200, 
@@ -64,7 +61,11 @@ function caboose_modal(el)
     closeButton: false, 
     onComplete: caboose_fix_colorbox, 
     opacity: 0.50 
-  });  
+  };  
+  if (typeof(el) == 'string')
+    $('#'+el).colorbox(options);
+  else
+    el.colorbox(options);  
 }
 
 function caboose_modal_url(url)

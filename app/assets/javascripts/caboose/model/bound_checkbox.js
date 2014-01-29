@@ -35,17 +35,23 @@ BoundCheckbox = BoundControl.extend({
     var cb = $('<input/>')
       .attr('id', this.el)
       .attr('type', 'checkbox')      
-      .attr('checked', this.attribute.value)
+      .attr('checked', this.attribute.value == 1)
       .on('change', function() {        
         this2.save(); 
-      });
-    if (this.attribute.align == 'right')
-      cb.css('left', this.attribute.width - 10)
-    else if (this.attribute.align == 'center')
-      cb.css('left', Math.floor($('#'+this.el+'_container').outerWidth()/2))
-    else // left
-      cb.css('left', $('#'+this.placeholder).outerWidth() + 10)
+      });    
     $('#'+this.el+'_container').append(cb);
+    
+    if (this.attribute.align == 'right')
+      $('#'+this.el).css('left', this.attribute.width - 10)
+    else if (this.attribute.align == 'center')
+      $('#'+this.el).css('left', Math.floor($('#'+this.el+'_container').outerWidth()/2))
+    else // left
+    {
+      //alert(this.placeholder);
+      //alert($('#'+this.placeholder).html());
+      //alert($('#'+this.placeholder).outerWidth());
+      $('#'+this.el).css('left', $('#'+this.placeholder).outerWidth(true) + 10);
+    }
     
     $('#'+this.el+'_container').append($('<input/>')
       .attr('type', 'text')

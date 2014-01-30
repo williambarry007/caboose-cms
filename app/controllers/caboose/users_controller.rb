@@ -124,7 +124,7 @@ module Caboose
     	  	when "first_name", "last_name", "username", "email"
     	  	  user[name.to_sym] = value
     	  	when "password"			  
-    	  	  confirm = params[:confirm]
+    	  	  confirm = params[:password2]
     	  		if (value != confirm)			
     	  		  resp.error = "Passwords do not match.";
     	  		  save = false

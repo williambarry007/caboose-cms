@@ -6,7 +6,11 @@ namespace :caboose do
   desc "Creates/verifies that all database tables and fields are correctly added."
   task :db => :environment do
     Caboose::Schema.create_schema
-    Caboose::Schema.load_data
+    Caboose::Schema.load_data    
+    if class_exists?('Schema')
+      Schema.create_schema
+      Schema.load_data
+    end
   end
 
   desc "Creates all caboose tables"
@@ -16,6 +20,13 @@ namespace :caboose do
   task :load_data => :environment do Caboose::Schema.load_data end
 
   #=============================================================================
+  
+  def class_exists?(class_name)
+    klass = Module.const_get(class_name)
+      return klass.is_a?(Class)
+    rescue NameError
+      return false
+  end
   
   desc "Resets the admin password to 'caboose'"
   task :reset_admin_pass => :environment do  

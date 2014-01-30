@@ -2,7 +2,6 @@
 
 $(document).ready(function() {
 	$('[placeholder]').focus(function() {
-	  console.log("PH"); 
 	  var input = $(this);
 	  if (input.val() == input.attr('placeholder')) {
 	    input.val('');

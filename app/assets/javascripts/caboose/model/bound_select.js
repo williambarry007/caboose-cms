@@ -66,7 +66,21 @@ BoundSelect = BoundControl.extend({
           $('#'+this2.el).val($('#'+this2.el+'_select').val());
           this2.save();                     
         });
-        
+      // Make sure the existing value is in the list of options
+      var exists = false;
+      $.each(this2.attribute.options, function(i, option) {
+        if (option.value == this2.attribute.value)
+        {
+          exists = true;
+          return false;
+        }
+      });
+      if (!exists)
+        this2.attribute.options.unshift({ 
+          value: this2.attribute.value,
+          text: this2.attribute.text
+        });
+
       $.each(this2.attribute.options, function(i, option) {
         var opt = $('<option/>')
           .val(option.value)
@@ -74,9 +88,9 @@ BoundSelect = BoundControl.extend({
         if (option.value == this2.attribute.value)
           opt.attr('selected', 'true');
         select.append(opt);
-      });
+      });      
       $('#'+this2.el+'_container').append(select);
-      $('#'+this2.el+'_select').css('width', $('#'+this2.el).outerWidth());      
+      $('#'+this2.el+'_select').css('width', $('#'+this2.el).outerWidth());            
     });
   },
              

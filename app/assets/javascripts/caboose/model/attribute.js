@@ -2,6 +2,8 @@
 var Attribute = function(params) {
   for (var thing in params)
     this[thing] = params[thing];
+  if (!this.text)
+    this.text = this.value;
   this.value_clean = this.value;  
 };
 

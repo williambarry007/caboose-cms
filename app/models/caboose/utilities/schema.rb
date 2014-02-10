@@ -52,7 +52,7 @@ class Caboose::Utilities::Schema
         
         # Special case for attachments
         if col[1] == :attachment          
-          c.add_attachment tbl, col[1] if !c.column_exists?(tbl, "#{col[1]}_file_size")            
+          c.add_attachment tbl, col[0] if !c.column_exists?(tbl, "#{col[0]}_file_size")            
           next
         end
                 

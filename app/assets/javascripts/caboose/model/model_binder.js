@@ -58,6 +58,7 @@ ModelBinder.prototype = {
         binder: this2
       };
       var control = false;
+      
       if (attrib.type == 'text')                   control = new BoundText(opts);
       else if (attrib.type == 'select')            control = new BoundSelect(opts);
       else if (attrib.type == 'checkbox')          control = new BoundCheckbox(opts);
@@ -65,6 +66,14 @@ ModelBinder.prototype = {
       else if (attrib.type == 'textarea')          control = new BoundTextarea(opts);
       else if (attrib.type == 'richtext')          control = new BoundRichText(opts);
       else if (attrib.type == 'image')             control = new BoundImage(opts);
+      else if (attrib.type == 'file')              control = new BoundFile(opts);
+      else
+      {
+        control_class = "";
+        $.each(attrib.type.split('-'), function(j, word) { control_class += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });
+        control = eval("new Bound" + control_class + "(opts)"); 
+      }
+      
       this2.controls.push(control);    
     });
     

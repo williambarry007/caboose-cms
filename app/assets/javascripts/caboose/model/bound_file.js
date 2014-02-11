@@ -31,12 +31,16 @@ BoundFile = BoundControl.extend({
       );
     }
     
-    tr.append($('<td/>').append($('<a/>')
+    var td = $('<td/>').append($('<a/>')
       .attr('id', this.el + '_link')
       .attr('href', this.attribute.value)
-      .html('Download current file')
+      .attr('target', '_blank')
+      .html(this.attribute.download_text ? this.attribute.download_text : 'Download current file')
       .css('margin-right', 10)      
-    ));    
+    );
+    if (this.attribute.value == false)
+      td.css('display', 'none');
+    tr.append(td);
     
     tr.append($('<td/>').append($('<form/>')
       .attr('action', this.attribute.update_url)
@@ -48,10 +52,13 @@ BoundFile = BoundControl.extend({
          $('#'+this2.el+'_message').html("<p class='loading'>Uploading...</p>");
          $('#'+this2.el+'_iframe').on('load', function() { this2.post_upload(); });  
       })
-      .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(this.binder.authenticity_token))
-      .append($('<input/>').attr('type', 'button').val('Update ' + this.attribute.nice_name).click(function() { 
+      .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(this.binder.authenticity_token))      
+      .append($('<a/>').attr('href', '#').html(this.attribute.upload_text ? this.attribute.upload_text : 'Update ' + this.attribute.nice_name).click(function() { 
         $('#'+this2.el+'_container input[type="file"]').click(); 
-      }))
+      }))      
+      //.append($('<input/>').attr('type', 'button').val('Update ' + this.attribute.nice_name).click(function() { 
+      //  $('#'+this2.el+'_container input[type="file"]').click(); 
+      //}))
       .append($('<input/>')
         .attr('type', 'file')
         .attr('name', this.attribute.name)
@@ -96,7 +103,8 @@ BoundFile = BoundControl.extend({
       this.error(resp.error);
     else
     {
-      $('#'+this.el+'_container a').attr('href', this.attribute.value);      
+      $('#'+this.el+'_link').parent().css('display', 'block');
+      $('#'+this.el+'_link').attr('href', this.attribute.value);      
       //$('#'+this.el+'_container img').attr('src', this.attribute.value);
     }
   },

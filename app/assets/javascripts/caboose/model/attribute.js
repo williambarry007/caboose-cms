@@ -22,6 +22,8 @@ Attribute.prototype = {
   before_cancel: false,
   after_cancel: false,
   debug: false,
+  download_text: false,
+  upload_text: false,
   
   update_url: false,
   options_url: false,

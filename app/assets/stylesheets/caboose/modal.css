@@ -190,7 +190,7 @@ select.fake option {
 }
 
 #modal_content input[type='checkbox'] {
-  position: absolute;
+  /*position: absolute;*/
   top: 4px;
   left: 0;
   z-index: 19;

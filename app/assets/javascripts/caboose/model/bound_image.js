@@ -83,7 +83,7 @@ BoundImage = BoundControl.extend({
     if (resp.error)
       this.error(resp.error);
     else
-      $('#'+this.el+'_container img').attr('src', this.attribute.value);
+      $('#'+this.el+'_container img').attr('src', this.attribute.value + '?' + Math.random());
   },
     
   error: function(str) {

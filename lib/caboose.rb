@@ -29,5 +29,17 @@ module Caboose
   # Whether or not to use URL parameters (parameters embedded in the URL before the querystring)
   mattr_accessor :use_url_params
   @@use_url_params = true
+  
+  # Website name
+  mattr_accessor :website_name
+  @@website_name = "Website"
+  
+  # Website domain name (with the protocol)
+  mattr_accessor :website_domain
+  @@website_domain = "http://www.google.com"
+  
+  # Email settings
+  mattr_accessor :email_from
+  @@email_from = "webmaster@caboosecms.com"
 
 end

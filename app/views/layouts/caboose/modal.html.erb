@@ -19,6 +19,9 @@
   </div>
 </div>
 <%= javascript_include_tag "caboose/modal" %>
+<% if File.exists?("#{Rails.root}/app/assets/javascripts/modal.js") %>
+<%= javascript_include_tag "modal" %>
+<% end %>
 <%= yield :caboose_js %>
 </body>
 </html>

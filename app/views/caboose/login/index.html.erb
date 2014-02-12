@@ -1,15 +1,16 @@
 
 <form action='/login' method='post' id='login_form'>
-<p class='other_options'>
-<a href='/register?return_url=<%= @return_url %>'>Need to register?</a>
-</p>
 <h1>Login</h1>
 <input type='hidden'    name='return_url' value='<%= @return_url %>' />
 <input type='text'      name='username' id='username' placeholder='Login or email' />
 <input type='password'  name='password' id='password' placeholder='Password' />
 <input type='checkbox'  name='remember' id='remember' value='1' checked='true' /> Remember me
+<ul class='other_options'>
+<li><a href='/register?return_url=<%= @return_url %>'>Need to register?</a></li>
+<li><a href='/login/forgot-password?return_url=<%= @return_url %>'>Forgot your password?</a></li>
+</ul>
 <div id='message'></div>
-<p>
+<p class='buttons'>
   <input type='button' id='btn_cancel' value='Cancel' onclick="parent.$.fn.colorbox.close();" />
 	<input type='submit' id='btn_login'  value='Login' onclick='login(); return false;' />
 </p>
@@ -22,7 +23,12 @@
 <% end %>
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
-var modal = new CabooseModal(400);
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(400);
+});
+
 function login()
 {
   modal.autosize("<p class='loading'>Logging in...</p>");
@@ -43,6 +49,7 @@ function login()
 		}
 	});
 }
+
 </script>
 <% end %>
 <%= content_for :caboose_css do %>

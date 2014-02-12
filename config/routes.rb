@@ -5,11 +5,17 @@ Caboose::Engine.routes.draw do
   get     "station"               => "station#index"
   get     "station/plugin-count"  => "station#plugin_count"
   
-  get     "login"                 => "login#index"
-  post    "login"                 => "login#login"
-  get     "logout"                => "logout#index"
-  get     "register"              => "register#index"
-  post    "register"              => "register#register"
+  get     "modal/:url" => "modal#index", :constraints => {:url => /.*/}
+  
+  get     "login/forgot-password"           => "login#forgot_password_form"
+  post    "login/forgot-password"           => "login#send_reset_email"  
+  get     "login/reset-password/:reset_id"  => "login#reset_password_form"
+  post    "login/reset-password"            => "login#reset_password"  
+  get     "login"                           => "login#index"
+  post    "login"                           => "login#login"
+  get     "logout"                          => "logout#index"
+  get     "register"                        => "register#index"
+  post    "register"                        => "register#register"
 
   get     "my-account"                      => "users#my_account"
   put     "my-account"                      => "users#update_my_account"

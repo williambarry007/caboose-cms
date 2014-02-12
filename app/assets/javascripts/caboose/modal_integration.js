@@ -84,14 +84,18 @@ function caboose_modal_url(url)
 }
 
 function caboose_fix_colorbox() {
+  var color = '#111';
+  if (typeof COLORBOX_COLOR !== 'undefined')
+    color = COLORBOX_COLOR;
+  
   var padding = 21; // 21 is default
-  $("#cboxTopLeft"      ).css('background', '#111');
-  $("#cboxTopRight"     ).css('background', '#111');
-  $("#cboxBottomLeft"   ).css('background', '#111');
-  $("#cboxBottomRight"  ).css('background', '#111');
-  $("#cboxMiddleLeft"   ).css('background', '#111');
-  $("#cboxMiddleRight"  ).css('background', '#111');
-  $("#cboxTopCenter"    ).css('background', '#111');
-  $("#cboxBottomCenter" ).css('background', '#111');
+  $("#cboxTopLeft"      ).css('background', color);
+  $("#cboxTopRight"     ).css('background', color);
+  $("#cboxBottomLeft"   ).css('background', color);
+  $("#cboxBottomRight"  ).css('background', color);
+  $("#cboxMiddleLeft"   ).css('background', color);
+  $("#cboxMiddleRight"  ).css('background', color);
+  $("#cboxTopCenter"    ).css('background', color);
+  $("#cboxBottomCenter" ).css('background', color);
   $("#cboxClose"        ).hide();    
 }

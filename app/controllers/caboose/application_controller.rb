@@ -25,7 +25,7 @@ module Caboose
       @is_real_page = false
       
       # Sets an instance variable of the logged in user
-      @logged_in_user = logged_in_user
+      @logged_in_user = logged_in_user      
 
       before_action
     end

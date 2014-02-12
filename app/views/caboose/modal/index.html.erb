@@ -1,0 +1,9 @@
+<%= content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  caboose_modal_url(<%= raw Caboose.json(@url) %>);    
+});
+
+</script>
+<% end %>

@@ -54,4 +54,13 @@ class Caboose::User < ActiveRecord::Base
     end
     return false
   end
+  
+  def self.user_for_reset_id(reset_id)          
+    return nil if reset_id.nil?          
+    d = DateTime.now - 3.days
+    if self.where("password_reset_id = ? and password_reset_sent > ?", reset_id, d).exists?
+      return self.where("password_reset_id = ? and password_reset_sent > ?", reset_id, d).first
+    end
+    return nil
+  end
 end

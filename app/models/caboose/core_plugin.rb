@@ -74,5 +74,9 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     }
     return block_types
   end
+  
+  def self.global_js_assets(files)
+    return files
+  end
 
 end

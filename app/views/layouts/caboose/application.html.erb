@@ -1,6 +1,9 @@
 
 <%= content_for :js do %>
 <%= javascript_include_tag "caboose/application" %>
+<% Caboose::plugin_hook('global_js_assets', []).each do |file| %>
+<%= javascript_include_tag file %>
+<% end %>
 <%= yield :caboose_js %>
 <% end %>
 

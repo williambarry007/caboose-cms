@@ -20,17 +20,17 @@ module Caboose
       end
 
       user = logged_in_user
-      if (!user.is_allowed(page, 'view'))
-        if (user.id == User.logged_out_user_id)	
-           redirect_to "/login?return_url=" + URI.encode(request.fullpath)		  		
+      if !user.is_allowed(page, 'view')
+        if user.id == User.logged_out_user_id	
+          redirect_to "/login?return_url=" + URI.encode(request.fullpath)		  		
           return
         else
           page.title = 'Access Denied'
-          page.content = "<p class='note error'>You do not have access to view this page.</p>"
+          #page.content = "<p class='note error'>You do not have access to view this page.</p>"
         end
       end
 
-      if (session['use_redirect_urls'] && !page.redirect_url.nil? && page.redirect_url.strip.length > 0)
+      if session['use_redirect_urls'] && !page.redirect_url.nil? && page.redirect_url.strip.length > 0
         redirect_to page.redirect_url
         return
       end

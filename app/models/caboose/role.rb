@@ -46,7 +46,7 @@ class Caboose::Role < ActiveRecord::Base
     for perm in permissions
       return true if (perm.resource == "all" && perm.action == "all")
     end
-    
+        
     if (resource.is_a?(Caboose::Page))
       for perm in page_permissions
         return true if (perm.page_id == resource.id && perm.action == action)

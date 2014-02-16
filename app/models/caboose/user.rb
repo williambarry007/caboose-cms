@@ -17,8 +17,11 @@ class Caboose::User < ActiveRecord::Base
     return self.where('username' => 'elo').limit(1).pluck(:id)[0]
   end
   
-  def is_allowed(resource, action)    
-    return true if Caboose::Role.where(:name => 'Everyone Logged Out').first.is_allowed(resource, action)        
+  def is_allowed(resource, action)
+    elo = Caboose::Role.logged_out_role
+    return true if elo.is_allowed(resource, action)
+    eli = Caboose::Role.logged_in_role
+    return true if self.id != elo.id && eli.is_allowed(resource, action)
     for role in roles      
       return true if role.is_allowed(resource, action)
     end

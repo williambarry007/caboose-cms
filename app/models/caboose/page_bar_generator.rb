@@ -69,10 +69,20 @@ module Caboose
   		return m if @options['includes'].nil?
   		
   		associations = []
-  		@options['includes'].each do |field, arr|
-  		  next if @params[field].nil? || (@params[field].kind_of?(String) && @params[field].length == 0)
+  		@options['includes'].each do |field, arr|  		  
+  		  next if @params[field].nil? || (@params[field].kind_of?(String) && @params[field].length == 0)  		  
         associations << arr[0]
-      end      
+      end
+      if @options['sort']
+        @options['sort'].split(',').each do |col|
+          tbl_col = col.split('.')
+          if tbl_col && tbl_col.count > 1
+            @options['includes'].each do |field, arr|
+              associations << arr[0] if table_name_of_association(arr[0]) == tbl_col[0]                              
+            end
+          end
+        end
+      end            
   		associations.uniq.each { |assoc| m = m.includes(assoc) }
   		return m
   	end
@@ -190,8 +200,9 @@ module Caboose
   	  if !@custom_url_vars.nil?
   	    return @custom_url_vars.call @options['base_url'], @params
   	  end
+  	  
   	  vars = []
-  	  @params.each do |k,v|
+  	  @params.each do |k,v|  	    
   	    next if @options['skip'].include?(k)
   	    k = @options['abbreviations'].include?(k) ? @options['abbreviations'][k] : k  	      	    
   	    if v.kind_of?(Array)

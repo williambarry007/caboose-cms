@@ -148,7 +148,7 @@ module Caboose
     # Redirects to login if not logged in.
     def verify_logged_in
       if (!logged_in?)
-        redirect_to "/login?return_url=" + URI.encode(request.fullpath)
+        redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)
         return false
       end      
       return true    

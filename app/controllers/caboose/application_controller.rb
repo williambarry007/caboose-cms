@@ -171,10 +171,10 @@ module Caboose
     #  redirect_to "/error?message=#{message}"
     #end
     
-    def var(key)
-      v = Var.where(:key => key).first
-        return "" if v.nil?    
-      return v.val
+    def var(name)
+      s = Setting.where(:name => name).first
+      return "" if s.nil?    
+      return s.value
     end
       
   end

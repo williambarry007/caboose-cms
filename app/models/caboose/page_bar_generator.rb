@@ -222,6 +222,9 @@ module Caboose
   	      end  	        
   	    end  	      	    
   	  end
+  	  vars.push("sort=#{@options['sort']}")
+  		vars.push("desc=#{@options['desc']}")  		
+  		vars.push("page=#{@options['page']}")  			
   	  return "#{@options['base_url']}" if vars.length == 0
   	  if Caboose.use_url_params
   	    vars = URI.escape(vars.join('/'))  	    

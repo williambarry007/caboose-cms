@@ -171,6 +171,20 @@ module Caboose
       render json: options
     end
     
+    # GET /admin/users/:id/su
+    def admin_su
+      return if !user_is_allowed('users', 'sudo')
+      user = User.find(params[:id])
+      
+      # Log out the current user
+      cookies.delete(:caboose_user_id)
+      reset_session
+      
+      # Login the new user
+      login_user(user, false)      
+      redirect_to "/"      
+    end
+    
   end
 end
 

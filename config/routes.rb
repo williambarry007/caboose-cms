@@ -23,6 +23,7 @@ Caboose::Engine.routes.draw do
   get     "admin/users"                     => "users#index"
   get     "admin/users/options"             => "users#options"
   get     "admin/users/new"                 => "users#new"
+  get     "admin/users/:id/su"              => "users#admin_su"
   get     "admin/users/:id/edit-password"   => "users#edit_password"
   get     "admin/users/:id/edit"            => "users#edit"
   put     "admin/users/:id"                 => "users#update"

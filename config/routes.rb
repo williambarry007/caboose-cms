@@ -87,7 +87,9 @@ Caboose::Engine.routes.draw do
   put     "admin/pages/:page_id/blocks/:id"        => "page_blocks#admin_update"
   delete  "admin/pages/:page_id/blocks/:id"        => "page_blocks#admin_delete"
   
-  put     "admin/page-block-field-values/:id"     => "page_block_field_values#admin_update"
+  put     "admin/page-block-field-values/:id"       => "page_block_field_values#admin_update"
+  post    "admin/page-block-field-values/:id/image" => "page_block_field_values#admin_update_image"
+  post    "admin/page-block-field-values/:id/file"  => "page_block_field_values#admin_update_file"
     
   get     "admin/page-block-types/new"            => "page_block_types#admin_new"    
   get     "admin/page-block-types/:id/edit"       => "page_block_types#admin_edit"

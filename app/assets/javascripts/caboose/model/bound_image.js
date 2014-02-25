@@ -73,7 +73,7 @@ BoundImage = BoundControl.extend({
     
     var resp = $.parseJSON(str);    
     if (resp.success)
-		{
+		{		  
 		  if (resp.attributes && resp.attributes[this.attribute.name])
 		    for (var thing in resp.attributes[this.attribute.name])
 		      this.attribute[thing] = resp.attributes[this.attribute.name][thing];
@@ -83,7 +83,25 @@ BoundImage = BoundControl.extend({
     if (resp.error)
       this.error(resp.error);
     else
-      $('#'+this.el+'_container img').attr('src', this.attribute.value + '?' + Math.random());
+    {
+      if (this.attribute.image_refresh_delay)
+      {
+        var that = this;
+        setTimeout(function() { that.refresh_image(); }, this.attribute.image_refresh_delay);
+      }
+      else
+      {
+        this.refresh_image();
+      }        
+    }
+  },
+  
+  refresh_image: function() {
+    var src = this.attribute.value;
+    if (src.indexOf('?') > 0)
+      src = src.split('?')[0];    
+    src = src + '?' + Math.random();    
+    $('#'+this.el+'_container img').attr('src', src);
   },
     
   error: function(str) {

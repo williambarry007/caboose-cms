@@ -21,7 +21,7 @@ module Caboose
     #		itemsPerPage:	Number of items you want to show per page. Defaults to 10 if not present.
     #		page: Current page number.  Defaults to 0 if not present.
     #
-    attr_accessor :params, :options, :custom_url_vars
+    attr_accessor :params, :options, :custom_url_vars    
   	
     #def initialize(post_get, params = nil, options = nil, &custom_url_vars = nil)
   	def initialize(post_get, params = nil, options = nil)
@@ -56,8 +56,9 @@ module Caboose
   		}			
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
   		#@custom_url_vars = custom_url_vars if !custom_url_vars.nil?
+  		@use_url_params = @options['use_url_params'].nil? ? Caboose.use_url_params : @options['use_url_params']
   		fix_desc
-  		set_item_count  		  		  		
+  		set_item_count
   	end
   	
   	def set_item_count
@@ -168,9 +169,9 @@ module Caboose
   		end
   		
   		base_url = url_with_vars      
-      base_url << (Caboose.use_url_params ? "/" : (base_url.include?("?") ? "&" : "?"))      
-      keyval_delim = Caboose.use_url_params ? "/" : "="
-  		var_delim    = Caboose.use_url_params ? "/" : "&"            
+      base_url << (@use_url_params ? "/" : (base_url.include?("?") ? "&" : "?"))      
+      keyval_delim = @use_url_params ? "/" : "="
+  		var_delim    = @use_url_params ? "/" : "&"            
   		
   		str = ''
   		str << "<p>Results: showing page #{page} of #{total_pages}</p>\n"
@@ -207,7 +208,7 @@ module Caboose
   	    k = @options['abbreviations'].include?(k) ? @options['abbreviations'][k] : k  	      	    
   	    if v.kind_of?(Array)
   	      v.each do |v2|  	        
-  	        if Caboose.use_url_params
+  	        if @use_url_params
   	          vars.push("#{k}/#{v2}") if !v2.nil?
   	        else
   	          vars.push("#{k}[]=#{v2}") if !v2.nil?
@@ -215,7 +216,7 @@ module Caboose
   	      end
   	    else  	      
   	      next if v.nil? || (v.kind_of?(String) && v.length == 0)
-  	      if Caboose.use_url_params
+  	      if @use_url_params
   	        vars.push("#{k}/#{v}")
   	      else
   	        vars.push("#{k}=#{v}")
@@ -226,7 +227,7 @@ module Caboose
   		vars.push("desc=#{@options['desc']}")  		
   		vars.push("page=#{@options['page']}")  			
   	  return "#{@options['base_url']}" if vars.length == 0
-  	  if Caboose.use_url_params
+  	  if @use_url_params
   	    vars = URI.escape(vars.join('/'))  	    
   	    return "#{@options['base_url']}/#{vars}"
   	  end

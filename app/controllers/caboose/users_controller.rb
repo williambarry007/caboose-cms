@@ -62,10 +62,11 @@ module Caboose
     		  'username'	  => '',
     		  'email' 		  => '',
     		},{
-    		  'model'       => 'Caboose::User',
-    	    'sort'			  => 'last_name, first_name',
-    		  'desc'			  => false,
-    		  'base_url'		=> '/admin/users'
+    		  'model'          => 'Caboose::User',
+    	    'sort'			     => 'last_name, first_name',
+    		  'desc'			     => false,
+    		  'base_url'		   => '/admin/users',
+    		  'use_url_params' => false
     	})
     	@users = @gen.items
     end

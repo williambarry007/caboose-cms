@@ -1,22 +1,25 @@
  
 <h1>Edit Setting</h1>
-<div id='setting_<%= @setting.id %>_container'></div>
+<p><div id='setting_<%= @setting.id %>_name'  ></div></p>
+<p><div id='setting_<%= @setting.id %>_value' ></div></p>
+
+<p><input type='button' value='< Back' onclick="window.location='/admin/settings';" /></p>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
 
 $(document).ready(function() {
-  var setting = new Model({
+  new ModelBinder({
     name: 'Setting',
     id: <%= @setting.id %>,
-    listing_url: 'get /admin/settings',
-    update_url:  'put /admin/settings/<%= @setting.id %>',
-    delete_url:  'delete /admin/settings/<%= @setting.id %>',
+    update_url: '/admin/settings/<%= @setting.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'name'  , type: 'text'     , value: "<%= @setting.name  %>" },
-      { name: 'value' , type: 'textarea' , value: "<%= @setting.value %>" }
-    ]
-  });
+      { name: 'name'  , nice_name: 'Name'  , type: 'text'     , value: <%= raw Caboose.json(@setting.name)  %>, width: 600 },
+      { name: 'value' , nice_name: 'Value' , type: 'textarea' , value: <%= raw Caboose.json(@setting.value) %>, width: 600, height: 200 }      
+    ]    
+  });  
 });
 
 </script>

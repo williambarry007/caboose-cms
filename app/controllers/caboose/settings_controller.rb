@@ -17,7 +17,8 @@ module Caboose
     		  'model'       => 'Caboose::Setting',
     	    'sort'			  => 'name',
     		  'desc'			  => false,
-    		  'base_url'		=> '/admin/settings'
+    		  'base_url'		=> '/admin/settings',
+    		  'use_url_params' => false
     	})
     	@settings = @gen.items    	
     end

@@ -62,10 +62,11 @@ module Caboose
     		  'username'	  => '',
     		  'email' 		  => '',
     		},{
-    		  'model'       => 'Caboose::User',
-    	    'sort'			  => 'last_name, first_name',
-    		  'desc'			  => false,
-    		  'base_url'		=> '/admin/users'
+    		  'model'          => 'Caboose::User',
+    	    'sort'			     => 'last_name, first_name',
+    		  'desc'			     => false,
+    		  'base_url'		   => '/admin/users',
+    		  'use_url_params' => false
     	})
     	@users = @gen.items
     end
@@ -169,6 +170,20 @@ module Caboose
       @users = User.reorder('last_name, first_name').all
       options = @users.collect { |u| { 'value' => u.id, 'text' => "#{u.first_name} #{u.last_name}"}}
       render json: options
+    end
+    
+    # GET /admin/users/:id/su
+    def admin_su
+      return if !user_is_allowed('users', 'sudo')
+      user = User.find(params[:id])
+      
+      # Log out the current user
+      cookies.delete(:caboose_user_id)
+      reset_session
+      
+      # Login the new user
+      login_user(user, false)      
+      redirect_to "/"      
     end
     
   end

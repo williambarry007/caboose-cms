@@ -13,7 +13,12 @@ class Caboose::PageBlock < ActiveRecord::Base
   
   def field_value(name)    
     page_block_field_values.each do |fv|
-      return fv.value if fv.page_block_field.name == name
+      if fv.page_block_field.name == name
+        if    fv.page_block_field.field_type == 'image' then return fv.image
+        elsif fv.page_block_field.field_type == 'file'  then return fv.file
+        else return fv.value
+        end
+      end
     end
     return nil
   end

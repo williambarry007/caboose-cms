@@ -120,9 +120,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :options_url          , :string  ]
       ],
       Caboose::PageBlockFieldValue => [
-        [ :page_block_id        , :integer ],
-        [ :page_block_field_id  , :integer ],
-        [ :value                , :text    ]                
+        [ :page_block_id        , :integer    ],
+        [ :page_block_field_id  , :integer    ],
+        [ :value                , :text       ],
+        [ :file                 , :attachment ],
+        [ :image                , :attachment ]
       ],      
       Caboose::Post => [  
         [ :title       , :text     ],  		 	 

@@ -1,9 +1,15 @@
+<%
+update_on_close = false
+@block.page_block_type.fields.each do |f|
+  update_on_close = true if f.field_type == 'image' || f.field_type == 'file'
+end
+%>
 <h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.page_block_type.description %></h2>
 <% @block.page_block_type.fields.each do |f| %>  
   <% fv = @block.field_value_object(f.name) %>  
   <div id='pageblockfieldvalue_<%= fv.id %>_value'></div>
 <% end %>
-<p><input type='button' value='Close' onclick="modal.close();" /></p>
+<p><input type='button' value='Close' onclick="<% if update_on_close %>parent.controller.render_blocks();<% end %>modal.close();" /></p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
@@ -27,14 +33,23 @@ $(document).ready(function() {
       attributes: [{      
         name: 'value',
         type: <%=  raw Caboose.json(f.field_type) %>,
-        value: <% if f.field_type == 'checkbox' %><%= fv.value ? 'true' : 'false' %><% else %><%= raw Caboose.json(fv.value) %><% end %>,
+        value: <% 
+          if f.field_type == 'checkbox' %><%= fv.value ? 'true' : 'false'           %><%
+          elsif f.field_type == 'image' %><%= raw Caboose.json(fv.image.url(:tiny)) %><%
+          elsif f.field_type == 'file'  %><%= raw Caboose.json(fv.image.url)        %><%
+          else                          %><%= raw Caboose.json(fv.value)            %><% 
+        end %>,
         <% if f.field_type == 'select' %>text: <%= raw Caboose.json(fv.value) %>,<% end %>        
         nice_name: <%= raw Caboose.json(f.nice_name ? f.nice_name : f.name) %>,
         width: <% if f.width %><%= raw Caboose.json(f.width) %><% else %>780<% end %>,
-        <% if f.height            %>height: <%=            raw Caboose.json(f.height)            %>,<% end %>
-        <% if f.fixed_placeholder %>fixed_placeholder: <%= raw Caboose.json(f.fixed_placeholder) %>,<% end %>
-        <% if f.options           %>options_url: '/admin/page-block-fields/<%= f.id %>/options',<%
-           elsif f.options_url    %>options_url: <%=       raw Caboose.json(f.options_url)       %>,<% end %>        
+        <% if f.height                %>height: <%=            raw Caboose.json(f.height)            %>,<% end %>
+        <% if f.fixed_placeholder     %>fixed_placeholder: <%= raw Caboose.json(f.fixed_placeholder) %>,<% end %>
+        <% if f.options               %>options_url: '/admin/page-block-fields/<%= f.id %>/options',<%
+           elsif f.options_url        %>options_url: <%=       raw Caboose.json(f.options_url)       %>,<% end %>
+        <% if f.field_type == 'image' %>update_url: '/admin/page-block-field-values/<%= fv.id %>/image',
+        image_refresh_delay: 100,
+        <% end %>
+        <% if f.field_type == 'file'  %>update_url: '/admin/page-block-field-values/<%= fv.id %>/file',<% end %>
         after_update: function() { parent.controller.render_blocks(); },
         after_cancel: function() { parent.controller.render_blocks(); }
       }]

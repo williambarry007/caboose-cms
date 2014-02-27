@@ -26,13 +26,13 @@ module Caboose
           
           bouncer_class = Caboose::authenticator_class.constantize
           bouncer = bouncer_class.new
-          user = bouncer.authenticate(username, password)
+          login_resp = bouncer.authenticate(username, password)
           
-          if (user.nil? || user == false)
-            resp.error = "Invalid credentials"
+          if login_resp.error
+            resp.error = login_resp.error
           else
             remember = params[:remember] && (params[:remember] == 1 || params[:remember] == "1")
-            login_user(user, remember)
+            login_user(login_resp.user, remember)
             resp.redirect = return_url
           end
         end

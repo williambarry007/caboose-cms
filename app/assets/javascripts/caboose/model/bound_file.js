@@ -72,7 +72,7 @@ BoundFile = BoundControl.extend({
     $('#'+this.el+'_container').append($('<div/>')
       .attr('id', this.el + '_message')
     );
-    iframe = $('<iframe/>')
+    iframe = $("<iframe name=\"" + this.el + "_iframe\"></iframe>")    
       .attr('name', this.el + '_iframe')
       .attr('id', this.el + '_iframe');      
     if (this.attribute.debug)      

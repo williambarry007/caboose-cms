@@ -18,10 +18,12 @@ class Caboose::User < ActiveRecord::Base
   end
   
   def is_allowed(resource, action)
-    for role in roles
-      if role.is_allowed(resource, action)
-        return true
-      end
+    elo = Caboose::Role.logged_out_role
+    return true if elo.is_allowed(resource, action)
+    eli = Caboose::Role.logged_in_role
+    return true if self.id != elo.id && eli.is_allowed(resource, action)
+    for role in roles      
+      return true if role.is_allowed(resource, action)
     end
     return false;
   end

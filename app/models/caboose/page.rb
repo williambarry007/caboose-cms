@@ -26,7 +26,7 @@ class Caboose::Page < ActiveRecord::Base
     :meta_robots, # Multi-select options: none, noindex, nofollow, nosnippet, noodp, noarchive
     :canonical_url,
     :facebook_description, # defaults to meta_description
-    :googleplus_description # defaults to meta_description
+    :googleplus_description # defaults to meta_description      
    
   CONTENT_FORMAT_HTML  = 1 
   CONTENT_FORMAT_TEXT  = 2

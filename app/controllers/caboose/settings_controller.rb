@@ -17,7 +17,8 @@ module Caboose
     		  'model'       => 'Caboose::Setting',
     	    'sort'			  => 'name',
     		  'desc'			  => false,
-    		  'base_url'		=> '/admin/settings'
+    		  'base_url'		=> '/admin/settings',
+    		  'use_url_params' => false
     	})
     	@settings = @gen.items    	
     end
@@ -66,15 +67,13 @@ module Caboose
       save = true
       params.each do |name,value|
         case name
-    	  	when "name"
-    	  	  setting.name = value
-    	  	when "value"
-    	  	  setting.value = value
+    	  	when "name"  then setting.name  = value
+    	  	when "value" then setting.value = value
     	  end
     	end
     	
     	resp.success = save && setting.save
-    	render json: resp
+    	render :json => resp
     end
   
     # DELETE /admin/settings/1

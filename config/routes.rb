@@ -21,9 +21,10 @@ Caboose::Engine.routes.draw do
   get     "my-account"                      => "users#my_account"
   put     "my-account"                      => "users#update_my_account"
   
-  get     "admin/users"                     => "users#index"
+  get     "admin/users"                     => "users#index"  
   get     "admin/users/options"             => "users#options"
-  get     "admin/users/new"                 => "users#new"
+  get     "admin/users/new"                 => "users#new"  
+  get     "admin/users/:id/su"              => "users#admin_su"
   get     "admin/users/:id/edit-password"   => "users#edit_password"
   get     "admin/users/:id/edit"            => "users#edit"
   put     "admin/users/:id"                 => "users#update"
@@ -87,7 +88,9 @@ Caboose::Engine.routes.draw do
   put     "admin/pages/:page_id/blocks/:id"        => "page_blocks#admin_update"
   delete  "admin/pages/:page_id/blocks/:id"        => "page_blocks#admin_delete"
   
-  put     "admin/page-block-field-values/:id"     => "page_block_field_values#admin_update"
+  put     "admin/page-block-field-values/:id"       => "page_block_field_values#admin_update"
+  post    "admin/page-block-field-values/:id/image" => "page_block_field_values#admin_update_image"
+  post    "admin/page-block-field-values/:id/file"  => "page_block_field_values#admin_update_file"
     
   get     "admin/page-block-types/new"            => "page_block_types#admin_new"    
   get     "admin/page-block-types/:id/edit"       => "page_block_types#admin_edit"

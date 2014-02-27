@@ -3,7 +3,7 @@ var CabooseModal = function(w, h) {
   if (!h)
   {
     $('#modal_content').css('width', w);
-    h = $('#modal_content').outerHeight(true);
+    h = $('#modal_content').outerHeight(true);    
   }  
   if (parent.$.fn.colorbox)
     this.resize(w, h);
@@ -27,7 +27,7 @@ CabooseModal.prototype = {
   
   colorbox: function() {
     if (parent && parent.$.fn.colorbox)
-    {
+    {            
       parent.$.fn.colorbox.resize({ 
         innerWidth:  '' + this.width + 'px', 
         innerHeight: '' + this.height + 'px' 

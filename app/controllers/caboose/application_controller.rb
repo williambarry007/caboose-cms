@@ -3,13 +3,14 @@ module Caboose
 
     protect_from_forgery  
     before_filter :before_before_action
+    helper_method :logged_in?
     
     def before_before_action
       
-      # Modify the built-in params array with URL params if necessary 
+      # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
       
-      # Try to find the page 
+      # Try to find the page
       @page = Page.page_with_uri(request.fullpath)
       
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?

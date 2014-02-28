@@ -12,6 +12,8 @@ var Caboose = function() {
 	//
 	
 	self.initialize = function() {
+		self.loggedIn = window.loggedIn || false;
+		
 		$('a[href="/register"], [caboose=register]').click(function(event) {
 			event.preventDefault();
 			self.register();

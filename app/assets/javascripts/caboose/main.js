@@ -16,17 +16,17 @@ var Caboose = function() {
 		
 		$('a[href="/register"], [caboose=register]').click(function(event) {
 			event.preventDefault();
-			self.register();
+			self.register( $(window).width() < 1024 );
 		});
 		
 		$('a[href="/login"], [caboose=login]').click(function(event) {
 			event.preventDefault();
-			self.login();
+			self.login( $(window).width() < 1024 );
 		});
 		
 		$('a[href="/logout"], [caboose=logout]').click(function(event) {
 			event.preventDefault();
-			self.logout();
+			self.logout( $(window).width() < 1024 );
 		});
 	};
 	
@@ -48,7 +48,9 @@ var Caboose = function() {
 	// Login
 	//
 	
-	self.login = function() {
+	self.login = function(mobile) {
+		if (mobile) window.location.href = '/login?return_url=' + window.location.pathname;
+		
 		$.colorbox({
 			href: '/login?return_url=' + window.location.pathname,
 			iframe: true,
@@ -74,6 +76,8 @@ var Caboose = function() {
 	//
 	
 	self.register = function(callback) {
+		if (mobile) window.location.href = '/register?return_url=' + window.location.pathname;
+		
 		$.colorbox({
 			href: '/register?return_url=' + window.location.pathname,
 			iframe: true,

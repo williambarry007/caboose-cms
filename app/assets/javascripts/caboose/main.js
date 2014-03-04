@@ -3,6 +3,11 @@
 //
 // :: Initialize
 // :: Events
+// :: Redirect
+// :: Reload
+// :: Login
+// :: Logout
+// :: Register
 
 var Caboose = function() {
 	var self = this;
@@ -45,11 +50,33 @@ var Caboose = function() {
 	};
 	
 	//
+	// Redirect
+	//
+	
+	self.redirect = function(url) {
+		if (!$.browser.mobile) {
+			window.location.href = url;
+		} else if ( (navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) ) {
+			location.replace(url);
+		} else if ($.browser.mobile) {
+			document.location = url;
+		}
+	};
+	
+	//
+	// Reload
+	//
+	
+	self.reload = function() {
+		self.redirect(window.location.href);
+	};
+	
+	//
 	// Login
 	//
 	
-	self.login = function(mobile) {
-		if (mobile) window.location.href = '/login?return_url=' + window.location.pathname;
+	self.login = function() {
+		if ($.browser.mobile) window.location.href = '/login?return_url=' + window.location.pathname;
 		
 		$.colorbox({
 			href: '/login?return_url=' + window.location.pathname,
@@ -76,7 +103,7 @@ var Caboose = function() {
 	//
 	
 	self.register = function(callback) {
-		if (mobile) window.location.href = '/register?return_url=' + window.location.pathname;
+		if ($.browser.mobile) window.location.href = '/register?return_url=' + window.location.pathname;
 		
 		$.colorbox({
 			href: '/register?return_url=' + window.location.pathname,

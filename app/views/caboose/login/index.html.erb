@@ -1,57 +1,67 @@
-
-<form action='/login' method='post' id='login_form'>
-<h1>Login</h1>
-<input type='hidden'    name='return_url' value='<%= @return_url %>' />
-<input type='text'      name='username' id='username' placeholder='Login or email' />
-<input type='password'  name='password' id='password' placeholder='Password' />
-<input type='checkbox'  name='remember' id='remember' value='1' checked='true' /> Remember me
-<ul class='other_options'>
-<li><a href='/register?return_url=<%= @return_url %>'>Need to register?</a></li>
-<li><a href='/login/forgot-password?return_url=<%= @return_url %>'>Forgot your password?</a></li>
-</ul>
-<div id='message'></div>
-<p class='buttons'>
-  <input type='button' id='btn_cancel' value='Cancel' onclick="parent.$.fn.colorbox.close();" />
-	<input type='submit' id='btn_login'  value='Login' onclick='login(); return false;' />
-</p>
+<form action="/login" method="post" id="login-form">
+	<h1>Login</h1>
+	
+	<input type="hidden"   name="return_url" value="<%= @return_url %>" />
+	<input type="text"     name="username" id="username" placeholder="Login or email" />
+	<input type="password" name="password" id="password" placeholder="Password" />
+	
+	<label>
+		<input type="checkbox" name="remember" id="remember" value="1" checked="true" /> Remember me
+	</label>
+	
+	<ul id="login-options">
+		<li><a href="/register?return_url=<%= @return_url %>">Need to register?</a></li>
+		<li><a href="/login/forgot-password?return_url=<%= @return_url %>">Forgot your password?</a></li>
+	</ul>
+	
+	<div id="message"></div>
+	
+	<p class="buttons">
+	  <input type="button" class="btn" value="Cancel" onclick="parent.$.fn.colorbox.close();" />
+		<input type="submit" class="btn" value="Login" onclick='login(); return false;' />
+	</p>
 </form>
 
 <% content_for :caboose_css do %>
-<style type="text/css">
-#modal_content input[type="checkbox"] { position: relative; }
-</style>
+	<%= stylesheet_link_tag 'caboose/login' %>
+	
+	<style type="text/css">
+		#modal_content input[type=checkbox] { position: relative; }
+	</style>
 <% end %>
+
 <% content_for :caboose_js do %>
-<script type='text/javascript'>
-
-var modal = false;
-$(window).load(function() {
-  modal = new CabooseModal(400);
-});
-
-function login()
-{
-  modal.autosize("<p class='loading'>Logging in...</p>");
-	$.ajax({
-		url: '/login',
-		type: 'post',
-		data: $('#login_form').serialize(),
-		success: function(resp) {
-		  if (resp.error)
-		    modal.autosize("<p class='note error'>" + resp.error + "</p>");
-			else if (resp.redirect != false)
-			  <%= @modal ? "" : "parent." %>window.location = resp.redirect;
-			else
-			  parent.location.reload(true);
-		},
-		error: function() {	
-			modal.autosize("<p class='note error'>Error</p>");			
+	<script type="text/javascript">
+		var modal = false;
+		
+		$(window).load(function() {
+		  modal = new CabooseModal(400);
+		});
+		
+		function login() {
+		  modal.autosize("<p class='loading'>Logging in...</p>");
+	
+			$.ajax({
+				url: '/login',
+				type: 'post',
+				data: $('#login-form').serialize(),
+				success: function(response) {
+					if (response.error) {
+						modal.autosize("<p class='note error'>" + response.error + "</p>");
+					} else if (response.redirect != false) {
+						<%= @modal ? "" : "parent." %>window.location = response.redirect;
+					} else {
+						parent.location.reload(true);
+					}
+				},
+				error: function() {	
+					modal.autosize("<p class='note error'>Error</p>");			
+				}
+			});
 		}
-	});
-}
-
-</script>
+	</script>
 <% end %>
+
 <%= content_for :caboose_css do %>
-<%= stylesheet_link_tag "caboose/login", :media => "all" %>
+	<%= stylesheet_link_tag "caboose/login", media: "all" %>
 <% end %>

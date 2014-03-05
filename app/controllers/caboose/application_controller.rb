@@ -37,7 +37,7 @@ module Caboose
       
       before_action
     end
-    s
+    
     # Parses any parameters in the URL and adds them to the params
     def parse_url_params      
       return if !Caboose.use_url_params      

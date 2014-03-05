@@ -5,32 +5,39 @@ module Caboose
     before_filter :before_before_action
     helper_method :logged_in?
     
+    @find_page = true
+    
     def before_before_action
       
       # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
       
-      # Try to find the page
-      @page = Page.page_with_uri(request.fullpath)
       
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
       
       # Initialize AB Testing
-      AbTesting.init(request.session_options[:id])      
+      AbTesting.init(request.session_options[:id]) if Caboose.use_ab_testing      
       
-      @crumb_trail  = Caboose::Page.crumb_trail(@page)
-		  @subnav       = {}
+      # Try to find the page 
+      @page = Page.new
+      @crumb_trail  = []
+      @subnav       = {}
       @actions      = {}
       @tasks        = {}
       @page_tasks   = {}
       @is_real_page = false
       
+      if @find_page
+        @page = Page.page_with_uri(request.fullpath)
+        @crumb_trail  = Caboose::Page.crumb_trail(@page)		    
+      end
+      
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user      
-
+      
       before_action
     end
-
+    s
     # Parses any parameters in the URL and adds them to the params
     def parse_url_params      
       return if !Caboose.use_url_params      
@@ -54,6 +61,12 @@ module Caboose
     def before_action      
     end
     
+    # Logs a user out
+    def logout_user
+      cookies.delete(:caboose_user_id)
+      reset_session
+    end
+      
     # Logs in a user
     def login_user(user, remember = false)
       session["app_user"] = user
@@ -148,7 +161,7 @@ module Caboose
 
     # Redirects to login if not logged in.
     def verify_logged_in
-      if (!logged_in?)
+      if !logged_in?
         redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)
         return false
       end      

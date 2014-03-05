@@ -265,19 +265,29 @@ module Caboose
           col = "#{table_name_of_association(arr[0])}.#{arr[1]}"
         end        
         if k.include?('_concat_')
-          arr = k.split('_concat_')
-          col1 = arr[0]
-          col2 = arr[1]           
+          #arr = k.split('_concat_')
+          #col1 = arr[0]
+          #col2 = arr[1]           
+          #
+          #col2 = col2[0..-5] if col2.ends_with?('_gte')
+          #col2 = col2[0..-4] if col2.ends_with?('_gt')                        
+          #col2 = col2[0..-5] if col2.ends_with?('_lte')                        
+          #col2 = col2[0..-4] if col2.ends_with?('_lt')                                  
+          #col2 = col2[0..-4] if col2.ends_with?('_bw')                                              
+          #col2 = col2[0..-4] if col2.ends_with?('_ew')
+          #col2 = col2[0..-6] if col2.ends_with?('_like')
+          #                                  
+          #col = "concat(#{col1},' ', #{col2})"
           
-          col2 = col2[0..-5] if col2.ends_with?('_gte')
-          col2 = col2[0..-4] if col2.ends_with?('_gt')                        
-          col2 = col2[0..-5] if col2.ends_with?('_lte')                        
-          col2 = col2[0..-4] if col2.ends_with?('_lt')                                  
-          col2 = col2[0..-4] if col2.ends_with?('_bw')                                              
-          col2 = col2[0..-4] if col2.ends_with?('_ew')
-          col2 = col2[0..-6] if col2.ends_with?('_like')
-                                            
-          col = "concat(#{col1}, ' ', #{col2})"                   
+          arr = k.split('_concat_')                                         
+          arr[arr.count-1] = arr[arr.count-1][0..-5] if k.ends_with?('_gte')
+          arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_gt')                        
+          arr[arr.count-1] = arr[arr.count-1][0..-5] if k.ends_with?('_lte')                        
+          arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_lt')                                  
+          arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_bw')                                              
+          arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_ew')
+          arr[arr.count-1] = arr[arr.count-1][0..-6] if k.ends_with?('_like')                                            
+          col = "concat(#{arr.join(",' ',")})"
         end
         
         sql2 = ""

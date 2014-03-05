@@ -71,7 +71,7 @@ module Caboose
   		return m if @options['includes'].nil?
   		
   		associations = []
-  		@options['includes'].each do |field, arr|  		  
+  		@options['includes'].each do |field, arr|    		          
   		  next if @params[field].nil? || (@params[field].kind_of?(String) && @params[field].length == 0)  		  
         associations << arr[0]
       end
@@ -84,7 +84,17 @@ module Caboose
             end
           end
         end
-      end            
+      end
+      @params.each do |k,v|
+        k.split('_concat_').each do |col,v2|        
+          tbl_col = col.split('.')
+          if tbl_col && tbl_col.count > 1
+            @options['includes'].each do |field, arr|
+              associations << arr[0] if table_name_of_association(arr[0]) == tbl_col[0]                              
+            end
+          end
+        end
+      end
   		associations.uniq.each { |assoc| m = m.includes(assoc) }
   		return m
   	end

@@ -57,6 +57,7 @@ module Caboose
   		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
   		#@custom_url_vars = custom_url_vars if !custom_url_vars.nil?
   		@use_url_params = @options['use_url_params'].nil? ? Caboose.use_url_params : @options['use_url_params']
+      
   		fix_desc
   		set_item_count
   	end
@@ -98,7 +99,8 @@ module Caboose
   		return m
   	end
   	
-  	def table_name_of_association(assoc)  	    	  
+  	def table_name_of_association(assoc)
+      ap assoc
   	  return @options['model'].constantize.reflect_on_association(assoc.to_sym).class_name.constantize.table_name
   	end
   	

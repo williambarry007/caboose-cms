@@ -10,9 +10,10 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
+//= require_tree ../../templates
 //= require jquery
 //= require jquery_ujs
 //= require colorbox-rails
+//= require caboose/jquery.placeholder
+//= require caboose/jquery.detect
 //= require caboose/modal_integration
-//= require caboose/placeholder
-

@@ -13,6 +13,8 @@
  *= require caboose/caboose
  */
 
+html { width: 100%; }
+
 body {
   background: #111111;
   margin: 0;
@@ -29,6 +31,7 @@ body {
 
 #modal_content {
   width: 100%;
+	max-width: 100%;
   padding: 0;
 }
 
@@ -316,6 +319,16 @@ Message boxes
 #modal_content .success a {
 	color: #ffffff;	
 }
+
+#cboxTopLeft,
+#cboxTopRight,
+#cboxBottomLeft,
+#cboxBottomRight,
+#cboxMiddleLeft,
+#cboxMiddleRight,
+#cboxTopCenter,
+#cboxBottomCenter,
+#cboxClose { background: #111 !important; }
 
 /*******************************************************************************
 Page Bar Generator

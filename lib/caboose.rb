@@ -45,5 +45,10 @@ module Caboose
   # Email settings
   mattr_accessor :email_from
   @@email_from = "webmaster@caboosecms.com"
-
+  
+  # Define asset collections
+  mattr_accessor :javascripts, :stylesheets
+  @@javascripts = ['caboose/application']
+  @@stylesheets = ['caboose/application']
+  
 end

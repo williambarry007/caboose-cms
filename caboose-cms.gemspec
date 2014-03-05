@@ -39,6 +39,7 @@ Gem::Specification.new do |s|
   s.executables = ["caboose"]
 
   s.add_dependency "rails", "~> 3.2.13"
+  s.add_dependency "underscore-rails"
   s.add_dependency "jquery-rails"
   s.add_dependency "jquery-ui-rails"
   #s.add_dependency "activesupport"
@@ -46,5 +47,6 @@ Gem::Specification.new do |s|
   s.add_dependency "trollop"
   s.add_dependency "colorbox-rails"
   s.add_dependency "paperclip"
+  s.add_dependency "awesome_print"
   
 end

@@ -1,23 +1,46 @@
+/**
+ * Login
+ */
 
-#login_form .other_options {
-  position: absolute;
-  top: -4px;
-  right: 0;
+#modal_content { margin: 0 auto; }
+
+#login-form {
+	box-sizing: content-box;
+	max-width: 100%;
+	overflow: hidden;
+	padding: 12px 0;
+	position: relative;
+	width: 100%;
 }
 
-input#username,
-input#password {
-  font-size: 18px;
-  width: 95%;
-  margin: 0 0 8px 0;
-  padding: 7px;  
+@media all and (max-width: 400px) {
+	#login-form {
+		width: 400px;
+		margin: 0 auto;
+	}
 }
 
-input#btn_login {
-  font-size: 18px;
+#login-form #login-options {
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	top: 12px;
+	right: 0;
 }
 
-input#btn_cancel {
-  font-size: 18px;
+#login-form input#username,
+#login-form input#password {
+	font-size: 18px;
+	margin: 0 0 8px 0;
+	max-width: 100%;
+	padding: 7px;
+	width: 386px; /* 400 - 14:padding */
 }
 
+#login-form label {
+	cursor: pointer;
+	display: block;
+}
+	
+#login-form input[type=checkbox] { top: 8px; }
+#login-form .btn { font-size: 18px; }

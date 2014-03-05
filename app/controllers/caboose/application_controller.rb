@@ -3,13 +3,16 @@ module Caboose
 
     protect_from_forgery  
     before_filter :before_before_action
+    helper_method :logged_in?
+    
     @find_page = true
     
     def before_before_action
       
-      # Modify the built-in params array with URL params if necessary 
+      # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
-                  
+      
+      
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
       
       # Initialize AB Testing
@@ -18,11 +21,12 @@ module Caboose
       # Try to find the page 
       @page = Page.new
       @crumb_trail  = []
-		  @subnav       = {}
+      @subnav       = {}
       @actions      = {}
       @tasks        = {}
       @page_tasks   = {}
-      @is_real_page = false      
+      @is_real_page = false
+      
       if @find_page
         @page = Page.page_with_uri(request.fullpath)
         @crumb_trail  = Caboose::Page.crumb_trail(@page)		    
@@ -30,10 +34,10 @@ module Caboose
       
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user      
-
+      
       before_action
     end
-
+    
     # Parses any parameters in the URL and adds them to the params
     def parse_url_params      
       return if !Caboose.use_url_params      

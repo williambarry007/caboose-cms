@@ -16,3 +16,13 @@
  */
 
 #cboxLoadedContent { margin-bottom: 0; }
+
+#cboxTopLeft,
+#cboxTopRight,
+#cboxBottomLeft,
+#cboxBottomRight,
+#cboxMiddleLeft,
+#cboxMiddleRight,
+#cboxTopCenter,
+#cboxBottomCenter,
+#cboxClose { background: #111 !important; }

@@ -5,7 +5,8 @@ Caboose::Engine.routes.draw do
   get     "station"               => "station#index"
   get     "station/plugin-count"  => "station#plugin_count"
   
-  get     "modal/:url" => "modal#index", :constraints => {:url => /.*/}
+  get "modal"      => "modal#layout"
+  get "modal/:url" => "modal#index", :constraints => {:url => /.*/}
   
   get     "login/forgot-password"           => "login#forgot_password_form"
   post    "login/forgot-password"           => "login#send_reset_email"  

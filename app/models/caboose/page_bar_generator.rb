@@ -69,11 +69,13 @@ module Caboose
   	  m = @options['model'].constantize
   		return m if @options['includes'].nil?
   		
+  		# See if any fields that we know have includes have values
   		associations = []
   		@options['includes'].each do |field, arr|    		          
   		  next if @params[field].nil? || (@params[field].kind_of?(String) && @params[field].length == 0)  		  
         associations << arr[0]
       end
+      # See if any fields in the sort option are listed in a table_name.column_name format
       if @options['sort']
         @options['sort'].split(',').each do |col|
           tbl_col = col.split('.')
@@ -84,6 +86,7 @@ module Caboose
           end
         end
       end
+      # See if any parameters are listed in a table_name.column_name format
       @params.each do |k,v|
         k.split('_concat_').each do |col,v2|        
           tbl_col = col.split('.')

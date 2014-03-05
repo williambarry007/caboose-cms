@@ -30,6 +30,10 @@ module Caboose
   mattr_accessor :use_url_params
   @@use_url_params = true
   
+  # Whether or not to use AB Testing
+  mattr_accessor :use_ab_testing
+  @@use_ab_testing = true
+  
   # Website name
   mattr_accessor :website_name
   @@website_name = "Website"

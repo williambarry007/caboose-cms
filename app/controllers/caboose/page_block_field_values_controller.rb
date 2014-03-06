@@ -15,7 +15,7 @@ module Caboose
       params.each do |k,v|
         case k
           when 'value'
-            fv.value = v        
+            fv.value = v                                
         end
       end      
                

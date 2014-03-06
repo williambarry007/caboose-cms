@@ -80,27 +80,26 @@ module Caboose
       if @options['sort']
         @options['sort'].split(',').each do |col|
           tbl_col = col.split('.')
-          if tbl_col && tbl_col.count > 1
-            @options['includes'].each do |field, arr|
-              associations << arr[0] if table_name_of_association(arr[0]) == tbl_col[0]                              
-            end
-          end
+          associations << association_for_table_name(tbl_col[0]) if tbl_col && tbl_col.count > 1          
         end
       end
       # See if any parameters are listed in a table_name.column_name format
       @params.each do |k,v|
         k.split('_concat_').each do |col,v2|        
           tbl_col = col.split('.')
-          if tbl_col && tbl_col.count > 1
-            @options['includes'].each do |field, arr|
-              associations << arr[0] if table_name_of_association(arr[0]) == tbl_col[0]                              
-            end
-          end
+          associations << association_for_table_name(tbl_col[0]) if tbl_col && tbl_col.count > 1
         end
       end
   		associations.uniq.each { |assoc| m = m.includes(assoc) }
   		return m
   	end
+  	
+  	def association_for_table_name(table_name)
+  	  @options['includes'].each do |field, arr|
+  	    return arr[0] if table_name_of_association(arr[0]) == table_name                              
+      end
+      return false
+    end
   	
   	def table_name_of_association(assoc)
       ap assoc

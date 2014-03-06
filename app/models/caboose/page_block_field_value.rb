@@ -17,5 +17,23 @@ class Caboose::PageBlockFieldValue < ActiveRecord::Base
   #do_not_validate_attachment_file_type :image
     
   attr_accessible :id, :page_block_id, :page_block_field_id, :value
-    
+  
+  after_initialize do |fv|
+    # Do whatever we need to do to set the value to be correct for the field type we have.
+    # Most field types are fine with the raw value in the database                    
+    case fv.page_block_field.field_type       
+      when 'checkbox' then fv.value = (fv.value == 1 || fv.value == '1' || fv.value == true ? true : false)
+    end
+  end
+  
+  before_save :caste_value
+  def caste_value  
+    case self.page_block_field.field_type
+      when 'checkbox'
+        if self.value.nil? then self.value = false
+        else self.value = (self.value == 1 || self.value == '1' || self.value == true ? 1 : 0)
+        end
+    end
+  end
+
 end

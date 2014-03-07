@@ -48,7 +48,7 @@ module Caboose
   
   # Define asset collections
   mattr_accessor :javascripts, :stylesheets
-  @@javascripts = ['caboose/application']
-  @@stylesheets = ['caboose/application']
+  @@javascripts = []
+  @@stylesheets = []
   
 end

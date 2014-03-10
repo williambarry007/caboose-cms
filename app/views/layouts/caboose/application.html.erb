@@ -2,13 +2,13 @@
 <%= content_for :js do %>
 <%= javascript_include_tag "caboose/application" %>
 <script>window.loggedIn = <%= logged_in?.to_json %></script>
-<%= javascript_include_tag(*Caboose::javascripts) %>
+<% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
 <%= yield :caboose_js %>
 <% end %>
 
 <%= content_for :css do %>
 <%= stylesheet_link_tag('caboose/application') %>
-<%= stylesheet_link_tag(*Caboose::stylesheets) %>
+<% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
 <%= yield :caboose_css %>
 <% end %>
 

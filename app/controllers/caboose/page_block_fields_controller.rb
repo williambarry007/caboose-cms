@@ -115,7 +115,8 @@ module Caboose
       options = [ 
         { 'value' => 'checkbox'           , 'text' => 'checkbox'          }, 
         { 'value' => 'checkbox_multiple'  , 'text' => 'checkbox_multiple' }, 
-        { 'value' => 'image'              , 'text' => 'image'             }, 
+        { 'value' => 'image'              , 'text' => 'image'             },
+        { 'value' => 'file'               , 'text' => 'file'              },
         { 'value' => 'richtext'           , 'text' => 'richtext'          }, 
         { 'value' => 'select'             , 'text' => 'select'            }, 
         { 'value' => 'text'               , 'text' => 'text'              }, 

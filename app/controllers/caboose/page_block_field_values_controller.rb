@@ -37,14 +37,16 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/page-block-field-values/:id/image
+    # POST /admin/page-block-field-values/:id/file
     def admin_update_file
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
       fv = PageBlockFieldValue.find(params[:id])
-      fv.file = params[:value]               
-      resp.success = fv.save      
+      fv.file = params[:value]
+      fv.save
+      resp.success = true      
+      resp.attributes = { 'value' => { 'value' => fv.file.url }}
       
       render :json => resp
     end

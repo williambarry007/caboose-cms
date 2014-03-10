@@ -18,3 +18,4 @@
 //= require caboose/jquery.placeholder
 //= require caboose/modal_integration
 //= require caboose/main
+//= require application

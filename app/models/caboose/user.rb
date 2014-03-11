@@ -10,7 +10,8 @@ class Caboose::User < ActiveRecord::Base
       :tiny  => '150x200>',
       :thumb => '300x400>',
       :large => '600x800>'
-    }  
+    }
+  do_not_validate_attachment_file_type :image
   attr_accessible :email, :first_name, :last_name, :username, :token, :password, :phone
 
   before_save do

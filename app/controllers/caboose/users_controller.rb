@@ -122,8 +122,18 @@ module Caboose
       save = true
       params.each do |name,value|
         case name
-    	  	when "first_name", "last_name", "username", "email"
-    	  	  user[name.to_sym] = value
+          when 'first_name'           then user.first_name          = value     
+          when 'last_name'            then user.last_name           = value 
+          when 'username'             then user.username            = value 
+          when 'email'                then user.email               = value         
+          when 'address'              then user.address             = value
+          when 'address2'             then user.address2            = value
+          when 'city'                 then user.city                = value
+          when 'state'                then user.state               = value
+          when 'zip'                  then user.zip                 = value
+          when 'phone'                then user.phone               = value
+          when 'fax'                  then user.fax                 = value
+          when 'utc_offset'           then user.utc_offset          = value.to_f        
     	  	when "password"			  
     	  	  confirm = params[:password2]
     	  		if (value != confirm)			

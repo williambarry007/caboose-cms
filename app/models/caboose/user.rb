@@ -2,7 +2,15 @@ class Caboose::User < ActiveRecord::Base
   self.table_name = "users"  
   #has_and_belongs_to_many :roles
   has_many :role_memberships
-  has_many :roles, :through => :role_memberships  
+  has_many :roles, :through => :role_memberships
+  has_attached_file :image, 
+    :path => 'users/:id_:style.:extension',
+    :default_url => '/images/default_user_image.jpg',    
+    :styles => {
+      :tiny  => '150x200>',
+      :thumb => '300x400>',
+      :large => '600x800>'
+    }  
   attr_accessible :email, :first_name, :last_name, :username, :token, :password, :phone
 
   before_save do

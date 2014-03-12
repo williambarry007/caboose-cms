@@ -42,6 +42,10 @@ module Caboose
   mattr_accessor :website_domain
   @@website_domain = "http://www.google.com"
   
+  # CDN domain
+  mattr_accessor :cdn_domain
+  @@cdn_domain = ""
+  
   # Email settings
   mattr_accessor :email_from
   @@email_from = "webmaster@caboosecms.com"

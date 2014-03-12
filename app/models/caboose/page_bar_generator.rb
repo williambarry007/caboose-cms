@@ -49,12 +49,26 @@ module Caboose
   			                         # }  			
   		}      
   		params.each   { |key, val| @params[key]  = val }
-  		options.each  { |key, val| @options[key] = val }  		
-  		@params.each  { |key, val|  		  
-  		  k = @options['abbreviations'].include?(key) ? @options['abbreviations'][key] : nil  		  
-  		  @params[key] = post_get[key].nil? ? (k && !post_get[k].nil? ? post_get[k] : val) : post_get[key]  		   
-  		}			
-  		@options.each { |key, val| @options[key] = post_get[key].nil? ? val : post_get[key] }
+  		options.each  { |key, val| @options[key] = val }
+  		
+  		#@params.each  { |key, val|  		  
+  		#  k = @options['abbreviations'].include?(key) ? @options['abbreviations'][key] : nil  		  
+  		#  @params[key] = post_get[key].nil? ? (k && !post_get[k].nil? ? post_get[k] : val) : post_get[key]  		          
+  		#}
+  		
+  		new_params = {}
+  		keys_to_delete = []
+  		@params.each  { |key, val|
+  		  next if !@options['abbreviations'].has_key?(key)  		  
+  		  long_key = @options['abbreviations'][key]  		  
+        new_params[long_key] = val
+        keys_to_delete << key        
+  		}
+  		keys_to_delete.each { |k| @params.delete(k) }
+  		new_params.each { |k,v| @params[k] = v }        		
+  		@params.each  { |k,v| @params[k]  = post_get[k] ? post_get[k] : v }        			
+  		@options.each { |k,v| @options[k] = post_get[k] ? post_get[k] : v }
+  		
   		#@custom_url_vars = custom_url_vars if !custom_url_vars.nil?
   		@use_url_params = @options['use_url_params'].nil? ? Caboose.use_url_params : @options['use_url_params']
       
@@ -129,7 +143,8 @@ module Caboose
       return true
   	end
   	
-  	def items  		
+  	def items
+      Caboose.log(where)  		
   		assoc = model_with_includes.where(where)
     	if @options['items_per_page'] != -1
     	  assoc = assoc.limit(limit).offset(offset)

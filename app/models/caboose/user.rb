@@ -5,7 +5,7 @@ class Caboose::User < ActiveRecord::Base
   has_many :roles, :through => :role_memberships
   has_attached_file :image, 
     :path => 'users/:id_:style.:extension',
-    :default_url => '/images/default_user_image.jpg',    
+    :default_url => "#{Caboose::cdn_domain}/images/default_user_image.jpg",    
     :styles => {
       :tiny  => '150x200>',
       :thumb => '300x400>',

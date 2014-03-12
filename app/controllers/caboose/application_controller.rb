@@ -12,7 +12,6 @@ module Caboose
       # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
       
-      
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
       
       # Initialize AB Testing

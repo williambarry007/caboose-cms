@@ -21,7 +21,7 @@ module Caboose
     #		itemsPerPage:	Number of items you want to show per page. Defaults to 10 if not present.
     #		page: Current page number.  Defaults to 0 if not present.
     #
-    attr_accessor :params, :options, :custom_url_vars    
+    attr_accessor :original_params, :params, :options, :custom_url_vars    
   	
     #def initialize(post_get, params = nil, options = nil, &custom_url_vars = nil)
   	def initialize(post_get, params = nil, options = nil)
@@ -31,7 +31,7 @@ module Caboose
   	  
   		# Note: a few keys are required:
   		# base_url, page, itemCount, itemsPerPage
-  		@orginal_params = {}
+  		@original_params = {}
   		@params = {}
   		@options = {
   		  'model'           => '',
@@ -49,10 +49,10 @@ module Caboose
   			                         #   search_field_2 => [association_name, join_table, column_name]
   			                         # }  			
   		}      
-  		params.each { |key, val|
+  		params.each do |key, val|
   		  @original_params[key] = val
   		  @params[key] = val 
-  		}
+  		end
   		options.each { |key, val| @options[key] = val }
   		
   		#@params.each  { |key, val|  		  
@@ -69,7 +69,8 @@ module Caboose
         keys_to_delete << key        
   		}
   		keys_to_delete.each { |k| @params.delete(k) }
-  		new_params.each { |k,v| @params[k] = v }        		
+  		new_params.each { |k,v| @params[k] = v }
+  		@original_params.each { |k,v| @original_params[k] = post_get[k] ? post_get[k] : v }
   		@params.each  { |k,v| @params[k]  = post_get[k] ? post_get[k] : v }        			
   		@options.each { |k,v| @options[k] = post_get[k] ? post_get[k] : v }
   		
@@ -147,8 +148,7 @@ module Caboose
       return true
   	end
   	
-  	def items
-      Caboose.log(where)  		
+  	def items        		
   		assoc = model_with_includes.where(where)
     	if @options['items_per_page'] != -1
     	  assoc = assoc.limit(limit).offset(offset)
@@ -234,9 +234,9 @@ module Caboose
   	  if !@custom_url_vars.nil?
   	    return @custom_url_vars.call @options['base_url'], @params
   	  end
-  	  
+  	    	  
   	  vars = []
-  	  @params.each do |k,v|  	    
+  	  @original_params.each do |k,v|          	    
   	    next if @options['skip'].include?(k)
   	    k = @options['abbreviations'].include?(k) ? @options['abbreviations'][k] : k  	      	    
   	    if v.kind_of?(Array)
@@ -256,9 +256,15 @@ module Caboose
   	      end  	        
   	    end  	      	    
   	  end
-  	  vars.push("sort=#{@options['sort']}")
-  		vars.push("desc=#{@options['desc']}")  		
-  		vars.push("page=#{@options['page']}")  			
+  	  if @use_url_params
+  	    vars.push("sort/#{@options['sort']}")
+  		  vars.push("desc/#{@options['desc']}")  		
+  		  #vars.push("page/#{@options['page']}")
+      else
+        vars.push("sort=#{@options['sort']}")
+  		  vars.push("desc=#{@options['desc']}")  		
+  		  #vars.push("page=#{@options['page']}")
+  		end  			
   	  return "#{@options['base_url']}" if vars.length == 0
   	  if @use_url_params
   	    vars = URI.escape(vars.join('/'))  	    

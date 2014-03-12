@@ -65,7 +65,7 @@ module Caboose
   		@params.each  { |key, val|
   		  next if !@options['abbreviations'].has_key?(key)  		  
   		  long_key = @options['abbreviations'][key]  		  
-        new_params[long_key] = val
+        new_params[long_key] = post_get[key] ? post_get[key] : val
         keys_to_delete << key        
   		}
   		keys_to_delete.each { |k| @params.delete(k) }
@@ -89,26 +89,22 @@ module Caboose
   	  m = @options['model'].constantize
   		return m if @options['includes'].nil?
   		
-  		# See if any fields that we know have includes have values
   		associations = []
-  		@options['includes'].each do |field, arr|    		          
-  		  next if @params[field].nil? || (@params[field].kind_of?(String) && @params[field].length == 0)  		  
-        associations << arr[0]
-      end
+  		# See if any fields that we know have includes have values  		
+  		@params.each do |k,v|
+        next if v.nil? || (v.kind_of?(String) && k.length == 0)
+        k.split('_concat_').each do |k2|
+          next if !@options['includes'].has_key?(k2)
+          associations << @options['includes'][k2][0]
+        end
+      end        		
       # See if any fields in the sort option are listed in a table_name.column_name format
       if @options['sort']
         @options['sort'].split(',').each do |col|
           tbl_col = col.split('.')
           associations << association_for_table_name(tbl_col[0]) if tbl_col && tbl_col.count > 1          
         end
-      end
-      # See if any parameters are listed in a table_name.column_name format
-      @params.each do |k,v|
-        k.split('_concat_').each do |col,v2|        
-          tbl_col = col.split('.')
-          associations << association_for_table_name(tbl_col[0]) if tbl_col && tbl_col.count > 1
-        end
-      end
+      end      
   		associations.uniq.each { |assoc| m = m.includes(assoc) }
   		return m
   	end

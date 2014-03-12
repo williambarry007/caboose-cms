@@ -31,6 +31,7 @@ module Caboose
   	  
   		# Note: a few keys are required:
   		# base_url, page, itemCount, itemsPerPage
+  		@orginal_params = {}
   		@params = {}
   		@options = {
   		  'model'           => '',
@@ -48,8 +49,11 @@ module Caboose
   			                         #   search_field_2 => [association_name, join_table, column_name]
   			                         # }  			
   		}      
-  		params.each   { |key, val| @params[key]  = val }
-  		options.each  { |key, val| @options[key] = val }
+  		params.each { |key, val|
+  		  @original_params[key] = val
+  		  @params[key] = val 
+  		}
+  		options.each { |key, val| @options[key] = val }
   		
   		#@params.each  { |key, val|  		  
   		#  k = @options['abbreviations'].include?(key) ? @options['abbreviations'][key] : nil  		  
@@ -313,8 +317,17 @@ module Caboose
           arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_lt')                                  
           arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_bw')                                              
           arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_ew')
-          arr[arr.count-1] = arr[arr.count-1][0..-6] if k.ends_with?('_like')                                            
-          col = "concat(#{arr.join(",' ',")})"
+          arr[arr.count-1] = arr[arr.count-1][0..-6] if k.ends_with?('_like')
+          arr2 = []
+          arr.each do |col|
+            if @options['includes'] && @options['includes'].include?(col)           
+              arr3 = @options['includes'][col]
+              arr2 << "#{table_name_of_association(arr3[0])}.#{arr3[1]}"
+            else
+              arr2 << col
+            end            
+          end
+          col = "concat(#{arr2.join(",' ',")})"
         end
         
         sql2 = ""

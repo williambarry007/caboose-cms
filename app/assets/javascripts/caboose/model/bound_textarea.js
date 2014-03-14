@@ -94,7 +94,7 @@ BoundTextarea = BoundControl.extend({
       {
         this2.show_check(500);
         $('#'+this2.el).val(this2.attribute.value);
-        $('#'+this2.el).removeClass('dirty');
+        $('#'+this2.el).removeClass('mb_dirty');
 
         if (this2.binder.success)
           this2.binder.success(this2);
@@ -115,7 +115,7 @@ BoundTextarea = BoundControl.extend({
     }    
     this.attribute.value = this.attribute.value_clean;
     $('#'+this.el).val(this.attribute.value);
-    $('#'+this.el).removeClass('dirty');
+    $('#'+this.el).removeClass('mb_dirty');
     
     if ($('#'+this.el+'_check').length)
       this.hide_check();

@@ -11,7 +11,8 @@
  *= require colorbox-rails
  *= require jquery.ui.all
  *= require caboose/fonts
- *= require caboose/caboose  
+ *= require caboose/caboose
+ *= require caboose/model_binder
  */
 
 #cboxLoadedContent { margin-bottom: 0; }

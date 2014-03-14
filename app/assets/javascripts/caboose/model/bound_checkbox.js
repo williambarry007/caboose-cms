@@ -21,6 +21,7 @@ BoundCheckbox = BoundControl.extend({
     var this2 = this;
     $('#'+this.el).wrap($('<div/>')
       .attr('id', this.el + '_container')
+      .addClass('mb_container')
       .css('position', 'relative')
     );
     $('#'+this.el+'_container').empty();
@@ -28,7 +29,7 @@ BoundCheckbox = BoundControl.extend({
     {
       $('#'+this.el+'_container').append($('<div/>')
         .attr('id', this.placeholder)
-        .addClass('placeholder')
+        .addClass('mb_placeholder')
         .append($('<span/>').html(this.attribute.nice_name + ': '))
       );
     }
@@ -58,7 +59,7 @@ BoundCheckbox = BoundControl.extend({
       .attr('id', this.el + '_background')
       .attr('disabled', true)
       //.css('background', '#fff')
-      .addClass('checkbox_background')
+      .addClass('mb_checkbox_background')
     );
     if (this.attribute.width)
       $('#'+this.el+'_background').css('width' , this.attribute.width);

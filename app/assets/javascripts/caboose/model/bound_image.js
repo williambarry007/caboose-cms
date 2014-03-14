@@ -20,7 +20,11 @@ BoundImage = BoundControl.extend({
       this.attribute.update_url = this.model.update_url;
          
     var this2 = this;
-    $('#'+this.el).wrap($('<div/>').attr('id', this.el + '_container').css('position', 'relative'));
+    $('#'+this.el).wrap($('<div/>')
+      .attr('id', this.el + '_container')
+      .addClass('mb_container')
+      .css('position', 'relative')
+    );
     $('#'+this.el+'_container').empty();
     
     $('#'+this.el+'_container').append($('<img/>')

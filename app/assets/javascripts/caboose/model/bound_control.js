@@ -22,7 +22,7 @@ BoundControl = Class.extend({
     {      
       $('#'+this.el+'_container').prepend($('<div/>')
         .attr('id', this.el + '_check')
-        .addClass('bound_input_check')
+        .addClass('mb_bound_input_check')
         .css('position', 'absolute')
         .css('top', 0)
         .css('left', w-h-1)
@@ -39,7 +39,7 @@ BoundControl = Class.extend({
       );
     }    
     $('#'+this.el+'_check a')
-      .addClass('loading')
+      .addClass('mb_loading')
       .css('margin-left', h);
     $('#'+this.el+'_check a').animate({ 'margin-left': 0 }, 300); 
   },

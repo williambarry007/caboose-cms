@@ -1,0 +1,118 @@
+
+.mb_container {
+  width: 100%;  
+}
+
+.mb_container div.mb_model_attribute_text {
+  color: #000;
+}
+
+.mb_container input[type=text],
+.mb_container select,
+.mb_container .mb_fake option,
+.mb_container option {
+  font-size: 16px !important;
+}
+
+.mb_container input.mb_dirty,
+.mb_container textarea.mb_dirty {
+  background: #fff799;  
+}
+
+.mb_container select.mb_fake {
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: transparent;
+  background: transparent;
+  height: 50px !important;
+}
+
+.mb_container select.mb_fake option {
+  background: #fff;
+  color: #000;
+}
+
+.mb_container .mb_bound_input_check a,
+.mb_container .mb_bound_input_cancel a {
+  border: 1px solid #ccc;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  
+  font-size: 28px;
+  text-align: center;
+  background: #00cc00;
+  color: #fff;
+  
+  display: block;
+  padding: 4px 0;
+  height: 34px;
+}
+
+.mb_container .mb_bound_input_check a.loading {
+  background-image: url(/assets/caboose/loading_green.gif);
+  background-color: #00cc00;
+  background-repeat: no-repeat;
+  background-position: 6px 5px;
+  color: rgba(255, 255, 255, 0.0);
+}
+
+.mb_container .mb_bound_textarea_controls a {
+  display: inline-block;
+  margin: 3px 0 0 1px;
+  padding: 8px 0 6px 0;
+  background: #ccc;
+  color: #000;
+  text-align: center;
+  border: #666 1px solid;
+}
+
+.mb_container .mb_bound_textarea_controls a.save    { width: 60px; }
+.mb_container .mb_bound_textarea_controls a.discard { width: 80px; }
+  
+div.mb_container div.mb_placeholder {
+  display: block;
+  margin: 0;
+  padding: 0 5px 0 0;
+  /*height: 34px;*/
+  
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  z-index: 19;  
+}
+
+.mb_container .mb_placeholder span {
+  display: block;
+  font-size: 20px;
+  color: #757575;
+}
+
+.mb_container input[type='checkbox'] {
+  /*position: absolute;*/
+  top: 4px;
+  left: 0;
+  z-index: 19;
+  
+  margin: 0;
+  padding: 0;
+  width: 20px;
+}
+
+.mb_container div.model_attribute_text {
+  color: #fff;
+}
+
+.mb_container .mb_model_attribute {
+  background: none repeat scroll 0 0 transparent;
+  display: block;
+  padding: 2px 4px;
+  text-decoration: none;
+}
+
+.mb_container .mb_clear {
+  clear: both;
+  line-height: 0;  
+}

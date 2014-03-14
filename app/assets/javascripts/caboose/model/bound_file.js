@@ -16,7 +16,11 @@ BoundFile = BoundControl.extend({
     this.placeholder = this.el + '_placeholder';
          
     var this2 = this;
-    $('#'+this.el).wrap($('<div/>').attr('id', this.el + '_container').css('position', 'relative'));
+    $('#'+this.el).wrap($('<div/>')
+      .attr('id', this.el + '_container')
+      .addClass('mb_container')
+      .css('position', 'relative')
+    );
     $('#'+this.el+'_container').empty();
         
     var tr = $('<tr/>');
@@ -25,7 +29,7 @@ BoundFile = BoundControl.extend({
     {
       tr.append($('<td/>')
         .attr('id', this.placeholder)
-        .addClass('placeholder')
+        .addClass('mb_placeholder')
         .css('position', 'relative')
         .append($('<span/>').html(this.attribute.nice_name + ': '))
       );

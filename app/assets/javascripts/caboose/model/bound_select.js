@@ -19,6 +19,7 @@ BoundSelect = BoundControl.extend({
          
     $('#'+this.el).wrap($('<div/>')
       .attr('id', this.el + '_container')
+      .addClass('mb_container')
       .css('position', 'relative')
     );
     $('#'+this.el+'_container').empty();
@@ -26,16 +27,19 @@ BoundSelect = BoundControl.extend({
     {
       $('#'+this.el+'_container').append($('<div/>')
         .attr('id', this.placeholder)
-        .addClass('placeholder')
+        .addClass('mb_placeholder')
         .append($('<span/>')
           .html(this.attribute.nice_name + ': ')
         )
       );
     }
+    var this2 = this;
     $('#'+this.el+'_container').append($('<input/>')
+      .attr('type', 'text')
       .attr('id', this.el)
+      .addClass('mb_fake_option')
       .attr('placeholder', this.attribute.empty_text)
-      .on('focus', function() { this2.edit(); })
+      .click(function() { this2.edit(); })
       .val(this.attribute.text.length > 0 ? this.attribute.text : this.attribute.empty_text)
     );
     if (this.attribute.width)
@@ -55,17 +59,16 @@ BoundSelect = BoundControl.extend({
     //this.attribute.populate_options(function() {
     //  this2.print_options(this2);
     //});    
-    
-    var this2 = this;
+        
     this.attribute.populate_options(function() {
       var select = $('<select/>')
         .attr('id', this2.el + '_select')
-        .addClass('fake')
-        .css('width', $('#'+this2.el).outerWidth())
+        .addClass('mb_fake')
+        .css('width', $('#'+this2.el).outerWidth())        
         .on('change', function() {
           $('#'+this2.el).val($('#'+this2.el+'_select').val());
           this2.save();                     
-        });
+        });        
       // Make sure the existing value is in the list of options
       var exists = false;
       $.each(this2.attribute.options, function(i, option) {
@@ -127,8 +130,7 @@ BoundSelect = BoundControl.extend({
     
   },
     
-  edit: function() {
-    
+  edit: function() {        
   },
   
   save: function() {

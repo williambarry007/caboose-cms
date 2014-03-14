@@ -14,7 +14,11 @@ BoundRichText = BoundControl.extend({
     
     this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;
 
-    $('#'+this.el).wrap($('<div/>').attr('id', this.el + '_container').css('position', 'relative'));
+    $('#'+this.el).wrap($('<div/>')
+      .attr('id', this.el + '_container')
+      .addClass('mb_container')
+      .css('position', 'relative')
+    );
     $('#'+this.el+'_container').empty();
     $('#'+this.el+'_container').append($('<textarea/>').attr('id', this.el).attr('class', 'tinymce').attr('placeholder', 'empty').val(this.attribute.value));
     //$('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));

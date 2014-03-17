@@ -84,12 +84,22 @@ div.mb_container div.mb_placeholder {
   z-index: 19;  
 }
 
+div.mb_container form.mb_file_form div.mb_placeholder {
+  position: relative;
+  float: left;
+  margin-right: 14px;
+}
+
 .mb_container .mb_placeholder span {
   display: block;
   font-size: 20px;
   color: #757575;
 }
 
+div.mb_container form.mb_file_form div.mb_placeholder span {
+  display: inline;
+}
+  
 .mb_container input[type='checkbox'] {
   /*position: absolute;*/
   top: 4px;
@@ -115,4 +125,34 @@ div.mb_container div.mb_placeholder {
 .mb_container .mb_clear {
   clear: both;
   line-height: 0;  
+}
+
+.mb_fake_file_input {
+  position: relative;
+  overflow: hidden;
+  float: left;
+  margin-right: 14px;
+}
+
+.mb_fake_file_input input[type='file'] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  width: 1000px;
+  height: 100px;
+  text-align: right;      
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+  -khtml-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+}
+
+.mb_fake_file_input input[type='button'] {
+  z-index: 1; 
+}
+
+.mb_fake_file_input input[type='submit'] {
+  display: none;
 }

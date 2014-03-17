@@ -33,48 +33,62 @@ BoundImage = BoundControl.extend({
       .css('float', 'left')
       .css('margin-right', 10)
     );    
-    $('#'+this.el+'_container').append($('<form/>')
-      .attr('action', this.attribute.update_url)
-      .attr('method', 'post')
-      .attr('enctype', 'multipart/form-data')
-      .attr('encoding', 'multipart/form-data')
-      .attr('target', this.el + '_iframe')
-      .on('submit', function() {
-         $('#'+this2.el+'_message').html("<p class='loading'>Uploading...</p>");
-         $('#'+this2.el+'_iframe').on('load', function() { this2.post_upload(); });  
-      })
-      .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(this.binder.authenticity_token))
-      .append($('<input/>').attr('type', 'button').val('Update ' + this.attribute.nice_name).click(function() { 
-        $('#'+this2.el+'_container input[type="file"]').click(); 
-      }))
-      .append($('<input/>')
-        .attr('type', 'file')
-        .attr('name', this.attribute.name)
-        .css('display', 'none')
-        .on('change', function() { $('#'+this2.el+'_container form').submit(); })
-      )
-    );
+    $('#'+this.el+'_container')
+      .append($('<form target="' + this.el + '_iframe"></form>')
+        .attr('id', this.el + '_form')
+        .attr('action', this.attribute.update_url)
+        .attr('method', 'post')
+        .attr('enctype', 'multipart/form-data')
+        .attr('encoding', 'multipart/form-data')
+        //.attr('target', this.el + '_iframe')
+        .on('submit', function() {           
+           $('#'+this2.el+'_message').html("<p class='loading'>Uploading...</p>");
+           $('#'+this2.el+'_iframe').on('load', function() { this2.post_upload(); });
+           return true;
+        })
+        .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(this.binder.authenticity_token))        
+        .append($('<div/>')
+          .attr('id', this.el + '_fake_file_input')
+          .addClass('mb_fake_file_input')          
+          .append($('<input/>')            
+            .attr('type', 'button')
+            .attr('id', this.el + '_update_button')
+            .val('Update ' + this.attribute.nice_name)
+            .click(function() { $('#'+this2.el+'_file').click(); })
+          )
+          .append($('<input/>')
+            .attr('type', 'file')
+            .attr('id', this.el + '_file')
+            .attr('name', this.attribute.name)            
+            .change(function() { $('#'+this2.el+'_form').trigger('submit'); })
+          )
+          .append($('<input/>')
+            .attr('type', 'submit')            
+            .val('Submit')
+          )
+        )
+      );
     $('#'+this.el+'_container').append($('<div/>')
       .attr('id', this.el + '_message')
     );
-    iframe = $('<iframe/>')
-      .attr('name', this.el + '_iframe')
-      .attr('id', this.el + '_iframe');      
+    iframe = $("<iframe name=\"" + this.el + "_iframe\" id=\"" + this.el + "_iframe\" src=''></iframe>");          
     if (this.attribute.debug)      
       iframe.css('width', '100%').css('height', 600).css('background', '#fff');
     else
       iframe.css('width', 0).css('height', 0).css('border', 0);         
     $('#'+this.el+'_container').append(iframe);    
     $('#'+this.el+'_container').append($('<br/>').css('clear', 'both'));
+        
+    var w = $('#' + this.el + '_update_button').outerWidth(true);
+    $('#' + this.el + '_fake_file_input').css('width', '' + w + 'px');      
   },
   
   post_upload: function() {
     $('#'+this.el+'_message').empty();
     
     var str = frames[this.el+'_iframe'].document.documentElement.innerHTML;
-    str = str.replace(/.*?{(.*?)/, '{$1');
+    str = str.replace(/[\s\S]*?{([\s\S]*?)/, '{$1');
     str = str.substr(0, str.lastIndexOf('}')+1);
-    
     var resp = $.parseJSON(str);    
     if (resp.success)
 		{		  

@@ -19,79 +19,87 @@ BoundFile = BoundControl.extend({
     $('#'+this.el).wrap($('<div/>')
       .attr('id', this.el + '_container')
       .addClass('mb_container')
-      .css('position', 'relative')
+      .addClass('mb_file_container')      
     );
     $('#'+this.el+'_container').empty();
-        
-    var tr = $('<tr/>');
-        
+    
+    $('#'+this.el+'_container')
+      .append($('<form target="' + this.el + '_iframe"></form>')
+        .addClass('mb_file_form')
+        .attr('id', this.el + '_form')        
+        .attr('action', this.attribute.update_url)
+        .attr('method', 'post')
+        .attr('enctype', 'multipart/form-data')
+        .attr('encoding', 'multipart/form-data')
+        .on('submit', function() {           
+           $('#'+this2.el+'_message').html("<p class='loading'>Uploading...</p>");
+           $('#'+this2.el+'_iframe').on('load', function() { this2.post_upload(); });
+           return true;
+        })
+      );
+    
     if (this.attribute.fixed_placeholder == true)
     {
-      tr.append($('<td/>')
+      $('#'+this.el+'_form').append($('<div/>')        
         .attr('id', this.placeholder)
-        .addClass('mb_placeholder')
-        .css('position', 'relative')
+        .addClass('mb_placeholder')          
         .append($('<span/>').html(this.attribute.nice_name + ': '))
       );
     }
-    
-    var td = $('<td/>').append($('<a/>')
-      .attr('id', this.el + '_link')
-      .attr('href', this.attribute.value)
-      .attr('target', '_blank')
-      .html(this.attribute.download_text ? this.attribute.download_text : 'Download current file')
-      .css('margin-right', 10)      
-    );
-    if (this.attribute.value == false)
-      td.css('display', 'none');
-    tr.append(td);
-    
-    tr.append($('<td/>').append($('<form/>')
-      .attr('action', this.attribute.update_url)
-      .attr('method', 'post')
-      .attr('enctype', 'multipart/form-data')
-      .attr('encoding', 'multipart/form-data')
-      .attr('target', this.el + '_iframe')
-      .on('submit', function() {
-         $('#'+this2.el+'_message').html("<p class='loading'>Uploading...</p>");
-         $('#'+this2.el+'_iframe').on('load', function() { this2.post_upload(); });  
-      })
-      .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(this.binder.authenticity_token))      
-      .append($('<a/>').attr('href', '#').html(this.attribute.upload_text ? this.attribute.upload_text : 'Update ' + this.attribute.nice_name).click(function() { 
-        $('#'+this2.el+'_container input[type="file"]').click(); 
-      }))      
-      //.append($('<input/>').attr('type', 'button').val('Update ' + this.attribute.nice_name).click(function() { 
-      //  $('#'+this2.el+'_container input[type="file"]').click(); 
-      //}))
-      .append($('<input/>')
-        .attr('type', 'file')
-        .attr('name', this.attribute.name)
-        .css('display', 'none')
-        .on('change', function() { $('#'+this2.el+'_container form').submit(); })
-      )
-    ));
-    
-    $('#'+this.el+'_container').append($('<table/>').append($('<thead/>').append(tr)));
         
+    $('#'+this.el+'_form')      
+      .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(this.binder.authenticity_token))        
+      .append($('<div/>')
+        .attr('id', this.el + '_fake_file_input')
+        .addClass('mb_fake_file_input')          
+        .append($('<input/>')            
+          .attr('type', 'button')
+          .attr('id', this.el + '_update_button')
+          .val(this.attribute.upload_text ? this.attribute.upload_text : 'Update ' + this.attribute.nice_name)
+          .click(function() { $('#'+this2.el+'_file').click(); })
+        )
+        .append($('<input/>')
+          .attr('type', 'file')
+          .attr('id', this.el + '_file')
+          .attr('name', this.attribute.name)            
+          .change(function() { $('#'+this2.el+'_form').trigger('submit'); })
+        )
+        .append($('<input/>')
+          .attr('type', 'submit')            
+          .val('Submit')
+        )
+      );
+      
+    if (this.attribute.value && this.attribute.value != '/files/original/missing.png')
+    {
+      $('#'+this.el+'_form').append($('<input/>')            
+        .attr('type', 'button')
+        .attr('id', this.el + '_download_button')
+        .val(this.attribute.download_text ? this.attribute.download_text : 'Download current file')
+        .click(function() { window.open(this2.timestamped_link(), '_blank'); })
+      );
+    }
+
     $('#'+this.el+'_container').append($('<div/>')
       .attr('id', this.el + '_message')
     );
-    iframe = $("<iframe name=\"" + this.el + "_iframe\"></iframe>")    
-      .attr('name', this.el + '_iframe')
-      .attr('id', this.el + '_iframe');      
+    iframe = $("<iframe name=\"" + this.el + "_iframe\" id=\"" + this.el + "_iframe\" src=''></iframe>");          
     if (this.attribute.debug)      
       iframe.css('width', '100%').css('height', 600).css('background', '#fff');
     else
       iframe.css('width', 0).css('height', 0).css('border', 0);         
     $('#'+this.el+'_container').append(iframe);    
     $('#'+this.el+'_container').append($('<br/>').css('clear', 'both'));
+        
+    var w = $('#' + this.el + '_update_button').outerWidth(true);
+    $('#' + this.el + '_fake_file_input').css('width', '' + w + 'px');                                           
   },
   
   post_upload: function() {
     $('#'+this.el+'_message').empty();
     
     var str = frames[this.el+'_iframe'].document.documentElement.innerHTML;
-    str = str.replace(/.*?{(.*?)/, '{$1');
+    str = str.replace(/[\s\S]*?{([\s\S]*?)/, '{$1');
     str = str.substr(0, str.lastIndexOf('}')+1);
     
     var resp = $.parseJSON(str);    
@@ -100,19 +108,21 @@ BoundFile = BoundControl.extend({
 		  if (resp.attributes && resp.attributes[this.attribute.name])
 		    for (var thing in resp.attributes[this.attribute.name])
 		      this.attribute[thing] = resp.attributes[this.attribute.name][thing];
-		  this.attribute.value_clean = this.attribute.value;
+		  this.attribute.value_clean = this.attribute.value;		  		  
 		}
 				
     if (resp.error)
-      this.error(resp.error);
-    else
-    {
-      $('#'+this.el+'_link').parent().css('display', 'block');
-      $('#'+this.el+'_link').attr('href', this.attribute.value);      
-      //$('#'+this.el+'_container img').attr('src', this.attribute.value);
-    }
+      this.error(resp.error);    
   },
     
+  timestamped_link: function() {
+    var href = this.attribute.value;
+    if (href.indexOf('?') > 0)
+      href = href.split('?')[0];    
+    href = href + '?' + Math.random();
+    return href;
+  },
+  
   error: function(str) {
     if (!$('#'+this.el+'_message').length)
     {

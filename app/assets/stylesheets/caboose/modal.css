@@ -11,6 +11,7 @@
  *= require colorbox-rails
  *= require caboose/fonts
  *= require caboose/caboose
+ *= require caboose/model_binder
  */
 
 html { width: 100%; }

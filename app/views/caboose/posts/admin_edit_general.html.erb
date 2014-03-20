@@ -20,7 +20,7 @@ $(document).ready(function() {
     attributes: [
       { name: 'published'   , nice_name: 'Published'  , type: 'checkbox'  , value: <%= raw @post.published ? true : false         %>, width: 600 },      
       { name: 'title'       , nice_name: 'Title'      , type: 'text'      , value: <%= raw Caboose.json(@post.title)              %>, width: 600 },
-      { name: 'image'       , nice_name: 'Image'      , type: 'image'     , value: <%= raw Caboose.json(@post.image.url(:thumb))  %>, width: 600 }      
+      { name: 'image'       , nice_name: 'Image'      , type: 'image'     , value: <%= raw Caboose.json(@post.image.url(:thumb))  %>, width: 600, update_url: '/admin/posts/<%= @post.id %>/image' }      
     ]
   });
 });

@@ -28,7 +28,8 @@ Attribute.prototype = {
   
   update_url: false,
   options_url: false,
-  options: false, 
+  options: false,
+  s3: false,
   
   save: function(after) {
     if (this.before_update) this.before_update();    

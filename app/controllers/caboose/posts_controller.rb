@@ -68,18 +68,11 @@ module Caboose
       save = true
       params.each do |name, value|    
         case name
-          when 'category_id'
-            post.category_id = value
-          when 'title'            
-            post.title = value
-          when 'body'
-            post.body = value
-          when 'image'
-            post.image = value
-          when 'published'
-            post.published = value.to_i == 1
-          when 'created_at'
-            post.created_at = DateTime.parse(value)
+          when 'category_id'    then post.category_id = value
+          when 'title'          then post.title = value
+          when 'body'           then post.body = value          
+          when 'published'      then post.published = value.to_i == 1
+          when 'created_at'     then post.created_at = DateTime.parse(value)
         end
       end
       resp.success = save && post.save
@@ -87,6 +80,19 @@ module Caboose
         resp.attributes['image'] = { 'value' => post.image.url(:thumb) }
       end
       render :json => resp
+    end
+    
+    # POST /admin/posts/:id/image
+    def admin_update_image
+      return if !user_is_allowed('posts', 'edit')
+      
+      resp = Caboose::StdClass.new
+      post = Post.find(params[:id])
+      post.image = params[:image]            
+      resp.success = post.save
+      resp.attributes = { 'image' => { 'value' => post.image.url(:thumb) }}
+      
+      render :text => resp.to_json
     end
     
     # GET /admin/posts/new

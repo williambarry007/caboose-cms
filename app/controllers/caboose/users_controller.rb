@@ -57,10 +57,10 @@ module Caboose
       return if !user_is_allowed('users', 'view')
       
       @gen = PageBarGenerator.new(params, {
-    		  'first_name'  => '',
-    		  'last_name'		=> '',
-    		  'username'	  => '',
-    		  'email' 		  => '',
+    		  'first_name_like' => '',
+    		  'last_name_like'	=> '',
+    		  'username_like'	  => '',
+    		  'email_like' 		  => '',
     		},{
     		  'model'          => 'Caboose::User',
     	    'sort'			     => 'last_name, first_name',

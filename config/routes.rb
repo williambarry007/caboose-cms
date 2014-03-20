@@ -121,7 +121,7 @@ Caboose::Engine.routes.draw do
   get     "admin/posts/:id/remove-from-category"  => "posts#admin_remove_from_category"
   get     "admin/posts/:id/delete"                => "posts#admin_delete_form"
   put     "admin/posts/:id"                       => "posts#admin_update"
-  post    "admin/posts/:id"                       => "posts#admin_update"
+  post    "admin/posts/:id/image"                 => "posts#admin_update_image"
   get     "admin/posts"                           => "posts#admin_index"
   post    "admin/posts"                           => "posts#admin_add"  
   delete  "admin/posts/:id"                       => "posts#admin_delete"

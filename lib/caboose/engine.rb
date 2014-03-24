@@ -63,7 +63,8 @@ module Caboose
   end
   
   class Engine < ::Rails::Engine
-    isolate_namespace Caboose    
+    isolate_namespace Caboose
+    require 'jquery-rails'    
     initializer 'caboose.assets.precompile' do |app|            
       app.config.assets.precompile += [      
         # Images

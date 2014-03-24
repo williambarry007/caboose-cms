@@ -48,5 +48,6 @@ Gem::Specification.new do |s|
   s.add_dependency "colorbox-rails"
   s.add_dependency "paperclip"
   s.add_dependency "awesome_print"
+  s.add_dependency "ejs"
   
 end

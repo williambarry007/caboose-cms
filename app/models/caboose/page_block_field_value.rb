@@ -6,7 +6,7 @@ class Caboose::PageBlockFieldValue < ActiveRecord::Base
   belongs_to :page_block_field
 
   has_attached_file :file, :path => '/uploads/:id.:extension'
-  #do_not_validate_attachment_file_type :file
+  do_not_validate_attachment_file_type :file
   has_attached_file :image, 
     :path => 'uploads/:id_:image_updated_at_:style.:extension', 
     :styles => {
@@ -14,7 +14,7 @@ class Caboose::PageBlockFieldValue < ActiveRecord::Base
       :thumb => '400x300>',
       :large => '640x480>'
     }
-  #do_not_validate_attachment_file_type :image
+  do_not_validate_attachment_file_type :image
     
   attr_accessible :id, :page_block_id, :page_block_field_id, :value
   

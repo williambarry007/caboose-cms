@@ -273,10 +273,6 @@ class Caboose::Page < ActiveRecord::Base
     return block
   end
   
-  def url
-    return self.url(self.id)
-  end
-  
   def self.url(page_id)
     arr = []
     self.url_helper(page_id, arr)

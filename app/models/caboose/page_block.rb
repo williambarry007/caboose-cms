@@ -40,7 +40,8 @@ class Caboose::PageBlock < ActiveRecord::Base
     end
   end
   
-  def render_from_function(empty_text = nil, editing = false) 
+  def render_from_function(empty_text = nil, editing = false)
+    Caboose.log("editing = #{editing}")
     locals = OpenStruct.new(:block => self, :empty_text => empty_text, :editing => editing)
     erb = ERB.new(page_block_type.render_function)
     return erb.result(locals.instance_eval { binding })

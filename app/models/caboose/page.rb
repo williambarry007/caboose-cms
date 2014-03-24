@@ -3,7 +3,7 @@ class Caboose::Page < ActiveRecord::Base
   self.table_name = "pages"
   
   belongs_to :parent, :class_name => "Page"
-  has_many :children, :class_name => "Page", :foreign_key => 'parent_id'    
+  has_many :children, :class_name => "Page", :foreign_key => 'parent_id', :order => 'sort_order, title'
   has_many :page_permissions
   has_many :page_blocks, :order => 'sort_order'
   attr_accessible :parent_id, 

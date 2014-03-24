@@ -41,7 +41,7 @@ module Caboose
       html = nil
       
       if bt.use_render_function && bt.render_function
-        html = b.render_from_function(params[:empty_text])        
+        html = b.render_from_function(params[:empty_text], true)        
       else        
         html = render_to_string({
           :partial => "caboose/page_blocks/#{b.page_block_type.name}",

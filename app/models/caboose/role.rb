@@ -75,6 +75,23 @@ class Caboose::Role < ActiveRecord::Base
     return self.where(:parent_id => -1).reorder("name").all
   end
   
+  def self.flat_tree(prefix = '-')
+    arr = []
+    self.tree.each do |r|
+      arr += self.flat_tree_helper(r, prefix, '')
+    end
+    return arr
+  end
+  
+  def self.flat_tree_helper(role, prefix, str)
+    role.name = "#{str}#{role.name}"
+    arr = [role]
+    role.children.each do |r|
+      arr += self.flat_tree_helper(r, prefix, "#{str}#{prefix}")
+    end
+    return arr
+  end
+  
   def is_ancestor_of?(role)    
     if (role.is_a?(Integer) || role.is_a?(String))
       role_id = role.to_i
@@ -90,6 +107,6 @@ class Caboose::Role < ActiveRecord::Base
   def is_child_of?(role)    
     role = Role.find(role) if role.is_a?(Integer)
     return role.is_ancestor_of?(self)      
-  end
-	
+  end    
+    	
 end

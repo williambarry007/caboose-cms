@@ -22,7 +22,7 @@ module Caboose
       user = logged_in_user
       if !user.is_allowed(page, 'view')
         if user.id == User.logged_out_user_id	
-          redirect_to "/login?return_url=" + URI.encode(request.fullpath)		  		
+          redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)		  		
           return
         else
           page.title = 'Access Denied'
@@ -115,6 +115,13 @@ module Caboose
     
     # GET /admin/pages/:id/edit
     def admin_edit_general
+      return unless user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # GET /admin/pages/:id/permissions
+    def admin_edit_permissions
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'

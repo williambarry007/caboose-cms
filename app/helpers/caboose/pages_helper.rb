@@ -24,5 +24,20 @@ module Caboose
       return "var _gaq = _gaq || [];\n_gaq.push(['_setCustomVar', 1, 'caboose_ab_variants', #{Caboose.json(AbTesting.analytics_string)}]);"            
     end
     
+    def pages_roles_with_prefix(top_roles, prefix)
+      arr = []
+      top_roles.each do |r|        
+        arr = pages_roles_with_prefix_helper(arr, r, prefix, "")
+      end
+    end
+    
+    def pages_roles_with_prefix_helper(arr, role, prefix, str)      
+      arr << "#{str}#{role.name}"
+      role.children.each do |r|
+        arr = pages_roles_with_prefix_helper(arr, r, prefix, "#{prefix}#{str}")
+      end
+      return arr
+    end
+          
   end
 end

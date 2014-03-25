@@ -1,35 +1,39 @@
 
 <h1>New role</h1>
-<div id='role_new_container'></div>
+
+<form action='/admin/roles' method='post' id='new_role_form'>
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' /> 
+<p><select name='parent_id'>
+  <option value=''>-- Select a parent role --</option>
+  <% Caboose::Role.flat_tree(' - ').each do |r| %>
+    <option value='<%= r.id %>'><%= r.name %></option>
+  <% end %>
+</select></p>
+<p><input type='text' name='name' id='name' placeholder='Name' value='' style='width: 200px;' /></p>
+<div id='message'></div>
+<p><input type='submit' value='Add Role' /></p>
+</form>
 
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
-var role = false;
 $(document).ready(function() {
-
-  role = new Model({
-    name: 'Role',
-    id: 'new',
-    listing_url: 'get /admin/roles',
-    create_url: 'post /admin/roles',
-    attributes: [
-      {
-        name: 'parent_id',
-        type: 'select',
-        value: -1,
-        text: "[No Parent]",
-        options_url: '/admin/roles/options' 
-      },
-      { 
-        name: 'name', 
-        type: 'text',
-        value: '' 
-      }
-    ]
-  });
-  
+  $('#new_role_form').submit(function() { add_role(); return false; });
 });
+
+function add_role()
+{
+  $('#message').html("<p class='loading'>Adding role...</p>");
+  $.ajax({
+    url: '/admin/roles',
+    type: 'post',
+    data: $('#new_role_form').serialize(),
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;    
+    }
+  });
+}
 
 </script>
 <% end %>

@@ -1,0 +1,46 @@
+
+<%= render :partial => 'caboose/pages/admin_header' %>
+
+<p class='uri'>URI: /<span id='uri'><%= @page.uri %></span></p>
+
+<table class='data' id='viewers'>
+<tr><th>Role</th><th>View</th><th>Edit</th></tr>
+<% Caboose::Role.flat_tree(' - ').each do |r| %>
+  <% next if r.id == 1 %>
+  <% may_view = Caboose::PagePermission.where(:role_id => r.id, :page_id => @page.id, :action => 'view').exists? %>
+  <% may_edit = Caboose::PagePermission.where(:role_id => r.id, :page_id => @page.id, :action => 'edit').exists? %>
+  <tr>
+    <td><label for='role_<%= r.id %>'><%= r.name %></td>
+    <td><input type='checkbox' id='role_<%= r.id %>' value='<%= r.id %>' <%= may_view ? "checked='true'" : '' %> onchange="toggle_page_permission(<%= r.id %>, $(this).prop('checked'), 'view');" /></td>
+    <td><input type='checkbox' id='role_<%= r.id %>' value='<%= r.id %>' <%= may_edit ? "checked='true'" : '' %> onchange="toggle_page_permission(<%= r.id %>, $(this).prop('checked'), 'edit');" /></td>
+  </tr>
+<% end %>
+</table>
+  
+<%= render :partial => 'caboose/pages/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#viewers input[type=checkbox] { position: relative; }
+#editors input[type=checkbox] { position: relative; }
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+function toggle_page_permission(role_id, checked, action)
+{              
+  $.ajax({
+    url: '/admin/page-permissions',
+    type: checked ? 'post' : 'delete',
+    data: { 
+      page_id: <%= @page.id %>, 
+      role_id: role_id, 
+      action2: action 
+    },
+    success: function(resp) {}
+  });
+}
+
+</script>
+<% end %>

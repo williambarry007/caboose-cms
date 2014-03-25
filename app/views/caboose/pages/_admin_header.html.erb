@@ -1,4 +1,17 @@
 <% content_for :caboose_css do %>
+<style type='text/css'>
+
+p.uri {
+  background: #efefef;
+  border: #999 1px solid;
+  padding: 10px;
+  position: absolute;
+  top: 67px;
+  left: 0;
+  height: 16px;
+}
+
+</style>
 <% end %>
 <% content_for :caboose_js do %>
 <%
@@ -23,6 +36,7 @@
 <%
 tabs = {
   'General'         => "/admin/pages/#{@page.id}/edit",
+  'Permissions'     => "/admin/pages/#{@page.id}/permissions",
   'Content'         => "/admin/pages/#{@page.id}/content",     
   'Custom CSS'      => "/admin/pages/#{@page.id}/css", 
   'Custom JS'       => "/admin/pages/#{@page.id}/js", 

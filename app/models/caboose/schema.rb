@@ -135,13 +135,14 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :image                , :attachment ]
       ],      
       Caboose::Post => [  
-        [ :title       , :text     ],  		 	 
-        [ :body        , :text 		 ],  	 
-        [ :hide        , :boolean  ], 	 
-        [ :image_url   , :text 		 ],
-        [ :published   , :boolean  ],
-        [ :created_at  , :datetime ],
-        [ :updated_at  , :datetime ]
+        [ :title       , :text       ],  		 	 
+        [ :body        , :text 		   ],  	 
+        [ :hide        , :boolean    ], 	 
+        [ :image_url   , :text 		   ],
+        [ :published   , :boolean    ],
+        [ :created_at  , :datetime   ],
+        [ :updated_at  , :datetime   ],
+        [ :image       , :attachment ]
       ],
       Caboose::PostCategory => [
         [ :name , :string ]

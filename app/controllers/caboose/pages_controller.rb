@@ -184,6 +184,28 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
+    # GET /admin/pages/:id/child-order
+    def admin_edit_child_sort_order
+      return unless user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # PUT /admin/pages/:id/child-order
+    def admin_update_child_sort_order
+      return unless user_is_allowed('pages', 'edit')      
+      @page = Page.find(params[:id])
+      page_ids = params[:page_ids]
+      i = 0
+      page_ids.each do |pid|
+        p = Page.find(pid)
+        p.sort_order = i
+        p.save
+        i = i + 1
+      end
+      render :json => true
+    end
+    
     # POST /admin/pages
     def admin_create
       return unless user_is_allowed('pages', 'add')

@@ -1,0 +1,46 @@
+
+<%= render :partial => 'caboose/pages/admin_header' %>
+
+<p class='uri'>URI: /<span id='uri'><%= @page.uri %></span></p>
+
+<p>Drag the pages into the order you would like.</p>
+<% if @page.children && @page.children.count > 0 %>
+  <ul id='children'>
+    <% Caboose::Page.where(:parent_id => @page.id).reorder(:sort_order).all.each do |p| %>
+      <li id='page_ids_<%= p.id %>'><%= p.title %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>This page doesn't have any children.</p>
+<% end %>
+<p><input type='button' value='< Back to edit' onclick="window.location='/admin/pages/<%= @page.id %>/edit';" /></p>
+
+<%= render :partial => 'caboose/pages/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#children { list-style: none; margin: 0; padding: 0; }
+#children li { list-style: none; margin: 4px 0; padding: 10px; border: #ccc 1px solid; }
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  $('#children').sortable({
+    axis: 'y',
+    update: function (event, ui) {                
+      $.ajax({
+        url: '/admin/pages/<%= @page.id %>/child-order',
+        type: 'put',            
+        data: $(this).sortable('serialize'),
+        success: function(resp) {
+        
+        }            
+      });
+    }
+});
+});
+
+</script>
+<% end %>

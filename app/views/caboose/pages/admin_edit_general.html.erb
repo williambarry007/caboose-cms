@@ -10,7 +10,7 @@
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_redirect_url'          ></div><span class='explanation'>If the redirect URL field is set, then this page will simply redirect to that URL instead of showing the page itself.</span></div>
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_hide'                  ></div><span class='explanation'>Whether or not this page is displayed in the menu.</span></div>
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_layout'                ></div><span class='explanation'>Specify a specific layout file for this page.</span></div>
-<div class='field_with_explanation'><div id='page_<%= @page.id %>_custom_sort_children'  ></div><span class='explanation'>Sort child pages alphabetically or custom.</span></div>
+<div class='field_with_explanation'><div id='page_<%= @page.id %>_custom_sort_children'  ></div><span class='explanation'>Sort child pages alphabetically or <a href='/admin/pages/<%= @page.id %>/child-order'>custom</a>.</span></div>
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_content_format'        ></div><span class='explanation'>Specify whether or not you want to embed ruby code in your page.</span></div>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>

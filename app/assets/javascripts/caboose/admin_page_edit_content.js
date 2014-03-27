@@ -19,8 +19,10 @@ PageContentController.prototype = {
   sortable_blocks: function()
   { 
     var that = this;
-    $('#pageblocks').sortable({      
+    $('#pageblocks').sortable({
+      //hoverClass: "ui-state-active",
       placeholder: 'sortable-placeholder',
+      forcePlaceholderSize: true,
       handle: '.sort_handle',
       receive: function(e, ui) {      
         that.new_block_type_id = ui.item.attr('id').replace('new_block_', '');    
@@ -133,3 +135,8 @@ PageContentController.prototype = {
     $('#pageblock_' + block_id).click(function(e) { that.edit_block(block_id); });
   }        
 };
+
+function toggle_page_blocks()
+{
+  $('#new_blocks_container2').slideToggle();
+}

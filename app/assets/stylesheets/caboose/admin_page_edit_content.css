@@ -9,6 +9,7 @@
 #pageblocks > li:hover { background: #fff799; }
 #pageblocks .ui-selecting { background: #ddd; }
 #pageblocks .ui-selected  { background: #fff799; }
+#pageblocks .sortable-placeholder { height: 40px; background: #fff799; border: #ccc 1px solid; }
 
 #pageblocks li .sort_handle   { display: none; }
 #pageblocks li .delete_handle { display: none; }
@@ -39,7 +40,7 @@
   background: #fef49c;
 }
 
-#new_blocks_container1 { position: absolute; top: 30px; left: 300px; width: 700px; }
-#new_blocks_container2 { position: relative; } 
-#new_blocks { position: absolute; top: 16px; left: 380px; list-style: none; margin: 0; padding: 0; }
-#new_blocks li { list-style: none; margin: 2px; padding: 4px; float: left; background: #eee; border: #ccc 1px solid; }
+#new_blocks_container1 { position: absolute; top: 30px; right: 20px; width: 200px; text-align: right; z-index: 100; }
+#new_blocks_container2 { position: relative; border: #ccc 1px solid; padding-bottom: 0; } 
+#new_blocks { list-style: none; margin: 0; padding: 0; }
+#new_blocks li { list-style: none; margin: 2px; padding: 4px; background: #eee; border: #ccc 1px solid; text-align: left; }

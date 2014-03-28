@@ -4,8 +4,8 @@ class Caboose::CaboosePlugin
     return str    
   end
   
-  def self.admin_nav(arr)
-    return arr
+  def self.admin_nav(nav, user, page)
+    return nav
   end
   
 end

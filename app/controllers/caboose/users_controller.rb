@@ -171,7 +171,7 @@ module Caboose
       resp = StdClass.new({
         'redirect' => '/admin/users'
       })
-      render json: resp
+      render :json => resp
     end
     
     # GET /admin/users/options

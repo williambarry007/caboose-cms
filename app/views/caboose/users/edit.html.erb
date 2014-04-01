@@ -12,7 +12,7 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 <div id='controls'>
 <input type='button' value='Back'           onclick="window.location='/admin/users';" />
 <input type='button' value='Reset Password' onclick="window.location='/admin/users/<%= @edituser.id %>/edit-password';" />
-<input type='button' value='Delete User'    onclick="deleteUser();" />
+<input type='button' value='Delete User'    onclick="delete_user(<%= @edituser.id %>);" />
 </div>
 
 <% content_for :caboose_js do %>
@@ -38,6 +38,29 @@ $(document).ready(function() {
     on_load: function() { modal.autosize(); }
   });  
 });
+
+function delete_user(user_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note confirm')
+      .append('Are you sure you want to delete the user? ')
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_user(user_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').html("<p class='loading'>Deleting user...</p>");
+  $.ajax({
+    url: '/admin/users/' + user_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
 </script>
 <% end %>
 

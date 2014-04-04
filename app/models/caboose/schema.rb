@@ -14,7 +14,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::PageBlock => [:block_type, :value, :name],      
       Caboose::PageBlockField => [:model_binder_options],
       Caboose::AbValue => [:i, :text],
-      Caboose::AbOption => [:text]
+      Caboose::AbOption => [:text],
+      Caboose::User => [:utc_offset, :timezone]
     }
   end
   
@@ -44,7 +45,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :zip                  , :string     ],
         [ :phone                , :string     ],
         [ :fax                  , :string     ],
-        [ :utc_offset           , :float      , { :default => -5 }],        
+        #[ :utc_offset           , :float      , { :default => -5 }],
+        #[ :timezone             , :string     , { :default => 'America/Chicago' }],
+        [ :timezone_id          , :integer    , { :defualt => 381 }], # Defaults to 'America/Chicago'        
         [ :password             , :string     ], 
         [ :password_reset_id    , :string     ], 
         [ :password_reset_sent  , :datetime   ], 
@@ -178,7 +181,22 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Setting => [    
         [ :name  , :string ],
         [ :value , :text   ]
-      ]
+      ],
+      Caboose::Timezone => [
+        [ :country_code , :string ],
+        [ :name         , :string ]
+      ],
+      Caboose::TimezoneAbbreviation => [        
+        [ :abbreviation , :string  ],
+        [ :name         , :string  ]                
+      ],
+      Caboose::TimezoneOffset => [
+        [ :timezone_id  , :integer  ],
+        [ :abbreviation , :string   ],
+        [ :time_start   , :integer  ],
+        [ :gmt_offset   , :integer  ],
+        [ :dst          , :boolean  ]        
+      ]            
     }
 
   end

@@ -31,9 +31,10 @@ module Caboose
           if login_resp.error
             resp.error = login_resp.error
           else
-            remember = params[:remember] && (params[:remember] == 1 || params[:remember] == "1")
-            login_user(login_resp.user, remember)
+            remember = params[:remember] && (params[:remember] == 1 || params[:remember] == "1")            
+            login_user(login_resp.user, remember)            
             resp.redirect = return_url
+            Caboose.plugin_hook('login_success')            
           end
         end
       end            

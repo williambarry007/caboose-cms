@@ -1,3 +1,4 @@
+require 'csv'
 
 module Caboose
   class UsersController < ApplicationController
@@ -71,6 +72,25 @@ module Caboose
     	@users = @gen.items
     end
     
+    # GET /admin/users
+    def index
+      return if !user_is_allowed('users', 'view')
+      
+      @gen = PageBarGenerator.new(params, {
+    		  'first_name_like' => '',
+    		  'last_name_like'	=> '',
+    		  'username_like'	  => '',
+    		  'email_like' 		  => '',
+    		},{
+    		  'model'          => 'Caboose::User',
+    	    'sort'			     => 'last_name, first_name',
+    		  'desc'			     => false,
+    		  'base_url'		   => '/admin/users',
+    		  'use_url_params' => false
+    	})
+    	@users = @gen.items
+    end
+    
     # GET /admin/users/new
     def new
       return if !user_is_allowed('users', 'add')
@@ -89,6 +109,79 @@ module Caboose
     def edit_password
       return if !user_is_allowed('users', 'edit')
       @edituser = User.find(params[:id])
+    end
+    
+    # GET /admin/users/import
+    def import_form
+      return if !user_is_allowed('users', 'edit')      
+    end
+    
+    def random_string(length)
+      o = [('a'..'z'),('A'..'Z'),('0'..'9')].map { |i| i.to_a }.flatten
+      return (0...length).map { o[rand(o.length)] }.join
+    end
+          
+    # POST /admin/users/import
+    def import
+      return if !user_is_allowed('users', 'add')
+      
+      resp = StdClass.new
+      csv_data = params[:csv_data]
+      arr = []
+      good_count = 0
+      bad_count = 0            
+      csv_data.strip.split("\n").each do |line|        
+        data = CSV.parse_line(line)
+
+        if data.count < 3
+          arr << [line, true, "Too few columns"] 
+          bad_count = bad_count + 1
+          next
+        end
+        
+        first_name = data[0].nil? ? nil : data[0].strip
+        last_name  = data[1].nil? ? nil : data[1].strip
+        email      = data[2].nil? ? nil : data[2].strip.downcase
+        username   = data.count >= 4 && !data[3].nil? ? data[3].strip.downcase : nil
+        password   = data.count >= 5 && !data[4].nil? ? data[4].strip : random_string(8)
+        
+        first_name = data[0]
+        last_name  = data[1]
+        email      = data[2]
+        username   = data.count >= 4 ? data[3] : nil
+        password   = data.count >= 5 ? data[4] : random_string(8)
+
+        if first_name.nil? || first_name.length == 0
+          arr << [line, false, "Missing first name."]
+          bad_count = bad_count + 1
+        elsif last_name.nil? || last_name.length == 0
+          arr << [line, false, "Missing last name."]
+          bad_count = bad_count + 1          
+        elsif email.nil? || email.length == 0 || !email.include?('@')
+          arr << [line, false, "Email is invalid."]
+          bad_count = bad_count + 1          
+        elsif Caboose::User.where(:email => email).exists?
+          arr << [line, false, "Email already exists."]
+          bad_count = bad_count + 1                    
+        else                  
+          Caboose::User.create(
+            :first_name => first_name,
+            :last_name  => last_name,
+            :email      => email,
+            :username   => username,          
+            :password   => Digest::SHA1.hexdigest(Caboose::salt + password)
+          )
+          good_count = good_count + 1
+        end
+      end
+      
+      resp.success = "#{good_count} user#{good_count == 1 ? '' : 's'} were added successfully."     
+      if bad_count > 0
+        resp.success << "<br />#{bad_count} user#{bad_count == 1 ? '' : 's'} were skipped."
+        resp.success << "<br /><br />Please check the log below for more details."
+        resp.log = arr
+      end      
+      render :json => resp
     end
     
     # POST /admin/users

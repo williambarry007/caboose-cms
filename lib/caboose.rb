@@ -55,4 +55,8 @@ module Caboose
   @@javascripts = []
   @@stylesheets = []
   
+  # API key for timezonedb.com/api
+  mattr_accessor :timezonedb_api_key
+  @@timezonedb_api_key = ''  
+  
 end

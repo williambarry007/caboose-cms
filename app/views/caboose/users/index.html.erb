@@ -7,6 +7,11 @@
 <input type='submit' value='Search' />
 </form>
 
+<p>
+<a href='/admin/users/new'>New User</a> |
+<a href='/admin/users/import'>Import CSV</a>
+</p>
+
 <table class='data' id='users_table'>
   <tr>
     <%= raw @gen.sortable_table_headings({

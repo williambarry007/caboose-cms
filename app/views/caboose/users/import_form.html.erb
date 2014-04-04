@@ -1,0 +1,54 @@
+<h1>Import Users</h1>
+
+<p>In the box below, paste CSV data in the following format:
+<p>"First Name","Last Name","Email","Username","Password"</p>
+
+<form action='/admin/users/import' method='post' id='csv_form'>
+<p><textarea name='csv_data' style='width: 100%; height: 200px'></textarea></p>
+<div id='message'></div>
+<p><input type='submit' value='Add Users' onclick="add_users(); return false;" /></p>
+</form>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+table.logs { margin: 0; padding: 0; border: 0; border-collapse: collapse; }
+table.logs td { margin: 0; padding: 4px; border: #fff 1px solid; }
+tr.good td { background: #009900; color: #fff; }
+tr.bad  td { background: #990000; color: #fff; }
+           
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+function add_users()
+{
+  $('#message').html("<p class='loading'>Adding users...</p>");
+  $.ajax({
+    url: '/admin/users/import',
+    type: 'post',
+    data: $('#csv_form').serialize(),
+    success: function(resp) {
+      $('#message').empty();
+      if (resp.error)   $('#message').append("<p class='note error'>" + resp.error + "</p>");
+      if (resp.success) $('#message').append("<p class='note success'>" + resp.success + "</p>");
+      if (resp.log)
+      {
+        var tbody = $('<tbody/>');
+        $(resp.log).each(function(i, arr) {
+          tbody.append(
+            $('<tr/>').addClass(arr[1] == true ? 'good' : 'bad')
+              .append($('<td/>').html(arr[2]))
+              .append($('<td/>').html(arr[0]))
+          );
+        });
+        $('#message').append($('<table/>').addClass('logs').append(tbody));
+      }
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

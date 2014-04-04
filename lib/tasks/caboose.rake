@@ -56,6 +56,20 @@ namespace :caboose do
     `pg_restore --verbose --clean --no-acl --no-owner -h #{ddb['host']} -U #{ddb['username']} -d #{ddb['database']} #{dump_file}`
     
   end
+  
+  desc "Loads and refreshes the timezones from timezonedb.com"
+  task :load_timezones => :environment do
+    Caboose::Timezone.load_zones('/Users/william/Sites/repconnex/tmp/timezones')
+  end
+  
+  desc "Loads and refreshes the timezones from timezonedb.com"
+  task :test_timezones => :environment do
+    
+    d = DateTime.strptime("04/01/2014 10:00 am -0500", "%m/%d/%Y %I:%M %P %Z")
+    puts d    
+    d = DateTime.strptime("04/01/2014 10:00 am -0700", "%m/%d/%Y %I:%M %P %Z")
+    puts d
+  end
 
 end
 

@@ -194,15 +194,18 @@ module Caboose
       })
       
       user = User.new()
-      user.username = params[:username]
+      user.email = params[:email] ? params[:email].strip.downcase : nil
       
-      if (user.username.length == 0)
-        resp.error = "Your username is required."
-      elsif      
+      if user.email.length == 0
+        resp.error = "Please enter a valid email address."
+      elsif User.where(:email => user.email).exists?
+        resp.error = "That email is already in the system."
+      else
         user.save
         resp.redirect = "/admin/users/#{user.id}/edit"
       end
-      render json: resp
+      
+      render :json => resp
     end
     
     # PUT /admin/users/1

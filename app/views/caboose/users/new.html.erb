@@ -1,24 +1,33 @@
 
 <h1>New user</h1>
-<div id='user_new_container'></div>
+
+<form action='/admin/users' method='post' id='new_user_form'>
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' /> 
+<p><input type='text' name='email' id='email' placeholder='Email' value='' style='width: 400px;' /></p>
+<div id='message'></div>
+<p><input type='submit' value='Add User' /></p>
+</form>
 
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
-var user = false;
 $(document).ready(function() {
-
-  user = new Model({
-    name: 'User',
-    id: 'new',
-    listing_url: 'get /admin/users',
-    create_url: 'post /admin/users',
-    attributes: [
-      { name: 'username', type: 'text', value: '' }
-    ]
-  });
-  
+  $('#new_user_form').submit(function() { add_user(); return false; });
 });
+
+function add_user()
+{
+  $('#message').html("<p class='loading'>Adding user...</p>");
+  $.ajax({
+    url: '/admin/users',
+    type: 'post',
+    data: $('#new_user_form').serialize(),
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;    
+    }
+  });
+}
 
 </script>
 <% end %>

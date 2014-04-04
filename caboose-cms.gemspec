@@ -49,5 +49,6 @@ Gem::Specification.new do |s|
   s.add_dependency "paperclip"
   s.add_dependency "awesome_print"
   s.add_dependency "ejs"
+  s.add_dependency "httparty"
   
 end

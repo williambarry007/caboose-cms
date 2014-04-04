@@ -70,6 +70,22 @@ namespace :caboose do
     d = DateTime.strptime("04/01/2014 10:00 am -0700", "%m/%d/%Y %I:%M %P %Z")
     puts d
   end
+  
+  desc "Removes duplicate users"
+  task :remove_duplicate_users => :environment do    
+    while true
+      query = ["select email from users group by email having count(email) > ?", 1]    
+      rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))
+      break if rows.nil? || rows.count == 0
+      puts "Deleting #{rows.count} emails..."      
+      query = ["delete from users where id in (
+          select max(A.id) from users A 
+          where A.email in (select email from users B group by B.email having count(B.email) > ?)
+          group by A.email
+        )", 1]
+      ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
+    end
+  end
 
 end
 

@@ -15,13 +15,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::PageBlockField => [:model_binder_options],
       Caboose::AbValue => [:i, :text],
       Caboose::AbOption => [:text],
-      Caboose::User => [:utc_offset, :timezone]
+      Caboose::User => [:timezone]
     }
   end
   
   # Any column indexes that need to exist in the database
   def self.indexes
-    {    
+    {
       :role_memberships          => [ :role_id    , :user_id          ],
       :role_permissions          => [ :role_id    , :permission_id    ],
       :post_category_memberships => [ :post_id    , :post_category_id ],
@@ -45,7 +45,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :zip                  , :string     ],
         [ :phone                , :string     ],
         [ :fax                  , :string     ],
-        #[ :utc_offset           , :float      , { :default => -5 }],
+        [ :utc_offset           , :float      , { :default => -5 }],
         #[ :timezone             , :string     , { :default => 'America/Chicago' }],
         [ :timezone_id          , :integer    , { :defualt => 381 }], # Defaults to 'America/Chicago'        
         [ :password             , :string     ], 

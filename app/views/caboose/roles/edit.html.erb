@@ -3,10 +3,41 @@
 <div id="role_<%= @role.id %>_name"></div>
 <div id="role_<%= @role.id %>_parent_id"></div>
 <div id="role_<%= @role.id %>_description"></div>
+<h3>Members</h3>
+<div id='members'>
+  <table class='data'>
+    <% Caboose::User.reorder("last_name, first_name").all.each do |u| %>
+      <% is_member = Caboose::RoleMembership.where(:role_id => @role.id, :user_id => u.id).exists? %>
+      <tr>
+        <td><input type='checkbox' name='user<%= u.id %>' <%= raw is_member ? "checked='true'" : '' %> onclick="toggle_role(<%= u.id %>, <%= @role.id %>, $(this).prop('checked'));" /></td>
+        <td><%= u.first_name %> <%= u.last_name %> (<%= u.email %>)</td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+<h3>Permissions</h3>
+<div id='permissions'>
+  <table class='data'>
+    <% Caboose::Permission.reorder("resource, action").all.each do |p| %>
+      <% has_permission = Caboose::RolePermission.where(:role_id => @role.id, :permission_id => p.id).exists? %>
+      <tr>
+        <td><input type='checkbox' name='perm<%= p.id %>' <%= raw has_permission ? "checked='true'" : '' %> onclick="toggle_permission(<%= p.id %>, <%= @role.id %>, $(this).prop('checked'));" /></td>
+        <td><%= p.resource %> - <%= p.action %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
 <div id="role_<%= @role.id %>_members"></div>
 <div id="role_<%= @role.id %>_permissions"></div>
 <div id="message"></div>
 
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#content input[type=checkbox] { position: relative; }
+#members { height: 400px; overflow-y: scroll; margin-bottom: 20px; }
+#permissions { height: 400px; overflow-y: scroll; margin-bottom: 20px; }
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
@@ -25,84 +56,31 @@ $(document).ready(function() {
     delete_url: 'delete /admin/roles/<%= @role.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { 
-        name: 'parent_id',
-        nice_name: 'Parent',
-        type: 'select',
-        value: <%= @role.parent_id %>,
-        text: "<%= @role.parent.nil? ? '[No parent]' : @role.parent.name %>",
-        show_controls: true,
-        loading_message: 'Getting roles...',
-        options_url: '/admin/roles/options',
-        width: 590,
-        message: 'message'
-      },    
+      { name: 'parent_id'   , nice_name: 'Parent'      , type: 'select', value: <%= @role.parent_id %>, text: "<%= @role.parent.nil? ? '[No parent]' : @role.parent.name %>", show_controls: true, loading_message: 'Getting roles...', options_url: '/admin/roles/options', width: 590, message: 'message' },    
       { name: 'name'        , nice_name: 'Name'        , type: 'text' , value: "<%= @role.name %>"        , width: 590 , message: 'message' },
-      { name: 'description' , nice_name: 'Description' , type: 'text' , value: "<%= @role.description %>" , width: 590 , message: 'message' },
-      { 
-        name: 'members',
-        nice_name: 'Members',
-        type: 'checkbox-multiple',
-        value: <%= @role.users.collect{|u| u.id}.to_json %>,
-        text: "<%= raw @role.users.order('last_name, first_name').collect{|u| "#{u.first_name} #{u.last_name}"}.join('<br />') %>",
-        loading_message: 'Getting users...',
-        options_url: '/admin/users/options',
-        width: 590,
-        message: 'message'
-      },
-      { 
-        name: 'permissions',
-        nice_name: 'Permissions',
-        type: 'checkbox-multiple',
-        value: <%= @role.permissions.collect{|p| p.id}.to_json %>,
-        text: "<%= raw @role.permissions.order('resource, action').collect{|p| "#{p.resource}_#{p.action}"}.join('<br />') %>",
-        loading_message: 'Getting permissions...',
-        options_url: '/admin/permissions/options',
-        width: 590,
-        message: 'message'
-      }
+      { name: 'description' , nice_name: 'Description' , type: 'text' , value: "<%= @role.description %>" , width: 590 , message: 'message' }      
     ],
     on_load: function() { modal.autosize(); }
-  });
-
-  /*var user = new Model({
-    name: 'Role',
-    id: <%= @role.id %>,
-    listing_url: 'get /admin/roles',
-    update_url: 'put /admin/roles/<%= @role.id %>',
-    delete_url: 'delete /admin/roles/<%= @role.id %>',
-    attributes: [
-      { 
-        name: 'parent_id',
-        nice_name: 'Parent',
-        type: 'select',
-        value: <%= @role.parent_id %>,
-        text: "<%= @role.parent.nil? ? '[No parent]' : @role.parent.name %>",
-        show_controls: true,
-        loading_message: 'Getting roles...',
-        options_url: '/admin/roles/options' 
-      },    
-      { name: 'name'        , type: 'text' , value: "<%= @role.name %>" },
-      { name: 'description' , type: 'text' , value: "<%= @role.description %>" },
-      { 
-        name: 'members',
-        type: 'checkbox-multiple',
-        value: <%= @role.users.collect{|u| u.id}.to_json %>,
-        text: "<%= raw @role.users.order('last_name, first_name').collect{|u| "#{u.first_name} #{u.last_name}"}.join('<br />') %>",
-        loading_message: 'Getting users...',
-        options_url: '/admin/users/options',
-      },
-      { 
-        name: 'permissions',
-        type: 'checkbox-multiple',
-        value: <%= @role.permissions.collect{|p| p.id}.to_json %>,
-        text: "<%= raw @role.permissions.order('resource, action').collect{|p| "#{p.resource}_#{p.action}"}.join('<br />') %>",
-        loading_message: 'Getting permissions...',
-        options_url: '/admin/permissions/options',
-      }
-    ]
-  });*/
+  });  
 });
+
+function toggle_role(user_id, role_id, checked)
+{
+  $.ajax({
+    url: '/admin/users/' + user_id +'/roles/' + role_id,
+    type: checked ? 'post' : 'delete',    
+    success: function(resp) { }
+  });
+}
+
+function toggle_permission(permission_id, role_id, checked)
+{
+  $.ajax({
+    url: '/admin/roles/' + role_id +'/permissions/' + permission_id,
+    type: checked ? 'post' : 'delete',    
+    success: function(resp) { }
+  });
+}
 
 </script>
 <% end %>

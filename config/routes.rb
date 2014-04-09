@@ -33,6 +33,9 @@ Caboose::Engine.routes.draw do
   post    "admin/users"                     => "users#create"
   delete  "admin/users/:id"                 => "users#destroy"
   
+  post    "admin/users/:id/roles/:role_id"  => "users#add_to_role"  
+  delete  "admin/users/:id/roles/:role_id"  => "users#remove_from_role"
+  
   get     "admin/roles"                   => "roles#index"
   get     "admin/roles/options"           => "roles#options"
   get     "admin/roles/new"               => "roles#new"
@@ -40,6 +43,9 @@ Caboose::Engine.routes.draw do
   put     "admin/roles/:id"               => "roles#update"
   post    "admin/roles"                   => "roles#create"
   delete  "admin/roles/:id"               => "roles#destroy"
+  
+  post    "admin/roles/:id/permissions/:permission_id"  => "roles#add_permission"  
+  delete  "admin/roles/:id/permissions/:permission_id"  => "roles#remove_permission"
   
   get     "admin/permissions"             => "permissions#index"
   get     "admin/permissions/options"     => "permissions#options"

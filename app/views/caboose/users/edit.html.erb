@@ -8,6 +8,14 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 <p><div id='user_<%= @edituser.id %>_last_name'  ></div></p>
 <p><div id='user_<%= @edituser.id %>_username'   ></div></p>
 <p><div id='user_<%= @edituser.id %>_email'      ></div></p>
+<div id='roles'>
+<table class='data'>
+<% Caboose::Role.flat_tree.each do |r| %>
+<% is_member = Caboose::RoleMembership.where(:role_id => r.id, :user_id => @edituser.id).exists? %>
+<tr><td><input type='checkbox' name='role<%= r.id %>' <%= is_member ? "checked='true'" : '' %> onclick="toggle_role(<%= @edituser.id %>, <%= r.id %>, $(this).prop('checked'));" /></td><td><%= r.name %></td></tr>
+<% end %>
+</table>
+</div>
 <div id='message'></div>
 <div id='controls'>
 <input type='button' value='Back'           onclick="window.location='/admin/users';" />
@@ -15,6 +23,12 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 <input type='button' value='Delete User'    onclick="delete_user(<%= @edituser.id %>);" />
 </div>
 
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#content input[type=checkbox] { position: relative; }
+#roles { height: 200px; overflow-y: scroll; margin-bottom: 20px; }
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
@@ -58,6 +72,15 @@ function delete_user(user_id, confirm)
       if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
       if (resp.redirect) window.location = resp.redirect;
     }
+  });
+}
+
+function toggle_role(user_id, role_id, checked)
+{
+  $.ajax({
+    url: '/admin/users/' + user_id +'/roles/' + role_id,
+    type: checked ? 'post' : 'delete',    
+    succes: function(resp) { }
   });
 }
 

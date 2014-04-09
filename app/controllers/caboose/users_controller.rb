@@ -270,6 +270,22 @@ module Caboose
       render :json => resp
     end
     
+    # POST /admin/users/:id/roles/:role_id
+    def add_to_role
+      return if !user_is_allowed('users', 'edit')
+      if !RoleMembership.where(:user_id => params[:id], :role_id => params[:role_id]).exists?
+        RoleMembership.create(:user_id => params[:id], :role_id => params[:role_id])
+      end
+      render :json => true
+    end
+    
+    # DELETE /admin/users/:id/roles/:role_id
+    def remove_from_role
+      return if !user_is_allowed('users', 'edit')
+      RoleMembership.where(:user_id => params[:id], :role_id => params[:role_id]).destroy_all        
+      render :json => true
+    end
+    
     # GET /admin/users/options
     def options
       return if !user_is_allowed('users', 'view')

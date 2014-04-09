@@ -95,6 +95,22 @@ module Caboose
       render json: { 'redirect' => '/admin/roles' }
     end
     
+    # POST /admin/roles/:id/permissions/:permission_id
+    def add_permission
+      return if !user_is_allowed('roles', 'edit')
+      if !RolePermission.where(:role_id => params[:id], :permission_id => params[:permission_id], ).exists?
+        RolePermission.create(:role_id => params[:id], :permission_id => params[:permission_id])
+      end
+      render :json => true
+    end
+    
+    # DELETE /admin/roles/:id/permissions/:permission_id
+    def remove_permission
+      return if !user_is_allowed('roles', 'edit')
+      RolePermission.where(:role_id => params[:id], :permission_id => params[:permission_id]).destroy_all        
+      render :json => true
+    end
+    
     # GET /admin/roles/options
     def options
       return unless user_is_allowed('roles', 'view')

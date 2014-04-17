@@ -12,6 +12,12 @@ module Caboose
       # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
       
+      # Make sure someone is logged in
+      if !logged_in?      
+        elo = User.find(User::LOGGED_OUT_USER_ID)        
+        login_user(elo)
+      end
+      
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
       
       # Initialize AB Testing
@@ -76,7 +82,7 @@ module Caboose
     def logged_in?
       validate_token
       validate_cookie
-      return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1    
+      return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1 && session["app_user"].id != User::LOGGED_OUT_USER_ID     
       return false
     end
     

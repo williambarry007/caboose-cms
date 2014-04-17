@@ -1,3 +1,33 @@
+/*
+{
+  "expiration": "2007-12-01T12:00:00.000Z",
+  "conditions": [
+    {"bucket": "johnsmith"},
+    ["starts-with", "$key", "user/eric/"],
+    {"acl": "public-read"},
+    {"success_action_redirect": "http://johnsmith.s3.amazonaws.com/successful_upload.html"},
+    ["starts-with", "$Content-Type", "image/"],
+    {"x-amz-meta-uuid": "14365123651274"},
+    ["starts-with", "$x-amz-meta-tag", ""]
+  ]
+}
+key = '1234'
+signature = 'abcdef'
+return Base64.encode64(OpenSSL::HMAC.digest('sha1', key, signature))
+
+<form action="http://johnsmith.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
+<input type="hidden" name="AWSAccessKeyId"          value="AKIAIOSFODNN7EXAMPLE" />
+<input type="hidden" name="acl"                     value="public-read" />
+<input type="hidden" name="policy"                  value="POLICY" />
+<input type="hidden" name="Signature"               value="SIGNATURE" />
+<input type="hidden" name="success_action_status"   value="200" />
+<input type="hidden" name="key"                     value="uploads/1.jpg" />
+
+File:          <input type="file" name="file"                               /><br />
+
+<input type="submit" name="submit" value="Upload to Amazon S3" />
+</form>
+*/
 
 BoundS3Image = BoundControl.extend({
 
@@ -34,21 +64,33 @@ BoundS3Image = BoundControl.extend({
       .css('margin-right', 10)
     );    
     
-
+    var s3 = this.attribute.s3;
     $('#'+this.el+'_container')
       .append($('<form target="' + this.el + '_iframe"></form>')
         .attr('id', this.el + '_form')
-        .attr('action', this.attribute.update_url)
+        .attr('action', 'http://' + this.attribute.s3.bucket + '.s3.amazonaws.com/')
         .attr('method', 'post')
         .attr('enctype', 'multipart/form-data')
-        .attr('encoding', 'multipart/form-data')
-        //.attr('target', this.el + '_iframe')
+        .attr('encoding', 'multipart/form-data')        
         .on('submit', function() {           
            $('#'+this2.el+'_message').html("<p class='loading'>Uploading...</p>");
-           $('#'+this2.el+'_iframe').on('load', function() { this2.post_upload(); });
+           $('#'+this2.el+'_iframe').on('load', function() {
+             $.ajax({
+               url: this2.attribute.update_url,
+               type: 'post',
+               success: function(resp) {
+                 this2.post_upload();
+               }
+             });             
+           });
            return true;
         })
-        .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(this.binder.authenticity_token))        
+        .append($('<input/>').attr('type','hidden').attr('name', "AWSAccessKeyId"        ).val(s3.access_key_id))
+        .append($('<input/>').attr('type','hidden').attr('name', "acl"                   ).val(s3.acl))
+        .append($('<input/>').attr('type','hidden').attr('name', "policy"                ).val(s3.policy))
+        .append($('<input/>').attr('type','hidden').attr('name', "Signature"             ).val(s3.signature))
+        .append($('<input/>').attr('type','hidden').attr('name', "success_action_status" ).val("200"))
+        .append($('<input/>').attr('type','hidden').attr('name', "key"                   ).val(s3.key))                
         .append($('<div/>')
           .attr('id', this.el + '_fake_file_input')
           .addClass('mb_fake_file_input')          
@@ -61,7 +103,7 @@ BoundS3Image = BoundControl.extend({
           .append($('<input/>')
             .attr('type', 'file')
             .attr('id', this.el + '_file')
-            .attr('name', this.attribute.name)            
+            .attr('name', 'file')            
             .change(function() { $('#'+this2.el+'_form').trigger('submit'); })
           )
           .append($('<input/>')

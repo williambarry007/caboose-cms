@@ -229,7 +229,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
       admin_user.password = Digest::SHA1.hexdigest(Caboose::salt + 'caboose')
       admin_user.save
     end
-    admin_user = Caboose::User.where(:username => 'admin').first if admin_user.nil?
+    admin_user = Caboose::User.where(:username => 'admin').first if admin_user.nil?    
+    
+    if !Caboose::User.where(:id => Caboose::User::LOGGED_OUT_USER_ID).exists?
+      Caboose::User.create(:id => Caboose::User::LOGGED_OUT_USER_ID, :first_name => 'Logged', :last_name => 'Out', :username => 'elo', :email => 'elo@nine.is')            
+    end    
     
     Caboose::Role.create(:parent_id => -1           , :name => 'Admin'               ) if !Caboose::Role.exists?(:name =>  'Admin'               )
     admin_role  = Caboose::Role.where(:name => 'Admin'               ).first

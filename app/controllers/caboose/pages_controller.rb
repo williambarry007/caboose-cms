@@ -19,8 +19,8 @@ module Caboose
         return
       end
 
-      user = logged_in_user      
-      if !user.is_allowed(page, 'view')
+      user = logged_in_user            
+      if !user.is_allowed(page, 'view')        
         if user.id == User::LOGGED_OUT_USER_ID	
           redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)		  		
           return

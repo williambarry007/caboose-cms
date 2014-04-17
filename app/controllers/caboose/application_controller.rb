@@ -69,6 +69,7 @@ module Caboose
     # Logs a user out
     def logout_user
       cookies.delete(:caboose_user_id)
+      session["app_user"] = nil
       reset_session
     end
       

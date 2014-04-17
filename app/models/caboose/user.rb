@@ -22,11 +22,13 @@ class Caboose::User < ActiveRecord::Base
   end
   
   def self.logged_out_user
-    return self.where('username' => 'elo').first
+    #return self.where('username' => 'elo').first
+    return self.where(:id => self::LOGGED_OUT_USER_ID).first
   end
   
   def self.logged_out_user_id
-    return self.where('username' => 'elo').limit(1).pluck(:id)[0]
+    #return self.where('username' => 'elo').limit(1).pluck(:id)[0]
+    return self::LOGGED_OUT_USER_ID
   end
   
   def is_allowed(resource, action)

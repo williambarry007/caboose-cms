@@ -32,6 +32,11 @@
 <input type='button' value='Delete Block Type' onclick="delete_block_type(<%= @block_type.id %>);" />
 </p>
 
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#pageblocktype_<%= @block_type.id %>_render_function { font-family: Courier; font-size: 80%; }
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">

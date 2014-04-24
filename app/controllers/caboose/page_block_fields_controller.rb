@@ -62,36 +62,17 @@ module Caboose
 
       params.each do |k,v|
         case k
-          when 'page_block_type_id' 
-            field.page_block_type_id = v
-            break
-          when 'name'               
-            field.name = v
-            break
-          when 'field_type'
-            field.field_type = v
-            break
-          when 'nice_name'      
-            field.nice_name = v
-            break
-          when 'default'       
-            field.default = v
-            break
-          when 'width'       
-            field.width = v
-            break
-          when 'height'    
-            field.height = v
-            break
-          when 'fixed_placeholder'
-            field.fixed_placeholder = v
-            break
-          when 'options'            
-            field.options = v
-            break
-          when 'options_url' 
-            field.options_url = v
-            break
+          when 'page_block_type_id' then field.page_block_type_id = v
+          when 'name'               then field.name               = v
+          when 'field_type'         then field.field_type         = v
+          when 'nice_name'          then field.nice_name          = v
+          when 'default'            then field.default            = v
+          when 'width'              then field.width              = v
+          when 'height'             then field.height             = v
+          when 'fixed_placeholder'  then field.fixed_placeholder  = v
+          when 'options'            then field.options            = v
+          when 'options_function'   then field.options_function   = v
+          when 'options_url'        then field.options_url        = v
         end
       end
     
@@ -130,7 +111,9 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')
       f = PageBlockField.find(params[:id])            
       options = []
-      if f.options
+      if f.options_function
+        options = f.render_options
+      elsif f.options
         options = f.options.strip.split("\n").collect { |line| { 'value' => line, 'text' => line }}
       end        
       render :json => options

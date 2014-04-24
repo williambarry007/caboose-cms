@@ -11,6 +11,7 @@ block_type_id = @field.page_block_type.id
 <div id='pageblockfield_<%= @field.id %>_height'></div>
 <div id='pageblockfield_<%= @field.id %>_fixed_placeholder'></div>
 <div id='pageblockfield_<%= @field.id %>_options_url'></div>
+<div id='pageblockfield_<%= @field.id %>_options_function'></div>
 <div id='pageblockfield_<%= @field.id %>_options'></div>
 <br />
 
@@ -20,6 +21,11 @@ block_type_id = @field.page_block_type.id
 <input type='button' value='Delete Field' onclick="delete_field(<%= @field.id %>);" />
 </p>
 
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#pageblockfield_<%= @field.id %>_options_function { font-family: Courier; font-size: 80%; }
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
@@ -61,6 +67,7 @@ $(document).ready(function() {
       { name: 'height'              , nice_name: 'Height'             , type: 'text'     , value: <%= raw Caboose.json(@field.height)            %>, width: 400 },
       { name: 'fixed_placeholder'   , nice_name: 'Fixed placeholder'  , type: 'checkbox' , value: <%= raw Caboose.json(@field.fixed_placeholder) %>, width: 400 },
       { name: 'options_url'         , nice_name: 'Options URL'        , type: 'text'     , value: <%= raw Caboose.json(@field.options_url)       %>, width: 400 },
+      { name: 'options_function'    , nice_name: 'Options Function'   , type: 'textarea' , value: <%= raw Caboose.json(@field.options_function)  %>, width: 400, height: 100 },
       { name: 'options'             , nice_name: 'Options'            , type: 'textarea' , value: <%= raw Caboose.json(@field.options)           %>, width: 400, height: 100 }                         
     ]
   });

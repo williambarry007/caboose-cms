@@ -44,8 +44,8 @@ $(document).ready(function() {
         width: <% if f.width %><%= raw Caboose.json(f.width) %><% else %>780<% end %>,
         <% if f.height                %>height: <%=            raw Caboose.json(f.height)            %>,<% end %>
         <% if f.fixed_placeholder     %>fixed_placeholder: <%= raw Caboose.json(f.fixed_placeholder) %>,<% end %>
-        <% if f.options               %>options_url: '/admin/page-block-fields/<%= f.id %>/options',<%
-           elsif f.options_url        %>options_url: <%=       raw Caboose.json(f.options_url)       %>,<% end %>
+        <% if f.options || f.options_function %>options_url: '/admin/page-block-fields/<%= f.id %>/options',<%
+           elsif f.options_url        %>options_url: <%=       raw Caboose.json(f.options_url)   %>,<% end %>
         <% if f.field_type == 'image' %>update_url: '/admin/page-block-field-values/<%= fv.id %>/image',
         image_refresh_delay: 100,
         <% end %>

@@ -128,6 +128,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :height               , :integer ],
         [ :fixed_placeholder    , :boolean ],
         [ :options              , :text    ],
+        [ :options_function     , :text    ],
         [ :options_url          , :string  ]
       ],
       Caboose::PageBlockFieldValue => [

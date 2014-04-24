@@ -89,7 +89,11 @@ BoundSelect = BoundControl.extend({
           .val(option.value)
           .html(option.text);
         if (option.value == this2.attribute.value)
+        {
+          this2.attribute.text = option.text;
+          $('#'+this2.el).val(this2.attribute.text);
           opt.attr('selected', 'true');
+        }
         select.append(opt);
       });      
       $('#'+this2.el+'_container').append(select);
@@ -136,7 +140,11 @@ BoundSelect = BoundControl.extend({
   save: function() {
     this.attribute.value = $('#'+this.el).val();
     var this2 = this;
-    this.model.save(this.attribute, function(resp) {
+    this.model.save(this.attribute, function(resp) {      
+      $(this2.attribute.options).each(function(i,opt) {
+        if (opt.value == this2.attribute.value)
+          this2.attribute.text = opt.text;        
+      });
       if (this2.attribute.text)
         $('#'+this2.el).val(this2.attribute.text);        
       $('#'+this2.el+'_check a').removeClass('loading');

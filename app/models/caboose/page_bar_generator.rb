@@ -285,6 +285,19 @@ module Caboose
     	return str  	
     end
     
+    def sortable_links(cols)
+      base_url = url_with_vars
+      base_url << (base_url.include?("?") ? "&" : "?")
+    	h = {}
+    	# key = sort field, value = text to display
+    	cols.each do |sort, text|    		
+    		arrow = @options['sort'] == sort ? (@options['desc'] == 1 ? ' &uarr;' : ' &darr;') : ''    		
+        link = "#{base_url}sort=#{sort}&desc=" + (@options['desc'] == 1 ? "0" : "1")            		
+    		h[sort] = [link, "#{text}#{arrow}"]
+    	end
+    	return h  	
+    end
+    
     def where
       sql = []
       values = []

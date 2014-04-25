@@ -40,7 +40,7 @@ BoundSelect = BoundControl.extend({
       .addClass('mb_fake_option')
       .attr('placeholder', this.attribute.empty_text)
       .click(function() { this2.edit(); })
-      .val(this.attribute.text.length > 0 ? this.attribute.text : this.attribute.empty_text)
+      .val(this.attribute.text && this.attribute.text.length > 0 ? this.attribute.text : this.attribute.empty_text)
     );
     if (this.attribute.width)
       $('#'+this.el).css('width', this.attribute.width);

@@ -164,7 +164,7 @@ module Caboose
     	return arr.uniq
     end  	  
   		
-  	def generate
+  	def generate(summary = true)
   	    	  
   		# Check for necessary parameter values
   		return false if !ok(@options['base_url']) # Error: base_url is required for the page bar generator to work.
@@ -203,7 +203,7 @@ module Caboose
   		var_delim    = @use_url_params ? "/" : "&"            
   		
   		str = ''
-  		str << "<p>Results: showing page #{page} of #{total_pages}</p>\n"
+  		str << "<p>Results: showing page #{page} of #{total_pages}</p>\n" if summary
   		
   		if (total_pages > 1)
   		  str << "<div class='page_links'>\n"

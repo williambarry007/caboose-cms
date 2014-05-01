@@ -26,7 +26,7 @@
       if bt.use_render_function && bt.render_function
         %><%= raw b.render_from_function(params[:empty_text]) %><%        
       else        
-        %><%= render :partial => "caboose/page_blocks/#{bt.name}", :locals => { :block => b, :empty_text => "" } %><%
+        %><%= render :partial => "caboose/page_blocks/#{bt.name}", :locals => { :block => b, :empty_text => "", :editing => false } %><%
       end
     end
   end

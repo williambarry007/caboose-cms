@@ -1,0 +1,11 @@
+<%
+partial = block.field_value('partial')
+%><% if editing %>
+  <% if partial.nil? || partial.strip.length == 0 %>
+    <p>Empty partial, click to edit.</p>
+  <% else %>
+    <p>Partial <%= partial %>, click to edit.</p>
+  <% end %>
+<% elsif !partial.nil? && partial.strip.length > 0 %>
+<%= render partial %>
+<% end %>

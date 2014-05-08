@@ -38,6 +38,19 @@ module Caboose
       end
       return arr
     end
-          
+    
+    def nav_link(p, css_class = nil, style = nil) 
+      str = "<a "
+      str << "class='#{css_class}' " if css_class
+      str << "style='#{style}' " if style
+      if p.redirect_url && p.redirect_url.strip.length > 0
+        str << "href='#{p.redirect_url}' target='_blank'"
+      else
+        str << "href='/#{p.uri}'"
+      end
+      str << ">#{p.title}</a>"
+      return str
+    end
+
   end
 end

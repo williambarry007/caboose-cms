@@ -32,10 +32,10 @@ module Caboose
       @page_tasks   = {}
       @is_real_page = false
       
-      if @find_page
+      #if @find_page
         @page = Page.page_with_uri(request.fullpath)
         @crumb_trail  = Caboose::Page.crumb_trail(@page)		    
-      end
+      #end
       
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user      

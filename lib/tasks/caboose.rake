@@ -11,6 +11,7 @@ namespace :caboose do
       Schema.create_schema
       Schema.load_data
     end
+    caboose_correct_sequences
   end
 
   desc "Creates all caboose tables"
@@ -18,16 +19,12 @@ namespace :caboose do
 
   desc "Loads data into caboose tables"
   task :load_data => :environment do Caboose::Schema.load_data end
-
-  #=============================================================================
-  
-  def class_exists?(class_name)
-    klass = Module.const_get(class_name)
-      return klass.is_a?(Class)
-    rescue NameError
-      return false
+      
+  desc "Corrects any sequences in tables"
+  task :correct_sequences => :environment do
+    caboose_correct_sequences    
   end
-  
+
   desc "Resets the admin password to 'caboose'"
   task :reset_admin_pass => :environment do  
     admin_user = Caboose::User.where(username: 'admin').first
@@ -84,6 +81,39 @@ namespace :caboose do
           group by A.email
         )", 1]
       ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
+    end
+  end
+
+  #=============================================================================
+  
+  def class_exists?(class_name)
+    klass = Module.const_get(class_name)
+      return klass.is_a?(Class)
+    rescue NameError
+      return false
+  end
+  
+  # Corrects any sequences in tables
+  def caboose_correct_sequences
+    c = ActiveRecord::Base.connection
+    c.tables.each do |tbl|      
+      next if !c.column_exists? tbl, :id
+      
+      rows = c.execute("select max(id) from #{tbl}")      
+      max = rows[0]['max']
+      max = max.to_i if !max.nil?
+      
+      rows = c.execute("select nextval('#{tbl}_id_seq')")
+      nextval = rows[0]['nextval']
+      nextval = nextval.to_i if !nextval.nil?
+      
+      next if max.nil? || nextval.nil?
+      next if nextval >= max
+      
+      # If nextval is lower than the max id, then fix it.
+      puts "Correcting sequence for #{tbl}..."
+      c.execute("select setval('#{tbl}_id_seq', (select max(id) from #{tbl}))")
+      
     end
   end
 

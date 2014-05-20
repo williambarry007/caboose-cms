@@ -13,7 +13,7 @@ Caboose::Engine.routes.draw do
   get     "login/reset-password/:reset_id"  => "login#reset_password_form"
   post    "login/reset-password"            => "login#reset_password"  
   get     "login"                           => "login#index"
-  post    "login"                           => "login#login"
+  post    "login"                           => "login#login"  
   get     "logout"                          => "logout#index"
   get     "register"                        => "register#index"
   post    "register"                        => "register#register"

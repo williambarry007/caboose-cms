@@ -134,6 +134,7 @@ module Caboose
       @user = logged_in_user
       if (!@user.is_allowed(resource, action))
         @error = "You don't have permission to " + action + " " + resource
+        @return_url = request.fullpath
         render :template => "caboose/extras/error"
         return false
       end
@@ -159,6 +160,7 @@ module Caboose
       @user = logged_in_user
       unless @user.is_allowed(resource, action)
         @error = "You don't have permission to #{action} #{resource}"
+        @return_url = request.fullpath
         render :template => "caboose/extras/error"
         return false
       end

@@ -53,6 +53,11 @@ namespace :caboose do
     `pg_restore --verbose --clean --no-acl --no-owner -h #{ddb['host']} -U #{ddb['username']} -d #{ddb['database']} #{dump_file}`
     
   end
+               
+  desc "Clears sessions older than the length specified in the caboose config from the sessions table"
+  task :clear_old_sessions => :environment do
+    ActiveRecord::SessionStore::Session.delete_all(["updated_at < ?", Caboose::session_length.hours.ago])        
+  end
   
   desc "Loads and refreshes the timezones from timezonedb.com"
   task :load_timezones => :environment do

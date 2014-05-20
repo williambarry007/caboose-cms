@@ -57,6 +57,10 @@ module Caboose
   
   # API key for timezonedb.com/api
   mattr_accessor :timezonedb_api_key
-  @@timezonedb_api_key = ''  
+  @@timezonedb_api_key = ''
+
+  # Session length (in hours)
+  mattr_accessor :session_length
+  @@session_length = 24  
   
 end

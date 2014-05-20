@@ -4,26 +4,30 @@ module Caboose
     
     # GET /login
     def index
+      if params[:logout]
+        logout_user
+        elo = User.find(User::LOGGED_OUT_USER_ID)        
+        login_user(elo)
+      end      
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       @modal = params[:modal].nil? ? false : params[:modal]
       redirect_to @return_url and return if logged_in?
     end
     
     # POST /login
-    def login
+    def login      
       resp = StdClass.new('error' => '', 'redirect' => '')
       return_url = params[:return_url].nil? ? "/" : params[:return_url]
       
-      if (logged_in?)
+      if logged_in?
         resp.redirect = return_url
       else
         username = params[:username].downcase
         password = params[:password]
                            
-        if (username.nil? || password.nil? || password.strip.length == 0)
+        if username.nil? || password.nil? || password.strip.length == 0
           resp.error = "Invalid credentials"
-        else
-          
+        else          
           bouncer_class = Caboose::authenticator_class.constantize
           bouncer = bouncer_class.new
           login_resp = bouncer.authenticate(username, password)
@@ -37,8 +41,8 @@ module Caboose
             Caboose.plugin_hook('login_success')            
           end
         end
-      end            
-      render :json => resp
+      end
+      render :json => resp      
     end
     
     # GET /login/forgot-password

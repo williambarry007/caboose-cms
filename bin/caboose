@@ -31,8 +31,7 @@ case cmd
       's3_bucket_name'       => "What's the amazon S3 bucket name?",
       's3_access_key_id'     => "What's the amazon S3 access key id?",
       's3_secret_access_key' => "What's the amazon S3 access secret key?",
-      'cdn_url'              => "What's the CDN base URL?",
-      'favorite_color'       => "What's your favorite color?"            
+      'cdn_url'              => "What's the CDN base URL?"                  
     }
     vars = {}
     questions.each do |k,q|

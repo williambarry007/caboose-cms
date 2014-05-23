@@ -1,5 +1,4 @@
 require "caboose/version"
-require "caboose/migrations"
 
 namespace :caboose do  
   

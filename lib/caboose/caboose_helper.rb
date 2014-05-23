@@ -10,6 +10,8 @@ class CabooseHelper
   end
   
   def create_app
+    puts File.expand_path(@vars['APP_NAME'].downcase)
+    
     # Create the rails app
     puts "Creating the rails app..."
     `rails new #{@vars['APP_NAME'].downcase} -d=postgresql`
@@ -29,7 +31,7 @@ class CabooseHelper
     Find.find(skeleton_root).each do |file|    
       next if File.directory?(file)  
       file2 = file.gsub(skeleton_root, '')
-      file2 = File.join(@vars['APP_NAME'].downcase, file2)            
+      file2 = File.join(File.expand_path(@vars['APP_NAME'].downcase), file2)            
       FileUtils.cp(file, file2)
       
       # Replace any variables

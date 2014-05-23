@@ -22,12 +22,17 @@ case cmd
     puts "Create a new Caboose CMS App\n"
     puts "--------------------------------------------------------------------------------\n"
     
-    questions = {
-      'app_name'      => "What's the name of your new app?",
-      'smtp_server'   => "What's the SMTP server?",
-      'smtp_domain'   => "What's the SMTP domain?",
-      'smtp_user'     => "What's the SMTP user?",
-      'smtp_password' => "What's the SMTP password?"
+    questions = {       
+      'app_name'             => "What's the name of your new app?",
+      'smtp_server'          => "What's the SMTP server?",
+      'smtp_domain'          => "What's the SMTP domain?",
+      'smtp_user'            => "What's the SMTP user?",
+      'smtp_password'        => "What's the SMTP password?",
+      's3_bucket_name'       => "What's the amazon S3 bucket name?",
+      's3_access_key_id'     => "What's the amazon S3 access key id?",
+      's3_secret_access_key' => "What's the amazon S3 access secret key?",
+      'cdn_url'              => "What's the CDN base URL?",
+      'favorite_color'       => "What's your favorite color?"            
     }
     vars = {}
     questions.each do |k,q|
@@ -41,6 +46,11 @@ case cmd
     # Do the caboose init  
     helper = CabooseHelper.new(vars)
     helper.create_app  
+    
+    puts "\n"
+    puts "--------------------------------------------------------------------------------\n"
+    puts "Choo! Choo! You're all set!\n"
+    puts "--------------------------------------------------------------------------------\n"
   
   when 'pg_restore'
     

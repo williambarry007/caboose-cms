@@ -13,11 +13,11 @@ class CabooseHelper
   def create_app
     # Create the rails app
     puts "Creating the rails app..."
-    `rails new #{@vars['APP_NAME'].downcase} -d=postgresql`
+    `rails _3.2.15_ new #{@vars['APP_NAME'].downcase} -d=postgresql`
 
     # Do the caboose init
     init_skeleton_files
-    remove_public_index
+    remove_public_index        
   end
   
   # Copies all the files in the sample directory to the host application

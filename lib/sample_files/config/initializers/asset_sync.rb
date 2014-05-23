@@ -1,7 +1,7 @@
 AssetSync.configure do |config| 
   config.fog_provider = 'AWS'
-  config.fog_directory = '<bucket_name>'
-  config.aws_access_key_id = '<s3_key_id>'
-  config.aws_secret_access_key = '<s3_access_key>'  
-  config.run_on_precompile = true 
+  config.fog_directory = '|S3_BUCKET_NAME|'
+  config.aws_access_key_id = '|S3_ACCESS_KEY_ID|'
+  config.aws_secret_access_key = '|S3_SECRET_ACCESS_KEY|'  
+  config.run_on_precompile = true
 end

@@ -1,3 +1,4 @@
+require 'find'
 
 class CabooseHelper
   

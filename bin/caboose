@@ -36,6 +36,7 @@ case cmd
         vars[k.upcase] = gets.chomp
       end
     end  
+    puts "\n"
     
     # Do the caboose init  
     helper = CabooseHelper.new(vars)

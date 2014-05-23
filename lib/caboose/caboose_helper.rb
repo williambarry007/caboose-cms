@@ -8,13 +8,20 @@ class CabooseHelper
     @vars['CABOOSER_VERSION'] = Caboose::VERSION if @vars['CABOOSE_VERSION'].nil?
   end
   
-  def init_all        
+  def create_app
+    # Create the rails app
+    puts "Creating the rails app..."
+    `rails new #{path} -d=postgresql`
+
+    # Do the caboose init
     init_skeleton_files
     remove_public_index
   end
   
   # Copies all the files in the sample directory to the host application
   def init_skeleton_files
+    puts "Adding files to rails app..."
+    
     gem_root = Gem::Specification.find_by_name('caboose-cms').gem_dir    
     skeleton_root = File.join(gem_root,'lib','sample_files')
     

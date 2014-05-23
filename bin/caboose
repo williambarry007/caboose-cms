@@ -34,13 +34,10 @@ when 'new'
       vars[k.upcase] = gets.chomp
     end
   end  
-      
-  # Create the rails app
-  `rails new #{path} -d=postgresql`
 
   # Do the caboose init  
-  helper = CabooseHelper.new(vars)          
-  helper.init_all
+  helper = CabooseHelper.new(vars)
+  helper.create_app  
 
 when 'pg_restore'
   

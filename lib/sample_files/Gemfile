@@ -1,0 +1,25 @@
+source 'https://rubygems.org'
+ruby '1.9.3'
+
+gem 'rails', '3.2.15'
+
+# For heroku
+# gem 'rails_12factor', :group => :production
+
+gem 'pg'
+
+group :assets do
+  gem 'sass-rails',   '~> 3.2.3'
+  gem 'coffee-rails', '~> 3.2.1'
+  gem 'compass-rails'
+  gem 'uglifier', '>= 1.0.3'
+end
+
+gem 'jquery-rails'
+gem 'ejs'
+#gem 'unicorn'
+
+gem 'caboose-cms', '|CABOOSE_VERSION|'
+gem 'asset_sync'
+gem 'unf'
+gem 'aws-sdk'

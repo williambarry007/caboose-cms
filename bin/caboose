@@ -49,9 +49,9 @@ when 'new'
   questions.each do |k,q|
     while vars[k].nil? || vars[k].strip.length == 0
       puts "\n#{q}"
-      vars[k] = gets.chomp
+      vars[k.upcase] = gets.chomp
     end
-  end
+  end  
       
   # Create the rails app
   `rails new #{path} -d=postgresql`

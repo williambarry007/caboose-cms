@@ -1,74 +1,76 @@
 #!/usr/bin/env ruby
 
-require 'rails/all'
-require 'caboose'
-require 'caboose/engine'
+#require 'rails/all'
+#require 'caboose'
+#require 'caboose/engine'
 require 'caboose/version'
-require 'caboose/caboose_helper'
+#require 'caboose/caboose_helper'
 #require 'trollop'
 
 cmd = ARGV.shift
+
 case cmd
-
-when 'version'
   
-  puts "Caboose CMS Version #{Caboose::VERSION}\n\n"
+  when 'version'
+    
+    puts "Caboose CMS Version #{Caboose::VERSION}\n\n"
+    
+  when 'new'
+    
+    puts "\n"
+    puts "--------------------------------------------------------------------------------\n"
+    puts "Create a new Caboose CMS App\n"
+    puts "--------------------------------------------------------------------------------\n"
+    
+    questions = {
+      'app_name'      => "What's the name of your new app?",
+      'smtp_server'   => "What's the SMTP server?",
+      'smtp_domain'   => "What's the SMTP domain?",
+      'smtp_user'     => "What's the SMTP user?",
+      'smtp_password' => "What's the SMTP password?"
+    }
+    vars = {}
+    questions.each do |k,q|
+      while vars[k.upcase].nil? || vars[k.upcase].strip.length == 0
+        puts "\n#{q}"
+        vars[k.upcase] = gets.chomp
+      end
+    end  
+    
+    # Do the caboose init  
+    helper = CabooseHelper.new(vars)
+    helper.create_app  
   
-when 'new'
-  
-  puts "\n"
-  puts "--------------------------------------------------------------------------------\n"
-  puts "Create a new Caboose CMS App\n"
-  puts "--------------------------------------------------------------------------------\n"
-  
-  questions = {
-    'app_name'      => "What's the name of your new app?",
-    'smtp_server'   => "What's the SMTP server?",
-    'smtp_domain'   => "What's the SMTP domain?",
-    'smtp_user'     => "What's the SMTP user?",
-    'smtp_password' => "What's the SMTP password?"
-  }
-  questions.each do |k,q|
-    while vars[k].nil? || vars[k].strip.length == 0
-      puts "\n#{q}"
-      vars[k.upcase] = gets.chomp
-    end
-  end  
-
-  # Do the caboose init  
-  helper = CabooseHelper.new(vars)
-  helper.create_app  
-
-when 'pg_restore'
-  
-  puts "\nTo what database do you want to restore?"
-  db = gets.chomp
-  puts "\nWhere's the dump file?"
-  dump_file = gets.chomp
-  puts "\nRunning pg_restore...\n"
-  `pg_restore --verbose --clean --no-acl --no-owner -h localhost -d #{db} #{dump_file}`
-  
-when 'sync_db'
-  
-  puts "\nCapturing production database...\n"
-  `heroku pgbackups:capture`
-  puts "\nWhere do you want to save the production database dump file?\n"  
-  dump_file = gets.chomp
-  puts "\nDownloading production database dump file...\n"
-  `curl -o #{dump_file} \`heroku pgbackups:url\``
-  puts "\nTo what database do you want to restore?"
-  db = gets.chomp  
-  puts "\nRunning pg_restore...\n"
-  `pg_restore --verbose --clean --no-acl --no-owner -h localhost -d #{db} #{dump_file}`
-  
-else
-  
-  puts "--------------------------------------------------------------------------------"  
-  puts "Caboose CMS"
-  puts "A content management system built on top of Ruby on Rails."
-  puts "--------------------------------------------------------------------------------"
-  puts "Usage:"
-  puts "caboose new <path>"
-  puts "--------------------------------------------------------------------------------"
-  
+  when 'pg_restore'
+    
+    puts "\nTo what database do you want to restore?"
+    db = gets.chomp
+    puts "\nWhere's the dump file?"
+    dump_file = gets.chomp
+    puts "\nRunning pg_restore...\n"
+    `pg_restore --verbose --clean --no-acl --no-owner -h localhost -d #{db} #{dump_file}`
+    
+  when 'sync_db'
+    
+    puts "\nCapturing production database...\n"
+    `heroku pgbackups:capture`
+    puts "\nWhere do you want to save the production database dump file?\n"  
+    dump_file = gets.chomp
+    puts "\nDownloading production database dump file...\n"
+    `curl -o #{dump_file} \`heroku pgbackups:url\``
+    puts "\nTo what database do you want to restore?"
+    db = gets.chomp  
+    puts "\nRunning pg_restore...\n"
+    `pg_restore --verbose --clean --no-acl --no-owner -h localhost -d #{db} #{dump_file}`
+    
+  else
+    
+    puts "--------------------------------------------------------------------------------"  
+    puts "Caboose CMS"
+    puts "A content management system built on top of Ruby on Rails."
+    puts "--------------------------------------------------------------------------------"
+    puts "Usage:"
+    puts "caboose new <path>"
+    puts "--------------------------------------------------------------------------------"
+    
 end

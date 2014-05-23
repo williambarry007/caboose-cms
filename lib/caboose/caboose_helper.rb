@@ -7,7 +7,7 @@ class CabooseHelper
     @vars = vars
     @vars['APP_NAME'] = @vars['APP_NAME'].downcase.capitalize
     @vars['CABOOSE_SALT'] = Digest::SHA1.hexdigest(DateTime.now.to_s) if @vars['CABOOSE_SALT'].nil?
-    @vars['CABOOSER_VERSION'] = Caboose::VERSION if @vars['CABOOSE_VERSION'].nil?
+    @vars['CABOOSE_VERSION'] = Caboose::VERSION if @vars['CABOOSE_VERSION'].nil?
   end
   
   def create_app

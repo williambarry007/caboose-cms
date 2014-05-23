@@ -1,4 +1,5 @@
 require 'find'
+require 'digest'
 
 class CabooseHelper
   
@@ -10,8 +11,6 @@ class CabooseHelper
   end
   
   def create_app
-    puts File.expand_path(@vars['APP_NAME'].downcase)
-    
     # Create the rails app
     puts "Creating the rails app..."
     `rails new #{@vars['APP_NAME'].downcase} -d=postgresql`

@@ -34,9 +34,6 @@
 
   # Expands the lines which load the assets
   config.assets.debug = true
-    
-  # Ensure active merchant is in test mode for development
-  ActiveMerchant::Billing::Base.mode = :test
   
   # Show action mailer errors for development
   ActionMailer::Base.raise_delivery_errors = true

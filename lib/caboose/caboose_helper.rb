@@ -1,29 +1,38 @@
 
 class CabooseHelper
   
-  def initialize(app_path, force = false)
-    @app_path = app_path
-    @force = force
+  def initialize(vars)    
+    @vars = vars
+    @vars['CABOOSE_SALT'] = Digest::SHA1.hexdigest(DateTime.now.to_s) if @vars['|CABOOSE_SALT|'].nil?
   end
   
-  def init_all
+  def init_all        
+    init_skeleton_files
     init_gem
     init_app_config    
     init_initializer
-    init_routes
-    init_assets
-    init_tinymce
+    init_routes    
     init_session
     remove_public_index
   end
   
-  def init_file(filename)
-    gem_root = Gem::Specification.find_by_name('caboose-cms').gem_dir
-    filename = File.join(@app_path, filename)  
-    copy_from = File.join(gem_root,'lib','sample_files', Pathname.new(filename).basename)
-
-    if (!File.exists?(filename) || @force)
-      FileUtils.cp(copy_from, filename)
+  # Copies all the files in the sample directory to the host application
+  def init_skeleton_files
+    gem_root = Gem::Specification.find_by_name('caboose-cms').gem_dir    
+    skeleton_root = File.join(gem_root,'lib','sample_files')
+    
+    Find.find(skeleton_root).each do |file|    
+      next if File.directory?(file)  
+      file2 = file.gsub(skeleton_root, '')
+      file2 = File.join(Rails.root, file2)            
+      FileUtils.cp(file, file2)
+      
+      # Replace any variables
+      f = File.open(file2, 'rb')
+      str = f.read
+      f.close
+      @vars.each { |k,v| str.gsub!("|#{k}|",v) }      
+      File.open(file2, 'w') { |f| f.write(str) }      
     end  
   end
   
@@ -46,6 +55,10 @@ class CabooseHelper
       end
     end
     str2 << "gem 'caboose-cms', '= #{Caboose::VERSION}'\n"
+    str2 << "gem 'asset_sync'\n"
+    str2 << "gem 'unf'\n"
+    str2 << "gem 'aws-sdk'\n"
+
     File.open(filename, 'w') {|file| file.write(str2) }
   end
     
@@ -61,7 +74,10 @@ class CabooseHelper
     file.close    
     if (contents.index("require 'caboose'").nil?)
       arr = contents.split("require 'rails/all'", -1)
-      str = arr[0] + "\nrequire 'rails/all'\nrequire 'caboose'\n" + arr[1]
+      str = arr[0] + "\nrequire 'rails/all'\nrequire 'caboose'\n" + arr[1]      
+      str.gsub!("config.assets.initialize_on_precompile = false", "config.assets.initialize_on_precompile
+
+      
       File.open(filename, 'w') { |file| file.write(str) }
     end
   end
@@ -75,39 +91,20 @@ class CabooseHelper
     File.delete(filename)
   end
   
-  # Adds the caboose initializer file  
+  # Inits the caboose initializer file  
   def init_initializer
-    puts "Adding the caboose initializer file..."
+    puts "Initializing the salt variable in the caboose initializer file..."
     
     filename = File.join(@app_path,'config','initializers','caboose.rb')
-    return if File.exists?(filename) && !@force
+    return if File.exists?(filename)
     
     Caboose::salt = Digest::SHA1.hexdigest(DateTime.now.to_s)
-    str = ""
-    str << "# Salt to ensure passwords are encrypted securely\n"
-    str << "Caboose::salt = '#{Caboose::salt}'\n\n"
-    str << "# Where page asset files will be uploaded\n"
-    str << "Caboose::assets_path = Rails.root.join('app', 'assets', 'caboose')\n\n"
-    str << "# Register any caboose plugins\n"
-    str << "#Caboose::plugins + ['MyCaboosePlugin']\n\n"
-    str << "# Tell the host app about the caboose assets\n"
-    str << "Rails.application.config.assets.paths << Rails.root.join('vendor','gems','caboose-cms','app','assets','javascripts')\n"
-    str << "Rails.application.config.assets.paths << Rails.root.join('vendor','gems','caboose-cms','app','assets','stylesheets')\n"
-    str << "Rails.application.config.assets.precompile += [\n"
-    str << "  'login.css',\n"
-    str << "  'caboose/admin.js',\n"
-    str << "  'caboose/application.js',\n"
-    str << "  'caboose/login.js',\n"
-    str << "  'caboose/model.form.page.js',\n"
-    str << "  'caboose/station.js',\n"
-    str << "  'caboose/admin.css',\n"
-    str << "  'caboose/application.css',\n"
-    str << "  'caboose/caboose.css',\n"
-    str << "  'caboose/fonts.css',\n"
-    str << "  'caboose/tinymce.css'\n"
-    str << "]\n\n"
-
-    File.open(filename, 'w') {|file| file.write(str) }
+    
+    file = File.open(filename, 'rb')
+    contents = file.read
+    file.close
+    contents.gsub('|CABOOSE_SALT|', Caboose::salt)    
+    File.open(filename, 'w') { |file| file.write(contents) }
   end
 
   # Adds the routes to the host app to point everything to caboose
@@ -115,8 +112,7 @@ class CabooseHelper
     puts "Adding the caboose routes..."
     
     filename = File.join(@app_path,'config','routes.rb')
-    return if !File.exists?(filename)
-    return if !@force
+    return if !File.exists?(filename)    
     
     str = "" 
     str << "\t# Catch everything with caboose\n"  
@@ -132,19 +128,8 @@ class CabooseHelper
       File.open(filename, 'w') {|file| file.write(str2) }
     end    
   end
-  
-  def init_assets
-    puts "Adding the layout files..."
-    init_file('app/views/layouts/layout_default.html.erb')
-    puts "Adding the layout files..."
-    init_file('app/assets/stylesheets/login.css')
-  end
-  
-  def init_tinymce
-    puts "Adding the tinymce config file..."
-    init_file('config/tinymce.yml')
-  end
-  
+
+  # Changes session storage to active record
   def init_session
     puts "Setting the session config..."    
     

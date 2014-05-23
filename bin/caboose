@@ -34,34 +34,30 @@ case cmd
 
 when 'new'
   
-  path = ARGV.shift
-  if (path.nil?)
-    puts "Error: path for new app is required.\n\n"
-    global_opts.help
-    exit
+  puts "\n"
+  puts "--------------------------------------------------------------------------------\n"
+  puts "Create a new Caboose CMS App\n"
+  puts "--------------------------------------------------------------------------------\n"        
+  puts "\nWhat's the name of your new app?" vars['APP_NAME'] = gets.chomp
+  questions = {
+    'app_name'      => "What's the name of your new app?",
+    'smtp_server'   => "What's the SMTP server?",
+    'smtp_domain'   => "What's the SMTP domain?",
+    'smtp_user'     => "What's the SMTP user?",
+    'smtp_password' => "What's the SMTP password?"
+  }
+  questions.each do |k,q|
+    while vars[k].nil? || vars[k].strip.length == 0
+      puts "\n#{q}"
+      vars[k] = gets.chomp
+    end
   end
-  
-  puts "Creating the new rails app..."
-  `rails new #{path} -d=mysql`  
-  helper = CabooseHelper.new(path, true)
-  helper.init_all
-  
-when 'init'
-  
-  opts = Trollop::options do
-    opt :force, 'Force re-installation of all caboose files.', :default => false
-  end
-  
-  path = ARGV.shift
-  path = Dir.pwd if path.nil?  
-  is_rails_app = File.exists?(File.join(path, 'config', 'environment.rb'))  
-  if (!is_rails_app)
-    puts "Error: Not a rails app.\n\n"
-    global_opts.help
-    exit
-  end
-  
-  helper = CabooseHelper.new(path, opts.force)
+      
+  # Create the rails app
+  `rails new #{path} -d=postgresql`
+
+  # Do the caboose init  
+  helper = CabooseHelper.new(vars)          
   helper.init_all
 
 when 'pg_restore'

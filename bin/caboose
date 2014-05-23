@@ -20,6 +20,7 @@ when 'new'
   puts "--------------------------------------------------------------------------------\n"
   puts "Create a new Caboose CMS App\n"
   puts "--------------------------------------------------------------------------------\n"
+  
   questions = {
     'app_name'      => "What's the name of your new app?",
     'smtp_server'   => "What's the SMTP server?",

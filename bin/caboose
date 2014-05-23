@@ -58,7 +58,8 @@ case cmd
     puts "A content management system built on top of Ruby on Rails."
     puts "--------------------------------------------------------------------------------"
     puts "Usage:"
-    puts "caboose new <path>"
+    puts "caboose new"
+    puts "caboose version"
     puts "--------------------------------------------------------------------------------"
     
 end

@@ -32,14 +32,15 @@ namespace :caboose do
   end
 
   desc "Sync production db to development"
-  task :sync_dev_db, :app_name, :dump_dir do
-    args.with_defaults(:app_name => nil, :dump_dir => "#{Rails.root}/db/backups")
-    app_name = " --app #{:app_name}" if :app_name
-    `mkdir -p #{:dump_dir}` if !File.exists?(:dump_dir)
-
+  task :sync_dev_db, :app_name, :dump_dir do |t, args|  
+    app_name = args[:app_name] ? " --app #{args[:app_name]}" : ''
+    dump_dir = args[:dump_dir] ? args[:dump_dir] : "#{Rails.root}/db/backups"
+    `mkdir -p #{dump_dir}` if !File.exists?(dump_dir)
+    
+    # Get the db conf
     ddb = Rails.application.config.database_configuration['development']
-    pdb = Rails.application.config.database_configuration['production']        
-    dump_file = "#{:dump_dir}/#{pdb['database']}_#{DateTime.now.strftime('%FT%T')}.dump"    
+    pdb = Rails.application.config.database_configuration['production']            
+    dump_file = "#{dump_dir}/#{pdb['database']}_#{DateTime.now.strftime('%FT%T')}.dump"    
         
     puts "Capturing production database..."
     `heroku pgbackups:capture --expire#{app_name}`

@@ -46,7 +46,7 @@ class CabooseHelper
   def remove_public_index
     puts "Removing the public/index.html file... "
     
-    filename = File.join(@app_path,'public','index.html')
+    filename = File.join(File.expand_path(@vars['APP_NAME'].downcase),'public','index.html')
     return if !File.exists?(filename)
     File.delete(filename)
   end

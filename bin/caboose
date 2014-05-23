@@ -5,33 +5,15 @@ require 'caboose'
 require 'caboose/engine'
 require 'caboose/version'
 require 'caboose/caboose_helper'
-require 'trollop'
-
-#puts "Usage:"
-#puts "Create a new caboose app:"
-#puts "  caboose new <app_path>"
-#puts "Initialize an existing rails app as a new caboose app:"
-#puts "  caboose init [<app_path>]\n\n"
-#exit
-  
-global_opts = Trollop::options do
-  banner <<-EOS
---------------------------------------------------------------------------------  
-Caboose CMS
-A content management system built on top of Ruby on Rails.
---------------------------------------------------------------------------------
-Usage:
-caboose new <path>
-caboose init [--force] [<path>]
---------------------------------------------------------------------------------
-EOS
-  version "Caboose CMS Version #{Caboose::VERSION}\n\n"
-  stop_on ['version', 'new', 'init']
-end
+#require 'trollop'
 
 cmd = ARGV.shift
 case cmd
 
+when 'version'
+  
+  puts "Caboose CMS Version #{Caboose::VERSION}\n\n"
+  
 when 'new'
   
   puts "\n"
@@ -83,4 +65,13 @@ when 'sync_db'
   `pg_restore --verbose --clean --no-acl --no-owner -h localhost -d #{db} #{dump_file}`
   
 else
+  
+  puts "--------------------------------------------------------------------------------"  
+  puts "Caboose CMS"
+  puts "A content management system built on top of Ruby on Rails."
+  puts "--------------------------------------------------------------------------------"
+  puts "Usage:"
+  puts "caboose new <path>"
+  puts "--------------------------------------------------------------------------------"
+  
 end

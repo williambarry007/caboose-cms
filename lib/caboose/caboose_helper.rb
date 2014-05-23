@@ -6,6 +6,7 @@ class CabooseHelper
   def initialize(vars)    
     @vars = vars
     @vars['APP_NAME'] = @vars['APP_NAME'].downcase.capitalize
+    @vars['APP_NAME_LOWERCASE'] = @vars['APP_NAME'].downcase
     @vars['CABOOSE_SALT'] = Digest::SHA1.hexdigest(DateTime.now.to_s) if @vars['CABOOSE_SALT'].nil?
     @vars['CABOOSE_VERSION'] = Caboose::VERSION if @vars['CABOOSE_VERSION'].nil?
   end

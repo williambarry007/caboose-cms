@@ -79,6 +79,6 @@ module |APP_NAME|
     }
     
     # Make sure caboose loads first
-    config.railties_order = [Caboose::Engine, :main_app, :all]
+    #config.railties_order = [Caboose::Engine, :main_app, :all]
   end
 end

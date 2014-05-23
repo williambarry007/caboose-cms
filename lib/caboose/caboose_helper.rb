@@ -11,7 +11,7 @@ class CabooseHelper
   def create_app
     # Create the rails app
     puts "Creating the rails app..."
-    `rails new #{path} -d=postgresql`
+    `rails new #{@vars['APP_NAME'].downcase} -d=postgresql`
 
     # Do the caboose init
     init_skeleton_files

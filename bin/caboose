@@ -19,8 +19,7 @@ when 'new'
   puts "\n"
   puts "--------------------------------------------------------------------------------\n"
   puts "Create a new Caboose CMS App\n"
-  puts "--------------------------------------------------------------------------------\n"        
-  puts "\nWhat's the name of your new app?" vars['APP_NAME'] = gets.chomp
+  puts "--------------------------------------------------------------------------------\n"
   questions = {
     'app_name'      => "What's the name of your new app?",
     'smtp_server'   => "What's the SMTP server?",

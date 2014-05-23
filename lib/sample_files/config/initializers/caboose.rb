@@ -10,7 +10,7 @@ Caboose::assets_path = Rails.root.join('app', 'assets', 'caboose')
 
 Caboose::use_url_params = false
 
-Caboose::website_name = "My Website"
+Caboose::website_name = "|APP_NAME|"
 Caboose::website_domain = "http://mywebsite.com"
 Caboose::cdn_domain = "|CDN_URL|"
 Caboose::email_from = "contact@mywebsite.com"

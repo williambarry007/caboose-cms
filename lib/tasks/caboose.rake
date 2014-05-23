@@ -32,27 +32,25 @@ namespace :caboose do
   end
 
   desc "Sync production db to development"
-  task :sync_dev_db do
-    
+  task :sync_dev_db, :app_name, :dump_dir do
+    args.with_defaults(:app_name => nil, :dump_dir => "#{Rails.root}/db/backups")
+    app_name = " --app #{:app_name}" if :app_name
+    `mkdir -p #{:dump_dir}` if !File.exists?(:dump_dir)
+
     ddb = Rails.application.config.database_configuration['development']
-    pdb = Rails.application.config.database_configuration['production']
-    
-    dump_file = "#{Rails.root}/db/backups/#{pdb['database']}_#{DateTime.now.strftime('%FT%T')}.dump"
-    if !File.exists?("#{Rails.root}/db/backups")
-      `mkdir -p #{Rails.root}/db/backups`
-    end
-    
+    pdb = Rails.application.config.database_configuration['production']        
+    dump_file = "#{:dump_dir}/#{pdb['database']}_#{DateTime.now.strftime('%FT%T')}.dump"    
+        
     puts "Capturing production database..."
-    `heroku pgbackups:capture --expire`
+    `heroku pgbackups:capture --expire#{app_name}`
     
     puts "Downloading production database dump file..."
-    `curl -o #{dump_file} \`heroku pgbackups:url\``
+    `curl -o #{dump_file} \`heroku pgbackups:url#{app_name}\``
     
     puts "Restoring development database from dump file..."
     `pg_restore --verbose --clean --no-acl --no-owner -h #{ddb['host']} -U #{ddb['username']} -d #{ddb['database']} #{dump_file}`
-    
   end
-               
+                 
   desc "Clears sessions older than the length specified in the caboose config from the sessions table"
   task :clear_old_sessions => :environment do
     ActiveRecord::SessionStore::Session.delete_all(["updated_at < ?", Caboose::session_length.hours.ago])        

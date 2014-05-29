@@ -4,18 +4,33 @@ class Caboose::Schema < Caboose::Utilities::Schema
   # Tables (in order) that were renamed in the development of the gem.
   def self.renamed_tables
     {
-      :roles_users       => :role_memberships,
-      :permissions_roles => :role_permissions
+      :roles_users             => :role_memberships,
+      :permissions_roles       => :role_permissions,
+      :page_block_field_values => :fields,
+      :page_block_fields       => :field_types,
+      :page_block_types        => :block_types,
+      :page_blocks             => :blocks
+    }
+  end
+  
+  def self.renamed_columns
+    {
+      Caboose::Field     => { :page_block_id        => :block_id,
+                              :page_block_field_id  => :field_type_id },      
+      Caboose::FieldType => { :page_block_type_id   => :block_type_id },
+      Caboose::Block     => { :page_block_type_id   => :block_type_id }    
     }
   end
   
   def self.removed_columns
     {
-      Caboose::PageBlock => [:block_type, :value, :name],      
-      Caboose::PageBlockField => [:model_binder_options],
+      Caboose::Block => [:block_type, :value, :name],      
+      Caboose::FieldType => [:model_binder_options],
       Caboose::AbValue => [:i, :text],
       Caboose::AbOption => [:text],
-      Caboose::User => [:timezone]
+      Caboose::User => [:timezone],
+      Caboose::Field => [:child_block_id],
+      Caboose::BlockType => [:layout_function]
     }
   end
   
@@ -90,36 +105,45 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :alias                 , :string  ],
         [ :uri                   , :string  ],
         [ :redirect_url          , :string  ],
-        [ :hide                  , :boolean , :default => false ],
-        [ :content_format        , :integer , :default => Caboose::Page::CONTENT_FORMAT_HTML ],
+        [ :hide                  , :boolean , { :default => false }],
+        [ :content_format        , :integer , { :default => Caboose::Page::CONTENT_FORMAT_HTML }],
         [ :custom_css            , :text    ],
         [ :custom_js             , :text    ],
         [ :linked_resources      , :text    ],
         [ :layout                , :string  ],
-        [ :sort_order            , :integer , :default => 0                ],
-        [ :custom_sort_children  , :boolean , :default => false            ],
-        [ :seo_title             , :string  , :limit => 70                 ],
-        [ :meta_description      , :string  , :limit => 156                ],
-        [ :meta_robots           , :string  , :default => 'index, follow'  ],
+        [ :sort_order            , :integer , { :default => 0                }],
+        [ :custom_sort_children  , :boolean , { :default => false            }],
+        [ :seo_title             , :string  , { :limit => 70                 }],
+        [ :meta_description      , :string  , { :limit => 156                }],
+        [ :meta_robots           , :string  , { :default => 'index, follow'  }],
         [ :canonical_url         , :string  ],
-        [ :fb_description        , :string  , :limit => 156 ],
-        [ :gp_description        , :string  , :limit => 156 ]
+        [ :fb_description        , :string  , { :limit => 156 }],
+        [ :gp_description        , :string  , { :limit => 156 }]
       ],
-      Caboose::PageBlock => [        
-        [ :page_id               , :integer ],         
-        [ :page_block_type_id    , :integer ],
-        [ :sort_order            , :integer , :default => 0   ],
+      Caboose::Block => [        
+        [ :page_id               , :integer ],
+        [ :field_id              , :integer ],
+        [ :block_type_id         , :integer ],
+        [ :sort_order            , :integer , { :default => 0 }],
         [ :name                  , :string  ],
         [ :value                 , :text    ]        
       ],
-      Caboose::PageBlockType => [        
-        [ :name                  , :string  ],
-        [ :description           , :string  ],
-        [ :use_render_function   , :boolean , :default => false ],
-        [ :render_function       , :text    ] 
+      Caboose::BlockType => [        
+        [ :name                            , :string  ],
+        [ :description                     , :string  ],
+        [ :render_function                 , :text    ],
+        [ :use_render_function             , :boolean , { :default => false }],        
+        [ :use_render_function_for_layout  , :boolean , { :default => false }]
+      ],      
+      Caboose::Field => [
+        [ :block_id             , :integer    ],
+        [ :field_type_id        , :integer    ],        
+        [ :value                , :text       ],
+        [ :file                 , :attachment ],
+        [ :image                , :attachment ]        
       ],
-      Caboose::PageBlockField => [
-        [ :page_block_type_id   , :integer ],      
+      Caboose::FieldType => [
+        [ :block_type_id        , :integer ],      
         [ :name                 , :string  ],
         [ :field_type           , :string  ],
         [ :nice_name            , :string  ],
@@ -131,22 +155,15 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :options_function     , :text    ],
         [ :options_url          , :string  ]
       ],
-      Caboose::PageBlockFieldValue => [
-        [ :page_block_id        , :integer    ],
-        [ :page_block_field_id  , :integer    ],
-        [ :value                , :text       ],
-        [ :file                 , :attachment ],
-        [ :image                , :attachment ]
-      ],      
       Caboose::Post => [  
-        [ :title       , :text       ],  		 	 
-        [ :body        , :text 		   ],  	 
-        [ :hide        , :boolean    ], 	 
-        [ :image_url   , :text 		   ],
-        [ :published   , :boolean    ],
-        [ :created_at  , :datetime   ],
-        [ :updated_at  , :datetime   ],
-        [ :image       , :attachment ]
+        [ :title                , :text       ],  		 	 
+        [ :body                 , :text 		   ],  	 
+        [ :hide                 , :boolean    ], 	 
+        [ :image_url            , :text 		   ],
+        [ :published            , :boolean    ],
+        [ :created_at           , :datetime   ],
+        [ :updated_at           , :datetime   ],
+        [ :image                , :attachment ]
       ],
       Caboose::PostCategory => [
         [ :name , :string ]
@@ -213,15 +230,15 @@ class Caboose::Schema < Caboose::Utilities::Schema
     #  c.remove_column(:pages, :content)
     #end
       
-    if !Caboose::PageBlockType.where(:name => 'heading').exists?
-      bt = Caboose::PageBlockType.create(:name => 'heading', :description => 'Heading')
-      Caboose::PageBlockField.create(:page_block_type_id => bt.id, :name => 'text', :field_type => 'text', :nice_name => 'Text', :default => '', :width => 800, :fixed_placeholder => false)
-      Caboose::PageBlockField.create(:page_block_type_id => bt.id, :name => 'size', :field_type => 'text', :nice_name => 'Size', :default =>  1, :width => 800, :fixed_placeholder => false, :options => "1|2|3|4|5|6")
+    if !Caboose::BlockType.where(:name => 'heading').exists?
+      bt = Caboose::BlockType.create(:name => 'heading', :description => 'Heading')
+      Caboose::FieldType.create(:block_type_id => bt.id, :name => 'text', :field_type => 'text', :nice_name => 'Text', :default => '', :width => 800, :fixed_placeholder => false)
+      Caboose::FieldType.create(:block_type_id => bt.id, :name => 'size', :field_type => 'text', :nice_name => 'Size', :default =>  1, :width => 800, :fixed_placeholder => false, :options => "1|2|3|4|5|6")
     end
     
-    if !Caboose::PageBlockType.where(:name => 'richtext').exists?
-      bt = Caboose::PageBlockType.create(:name => 'richtext', :description => 'Rich Text')
-      Caboose::PageBlockField.create(:page_block_type_id => bt.id, :name => 'text', :field_type => 'richtext', :nice_name => 'Text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
+    if !Caboose::BlockType.where(:name => 'richtext').exists?
+      bt = Caboose::BlockType.create(:name => 'richtext', :description => 'Rich Text')
+      Caboose::FieldType.create(:block_type_id => bt.id, :name => 'text', :field_type => 'richtext', :nice_name => 'Text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
     end
     
     admin_user = nil

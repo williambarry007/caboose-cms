@@ -5,7 +5,7 @@ class Caboose::Page < ActiveRecord::Base
   belongs_to :parent, :class_name => "Page"
   has_many :children, :class_name => "Page", :foreign_key => 'parent_id', :order => 'sort_order, title'
   has_many :page_permissions
-  has_many :page_blocks, :order => 'sort_order'
+  has_many :blocks, :order => 'sort_order'
   attr_accessible :parent_id, 
     :title, 
     :menu_title, 
@@ -37,10 +37,6 @@ class Caboose::Page < ActiveRecord::Base
     return menu_title unless menu_title.nil?
     return title unless title.nil?
     return ""
-  end
-  
-  def blocks
-    self.page_blocks
   end
   
   #def content

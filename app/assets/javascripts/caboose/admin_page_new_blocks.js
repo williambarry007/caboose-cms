@@ -15,15 +15,15 @@ PageContentEditor.prototype = {
   add_controls: function(id)
   {
     var that = this;
-    //$('#pageblock_controls').empty();          
-    //$('#pageblock_controls')
+    //$('#block_controls').empty();          
+    //$('#block_controls')
     //  .append($('<h2/>').attr('id', 'edit_blocks_header').html('Edit Blocks'))
     //  .append($('<div/>').addClass('content').append($('<p/>').html('Select a block to edit.')));
-    $('#pageblocks').selectable({ 
+    $('#blocks').selectable({ 
       filter: "li", 
       cancel: ".handle",
       selected: function(e, ui) {
-        var block_id = ui.selected.id.replace("pageblock_container_", "");
+        var block_id = ui.selected.id.replace("block_container_", "");
         that.edit_block(block_id);         
       }
     });              

@@ -1,13 +1,13 @@
 
 module Caboose
-  class PageBlockFieldValuesController < ApplicationController
+  class FieldsController < ApplicationController
     
-    # PUT /admin/page-block-field-values/:id
+    # PUT /admin/fields/:id
     def admin_update
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
-      fv = PageBlockFieldValue.find(params[:id])
+      f = Field.find(params[:id])
                   
       save = true
       user = logged_in_user      
@@ -15,38 +15,38 @@ module Caboose
       params.each do |k,v|
         case k
           when 'value'
-            fv.value = v                                
+            f.value = v                                
         end
       end      
                
-      resp.success = save && fv.save
+      resp.success = save && f.save
       render :json => resp
     end
     
-    # POST /admin/page-block-field-values/:id/image
+    # POST /admin/fields/:id/image
     def admin_update_image
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
-      fv = PageBlockFieldValue.find(params[:id])
-      fv.image = params[:value]
-      fv.save
+      f = Field.find(params[:id])
+      f.image = params[:value]
+      f.save
       resp.success = true 
-      resp.attributes = { 'value' => { 'value' => fv.image.url(:tiny) }}
+      resp.attributes = { 'value' => { 'value' => f.image.url(:tiny) }}
       
       render :json => resp
     end
     
-    # POST /admin/page-block-field-values/:id/file
+    # POST /admin/fields/:id/file
     def admin_update_file
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
-      fv = PageBlockFieldValue.find(params[:id])
-      fv.file = params[:value]
-      fv.save
+      f = Field.find(params[:id])
+      f.file = params[:value]
+      f.save
       resp.success = true      
-      resp.attributes = { 'value' => { 'value' => fv.file.url }}
+      resp.attributes = { 'value' => { 'value' => f.file.url }}
       
       render :json => resp
     end

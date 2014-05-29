@@ -3,8 +3,8 @@
 <p><input type='text' id='name' name='name' placeholder='Name' /></p>
 <div id='message'></div>
 <p>
-<input type='button' value='< Back' onclick="window.location='/admin/page-block-types';" />
-<input type='button' value='Add Field' onclick="add_block_type();" />
+<input type='button' value='< Back' onclick="window.location='/admin/block-types';" />
+<input type='button' value='Add Block Type' onclick="add_block_type();" />
 </p>
 
 <% content_for :caboose_js do %>
@@ -14,7 +14,7 @@ function add_block_type()
 {
   $('#message').empty().append($('<p/>').addClass('loading').html('Adding block type...'));
   $.ajax({
-    url: '/admin/page-block-types',
+    url: '/admin/block-types',
     type: 'post',
     data: {
       name: $('#name').val()

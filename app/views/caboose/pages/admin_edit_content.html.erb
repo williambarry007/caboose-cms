@@ -2,18 +2,18 @@
 <%= render :partial => 'caboose/pages/admin_header' %>
 
 <div id='new_blocks_container1'>
-  <p><input type='button' value='New Page Block' onclick='toggle_page_blocks();' /></p>
+  <p><input type='button' value='New Page Block' onclick='toggle_blocks();' /></p>
 </div>
 <div id='new_blocks_container2' style='display: none;'>
-  <input type='button' value='New Page Block' onclick='toggle_page_blocks();' />
+  <input type='button' value='New Page Block' onclick='toggle_blocks();' />
   <p>Drag a block onto the page.</p>
   <ul id='new_blocks'>
     <% @block_types.each do |block_type| %><li id='new_block_<%= block_type.id %>'><%= block_type.description %></li><% end %>
   </ul>
-  <p><a href='#' onclick='toggle_page_blocks();'>Close</a></p>
+  <p><a href='#' onclick='toggle_blocks();'>Close</a></p>
 </div>
 
-<ul id='pageblocks'></ul>
+<ul id='blocks'></ul>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
 

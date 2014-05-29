@@ -131,7 +131,7 @@ module Caboose
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
-      @block_types = Caboose::PageBlockType.reorder(:name).all
+      @block_types = Caboose::BlockType.reorder(:name).all
       render :layout => 'caboose/admin'
     end
     
@@ -148,7 +148,7 @@ module Caboose
       block_ids = params[:block_ids]
       i = 0
       block_ids.each do |block_id|
-        b = PageBlock.find(block_id)
+        b = Block.find(block_id)
         b.sort_order = i
         b.save
         i = i + 1

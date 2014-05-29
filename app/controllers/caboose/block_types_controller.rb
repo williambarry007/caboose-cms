@@ -1,40 +1,40 @@
 
 module Caboose
-  class PageBlockTypesController < ApplicationController
+  class BlockTypesController < ApplicationController
     
     #===========================================================================
     # Admin actions
     #===========================================================================
     
-    # GET /admin/page-block-types
+    # GET /admin/block-types
     def admin_index
       return if !user_is_allowed('pages', 'view')
-      @block_types = PageBlockType.reorder(:name).all
+      @block_types = BlockType.reorder(:name).all
       render :layout => 'caboose/admin'      
     end
     
-    # GET /admin/page-block-types/:id
+    # GET /admin/block-types/:id
     def admin_show
       return if !user_is_allowed('pages', 'view')
-      block_type = PageBlockType.find(params[:id])
+      block_type = BlockType.find(params[:id])
       render :json => block_type      
     end
 
-    # GET /admin/page-block-types/new
+    # GET /admin/block-types/new
     def admin_new
       return unless user_is_allowed('pages', 'add')      
-      @block_type = PageBlockType.new
+      @block_type = BlockType.new
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/page-block-types/:id/edit
+    # GET /admin/block-types/:id/edit
     def admin_edit
       return unless user_is_allowed('pages', 'edit')      
-      @block_type = PageBlockType.find(params[:id])
+      @block_type = BlockType.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # POST /admin/page-block-types
+    # POST /admin/block-types
     def admin_create
       return unless user_is_allowed('pages', 'add')
 
@@ -43,7 +43,7 @@ module Caboose
           'redirect' => nil
       })
 
-      bt = PageBlockType.new(
+      bt = BlockType.new(
         :name => params[:name].downcase.gsub(' ', '_'),
         :description => params[:name],
         :use_render_function => false
@@ -51,34 +51,27 @@ module Caboose
       bt.save      
       
       # Send back the response
-      resp.redirect = "/admin/page-block-types/#{bt.id}/edit"
+      resp.redirect = "/admin/block-types/#{bt.id}/edit"
       render :json => resp
     end
     
-    # PUT /admin/page-block-types/:id
+    # PUT /admin/block-types/:id
     def admin_update
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
-      bt = PageBlockType.find(params[:id])
+      bt = BlockType.find(params[:id])
 
       save = true
       user = logged_in_user
 
       params.each do |k,v|
         case k
-          when 'name'
-            bt.name = v
-            break
-          when 'description'
-            bt.description = v
-            break
-          when 'use_render_function'
-            bt.use_render_function = v
-            break
-          when 'render_function'
-            bt.render_function = v
-            break            
+          when 'name'                            then bt.name                = v
+          when 'description'                     then bt.description         = v
+          when 'render_function'                 then bt.render_function     = v
+          when 'use_render_function'             then bt.use_render_function = v
+          when 'use_render_function_for_layout'  then bt.use_render_function_for_layout = v                      
         end
       end
     
@@ -86,14 +79,23 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/page-block-types/:id
+    # DELETE /admin/block-types/:id
     def admin_delete
       return unless user_is_allowed('pages', 'delete')                  
-      PageBlockType.find(params[:id]).destroy            
+      BlockType.find(params[:id]).destroy            
       resp = StdClass.new({
-        'redirect' => "/admin/page-block-types"
+        'redirect' => "/admin/block-types"
       })
       render :json => resp
+    end
+    
+    # GET /admin/block-types/options
+    def admin_options
+      return unless user_is_allowed('pages', 'edit')      
+      options = BlockType.reorder(:name).all.collect do |bt| 
+        { 'value' => bt.id, 'text' => bt.description } 
+      end      
+      render :json => options
     end
 		
   end  

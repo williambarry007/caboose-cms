@@ -19,7 +19,7 @@ PageContentController.prototype = {
   sortable_blocks: function()
   { 
     var that = this;
-    $('#pageblocks').sortable({
+    $('#blocks').sortable({
       //hoverClass: "ui-state-active",
       placeholder: 'sortable-placeholder',
       forcePlaceholderSize: true,
@@ -33,7 +33,7 @@ PageContentController.prototype = {
           $.ajax({
             url: '/admin/pages/' + that.page_id + '/blocks',
             type: 'post',
-            data: { page_block_type_id: that.new_block_type_id, index: ui.item.index() },
+            data: { block_type_id: that.new_block_type_id, index: ui.item.index() },
             success: function(resp) { that.render_blocks(function() { that.edit_block(resp.block.id); }); }
           });                    
           that.new_block_type_id = false;
@@ -43,7 +43,7 @@ PageContentController.prototype = {
           $.ajax({
             url: '/admin/pages/' + that.page_id + '/block-order',
             type: 'put',
-            data: $('#pageblocks').sortable('serialize', { key: "block_ids[]" }),
+            data: $('#blocks').sortable('serialize', { key: "block_ids[]" }),
             success: function(resp) {}
           });
         }
@@ -55,7 +55,7 @@ PageContentController.prototype = {
   {
     $('#new_blocks li').draggable({
       dropOnEmpty: true,
-      connectToSortable: "#pageblocks",
+      connectToSortable: "#blocks",
       helper: "clone",
       revert: "invalid"    
     });    
@@ -76,8 +76,8 @@ PageContentController.prototype = {
         .append("Are you sure you want to delete the block? ")
         .append($('<input/>').attr('type', 'button').val('Yes').click(function() { that.delete_block(block_id, true); })).append(" ")
         .append($('<input/>').attr('type', 'button').val('No').click(function() { that.render_block(block_id); }));
-      $('#pageblock_' + block_id).attr('onclick','').unbind('click');
-      $('#pageblock_' + block_id).empty().append(p);
+      $('#block_' + block_id).attr('onclick','').unbind('click');
+      $('#block_' + block_id).empty().append(p);
       return;
     }
     $.ajax({
@@ -95,18 +95,18 @@ PageContentController.prototype = {
 
   render_blocks: function(after)
   {
-    $('#pageblocks').empty();    
+    $('#blocks').empty();    
     var that = this;
     $.ajax({      
       url: '/admin/pages/' + this.page_id + '/blocks/render?empty_text=[Empty, click to edit]',
       success: function(blocks) {
         $(blocks).each(function(i,b) {
-          $('#pageblocks')
+          $('#blocks')
             .append($('<li/>')
-              .attr('id', 'pageblock_container_' + b.id)                                          
-              .append($('<a/>').attr('id', 'pageblock_' + b.id + '_sort_handle'  ).addClass('sort_handle'  ).append($('<span/>').addClass('ui-icon ui-icon-arrow-2-n-s')))
-              .append($('<a/>').attr('id', 'pageblock_' + b.id + '_delete_handle').addClass('delete_handle').append($('<span/>').addClass('ui-icon ui-icon-close')).click(function(e) { e.preventDefault(); that.delete_block(b.id); }))
-              .append($('<div/>').attr('id', 'pageblock_' + b.id).addClass('page_block'))
+              .attr('id', 'block_container_' + b.id)                                          
+              .append($('<a/>').attr('id', 'block_' + b.id + '_sort_handle'  ).addClass('sort_handle'  ).append($('<span/>').addClass('ui-icon ui-icon-arrow-2-n-s')))
+              .append($('<a/>').attr('id', 'block_' + b.id + '_delete_handle').addClass('delete_handle').append($('<span/>').addClass('ui-icon ui-icon-close')).click(function(e) { e.preventDefault(); that.delete_block(b.id); }))
+              .append($('<div/>').attr('id', 'block_' + b.id).addClass('block'))
             );
         });                
         $(blocks).each(function(i,b) { that.render_block_html(b.id, b.html); });                        
@@ -130,13 +130,13 @@ PageContentController.prototype = {
   render_block_html: function(block_id, html)
   {        
     var that = this;    
-    $('#pageblock_' + block_id).empty().html(html);
-    $('#pageblock_' + block_id).attr('onclick','').unbind('click');    
-    $('#pageblock_' + block_id).click(function(e) { that.edit_block(block_id); });
+    $('#block_' + block_id).empty().html(html);
+    $('#block_' + block_id).attr('onclick','').unbind('click');    
+    $('#block_' + block_id).click(function(e) { that.edit_block(block_id); });
   }        
 };
 
-function toggle_page_blocks()
+function toggle_blocks()
 {
   $('#new_blocks_container2').slideToggle();
 }

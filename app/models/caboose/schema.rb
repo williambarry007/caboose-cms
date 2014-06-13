@@ -246,13 +246,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
       
     if !Caboose::BlockType.where(:name => 'heading').exists?
       bt = Caboose::BlockType.create(:name => 'heading', :description => 'Heading')
-      Caboose::FieldType.create(:block_type_id => bt.id, :name => 'text', :field_type => 'text', :nice_name => 'Text', :default => '', :width => 800, :fixed_placeholder => false)
-      Caboose::FieldType.create(:block_type_id => bt.id, :name => 'size', :field_type => 'text', :nice_name => 'Size', :default =>  1, :width => 800, :fixed_placeholder => false, :options => "1|2|3|4|5|6")
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'text', :field_type => 'text', :description => 'Text', :default => '', :width => 800, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'size', :field_type => 'text', :description => 'Size', :default =>  1, :width => 800, :fixed_placeholder => false, :options => "1|2|3|4|5|6")
     end
     
     if !Caboose::BlockType.where(:name => 'richtext').exists?
       bt = Caboose::BlockType.create(:name => 'richtext', :description => 'Rich Text')
-      Caboose::FieldType.create(:block_type_id => bt.id, :name => 'text', :field_type => 'richtext', :nice_name => 'Text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'text', :field_type => 'richtext', :description => 'Text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
     end
     
     admin_user = nil

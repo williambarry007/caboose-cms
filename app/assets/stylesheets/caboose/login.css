@@ -11,6 +11,26 @@
 	padding: 12px 0;
 	position: relative;
 	width: 100%;
+	padding-bottom: 0;
+}
+
+#login-form .header {
+	width: 100%; 
+	text-align: center; 
+}
+
+#login-form .header h1 {
+	position: relative;
+	bottom: 7px;
+	margin-bottom: 0;
+}
+#login-form .header p {
+	margin: 0; 
+	position: relative;
+	bottom: 8px;
+	font-style: italic;
+	font-size: 14px;
+	margin-bottom: 10px;
 }
 
 @media all and (max-width: 400px) {
@@ -23,24 +43,92 @@
 #login-form #login-options {
 	margin: 0;
 	padding: 0;
-	position: absolute;
-	top: 12px;
-	right: 0;
+	float: right;
+	list-style-type: none;
+	position: relative;
+	right: 13px;
 }
+#login-options li {
+	text-align: right; 
+}
+
+#login-options li a {
+	color: #387a8f;
+	font-size: 0.9em;
+	border-bottom: 0;
+}
+
+#login-form input#username {
+	background-image: url('/assets/caboose/login_image.png');
+	background-position: 8px center;
+}
+#login-form input#password {
+	background-image: url('/assets/caboose/password_image.png');
+	background-position: 12px center;
+}
+
 
 #login-form input#username,
 #login-form input#password {
 	font-size: 18px;
-	margin: 0 0 8px 0;
+	margin: 0 auto;
 	max-width: 100%;
+	display: block;
+	margin-bottom: 12px;
 	padding: 7px;
-	width: 386px; /* 400 - 14:padding */
+	width: 315px;
+	background-repeat: no-repeat;
+	padding-left: 42px;
 }
 
 #login-form label {
 	cursor: pointer;
 	display: block;
+	float: left;
+	position: relative;
+	left: 13px;
+	font-size: 0.9em;
+	color: #a58a32;
+	bottom: 18px;
+}
+
+p.buttons {
+	clear: both;
+	margin-top: 80px;
+	overflow: auto;
+	padding: 0 16px;
+	margin-bottom: 0;
 }
 	
 #login-form input[type=checkbox] { top: 8px; }
-#login-form .btn { font-size: 18px; }
+
+#login-form .btn { 
+	font-size: 18px; 
+	display: block;
+	width: 48%;
+	padding: 13px 1%;
+	height: auto;
+	border: 0;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+#login-form input.btn[type=button] {
+	background: #d34f46;
+	float: left;
+}
+
+#login-form input.btn[type=button]:hover {
+	background: #b53c34;
+}
+
+#login-form input[type=submit] {
+	background: #1c9a7f;
+	float: right;
+}
+
+#login-form input[type=submit]:hover {
+	background: #096652;
+}
+
+

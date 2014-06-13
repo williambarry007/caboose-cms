@@ -1,5 +1,9 @@
 <form action="/login" method="post" id="login-form">
-	<h1>Login</h1>
+	<div class="header">
+		<img src="/assets/caboose/caboose_logo.png" alt="Caboose">
+		<h1>caboose</h1>
+		<p>Coo Coo Ca Choo</p>
+	</div>
 	
 	<input type="hidden"   name="return_url" value="<%= @return_url %>" />
 	<input type="text"     name="username" id="username" placeholder="Login or email" />

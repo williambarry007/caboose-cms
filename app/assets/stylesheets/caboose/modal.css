@@ -16,13 +16,24 @@
 
 html { width: 100%; }
 
+@font-face {
+  font-family: 'Avenir';
+  src: url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.eot');
+  src: url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.eot') format('embedded-opentype'),
+       url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.woff')       format('woff'),
+       url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.ttf')        format('truetype'),
+       url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.svg')        format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   background: #111111;
   margin: 0;
   padding: 0;
   color: #fff;
   width: 100%;  
-  font-family: Helvetica, Arial;
+  font-family: "Avenir", Arial;
 }
 
 #modal_wrapper {
@@ -94,11 +105,14 @@ div.model_attribute_text {
 }
 
 input, select, textarea {
-  font-family: Helvetica, arial;
-  border: 1px solid #ccc;
+  font-family: "Avenir", Arial;
+  border: 2px solid #ccc;
+  background: none;
+  color: #fff;
+  /*
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
-  border-radius: 2px;
+  border-radius: 2px; */
   padding: 4px 8px;
   height: 34px;
   font-size: 20px;

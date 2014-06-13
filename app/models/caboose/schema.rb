@@ -15,21 +15,21 @@ class Caboose::Schema < Caboose::Utilities::Schema
   
   def self.renamed_columns
     {
-      Caboose::Field     => { :page_block_id        => :block_id,
-                              :page_block_field_id  => :field_type_id },      
-      Caboose::FieldType => { :page_block_type_id   => :block_type_id },
+      #Caboose::Field     => { :page_block_id        => :block_id,
+      #                        :page_block_field_id  => :field_type_id },      
+      #Caboose::FieldType => { :page_block_type_id   => :block_type_id },
       Caboose::Block     => { :page_block_type_id   => :block_type_id }    
     }
   end
   
   def self.removed_columns
     {
-      Caboose::Block => [:block_type, :value, :name],      
-      Caboose::FieldType => [:model_binder_options],
+      Caboose::Block => [:block_type],      
+      #Caboose::FieldType => [:model_binder_options],
       Caboose::AbValue => [:i, :text],
       Caboose::AbOption => [:text],
       Caboose::User => [:timezone],
-      Caboose::Field => [:child_block_id],
+      #Caboose::Field => [:child_block_id],
       Caboose::BlockType => [:layout_function]
     }
   end
@@ -122,39 +122,53 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Block => [        
         [ :page_id               , :integer ],
-        [ :field_id              , :integer ],
+        [ :parent_id             , :integer ],
         [ :block_type_id         , :integer ],
         [ :sort_order            , :integer , { :default => 0 }],
         [ :name                  , :string  ],
-        [ :value                 , :text    ]        
+        [ :value                 , :text    ],   
+        [ :file                  , :attachment ],
+        [ :image                 , :attachment ]
       ],
-      Caboose::BlockType => [        
+      Caboose::BlockType => [      
+        [ :parent_id                       , :integer ],
         [ :name                            , :string  ],
         [ :description                     , :string  ],
         [ :render_function                 , :text    ],
         [ :use_render_function             , :boolean , { :default => false }],        
-        [ :use_render_function_for_layout  , :boolean , { :default => false }]
+        [ :use_render_function_for_layout  , :boolean , { :default => false }],
+        [ :allow_child_blocks              , :boolean , { :default => false }],
+        
+        # Used for field values
+        [ :field_type                      , :string  ],        
+        [ :default                         , :text    ],
+        [ :width                           , :integer ],
+        [ :height                          , :integer ],
+        [ :fixed_placeholder               , :boolean ],
+        [ :options                         , :text    ],
+        [ :options_function                , :text    ],
+        [ :options_url                     , :string  ]
       ],      
-      Caboose::Field => [
-        [ :block_id             , :integer    ],
-        [ :field_type_id        , :integer    ],        
-        [ :value                , :text       ],
-        [ :file                 , :attachment ],
-        [ :image                , :attachment ]        
-      ],
-      Caboose::FieldType => [
-        [ :block_type_id        , :integer ],      
-        [ :name                 , :string  ],
-        [ :field_type           , :string  ],
-        [ :nice_name            , :string  ],
-        [ :default              , :text    ],
-        [ :width                , :integer ],
-        [ :height               , :integer ],
-        [ :fixed_placeholder    , :boolean ],
-        [ :options              , :text    ],
-        [ :options_function     , :text    ],
-        [ :options_url          , :string  ]
-      ],
+      #Caboose::Field => [
+      #  [ :block_id             , :integer    ],
+      #  [ :field_type_id        , :integer    ],        
+      #  [ :value                , :text       ],
+      #  [ :file                 , :attachment ],
+      #  [ :image                , :attachment ]        
+      #],
+      #Caboose::FieldType => [
+      #  [ :block_type_id        , :integer ],      
+      #  [ :name                 , :string  ],
+      #  [ :field_type           , :string  ],
+      #  [ :nice_name            , :string  ],
+      #  [ :default              , :text    ],
+      #  [ :width                , :integer ],
+      #  [ :height               , :integer ],
+      #  [ :fixed_placeholder    , :boolean ],
+      #  [ :options              , :text    ],
+      #  [ :options_function     , :text    ],
+      #  [ :options_url          , :string  ]
+      #],
       Caboose::Post => [  
         [ :title                , :text       ],  		 	 
         [ :body                 , :text 		   ],  	 

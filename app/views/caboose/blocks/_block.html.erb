@@ -1,0 +1,8 @@
+<div id='block_<%= block.id %>'>
+  <% if block.children.count > 0 %>
+    <% block.children.each do |b| %><%= raw block.render(b, local_assigns) %><% end %>  
+  <% elsif editing %>  
+    <%= raw empty_text %>
+  <% end %>
+  <% if editing && !modal %><%= raw block.child_block_link %><% end %>
+</div>

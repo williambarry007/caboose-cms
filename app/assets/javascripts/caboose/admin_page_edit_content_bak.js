@@ -10,7 +10,6 @@ PageContentController.prototype = {
   {
     this.page_id = page_id;
     var that = this;
-    that.set_clickable();   
     //this.render_blocks(function() {
     //  that.sortable_blocks();
     //  that.draggable_blocks();
@@ -67,11 +66,6 @@ PageContentController.prototype = {
     caboose_modal_url('/admin/pages/' + this.page_id + '/blocks/' + block_id + '/edit');    
   },
   
-  new_block: function(block_id)
-  {
-    caboose_modal_url('/admin/pages/' + this.page_id + '/blocks/' + block_id + '/new');    
-  },
-  
   delete_block: function(block_id, confirm)
   {
     var that = this;        
@@ -98,20 +92,42 @@ PageContentController.prototype = {
   /*****************************************************************************
   Block Rendering
   *****************************************************************************/
-  
-  render_blocks: function() {
-    var that = this;                
-    $.ajax({
-      url: '/admin/pages/' + this.page_id + '/blocks/render-second-level',
+
+  render_blocks: function(after)
+  {
+    $('#blocks').empty();    
+    var that = this;
+    $.ajax({      
+      url: '/admin/pages/' + this.page_id + '/blocks/render?empty_text=[Empty, click to edit]',
       success: function(blocks) {
-        $(blocks).each(function(i, b) {
-          $('#block_' + b.id).replaceWith(b.html);
+        if (blocks.length == 0)
+        {
+          $('#blocks').parent().append("<p>This page is empty.  Please add a new block.</p>");
+        }          
+        $(blocks).each(function(i,b) {
+          $('#blocks')
+            .append($('<li/>')
+              .attr('id', 'block_container_' + b.id)                                          
+              //.append($('<a/>').attr('id', 'block_' + b.id + '_sort_handle'  ).addClass('sort_handle'  ).append($('<span/>').addClass('ui-icon ui-icon-arrow-2-n-s')))
+              //.append($('<a/>').attr('id', 'block_' + b.id + '_delete_handle').addClass('delete_handle').append($('<span/>').addClass('ui-icon ui-icon-close')).click(function(e) { e.preventDefault(); that.delete_block(b.id); }))
+              //.append($('<div/>').attr('id', 'block_' + b.id).addClass('block'))
+            );
+        });                
+        $(blocks).each(function(i,b) { 
+          that.render_block_html(b.id, b.html); 
         });
-        that.set_clickable();
+        that.set_clickable();        
+        if (after) after();
       }
-    });
+    });    
   },
-         
+  
+  render_block_html: function(block_id, html)
+  {        
+    var that = this;    
+    $('#block_container_' + block_id).empty().html(html);    
+  },
+  
   set_clickable: function()
   {        
     var that = this;                
@@ -126,43 +142,23 @@ PageContentController.prototype = {
   },
   
   set_clickable_helper: function(b)
-  {    
-    var that = this;        
-    $('#block_' + b.id).attr('onclick','').unbind('click');    
-    $('#block_' + b.id).click(function(e) {
-      e.stopPropagation();
-      that.edit_block(b.id); 
-    });
-    if (b.allow_child_blocks == true)
-    {
-      $('#new_block_' + b.id).replaceWith($('<input/>')
-        .attr('type', 'button')
-        .val('New Block')
-        .click(function(e) { e.stopPropagation(); that.new_block(b.id);          
-        })
-      );
-    } 
-    var show_mouseover = true;
-    if (b.children && b.children.length > 0)
-    {
+  {
+    var that = this;    
+    if (!b.children || b.children.length == 0)
+    {      
+      $('#block_' + b.id).attr('onclick','').unbind('click');    
+      $('#block_' + b.id).click(function(e) { that.edit_block(b.id); });
+    }
+    else
+    {      
       $.each(b.children, function(i, b2) {
-        if (b2.block_type_id = 34)
-          show_mouseover = false;
         that.set_clickable_helper(b2);
       });
-    }    
-    if (show_mouseover)
-    {
-      $('#block_' + b.id).mouseover(function(el) { $('#block_' + b.id).addClass(   'block_over'); });
-      $('#block_' + b.id).mouseout(function(el)  { $('#block_' + b.id).removeClass('block_over'); }); 
-    }    
-  }    
-  
+    }
+  }
 };
 
 function toggle_blocks()
 {
   $('#new_blocks_container2').slideToggle();
 }
-
-

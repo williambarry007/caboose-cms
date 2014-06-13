@@ -4,4 +4,4 @@ if text.nil? || text == ""
   text = (empty_text ? "<p>#{empty_text}</p>" : "") 
 end
 
-%><div id='block_<%= block.id %>'><%= raw text %></div>
+%><%= raw text %>

@@ -1,0 +1,7 @@
+<%
+html = block.value
+if html.nil? || html == ""
+  html = (empty_text ? "<p>#{empty_text}</p>" : "") 
+end
+
+%><%= raw html %>

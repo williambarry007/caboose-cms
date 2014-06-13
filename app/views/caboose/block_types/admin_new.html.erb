@@ -1,11 +1,16 @@
 
 <h1>New Block Type</h1>
+<form action='/admin/block-types' method='post' id='new_block_type_form'>
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
+<input type='hidden' name='parent_id' value='<%= @parent_id %>' />
+<input type='hidden' name='field_type' value='block' />
 <p><input type='text' id='name' name='name' placeholder='Name' /></p>
 <div id='message'></div>
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/block-types';" />
 <input type='button' value='Add Block Type' onclick="add_block_type();" />
 </p>
+</form>
 
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
@@ -16,9 +21,7 @@ function add_block_type()
   $.ajax({
     url: '/admin/block-types',
     type: 'post',
-    data: {
-      name: $('#name').val()
-    },      
+    data: $('#new_block_type_form').serialize(),          
     success: function(resp) {
       if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
       if (resp.redirect) window.location = resp.redirect;

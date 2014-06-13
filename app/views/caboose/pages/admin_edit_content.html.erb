@@ -1,33 +1,37 @@
 
-<%= render :partial => 'caboose/pages/admin_header' %>
-
-<div id='new_blocks_container1'>
-  <p><input type='button' value='New Page Block' onclick='toggle_blocks();' /></p>
-</div>
-<div id='new_blocks_container2' style='display: none;'>
-  <input type='button' value='New Page Block' onclick='toggle_blocks();' />
-  <p>Drag a block onto the page.</p>
-  <ul id='new_blocks'>
-    <% @block_types.each do |block_type| %><li id='new_block_<%= block_type.id %>'><%= block_type.description %></li><% end %>
-  </ul>
-  <p><a href='#' onclick='toggle_blocks();'>Close</a></p>
-</div>
-
-<ul id='blocks'></ul>
-
-<%= render :partial => 'caboose/pages/admin_footer' %>
-
 <% content_for :caboose_css do %>
-<%= stylesheet_link_tag 'caboose/admin_page_edit_content', :media => 'all' %>
+<style type='text/css'>
+#back_to_admin {
+  display: block;  
+  color: #fff;
+  background-image: url(/assets/caboose/caboose_logo_small.png);
+  background-color: #000;  
+  background-repeat: no-repeat;  
+  padding: 14px 10px 14px 50px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 100;
+}
+.block_over { background: #fff799; }
+</style>
 <% end %>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/admin" %>
+<%= javascript_include_tag "caboose/model/all" %>
 <%= javascript_include_tag 'caboose/admin_page_edit_content' %>
 <script type='text/javascript'>
 
 var controller = false;
 $(document).ready(function() {
-  controller = new PageContentController(<%= @page.id %>);  
+  controller = new PageContentController(<%= @page.id %>);
+
+  $('body').append($('<a/>')
+    .attr('id', 'back_to_admin')      
+    .attr('href', '/admin/pages/<%= @page.id %>/edit')
+    .html("Back to Admin")      
+  );  
 });
 
 </script>

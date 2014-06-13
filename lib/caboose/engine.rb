@@ -43,9 +43,9 @@ module Caboose
     return resp
   end
   
-  def Caboose.json(obj, defaultvalue = "")
+  def Caboose.json(obj, defaultvalue = "", options = {})
     return defaultvalue.to_json if obj.nil?
-    return obj.to_json
+    return obj.to_json(options)
   end
   
   # Strips html and returns the text that breaks closest to the given length

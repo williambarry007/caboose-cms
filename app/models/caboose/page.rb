@@ -4,7 +4,7 @@ class Caboose::Page < ActiveRecord::Base
   
   belongs_to :parent, :class_name => "Page"
   has_many :children, :class_name => "Page", :foreign_key => 'parent_id', :order => 'sort_order, title'
-  has_many :page_permissions
+  has_many :page_permissions  
   has_many :blocks, :order => 'sort_order'
   attr_accessible :parent_id, 
     :title, 
@@ -37,6 +37,14 @@ class Caboose::Page < ActiveRecord::Base
     return menu_title unless menu_title.nil?
     return title unless title.nil?
     return ""
+  end
+  
+  def block
+    Caboose::Block.where("page_id = ? and parent_id is null", self.id).first
+  end
+  
+  def top_level_blocks
+    Caboose::Block.where("page_id = ? and parent_id is null", self.id).reorder(:sort_order).all
   end
   
   #def content

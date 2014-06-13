@@ -40,7 +40,8 @@ class Caboose::Utilities::Schema
     return if self.schema.nil?
     
     rename_tables
-    rename_columns    
+    rename_columns
+    remove_columns    
     
     c = ActiveRecord::Base.connection
     self.schema.each do |model, columns|
@@ -74,8 +75,7 @@ class Caboose::Utilities::Schema
         end
       end
     end
-    
-    remove_columns
+        
     create_indexes
     
     self.schema.each do |model, columns|
@@ -121,6 +121,7 @@ class Caboose::Utilities::Schema
     return if self.removed_columns.nil?
     c = ActiveRecord::Base.connection
     self.removed_columns.each do |model, columns|
+      next if !c.table_exists?(model.table_name)
       columns.each do |col|
         c.remove_column model.table_name, col if c.column_exists?(model.table_name, col)
       end

@@ -1,25 +1,41 @@
- 
-<h1>Edit Block Type</h1>
-<div id='blocktype_<%= @block_type.id %>_name'></div>
-<div id='blocktype_<%= @block_type.id %>_description'></div>
-<div id='blocktype_<%= @block_type.id %>_use_render_function'></div>
-<div id='blocktype_<%= @block_type.id %>_use_render_function_for_layout'></div>
-<div id='blocktype_<%= @block_type.id %>_render_function'></div>
+<%
+bt = @block_type
+%>
 
-<h2>Fields</h2>
-<p><a href='/admin/block-types/<%= @block_type.id %>/field-types/new'>New Field</a></p>
-<% if @block_type.field_types.count > 0 %>
+<h1>Edit Block Type</h1>
+<p><div id='blocktype_<%= bt.id %>_parent_id'></div></p>
+<p><div id='blocktype_<%= bt.id %>_name'></div></p>
+<p><div id='blocktype_<%= bt.id %>_description'></div></p>
+<p><div id='blocktype_<%= bt.id %>_field_type'></div></p>
+
+
+<p><div id='blocktype_<%= bt.id %>_default'></div></p>
+<p><div id='blocktype_<%= bt.id %>_width'></div></p>
+<p><div id='blocktype_<%= bt.id %>_height'></div></p>
+<p><div id='blocktype_<%= bt.id %>_fixed_placeholder'></div></p>
+<p><div id='blocktype_<%= bt.id %>_options_url'></div></p>
+<p><div id='blocktype_<%= bt.id %>_options'></div></p>
+
+<p><div id='blocktype_<%= bt.id %>_use_render_function'></div></p>
+<p><div id='blocktype_<%= bt.id %>_use_render_function_for_layout'></div></p>
+<p><div id='blocktype_<%= bt.id %>_allow_child_blocks'></div></p>
+<p><div id='blocktype_<%= bt.id %>_render_function'></div></p>
+<p><div id='blocktype_<%= bt.id %>_options_function'></div></p>
+
+<h2>Children</h2>
+<p><a href='/admin/block-types/<%= @block_type.id %>/new'>New Child Block</a></p>
+<% if @block_type.children.count > 0 %>
   <table class='data'>
     <tr>
       <th>Short Name</th>
       <th>Long Name</th>
       <th>Field Type</th>      
     </tr>
-  <% @block_type.field_types.each do |ft| %>
-    <tr onclick="window.location='/admin/block-types/<%= @block_type.id %>/field-types/<%= ft.id %>/edit';">
-      <td><%= ft.name       %></td>
-      <td><%= ft.nice_name  %></td>
-      <td><%= ft.field_type %></td>    
+  <% bt.children.each do |bt2| %>
+    <tr onclick="window.location='/admin/block-types/<%= bt2.id %>/edit';">
+      <td><%= bt2.name        %></td>
+      <td><%= bt2.description %></td>
+      <td><%= bt2.field_type  %></td>    
     </tr>
   <% end %>
   </table><br />
@@ -29,14 +45,14 @@
 
 <div id='message'></div>
 <p>
-<input type='button' value='< Back' onclick="window.location='/admin/block-types';" />
+<input type='button' value='< Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}/edit" : '' %>';" />
 <input type='button' value='Delete Block Type' onclick="delete_block_type(<%= @block_type.id %>);" />
 </p>
 
 <% content_for :caboose_css do %>
 <style type='text/css'>
-#blocktype_<%= @block_type.id %>_render_function { font-family: Courier; font-size: 80%; }
-#blocktype_<%= @block_type.id %>_layout_function { font-family: Courier; font-size: 80%; }
+#blocktype_<%= bt.id %>_render_function  { font-family: Courier; font-size: 80%; width: 100%; }
+#blocktype_<%= bt.id %>_options_function { font-family: Courier; font-size: 80%; width: 100%; }
 </style>
 <% end %>
 <% content_for :caboose_js do %>
@@ -72,11 +88,21 @@ $(document).ready(function() {
     update_url: '/admin/block-types/<%= @block_type.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'name'                           , nice_name: 'Name'                           , type: 'text'     , value: <%= raw Caboose.json(@block_type.name)            %> , width: 400 },
-      { name: 'description'                    , nice_name: 'Description'                    , type: 'text'     , value: <%= raw Caboose.json(@block_type.description)     %> , width: 400 },
-      { name: 'use_render_function'            , nice_name: 'Use Render Function'            , type: 'checkbox' , value: <%= @block_type.use_render_function            ? 'true' : 'false' %> , width: 400 },
-      { name: 'use_render_function_for_layout' , nice_name: 'Use Render Function for Layout' , type: 'checkbox' , value: <%= @block_type.use_render_function_for_layout ? 'true' : 'false' %> , width: 400 },
-      { name: 'render_function'                , nice_name: 'Render Function'                , type: 'textarea' , value: <%= raw Caboose.json(@block_type.render_function) %> , width: 800, height: 200 }      
+      { name: 'parent_id'                      , nice_name: 'Parent'                         , type: 'select'   , value: <%= raw Caboose.json(bt.parent_id)                       %>, width: 400, options_url: '/admin/block-types/tree-options' },
+      { name: 'name'                           , nice_name: 'Name'                           , type: 'text'     , value: <%= raw Caboose.json(bt.name)                            %>, width: 400 },
+      { name: 'description'                    , nice_name: 'Description'                    , type: 'text'     , value: <%= raw Caboose.json(bt.description)                     %>, width: 400 },
+      { name: 'use_render_function'            , nice_name: 'Use Render Function'            , type: 'checkbox' , value: <%= bt.use_render_function            ? 'true' : 'false' %>, width: 400 },
+      { name: 'use_render_function_for_layout' , nice_name: 'Use Render Function for Layout' , type: 'checkbox' , value: <%= bt.use_render_function_for_layout ? 'true' : 'false' %>, width: 400 },
+      { name: 'allow_child_blocks'             , nice_name: 'Allow Child Blocks'             , type: 'checkbox' , value: <%= bt.allow_child_blocks             ? 'true' : 'false' %>, width: 400 },
+      { name: 'render_function'                , nice_name: 'Render Function'                , type: 'textarea' , value: <%= raw Caboose.json(bt.render_function)                 %>, width: 800, height: 200 },      
+      { name: 'field_type'                     , nice_name: 'Field type'                     , type: 'select'   , value: <%= raw Caboose.json(bt.field_type)                      %>, text: <%= raw Caboose.json(bt.field_type) %>, width: 400, options_url: '/admin/block-types/field-type-options' },
+      { name: 'default'                        , nice_name: 'Default value'                  , type: 'text'     , value: <%= raw Caboose.json(bt.default)                         %>, width: 400 },
+      { name: 'width'                          , nice_name: 'Width'                          , type: 'text'     , value: <%= raw Caboose.json(bt.width)                           %>, width: 400 },
+      { name: 'height'                         , nice_name: 'Height'                         , type: 'text'     , value: <%= raw Caboose.json(bt.height)                          %>, width: 400 },
+      { name: 'fixed_placeholder'              , nice_name: 'Fixed placeholder'              , type: 'checkbox' , value: <%= raw Caboose.json(bt.fixed_placeholder)               %>, width: 400 },
+      { name: 'options_url'                    , nice_name: 'Options URL'                    , type: 'text'     , value: <%= raw Caboose.json(bt.options_url)                     %>, width: 400 },
+      { name: 'options_function'               , nice_name: 'Options Function'               , type: 'textarea' , value: <%= raw Caboose.json(bt.options_function)                %>, width: 400, height: 100 },
+      { name: 'options'                        , nice_name: 'Options'                        , type: 'textarea' , value: <%= raw Caboose.json(bt.options)                         %>, width: 400, height: 100 }      
     ]
   });
 });

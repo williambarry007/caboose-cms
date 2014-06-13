@@ -1,6 +1,6 @@
 <%
-size = block.field_value('size')
-text = block.field_value('text')
+size = block.child('size').value
+text = block.child('text').value
 size = 1 if size.nil?
 text = (empty_text ? empty_text : "") if text.nil? || text == ""
 

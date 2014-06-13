@@ -1,0 +1,55 @@
+<%
+
+crumbs = []
+b = @block
+while b
+  href    = b.id == @block.id ? "#" : "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+  onclick = b.id == @block.id ? " onclick=\"$('#block_#{@block.id}_block_type_id_container').slideToggle(100, function() { modal.autosize(); });\"" : ''
+  text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
+  crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"     
+  b = b.parent
+end
+b = @block
+
+%>
+<h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
+<h1>New Block</h1>
+<form action='/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>' method='post' id='new_block_form' onsubmit="add_child_block(); return false;">
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
+<p><select name='block_type_id'>
+<option value=''>-- Select a block type --</option>
+<% Caboose::BlockType.where("parent_id is null").reorder(:name).all.each do |bt| %>
+  <option value="<%= bt.id %>"><%= bt.description %></option>
+<% end %>
+</select></p>
+<div id='message'></div>
+<p>
+  <input type='submit' value='Add Block' />
+  <input type='button' value='Cancel' onclick="modal.close();" />
+</p>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+function add_child_block()
+{
+  modal.autosize("<p class='loading'>Adding block...</p>");
+  $.ajax({
+    url: '/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>',
+    type: 'post',
+    data: $('#new_block_form').serialize(),
+    success: function(resp) {
+      if (resp.error)   modal.autosize("<p class='note error'>" + resp.error + "</p>");
+      if (resp.success) modal.autosize("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

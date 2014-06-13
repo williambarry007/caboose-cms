@@ -4,70 +4,219 @@ class Caboose::Block < ActiveRecord::Base
   
   belongs_to :page
   belongs_to :block_type
-  belongs_to :field   
-  has_many :fields
-  attr_accessible :id, :page_id, :field_id, :block_type_id, :sort_order
+  belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
+  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :dependent => :delete_all, :order => 'sort_order'
+  has_attached_file :file, :path => '/uploads/:id.:extension'
+  do_not_validate_attachment_file_type :file
+  has_attached_file :image, 
+    :path => 'uploads/:id_:style.:extension', 
+    :styles => {
+      :tiny  => '160x120>',
+      :thumb => '400x300>',
+      :large => '640x480>'
+    }
+  do_not_validate_attachment_file_type :image
   
-  def field_value(name)      
-    fields.each do |f|
-      if f.field_type.name == name
-        if    f.field_type.field_type == 'image' then return f.image
-        elsif f.field_type.field_type == 'file'  then return f.file
-        else return f.value
+  attr_accessible :id, 
+    :page_id, 
+    :parent_id,
+    :block_type_id,
+    :sort_order,
+    :name,
+    :value        
+    
+  after_initialize do |b|
+    # Do whatever we need to do to set the value to be correct for the field type we have.
+    # Most field types are fine with the raw value in the database
+    if b.block_type.nil?
+      bt = Caboose::BlockType.where(:field_type => 'text').first
+      b.block_type_id = bt.id
+    end
+    if b.block_type.field_type.nil?
+      b.block_type.field_type = 'text'
+      b.save
+    end
+    case b.block_type.field_type
+      when 'checkbox' then b.value = (b.value == 1 || b.value == '1' || b.value == true ? true : false)
+    end
+  end
+  
+  before_save :caste_value
+  def caste_value  
+    case self.block_type.field_type
+      when 'checkbox'
+        if self.value.nil? then self.value = false
+        else self.value = (self.value == 1 || self.value == '1' || self.value == true ? 1 : 0)
         end
+    end
+  end
+  
+  def child_value(name)
+    b = child(name)
+    return nil if b.nil?
+    return b.image if b.block_type.field_type == 'image'
+    return b.file  if b.block_type.field_type == 'file'
+    return b.value        
+  end
+  
+  def child(name)
+    Caboose::Block.where("parent_id = ? and name = ?", self.id, name).first
+  end
+  
+  def create_children(block_type_override = nil)
+    bt = block_type_override ? block_type_override : block_type
+    bt.children.each do |bt2|
+      bt_id = bt2.id      
+      #if bt2.parent_id
+      #  new_bt_id = Caboose::BlockType.where(:name => bt2.field_type).first.id 
+      #end      
+      if self.child(bt2.name).nil?
+        b = Caboose::Block.create(
+          :page_id => self.page_id,
+          :parent_id => self.id, 
+          :block_type_id => bt_id,
+          :name => bt2.name,
+          :value => bt2.default
+        )
+        b.create_children(bt2)
       end
     end
-    return nil
   end
-  
-  def field_block(name)
-    f = self.field_for(name)
-    return nil if f.nil? || f.child_block.nil?
-    return f.child_block    
-  end
-  
-  def field_for(name)    
-    fields.each do |f|
-      return f if f.field_type.name == name      
-    end
-    return nil
-  end
-  
-  #def self.create_fields(block_id)
-  #  block = self.find(block_id)
-  #  block.block_type.field_types.each do |ft| 
-  #    if block.field_for(f.name).nil?
-  #      Caboose::PageBlockFieldValue.create(:page_block_id => block.id, :page_block_field_id => f.id, :value => f.default)
-  #    end
-  #  end
-  #end
-  
-  def create_fields
-    block_type.field_types.each do |ft| 
-      if self.field_for(ft.name).nil?
-        f = Caboose::Field.create(:block_id => self.id, :field_type_id => ft.id, :value => ft.default)
-        if ft.field_type.starts_with?('block')
-          b = Caboose::Block.create(:page_id => self.page_id, :field_id => f.id, :block_type_id => 2)
-          b.create_fields
+                                            
+  def render(block, options)    
+    Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\noptions.class = #{options.class}\noptions = #{options}")
+    
+    if block && block.is_a?(String)
+      Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")
+      b = self.child(block)        
+      if b.nil?
+        self.create_children
+        b = self.child(block)
+        if b.nil?        
+          Caboose.log("No block exists with name \"#{block}\".")
+          return false
         end
       end
+      block = b
+    end        
+    str = ""
+
+    defaults = {
+      :modal      => false,
+      :empty_text => "",
+      :editing    => false,
+      :css        => nil,
+      :js         => nil,
+      :block      => block
+    }
+    options2 = nil
+    #Caboose.log(options.class)
+    if options.is_a?(Hash)
+      options2 = defaults.merge(options)      
+    #elsif options.is_a?(ActionView::Base)
+    #  options2 = {        
+    #    :modal      => options.modal,
+    #    :empty_text => options.empty_text,
+    #    :editing    => options.editing,
+    #    :css        => options.css,
+    #    :js         => options.js        
+    #  }
+    else
+      options2 = {        
+        :modal      => options.modal,
+        :empty_text => options.empty_text,
+        :editing    => options.editing,
+        :css        => options.css,
+        :js         => options.js        
+      }        
     end
-  end
-  
-  def render(empty_text = nil, editing = false)
-    if block_type.use_render_function && block_type.render_function
-      return render_from_function(empty_text, editing)        
-    else       
-      view = ActionView::Base.new(ActionController::Base.view_paths)      
-      return view.render(:partial => "caboose/blocks/#{block_type.name}", :locals => { :block => self, :empty_text => empty_text, :editing => editing })
-    end
+    options2[:block] = block
+          
+    #options2.modal      = false if options2.modal.nil? 
+    #options2.empty_text = ""    if options2.empty_text.nil? 
+    #options2.editing    = false if options2.editing.nil?
+    #options[:css => nil, 
+    #options[:js => nil 
+    #}.merge(options)
+    #options2.block = block
+       
+    if block.block_type.use_render_function && block.block_type.render_function
+      #Caboose.log("Rendering from function")      
+      str = block.render_from_function(options2)
+    else
+      view = ActionView::Base.new(ActionController::Base.view_paths)
+      begin
+        #Caboose.log("Rendering caboose/blocks/#{block.name}")
+        str = view.render(:partial => "caboose/blocks/#{block.name}", :locals => options2)
+      rescue
+        #Caboose.log("Error rendering caboose/blocks/#{block.name}")
+        begin          
+          #Caboose.log("Rendering caboose/blocks/#{block.block_type.name}")
+          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)
+        rescue                    
+          #Caboose.log("Error rendering caboose/blocks/#{block.block_type.name}")
+          #Caboose.log("Rendering caboose/blocks/#{block.block_type.field_type}")
+          str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)
+        end
+      end        
+    end     
+    #return str if block.parent_id.nil?    
+    #return str if options[:editing].nil? || options[:editing] == false
+    #return "<div id='block_#{block.id}' class='block'>#{str}</div>"
+    return str
   end
 
-  def render_from_function(empty_text = nil, editing = false)    
-    locals = OpenStruct.new(:block => self, :empty_text => empty_text, :editing => editing)
-    Caboose.log(block_type.id)
+  def render_from_function(options)
+    self.create_children    
+    #locals = OpenStruct.new(:block => self, :empty_text => empty_text, :editing => editing)
+    locals = OpenStruct.new(options)
     erb = ERB.new(block_type.render_function)
     return erb.result(locals.instance_eval { binding })
   end
   
+  def child_block_link        
+    return "<div class='new_block' id='new_block_#{self.id}'>New Block</div>"    
+  end    
+  
+  def js_hash
+    kids = self.children.collect { |b| b.js_hash }
+    bt = self.block_type
+    return {
+      'id'             => self.id,           
+      'page_id'        => self.page_id,      
+      'parent_id'      => self.parent_id,    
+      'block_type_id'  => self.block_type_id,    
+      'sort_order'     => self.sort_order,
+      'name'           => self.name,
+      'value'          => self.value,
+      'children'       => kids,      
+      'block_type'     => {      
+        'id'                              => bt.id,                            
+        'parent_id'                       => bt.parent_id,                     
+        'name'                            => bt.name,
+        'description'                     => bt.description,
+        'render_function'                 => bt.render_function,
+        'use_render_function'             => bt.use_render_function,
+        'use_render_function_for_layout'  => bt.use_render_function_for_layout,
+        'allow_child_blocks'              => bt.allow_child_blocks,
+        'field_type'                      => bt.field_type,
+        'default'                         => bt.default,
+        'width'                           => bt.width,
+        'height'                          => bt.height,
+        'fixed_placeholder'               => bt.fixed_placeholder,
+        'options'                         => bt.options,
+        'options_function'                => bt.options_function,
+        'options_url'                     => bt.options_url
+      },
+      'file' => {
+        'url' => self.file.url
+      },
+      'image' => {
+        'tiny_url'  => self.image.url(:tiny),
+        'thumb_url' => self.image.url(:thumb),
+        'large_url' => self.image.url(:large),
+      }
+    }
+  end
+
 end

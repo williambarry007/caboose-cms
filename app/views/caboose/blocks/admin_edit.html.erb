@@ -1,38 +1,74 @@
 <%
 update_on_close = false
-@block.block_type.field_types.each do |ft|
-  update_on_close = true if ft.field_type == 'image' || ft.field_type == 'file'
+@block.block_type.children.each do |bt|
+  update_on_close = true if bt.field_type == 'image' || bt.field_type == 'file'
 end
-%>
-<h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.block_type.description %></h2>
-<p><div id='block_<%= @block.id %>_block_type_id'></div></p>
 
+crumbs = []
+b = @block
+while b
+  href    = b.id == @block.id ? "#" : "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+  onclick = b.id == @block.id ? " onclick=\"$('#block_#{@block.id}_block_type_id_container').slideToggle(100, function() { modal.autosize(); });\"" : ''
+  text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
+  crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"     
+  b = b.parent
+end
+
+%>
+<!--<h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.name ? @block.name : @block.block_type.description %></h2>-->
+<h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
+<p id='block_type_container'><div id='block_<%= @block.id %>_block_type_id'></div></p>
+                                         
 <% if @block.block_type.use_render_function_for_layout %>
-  <%= raw @block.render('[Empty, click to edit]', true) %>
-<% else %>
-  <% @block.block_type.field_types.each do |ft| %>    
-    <% f = @block.field_for(ft.name) %>
-    <% if ft.field_type.starts_with?('block') %>
-      <div id='field_<%= f.id %>'><%= ft.nice_name %>: <%= f.child_block.render('[Empty, click to edit]', true) %></div>      
-    <% else %>  
-      <div id='field_<%= f.id %>_value'></div>
+  <!-- Start -->
+  <%= raw @block.render(@block, {
+    :modal => true,
+    :empty_text => '[Empty, click to edit]',
+    :editing => true
+  }) %>
+  <!-- Stop -->
+<% elsif @block.block_type.field_type != 'block' %>
+  <p><div id='block_<%= @block.id %>_value'></div></p>
+<% else %>  
+  <% if @block.children.count > 0 %>  
+    <% @block.children.each do |b| %>
+      <% if b.block_type.field_type != 'block' && b.block_type.field_type != 'richtext' %>
+        <p><div id='block_<%= b.id %>_value'></div></p>
+      <% else %>
+        <%= raw @block.render(b, {
+          :modal => true,
+          :empty_text => '[Empty, click to edit]',
+          :editing => true
+        }) %>
+      <% end %>
     <% end %>
+  <% else %>
+    <p>This block doesn't have any content yet. 
+      <% if @block.block_type.allow_child_blocks %>
+        <a href='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>/new'>Add a child block!</a>
+      <% end %>
+    </p>
   <% end %>
 <% end %>
-<p>
-<% if @block.field_id %>
-  <input type='button' value='< Back' onclick="window.location='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.field.block_id %>/edit';" />
-<% end %>
+<div id='message'></div>
+<p>  
 <input type='button' value='Close' onclick="<% if update_on_close %>parent.controller.render_blocks();<% end %>modal.close();" />
+<% if @block.name.nil? %>
+  <input type='button' value='Delete Block' onclick="controller.delete_block();" />
+<% end %>
+<input type='button' value='Move Up'   onclick="controller.move_up();" />
+<input type='button' value='Move Down' onclick="controller.move_down();" />
 </p>
 
 <% content_for :caboose_css do %>
 <style type='text/css'>
+.block { border: #ccc 1px dotted; }
 #block_<%= @block.id %>_block_type_id_container { }
 </style>
 <% end %>
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/admin_block_edit" %>
 <script type='text/javascript'>
 
 var modal = false;
@@ -40,76 +76,31 @@ $(window).load(function() {
   modal = new CabooseModal(800);
 });
 
+<%
+#b = @block, nil, { 
+#  :include => [
+#    :block_type, 
+#    :children => { :include => :block_type } 
+#  ]
+#})
+#b.image
+%>
+    
+var controller = false;
 $(document).ready(function() {
-              
-  m = new ModelBinder({
-    name: 'Block',
-    id: <%= @block.id %>,
-    update_url: '/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>',
-    authenticity_token: '<%= form_authenticity_token %>',
-    attributes: [{      
-      name: 'block_type_id',
-      nice_name: 'Block type',
-      type: 'select',
-      value: <%= @block.block_type_id %>,             
-      text: <%= raw Caboose.json(@block.block_type.name) %>,                  
-      width: 200,
-      fixed_placeholder: true,
-      options_url: '/admin/block-types/options',          
-      after_update: function() { parent.controller.render_blocks(); window.location.reload(true); },
-      after_cancel: function() { parent.controller.render_blocks(); window.location.reload(true); }
-    }]
-  });  
-      
-  <% use_tinymce = false %>
-  <% @block.block_type.field_types.each do |ft| %>
-    <% f = @block.field_for(ft.name) %>    
-    <% if ft.field_type.starts_with?('block') %>
-      $('#field_<%= f.id %>').attr('onclick','').unbind('click');    
-      $('#field_<%= f.id %>').click(function(e) {
-        window.location = '/admin/pages/<%= @block.page_id %>/blocks/<%= f.child_block.id %>/edit';               
-      });    
-    <% else %>
-      <% use_tinymce = true if ft.field_type == 'richtext' %>
-      m = new ModelBinder({
-        name: 'Field',
-        id: <%= f.id %>,
-        update_url: '/admin/fields/<%= f.id %>',
-        authenticity_token: '<%= form_authenticity_token %>',
-        attributes: [{      
-          name: 'value',
-          type: <%=  raw Caboose.json(ft.field_type) %>,
-          value: <% 
-            if ft.field_type == 'checkbox' %><%= f.value ? 'true' : 'false'           %><%
-            elsif ft.field_type == 'image' %><%= raw Caboose.json(f.image.url(:tiny)) %><%
-            elsif ft.field_type == 'file'  %><%= raw Caboose.json(f.image.url)        %><%
-            else                           %><%= raw Caboose.json(f.value)            %><% 
-          end %>,
-          <% if ft.field_type == 'select' %>text: <%= raw Caboose.json(f.value) %>,<% end %>        
-          nice_name: <%= raw Caboose.json(ft.nice_name ? ft.nice_name : ft.name) %>,
-          width: <% if ft.width %><%= raw Caboose.json(ft.width) %><% else %>780<% end %>,
-          <% if ft.height                %>height: <%=            raw Caboose.json(ft.height)            %>,<% end %>
-          <% if ft.fixed_placeholder     %>fixed_placeholder: <%= raw Caboose.json(ft.fixed_placeholder) %>,<% end %>
-          <% if ft.options || ft.options_function %>options_url: '/admin/field-types/<%= ft.id %>/options',<%
-             elsif ft.options_url        %>options_url: <%=       raw Caboose.json(ft.options_url)      %>,<% end %>
-          <% if ft.field_type == 'image' %>update_url: '/admin/fields/<%= f.id %>/image',
-          image_refresh_delay: 100,
-          <% end %>
-          <% if ft.field_type == 'file'  %>update_url: '/admin/fields/<%= f.id %>/file',<% end %>
-          after_update: function() { parent.controller.render_blocks(); },
-          after_cancel: function() { parent.controller.render_blocks(); }
-        }]
-      });
-    <% end %>
-  <% end %>
-});
+  controller = new BlockController({
+    block: <%= raw Caboose.json(@block.js_hash) %>,    
+    authenticity_token: '<%= form_authenticity_token %>'    
+  });                  
+});    
 
 </script>
-<% if use_tinymce %>
-<%= tinymce_assets %>
-<script type='textjavascript'>
-document.domain = "<%= Rails.application.config.action_controller.asset_host %>";
-</script>
-<%= tinymce :caboose, width: '800px', height:'300px' %>
+<% if @block.block_type.field_type == 'richtext' %>
+  <%= tinymce_assets %>
+  <script type='textjavascript'>
+  document.domain = "<%= Rails.application.config.action_controller.asset_host %>";
+  </script>
+  <%= tinymce :caboose, width: '800px', height:'300px' %>
 <% end %>
+
 <% end %>

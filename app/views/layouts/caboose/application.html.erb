@@ -1,21 +1,34 @@
 
 <%= content_for :js do %>
-<%= javascript_include_tag "caboose/application" %>
-<script>window.loggedIn = <%= logged_in?.to_json %></script>
-<% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
-<%= yield :caboose_js %>
+  <%= javascript_include_tag "caboose/application" %>
+  <script>window.loggedIn = <%= logged_in?.to_json %></script>
+  <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
+  <% @page.linked_resources_map[:js].each do |r| %><%= javascript_include_tag r %><% end %>
+  <%= yield :caboose_js %>
 <% end %>
 
 <%= content_for :css do %>
-<%= stylesheet_link_tag('caboose/application') %>
-<% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
-<%= yield :caboose_css %>
+  <%= stylesheet_link_tag('caboose/application') %>
+  <% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
+  <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
+  <%= yield :caboose_css %>
 <% end %>
 
-<% if (File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.id}.html.erb") || File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.id}.html.haml")) %>
-<%= render :file => "layouts/layout_#{@page.id}" %>
-<% elsif (!@page.layout.nil? && @page.layout.length > 0 && (File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.layout}.html.erb") || File.exists?("#{Rails.root}/app/views/layouts/layout_#{@page.layout}.html.haml"))) %>
-<%= render :file => "layouts/layout_#{@page.layout}" %>
-<% else %>
-<%= render :file => "layouts/layout_default" %>
-<% end %>
+<%
+
+if yield && yield.strip.length > 0 
+  %><%= yield %><%
+elsif !@page.nil? && @page.title != 'Access Denied' 
+  @page.top_level_blocks.each do |b|    
+    %><%= raw b.render(b, {
+      :modal => false,
+      :empty_text => '',
+      :editing => defined?(@editing) ? @editing : false,
+      :css => yield(:css),
+      :js => yield(:js),
+      :csrf_meta_tags => csrf_meta_tags
+    }) %><%
+  end
+end 
+
+%>

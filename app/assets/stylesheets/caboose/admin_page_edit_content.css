@@ -61,3 +61,24 @@
 #new_blocks_container2 input { margin-left: 28px; }
 #new_blocks { list-style: none; margin: 0; padding: 0; }
 #new_blocks li { list-style: none; margin: 2px; padding: 4px; background: #eee; border: #ccc 1px solid; text-align: left; }
+
+/*********************************/
+
+#content h1#page_title { 
+  position: absolute;
+  top: -36px;
+  left: 60px;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  border: 0;
+  font-size: 20pt;
+}
+#tabs { display: none; }
+#content2 { margin-left: 0; }
+.block { border: #ccc 1px dotted; }
+#new_blocks_container1 {
+  top: -58px;
+  right: 250px;
+}

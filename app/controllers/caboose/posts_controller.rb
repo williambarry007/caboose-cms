@@ -59,7 +59,7 @@ module Caboose
   
     # POST /admin/posts/:id
     def admin_update
-      Caboose.log(params)
+      #Caboose.log(params)
       return if !user_is_allowed('posts', 'edit')
       
       resp = Caboose::StdClass.new({'attributes' => {}})

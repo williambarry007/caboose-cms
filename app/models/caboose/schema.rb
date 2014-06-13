@@ -134,6 +134,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :parent_id                       , :integer ],
         [ :name                            , :string  ],
         [ :description                     , :string  ],
+        [ :block_type_category_id          , :integer ],
         [ :render_function                 , :text    ],
         [ :use_render_function             , :boolean , { :default => false }],        
         [ :use_render_function_for_layout  , :boolean , { :default => false }],
@@ -148,6 +149,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :options                         , :text    ],
         [ :options_function                , :text    ],
         [ :options_url                     , :string  ]
+      ],
+      Caboose::BlockTypeCategory => [      
+        [ :parent_id  , :integer ],
+        [ :name       , :string  ]        
       ],      
       #Caboose::Field => [
       #  [ :block_id             , :integer    ],

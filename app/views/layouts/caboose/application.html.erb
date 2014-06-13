@@ -25,7 +25,8 @@ elsif !@page.nil? && @page.title != 'Access Denied'
       :empty_text => '',
       :editing => defined?(@editing) ? @editing : false,
       :css => yield(:css),
-      :js => yield(:js)
+      :js => yield(:js),
+      :csrf_meta_tags => csrf_meta_tags
     }) %><%
   end
 end 

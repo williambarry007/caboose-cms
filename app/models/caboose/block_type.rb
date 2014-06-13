@@ -2,12 +2,14 @@
 class Caboose::BlockType < ActiveRecord::Base
   self.table_name = "block_types"
 
+  belongs_to :block_type_category
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType'
   has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType', :dependent => :destroy    
   attr_accessible :id,
     :parent_id,
     :name, 
-    :description, 
+    :description,
+    :block_type_category_id,
     :use_render_function,
     :use_render_function_for_layout,
     :allow_child_blocks,

@@ -1,12 +1,23 @@
-
 <h1>New Page</h1>
 <p>Parent: <%= @parent ? @parent.title : "Home" %></p>
-<input type='hidden' id='parent_id' name='parent_id' value='<%= @parent_id %>' />
-<p><input type='text' id='title' name='title' placeholder='Title' style="width: 400px;" /></p>
+
+<form action='/admin/pages' method='post' id='new_page_form' onsubmit="add_page(); return false;">
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
+<input type='hidden' name='parent_id' value='<%= @parent_id %>' />
+<p><input type='text' name='title' placeholder='Title' style="width: 400px;" /></p>
+<p><select name='block_type_id'>
+  <option value=''>-- Select a layout --</option>
+  <% cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id } %>
+  <% Caboose::BlockType.where("block_type_category_id in (?)", cat_ids).reorder(:description).all.each do |bt| %>
+    <option value="<%= bt.id %>"><%= bt.description %></option>
+  <% end %>
+</select></p>
+<div id='message'></div>
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/pages';" />
-<input type='submit' value='Add Page' onclick='add_page();' />
+<input type='submit' value='Add Page' />
 </p>
+</form>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
@@ -23,15 +34,10 @@ function add_page()
   $.ajax({
     url: '/admin/pages',
     type: 'post',
-    data: {
-      parent_id: $('#parent_id').val(),
-      title: $('#title').val()
-    },
+    data: $('#new_page_form').serialize(),    
     success: function(resp) {
-      if (resp.error)
-        modal.autosize("<p class='note error'>" + resp.error + "</p>");
-      if (resp.redirect)
-        parent.window.location = resp.redirect
+      if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) parent.window.location = resp.redirect
     }
   });
 }

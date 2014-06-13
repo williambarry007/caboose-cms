@@ -134,6 +134,8 @@ Caboose::Engine.routes.draw do
   put     "admin/block-types/:id"                  => "block_types#admin_update"
   delete  "admin/block-types/:id"                  => "block_types#admin_delete"
   
+  get     "admin/block-type-categories/tree-options" => "block_type_categories#admin_tree_options"
+  
   get     "posts"                                 => "posts#index"
   get     "posts/:id"                             => "posts#detail"
   get     "admin/posts/category-options"          => "posts#admin_category_options"

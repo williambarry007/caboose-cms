@@ -51,6 +51,11 @@ class Caboose::Block < ActiveRecord::Base
     end
   end
   
+  def full_name
+    return name if parent_id.nil?
+    return "#{parent.full_name}_#{name}"
+  end
+  
   def child_value(name)
     b = child(name)
     return nil if b.nil?
@@ -84,7 +89,7 @@ class Caboose::Block < ActiveRecord::Base
   end
                                             
   def render(block, options)    
-    Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\noptions.class = #{options.class}\noptions = #{options}")
+    #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\noptions.class = #{options.class}\noptions = #{options}")
     
     if block && block.is_a?(String)
       Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")
@@ -101,68 +106,30 @@ class Caboose::Block < ActiveRecord::Base
     end        
     str = ""
 
-    defaults = {
-      :modal      => false,
-      :empty_text => "",
-      :editing    => false,
-      :css        => nil,
-      :js         => nil,
-      :block      => block
-    }
+    defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil, :block => block }
     options2 = nil
-    #Caboose.log(options.class)
     if options.is_a?(Hash)
-      options2 = defaults.merge(options)      
-    #elsif options.is_a?(ActionView::Base)
-    #  options2 = {        
-    #    :modal      => options.modal,
-    #    :empty_text => options.empty_text,
-    #    :editing    => options.editing,
-    #    :css        => options.css,
-    #    :js         => options.js        
-    #  }
+      options2 = defaults.merge(options)
     else
-      options2 = {        
-        :modal      => options.modal,
-        :empty_text => options.empty_text,
-        :editing    => options.editing,
-        :css        => options.css,
-        :js         => options.js        
-      }        
+      options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }        
     end
     options2[:block] = block
-          
-    #options2.modal      = false if options2.modal.nil? 
-    #options2.empty_text = ""    if options2.empty_text.nil? 
-    #options2.editing    = false if options2.editing.nil?
-    #options[:css => nil, 
-    #options[:js => nil 
-    #}.merge(options)
-    #options2.block = block
-       
-    if block.block_type.use_render_function && block.block_type.render_function
-      #Caboose.log("Rendering from function")      
+
+    if block.block_type.use_render_function && block.block_type.render_function            
       str = block.render_from_function(options2)
     else
       view = ActionView::Base.new(ActionController::Base.view_paths)
       begin
-        #Caboose.log("Rendering caboose/blocks/#{block.name}")
-        str = view.render(:partial => "caboose/blocks/#{block.name}", :locals => options2)
+        #str = view.render(:partial => "caboose/blocks/#{block.name}", :locals => options2)
+        str = view.render(:partial => "caboose/blocks/#{block.full_name}", :locals => options2)
       rescue
-        #Caboose.log("Error rendering caboose/blocks/#{block.name}")
-        begin          
-          #Caboose.log("Rendering caboose/blocks/#{block.block_type.name}")
-          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)
-        rescue                    
-          #Caboose.log("Error rendering caboose/blocks/#{block.block_type.name}")
-          #Caboose.log("Rendering caboose/blocks/#{block.block_type.field_type}")
+        #begin
+        #  str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)
+        #rescue
           str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)
-        end
+        #end
       end        
-    end     
-    #return str if block.parent_id.nil?    
-    #return str if options[:editing].nil? || options[:editing] == false
-    #return "<div id='block_#{block.id}' class='block'>#{str}</div>"
+    end
     return str
   end
 

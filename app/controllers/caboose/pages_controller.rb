@@ -217,7 +217,7 @@ module Caboose
       })
 
       parent_id = params[:parent_id]
-      title = params[:title] 
+      title = params[:title]      
 
       if (title.strip.length == 0)
         resp.error = "A page title is required."
@@ -235,7 +235,7 @@ module Caboose
       		
       page = Caboose::Page.new
       page.title = title
-      page.parent_id = parent_id
+      page.parent_id = parent_id      
       page.hide = true
       page.content_format = Caboose::Page::CONTENT_FORMAT_HTML
 
@@ -247,6 +247,9 @@ module Caboose
       end while (Page.where(:uri => page.uri).count > 0 && i < 10)
 
       page.save
+      
+      # Create the top level block for the page             
+      Block.create(:page_id => page.id, :block_type_id => params[:block_type_id])
       
       # Set the new page's permissions		  
       viewers = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'view' }).pluck(:role_id)

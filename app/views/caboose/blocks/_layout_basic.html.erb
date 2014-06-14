@@ -22,9 +22,9 @@ page = block.page
       <!--[if lt IE 7]>
         <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
       <![endif]-->      
-      <%= raw block.render('layout_basic_header' , local_assigns) %>
-      <%= raw block.render('layout_basic_content', local_assigns) %>
-      <%= raw block.render('layout_basic_footer' , local_assigns) %>      
+      <%= raw block.render('header' , local_assigns) %>
+      <%= raw block.render('content', local_assigns) %>
+      <%= raw block.render('footer' , local_assigns) %>      
     </div>
 <%= raw js %>
   </body>

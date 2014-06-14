@@ -248,8 +248,9 @@ module Caboose
 
       page.save
       
-      # Create the top level block for the page             
-      Block.create(:page_id => page.id, :block_type_id => params[:block_type_id])
+      # Create the top level block for the page
+      bt = BlockType.find(params[:block_type_id])
+      Block.create(:page_id => page.id, :block_type_id => params[:block_type_id], :name => bt.name)
       
       # Set the new page's permissions		  
       viewers = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'view' }).pluck(:role_id)

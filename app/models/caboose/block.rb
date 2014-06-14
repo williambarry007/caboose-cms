@@ -89,7 +89,7 @@ class Caboose::Block < ActiveRecord::Base
   end
                                             
   def render(block, options)    
-    #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\noptions.class = #{options.class}\noptions = #{options}")
+    #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")
     
     if block && block.is_a?(String)
       Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")
@@ -123,11 +123,12 @@ class Caboose::Block < ActiveRecord::Base
         #str = view.render(:partial => "caboose/blocks/#{block.name}", :locals => options2)
         str = view.render(:partial => "caboose/blocks/#{block.full_name}", :locals => options2)
       rescue
-        #begin
-        #  str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)
-        #rescue
+        begin
+          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)
+          #str = view.render(:partial => "caboose/blocks/#{block.name}", :locals => options2)
+        rescue
           str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)
-        #end
+        end
       end        
     end
     return str

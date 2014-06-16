@@ -1,0 +1,24 @@
+<h1>Block Type Sources</h1>
+
+<p><a href='/admin/block-type-sources/new'>New Source</a></p>
+
+<% if (@block_type_sources.count > 0) %>
+
+  <table class='data'>
+    <tr>
+      <th>Name</th>
+      <th>URL</th>      
+    </tr>
+  <% @block_type_sources.each do |bts| %>
+    <tr onclick="window.location='/admin/block-type-sources/<%= bts.id %>/edit';">
+      <td><%= bts.name  %></td>
+      <td><%= bts.url   %></td>    
+    </tr>
+  <% end %>
+  </table>  
+
+<% else %>
+
+  <p>There are no sources.</p>
+
+<% end %>

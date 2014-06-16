@@ -1,0 +1,31 @@
+
+<h1>New Source</h1>
+<form action='/admin/block-type-sources' method='post' id='new_source_form'>
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
+<p><input type='text' id='name' name='name' placeholder='Name' /></p>
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/block-type-sources';" />
+<input type='button' value='Add Source' onclick="add_block_type_source();" />
+</p>
+</form>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+function add_block_type_source()
+{
+  $('#message').empty().append($('<p/>').addClass('loading').html('Adding source...'));
+  $.ajax({
+    url: '/admin/block-type-sources',
+    type: 'post',
+    data: $('#new_source_form').serialize(),          
+    success: function(resp) {
+      if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

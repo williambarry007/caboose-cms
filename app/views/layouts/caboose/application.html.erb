@@ -16,11 +16,25 @@
 
 <%
 
-if yield && yield.strip.length > 0 
-  %><%= yield %><%
-elsif !@page.nil? && @page.title != 'Access Denied' 
+#if yield && yield.strip.length > 0 
+#  %><%= yield %><%
+#elsif !@page.nil? && @page.title != 'Access Denied' 
+#  @page.top_level_blocks.each do |b|    
+#    %><%= raw b.render(b, {
+#      :modal => false,
+#      :empty_text => '',
+#      :editing => defined?(@editing) ? @editing : false,
+#      :css => yield(:css),
+#      :js => yield(:js),
+#      :csrf_meta_tags => csrf_meta_tags
+#    }) %><%
+#  end
+#end
+
+if !@page.nil? && @page.title != 'Access Denied' 
   @page.top_level_blocks.each do |b|    
     %><%= raw b.render(b, {
+      :controller_view_content => yield,
       :modal => false,
       :empty_text => '',
       :editing => defined?(@editing) ? @editing : false,
@@ -29,6 +43,6 @@ elsif !@page.nil? && @page.title != 'Access Denied'
       :csrf_meta_tags => csrf_meta_tags
     }) %><%
   end
-end 
+end
 
 %>

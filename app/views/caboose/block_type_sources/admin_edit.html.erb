@@ -1,0 +1,75 @@
+<%
+bts = @block_type_source
+%>
+
+<h1>Edit Source</h1>
+<p><div id='blocktypesource_<%= bts.id %>_name'     ></div></p>
+<p><div id='blocktypesource_<%= bts.id %>_url'      ></div></p>
+<p><div id='blocktypesource_<%= bts.id %>_token'    ></div></p>
+<p><div id='blocktypesource_<%= bts.id %>_priority' ></div></p>
+<p><div id='blocktypesource_<%= bts.id %>_active'   ></div></p>
+        
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/block-type-sources';" />
+<input type='button' value='Refresh Block Types' onclick="refresh_block_types(<%= bts.id %>);" />
+<input type='button' value='Delete Source' onclick="delete_block_type_source(<%= bts.id %>);" />
+</p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+function delete_block_type_source(bts_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append('Are you sure you want to delete the source?')
+      .append($('<input/>').attr('type', 'button').val('Yes').click(function() { delete_block_type_source(bts_id, true); })).append(" ")
+      .append($('<input/>').attr('type', 'button').val('No' ).click(function() { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').empty().append($('<p/>').addClass('loading').html('Deleting source...'));
+  $.ajax({
+    url: '/admin/block-type-sources/' + bts_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+function refresh_block_types(bts_id)
+{  
+  $('#message').empty().append($('<p/>').addClass('loading').html('Refreshing block types from source...'));
+  $.ajax({
+    url: '/admin/block-type-sources/' + bts_id + '/refresh',
+    type: 'get',
+    success: function(resp) {
+      if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
+      if (resp.success) $('#message').empty().append($('<p/>').addClass('note success').html(resp.error));      
+    }
+  });
+}
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'BlockTypeSource',
+    id: <%= bts.id %>,
+    update_url: '/admin/block-type-sources/<%= bts.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'name'     , nice_name: 'Name'      , type: 'text'     , value: <%= raw Caboose.json(bts.name)      %>, width: 400 }, 
+      { name: 'url'      , nice_name: 'URL'       , type: 'text'     , value: <%= raw Caboose.json(bts.url)       %>, width: 400 }, 
+      { name: 'token'    , nice_name: 'Token'     , type: 'text'     , value: <%= raw Caboose.json(bts.token)     %>, width: 400 }, 
+      { name: 'priority' , nice_name: 'Priority'  , type: 'text'     , value: <%= raw Caboose.json(bts.priority)  %>, width: 400 }, 
+      { name: 'active'   , nice_name: 'Active'    , type: 'checkbox' , value: <%= bts.active ? 'true' : 'false'   %>, width: 400 }      
+    ]
+  });
+});
+
+</script>
+<% end %>

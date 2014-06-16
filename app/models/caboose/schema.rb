@@ -63,7 +63,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :utc_offset           , :float      , { :default => -5 }],
         #[ :timezone             , :string     , { :default => 'America/Chicago' }],
         [ :timezone_id          , :integer    , { :defualt => 381 }], # Defaults to 'America/Chicago'        
-        [ :password             , :string     ], 
+        [ :password             , :string     ],
         [ :password_reset_id    , :string     ], 
         [ :password_reset_sent  , :datetime   ], 
         [ :token                , :string     ], 
@@ -154,26 +154,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :parent_id  , :integer ],
         [ :name       , :string  ]        
       ],      
-      #Caboose::Field => [
-      #  [ :block_id             , :integer    ],
-      #  [ :field_type_id        , :integer    ],        
-      #  [ :value                , :text       ],
-      #  [ :file                 , :attachment ],
-      #  [ :image                , :attachment ]        
-      #],
-      #Caboose::FieldType => [
-      #  [ :block_type_id        , :integer ],      
-      #  [ :name                 , :string  ],
-      #  [ :field_type           , :string  ],
-      #  [ :nice_name            , :string  ],
-      #  [ :default              , :text    ],
-      #  [ :width                , :integer ],
-      #  [ :height               , :integer ],
-      #  [ :fixed_placeholder    , :boolean ],
-      #  [ :options              , :text    ],
-      #  [ :options_function     , :text    ],
-      #  [ :options_url          , :string  ]
-      #],
+      Caboose::BlockTypeSource => [
+        [ :name       , :string ],
+        [ :url        , :string ],
+        [ :token      , :string ],
+        [ :priority   , :integer, { :default => 0 }],
+        [ :active     , :boolean, { :default => true }],
+      ],
       Caboose::Post => [  
         [ :title                , :text       ],  		 	 
         [ :body                 , :text 		   ],  	 

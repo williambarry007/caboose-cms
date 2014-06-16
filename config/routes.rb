@@ -136,6 +136,15 @@ Caboose::Engine.routes.draw do
   
   get     "admin/block-type-categories/tree-options" => "block_type_categories#admin_tree_options"
   
+  get     "admin/block-type-sources"              => "block_type_sources#admin_index"
+  get     "admin/block-type-sources/new"          => "block_type_sources#admin_new"
+  get     "admin/block-type-sources/options"      => "block_type_sources#admin_options"
+  get     "admin/block-type-sources/:id/edit"     => "block_type_sources#admin_edit"    
+  get     "admin/block-type-sources/:id/refresh"  => "block_type_sources#admin_refresh"
+  post    "admin/block-type-sources"              => "block_type_sources#admin_create"
+  put     "admin/block-type-sources/:id"          => "block_type_sources#admin_update"
+  delete  "admin/block-type-sources/:id"          => "block_type_sources#admin_delete"
+
   get     "posts"                                 => "posts#index"
   get     "posts/:id"                             => "posts#detail"
   get     "admin/posts/category-options"          => "posts#admin_category_options"

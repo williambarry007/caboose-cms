@@ -174,6 +174,10 @@ Caboose::Engine.routes.draw do
   post    "admin/ab-variants/:variant_id/options" => "ab_options#admin_create"
   delete  "admin/ab-options/:id"                  => "ab_options#admin_delete"
   
+  # API
+  get "caboose/block-types"       => "block_types#api_block_type_list"
+  get "caboose/block-types/:name" => "block_types#api_block_type"
+        
   match '*path' => 'pages#show'
   root :to => 'pages#show'
   

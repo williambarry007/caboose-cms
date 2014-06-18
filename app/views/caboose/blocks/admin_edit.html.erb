@@ -1,4 +1,7 @@
 <%
+Caboose.log(@block.block_type.field_type)
+
+  
 update_on_close = false
 @block.block_type.children.each do |bt|
   update_on_close = true if bt.field_type == 'image' || bt.field_type == 'file'
@@ -91,7 +94,7 @@ $(document).ready(function() {
   controller = new BlockController({
     block: <%= raw Caboose.json(@block.js_hash) %>,    
     authenticity_token: '<%= form_authenticity_token %>'    
-  });                  
+  });    
 });    
 
 </script>

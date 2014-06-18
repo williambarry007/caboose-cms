@@ -1,5 +1,17 @@
+<%
 
-<%= content_for :js do %>
+#if !@page.nil? && @page.title != 'Access Denied'
+#
+#  str = @page.block.render(@page.block, {
+#    :controller_view_content => yield,
+#    :modal => false,
+#    :empty_text => '',
+#    :editing => defined?(@editing) ? @editing : false
+#  })      
+
+%>
+
+<% content_for :js do %>
   <%= javascript_include_tag "caboose/application" %>
   <script>window.loggedIn = <%= logged_in?.to_json %></script>
   <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
@@ -7,7 +19,7 @@
   <%= yield :caboose_js %>
 <% end %>
 
-<%= content_for :css do %>
+<% content_for :css do %>
   <%= stylesheet_link_tag('caboose/application') %>
   <% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
   <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
@@ -15,21 +27,6 @@
 <% end %>
 
 <%
-
-#if yield && yield.strip.length > 0 
-#  %><%= yield %><%
-#elsif !@page.nil? && @page.title != 'Access Denied' 
-#  @page.top_level_blocks.each do |b|    
-#    %><%= raw b.render(b, {
-#      :modal => false,
-#      :empty_text => '',
-#      :editing => defined?(@editing) ? @editing : false,
-#      :css => yield(:css),
-#      :js => yield(:js),
-#      :csrf_meta_tags => csrf_meta_tags
-#    }) %><%
-#  end
-#end
 
 if !@page.nil? && @page.title != 'Access Denied' 
   @page.top_level_blocks.each do |b|    

@@ -21,7 +21,9 @@ class Caboose::BlockType < ActiveRecord::Base
     :fixed_placeholder, 
     :options,
     :options_function,
-    :options_url
+    :options_url,
+    :share,      # Whether or not to share the block type in the existing block store.
+    :downloaded  # Whether the full block type has been download or just the name and description.
     
   def render_options(empty_text = nil)    
     return eval(self.options_function)    
@@ -51,6 +53,24 @@ class Caboose::BlockType < ActiveRecord::Base
   def api_hash_children
     return nil if self.children.nil? || self.children.count == 0    
     return self.children.collect { |bt| bt.api_hash }
+  end
+  
+  def parse_api_hash(h)    
+    self.name                            = h['name']
+    self.description                     = h['description']
+    self.block_type_category_id          = h['block_type_category_id']
+    self.render_function                 = h['render_function']
+    self.use_render_function             = h['use_render_function']
+    self.use_render_function_for_layout  = h['use_render_function_for_layout']
+    self.allow_child_blocks              = h['allow_child_blocks']
+    self.field_type                      = h['field_type']
+    self.default                         = h['default']
+    self.width                           = h['width']
+    self.height                          = h['height']
+    self.fixed_placeholder               = h['fixed_placeholder']
+    self.options                         = h['options']
+    self.options_function                = h['options_function']
+    self.options_url                     = h['options_url']
   end
 
 end

@@ -142,6 +142,25 @@ class Caboose::Block < ActiveRecord::Base
     return erb.result(locals.instance_eval { binding })
   end
   
+  def partial(name, options)    
+    defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil }
+    options2 = nil
+    if options.is_a?(Hash)
+      options2 = defaults.merge(options)
+    else
+      options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }        
+    end
+    options2[:block] = self
+    
+    view = ActionView::Base.new(ActionController::Base.view_paths)
+    begin
+      str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)
+    rescue
+      Caboose.log("Partial caboose/blocks/#{name} doesn't exist.")
+    end
+    return str
+  end
+        
   def child_block_link        
     return "<div class='new_block' id='new_block_#{self.id}'>New Block</div>"    
   end    

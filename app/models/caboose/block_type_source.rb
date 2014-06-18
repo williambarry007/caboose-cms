@@ -11,10 +11,11 @@ class Caboose::BlockTypeSource < ActiveRecord::Base
     :priority,
     :active    
 
-  def refresh
+  # Just get the names and descriptions of all block types from the source
+  def refresh_names
     resp = nil
-    begin
-      resp = HTTParty.get("#{self.url}/block-types?token=#{self.token}")
+    begin                             
+      resp = HTTParty.get("#{self.url}/caboose/block-types?token=#{self.token}")
     rescue HTTParty::Error => e
       Caboose.log(e.message)
       return false
@@ -28,37 +29,61 @@ class Caboose::BlockTypeSource < ActiveRecord::Base
       return false
     end
     
-    #block_types.each do |bt|
-    #  Caboose.log(
-    #  next if Caboose::BlockType.where(:name => bt.name).exists?
-    #  #self.recursive_add(bt)
-    #end
+    block_types.each do |h|      
+      next if Caboose::BlockType.where(:name => bt.name).exists?
+      Caboose::BlockType.create(:name => h['name'], :description => h['description'])      
+    end
     
     return true
   end
   
-  def recursive_add(bt, parent_id = nil)
-    bt2 = Caboose::BlockType.create(
-      :parent_id                       => parent_id,
-      :name                            => bt.name,
-      :description                     => bt.description,
-      :block_type_category_id          => bt.block_type_category_id,
-      :render_function                 => bt.render_function,
-      :use_render_function             => bt.use_render_function,
-      :use_render_function_for_layout  => bt.use_render_function_for_layout,
-      :allow_child_blocks              => bt.allow_child_blocks,
-      :field_type                      => bt.field_type,
-      :default                         => bt.default,
-      :width                           => bt.width,
-      :height                          => bt.height,
-      :fixed_placeholder               => bt.fixed_placeholder,
-      :options                         => bt.options,
-      :options_function                => bt.options_function,
-      :options_url                     => bt.options_url
-    )
-    bt.children.each do |bt3|
-      self.recursive_add(bt3, bt2.id)
+  # Get the full block type (including children)
+  def refresh(name, force = false)
+    bt = Caboose::BlockType.where(:name => name).first
+    bt = Caboose::BlockType.create(:name => name) if bt.nil?
+    return if bt.downloaded && !force    
+    if force
+      bt.children.each { |bt2| bt2.destroy }
     end
-  end        
 
+    # Try to contact the source URL
+    resp = nil
+    begin                             
+      resp = HTTParty.get("#{self.url}/caboose/block-types/#{bt.name}?token=#{self.token}")
+    rescue HTTParty::Error => e
+      Caboose.log(e.message)
+      return false
+    end
+                
+    # Try to parse the response
+    h = nil
+    begin
+      h = JSON.parse(resp.body)
+    rescue
+      Caboose.log("Response body isn't valid JSON.")
+      return false
+    end     
+    
+    # Grab all the fields from the hash for the top-level block
+    bt.parse_api_hash(h)
+    bt.save
+    
+    # Now add all the children
+    h['children'].each do |h2|
+      recursive_add(h2, bt.id)
+    end
+    
+    return true
+  end
+  
+  def self.recursive_add(h, parent_id = nil)
+    bt = Caboose::BlockType.new(:parent_id => parent_id)
+    bt.parse_api_hash(h)
+    bt.save
+          
+    h['children'].each do |h2|
+      self.recursive_add(h2, bt.id)
+    end
+    return bt
+  end
 end

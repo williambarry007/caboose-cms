@@ -138,7 +138,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :render_function                 , :text    ],
         [ :use_render_function             , :boolean , { :default => false }],        
         [ :use_render_function_for_layout  , :boolean , { :default => false }],
-        [ :allow_child_blocks              , :boolean , { :default => false }],
+        [ :allow_child_blocks              , :boolean , { :default => false }],        
         
         # Used for field values
         [ :field_type                      , :string  ],        
@@ -148,7 +148,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :fixed_placeholder               , :boolean ],
         [ :options                         , :text    ],
         [ :options_function                , :text    ],
-        [ :options_url                     , :string  ]
+        [ :options_url                     , :string  ],
+        
+        # Used for sharing block types
+        [ :share                           , :boolean , { :default => true  }],
+        [ :downloaded                      , :boolean , { :default => false }]
       ],
       Caboose::BlockTypeCategory => [      
         [ :parent_id  , :integer ],

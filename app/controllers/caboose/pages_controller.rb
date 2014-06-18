@@ -131,9 +131,29 @@ module Caboose
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
-      #@block_types = Caboose::BlockType.reorder(:name).all
-      #render :layout => 'caboose/admin'
+      #if @page.top_level_blocks.nil? || @page.top_level_blocks.count == 0      
+      #  redirect_to '/admin/page/:id/layout'
+      #  return
+      #end
       @editing = true
+    end
+    
+    # GET /admin/pages/:id/layout
+    def admin_edit_layout
+      return unless user_is_allowed('pages', 'edit')      
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # PUT /admin/pages/:id/layout
+    def admin_update_layout
+      return unless user_is_allowed('pages', 'edit')      
+      bt = BlockType.find(params[:block_type_id])
+      Block.create(:page_id => params[:id], :block_type_id => params[:block_type_id], :name => bt.name)
+      resp = Caboose::StdClass.new({
+        'redirect' => "/admin/pages/#{params[:id]}/content"
+      })
+      render :json => resp
     end
     
     # GET /admin/pages/:id/block-order

@@ -50,7 +50,7 @@ function refresh_block_types(bts_id)
     type: 'get',
     success: function(resp) {
       if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
-      if (resp.success) $('#message').empty().append($('<p/>').addClass('note success').html(resp.error));      
+      if (resp.success) $('#message').empty().append($('<p/>').addClass('note success').html(resp.success));      
     }
   });
 }

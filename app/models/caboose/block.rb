@@ -89,10 +89,9 @@ class Caboose::Block < ActiveRecord::Base
   end
                                             
   def render(block, options)    
-    #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")
-    
+    #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")                
     if block && block.is_a?(String)
-      #Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")
+      #Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")                                          
       b = self.child(block)        
       if b.nil?
         self.create_children

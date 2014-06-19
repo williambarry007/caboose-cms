@@ -1,45 +1,46 @@
-<%
 
-#if !@page.nil? && @page.title != 'Access Denied'
-#
-#  str = @page.block.render(@page.block, {
-#    :controller_view_content => yield,
-#    :modal => false,
-#    :empty_text => '',
-#    :editing => defined?(@editing) ? @editing : false
-#  })      
-
-%>
-
+<% if !@page.nil? && @page.title != 'Access Denied' %>
 <% content_for :js do %>
-  <%= javascript_include_tag "caboose/application" %>
-  <script>window.loggedIn = <%= logged_in?.to_json %></script>
-  <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
-  <% @page.linked_resources_map[:js].each do |r| %><%= javascript_include_tag r %><% end %>
-  <%= yield :caboose_js %>
-<% end %>
+<%= javascript_include_tag "caboose/application" %>
+<script>window.loggedIn = <%= logged_in?.to_json %></script>
+<% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
+<% @page.linked_resources_map[:js].each do |r| %><%= javascript_include_tag r %><% end %>
+<%= yield :caboose_js %>
+<% end %>  
+  <% content_for :css do %>
+    <%= stylesheet_link_tag('caboose/application') %>
+    <% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
+    <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
+    <%= yield :caboose_css %>
+  <% end %>
+  <%
+  b = @page.block
+  str = b.render(b, {
+    :controller_view_content => yield,
+    :modal => false,
+    :empty_text => '',
+    :editing => defined?(@editing) ? @editing : false,
+    :css => '|CABOOSE_CSS|',
+    :js => '|CABOOSE_JAVASCRIPT|',
+    :csrf_meta_tags => '|CABOOSE_CSRF|' 
+  })    
+  str.gsub!('|CABOOSE_CSS|'        , yield(:css))
+  str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
+  str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)
+  
+  %><%= raw str %><%
+    
+  #b = @page.block
+  #
+  #raw b.render(b, {
+  #    :controller_view_content => yield,
+  #    :modal => false,
+  #    :empty_text => '',
+  #    :editing => defined?(@editing) ? @editing : false,
+  #    :css => yield(:css),
+  #    :js => yield(:js),
+  #    :csrf_meta_tags => csrf_meta_tags
+  #  })      
 
-<% content_for :css do %>
-  <%= stylesheet_link_tag('caboose/application') %>
-  <% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
-  <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
-  <%= yield :caboose_css %>
-<% end %>
-
-<%
-
-if !@page.nil? && @page.title != 'Access Denied' 
-  @page.top_level_blocks.each do |b|    
-    %><%= raw b.render(b, {
-      :controller_view_content => yield,
-      :modal => false,
-      :empty_text => '',
-      :editing => defined?(@editing) ? @editing : false,
-      :css => yield(:css),
-      :js => yield(:js),
-      :csrf_meta_tags => csrf_meta_tags
-    }) %><%
-  end
 end
-
 %>

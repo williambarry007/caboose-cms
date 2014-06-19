@@ -131,10 +131,10 @@ module Caboose
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
-      #if @page.top_level_blocks.nil? || @page.top_level_blocks.count == 0      
-      #  redirect_to '/admin/page/:id/layout'
-      #  return
-      #end
+      if @page.block.nil?      
+        redirect_to '/admin/page/:id/layout'
+        return
+      end
       @editing = true
     end
     

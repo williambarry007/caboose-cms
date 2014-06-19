@@ -119,21 +119,28 @@ class Caboose::Block < ActiveRecord::Base
     else
       view = ActionView::Base.new(ActionController::Base.view_paths)
       begin        
-        str = view.render(:partial => "caboose/blocks/#{block.full_name}", :locals => options2)
+        full_name = block.full_name
+        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0
+        #Caboose.log("Rendering caboose/blocks/#{full_name}")
+        str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)
       rescue ActionView::MissingTemplate
         begin
+          #Caboose.log("Error rendering caboose/blocks/#{full_name}")
+          #Caboose.log("Rendering caboose/blocks/#{block.block_type.name}")
           str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)          
         rescue ActionView::MissingTemplate
           begin
+            #Caboose.log("Error rendering caboose/blocks/#{block.block_type.name}")
+            #Caboose.log("Error rendering caboose/blocks/#{block.block_type.field_type}")            
             str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)
           rescue Exception => ex
-            Caboose.log(ex.message)
+            Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
           end
-        rescue Exception => ex
-          Caboose.log(ex.message)
+        rescue Exception => ex          
+          Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
         end
       rescue Exception => ex
-        Caboose.log(ex.message)
+        Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
       end        
     end
     return str

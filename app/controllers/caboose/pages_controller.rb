@@ -149,6 +149,7 @@ module Caboose
     def admin_update_layout
       return unless user_is_allowed('pages', 'edit')      
       bt = BlockType.find(params[:block_type_id])
+      Block.where(:page_id => params[:id]).destroy_all
       Block.create(:page_id => params[:id], :block_type_id => params[:block_type_id], :name => bt.name)
       resp = Caboose::StdClass.new({
         'redirect' => "/admin/pages/#{params[:id]}/content"

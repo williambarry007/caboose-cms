@@ -7,12 +7,12 @@
 <% @page.linked_resources_map[:js].each do |r| %><%= javascript_include_tag r %><% end %>
 <%= yield :caboose_js %>
 <% end %>  
-  <% content_for :css do %>
-    <%= stylesheet_link_tag('caboose/application') %>
-    <% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
-    <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
-    <%= yield :caboose_css %>
-  <% end %>
+<% content_for :css do %>
+<%= stylesheet_link_tag('caboose/application') %>
+<% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
+<% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
+<%= yield :caboose_css %>
+<% end %>
   <%
   b = @page.block
   str = b.render(b, {

@@ -92,7 +92,7 @@ class Caboose::Block < ActiveRecord::Base
     #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")
     
     if block && block.is_a?(String)
-      Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")
+      #Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")
       b = self.child(block)        
       if b.nil?
         self.create_children
@@ -119,16 +119,22 @@ class Caboose::Block < ActiveRecord::Base
       str = block.render_from_function(options2)
     else
       view = ActionView::Base.new(ActionController::Base.view_paths)
-      begin
-        #str = view.render(:partial => "caboose/blocks/#{block.name}", :locals => options2)
+      begin        
         str = view.render(:partial => "caboose/blocks/#{block.full_name}", :locals => options2)
-      rescue
+      rescue ActionView::MissingTemplate
         begin
-          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)
-          #str = view.render(:partial => "caboose/blocks/#{block.name}", :locals => options2)
-        rescue
-          str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)
+          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)          
+        rescue ActionView::MissingTemplate
+          begin
+            str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)
+          rescue Exception => ex
+            Caboose.log(ex.message)
+          end
+        rescue Exception => ex
+          Caboose.log(ex.message)
         end
+      rescue Exception => ex
+        Caboose.log(ex.message)
       end        
     end
     return str

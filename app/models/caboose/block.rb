@@ -51,6 +51,11 @@ class Caboose::Block < ActiveRecord::Base
     end
   end
   
+  def full_name
+    return name if parent_id.nil?
+    return "#{parent.full_name}_#{name}"
+  end
+  
   def child_value(name)
     b = child(name)
     return nil if b.nil?
@@ -83,11 +88,10 @@ class Caboose::Block < ActiveRecord::Base
     end
   end
                                             
-  def render(block, options)    
-    Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\noptions.class = #{options.class}\noptions = #{options}")
-    
+  def render(block, options)
+    #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")                
     if block && block.is_a?(String)
-      Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")
+      #Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")                                          
       b = self.child(block)        
       if b.nil?
         self.create_children
@@ -101,68 +105,50 @@ class Caboose::Block < ActiveRecord::Base
     end        
     str = ""
 
-    defaults = {
-      :modal      => false,
-      :empty_text => "",
-      :editing    => false,
-      :css        => nil,
-      :js         => nil,
-      :block      => block
-    }
+    defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil, :block => block }
     options2 = nil
-    #Caboose.log(options.class)
     if options.is_a?(Hash)
-      options2 = defaults.merge(options)      
-    #elsif options.is_a?(ActionView::Base)
-    #  options2 = {        
-    #    :modal      => options.modal,
-    #    :empty_text => options.empty_text,
-    #    :editing    => options.editing,
-    #    :css        => options.css,
-    #    :js         => options.js        
-    #  }
+      options2 = defaults.merge(options)
     else
-      options2 = {        
-        :modal      => options.modal,
-        :empty_text => options.empty_text,
-        :editing    => options.editing,
-        :css        => options.css,
-        :js         => options.js        
-      }        
+      options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }        
     end
     options2[:block] = block
-          
-    #options2.modal      = false if options2.modal.nil? 
-    #options2.empty_text = ""    if options2.empty_text.nil? 
-    #options2.editing    = false if options2.editing.nil?
-    #options[:css => nil, 
-    #options[:js => nil 
-    #}.merge(options)
-    #options2.block = block
-       
-    if block.block_type.use_render_function && block.block_type.render_function
-      #Caboose.log("Rendering from function")      
-      str = block.render_from_function(options2)
+
+    view = options2[:view]
+    if block.block_type.use_render_function && block.block_type.render_function            
+      #str = block.render_from_function(options2)
+      
+      #locals = OpenStruct.new(options)      
+      #locals = OpenStruct.new(options2)
+      #str = ERB.new(block_type.render_function).result(locals.instance_eval { binding })        
+      #return erb.result(locals.instance_eval { binding })
+      
+      #eval("def render_my_function\n#{block.block_type.render_function}\nend\n\n, :locals => options2)
+      str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
     else
-      view = ActionView::Base.new(ActionController::Base.view_paths)
-      begin
-        #Caboose.log("Rendering caboose/blocks/#{block.name}")
-        str = view.render(:partial => "caboose/blocks/#{block.name}", :locals => options2)
-      rescue
-        #Caboose.log("Error rendering caboose/blocks/#{block.name}")
+      #view = ActionView::Base.new(ActionController::Base.view_paths, options2, )      
+      #view = ActionView::Base.new(options2[:view].view_renderer, {}, options2[:view].controller)
+      view = options2[:view]
+      begin        
+        full_name = block.full_name
+        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0        
+        str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)        
+      rescue ActionView::MissingTemplate
         begin          
-          #Caboose.log("Rendering caboose/blocks/#{block.block_type.name}")
-          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)
-        rescue                    
-          #Caboose.log("Error rendering caboose/blocks/#{block.block_type.name}")
-          #Caboose.log("Rendering caboose/blocks/#{block.block_type.field_type}")
-          str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)
+          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)                    
+        rescue ActionView::MissingTemplate
+          begin                        
+            str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)            
+          rescue Exception => ex
+            Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
+          end
+        rescue Exception => ex          
+          Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
         end
+      rescue Exception => ex
+        Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
       end        
-    end     
-    #return str if block.parent_id.nil?    
-    #return str if options[:editing].nil? || options[:editing] == false
-    #return "<div id='block_#{block.id}' class='block'>#{str}</div>"
+    end
     return str
   end
 
@@ -174,6 +160,25 @@ class Caboose::Block < ActiveRecord::Base
     return erb.result(locals.instance_eval { binding })
   end
   
+  def partial(name, options)    
+    defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil }
+    options2 = nil
+    if options.is_a?(Hash)
+      options2 = defaults.merge(options)
+    else
+      options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }        
+    end
+    options2[:block] = self
+    
+    view = ActionView::Base.new(ActionController::Base.view_paths)
+    begin
+      str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)
+    rescue
+      Caboose.log("Partial caboose/blocks/#{name} doesn't exist.")
+    end
+    return str
+  end
+        
   def child_block_link        
     return "<div class='new_block' id='new_block_#{self.id}'>New Block</div>"    
   end    

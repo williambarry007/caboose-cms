@@ -72,6 +72,7 @@ module Caboose
           when 'parent_id'                       then bt.parent_id                      = v
           when 'name'                            then bt.name                           = v
           when 'description'                     then bt.description                    = v
+          when 'block_type_category_id'          then bt.block_type_category_id         = v
           when 'render_function'                 then bt.render_function                = v
           when 'use_render_function'             then bt.use_render_function            = v
           when 'use_render_function_for_layout'  then bt.use_render_function_for_layout = v
@@ -157,6 +158,25 @@ module Caboose
         admin_tree_options_helper(options, bt2, " - #{prefix}")
       end      
     end
+    
+    #===========================================================================
+    # Public Repo Actions
+    #===========================================================================
+    
+    # GET /caboose/block-types
+    def api_block_type_list
+      arr = BlockType.where("parent_id is null and share = ?", true).reorder(:name).all.collect do |bt|
+        { 'name' => bt.name, 'description' => bt.description }
+      end      
+      render :json => arr      
+    end
+    
+    # GET /caboose/block-types/:name
+    def api_block_type
+      bt = BlockType.where(:name => params[:name]).first
+      render :json => { 'error' => 'Invalid block type.' } if bt.nil?            
+      render :json => bt.api_hash        
+    end        
 		
   end  
 end

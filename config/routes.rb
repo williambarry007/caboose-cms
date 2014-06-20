@@ -83,7 +83,9 @@ Caboose::Engine.routes.draw do
   get     "admin/pages/:id/child-order"   => "pages#admin_edit_child_sort_order"
   put     "admin/pages/:id/child-order"   => "pages#admin_update_child_sort_order"
   get     "admin/pages/:id/new-blocks"    => "pages#admin_new_blocks"
-  get     "admin/pages/:id/content"       => "pages#admin_edit_content"    
+  get     "admin/pages/:id/content"       => "pages#admin_edit_content"
+  get     "admin/pages/:id/layout"        => "pages#admin_edit_layout"
+  put     "admin/pages/:id/layout"        => "pages#admin_update_layout"
   put     "admin/pages/:id/viewers"       => "pages#admin_update_viewers"
   put     "admin/pages/:id/editors"       => "pages#admin_update_editors"  
   put     "admin/pages/:id"               => "pages#admin_update"
@@ -134,6 +136,17 @@ Caboose::Engine.routes.draw do
   put     "admin/block-types/:id"                  => "block_types#admin_update"
   delete  "admin/block-types/:id"                  => "block_types#admin_delete"
   
+  get     "admin/block-type-categories/tree-options" => "block_type_categories#admin_tree_options"
+  
+  get     "admin/block-type-sources"              => "block_type_sources#admin_index"
+  get     "admin/block-type-sources/new"          => "block_type_sources#admin_new"
+  get     "admin/block-type-sources/options"      => "block_type_sources#admin_options"
+  get     "admin/block-type-sources/:id/edit"     => "block_type_sources#admin_edit"    
+  get     "admin/block-type-sources/:id/refresh"  => "block_type_sources#admin_refresh"
+  post    "admin/block-type-sources"              => "block_type_sources#admin_create"
+  put     "admin/block-type-sources/:id"          => "block_type_sources#admin_update"
+  delete  "admin/block-type-sources/:id"          => "block_type_sources#admin_delete"
+
   get     "posts"                                 => "posts#index"
   get     "posts/:id"                             => "posts#detail"
   get     "admin/posts/category-options"          => "posts#admin_category_options"
@@ -163,6 +176,10 @@ Caboose::Engine.routes.draw do
   post    "admin/ab-variants/:variant_id/options" => "ab_options#admin_create"
   delete  "admin/ab-options/:id"                  => "ab_options#admin_delete"
   
+  # API
+  get "caboose/block-types"       => "block_types#api_block_type_list"
+  get "caboose/block-types/:name" => "block_types#api_block_type"
+        
   match '*path' => 'pages#show'
   root :to => 'pages#show'
   

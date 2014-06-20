@@ -3,11 +3,11 @@ bt = @block_type
 %>
 
 <h1>Edit Block Type</h1>
-<p><div id='blocktype_<%= bt.id %>_parent_id'></div></p>
-<p><div id='blocktype_<%= bt.id %>_name'></div></p>
 <p><div id='blocktype_<%= bt.id %>_description'></div></p>
+<p><div id='blocktype_<%= bt.id %>_name'></div></p>
+<p><div id='blocktype_<%= bt.id %>_parent_id'></div></p>
+<p><div id='blocktype_<%= bt.id %>_block_type_category_id'></div></p>
 <p><div id='blocktype_<%= bt.id %>_field_type'></div></p>
-
 
 <p><div id='blocktype_<%= bt.id %>_default'></div></p>
 <p><div id='blocktype_<%= bt.id %>_width'></div></p>
@@ -91,6 +91,7 @@ $(document).ready(function() {
       { name: 'parent_id'                      , nice_name: 'Parent'                         , type: 'select'   , value: <%= raw Caboose.json(bt.parent_id)                       %>, width: 400, options_url: '/admin/block-types/tree-options' },
       { name: 'name'                           , nice_name: 'Name'                           , type: 'text'     , value: <%= raw Caboose.json(bt.name)                            %>, width: 400 },
       { name: 'description'                    , nice_name: 'Description'                    , type: 'text'     , value: <%= raw Caboose.json(bt.description)                     %>, width: 400 },
+      { name: 'block_type_category_id'         , nice_name: 'Category'                       , type: 'select'   , value: <%= raw Caboose.json(bt.block_type_category_id)          %>, width: 400, options_url: '/admin/block-type-categories/tree-options' },
       { name: 'use_render_function'            , nice_name: 'Use Render Function'            , type: 'checkbox' , value: <%= bt.use_render_function            ? 'true' : 'false' %>, width: 400 },
       { name: 'use_render_function_for_layout' , nice_name: 'Use Render Function for Layout' , type: 'checkbox' , value: <%= bt.use_render_function_for_layout ? 'true' : 'false' %>, width: 400 },
       { name: 'allow_child_blocks'             , nice_name: 'Allow Child Blocks'             , type: 'checkbox' , value: <%= bt.allow_child_blocks             ? 'true' : 'false' %>, width: 400 },

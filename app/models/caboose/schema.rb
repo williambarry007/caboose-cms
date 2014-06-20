@@ -63,7 +63,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :utc_offset           , :float      , { :default => -5 }],
         #[ :timezone             , :string     , { :default => 'America/Chicago' }],
         [ :timezone_id          , :integer    , { :defualt => 381 }], # Defaults to 'America/Chicago'        
-        [ :password             , :string     ], 
+        [ :password             , :string     ],
         [ :password_reset_id    , :string     ], 
         [ :password_reset_sent  , :datetime   ], 
         [ :token                , :string     ], 
@@ -134,11 +134,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :parent_id                       , :integer ],
         [ :name                            , :string  ],
         [ :description                     , :string  ],
-        [ :block_type_category_id          , :integer ],
+        [ :block_type_category_id          , :integer , { :default => 2 }],
         [ :render_function                 , :text    ],
         [ :use_render_function             , :boolean , { :default => false }],        
         [ :use_render_function_for_layout  , :boolean , { :default => false }],
-        [ :allow_child_blocks              , :boolean , { :default => false }],
+        [ :allow_child_blocks              , :boolean , { :default => false }],        
         
         # Used for field values
         [ :field_type                      , :string  ],        
@@ -148,32 +148,23 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :fixed_placeholder               , :boolean ],
         [ :options                         , :text    ],
         [ :options_function                , :text    ],
-        [ :options_url                     , :string  ]
+        [ :options_url                     , :string  ],
+        
+        # Used for sharing block types
+        [ :share                           , :boolean , { :default => true  }],
+        [ :downloaded                      , :boolean , { :default => false }]
       ],
       Caboose::BlockTypeCategory => [      
         [ :parent_id  , :integer ],
         [ :name       , :string  ]        
       ],      
-      #Caboose::Field => [
-      #  [ :block_id             , :integer    ],
-      #  [ :field_type_id        , :integer    ],        
-      #  [ :value                , :text       ],
-      #  [ :file                 , :attachment ],
-      #  [ :image                , :attachment ]        
-      #],
-      #Caboose::FieldType => [
-      #  [ :block_type_id        , :integer ],      
-      #  [ :name                 , :string  ],
-      #  [ :field_type           , :string  ],
-      #  [ :nice_name            , :string  ],
-      #  [ :default              , :text    ],
-      #  [ :width                , :integer ],
-      #  [ :height               , :integer ],
-      #  [ :fixed_placeholder    , :boolean ],
-      #  [ :options              , :text    ],
-      #  [ :options_function     , :text    ],
-      #  [ :options_url          , :string  ]
-      #],
+      Caboose::BlockTypeSource => [
+        [ :name       , :string ],
+        [ :url        , :string ],
+        [ :token      , :string ],
+        [ :priority   , :integer, { :default => 0 }],
+        [ :active     , :boolean, { :default => true }],
+      ],
       Caboose::Post => [  
         [ :title                , :text       ],  		 	 
         [ :body                 , :text 		   ],  	 
@@ -248,17 +239,6 @@ class Caboose::Schema < Caboose::Utilities::Schema
     #  end      
     #  c.remove_column(:pages, :content)
     #end
-      
-    if !Caboose::BlockType.where(:name => 'heading').exists?
-      bt = Caboose::BlockType.create(:name => 'heading', :description => 'Heading')
-      Caboose::BlockType.create(:parent_id => bt.id, :name => 'text', :field_type => 'text', :description => 'Text', :default => '', :width => 800, :fixed_placeholder => false)
-      Caboose::BlockType.create(:parent_id => bt.id, :name => 'size', :field_type => 'text', :description => 'Size', :default =>  1, :width => 800, :fixed_placeholder => false, :options => "1|2|3|4|5|6")
-    end
-    
-    if !Caboose::BlockType.where(:name => 'richtext').exists?
-      bt = Caboose::BlockType.create(:name => 'richtext', :description => 'Rich Text')
-      Caboose::BlockType.create(:parent_id => bt.id, :name => 'text', :field_type => 'richtext', :description => 'Text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
-    end
     
     admin_user = nil
     if !Caboose::User.exists?(:username => 'admin')
@@ -326,5 +306,52 @@ class Caboose::Schema < Caboose::Utilities::Schema
     Caboose::Setting.create(:name => 'site_url'    , :value => 'www.mycaboosesite.com' ) if !Caboose::Setting.exists?(:name => 'site_url'    , :value => 'www.mycaboosesite.com' )
     Caboose::Setting.create(:name => 'admin_email' , :value => 'william@nine.is'       ) if !Caboose::Setting.exists?(:name => 'admin_email' , :value => 'william@nine.is'       )
     
+    # Create default block type categories
+    btc = Caboose::BlockTypeCategory
+    layouts = btc.exists?(:name => 'Layouts') ? btc.where(:name => 'Layouts').first : btc.create(:name => 'Layouts')
+    content = btc.exists?(:name => 'Content') ? btc.where(:name => 'Content').first : btc.create(:name => 'Content')
+    btc.create(:name => 'Rows', :parent_id => content.id) if !btc.where(:name => 'Rows', :parent_id => content.id).exists?
+    
+    # Create default block types
+    if !Caboose::BlockType.where(:name => 'layout_basic').exists?
+      bt = Caboose::BlockType.create(:name => 'layout_basic', :description => 'Basic', :block_type_category_id => layouts.id, :use_render_function_for_layout => true, :allow_child_blocks => false, :field_type => 'block')
+      Caboose::BlockType.create(:name => 'header'  , :description => 'Header'  , :parent_id => bt.id, :field_type => 'block')
+      Caboose::BlockType.create(:name => 'content' , :description => 'Content' , :parent_id => bt.id, :field_type => 'block', :allow_child_blocks => true)
+      Caboose::BlockType.create(:name => 'footer'  , :description => 'Footer'  , :parent_id => bt.id, :field_type => 'block')
+    end
+    
+    if !Caboose::BlockType.where(:name => 'layout_left_sidebar').exists?
+      bt = Caboose::BlockType.create(:name => 'layout_left_sidebar', :description => 'Left Sidebar', :block_type_category_id => layouts.id, :use_render_function_for_layout => true, :allow_child_blocks => false, :field_type => 'block')
+      Caboose::BlockType.create(:name => 'header'  , :description => 'Header'  , :parent_id => bt.id, :field_type => 'block')
+      Caboose::BlockType.create(:name => 'sidebar' , :description => 'Sidebar' , :parent_id => bt.id, :field_type => 'block', :allow_child_blocks => true)
+      Caboose::BlockType.create(:name => 'content' , :description => 'Content' , :parent_id => bt.id, :field_type => 'block', :allow_child_blocks => true)
+      Caboose::BlockType.create(:name => 'footer'  , :description => 'Footer'  , :parent_id => bt.id, :field_type => 'block')
+    end
+    
+    if !Caboose::BlockType.where(:name => 'layout_right_sidebar').exists?
+      bt = Caboose::BlockType.create(:name => 'layout_right_sidebar', :description => 'Right Sidebar', :block_type_category_id => layouts.id, :use_render_function_for_layout => true, :allow_child_blocks => false, :field_type => 'block')
+      Caboose::BlockType.create(:name => 'header'  , :description => 'Header'  , :parent_id => bt.id, :field_type => 'block')
+      Caboose::BlockType.create(:name => 'sidebar' , :description => 'Sidebar' , :parent_id => bt.id, :field_type => 'block', :allow_child_blocks => true)
+      Caboose::BlockType.create(:name => 'content' , :description => 'Content' , :parent_id => bt.id, :field_type => 'block', :allow_child_blocks => true)
+      Caboose::BlockType.create(:name => 'footer'  , :description => 'Footer'  , :parent_id => bt.id, :field_type => 'block')
+    end
+    
+    if !Caboose::BlockType.where(:name => 'heading').exists?   
+      bt = Caboose::BlockType.create(:name => 'heading', :description => 'Heading', :field_type => 'block')
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'text', :description => 'Text', :field_type => 'text', :default => '', :width => 800, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'size', :description => 'Size', :field_type => 'text', :default =>  1, :width => 800, :fixed_placeholder => false, :options => "1|2|3|4|5|6")
+    end
+    
+    if !Caboose::BlockType.where(:name => 'text').exists?
+      Caboose::BlockType.create(:name => 'text', :description => 'Text', :field_type => 'text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
+    end
+    if !Caboose::BlockType.where(:name => 'richtext').exists?      
+      Caboose::BlockType.create(:name => 'richtext', :description => 'Text', :field_type => 'richtext', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)
+    else
+      bt = Caboose::BlockType.where(:name => 'richtext').first
+      bt.field_type = 'richtext'
+      bt.save      
+    end    
+            
   end
 end

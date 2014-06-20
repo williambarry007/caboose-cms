@@ -131,9 +131,30 @@ module Caboose
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
-      #@block_types = Caboose::BlockType.reorder(:name).all
-      #render :layout => 'caboose/admin'
+      if @page.block.nil?      
+        redirect_to "/admin/page/#{@page.id}/layout"
+        return
+      end
       @editing = true
+    end
+    
+    # GET /admin/pages/:id/layout
+    def admin_edit_layout
+      return unless user_is_allowed('pages', 'edit')      
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # PUT /admin/pages/:id/layout
+    def admin_update_layout
+      return unless user_is_allowed('pages', 'edit')      
+      bt = BlockType.find(params[:block_type_id])
+      Block.where(:page_id => params[:id]).destroy_all
+      Block.create(:page_id => params[:id], :block_type_id => params[:block_type_id], :name => bt.name)
+      resp = Caboose::StdClass.new({
+        'redirect' => "/admin/pages/#{params[:id]}/content"
+      })
+      render :json => resp
     end
     
     # GET /admin/pages/:id/block-order
@@ -217,7 +238,7 @@ module Caboose
       })
 
       parent_id = params[:parent_id]
-      title = params[:title] 
+      title = params[:title]      
 
       if (title.strip.length == 0)
         resp.error = "A page title is required."
@@ -235,7 +256,7 @@ module Caboose
       		
       page = Caboose::Page.new
       page.title = title
-      page.parent_id = parent_id
+      page.parent_id = parent_id      
       page.hide = true
       page.content_format = Caboose::Page::CONTENT_FORMAT_HTML
 
@@ -247,6 +268,10 @@ module Caboose
       end while (Page.where(:uri => page.uri).count > 0 && i < 10)
 
       page.save
+      
+      # Create the top level block for the page
+      bt = BlockType.find(params[:block_type_id])
+      Block.create(:page_id => page.id, :block_type_id => params[:block_type_id], :name => bt.name)
       
       # Set the new page's permissions		  
       viewers = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'view' }).pluck(:role_id)

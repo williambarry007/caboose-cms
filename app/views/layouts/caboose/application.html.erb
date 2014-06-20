@@ -15,7 +15,8 @@
 <% end %>
   <%
   b = @page.block
-  str = b.render(b, {
+  str = b.render(b, {     
+    :view => self,
     :controller_view_content => yield,
     :modal => false,
     :empty_text => '',

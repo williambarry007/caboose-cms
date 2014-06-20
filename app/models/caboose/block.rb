@@ -88,7 +88,7 @@ class Caboose::Block < ActiveRecord::Base
     end
   end
                                             
-  def render(block, options)    
+  def render(block, options)
     #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")                
     if block && block.is_a?(String)
       #Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")                                          
@@ -114,25 +114,31 @@ class Caboose::Block < ActiveRecord::Base
     end
     options2[:block] = block
 
+    view = options2[:view]
     if block.block_type.use_render_function && block.block_type.render_function            
-      str = block.render_from_function(options2)
+      #str = block.render_from_function(options2)
+      
+      #locals = OpenStruct.new(options)      
+      #locals = OpenStruct.new(options2)
+      #str = ERB.new(block_type.render_function).result(locals.instance_eval { binding })        
+      #return erb.result(locals.instance_eval { binding })
+      
+      #eval("def render_my_function\n#{block.block_type.render_function}\nend\n\n, :locals => options2)
+      str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
     else
-      view = ActionView::Base.new(ActionController::Base.view_paths)
+      #view = ActionView::Base.new(ActionController::Base.view_paths, options2, )      
+      #view = ActionView::Base.new(options2[:view].view_renderer, {}, options2[:view].controller)
+      view = options2[:view]
       begin        
         full_name = block.full_name
-        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0
-        #Caboose.log("Rendering caboose/blocks/#{full_name}")
-        str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)
+        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0        
+        str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)        
       rescue ActionView::MissingTemplate
-        begin
-          #Caboose.log("Error rendering caboose/blocks/#{full_name}")
-          #Caboose.log("Rendering caboose/blocks/#{block.block_type.name}")
-          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)          
+        begin          
+          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)                    
         rescue ActionView::MissingTemplate
-          begin
-            #Caboose.log("Error rendering caboose/blocks/#{block.block_type.name}")
-            #Caboose.log("Error rendering caboose/blocks/#{block.block_type.field_type}")            
-            str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)
+          begin                        
+            str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)            
           rescue Exception => ex
             Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
           end

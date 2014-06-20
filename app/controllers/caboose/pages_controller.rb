@@ -132,7 +132,7 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
       if @page.block.nil?      
-        redirect_to "/admin/page/#{@page.id}/layout"
+        redirect_to "/admin/pages/#{@page.id}/layout"
         return
       end
       @editing = true

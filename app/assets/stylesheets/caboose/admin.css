@@ -36,9 +36,9 @@ body {
 }
 
 #top_nav {
-  background: #000;
+  background: #c1c1c1;
   border-bottom: #333 1px solid;
-  height: 50px;
+  height: 90px;
   position: relative;
 }
 
@@ -46,9 +46,13 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 50px;
-  height: 50px;
-  background: url(/assets/caboose/caboose_logo_small.png);
+  width: 80px;
+  height: 100px;
+  background-color: black;
+  width: 200px;
+  background-image: url('/assets/caboose/caboose_logo.png');
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 #top_nav ul {
@@ -88,11 +92,11 @@ body {
 
 #content h1 {
   margin: 0 0 20px -30px;
-  padding: 40px 0 0 30px;
+  padding: 20px 0 15px 20px;
   height: 80px;
   background: #e1e1e1;
   border-bottom: #aaa 1px solid;
-  font-size: 36pt;
+  font-size: 30px;
 }
 
 #content h1.model_attribute_h1 {
@@ -158,7 +162,7 @@ div.model_attribute_text {
 }
 
 input, select, textarea {
-  font-family: Helvetica, arial;
+  font-family: "Avenir", arial;
   border: 1px solid #ccc;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
@@ -179,10 +183,9 @@ select {
   height: 44px;
 }
 
-option {
-  
+select.mb_fake {
+  height: 44px !important;
 }
-
 select.fake {
   background: transparent;
   position: absolute;

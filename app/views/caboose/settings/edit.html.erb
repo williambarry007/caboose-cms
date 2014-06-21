@@ -3,7 +3,7 @@
 <p><div id='setting_<%= @setting.id %>_name'  ></div></p>
 <p><div id='setting_<%= @setting.id %>_value' ></div></p>
 
-<p><input type='button' value='< Back' onclick="window.location='/admin/settings';" /></p>
+<p><input type='button' class="caboose-btn" value='Back' onclick="window.location='/admin/settings';" /></p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>

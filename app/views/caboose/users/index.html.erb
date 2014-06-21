@@ -8,11 +8,11 @@
 </form>
 
 <p>
-<a href='/admin/users/new'>New User</a> |
-<a href='/admin/users/import'>Import CSV</a>
+<a href='/admin/users/new' class="caboose-btn">New User</a>
+<a href='/admin/users/import' class="caboose-btn">Import CSV</a>
 </p>
 
-<table class='data' id='users_table'>
+<table class='data' id='users_table' style="width:96%;">
   <tr>
     <%= raw @gen.sortable_table_headings({
 				'first_name' => 'First Name',

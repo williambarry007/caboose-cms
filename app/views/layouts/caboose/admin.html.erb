@@ -15,9 +15,31 @@
   <div id='top_nav'>
     <div class='caboose_logo'></div>
     <ul>
-      <li class='back'    ><a href='/'><span><< Back to Site</span></a></li>
-      <li class='cpanel'  ><a href='/station' id='caboose_station' class='caboose_modal'><span>Menu</span></a></li>
+      <li class='back'    ><a href='/' class="caboose-btn">Back to Site</a></li>
+      <li class='cpanel'  ><a href='/station' id='caboose_station' class='caboose_modal caboose-btn'>Menu</a></li>
     </ul>
+    <div class="options">
+      <div class="buttons">
+        <div class="unit">
+          <a href="#">
+            <img src="/assets/caboose/preview-icon.png" alt="Preview">
+            <p>Preview</p>
+          </a>
+        </div>
+        <div class="unit">
+          <a href="#">
+            <img src="/assets/caboose/settings-icon.png" alt="Settings">
+            <p>Settings</p>
+          </a>
+        </div>
+        <div class="unit">
+          <a href="#">
+            <img src="/assets/caboose/help-icon.png" alt="Help">
+            <p>Help</p>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <div id='content_wrapper'>
@@ -27,7 +49,9 @@
 
   </div>
 </div>
-<div class="footer"></div>
+<div class="footer" id="caboose">
+<p>This site is managed by Caboose, running smooth on Rails and loved by <a href="http://www.nine.is" target="_blank">The Nine</a>.</p>
+</div>
 <%= javascript_include_tag "caboose/admin" %>
 <%= yield :caboose_js %>
 </body>

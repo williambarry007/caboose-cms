@@ -18,6 +18,6 @@ tabs = {
 <% tabs.each do |href,text| %>
 <li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
 <% end %>
-<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/posts';" /></li>
+<li class='back'><input type='button' value='Back' onclick="window.location='/admin/posts';" /></li>
 </ul>
 <div id='content2'>

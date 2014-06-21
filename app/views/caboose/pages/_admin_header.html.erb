@@ -2,13 +2,13 @@
 <style type='text/css'>
 
 p.uri {
-  background: #efefef;
-  border: #999 1px solid;
+  background: #e3e3e3;
   padding: 10px;
-  position: absolute;
-  top: 67px;
-  left: 0;
+  position: fixed;
+  top: 86px;
+  left: 210px;
   height: 16px;
+  z-index: 2001;
 }
 
 </style>
@@ -32,23 +32,41 @@ p.uri {
 <% end %>
 
 <h1 id='page_title'>Edit Page</h1>
+<div class="left-sidebar">
+  <div class="profile">
+    <h2>All Aboard, Robby!</h2>
+  </div>
 <ul id='tabs'>
 <%
 tabs = {
-  'General'         => "/admin/pages/#{@page.id}/edit",
-  'Permissions'     => "/admin/pages/#{@page.id}/permissions",
-  'Content'         => "/admin/pages/#{@page.id}/content",     
-  'Custom CSS'      => "/admin/pages/#{@page.id}/css", 
-  'Custom JS'       => "/admin/pages/#{@page.id}/js", 
-  'SEO'             => "/admin/pages/#{@page.id}/seo", 
-  'Sitemap'         => "/admin/pages/#{@page.id}/sitemap", 
-  'Delete Page'     => "/admin/pages/#{@page.id}/delete" 
+  '<div class="tab-icon" id="general"></div>General'         => "/admin/pages/#{@page.id}/edit",
+  '<div class="tab-icon" id="permissions"></div>Permissions'     => "/admin/pages/#{@page.id}/permissions",
+  '<div class="tab-icon" id="contenticon"></div>Content'         => "/admin/pages/#{@page.id}/content",     
+  '<div class="tab-icon" id="css"></div>Custom CSS'      => "/admin/pages/#{@page.id}/css", 
+  '<div class="tab-icon" id="js"></div>Custom JS'       => "/admin/pages/#{@page.id}/js", 
+  '<div class="tab-icon" id="seo"></div>SEO'             => "/admin/pages/#{@page.id}/seo", 
+  '<div class="tab-icon" id="sitemap"></div>Sitemap'         => "/admin/pages/#{@page.id}/sitemap", 
+  '<div class="tab-icon" id="delete"></div>Delete Page'     => "/admin/pages/#{@page.id}/delete" 
 }
 
 %>
 <% tabs.each do |text, href| %>
 <li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
 <% end %>
-<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/pages';" /></li>
+<li class='back' style="text-align:center;"><input type='button' value='Back' style="margin-top:10px;" class="caboose-btn-white" onclick="window.location='/admin/pages';" /></li>
 </ul>
+<div class="nine">
+  <span>Powered by</span>
+  <a href="http://www.nine.is" target="_blank"><img src="/assets/caboose/nine_logo.png" alt="The Nine"></a>
+</div>
+</div>
 <div id='content2'>
+
+<style>
+#top_nav .options {
+  display: block;
+}
+.footer#caboose {
+  padding-left: 200px;
+}
+</style>

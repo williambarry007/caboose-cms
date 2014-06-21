@@ -13,7 +13,7 @@
 <% else %>
   <p>This page doesn't have any children.</p>
 <% end %>
-<p><input type='button' value='< Back to edit' onclick="window.location='/admin/pages/<%= @page.id %>/edit';" /></p>
+<p><input type='button' value='Back to edit' onclick="window.location='/admin/pages/<%= @page.id %>/edit';" /></p>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
 

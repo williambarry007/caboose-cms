@@ -1,10 +1,10 @@
 <h1>Page Block Types</h1>
 
-<p><a href='/admin/block-types/new'>New Block Type</a></p>
+ <p><a href='/admin/block-types/new' class="caboose-btn">New Block Type</a></p>
 
 <% if (@block_types.count > 0) %>
 
-  <table class='data'>
+  <table class='data' style="width: 96%;">
     <tr>
       <th>Name</th>
       <th>Description</th>      
@@ -17,8 +17,11 @@
   <% end %>
   </table>  
 
+
+
 <% else %>
 
   <p>There are no block types.</p>
 
 <% end %>
+

@@ -1,4 +1,11 @@
-<div id='block_<%= block.id %>'>
-<% if block.file %><a href="<%= block.file.url %>">Download</a>
-<% elsif editing %><p>Upload a file.</p>
-<% end %>
+<%
+file  = block.child('file')
+text  = block.child('text').value
+
+if editing && file && file.file && file.file.url.include?('missing.png')  
+  %><div id='block_<%= block.id %>'><p>Please upload a file.</p></div><%  
+elsif file && file.file
+  %><p><a href="<%= raw file.file.url %>"><%= raw text %></p><%
+end
+
+%>

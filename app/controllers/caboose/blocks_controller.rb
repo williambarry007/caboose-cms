@@ -113,7 +113,7 @@ module Caboose
             :modal => false,
             :editing => true,
             :empty_text => params[:empty_text],            
-            :css => '|CABOOSE_CSS|',
+            :css => '|CABOOSE_CSS|',                     
             :js => '|CABOOSE_JAVASCRIPT|',
             :csrf_meta_tags => '|CABOOSE_CSRF|'
           })

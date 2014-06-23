@@ -353,10 +353,22 @@ class Caboose::Schema < Caboose::Utilities::Schema
       bt.save      
     end
     if !Caboose::BlockType.where(:name => 'image').exists?
-      Caboose::BlockType.create(:name => 'image', :description => 'Image', :field_type => 'image', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
+      bt = Caboose::BlockType.create(:name => 'image', :description => 'Image', :field_type => 'block')
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'image_src'     , :description => 'Image'         , :field_type => 'image'  , :default => ''      , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'image_style'   , :description => 'Style'         , :field_type => 'select' , :default => 'Thumb' , :width => 400, :fixed_placeholder => false, :options => "Tiny\nThumb\nLarge")
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'link'          , :description => 'Link'          , :field_type => 'text'   , :default => ''      , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'width'         , :description => 'Width'         , :field_type => 'text'   , :default => ''      , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'height'        , :description => 'Height'        , :field_type => 'text'   , :default => ''      , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'margin_top'    , :description => 'Top Margin'    , :field_type => 'text'   , :default => '10'    , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'margin_right'  , :description => 'Right Margin'  , :field_type => 'text'   , :default => '10'    , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'margin_bottom' , :description => 'Bottom Margin' , :field_type => 'text'   , :default => '10'    , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'margin_left'   , :description => 'Left Margin'   , :field_type => 'text'   , :default => '10'    , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'align'         , :description => 'Align'         , :field_type => 'select' , :default => 'None'  , :width => 400, :fixed_placeholder => false, :options => "None\nCenter\nLeft\nRight")      
     end
     if !Caboose::BlockType.where(:name => 'file').exists?
-      Caboose::BlockType.create(:name => 'file', :description => 'File', :field_type => 'file', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
+      bt = Caboose::BlockType.create(:name => 'file', :description => 'File', :field_type => 'block')
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'file' , :description => 'File' , :field_type => 'file', :default => ''         , :width => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:parent_id => bt.id, :name => 'text' , :description => 'Text' , :field_type => 'text', :default => 'Download' , :width => 400, :fixed_placeholder => false)
     end    
             
   end

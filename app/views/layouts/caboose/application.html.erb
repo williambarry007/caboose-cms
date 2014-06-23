@@ -14,7 +14,7 @@
 <%= yield :caboose_css %>
 <% end %>
   <%
-  b = @page.block
+  b = @page.block  
   str = b.render(b, {     
     :view => self,
     :controller_view_content => yield,

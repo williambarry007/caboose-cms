@@ -126,5 +126,5 @@ BoundRichText = BoundControl.extend({
 });
 
 BoundRichText.test1 = function() {
-  alert('Testing');
+  //alert('Testing');
 };

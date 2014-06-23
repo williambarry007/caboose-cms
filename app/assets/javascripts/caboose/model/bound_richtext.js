@@ -96,7 +96,7 @@ BoundRichText = BoundControl.extend({
   },
   
   cancel: function() {    
-    if (this.attribute.before_cancel) this.attribute.before_cancel();            
+    if (this.attribute.before_cancel) this.attribute.before_cancel();
     this.attribute.value = this.attribute.value_clean;
     $('#'+this.el).val(this.attribute.value);
     $('#'+this.el).removeClass('mb_dirty');

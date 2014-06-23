@@ -101,18 +101,30 @@ module Caboose
     def admin_render_second_level
       return unless user_is_allowed('pages', 'edit')
       p = Page.find(params[:page_id])
+      @p = p
       blocks = p.block.children.collect do |b|
-        {          
+        {           
           :id => b.id,
           :block_type_id => b.block_type.id,
           :sort_order => b.sort_order,
           :html => b.render(b, {
-            :empty_text => params[:empty_text],
-            :editing => true
+            :view => nil,
+            :controller_view_content => nil,
+            :modal => false,
+            :editing => true,
+            :empty_text => params[:empty_text],            
+            :css => '|CABOOSE_CSS|',
+            :js => '|CABOOSE_JAVASCRIPT|',
+            :csrf_meta_tags => '|CABOOSE_CSRF|'
           })
         }
       end
       render :json => blocks
+      #render :layout => false
+      
+      #respond_to do |format|        
+      #  format.json
+      #end
     end
     
     # GET /admin/pages/:page_id/blocks/:id/edit

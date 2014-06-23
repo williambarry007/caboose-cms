@@ -1,5 +1,4 @@
-<% if block.file %>
-  <a href="<%= block.file.url %>" id='block_<%= block.id %>'>Download</a>
-<% elsif editing %>
-  <div id='block_<%= block.id %>'><p>Upload a file.</p></div>
+<div id='block_<%= block.id %>'>
+<% if block.file %><a href="<%= block.file.url %>">Download</a>
+<% elsif editing %><p>Upload a file.</p>
 <% end %>

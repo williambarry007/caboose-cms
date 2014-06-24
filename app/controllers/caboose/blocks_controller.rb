@@ -225,7 +225,7 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
-      b = Field.find(params[:id])
+      b = Block.find(params[:id])
       b.file = params[:value]
       b.save
       resp.success = true      

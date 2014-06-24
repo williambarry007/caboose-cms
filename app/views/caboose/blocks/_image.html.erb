@@ -1,0 +1,45 @@
+<%
+img           = block.child('image_src')
+img_style     = block.child('image_style').value.to_sym
+link          = block.child('link').value
+align         = block.child('align').value
+width         = block.child('width').value
+height        = block.child('height').value
+margin_top    = block.child('margin_top').value
+margin_right  = block.child('margin_right').value
+margin_bottom = block.child('margin_bottom').value
+margin_left   = block.child('margin_left').value
+url = img && img.image ? img.image.url(img_style.downcase.to_sym) : nil
+
+img = nil
+if url && !url.include?('missing.png')  
+  style = []
+  style << "width: #{width}px"               if width
+  style << "max-height: #{height}px"         if height
+  style << "float: left"                     if align == 'Left'
+  style << "float: right"                    if align == 'Right'
+  style << "margin: 0 auto"                  if align == 'Center'
+  style << "display: block"                  if align == 'Center'
+  style << "margin-top: #{margin_top}px"       if margin_top
+  style << "margin-right: #{margin_right}px"   if margin_right
+  style << "margin-bottom: #{margin_bottom}px" if margin_bottom
+  style << "margin-left: #{margin_left}px"     if margin_left  
+  style = style.join('; ')  
+  
+  img = "<img src='#{url}' style='#{style}' id='block_#{block.id}' />"
+  if link && link.strip.length > 0
+    if editing
+      img = "<a href='#'>#{img}</a>"            
+    else
+      img = "<a href='#{link}'>#{img}</a>"
+    end
+  end
+end 
+
+if editing && img.nil?
+  %><p id='block_<%= block.id %>'>Please upload an image.</p><%
+else
+  %><%= raw img %><%
+end
+
+%>

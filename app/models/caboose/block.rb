@@ -115,6 +115,7 @@ class Caboose::Block < ActiveRecord::Base
     options2[:block] = block
 
     view = options2[:view]
+    view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?    
     if block.block_type.use_render_function && block.block_type.render_function            
       #str = block.render_from_function(options2)
       
@@ -127,11 +128,10 @@ class Caboose::Block < ActiveRecord::Base
       str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
     else
       #view = ActionView::Base.new(ActionController::Base.view_paths, options2, )      
-      #view = ActionView::Base.new(options2[:view].view_renderer, {}, options2[:view].controller)
-      view = options2[:view]
+      #view = ActionView::Base.new(options2[:view].view_renderer, {}, options2[:view].controller)      
       begin        
         full_name = block.full_name
-        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0        
+        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0                
         str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)        
       rescue ActionView::MissingTemplate
         begin          

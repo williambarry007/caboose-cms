@@ -79,6 +79,7 @@ module Caboose
         'caboose/loading_white_on_black.gif',
         'caboose/search.png',
         # Javascript
+        'caboose/admin_block_edit.js',
         'caboose/admin_page_edit_content.js',
         'caboose/admin_page_new_blocks.js',
         'caboose/admin.js',

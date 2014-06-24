@@ -133,7 +133,13 @@ module Caboose
       @page = Page.find(params[:page_id])
       @block = Block.find(params[:id])
       @block.create_children
-      @modal = true      
+      @modal = true
+
+      @cdn_domain = Rails.application.config.action_controller.asset_host
+      if @cdn_domain.starts_with?('//')
+        protocol = request.protocol.gsub('//', '')
+        @cdn_domain = "#{protocol}#{Rails.application.config.action_controller.asset_host}"
+      end        
                     
       #render "caboose/blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/modal'
       render :layout => 'caboose/modal'

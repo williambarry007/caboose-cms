@@ -101,7 +101,7 @@ $(document).ready(function() {
 <% if @block.block_type.field_type == 'richtext' %>
   <%= tinymce_assets %>
   <script type='textjavascript'>
-  document.domain = "<%= Rails.application.config.action_controller.asset_host %>";
+  document.domain = "<%= raw @cdn_domain %>";
   </script>
   <%= tinymce :caboose, width: '800px', height:'300px' %>
 <% end %>

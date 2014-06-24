@@ -99,10 +99,7 @@ $(document).ready(function() {
 
 </script>
 <% if @block.block_type.field_type == 'richtext' %>
-  <script src="/assets/tinymce.js" type="text/javascript"></script>
-  <script type='textjavascript'>
-  //document.domain = "<%= raw @cdn_domain %>";
-  </script>
+  <script src="/assets/tinymce.js" type="text/javascript"></script>  
   <%= tinymce :caboose, width: '800px', height:'300px' %>
 <% end %>
 

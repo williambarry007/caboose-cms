@@ -135,12 +135,10 @@ module Caboose
       @block.create_children
       @modal = true
 
-      Caboose.log(Rails.application.config.action_controller)
-      @cdn_domain = Rails.application.config.action_controller.asset_host
-      if @cdn_domain.starts_with?('//')
-        @cdn_domain = @cdn_domain.gsub('//', '')                
-      end        
-                    
+      @document_domain = request.host
+      @document_domain.gsub('http://', '')
+      @document_domain.gsub('https://', '')
+                                  
       #render "caboose/blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/modal'
       render :layout => 'caboose/modal'
     end

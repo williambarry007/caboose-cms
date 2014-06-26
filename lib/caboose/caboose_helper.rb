@@ -1,5 +1,6 @@
 require 'find'
 require 'digest'
+require 'date'
 
 class CabooseHelper
   

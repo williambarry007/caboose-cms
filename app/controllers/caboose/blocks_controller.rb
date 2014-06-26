@@ -133,8 +133,12 @@ module Caboose
       @page = Page.find(params[:page_id])
       @block = Block.find(params[:id])
       @block.create_children
-      @modal = true      
-                    
+      @modal = true
+
+      @document_domain = request.host
+      @document_domain.gsub('http://', '')
+      @document_domain.gsub('https://', '')
+                                  
       #render "caboose/blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/modal'
       render :layout => 'caboose/modal'
     end
@@ -225,7 +229,7 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
-      b = Field.find(params[:id])
+      b = Block.find(params[:id])
       b.file = params[:value]
       b.save
       resp.success = true      

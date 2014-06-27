@@ -1,0 +1,24 @@
+/* All content should generally fall into one of these three categories */
+@mixin phone()   { @media only screen and (max-width : 568px) { @content }}
+@mixin tablet()  { @media only screen and (min-width : 569px) and (max-width : 1024px) { @content }}
+@mixin desktop() { @media only screen and (min-width : 1025px) { @content }}
+
+/* For targeting more specific devices  */
+/* iPad in portrait and landscape       */ @mixin ipad()                  { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) { @content }}
+/* iPad in landscape                    */ @mixin ipad_landscape()        { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (orientation : landscape) { @content }}
+/* iPad in portrait                     */ @mixin ipad_portrait()         { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (orientation : portrait ) { @content }}
+/* Retina iPad in portrait & landscape  */ @mixin ipad_retina()           { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (-webkit-min-device-pixel-ratio: 2) { @content }}                     
+/* Retina iPad in landscape             */ @mixin ipad_retina_landscape() { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (orientation : landscape) and (-webkit-min-device-pixel-ratio: 2) { @content }}
+/* Retina iPad in portrait              */ @mixin ipad_retina_portrait()  { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (orientation : portrait) and (-webkit-min-device-pixel-ratio: 2) { @content }}
+/* iPad 1 & 2 in portrait & landscape   */ @mixin ipad2()                 { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (-webkit-min-device-pixel-ratio: 1) { @content }}
+/* iPad 1 & 2 in landscape              */ @mixin ipad2_landscape()       { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (orientation : landscape) and (-webkit-min-device-pixel-ratio: 1) { @content }}
+/* iPad 1 & 2 in portrait               */ @mixin ipad2_portrait()        { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (orientation : portrait) and (-webkit-min-device-pixel-ratio: 1) { @content }}
+/* iPad mini in portrait & landscape    */ @mixin ipad_mini()             { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (-webkit-min-device-pixel-ratio: 1) { @content }}
+/* iPad mini in landscape               */ @mixin ipad_mini_landscape()   { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (orientation : landscape) and (-webkit-min-device-pixel-ratio: 1) { @content }}
+/* iPad mini in portrait                */ @mixin ipad_mini_portrait()    { @media only screen and (min-device-width : 764px) and (max-device-width : 1024px) and (orientation : portrait) and (-webkit-min-device-pixel-ratio: 1) { @content }}
+/* iPhone 5 in portrait & landscape     */ @mixin iphone5()               { @media only screen and (min-device-width : 320px) and (max-device-width :  568px) { @content }}
+/* iPhone 5 in landscape                */ @mixin iphone5_landscape()     { @media only screen and (min-device-width : 320px) and (max-device-width :  568px) and (orientation : landscape) { @content }}
+/* iPhone 5 in portrait                 */ @mixin iphone5_portrait()      { @media only screen and (min-device-width : 320px) and (max-device-width :  568px) and (orientation : portrait ) { @content }}
+/* iPhone 2G-4S in portrait & landscape */ @mixin iphone4()               { @media only screen and (min-device-width : 320px) and (max-device-width :  480px) { @content }}
+/* iPhone 2G-4S in landscape            */ @mixin iphone4_landscape()     { @media only screen and (min-device-width : 320px) and (max-device-width :  480px) and (orientation : landscape) { @content }}               
+/* iPhone 2G-4S in portrait             */ @mixin iphone4_portrait()      { @media only screen and (min-device-width : 320px) and (max-device-width :  480px) and (orientation : portrait ) { @content }}

@@ -13,13 +13,13 @@
 <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
 <%= yield :caboose_css %>
 <% end %>
-  <%
+  <%  
   b = @page.block  
   str = b.render(b, {     
     :view => self,
     :controller_view_content => yield,
     :modal => false,
-    :empty_text => '',
+    :empty_text => defined?(@editing) && @editing ? (defined?(@empty_text) ? @empty_text : 'Empty, click to edit') : "",
     :editing => defined?(@editing) ? @editing : false,
     :css => '|CABOOSE_CSS|',
     :js => '|CABOOSE_JAVASCRIPT|',

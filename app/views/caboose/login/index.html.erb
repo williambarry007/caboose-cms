@@ -49,8 +49,14 @@ function login() {
 		type: 'post',
 		data: $('#login-form').serialize(),
 		success: function(response) {
-			if (response.error) modal.autosize("<p class='note error'>" + response.error + "</p>");
-			else if (response.redirect != false) <%= @modal ? "" : "parent." %>window.location = response.redirect;
+			if (response.error) modal.autosize("<p class='note error'>" + response.error + "</p>");			
+			else if (response.redirect != false)
+			{
+			  if (response.modal)
+			    window.location = response.redirect;
+			  else
+			    parent.window.location = response.redirect;
+			}
 			else parent.location.reload(true);
 		},
 		error: function() {	

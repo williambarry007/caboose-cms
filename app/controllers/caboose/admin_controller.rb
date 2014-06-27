@@ -8,7 +8,7 @@ module Caboose
         redirect_to '/admin/pages'
         return
       end      
-      @return_url = params[:return_url].nil? ? '/station' : params[:return_url]
+      @return_url = params[:return_url].nil? ? '/admin/pages' : params[:return_url]
     end
     
     # GET /station

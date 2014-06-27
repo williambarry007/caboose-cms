@@ -1,0 +1,16 @@
+<%
+blocks = @p.block.children.collect do |b|
+  {               
+    :id => b.id,
+    :block_type_id => b.block_type.id,
+    :sort_order => b.sort_order,
+    :html => b.render(b, { 
+      :view => self,
+      #:controller_view_content => yield,
+      :modal => false,
+      :empty_text => @empty_text,
+      :editing => true      
+    })
+  }
+end
+%><%= raw blocks.to_json %>

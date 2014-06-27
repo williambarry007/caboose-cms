@@ -1,0 +1,54 @@
+<%
+img       = block.child('image_src')
+img_style = block.child('image_style').value.to_sym
+link      = block.child('link').value
+align     = block.child('align').value
+width     = block.child('width').value
+height    = block.child('height').value
+mt        = block.child('margin_top').value.downcase
+mr        = block.child('margin_right').value.downcase
+mb        = block.child('margin_bottom').value.downcase
+ml        = block.child('margin_left').value.downcase
+url = img && img.image ? img.image.url(img_style.downcase.to_sym) : nil
+
+img = nil
+if url && !url.include?('missing.png')  
+  style = []
+  if align == 'Center'
+    ml = 'auto'
+    mr = 'auto'
+    style << "display: block"
+  end
+  
+  ml = "#{ml}px" if ml && ml != 'auto' && !ml.ends_with?('px') && !ml.ends_with?('em') && !ml.ends_with?('%') 
+  mr = "#{mr}px" if mr && mr != 'auto' && !mr.ends_with?('px') && !mr.ends_with?('em') && !mr.ends_with?('%')
+  mt = "#{mt}px" if mt && mt != 'auto' && !mt.ends_with?('px') && !mt.ends_with?('em') && !mt.ends_with?('%')
+  mb = "#{mb}px" if mb && mb != 'auto' && !mb.ends_with?('px') && !mb.ends_with?('em') && !mb.ends_with?('%')
+  
+  style << "width: #{width}px"       if width
+  style << "max-height: #{height}px" if height
+  style << "float: left"             if align == 'Left'
+  style << "float: right"            if align == 'Right'
+  style << "margin-left:   #{ml}"    if ml
+  style << "margin-right:  #{mr}"    if mr
+  style << "margin-top:    #{mt}"    if mt
+  style << "margin-bottom: #{mb}"    if mb  
+  style = style.join('; ')  
+  
+  img = "<img src='#{url}' style='#{style}' id='block_#{block.id}' />"
+  if link && link.strip.length > 0
+    if editing
+      img = "<a href='#'>#{img}</a>"            
+    else
+      img = "<a href='#{link}'>#{img}</a>"
+    end
+  end
+end 
+
+if editing && img.nil?
+  %><p id='block_<%= block.id %>'>Please upload an image.</p><%
+else
+  %><%= raw img %><%
+end
+
+%>

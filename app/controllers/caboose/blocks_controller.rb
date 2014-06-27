@@ -101,18 +101,30 @@ module Caboose
     def admin_render_second_level
       return unless user_is_allowed('pages', 'edit')
       p = Page.find(params[:page_id])
+      @p = p
       blocks = p.block.children.collect do |b|
-        {          
+        {           
           :id => b.id,
           :block_type_id => b.block_type.id,
           :sort_order => b.sort_order,
           :html => b.render(b, {
-            :empty_text => params[:empty_text],
-            :editing => true
+            :view => nil,
+            :controller_view_content => nil,
+            :modal => false,
+            :editing => true,
+            :empty_text => params[:empty_text],            
+            :css => '|CABOOSE_CSS|',                     
+            :js => '|CABOOSE_JAVASCRIPT|',
+            :csrf_meta_tags => '|CABOOSE_CSRF|'
           })
         }
       end
       render :json => blocks
+      #render :layout => false
+      
+      #respond_to do |format|        
+      #  format.json
+      #end
     end
     
     # GET /admin/pages/:page_id/blocks/:id/edit
@@ -121,8 +133,12 @@ module Caboose
       @page = Page.find(params[:page_id])
       @block = Block.find(params[:id])
       @block.create_children
-      @modal = true      
-                    
+      @modal = true
+
+      @document_domain = request.host
+      @document_domain.gsub('http://', '')
+      @document_domain.gsub('https://', '')
+                                  
       #render "caboose/blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/modal'
       render :layout => 'caboose/modal'
     end
@@ -213,7 +229,7 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new({'attributes' => {}})
-      b = Field.find(params[:id])
+      b = Block.find(params[:id])
       b.file = params[:value]
       b.save
       resp.success = true      

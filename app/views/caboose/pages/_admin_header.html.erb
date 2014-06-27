@@ -6,9 +6,10 @@ p.uri {
   padding: 10px;
   position: fixed;
   top: 86px;
-  left: 210px;
+  left: 173px;
   height: 16px;
   z-index: 2001;
+  display: none; 
 }
 
 </style>
@@ -53,7 +54,7 @@ tabs = {
 <% tabs.each do |text, href| %>
 <li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
 <% end %>
-<li class='back' style="text-align:center;"><input type='button' value='Back' style="margin-top:10px;" class="caboose-btn-white" onclick="window.location='/admin/pages';" /></li>
+<!-- <li class='back' style="text-align:center;"><input type='button' value='Back' style="margin-top:10px;" class="caboose-btn-white" onclick="window.location='/admin/pages';" /></li> -->
 </ul>
 <div class="nine">
   <span>Powered by</span>

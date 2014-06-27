@@ -18,7 +18,7 @@ b = @block
 <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
 <p><select name='block_type_id'>
 <option value=''>-- Select a block type --</option>
-<% Caboose::BlockType.where("parent_id is null").reorder(:name).all.each do |bt| %>
+<% @blocktypes.each do |bt| %>
   <option value="<%= bt.id %>"><%= bt.description %></option>
 <% end %>
 </select></p>

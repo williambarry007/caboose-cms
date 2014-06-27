@@ -19,6 +19,7 @@ module Caboose
       return unless user_is_allowed('pages', 'add')
       @page = Page.find(params[:page_id])
       @block = params[:id] ? Block.find(params[:id]) : Block.new(:page_id => params[:page_id])             
+      @blocktypes = Caboose::BlockType.where('parent_id is null').reorder(:name).all
       render :layout => 'caboose/modal'
     end
     

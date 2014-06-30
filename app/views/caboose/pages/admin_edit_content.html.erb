@@ -24,10 +24,6 @@
 <% end %>
 
 <% content_for :caboose_js do %>
-<%
-#= javascript_include_tag "jquery.ui.all" 
-#= javascript_include_tag "caboose/model/all" 
-%>
 <%= javascript_include_tag 'caboose/admin_page_edit_content' %>
 <script type='text/javascript'>
 
@@ -36,9 +32,12 @@ $(document).ready(function() {
   controller = new PageContentController(<%= @page.id %>);
 
   $('body').append($('<div/>')        
-    .attr('id', 'tiny_header')    
-    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/edit').html("Back"))    
-    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/layout').html("Layout"))    
+
+    .attr('id', 'tiny_header')
+    .append($('<a/>').attr('href', '/admin/pages').html("< Back"))
+    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/layout').html("Page Layout"))
+    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/edit').html("Page Settings"))        
+
   );    
 });
 

@@ -29,6 +29,10 @@ class Caboose::BlockType < ActiveRecord::Base
     return eval(self.options_function)    
   end
   
+  def child(name)
+    Caboose::BlockType.where("parent_id = ? and name = ?", self.id, name).first
+  end
+  
   def api_hash
     return {
       :name                            => self.name,
@@ -71,6 +75,20 @@ class Caboose::BlockType < ActiveRecord::Base
     self.options                         = h['options']
     self.options_function                = h['options_function']
     self.options_url                     = h['options_url']
+    self.save
+    
+    # Remove any named children that don't exist in the given hash
+    new_child_names = h['children'].collect { |h2| h2['name'] }
+    Caboose::BlockType.where(:parent_id => self.id).all.each do |bt|
+      bt.destroy if bt.name && bt.name.strip.length > 0 && !new_child_names.include?(bt.name)
+    end
+    
+    # Now add/update all the children
+    h['children'].each do |h2|
+      bt = self.child(h2['name'])
+      bt = Caboose::BlockType.create(:parent_id => self.id) if bt.nil?
+      bt.parse_api_hash(h)
+    end
+    
   end
-
 end

@@ -1,0 +1,14 @@
+<%
+bts = @block_type_summary
+%>
+<div id='crumbtrail'>
+  <a href='/admin/block-types'>Page Block Types</a> > 
+  <a href='/admin/block-types/store'>Store</a>
+</div>
+
+<h1>Block Type Details</h1>
+
+<p>Name: <%= bts.name %></p>
+<p>Description: <%= bts.description %></p>
+<p>Status: 
+<p><a href='/admin/block-types/store'>< Back</a></p>

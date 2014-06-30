@@ -11,8 +11,8 @@ bts = @block_type_source
         
 <div id='message'></div>
 <p>
-<input type='button' value='< Back' onclick="window.location='/admin/block-type-sources';" />
-<input type='button' value='Refresh Block Types' onclick="refresh_block_types(<%= bts.id %>);" />
+<input type='button' value='< Back' onclick="window.location='/admin/block-types/store/sources';" />
+<input type='button' value='Refresh Block Type Summaries' onclick="refresh_block_types(<%= bts.id %>);" />
 <input type='button' value='Delete Source' onclick="delete_block_type_source(<%= bts.id %>);" />
 </p>
 
@@ -33,7 +33,7 @@ function delete_block_type_source(bts_id, confirm)
   }
   $('#message').empty().append($('<p/>').addClass('loading').html('Deleting source...'));
   $.ajax({
-    url: '/admin/block-type-sources/' + bts_id,
+    url: '/admin/block-types/store/sources/' + bts_id,
     type: 'delete',
     success: function(resp) {
       if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
@@ -46,7 +46,7 @@ function refresh_block_types(bts_id)
 {  
   $('#message').empty().append($('<p/>').addClass('loading').html('Refreshing block types from source...'));
   $.ajax({
-    url: '/admin/block-type-sources/' + bts_id + '/refresh',
+    url: '/admin/block-type/store/sources/' + bts_id + '/refresh',
     type: 'get',
     success: function(resp) {
       if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
@@ -59,7 +59,7 @@ $(document).ready(function() {
   m = new ModelBinder({
     name: 'BlockTypeSource',
     id: <%= bts.id %>,
-    update_url: '/admin/block-type-sources/<%= bts.id %>',
+    update_url: '/admin/block-types/store/sources/<%= bts.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'name'     , nice_name: 'Name'      , type: 'text'     , value: <%= raw Caboose.json(bts.name)      %>, width: 400 }, 

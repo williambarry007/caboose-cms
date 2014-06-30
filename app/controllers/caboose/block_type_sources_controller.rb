@@ -71,7 +71,7 @@ module Caboose
       return unless user_is_allowed('blocktypesources', 'delete')                  
       BlockTypeSource.find(params[:id]).destroy            
       resp = StdClass.new({
-        'redirect' => "/admin/block-type-sources"
+        'redirect' => "/admin/block-types/store/sources"
       })
       render :json => resp
     end
@@ -83,7 +83,7 @@ module Caboose
       resp = StdClass.new
 
       bts = BlockTypeSource.find(params[:id])           
-      if bts.refresh            
+      if bts.refresh_summaries
         resp.success = "Block types from the source have been refreshed successfully."
       else
         resp.error = "There was an error refreshing block types from the source."

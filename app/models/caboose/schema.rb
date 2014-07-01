@@ -37,10 +37,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
   # Any column indexes that need to exist in the database
   def self.indexes
     {
-      :role_memberships          => [ :role_id    , :user_id          ],
-      :role_permissions          => [ :role_id    , :permission_id    ],
-      :post_category_memberships => [ :post_id    , :post_category_id ],
-      :sessions                  => [ :session_id , :updated_at       ]
+      Caboose::RoleMembership         => [ :role_id    , :user_id          ],
+      Caboose::RolePermission         => [ :role_id    , :permission_id    ],
+      Caboose::PostCategoryMembership => [ :post_id    , :post_category_id ]
+      #Caboose::Session                => [ :session_id , :updated_at       ]
     }
   end      
   

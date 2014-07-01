@@ -471,3 +471,14 @@ Page Bar Generator
 #content2 {
   margin-left: 220px; 
 }
+
+#crumbtrail {
+  position: absolute;
+  top: -36px;
+  left: 54px;
+  color: #fff;
+}
+
+#crumbtrail a {
+  color: #fff; 
+}

@@ -1,0 +1,44 @@
+<div id='crumbtrail'>
+  <a href='/admin'>Admin</a> >
+  <a href='/admin/block-types'>Block Types</a>  
+</div>
+
+<h1>Block Type Store</h1>
+
+<p><a href='/admin/block-types/store/sources'>Store Sources</a></p>
+
+<form action='/admin/block-types/store' method='get'>
+<table>
+<tr><td>Source:</td><td>
+  <select name='block_type_source_id'>
+    <option value=''>-- Any Source --</option>
+    <% Caboose::BlockTypeSource.reorder(:name).all.each do |bts| %><option value='<%= bts.id %>'><%= bts.name %></option><% end %>
+  </select></td></tr>
+<tr><td><p>Name:        </td><td><input type='name_like' value="<%= @pager.params['name_like'] %>" /></td></tr>
+<tr><td><p>Description: </td><td><input type='name_like' value="<%= @pager.params['name_like'] %>" /></td></tr>
+</table>
+<p><input type='submit' value='Search' /></p>
+</form>
+
+<% if (@block_type_summaries.count > 0) %>
+
+  <table class='data'>
+    <tr>
+      <th>Source</th>
+      <th>Name</th>
+      <th>Description</th>      
+    </tr>
+  <% @block_type_summaries.each do |bts| %>
+    <tr onclick="window.location='/admin/block-types/store/<%= bts.id %>';">
+      <td><%= bts.source.name %></td>
+      <td><%= bts.name        %></td>
+      <td><%= bts.description %></td>    
+    </tr>
+  <% end %>
+  </table>  
+
+<% else %>
+
+  <p>There are no block types from any sources.</p>
+
+<% end %>

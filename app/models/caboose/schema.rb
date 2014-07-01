@@ -165,6 +165,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :priority   , :integer, { :default => 0 }],
         [ :active     , :boolean, { :default => true }],
       ],
+      Caboose::BlockTypeSummary => [      
+        [ :block_type_source_id , :integer ],
+        [ :name                 , :string  ],
+        [ :description          , :string  ]                
+      ],
       Caboose::Post => [  
         [ :title                , :text       ],  		 	 
         [ :body                 , :text 		   ],  	 

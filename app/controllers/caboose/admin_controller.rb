@@ -4,7 +4,11 @@ module Caboose
       
     # GET /admin
     def index
-      @return_url = params[:return_url].nil? ? '/station' : params[:return_url]
+      if logged_in?
+        redirect_to '/admin/pages'
+        return
+      end      
+      @return_url = params[:return_url].nil? ? '/admin/pages' : params[:return_url]
     end
     
     # GET /station

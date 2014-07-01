@@ -78,16 +78,20 @@ class Caboose::BlockType < ActiveRecord::Base
     self.save
     
     # Remove any named children that don't exist in the given hash
-    new_child_names = h['children'].collect { |h2| h2['name'] }
-    Caboose::BlockType.where(:parent_id => self.id).all.each do |bt|
-      bt.destroy if bt.name && bt.name.strip.length > 0 && !new_child_names.include?(bt.name)
+    if h['children'].nil?
+      Caboose::BlockType.where("parent_id = ? and name is not null", self.id).destroy_all
+    else
+      new_child_names = h['children'].collect { |h2| h2['name'] }      
+      Caboose::BlockType.where("parent_id = ? and name is not null and name not in (?)", self.id, new_child_names).destroy_all
     end
     
     # Now add/update all the children
-    h['children'].each do |h2|
-      bt = self.child(h2['name'])
-      bt = Caboose::BlockType.create(:parent_id => self.id) if bt.nil?
-      bt.parse_api_hash(h)
+    if h['children']
+      h['children'].each do |h2|
+        bt = self.child(h2['name'])
+        bt = Caboose::BlockType.create(:parent_id => self.id) if bt.nil?
+        bt.parse_api_hash(h2)
+      end
     end
     
   end

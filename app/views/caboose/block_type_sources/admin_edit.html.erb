@@ -1,6 +1,12 @@
 <%
 bts = @block_type_source
 %>
+<div id='crumbtrail'>
+  <a href='/admin'>Admin</a> >
+  <a href='/admin/block-types'>Block Types</a> >
+  <a href='/admin/block-types/store'>Store</a> >
+  <a href='/admin/block-types/store/sources'>Sources</a>
+</div>
 
 <h1>Edit Source</h1>
 <p><div id='blocktypesource_<%= bts.id %>_name'     ></div></p>
@@ -46,7 +52,7 @@ function refresh_block_types(bts_id)
 {  
   $('#message').empty().append($('<p/>').addClass('loading').html('Refreshing block types from source...'));
   $.ajax({
-    url: '/admin/block-type/store/sources/' + bts_id + '/refresh',
+    url: '/admin/block-types/store/sources/' + bts_id + '/refresh',
     type: 'get',
     success: function(resp) {
       if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));

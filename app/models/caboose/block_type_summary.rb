@@ -1,7 +1,7 @@
 require 'httparty'
 
 class Caboose::BlockTypeSummary < ActiveRecord::Base
-  self.table_name = "block_type_summary"
+  self.table_name = "block_type_summaries"
         
   belongs_to :block_type_source
   attr_accessible :id,

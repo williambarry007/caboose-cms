@@ -31,7 +31,7 @@ class Caboose::BlockTypeSource < ActiveRecord::Base
     
     summaries.each do |h|      
       s = Caboose::BlockTypeSummary.where(:block_type_source_id => self.id, :name => h['name']).first
-      s = Caboose::BlockTypeSummary.create(:block_type_source_id => self.id)
+      s = Caboose::BlockTypeSummary.create(:block_type_source_id => self.id) if s.nil?
       s.parse_api_hash(h)
       s.save
     end
@@ -65,7 +65,7 @@ class Caboose::BlockTypeSource < ActiveRecord::Base
       Caboose.log("Response body isn't valid JSON.")
       return false
     end     
-    
+    #Caboose.log(h)
     # Update the block type
     bt.parse_api_hash(h)
     

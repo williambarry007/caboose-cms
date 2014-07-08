@@ -34,16 +34,17 @@ module Caboose
   		@original_params = {}
   		@params = {}
   		@options = {
-  		  'model'           => '',
-  			'sort' 			      => '',
-  			'desc' 			      => 0,
-  			'base_url'		    => '',
-  			'page'			      => 1,
-  			'item_count'		  => 0,
-  			'items_per_page'  => 10,  			
-  			'abbreviations'   => {},
-  			'skip'            => [], # params to skip when printing the page bar  			
-  			'includes'        => nil # Hash of association includes
+  		  'model'            => '',
+  			'sort' 			       => '',
+  			'desc' 			       => 0,
+  			'base_url'		     => '',
+  			'page'			       => 1,
+  			'item_count'		   => 0,
+  			'items_per_page'   => 10,  			
+  			'abbreviations'    => {},
+  			'skip'             => [], # params to skip when printing the page bar
+        'additional_where' => [],
+  			'includes'         => nil # Hash of association includes
   			                         # {
   			                         #   search_field_1 => [association_name, join_table, column_name],
   			                         #   search_field_2 => [association_name, join_table, column_name]
@@ -333,6 +334,7 @@ module Caboose
           arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_bw')                                              
           arr[arr.count-1] = arr[arr.count-1][0..-4] if k.ends_with?('_ew')
           arr[arr.count-1] = arr[arr.count-1][0..-6] if k.ends_with?('_like')
+          arr[arr.count-1] = arr[arr.count-1][0..-6] if k.ends_with?('_null')
           arr2 = []
           arr.each do |col|
             if @options['includes'] && @options['includes'].include?(col)           
@@ -370,6 +372,10 @@ module Caboose
           col = "#{table}.#{k[0..-6]}" if col.nil?
           sql2 = "upper(#{col}) like ?"
           v = v.kind_of?(Array) ? v.collect{ |v2| "%#{v2}%".upcase } : "%#{v}%".upcase
+        elsif k.ends_with?('_null')
+          col = "#{table}.#{k[0..-6]}" if col.nil?
+          sql2 = "#{col} ? null"
+          v = v == true ? 'is' : 'is not'          
         else
           col = "#{table}.#{k}" if col.nil?
           sql2 = "#{col} = ?"
@@ -383,6 +389,7 @@ module Caboose
         end
         sql << sql2                          
   	  end
+  	  @options['additional_where'].each { |x| sql << x }
   	  sql_str = sql.join(' and ')
   	  sql = [sql_str]  	   	  
   	  values.each { |v| sql << v }  	  

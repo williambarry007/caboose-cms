@@ -53,13 +53,17 @@ module Caboose
 
       page = Page.page_with_uri(File.dirname(uri), false)
       if (page.nil? || !page)
-        render :file => "caboose/extras/error404", :layout => "caboose/error404" 
+        respond_to do |format|          
+          format.all { render :file => "caboose/extras/error404", :layout => "caboose/error404", :formats => [:html] }
+        end         
         return
       end
         
       asset = Asset.where(:page_id => page.id, :filename => File.basename(uri)).first
       if (asset.nil?)
-        render :file => "caboose/extras/error404", :layout => "caboose/error404"
+        respond_to do |format|          
+          format.all { render :file => "caboose/extras/error404", :layout => "caboose/error404", :formats => [:html] }
+        end
         return
       end
 

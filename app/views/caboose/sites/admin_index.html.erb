@@ -1,0 +1,31 @@
+<h1>Sites</h1>
+
+<form action='/admin/sites' method='get' class='search_form'>
+<input type='text' name='name_like' placeholder='Name' />
+<input type='submit' value='Search' />
+</form>
+
+<p><a href='/admin/sites/new'>New Site</a></p>
+
+<% if @sites && @sites.count > 0 %>
+  <table class='data' id='users_table'>
+    <tr>
+      <%= raw @pager.sortable_table_headings({
+  				'name'               => 'Name',
+  				'description'        => 'Description',
+  				'name, description'  => 'Domains'
+  			})
+  		%>
+    </tr>
+  <% @sites.each do |site| %>
+    <tr onclick="window.location='/admin/sites/<%= site.id %>';">
+      <td><%= site.name %></td>
+      <td><%= site.description %></td>
+      <td><%= raw site.domains ? site.domains.collect{ |d| d.domain }.join('<br />') : '' %></td>    
+    </tr>
+  <% end %>
+  </table>
+  <p><%= raw @pager.generate %></p>
+<% else %>
+  <p>There are no sites right now.</p>
+<% end %>

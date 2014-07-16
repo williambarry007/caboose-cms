@@ -5,14 +5,14 @@ module Caboose
     helper :application
     
     def before_action
-      @page = Page.page_with_uri('/admin')
+      @page = Page.page_with_uri(request.host_with_port, '/admin')
     end    
 
     # GET /pages/:id
     def show
       
       # Find the page with an exact URI match 
-      page = Page.page_with_uri(request.fullpath, false)
+      page = Page.page_with_uri(request.host_with_port, request.fullpath, false)
 
       if (!page)
         asset
@@ -51,7 +51,7 @@ module Caboose
       uri.chop! if uri.end_with?('/')
       uri[0] = '' if uri.starts_with?('/')
 
-      page = Page.page_with_uri(File.dirname(uri), false)
+      page = Page.page_with_uri(request.host_with_port, File.dirname(uri), false)
       if (page.nil? || !page)
         respond_to do |format|          
           format.all { render :file => "caboose/extras/error404", :layout => "caboose/error404", :formats => [:html] }
@@ -240,7 +240,7 @@ module Caboose
           'error' => nil,
           'redirect' => nil
       })
-
+            
       parent_id = params[:parent_id]
       title = params[:title]      
 
@@ -252,13 +252,20 @@ module Caboose
         resp.error = "You don't have permission to add a page there."
       end
       if (!resp.error.nil?)
-        render json: resp
+        render :json => resp
         return
       end
       	
-      parent = Caboose::Page.find(parent_id)
-      		
+      parent = Caboose::Page.find(parent_id)                  		
       page = Caboose::Page.new
+      
+      if parent.nil?
+        d = Domain.where(:domain => request.host_with_port).first.site_id
+        page.site_id = d.site_id
+      else      
+        page.site_id = parent.site_id
+      end
+      
       page.title = title
       page.parent_id = parent_id      
       page.hide = true
@@ -427,13 +434,14 @@ module Caboose
 
     # GET /admin/pages/sitemap-options
     def admin_sitemap_options
-      parent_id = params[:parent_id]
-      top_page = Page.index_page
+      parent_id = params[:parent_id]      
+      d = Domain.where(:domain => request.host_with_port).first      
+      top_page = Page.index_page(d.site_id)
       p = !parent_id.nil? ? Page.find(parent_id) : top_page
       options = []
       sitemap_helper(top_page, options)
      	  
-      render json: options 		
+      render :json => options 		
     end
 
     def sitemap_helper(page, options, prefix = '')

@@ -33,7 +33,7 @@ module Caboose
       @is_real_page = false
       
       #if @find_page
-        @page = Page.page_with_uri(request.fullpath)
+        @page = Page.page_with_uri(request.host_with_port, request.fullpath)
         @crumb_trail  = Caboose::Page.crumb_trail(@page)		    
       #end
       

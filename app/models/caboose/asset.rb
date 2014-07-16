@@ -8,10 +8,10 @@ class Caboose::Asset < ActiveRecord::Base
     return str.gsub(' ', '_').downcase 
   end
   
-  def assets_with_uri(uri)
+  def assets_with_uri(host_with_port, uri)
     uri[0] = '' if uri.start_with? '/'
     
-		page = Page.page_with_uri(File.dirname(uri), false)		
+		page = Page.page_with_uri(host_with_port, File.dirname(uri), false)		
 		return false if page.nil?
 		
 		asset = Asset.where(:page_id => page.id,:filename => File.basename(uri)).first

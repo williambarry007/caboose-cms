@@ -97,6 +97,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :extension      , :string     ]
       ],
       Caboose::Page => [        
+        [ :site_id               , :integer ],
         [ :parent_id             , :integer ], 
         [ :title                 , :string  ],
         [ :menu_title            , :string  ],
@@ -170,6 +171,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name                 , :string  ],
         [ :description          , :string  ]                
       ],
+      Caboose::Domain => [
+        [ :site_id     , :integer ],
+        [ :domain      , :string  ],
+        [ :primary     , :boolean, { :default => false }]        
+      ],
       Caboose::Post => [  
         [ :title                , :text       ],  		 	 
         [ :body                 , :text 		   ],  	 
@@ -215,6 +221,15 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name  , :string ],
         [ :value , :text   ]
       ],
+      Caboose::Site => [
+        [ :name        , :string ],
+        [ :description , :text   ]
+      ],
+      Caboose::SiteMembership => [
+        [ :site_id     , :integer ],
+        [ :user_id     , :integer ],
+        [ :role        , :string  ]        
+      ],      
       Caboose::Timezone => [
         [ :country_code , :string ],
         [ :name         , :string ]

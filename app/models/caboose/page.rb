@@ -2,11 +2,14 @@
 class Caboose::Page < ActiveRecord::Base
   self.table_name = "pages"
   
-  belongs_to :parent, :class_name => "Page"
-  has_many :children, :class_name => "Page", :foreign_key => 'parent_id', :order => 'sort_order, title'
+  belongs_to :site, :class_name => 'Caboose::Site'
+  belongs_to :parent, :class_name => 'Caboose::Page'
+  has_many :children, :class_name => 'Caboose::Page', :foreign_key => 'parent_id', :order => 'sort_order, title'
   has_many :page_permissions  
   has_many :blocks, :order => 'sort_order'
-  attr_accessible :parent_id, 
+  attr_accessible :id,
+    :site_id,
+    :parent_id, 
     :title, 
     :menu_title, 
     # :content, # Changed from column in pages to blocks
@@ -56,12 +59,16 @@ class Caboose::Page < ActiveRecord::Base
     return self.where(:id => page_id).select(fields).first
   end
 
-  def self.index_page
-    return self.where(:parent_id => -1).first
+  def self.index_page(site_id)
+    return self.where(:site_id => site_id, :parent_id => -1).first
   end
   
-  def self.page_with_uri(uri, get_closest_parent = true)
+  def self.page_with_uri(host_with_port, uri, get_closest_parent = true)
 
+    d = Caboose::Domain.where(:domain => host_with_port).first
+    return false if d.nil?
+    site_id = d.site_id    
+    
     uri = uri.to_s.gsub(/^(.*?)\?.*?$/, '\1')
     uri.chop! if uri.end_with?('/')
     uri[0] = '' if uri.starts_with?('/')
@@ -72,14 +79,14 @@ class Caboose::Page < ActiveRecord::Base
     parts = uri.split('/')
       
     # See where to start looking
-    page_ids = self.where(:alias => parts[0]).limit(1).pluck(:id)
+    page_ids = self.where(:site_id => site_id, :alias => parts[0]).limit(1).pluck(:id)
     page_id = !page_ids.nil? && page_ids.count > 0 ? page_ids[0] : false
     
     # Search for the page
-    if (page_id)
+    if page_id
       page_id = self.page_with_uri_helper(parts, 1, page_id)
     else
-      parent_id = self.index_page
+      parent_id = self.index_page(site_id)
       page_id = self.page_with_uri_helper(parts, 0, parent_id)
     end
     

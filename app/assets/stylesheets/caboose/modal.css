@@ -107,7 +107,7 @@ div.model_attribute_text {
 input, select, textarea {
   font-family: "Avenir", Arial;
   border: 2px solid #ccc;
-  background: none;
+  background: #000;
   color: #fff;
   /*
   -moz-border-radius: 2px;

@@ -15,6 +15,12 @@
 <% end %>
   <%  
   b = @page.block  
+  if b.nil?
+    bt = Caboose::BlockType.where(:name => 'layout_basic').first
+    Caboose::Block.create(:page_id => @page.id, :block_type_id => bt.id)    
+    b = @page.block
+    b.create_children
+  end
   str = b.render(b, {     
     :view => self,
     :controller_view_content => yield,
@@ -23,8 +29,9 @@
     :editing => defined?(@editing) ? @editing : false,
     :css => '|CABOOSE_CSS|',
     :js => '|CABOOSE_JAVASCRIPT|',
-    :csrf_meta_tags => '|CABOOSE_CSRF|' 
-  })    
+    :csrf_meta_tags => '|CABOOSE_CSRF|',
+    :logged_in_user => @logged_in_user
+  })       
   str.gsub!('|CABOOSE_CSS|'        , yield(:css))
   str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
   str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)

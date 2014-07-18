@@ -1,11 +1,19 @@
+<div id='crumbtrail'>
+  <a href='/admin'>Admin</a> >
+  <a href='/admin/block-types'>Block Types</a> >
+  <a href='/admin/block-types/store'>Store</a> >
+  <a href='/admin/block-types/store/sources'>Sources</a>  
+</div>
 
 <h1>New Source</h1>
-<form action='/admin/block-type-sources' method='post' id='new_source_form'>
+<form action='/admin/block-types/store/sources' method='post' id='new_source_form'>
 <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
 <p><input type='text' id='name' name='name' placeholder='Name' /></p>
 <div id='message'></div>
 <p>
-<input type='button' value='Back' onclick="window.location='/admin/block-type-sources';" />
+
+<input type='button' value='< Back' onclick="window.location='/admin/block-types/store/sources';" />
+
 <input type='button' value='Add Source' onclick="add_block_type_source();" />
 </p>
 </form>
@@ -17,7 +25,7 @@ function add_block_type_source()
 {
   $('#message').empty().append($('<p/>').addClass('loading').html('Adding source...'));
   $.ajax({
-    url: '/admin/block-type-sources',
+    url: '/admin/block-types/store/sources',
     type: 'post',
     data: $('#new_source_form').serialize(),          
     success: function(resp) {

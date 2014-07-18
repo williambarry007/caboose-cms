@@ -7,6 +7,7 @@ BlockController.prototype = {
   authenticity_token: false,
   //new_block_type_id: false,
   block_types: false,
+  modal: false,
   
   init: function(options)
   {
@@ -95,7 +96,8 @@ BlockController.prototype = {
         fixed_placeholder: true,
         options_url: '/admin/block-types/options',
         after_update: function() { parent.controller.render_blocks(); window.location.reload(true); },
-        after_cancel: function() { parent.controller.render_blocks(); window.location.reload(true); }
+        after_cancel: function() { parent.controller.render_blocks(); window.location.reload(true); },
+        on_load: function() { that.modal.autosize(); }
       }]
     });
     $('#block_' + b.id + '_block_type_id_container').hide();

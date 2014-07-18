@@ -12,7 +12,7 @@ class Caboose::BlockTypeSource < ActiveRecord::Base
     :active    
 
   # Just get the names and descriptions of all block types from the source
-  def refresh_names
+  def refresh_summaries
     resp = nil
     begin                             
       resp = HTTParty.get("#{self.url}/caboose/block-types?token=#{self.token}")
@@ -21,17 +21,19 @@ class Caboose::BlockTypeSource < ActiveRecord::Base
       return false
     end
     
-    block_types = nil
+    summaries = nil
     begin
-      block_types = JSON.parse(resp.body)
+      summaries = JSON.parse(resp.body)
     rescue
       Caboose.log("Response body isn't valid JSON.")
       return false
     end
     
-    block_types.each do |h|      
-      next if Caboose::BlockType.where(:name => bt.name).exists?
-      Caboose::BlockType.create(:name => h['name'], :description => h['description'])      
+    summaries.each do |h|      
+      s = Caboose::BlockTypeSummary.where(:block_type_source_id => self.id, :name => h['name']).first
+      s = Caboose::BlockTypeSummary.create(:block_type_source_id => self.id) if s.nil?
+      s.parse_api_hash(h)
+      s.save
     end
     
     return true
@@ -63,27 +65,11 @@ class Caboose::BlockTypeSource < ActiveRecord::Base
       Caboose.log("Response body isn't valid JSON.")
       return false
     end     
-    
-    # Grab all the fields from the hash for the top-level block
+    #Caboose.log(h)
+    # Update the block type
     bt.parse_api_hash(h)
-    bt.save
-    
-    # Now add all the children
-    h['children'].each do |h2|
-      recursive_add(h2, bt.id)
-    end
     
     return true
   end
   
-  def self.recursive_add(h, parent_id = nil)
-    bt = Caboose::BlockType.new(:parent_id => parent_id)
-    bt.parse_api_hash(h)
-    bt.save
-          
-    h['children'].each do |h2|
-      self.recursive_add(h2, bt.id)
-    end
-    return bt
-  end
 end

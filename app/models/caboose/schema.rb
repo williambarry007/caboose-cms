@@ -37,10 +37,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
   # Any column indexes that need to exist in the database
   def self.indexes
     {
-      :role_memberships          => [ :role_id    , :user_id          ],
-      :role_permissions          => [ :role_id    , :permission_id    ],
-      :post_category_memberships => [ :post_id    , :post_category_id ],
-      :sessions                  => [ :session_id , :updated_at       ]
+      Caboose::RoleMembership         => [ :role_id    , :user_id          ],
+      Caboose::RolePermission         => [ :role_id    , :permission_id    ],
+      Caboose::PostCategoryMembership => [ :post_id    , :post_category_id ]
+      #Caboose::Session                => [ :session_id , :updated_at       ]
     }
   end      
   
@@ -164,6 +164,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :token      , :string ],
         [ :priority   , :integer, { :default => 0 }],
         [ :active     , :boolean, { :default => true }],
+      ],
+      Caboose::BlockTypeSummary => [      
+        [ :block_type_source_id , :integer ],
+        [ :name                 , :string  ],
+        [ :description          , :string  ]                
       ],
       Caboose::Post => [  
         [ :title                , :text       ],  		 	 
@@ -346,7 +351,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::BlockType.create(:name => 'text', :description => 'Text', :field_type => 'text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)      
     end
     if !Caboose::BlockType.where(:name => 'richtext').exists?      
-      Caboose::BlockType.create(:name => 'richtext', :description => 'Text', :field_type => 'richtext', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)
+      Caboose::BlockType.create(:name => 'richtext', :description => 'Rich Text', :field_type => 'richtext', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)
     else
       bt = Caboose::BlockType.where(:name => 'richtext').first
       bt.field_type = 'richtext'

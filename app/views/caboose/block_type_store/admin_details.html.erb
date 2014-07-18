@@ -1,0 +1,46 @@
+<%
+bts = @block_type_summary
+%>
+<div id='crumbtrail'>
+  <a href='/admin'>Admin</a> >
+  <a href='/admin/block-types'>Block Types</a> >
+  <a href='/admin/block-types/store'>Store</a>
+</div>
+
+<h1>Block Type Details</h1>
+
+<p>Name: <%= bts.name %></p>
+<p>Description: <%= bts.description %></p>
+<div id='message'></div> 
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/block-types/store';" />
+<input type='button' value='Download from Source' onclick="download_block_type(<%= bts.id %>);" />
+</p>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+function download_block_type(summary_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append('Are you sure you want to download the block type?<br />')
+      .append($('<input/>').attr('type', 'button').val('Yes').click(function() { download_block_type(summary_id, true); })).append(' ')
+      .append($('<input/>').attr('type', 'button').val('No').click(function() { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').html("<p class='loading'>Downloading block type...</p>");
+  $.ajax({
+    url: '/admin/block-types/store/' + summary_id + '/download',
+    type: 'get',
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.success) $('#message').html("<p class='note success'>" + resp.success + "</p>");
+    }
+  });
+}
+
+</script>
+<% end %>

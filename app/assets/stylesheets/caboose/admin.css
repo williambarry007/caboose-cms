@@ -740,3 +740,14 @@ Page Bar Generator
 .footer#caboose a:hover {
   color: #2B2C30;
 }
+
+#crumbtrail {
+  position: absolute;
+  top: -36px;
+  left: 54px;
+  color: #fff;
+}
+
+#crumbtrail a {
+  color: #fff; 
+}

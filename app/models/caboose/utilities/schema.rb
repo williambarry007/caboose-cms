@@ -87,9 +87,9 @@ class Caboose::Utilities::Schema
   def self.create_indexes
     return if self.indexes.nil?
     c = ActiveRecord::Base.connection      
-    self.indexes.each do |table, indexes|
-      indexes.each do |index|
-        c.add_index table, index if !c.index_exists?(table, index)
+    self.indexes.each do |model, arr|
+      arr.each do |index|
+        c.add_index model.table_name, index if !c.index_exists?(model.table_name, index)
       end             
     end
   end

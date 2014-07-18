@@ -123,6 +123,19 @@ Caboose::Engine.routes.draw do
   #post    "admin/blocks/:id/image"                 => "fields#admin_update_image"
   #post    "admin/blocks/:id/file"                  => "fields#admin_update_file"    
   
+  get     "admin/block-types/store/sources"              => "block_type_sources#admin_index"
+  get     "admin/block-types/store/sources/new"          => "block_type_sources#admin_new"
+  get     "admin/block-types/store/sources/options"      => "block_type_sources#admin_options"
+  get     "admin/block-types/store/sources/:id/edit"     => "block_type_sources#admin_edit"    
+  get     "admin/block-types/store/sources/:id/refresh"  => "block_type_sources#admin_refresh"
+  post    "admin/block-types/store/sources"              => "block_type_sources#admin_create"
+  put     "admin/block-types/store/sources/:id"          => "block_type_sources#admin_update"
+  delete  "admin/block-types/store/sources/:id"          => "block_type_sources#admin_delete"
+  
+  get     "admin/block-types/store/:block_type_summary_id/download"  => "block_type_store#admin_download"  
+  get     "admin/block-types/store/:block_type_summary_id"           => "block_type_store#admin_details"  
+  get     "admin/block-types/store"                                  => "block_type_store#admin_index"
+      
   get     "admin/block-types/field-type-options"   => "block_types#admin_field_type_options"
   get     "admin/block-types/tree-options"         => "block_types#admin_tree_options"
   get     "admin/block-types/options"              => "block_types#admin_options"
@@ -137,16 +150,7 @@ Caboose::Engine.routes.draw do
   delete  "admin/block-types/:id"                  => "block_types#admin_delete"
   
   get     "admin/block-type-categories/tree-options" => "block_type_categories#admin_tree_options"
-  
-  get     "admin/block-type-sources"              => "block_type_sources#admin_index"
-  get     "admin/block-type-sources/new"          => "block_type_sources#admin_new"
-  get     "admin/block-type-sources/options"      => "block_type_sources#admin_options"
-  get     "admin/block-type-sources/:id/edit"     => "block_type_sources#admin_edit"    
-  get     "admin/block-type-sources/:id/refresh"  => "block_type_sources#admin_refresh"
-  post    "admin/block-type-sources"              => "block_type_sources#admin_create"
-  put     "admin/block-type-sources/:id"          => "block_type_sources#admin_update"
-  delete  "admin/block-type-sources/:id"          => "block_type_sources#admin_delete"
-
+    
   get     "posts"                                 => "posts#index"
   get     "posts/:id"                             => "posts#detail"
   get     "admin/posts/category-options"          => "posts#admin_category_options"

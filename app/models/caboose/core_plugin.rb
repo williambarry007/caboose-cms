@@ -26,8 +26,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'        , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'      , 'view')
     item['children'] << { 'id' => 'blocktypes'       , 'text' => 'AB Test Variants'   , 'href' => '/admin/ab-variants'        , 'modal' => false } if user.is_allowed('abvariants'       , 'view')
     item['children'] << { 'id' => 'variables'        , 'text' => 'Variables'          , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'         , 'view')
-    item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'        , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'       , 'view')
-    item['children'] << { 'id' => 'blocktypesources' , 'text' => 'Block Type Sources' , 'href' => '/admin/block-type-sources' , 'modal' => false } if user.is_allowed('blocktypesources' , 'view')    
+    item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'        , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'       , 'view')        
         
     nav << item if item['children'].count > 0
     

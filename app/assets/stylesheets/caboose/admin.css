@@ -49,7 +49,6 @@ body {
 .caboose-btn {
   background: #141516; 
   color: #f7f7f7;
-  border: 0; 
   text-align: center; 
   font-weight: 100; 
   padding: 5px 15px;
@@ -58,6 +57,7 @@ body {
   margin: 0 auto;
   font-size: 14px;
   cursor: pointer;
+  border: 1px solid #fff;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px; 
@@ -66,8 +66,8 @@ body {
 
 .caboose-btn-white {
   background: #e3e3e3; 
+  border: 1px solid #fff;
   color: #141516;
-  border: 0; 
   text-align: center; 
   font-weight: 100; 
   padding: 5px 15px;
@@ -657,40 +657,104 @@ Page Bar Generator
   font-size: 14px;
 }
 
+
+.admin-page-list {
+  width: 220px;
+}
+
 .admin-page-list ul {
   margin: 0;
   padding: 0;
   list-style: none; 
+  position: relative;
+}
+
+.admin-page-list > ul > li:first-of-type:before {
+  display: none; 
+}
+
+.admin-page-list > ul> li> ul:first-of-type {
+  margin-left: 0; 
+  border-left: 0; 
+}
+
+.admin-page-list > ul> li> ul:first-of-type > li:before {
+  display: none; 
+}
+
+.admin-page-list > ul > li:first-of-type > a:before {
+  background-image: url("/assets/caboose/home_icon.png");
+}
+
+.admin-page-list ul li.new_page_li > a:before {
+  background-image: url("/assets/caboose/new_icon.png");
+}
+
+.admin-page-list ul li.new_page_li:before {
+  border-top: 1px dotted rgb(191, 191, 191);
 }
 
 .admin-page-list ul li {
-  background: #e3e3e3;
-  
-
+  background: #f7f7f7;
+  position: relative;
 }
 
 .admin-page-list ul li a {
   color: #4a4e57;
+  font-size: 14px;
   text-decoration: none;
-  padding: 10px 10px 10px 20px;
+  padding: 7px 10px 9px 20px;
   display: block;
   height: 100%; 
 }
 
-.admin-page-list ul li ul li a {
-  padding: 10px 10px 10px 40px;
+.admin-page-list ul li a:before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background-image: url("/assets/caboose/page_icon.png");
+  background-size: 18px;
+  background-repeat: no-repeat;
+  background-position: center center; 
+  position: relative;
+  top: 3px;
+  right: 6px;
+}
+
+.admin-page-list ul li:before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 18px;
+  width: 8px;
+  height: 1px;
+  background: none;
+  border-top: 1px solid rgb(191, 191, 191);
+}
+
+
+.admin-page-list ul li ul {
+  margin-left: 22px;
+  border-left: 1px solid rgb(191, 191, 191);
 } 
 
+.admin-page-list ul li ul li a {
+  padding: 7px 10px 9px 20px;
+} 
+
+
+.admin-page-list ul li ul li ul {
+  margin-left: 22px;
+  border-left: 1px solid rgb(191, 191, 191);
+}
+
 .admin-page-list ul li ul li ul li a {
-  padding: 10px 10px 10px 60px;
+  padding: 7px 10px 9px 20px;
 }
 
 .admin-page-list ul li a:hover {
-  background: rgb(244, 239, 200);
-}
-
-.admin-page-list ul li:nth-of-type(odd) {
-  background: #f7f7f7;
+  background: #e3e3e3;
 }
 
 

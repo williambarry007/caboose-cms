@@ -38,7 +38,7 @@ tabs = {
 <%= raw pages_list(@home_page) %>
 </div>
 
-<p><a href='/admin/pages/new' class="caboose-btn" style="margin-left:20px;">New Page</a></p>
+<!-- <p><a href='/admin/pages/new' class="caboose-btn" style="margin-left:20px;">New Page</a></p> -->
 
 </div>
 
@@ -50,3 +50,13 @@ tabs = {
   padding-left: 200px;
 }
 </style>
+
+<% content_for :caboose_js do %>
+  <script>
+    $(document).ready(function() {
+      var new_link = "<li class='new_page_li'><a href='/admin/pages/new' class='new_page_link'>Add Page</a></li>";
+      $(".admin-page-list").children("ul").find("ul").first().append(new_link);
+    //  $(".admin-page-list").children("ul").children(".new_page_li").hide(); // hide the link for Home page siblings
+    });
+  </script>
+<% end %>

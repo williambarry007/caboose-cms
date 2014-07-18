@@ -98,10 +98,7 @@ $(document).ready(function() {
 </script>
 <% if @block.block_type.field_type == 'richtext' %>
   <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>    
-  <%= tinymce :caboose, 
-    :width => '800px', 
-    :height => '300px' 
-  %>
+  <%= tinymce :caboose, :width => '800px', :height => '300px' %>
 <% end %>
 
 <% end %>

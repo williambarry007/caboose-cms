@@ -14,7 +14,7 @@ class Caboose::BlockTypeSource < ActiveRecord::Base
   # Just get the names and descriptions of all block types from the source
   def refresh_summaries
     resp = nil
-    begin                             
+    begin
       resp = HTTParty.get("#{self.url}/caboose/block-types?token=#{self.token}")
     rescue HTTParty::Error => e
       Caboose.log(e.message)

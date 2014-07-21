@@ -4,4 +4,5 @@ text = block.child('text').value
 size = 1 if size.nil?
 text = (empty_text ? empty_text : "") if text.nil? || text == ""
 
-%><h<%= size %>><%= raw text %></h<%= size %>>
+if editing %><div id='block_<%= block.id %>'><h<%= size %>><%= raw text %></h<%= size %>></div><% 
+else       %><h<%= size %> id='block_<%= block.id %>'><%= raw text %></h<%= size %>><% end %>

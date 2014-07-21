@@ -21,6 +21,21 @@ Caboose::Engine.routes.draw do
   get     "my-account"                      => "users#my_account"
   put     "my-account"                      => "users#update_my_account"
   
+  post    "admin/sites/:id/members"            => "sites#admin_add_member"
+  delete  "admin/sites/:id/members/:user_id"   => "sites#admin_remove_member"
+  
+  post    "admin/sites/:id/domains"                        => "sites#admin_add_domain"
+  put     "admin/sites/:id/domains/:domain_id/set-primary" => "sites#admin_set_primary_domain"
+  delete  "admin/sites/:id/domains/:domain_id"             => "sites#admin_remove_domain"
+  
+  get     "admin/sites/options"              => "sites#options"
+  get     "admin/sites"                      => "sites#admin_index"    
+  get     "admin/sites/new"                  => "sites#admin_new"  
+  get     "admin/sites/:id"                  => "sites#admin_edit"  
+  put     "admin/sites/:id"                  => "sites#admin_update"  
+  post    "admin/sites"                      => "sites#admin_add"  
+  delete  "admin/sites/:id"                  => "sites#admin_delete"    
+  
   get     "admin/users"                     => "users#index"  
   get     "admin/users/options"             => "users#options"
   get     "admin/users/new"                 => "users#new"
@@ -46,6 +61,16 @@ Caboose::Engine.routes.draw do
   
   post    "admin/roles/:id/permissions/:permission_id"  => "roles#add_permission"  
   delete  "admin/roles/:id/permissions/:permission_id"  => "roles#remove_permission"
+  
+  get     "admin/images"                => "images#admin_index"
+  get     "admin/images/sign-s3"        => "images#admin_sign_s3"    
+  get     "admin/images/new"            => "images#admin_new"
+  get     "admin/images/:id"            => "images#admin_edit"
+  put     "admin/images/:id"            => "images#admin_update"
+  post    "admin/images/:id/image"      => "images#admin_update_image"  
+  post    "admin/images"                => "images#admin_add"
+  delete  "admin/images/:id"            => "images#admin_delete"
+  
   
   get     "admin/permissions"             => "permissions#index"
   get     "admin/permissions/options"     => "permissions#options"

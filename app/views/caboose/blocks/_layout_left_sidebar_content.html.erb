@@ -1,8 +1,7 @@
 <div class="content_wrapper" id='block_<%= block.id %>'>          
-  <div class="content_body">                      
-    <% if block.children.count > 0 %>
-      <% block.children.each do |b| %><%= raw block.render(b, local_assigns) %><% end %>
-    <% end %>                          
-    <% if editing %><%= raw block.child_block_link %><% end %>    
+  <div class="content_body">    
+    <% if editing %><div class='sortable'><% end %>        
+    <% block.children.each do |b| %><%= raw block.render(b, local_assigns) %><% end %>
+    <% if editing %></div><% end %>        
   </div>
 </div>

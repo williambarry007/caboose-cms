@@ -25,6 +25,11 @@ class Caboose::BlockType < ActiveRecord::Base
     :share,      # Whether or not to share the block type in the existing block store.
     :downloaded  # Whether the full block type has been download or just the name and description.
     
+  def full_name
+    return name if parent_id.nil?
+    return "#{parent.full_name}_#{name}"
+  end
+  
   def render_options(empty_text = nil)    
     return eval(self.options_function)    
   end

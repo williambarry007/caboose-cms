@@ -181,7 +181,15 @@ class Caboose::Block < ActiveRecord::Base
         
   def child_block_link        
     return "<div class='new_block' id='new_block_#{self.id}'>New Block</div>"    
-  end    
+  end
+  
+  def new_block_before_link        
+    return "<div class='new_block_before' id='new_block_before_#{self.id}'>New Block</div>"    
+  end
+  
+  def new_block_after_link        
+    return "<div class='new_block_after' id='new_block_after_#{self.id}'>New Block</div>"    
+  end
   
   def js_hash
     kids = self.children.collect { |b| b.js_hash }

@@ -1,0 +1,24 @@
+<h1>Images</h1>
+
+<% if @domain && @media_category %>
+  <p>
+    <a href='/admin/images/new'>Upload Images</a> |
+    <a href='/admin/images/new-category?parent_id=<%= @media_category.id %>'>New Category</a>
+  </p>  
+  <% if @media_category.children.count > 0 || @media_category.media_images.count > 0 %>
+    <ul class='media'>  
+      <% @media_category.children.each do |cat| %>
+        <li class='category' id='cat<%= cat.id %>'><a href='/admin/images?media_category_id=<%= cat.id %>'><%= cat.name %></a></li>
+      <% end %>
+      <% @media_category.media_images.each do |mi| %>
+        <li class='image' id='image<%= mi.id %>'><a href='/admin/images/<%= mi.id %>'><img src='<%= mi.image.url(:thumb) %>' /><span><%= img.name %></span></a></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>This category is empty.</p>
+  <% end %>
+<% elsif @domain && @media_category.nil? %>
+  <p>Invalid media category.</p>
+<% else %>
+  <p>It doesn't look like this site is configured for the current domain.  Please <a href='/admin/sites'>configure your sites</a>.</p>
+<% end %>  

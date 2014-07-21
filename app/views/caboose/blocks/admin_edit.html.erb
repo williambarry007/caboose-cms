@@ -18,7 +18,7 @@ end
 <!--<h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.name ? @block.name : @block.block_type.description %></h2>-->
 <h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
 <p id='block_type_container'><div id='block_<%= @block.id %>_block_type_id'></div></p>
-                                         
+
 <% if @block.block_type.use_render_function_for_layout %>
   <!-- Start -->
   <%= raw @block.render(@block, {
@@ -88,6 +88,7 @@ $(window).load(function() {
     
 var controller = false;
 $(document).ready(function() {
+  modal = new CabooseModal(800);
   controller = new BlockController({
     block: <%= raw Caboose.json(@block.js_hash) %>,    
     authenticity_token: '<%= form_authenticity_token %>',
@@ -98,10 +99,7 @@ $(document).ready(function() {
 </script>
 <% if @block.block_type.field_type == 'richtext' %>
   <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>    
-  <%= tinymce :caboose, 
-    :width => '800px', 
-    :height => '300px' 
-  %>
+  <%= tinymce :caboose, :width => '800px', :height => '300px' %>
 <% end %>
 
 <% end %>

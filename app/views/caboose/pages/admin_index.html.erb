@@ -1,11 +1,4 @@
 
-
-
-
-
-
-
-
 <h1 id='page_title'>Pages</h1>
 <div class="left-sidebar">
   <div class="profile">
@@ -35,7 +28,12 @@ tabs = {
 <div id="content2">
 
 <div class="admin-page-list">
-<%= raw pages_list(@home_page) %>
+<% if @domain %>
+  <p><a href='/admin/pages/new'>New Page</a></p>
+  <%= raw pages_list(@home_page) %>
+<% else %>
+  <p>It doesn't look like this site is configured for the current domain.  Please <a href='/admin/sites'>configure your sites</a>.</p>
+<% end %> 
 </div>
 
 <!-- <p><a href='/admin/pages/new' class="caboose-btn" style="margin-left:20px;">New Page</a></p> -->
@@ -60,3 +58,4 @@ tabs = {
     });
   </script>
 <% end %>
+

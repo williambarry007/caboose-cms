@@ -62,6 +62,16 @@ Caboose::Engine.routes.draw do
   post    "admin/roles/:id/permissions/:permission_id"  => "roles#add_permission"  
   delete  "admin/roles/:id/permissions/:permission_id"  => "roles#remove_permission"
   
+  get     "admin/images"                => "images#admin_index"
+  get     "admin/images/sign-s3"        => "images#admin_sign_s3"    
+  get     "admin/images/new"            => "images#admin_new"
+  get     "admin/images/:id"            => "images#admin_edit"
+  put     "admin/images/:id"            => "images#admin_update"
+  post    "admin/images/:id/image"      => "images#admin_update_image"  
+  post    "admin/images"                => "images#admin_add"
+  delete  "admin/images/:id"            => "images#admin_delete"
+  
+  
   get     "admin/permissions"             => "permissions#index"
   get     "admin/permissions/options"     => "permissions#options"
   get     "admin/permissions/new"         => "permissions#new"

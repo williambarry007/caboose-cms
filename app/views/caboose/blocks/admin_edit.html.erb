@@ -18,7 +18,7 @@ end
 <!--<h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.name ? @block.name : @block.block_type.description %></h2>-->
 <h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
 <p id='block_type_container'><div id='block_<%= @block.id %>_block_type_id'></div></p>
-                                         
+
 <% if @block.block_type.use_render_function_for_layout %>
   <!-- Start -->
   <%= raw @block.render(@block, {

@@ -104,8 +104,9 @@ module Caboose
     
     # GET /admin/pages
     def admin_index
-      return if !user_is_allowed('pages', 'view')
-      @home_page = Page.find(1)
+      return if !user_is_allowed('pages', 'view')            
+      @domain = Domain.where(:domain => request.host_with_port).first
+      @home_page = @domain ? Page.index_page(@domain.site_id) : nil    
       render :layout => 'caboose/admin'      
     end
 

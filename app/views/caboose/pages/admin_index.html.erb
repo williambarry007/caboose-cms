@@ -1,5 +1,8 @@
 <h1>Pages</h1>
 
-<p><a href='/admin/pages/new'>New Page</a></p>
-
-<%= raw pages_list(@home_page) %>
+<% if @domain %>
+  <p><a href='/admin/pages/new'>New Page</a></p>
+  <%= raw pages_list(@home_page) %>
+<% else %>
+  <p>It doesn't look like this site is configured for the current domain.  Please <a href='/admin/sites'>configure your sites</a>.</p>
+<% end %>  

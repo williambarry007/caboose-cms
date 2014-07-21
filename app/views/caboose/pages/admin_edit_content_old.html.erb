@@ -1,0 +1,45 @@
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#tiny_header {
+  display: block;  
+  color: #fff;
+  background-image: url(/assets/caboose/caboose_logo_small.png);
+  background-color: #000;  
+  background-repeat: no-repeat;
+  background-position: right 0;
+  padding: 0 50px 0 10px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 100;  
+}
+#tiny_header a {
+  display: inline-block;
+  color: #fff;
+  padding: 16px 10px;  
+}
+.block_over { background: #fff799; }
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/admin_page_edit_content' %>
+<script type='text/javascript'>
+
+var controller = false;
+$(document).ready(function() {
+  controller = new PageContentController(<%= @page.id %>);
+
+  $('body').append($('<div/>')        
+
+    .attr('id', 'tiny_header')
+    .append($('<a/>').attr('href', '/admin/pages').html("< Back"))
+    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/layout').html("Page Layout"))
+    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/edit').html("Page Settings"))        
+
+  );    
+});
+
+</script>
+<% end %>

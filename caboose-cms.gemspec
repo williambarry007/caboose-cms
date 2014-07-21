@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
   s.add_dependency "underscore-rails"
   s.add_dependency "jquery-rails"
   s.add_dependency "jquery-ui-rails"
-  s.add_dependency "activesupport", "= 3.2.19"
+  #s.add_dependency "activesupport", "= 3.2.19"
   s.add_dependency "tinymce-rails"
   s.add_dependency "trollop"
   s.add_dependency "colorbox-rails"

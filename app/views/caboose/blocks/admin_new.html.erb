@@ -35,7 +35,11 @@ b = @block
 
 var modal = false;
 $(window).load(function() {
-  modal = new CabooseModal(800);
+  modal = new CabooseModal(800);  
+});
+
+$(document).ready(function() {
+  modal = new CabooseModal(800);  
 });
 
 function add_child_block()

@@ -1,0 +1,52 @@
+<%
+crumbs = []
+b = @block
+while b
+  href    = b.id == @block.id ? "#" : "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+  onclick = b.id == @block.id ? " onclick=\"$('#block_#{@block.id}_block_type_id_container').slideToggle(100, function() { modal.autosize(); });\"" : ''
+  text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
+  crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"     
+  b = b.parent
+end
+%>
+<h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
+<p id='block_type_container'><div id='block_<%= @block.id %>_block_type_id'></div></p>                                                
+<p><div id='block_<%= b.child('style').id %>_value'></div></p>
+<p><div id='block_<%= b.child('size').id  %>_value'></div></p>
+<p><div id='block_<%= b.child('text').id  %>_value'></div></p>
+
+<div id='message'></div>
+<p>  
+<input type='button' value='Close' onclick="modal.close();" />
+<input type='button' value='Delete Block' onclick="controller.delete_block();" />
+<input type='button' value='Move Up'   onclick="controller.move_up();" />
+<input type='button' value='Move Down' onclick="controller.move_down();" />
+</p>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+.block { border: #ccc 1px dotted; }
+#block_<%= @block.id %>_block_type_id_container { }
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/admin_block_edit" %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+    
+var controller = false;
+$(document).ready(function() {
+  controller = new BlockController({
+    block: <%= raw Caboose.json(@block.js_hash) %>,    
+    authenticity_token: '<%= form_authenticity_token %>',
+    modal: modal    
+  });    
+});    
+
+</script>
+<% end %>

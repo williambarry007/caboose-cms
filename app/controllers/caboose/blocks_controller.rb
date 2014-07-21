@@ -1,3 +1,4 @@
+require 'nokogiri'
 
 module Caboose
   class BlocksController < ApplicationController
@@ -18,7 +19,9 @@ module Caboose
     def admin_new
       return unless user_is_allowed('pages', 'add')
       @page = Page.find(params[:page_id])
-      @block = params[:id] ? Block.find(params[:id]) : Block.new(:page_id => params[:page_id])             
+      @block = params[:id] ? Block.find(params[:id]) : Block.new(:page_id => params[:page_id])
+      @after_id = params[:after_id] ? params[:after_id] : nil
+      @before_id = params[:before_id] ? params[:before_id] : nil
       render :layout => 'caboose/modal'
     end
     
@@ -138,9 +141,12 @@ module Caboose
       @document_domain = request.host
       @document_domain.gsub('http://', '')
       @document_domain.gsub('https://', '')
-                                  
-      #render "caboose/blocks/admin_edit_#{@block.block_type}", :layout => 'caboose/modal'
-      render :layout => 'caboose/modal'
+
+      begin        
+        render "caboose/blocks/admin_edit_#{@block.block_type.full_name}", :layout => 'caboose/modal'
+      rescue
+        render :layout => 'caboose/modal'
+      end
     end
     
     # POST /admin/pages/:page_id/blocks
@@ -160,19 +166,39 @@ module Caboose
                     
       if !params[:index].nil?      
         b.sort_order = params[:index].to_i
+        
+        i = 1
+        b.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
+          b3.sort_order = b.sort_order + i
+          b3.save
+          i = i + 1                  
+        end
+        
+      elsif params[:before_id]
+        b2 = Block.find(params[:before_id].to_i)
+        b.sort_order = b2.sort_order
+        
+        i = 1
+        b2.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
+          b3.sort_order = b.sort_order + i
+          b3.save
+          i = i + 1                  
+        end
+      
       elsif params[:after_id]
         b2 = Block.find(params[:after_id].to_i)
         b.sort_order = b2.sort_order + 1
+        
+        i = 1
+        b2.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
+          b3.sort_order = b.sort_order + i
+          b3.save
+          i = i + 1                  
+        end
+        
       elsif params[:id]
-        b.sort_order = Block.where(:parent_id => params[:id]).count       
-      end
-      
-      i = b.sort_order + 1
-      Block.where("page_id = ? and sort_order >= ?", b.page_id, b.sort_order).reorder(:sort_order).each do |b2|
-        b2.sort_order = i
-        b2.save        
-        i = i + 1
-      end      
+        b.sort_order = Block.where(:parent_id => params[:id]).count        
+      end                  
       
       # Save the block
       b.save
@@ -196,12 +222,17 @@ module Caboose
       save = true
       params.each do |k,v|
         case k
-          when 'page_id'       then b.page_id       = v
+          #when 'page_id'       then b.page_id       = v
           when 'parent_id'     then b.parent_id     = v
           when 'block_type_id' then b.block_type_id = v
           when 'sort_order'    then b.sort_order    = v
           when 'name'          then b.name          = v
-          when 'value'         then b.value         = v                                        
+          when 'value'         then
+            if b.block_type.field_type == 'richtext'
+              b = RichTextBlockParser.parse(b, v, request.host_with_port)
+            else              
+              b.value = v
+            end
         end
       end
     

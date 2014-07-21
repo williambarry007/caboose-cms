@@ -1,4 +1,4 @@
-
+ 
 var PageContentController = function(page_id) { this.init(page_id); };
 
 PageContentController.prototype = {
@@ -10,9 +10,8 @@ PageContentController.prototype = {
   {
     this.page_id = page_id;
     var that = this;
-    that.set_clickable();   
-    //this.render_blocks(function() {
-    //  that.sortable_blocks();
+    that.set_clickable();       
+    that.sortable_blocks();
     //  that.draggable_blocks();
     //});
   },
@@ -20,7 +19,7 @@ PageContentController.prototype = {
   sortable_blocks: function()
   { 
     var that = this;
-    $('#blocks').sortable({
+    $('.sortable').sortable({
       //hoverClass: "ui-state-active",
       placeholder: 'sortable-placeholder',
       forcePlaceholderSize: true,
@@ -40,11 +39,19 @@ PageContentController.prototype = {
           that.new_block_type_id = false;
         }
         else
-        {        
+        {
+          var ids = [];
+          $.each($(e.target).children(), function(i, el) {
+            var id = $(el).attr('id');
+            if (id.substr(0, 6) == 'block_') ids.push(id.substr(6));
+          });          
+            
           $.ajax({
             url: '/admin/pages/' + that.page_id + '/block-order',
             type: 'put',
-            data: $('#blocks').sortable('serialize', { key: "block_ids[]" }),
+            data: {
+              block_ids: ids,
+            },
             success: function(resp) {}
           });
         }
@@ -78,12 +85,12 @@ PageContentController.prototype = {
     if (!confirm)
     {
       var p = $('<p/>')
-        .addClass('note warning')
+        .addClass('caboose_note')
         .append("Are you sure you want to delete the block? ")
-        .append($('<input/>').attr('type', 'button').val('Yes').click(function() { that.delete_block(block_id, true); })).append(" ")
-        .append($('<input/>').attr('type', 'button').val('No').click(function() { that.render_block(block_id); }));
-      $('#block_container_' + block_id).attr('onclick','').unbind('click');
-      $('#block_container_' + block_id).empty().append(p);
+        .append($('<input/>').attr('type', 'button').val('Yes').click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(block_id, true); })).append(" ")
+        .append($('<input/>').attr('type', 'button').val('No').click(function(e) {  e.preventDefault(); e.stopPropagation(); that.render_blocks(); }));
+      $('#block_' + block_id).attr('onclick','').unbind('click');
+      $('#block_' + block_id).empty().append(p);
       return;
     }
     $.ajax({
@@ -105,7 +112,7 @@ PageContentController.prototype = {
       url: '/admin/pages/' + this.page_id + '/blocks/render-second-level',
       success: function(blocks) {
         $(blocks).each(function(i, b) {
-          $('#block_' + b.id).replaceWith(b.html);
+          $('#block_' + b.id).replaceWith(b.html);                              
         });
         that.set_clickable();
       }
@@ -119,36 +126,51 @@ PageContentController.prototype = {
       url: '/admin/pages/' + this.page_id + '/blocks/tree',
       success: function(blocks) {        
         $(blocks).each(function(i,b) {
-          that.set_clickable_helper(b);                      
-        });
+          that.set_clickable_helper(b, false, false);
+        });                
       }
     });    
   },
   
-  set_clickable_helper: function(b)
+  set_clickable_helper: function(b, parent_id, parent_allows_child_blocks)
   {    
-    var that = this;        
+    var that = this;
+        
+    $('#block_' + b.id)      
+      .prepend($('<a/>').attr('id', 'block_' + b.id + '_sort_handle'  ).addClass('sort_handle'  ).append($('<span/>').addClass('ui-icon ui-icon-arrow-2-n-s')).click(function(e) { e.preventDefault(); e.stopPropagation(); }))
+      .prepend($('<a/>').attr('id', 'block_' + b.id + '_delete_handle').addClass('delete_handle').append($('<span/>').addClass('ui-icon ui-icon-close'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(b.id); }));
+      
+    if (parent_allows_child_blocks && (!b.name || b.name.length == 0))
+    {            
+      $('#block_' + b.id).prepend($('<div/>')          
+        .addClass('new_block_link')
+        .append($('<div/>').addClass('line'))
+        .append($('<a/>')
+          .attr('href', '#')
+          .html("New Block")
+          .click(function(e) { 
+            e.preventDefault(); e.stopPropagation();
+            caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + parent_id + '/new?before_id=' + b.id);                        
+          })
+        )
+        .mouseover(function(e) { $(this).addClass('new_block_link_over');    e.stopPropagation(); })
+        .mouseout(function(e)  { $(this).removeClass('new_block_link_over'); e.stopPropagation(); })
+      );      
+    }
+            
     $('#block_' + b.id).attr('onclick','').unbind('click');    
     $('#block_' + b.id).click(function(e) {
       e.stopPropagation();
       that.edit_block(b.id); 
     });
-    if (b.allow_child_blocks == true)
-    {
-      $('#new_block_' + b.id).replaceWith($('<input/>')
-        .attr('type', 'button')
-        .val('New Block')
-        .click(function(e) { e.stopPropagation(); that.new_block(b.id);          
-        })
-      );
-    } 
+     
     var show_mouseover = true;
     if (b.children && b.children.length > 0)
     {
       $.each(b.children, function(i, b2) {
         if (b2.block_type_id = 34)
           show_mouseover = false;
-        that.set_clickable_helper(b2);
+        that.set_clickable_helper(b2, b.id, b.allow_child_blocks);
       });
     }    
     if (show_mouseover)

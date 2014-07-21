@@ -171,12 +171,10 @@ module Caboose
     # PUT /admin/pages/:id/block-order
     def admin_update_block_order
       return unless user_is_allowed('pages', 'edit')
-      block_ids = params[:block_ids]
+      block_ids = params[:block_ids]      
       i = 0
       block_ids.each do |block_id|
-        b = Block.find(block_id)
-        b.sort_order = i
-        b.save
+        Block.find(block_id).update_attribute(:sort_order, i)        
         i = i + 1
       end      
       render :json => true

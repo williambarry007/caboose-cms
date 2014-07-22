@@ -73,7 +73,7 @@ class Caboose::Page < ActiveRecord::Base
     uri.chop! if uri.end_with?('/')
     uri[0] = '' if uri.starts_with?('/')
       
-    return self.index_page if uri.length == 0
+    return self.index_page(host_with_port) if uri.length == 0
 
     page = false
     parts = uri.split('/')

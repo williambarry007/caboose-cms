@@ -49,7 +49,7 @@ $(document).ready(function() {
           //form.attr('action', pp.url);
         }
       });
-      data.submit();
+      //data.submit();
     },                
     progressall: function (e, data) { $('#bar').css('width', parseInt(data.loaded / data.total * 100, 10) + '%') },
     start: function (e) { $('#bar').css('background', 'green').css('display', 'block').css('width', '0%').text("Loading..."); },

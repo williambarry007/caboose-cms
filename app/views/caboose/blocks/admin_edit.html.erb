@@ -43,11 +43,10 @@ end
       <% end %>
     <% end %>
   <% else %>
-    <p>This block doesn't have any content yet. 
-      <% if @block.block_type.allow_child_blocks %>
-        <a href='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>/new'>Add a child block!</a>
-      <% end %>
-    </p>
+    <p>This block doesn't have any content yet.</p>
+  <% end %>
+  <% if @block.block_type.allow_child_blocks %>
+    <a href='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>/new'>Add a child block!</a>
   <% end %>
 <% end %>
 <div id='message'></div>

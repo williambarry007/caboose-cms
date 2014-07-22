@@ -272,43 +272,35 @@ module Caboose
     #  #}                              
     #  
     #end
-         
+       
+    # GET /admin/images/sign-s3
     def admin_sign_s3
-      @document = Document.create(params[:doc])
       
-      policy = {"expiration" => 10.seconds.from_now.utc.xmlschema,
-        "conditions" =>  [
-          {"bucket" => 'cabooseit'},           
-          {"acl" => "public-read"},
-          {"success_action_status" => "200"}          
+      config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
+      access_key = config['access_key_id']
+      secret_key = config['secret_access_key']
+      bucket     = config['bucket']
+      
+      policy = {
+        "expiration" => 10.seconds.from_now.utc.xmlschema,
+        "conditions" => [
+          { "bucket" => 'cabooseit' },           
+          { "acl" => "public-read" },
+          { "success_action_status" => "200" }          
         ]
       }
-      policy = Base64.encode64(policy.to_json).gsub(/\n/,'')
+      policy = Base64.encode64(policy.to_json).gsub(/\n/,'')      
+      signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), secret_key, policy)).gsub("\n","")
       
       render :json => {
         :policy => policy, 
-        :signature => s3_upload_signature, 
-        :key => @document.s3_key, 
-        :success_action_redirect => document_upload_success_document_url(@document)
+        :signature => signature, 
+        :key => 'media-images/test.jpg',
+        :success_action_status => '200'
+        #:success_action_redirect => document_upload_success_document_url(@document)
       }
-    end
-     
-    def s3_upload_policy_document      
-      ret = {"expiration" => 10.seconds.from_now.utc.xmlschema,
-        "conditions" =>  [
-          {"bucket" => 'cabooseit'},           
-          {"acl" => "public-read"},
-          {"success_action_status" => "200"}          
-        ]
-      }
-      return Base64.encode64(ret.to_json).gsub(/\n/,'')
-    end
-    
-    # sign our request by Base64 encoding the policy document.
-    def s3_upload_signature
-      signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), 
-        YOUR_SECRET_KEY, s3_upload_policy_document)).gsub("\n","")
-    end
+      
+    end        
 		
   end
 end

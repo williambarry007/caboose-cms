@@ -51,6 +51,8 @@ var controller = false;
 $(document).ready(function() {
   controller = new PageContentController(<%= @page.id %>);
 
+  $(".caboose-admin-page-list").children("ul").children("li").children("ul").append("<li class='new_page_li'><a href='/admin/pages/new' class='new_page_link'>Add Page</a></li>"); 
+
   var page = $("body").children(".container"); 
 
   var caboose_menu = $("#caboose_page_sidebar_container");
@@ -672,6 +674,11 @@ body > .container.padleftsmall {
 
 @media screen and (max-height: 540px) {
   #caboose_page_sidebar_container #caboose-admin-left-sidebar {
+    height: 600px !important;
+    overflow: scroll !important;
+    position: absolute !important;
+  }
+  #caboose_page_sidebar_container #caboose-content-wrap {
     height: 600px !important;
     overflow: scroll !important;
     position: absolute !important;

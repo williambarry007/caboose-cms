@@ -42,8 +42,8 @@ PageContentController.prototype = {
         {
           var ids = [];
           $.each($(e.target).children(), function(i, el) {
-            var id = $(el).attr('id');
-            if (id.substr(0, 6) == 'block_') ids.push(id.substr(6));
+            var id = $(el).attr('id');            
+            if (id && id.substr(0, 6) == 'block_') ids.push(id.substr(6));
           });          
             
           $.ajax({

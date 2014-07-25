@@ -1,9 +1,18 @@
 <h1>Images</h1>
 
-<% if @domain && @media_category %>
-  <p>
-    <a href='/admin/images/new'>Upload Images</a> |
-    <a href='/admin/images/new-category?parent_id=<%= @media_category.id %>'>New Category</a>
+<% if @domain && @media_category %>  
+  <form action='/admin/images/sign-s3' method='post' id='new_image_form' enctype='multipart/form-data'>
+    <input type='hidden' name='key'                     value='' />
+    <input type='hidden' name='AWSAccessKeyId'          value='' />
+    <input type='hidden' name='acl'                     value='' />
+    <input type='hidden' name='success_action_status'   value='' />
+    <!--<input type='hidden' name='success_action_redirect' value='' />-->
+    <input type='hidden' name='policy'                  value='' />
+    <input type='hidden' name='signature'               value='' />
+    <input type="file" name="file" id="file" multiple='true' />    
+    <div id='progress'><div id='bar'></div></div>  
+  </form>
+  <p><a href='/admin/images/new-category?parent_id=<%= @media_category.id %>'>New Category</a></p>
   </p>  
   <% if @media_category.children.count > 0 || @media_category.media_images.count > 0 %>
     <ul class='media'>  
@@ -11,7 +20,7 @@
         <li class='category' id='cat<%= cat.id %>'><a href='/admin/images?media_category_id=<%= cat.id %>'><%= cat.name %></a></li>
       <% end %>
       <% @media_category.media_images.each do |mi| %>
-        <li class='image' id='image<%= mi.id %>'><a href='/admin/images/<%= mi.id %>'><img src='<%= mi.image.url(:thumb) %>' /><span><%= img.name %></span></a></li>
+        <li class='image' id='image<%= mi.id %>'><a href='/admin/images/<%= mi.id %>'><img src='<%= mi.image.url(:thumb) %>' /><span><%= mi.name %></span></a></li>
       <% end %>
     </ul>
   <% else %>
@@ -22,3 +31,78 @@
 <% else %>
   <p>It doesn't look like this site is configured for the current domain.  Please <a href='/admin/sites'>configure your sites</a>.</p>
 <% end %>  
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+ul.media li.image { list-style: none; margin: 0; padding: 0; float: left; }
+ul.media li.image { list-style: none; margin: 0; padding: 0; float: left; }
+ul.media li.image img {}
+.progress { max-width: 600px; margin: 0.2em 0 0.2em 0; }
+.progress .bar { height:  1.2em; padding: 0.2em; color: white; display: none; }
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'jquery.ui.widget' %>
+<%= javascript_include_tag 'caboose/jquery.iframe-transport.js' %>
+<%= javascript_include_tag 'caboose/jquery.fileupload.js' %>
+<script type='text/javascript'>
+
+var image_ids = [];
+$(document).ready(function() {  
+  $('#file').fileupload({
+    //forceIframeTransport: true,    
+    autoUpload: true,        
+    //replaceFileInput: true,
+    //singleFileUploads: false,        
+    add: function(e, data) {            
+      $.ajax({
+        url: '/admin/images/s3',
+        type: 'get',
+        data: {
+          name: data.files[0].name,
+          media_category_id: <%= @media_category.id %>
+        },
+        async: false,
+        success: function(resp) {
+          image_ids.push(resp.media_image_id);
+          var form = $('#new_image_form');          
+          for (var i in resp.fields)            
+            form.find("input[name=" + i + "]").val(resp.fields[i]);
+          form.attr('action', resp.url);
+        }
+      });            
+      data.submit();
+    },                
+    progressall: function (e, data) {
+      $('#bar').css('width', parseInt(data.loaded / data.total * 100, 10) + '%') 
+    },
+    start: function (e) {
+      $('#file').hide();
+      $('#bar').css('background', 'green').css('display', 'block').css('width', '0%').html("&nbsp;"); 
+    },
+    done: function(e, data) {
+      console.log("Upload done.");
+      console.log(data);
+      setTimeout(function() {
+        $.each(image_ids, function(i, id) {
+          $.ajax({
+            url: '/admin/images/' + id + '/process',
+            type: 'get',            
+            async: false,
+            success: function(resp) {}
+          });
+        });
+        window.location.reload(true); 
+      }, 500);      
+    },
+    fail: function(e, data) {
+      console.log("Upload failed.");
+      console.log(data);      
+      $('#bar').css("background", "red").text("Failed"); 
+    }
+  });
+});
+
+</script>
+<% end %>

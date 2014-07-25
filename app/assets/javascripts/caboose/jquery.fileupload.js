@@ -163,7 +163,7 @@
             // value properties, a function returning such an array, a FormData
             // object (for XHR file uploads), or a simple object.
             // The form of the first fileInput is given as parameter to the function:
-            formData: function (form) {
+            formData: function (form) {                
                 return form.serializeArray();
             },
 

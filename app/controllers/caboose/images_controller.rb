@@ -276,31 +276,58 @@ module Caboose
     # GET /admin/images/sign-s3
     def admin_sign_s3
       
+      name = params[:name]      
+      mi = MediaImage.create(
+        :media_category_id => params[:media_category_id], 
+        :name => params[:name]
+      )
+      key = "media-images/#{mi.id}#{File.extname(name)}".downcase
+      
       config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
       access_key = config['access_key_id']
       secret_key = config['secret_access_key']
       bucket     = config['bucket']
       
-      policy = {
+      policy = {        
         "expiration" => 10.seconds.from_now.utc.xmlschema,
         "conditions" => [
-          { "bucket" => 'cabooseit' },           
+          { "bucket" => 'cabooseit' },
+          ["starts-with", "$key", key],
           { "acl" => "public-read" },
-          { "success_action_status" => "200" }          
+          { "success_action_status" => "200" }
+          #{ "success_action_redirect" => "/admin/images/s3-result" }          
         ]
       }
       policy = Base64.encode64(policy.to_json).gsub(/\n/,'')      
       signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), secret_key, policy)).gsub("\n","")
       
       render :json => {
-        :policy => policy, 
-        :signature => signature, 
-        :key => 'media-images/test.jpg',
-        :success_action_status => '200'
-        #:success_action_redirect => document_upload_success_document_url(@document)
+        :media_image_id => mi.id,
+        :url => "https://#{bucket}.s3.amazonaws.com",
+        :fields => {
+          :key                     => key,
+          'AWSAccessKeyId'         => access_key,
+          :acl                     => 'public-read',
+          :success_action_status   => '200',
+          #:success_action_redirect => '/admin/images/s3-result',
+          :policy                  => policy, 
+          :signature               => signature
+        }
       }
       
-    end        
+    end
+    
+    def admin_s3_result
+      render :layout => 'caboose/empty'      
+    end
+    
+    # GET /admin/images/:id/process
+    def admin_process
+      return if !user_is_allowed('images', 'edit')
+      mi = MediaImage.find(params[:id])
+      mi.delay.process
+      render :json => true      
+    end
 		
   end
 end

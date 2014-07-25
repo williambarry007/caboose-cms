@@ -1,3 +1,5 @@
+require 'uri'
+
 class Caboose::MediaImage < ActiveRecord::Base
 
   self.table_name = "media_images"
@@ -13,4 +15,10 @@ class Caboose::MediaImage < ActiveRecord::Base
   do_not_validate_attachment_file_type :image  
   attr_accessible :id, :media_category_id, :name, :description
 
+  def process
+    puts "http://#{Caboose::cdn_domain}/media-images/#{self.id}#{File.extname(self.name.downcase)}"
+    self.image = URI.parse("http://#{Caboose::cdn_domain}/media-images/#{self.id}#{File.extname(self.name.downcase)}")
+    self.save    
+  end
+  
 end

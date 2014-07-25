@@ -19,8 +19,7 @@ module Caboose
     # GET /admin/images/new
     def admin_new
       return unless user_is_allowed('images', 'add')
-      @parent_id = params[:parent_id] ? params[:parent_id] : 1
-      @parent = Page.find(@parent_id)
+      @media_category_id = params[:media_category_id]             
       render :layout => 'caboose/admin'
     end
     
@@ -217,52 +216,117 @@ module Caboose
       render json: resp
     end       
     
-    # PUT /admin/images/sign-s3
+    ## PUT /admin/images/sign-s3
+    #def admin_sign_s3
+    #  return unless user_is_allowed('images', 'add')
+    #        
+    #  config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
+    #  access_key = config['access_key_id']
+    #  secret_key = config['secret_access_key']
+    #  bucket     = config['bucket']
+    #  s3 = AWS::S3.new(
+    #    :access_key_id => access_key,
+    #    :secret_access_key => secret_key
+    #  )
+    #  
+    #  name = params[:name]      
+    #  mi = MediaImage.create(
+    #    :media_category_id => params[:media_category_id], 
+    #    :name => params[:name]
+    #  )      
+    #  pp = s3.buckets[bucket].presigned_post(              
+    #    :key => "media-images/test.jpg", #{mi.id}.#{File.extname(name)}",
+    #    :expires => DateTime.now + 10.seconds,
+    #    :success_action_status => 201, 
+    #    :acl => :public_read
+    #  )
+    #  
+    #  render :json => {
+    #    'media_image' => mi,
+    #    'presigned_post' => {
+    #      'url' => pp.url.to_s,
+    #      'fields' => pp.fields
+    #    }
+    #  }
+    #  
+    #  #expires = (DateTime.now.utc + 10.seconds).to_i
+    #  #amz_headers = "x-amz-acl:public-read"      
+    #  #put_request = "PUT\n\n#{mime_type}\n#{expires}\n#{amz_headers}\n/#{bucket}/media-images/#{object_name}"
+    #  #signature = CGI.escape(Base64.encode64("#{OpenSSL::HMAC.digest('sha1', secret_key, put_request)}\n"))      
+    #  ##signature = base64.encodestring(hmac.new(secret_key, put_request, sha1).digest())
+    #  ##signature = urllib.quote_plus(signature.strip())
+    #  #render :json => {
+    #  #  'signed_request' => "#{url}?AWSAccessKeyId=#{access_key}&Expires=#{expires}&Signature=#{signature}",
+    #  #  'url' => url
+    #  #}
+    #
+    #  #pp = AWS::S3::PresignedPost.new(s3.buckets[bucket], 
+    #  #  :key => "media-images/#{object_name}",
+    #  #  :expires => DateTime.now + 10.seconds,
+    #  #  :content_type => mime_type
+    #  #)            
+    #  #url = "#{pp.url.to_s}#{pp.key}" #"https://#{pp.bucket.name}.s3.amazonaws.com/#{pp.key}"
+    #  #render :json => {
+    #  #  'signed_request' => "#{url}?AWSAccessKeyId=#{access_key}&Expires=#{pp.expires.to_time.to_i}&Signature=#{pp.fields[:signature]}",
+    #  #  'url' => url
+    #  #}                              
+    #  
+    #end
+       
+    # GET /admin/images/sign-s3
     def admin_sign_s3
-      return unless user_is_allowed('images', 'add')
-            
-      config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
-      Caboose.log(config)
+      
+      name = params[:name]      
+      mi = MediaImage.create(
+        :media_category_id => params[:media_category_id], 
+        :name => params[:name]
+      )
+      key = "media-images/#{mi.id}#{File.extname(name)}".downcase
+      
+      config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
       access_key = config['access_key_id']
       secret_key = config['secret_access_key']
       bucket     = config['bucket']
-      s3 = AWS::S3.new(
-        :access_key_id => access_key,
-        :secret_access_key => secret_key
-      )
       
-      object_name = params[:s3_object_name]
-      mime_type   = params[:s3_object_type]      
+      policy = {        
+        "expiration" => 10.seconds.from_now.utc.xmlschema,
+        "conditions" => [
+          { "bucket" => 'cabooseit' },
+          ["starts-with", "$key", key],
+          { "acl" => "public-read" },
+          { "success_action_status" => "200" }
+          #{ "success_action_redirect" => "/admin/images/s3-result" }          
+        ]
+      }
+      policy = Base64.encode64(policy.to_json).gsub(/\n/,'')      
+      signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), secret_key, policy)).gsub("\n","")
       
-      #expires = (DateTime.now.utc + 10.seconds).to_i
-      #amz_headers = "x-amz-acl:public-read"      
-      #put_request = "PUT\n\n#{mime_type}\n#{expires}\n#{amz_headers}\n/#{bucket}/media-images/#{object_name}"
-      #signature = CGI.escape(Base64.encode64("#{OpenSSL::HMAC.digest('sha1', secret_key, put_request)}\n"))      
-      ##signature = base64.encodestring(hmac.new(secret_key, put_request, sha1).digest())
-      ##signature = urllib.quote_plus(signature.strip())
-      #render :json => {
-      #  'signed_request' => "#{url}?AWSAccessKeyId=#{access_key}&Expires=#{expires}&Signature=#{signature}",
-      #  'url' => url
-      #}
-
-      pp = AWS::S3::PresignedPost.new(s3.buckets[bucket], 
-        :key => "media-images/#{object_name}",
-        :expires => DateTime.now + 10.seconds,
-        :content_type => mime_type
-      )            
-      url = "#{pp.url.to_s}#{pp.key}" #"https://#{pp.bucket.name}.s3.amazonaws.com/#{pp.key}"
       render :json => {
-        'signed_request' => "#{url}?AWSAccessKeyId=#{access_key}&Expires=#{pp.expires.to_time.to_i}&Signature=#{pp.fields[:signature]}",
-        'url' => url
+        :media_image_id => mi.id,
+        :url => "https://#{bucket}.s3.amazonaws.com",
+        :fields => {
+          :key                     => key,
+          'AWSAccessKeyId'         => access_key,
+          :acl                     => 'public-read',
+          :success_action_status   => '200',
+          #:success_action_redirect => '/admin/images/s3-result',
+          :policy                  => policy, 
+          :signature               => signature
+        }
       }
       
-      @s3_direct_post = S3_BUCKET.presigned_post(
-        :key => "uploads/#{SecureRandom.uuid}/${filename}", 
-        :success_action_status => 201, 
-        :acl => :public_read
-      )
-            
-      
+    end
+    
+    def admin_s3_result
+      render :layout => 'caboose/empty'      
+    end
+    
+    # GET /admin/images/:id/process
+    def admin_process
+      return if !user_is_allowed('images', 'edit')
+      mi = MediaImage.find(params[:id])
+      mi.delay.process
+      render :json => true      
     end
 		
   end

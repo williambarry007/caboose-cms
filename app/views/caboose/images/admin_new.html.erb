@@ -1,9 +1,19 @@
-
+<%
+# https://github.com/blueimp/jQuery-File-Upload/wiki/Upload-directly-to-S3
+%>
 <h1>Upload Images</h1>
 
-<input type="file" id="file" onchange="s3_upload();"/>
-<p id="status">Please select a file</p>
-<div id="preview"><img src="/static/default.png"  /></div>
+<form action='/admin/images/sign-s3' method='post' id='new_image_form' enctype='multipart/form-data'>
+  <input type='hidden' name='key'                     value='' />
+  <input type='hidden' name='AWSAccessKeyId'          value='' />
+  <input type='hidden' name='acl'                     value='' />
+  <input type='hidden' name='success_action_status'   value='' />
+  <!--<input type='hidden' name='success_action_redirect' value='' />-->
+  <input type='hidden' name='policy'                  value='' />
+  <input type='hidden' name='signature'               value='' />
+  <input type="file" name="file" id="file" multiple='true' />    
+  <div id='progress'><div id='bar'></div></div>  
+</form>
 
 <% content_for :caboose_css do %>
 <style type='text/css'>
@@ -13,49 +23,56 @@
 <% end %>
 
 <% content_for :caboose_js do %>
-<%= javascript_include_tag 'jquery.ui.all' %>
+<%= javascript_include_tag 'jquery.ui.widget' %>
+<%= javascript_include_tag 'caboose/jquery.iframe-transport.js' %>
 <%= javascript_include_tag 'caboose/jquery.fileupload.js' %>
 <script type='text/javascript'>
 
-$(function() {
-  $('.directUpload').find("input:file").each(function(i, elem) {
-  
-    var fileInput    = $(elem);
-    var form         = $(fileInput.parents('form:first'));
-    var submitButton = form.find('input[type="submit"]');
-    var progressBar  = $("<div class='bar'></div>");
-    var barContainer = $("<div class='progress'></div>").append(progressBar);
-    
-    fileInput.after(barContainer);
-    fileInput.fileupload({
-      fileInput:       fileInput,
-      url:             '', // @s3_direct_post.url
-      type:            'POST',
-      autoUpload:       true,
-      formData:         '', // @s3_direct_post.fields.to_json.html_safe
-      paramName:        'file', // S3 does not like nested name fields i.e. name="user[avatar_url]"
-      dataType:         'XML',  // S3 returns XML if success_action_status is set to 201
-      replaceFileInput: false,
-      fileuploadsubmit: function() {
-        alert('Testing');
-      },
-      progressall: function (e, data) {
-        var progress = parseInt(data.loaded / data.total * 100, 10);
-        progressBar.css('width', progress + '%')
-      },
-      start: function (e) {
-        submitButton.prop('disabled', true);
-        progressBar.css('background', 'green').css('display', 'block').css('width', '0%').text("Loading...");
-      },
-      done: function(e, data) {
-        submitButton.prop('disabled', false);
-        progressBar.text("Uploading done");        
-      },
-      fail: function(e, data) {
-        submitButton.prop('disabled', false);
-        progressBar.css("background", "red").text("Failed");
-      }
-    });
+$(document).ready(function() {  
+  $('#file').fileupload({
+    //forceIframeTransport: true,    
+    autoUpload: true,        
+    //replaceFileInput: true,
+    //singleFileUploads: false,        
+    add: function(e, data) {            
+      $.ajax({
+        url: '/admin/images/s3',
+        type: 'get',
+        data: {
+          name: data.files[0].name,
+          media_category_id: <%= @media_category_id %>
+        },
+        async: false,
+        success: function(resp) {          
+          var form = $('#new_image_form');          
+          for (var i in resp.fields)            
+            form.find("input[name=" + i + "]").val(resp.fields[i]);
+          form.attr('action', resp.url);
+        }
+      });            
+      data.submit();
+    },                
+    progressall: function (e, data) {
+      $('#bar').css('width', parseInt(data.loaded / data.total * 100, 10) + '%') 
+    },
+    start: function (e) {
+      $('#file').hide();
+      $('#bar').css('background', 'green').css('display', 'block').css('width', '0%').text("Uploading..."); 
+    },
+    done: function(e, data) {
+      console.log("Upload done.");
+      console.log(data);      
+      $('#bar').text("Uploading done");
+      setTimeout(function() { 
+        $('#file').val('').show(); 
+        $('#bar').css('background', 'transparent').empty();        
+      }, 2000);                  
+    },
+    fail: function(e, data) {
+      console.log("Upload failed.");
+      console.log(data);      
+      $('#bar').css("background", "red").text("Failed"); 
+    }
   });
 });
 

@@ -2,6 +2,6 @@
   <div class="content_body">    
     <% if editing %><div class='sortable'><% end %>        
     <% block.children.each do |b| %><%= raw block.render(b, local_assigns) %><% end %>
-    <% if editing %></div><% end %>        
+    <% if editing %></div><% end %>
   </div>
 </div>

@@ -1,7 +1,10 @@
 
 <% content_for :caboose_css do %>
 <!-- stylesheet_link_tag 'jquery.ui.all' -->
+
 <style type='text/css'>
+@import url("https://code.jquery.com/ui/jquery-ui-git.css"); 
+
 #tiny_header {
   display: block;  
   color: #fff;
@@ -43,7 +46,9 @@
 
 <% content_for :caboose_js do %>
 <!-- javascript_include_tag 'jquery.ui.all' -->
+<script src="https://code.jquery.com/ui/jquery-ui-git.js"></script>
 <%= javascript_include_tag 'caboose/admin_page_edit_content' %>
+
 <script type='text/javascript'>
 
 var controller = false;

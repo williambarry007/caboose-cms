@@ -53,12 +53,12 @@
       # '<div class="caboose-tab-icon" id="caboose-icon-css"></div>Custom CSS'      => "/admin/pages/#{@page.id}/css"
       "<div class='caboose-tab-icon' id='caboose-icon-pages'></div>Manage Pages" => "/admin/pages", 
       "<div class='caboose-tab-icon' id='caboose-icon-write'></div>Write Posts" => "/admin/posts", 
-      "<div class='caboose-tab-icon' id='caboose-icon-design'></div>Design" => "/admin/design", 
-      "<div class='caboose-tab-icon' id='caboose-icon-media'></div>Media" => "/admin/media", 
-      "<div class='caboose-tab-icon' id='caboose-icon-activity'></div>Activity" => "/admin/media", 
-      "<div class='caboose-tab-icon' id='caboose-icon-seo'></div>SEO" => "/admin/media", 
-      "<div class='caboose-tab-icon' id='caboose-icon-store'></div>Caboose Store" => "/admin/media", 
-      "<div class='caboose-tab-icon' id='caboose-icon-settings'></div>Settings" => "/admin/media"
+    # "<div class='caboose-tab-icon' id='caboose-icon-design'></div>Design" => "/admin/design", 
+    #  "<div class='caboose-tab-icon' id='caboose-icon-media'></div>Media" => "/admin/media", 
+    #  "<div class='caboose-tab-icon' id='caboose-icon-activity'></div>Activity" => "/admin/media", 
+      "<div class='caboose-tab-icon' id='caboose-icon-seo'></div>SEO" => "/admin/pages/#{@page.id}/seo", 
+    #  "<div class='caboose-tab-icon' id='caboose-icon-store'></div>Caboose Store" => "/admin/media", 
+      "<div class='caboose-tab-icon' id='caboose-icon-settings'></div>Settings" => "/admin/pages/#{@page.id}/edit"
     }
     %>
     <% tabs.each do |text, href| %>

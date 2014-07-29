@@ -228,7 +228,7 @@ module Caboose
           when 'sort_order'    then b.sort_order    = v
           when 'name'          then b.name          = v
           when 'value'         then
-            if b.block_type.field_type == 'richtext'
+            if b.block_type.field_type == 'richtext' && (b.name.nil? || b.name.strip.length == 0)
               b = RichTextBlockParser.parse(b, v, request.host_with_port)
             else              
               b.value = v

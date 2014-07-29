@@ -105,12 +105,36 @@ class Caboose::Block < ActiveRecord::Base
     end        
     str = ""
 
-    defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil, :block => block }
+    defaults = {
+      :view => nil,
+      :controller_view_content => nil,
+      :modal => false,
+      :empty_text => '',
+      :editing => false,
+      :css => nil,
+      :js => nil,
+      :csrf_meta_tags => nil,
+      :csrf_meta_tags2 => nil,    
+      :logged_in_user => nil
+    }    
+    #defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil, :block => block }
     options2 = nil
     if options.is_a?(Hash)
       options2 = defaults.merge(options)
     else
-      options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }        
+      #options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }
+      options2 = {
+        :view                    => options.view                    ? options.view                    : nil,
+        :controller_view_content => options.controller_view_content ? options.controller_view_content : nil,
+        :modal                   => options.modal                   ? options.modal                   : nil,
+        :empty_text              => options.empty_text              ? options.empty_text              : nil,
+        :editing                 => options.editing                 ? options.editing                 : nil,
+        :css                     => options.css                     ? options.css                     : nil,
+        :js                      => options.js                      ? options.js                      : nil,
+        :csrf_meta_tags          => options.csrf_meta_tags          ? options.csrf_meta_tags          : nil,
+        :csrf_meta_tags2         => options.csrf_meta_tags2         ? options.csrf_meta_tags2         : nil,
+        :logged_in_user          => options.logged_in_user          ? options.logged_in_user          : nil
+      }
     end
     options2[:block] = block
 
@@ -141,13 +165,16 @@ class Caboose::Block < ActiveRecord::Base
           begin                        
             str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)            
           rescue Exception => ex
-            Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
+            msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
+            Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
           end
         rescue Exception => ex          
-          Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
+          msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
+          Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
         end
       rescue Exception => ex
-        Caboose.log("#{ex.message}\n#{ex.backtrace.join("\n")}")
+        msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
+        Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
       end        
     end
     return str

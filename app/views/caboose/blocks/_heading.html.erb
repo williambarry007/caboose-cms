@@ -1,8 +1,9 @@
 <%
-size = block.child('size').value
-text = block.child('text').value
+size = block.child_value('size')
+text = block.child_value('text')
+style = block.child_value('style')
 size = 1 if size.nil?
 text = (empty_text ? empty_text : "") if text.nil? || text == ""
 
-if editing %><div id='block_<%= block.id %>'><h<%= size %>><%= raw text %></h<%= size %>></div><% 
-else       %><h<%= size %> id='block_<%= block.id %>'><%= raw text %></h<%= size %>><% end %>
+if editing %><div id='block_<%= block.id %>'><h<%= size %> style='<%= style %>'><%= raw text %></h<%= size %>></div><% 
+else       %><h<%= size %> id='block_<%= block.id %>' style='<%= style %>'><%= raw text %></h<%= size %>><% end %>

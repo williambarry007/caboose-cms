@@ -218,6 +218,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :user_id     , :integer ],
         [ :role        , :string  ]
       ],
+      Caboose::SmtpConfig => [
+        [ :site_id              , :integer ],
+        [ :address              , :string  , { :default => 'localhost' }],
+        [ :port                 , :integer , { :default => 25 }],
+        [ :domain               , :string ],
+        [ :user_name            , :string ],
+        [ :password             , :string ],
+        [ :authentication       , :string ], # :plain, :login, :cram_md5.
+        [ :enable_starttls_auto , :boolean , { :default => true }]
+      ],
       Caboose::Timezone => [
         [ :country_code , :string ],
         [ :name         , :string ]

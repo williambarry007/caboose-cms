@@ -1,7 +1,13 @@
 <div class="content_wrapper" id='block_<%= block.id %>'>          
   <div class="content_body">    
     <% if editing %><div class='sortable'><% end %>        
-    <% block.children.each do |b| %><%= raw block.render(b, local_assigns) %><% end %>
+    <% block.children.each do |b| %>
+      <% 
+      #msg = b ? (b.block_type ? "#{b.block_type.name} block (block_type_id #{b.block_type.id}, block_id #{b.id})\n" : "Block (block_id #{b.id})\n") : ''
+      #Caboose.log(msg)
+      %>
+      <%= raw block.render(b, local_assigns) %>
+    <% end %>
     <% if editing %></div><% end %>
   </div>
 </div>

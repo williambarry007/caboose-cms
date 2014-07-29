@@ -21,6 +21,7 @@
     b = @page.block
     b.create_children
   end
+  #b.log_helper
   str = b.render(b, {     
     :view => self,
     :controller_view_content => yield,

@@ -18,7 +18,7 @@ $(document).ready(function() {
   m = new ModelBinder({
     name: 'Page',
     id: <%= @page.id %>,
-    update_url: '/pages/<%= @page.id %>',
+    update_url: '/admin/pages/<%= @page.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [      
       { name: 'seo_title'         , nice_name: 'SEO Title'            , type: 'text'      , value: <%= raw Caboose.json(@page.seo_title)        %>, width: 580 },        

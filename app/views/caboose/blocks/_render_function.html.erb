@@ -1,1 +1,1 @@
-<%= raw ERB.new(block.block_type.render_function).result(self.instance_eval { binding }) %>
+<% if block && block.block_type && block.block_type.render_function %><%= raw ERB.new(block.block_type.render_function).result(self.instance_eval { binding }) %><% end %>

@@ -125,6 +125,7 @@ class Caboose::Block < ActiveRecord::Base
       #return erb.result(locals.instance_eval { binding })
       
       #eval("def render_my_function\n#{block.block_type.render_function}\nend\n\n, :locals => options2)
+      #Caboose.log(block.id)
       str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
     else
       #view = ActionView::Base.new(ActionController::Base.view_paths, options2, )      
@@ -230,6 +231,13 @@ class Caboose::Block < ActiveRecord::Base
         'large_url' => self.image.url(:large),
       }
     }
+  end
+  
+  def log_helper(prefix = '')
+    puts "#{prefix}#{self.id}"
+    self.children.each do |b|
+      b.log_helper("#{prefix}-")
+    end
   end
 
 end

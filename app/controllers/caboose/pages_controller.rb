@@ -355,14 +355,15 @@ module Caboose
           resp.attributes['content_format'] = { 'text' => value }
           
         when 'meta_robots'
-          if (value.include?('index') && value.include?('noindex'))
+          arr = value.split(',').collect { |v| v.strip }
+          if arr.include?('index') && arr.include?('noindex')
             resp.error = "You can't have both index and noindex"
             save = false
-          elsif (value.include?('follow') && value.include?('nofollow'))
+          elsif arr.include?('follow') && arr.include?('nofollow')
             resp.error = "You can't have both follow and nofollow"
             save = false
-          else
-            page.meta_robots = value.join(', ')
+          else            
+            page.meta_robots = arr.join(', ')
             resp.attributes['meta_robots'] = { 'text' => page.meta_robots }
           end
           

@@ -122,7 +122,8 @@ module Caboose
         'caboose/model/bound_s3_image.js',
         'caboose/model/bound_file.js',        
         'jquery.js',        
-        'jquery_ujs.js',        
+        'jquery_ujs.js',
+        'jquery.ui.all.js',
         'colorbox-rails/jquery.colorbox-min.js',        
         'colorbox-rails.js',
         'colorbox-rails/colorbox-links.js',
@@ -177,7 +178,9 @@ module Caboose
         'caboose/register.css',
         'caboose/station_modal.css',
         'caboose/station_sidebar.css',
-        'caboose/tinymce.css'
+        'caboose/tinymce.css',
+        'jquery.ui.all.css'
+        
       ]      
     end   
   end

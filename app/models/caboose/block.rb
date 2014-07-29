@@ -150,7 +150,13 @@ class Caboose::Block < ActiveRecord::Base
       
       #eval("def render_my_function\n#{block.block_type.render_function}\nend\n\n, :locals => options2)
       #Caboose.log(block.id)
-      str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
+      
+      begin
+        str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
+      rescue Exception => ex
+        msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
+        Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+      end            
     else
       #view = ActionView::Base.new(ActionController::Base.view_paths, options2, )      
       #view = ActionView::Base.new(options2[:view].view_renderer, {}, options2[:view].controller)      

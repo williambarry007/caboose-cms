@@ -1,0 +1,78 @@
+<%
+update_on_close = false
+@block.block_type.children.each do |bt|
+  update_on_close = true if bt.field_type == 'image' || bt.field_type == 'file'
+end
+
+crumbs = []
+b = @block
+while b
+  href    = b.id == @block.id ? "#" : "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+  onclick = b.id == @block.id ? " onclick=\"$('#advanced').slideToggle(100, function() { modal.autosize(); });\"" : ''
+  text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
+  crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"     
+  b = b.parent
+end
+
+%>
+<!--<h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.name ? @block.name : @block.block_type.description %></h2>-->
+<h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
+<div id='advanced'>
+  <p><div id='block_<%= @block.id %>_block_type_id' ></div></p>
+  <p><div id='block_<%= @block.id %>_parent_id'     ></div></p>
+</div>
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>/edit';" />
+<input type='button' value='Close' onclick="<% if update_on_close %>parent.controller.render_blocks();<% end %>modal.close();" />
+</p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/admin_block_edit" %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+    
+var controller = false;
+<% b = @block %>
+$(document).ready(function() {  
+  modal = new CabooseModal(800);       
+  m = new ModelBinder({
+    name: 'Block',
+    id: <%= b.id %>,
+    update_url: '/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [{      
+      name: 'block_type_id',
+      nice_name: 'Block type',
+      type: 'select',
+      value: <%= raw Caboose.json(b.block_type_id) %>,             
+      text:  <%= raw Caboose.json(b.block_type.name) %>,                  
+      width: 400,
+      fixed_placeholder: true,
+      options_url: '/admin/block-types/options',
+      after_update: function() { parent.controller.render_blocks(); },
+      after_cancel: function() { parent.controller.render_blocks(); },
+      on_load: function() { that.modal.autosize(); }
+    },{      
+      name: 'parent_id',
+      nice_name: 'Parent ID',
+      type: 'select',
+      value: <%= raw Caboose.json(b.parent_id) %>,
+      text:  <%= raw Caboose.json(b.parent ? b.parent.title : '') %>,        
+      width: 400,
+      fixed_placeholder: true,        
+      options_url: '/admin/pages/<%= b.page_id %>/block-options',        
+      after_update: function() { parent.controller.render_blocks(); },
+      after_cancel: function() { parent.controller.render_blocks(); },
+      on_load: function() { that.modal.autosize(); }
+    }]
+  });
+});    
+
+</script>
+<% end %>

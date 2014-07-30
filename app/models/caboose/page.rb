@@ -25,6 +25,7 @@ class Caboose::Page < ActiveRecord::Base
     :linked_resources, 
     :layout,
     :seo_title, # 70 chars
+    :meta_keywords,
     :meta_description, # 156 chars
     :meta_robots, # Multi-select options: none, noindex, nofollow, nosnippet, noodp, noarchive
     :canonical_url,

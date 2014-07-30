@@ -331,7 +331,7 @@ module Caboose
           page[name.to_sym] = value
 
         when 'title', 'menu_title', 'hide', 'layout', 'redirect_url',
-          'seo_title', 'meta_description', 'fb_description', 'gp_description', 'canonical_url'
+          'seo_title', 'meta_keywords', 'meta_description', 'fb_description', 'gp_description', 'canonical_url'
           page[name.to_sym] = value
 
         when 'linked_resources'
@@ -481,6 +481,24 @@ module Caboose
       p = Page.find(params[:id])
       render :json => { 'uri' => p.uri }
 		end
+		
+		# GET /admin/pages/:id/block-options        
+    def admin_block_options
+      return unless user_is_allowed('pages', 'edit')      
+      
+      options = []
+      Block.where("parent_id is null and page_id = ?", params[:id]).reorder(:sort_order).all.each do |b|
+        admin_block_options_helper(options, b, "") 
+      end      
+      render :json => options
+    end        
+      
+    def admin_block_options_helper(options, b, prefix)
+      options << { 'value' => b.id, 'text' => "#{prefix}#{b.title}" }      
+      b.children.each do |b2|
+        admin_block_options_helper(options, b2, "#{prefix} - ")        
+      end      
+    end
 		
   end
 end

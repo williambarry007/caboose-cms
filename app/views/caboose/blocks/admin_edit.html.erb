@@ -8,16 +8,16 @@ crumbs = []
 b = @block
 while b
   href    = b.id == @block.id ? "#" : "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
-  onclick = b.id == @block.id ? " onclick=\"$('#block_#{@block.id}_block_type_id_container').slideToggle(100, function() { modal.autosize(); });\"" : ''
+  #onclick = b.id == @block.id ? " onclick=\"$('#advanced').slideToggle(100, function() { modal.autosize(); });\"" : ''  
   text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
-  crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"     
+  #crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"
+  crumbs << "<a href=\"#{href}\">#{text}</a>"
   b = b.parent
 end
 
 %>
 <!--<h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.name ? @block.name : @block.block_type.description %></h2>-->
 <h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
-<p id='block_type_container'><div id='block_<%= @block.id %>_block_type_id'></div></p>
 
 <% if @block.block_type.use_render_function_for_layout %>
   <!-- Start -->
@@ -57,6 +57,7 @@ end
 <% end %>
 <input type='button' value='Move Up'   onclick="controller.move_up();" />
 <input type='button' value='Move Down' onclick="controller.move_down();" />
+<input type='button' value='Advanced'  onclick="window.location='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>/advanced';" />
 </p>
 
 <% content_for :caboose_css do %>
@@ -86,7 +87,7 @@ $(window).load(function() {
 %>
     
 var controller = false;
-$(document).ready(function() {
+$(document).ready(function() {  
   modal = new CabooseModal(800);
   controller = new BlockController({
     block: <%= raw Caboose.json(@block.js_hash) %>,    

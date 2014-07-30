@@ -18,11 +18,28 @@ module Caboose
     # GET /admin/pages/:page_id/blocks/new
     def admin_new
       return unless user_is_allowed('pages', 'add')
+                  
+      if params[:id]
+        block_type_id = params[:block_type_id]
+        block_type_id = Block.find(params[:id]).block_type.default_child_block_type_id if block_type_id.nil?                 
+        if block_type_id                                  
+          b = Block.new
+          b.page_id = params[:page_id].to_i
+          b.parent_id = params[:id]
+          b.block_type_id = block_type_id
+          b.sort_order = Block.where(:parent_id => params[:id]).count              
+          b.save
+          b.create_children        
+          redirect_to "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+          return
+        end
+      end
+    
       @page = Page.find(params[:page_id])
       @block = params[:id] ? Block.find(params[:id]) : Block.new(:page_id => params[:page_id])
       @after_id = params[:after_id] ? params[:after_id] : nil
       @before_id = params[:before_id] ? params[:before_id] : nil
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/modal'                
     end
     
     # GET /admin/pages/:page_id/blocks/:id
@@ -149,6 +166,15 @@ module Caboose
       end
     end
     
+    # GET /admin/pages/:page_id/blocks/:id/advanced
+    def admin_edit_advanced
+      return unless user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:page_id])
+      @block = Block.find(params[:id])
+      @block.create_children      
+      render :layout => 'caboose/modal'      
+    end
+    
     # POST /admin/pages/:page_id/blocks
     # POST /admin/pages/:page_id/blocks/:id
     def admin_create
@@ -223,7 +249,9 @@ module Caboose
       params.each do |k,v|
         case k
           #when 'page_id'       then b.page_id       = v
-          when 'parent_id'     then b.parent_id     = v
+          when 'parent_id'     then 
+            b.parent_id  = v
+            b.sort_order = Block.where(:parent_id => v).count
           when 'block_type_id' then b.block_type_id = v
           when 'sort_order'    then b.sort_order    = v
           when 'name'          then b.name          = v
@@ -304,10 +332,21 @@ module Caboose
       if b.sort_order == 0
         resp.error = "The block is already at the top."
       else
-        b2 = Block.where("parent_id = ? and sort_order = ?", b.parent_id, b.sort_order - 1).first
-        b2.sort_order = b.sort_order
-        b2.save
-        b.sort_order = b.sort_order - 1
+        b2 = nil
+        
+        new_sort_order = b.sort_order - 1
+        while new_sort_order > 0 do
+          b2 = Block.where("parent_id = ? and sort_order = ?", b.parent_id, new_sort_order).first
+          break if b2
+          new_sort_order = new_sort_order - 1
+        end
+        if b2
+          b2.sort_order = new_sort_order + 1
+          b2.save
+        else
+          new_sort_order = 1
+        end
+        b.sort_order = new_sort_order
         b.save
         resp.success = "The block has been moved up successfully."
       end

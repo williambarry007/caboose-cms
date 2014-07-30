@@ -52,8 +52,8 @@ class Caboose::Block < ActiveRecord::Base
   end
   
   def full_name
-    return name if parent_id.nil?
-    return "#{parent.full_name}_#{name}"
+    return self.name if parent_id.nil?
+    return "#{parent.full_name}_#{self.name}"
   end
   
   def child_value(name)
@@ -161,8 +161,8 @@ class Caboose::Block < ActiveRecord::Base
       #view = ActionView::Base.new(ActionController::Base.view_paths, options2, )      
       #view = ActionView::Base.new(options2[:view].view_renderer, {}, options2[:view].controller)      
       begin        
-        full_name = block.full_name
-        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0                
+        full_name = block.block_type.full_name
+        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0        
         str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)        
       rescue ActionView::MissingTemplate
         begin          
@@ -225,13 +225,22 @@ class Caboose::Block < ActiveRecord::Base
     return "<div class='new_block_after' id='new_block_after_#{self.id}'>New Block</div>"    
   end
   
+  def title    
+    str = "#{self.block_type.name}"
+    if self.name && self.name.strip.length > 0
+      str << " (#{self.name})"
+    end
+    return str
+  end
+  
   def js_hash
     kids = self.children.collect { |b| b.js_hash }
-    bt = self.block_type
+    bt = self.block_type    
     return {
       'id'             => self.id,           
       'page_id'        => self.page_id,      
-      'parent_id'      => self.parent_id,    
+      'parent_id'      => self.parent_id,
+      'parent_title'   => self.parent ? self.parent.title : '',
       'block_type_id'  => self.block_type_id,    
       'sort_order'     => self.sort_order,
       'name'           => self.name,

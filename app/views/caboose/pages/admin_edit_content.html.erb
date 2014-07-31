@@ -21,12 +21,17 @@
   padding: 16px 10px;  
 }
 .block_over { background: #e3e3e3; }
+.select_handle { display: none; }
 .sort_handle   { display: none; }
 .delete_handle { display: none; }
+.block_over .select_handle { display: block; position: relative; }
 .block_over .sort_handle   { display: block; position: relative; }
 .block_over .delete_handle { display: block; position: relative; }
+.block_over .select_handle span { position: absolute; top: 0; right: 36px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
 .block_over .sort_handle   span { position: absolute; top: 0; right: 18px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
 .block_over .delete_handle span { position: absolute; top: 0; right:  0px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
+
+.selected { background: #fff799; }
 
 .new_block_link { position: relative; width: 100%; }
 .new_block_link .line { position: absolute; top: -11px; width: 100%; height: 2px; background: transparent; }

@@ -1,5 +1,7 @@
 module Caboose
-  class PostsController < ApplicationController  
+  class PostsController < ApplicationController
+    
+    helper :application
      
     # GET /posts
     def index

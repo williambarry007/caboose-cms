@@ -156,6 +156,7 @@ class Caboose::Block < ActiveRecord::Base
       rescue Exception => ex
         msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
         Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+        str = "<p class='note error'>#{msg}</p>"
       end            
     else
       #view = ActionView::Base.new(ActionController::Base.view_paths, options2, )      
@@ -173,14 +174,17 @@ class Caboose::Block < ActiveRecord::Base
           rescue Exception => ex
             msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
             Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+            str = "<p class='note error'>#{msg}</p>"
           end
         rescue Exception => ex          
           msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
           Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+          str = "<p class='note error'>#{msg}</p>"
         end
       rescue Exception => ex
         msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
         Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+        str = "<p class='note error'>#{msg}</p>"
       end        
     end
     return str

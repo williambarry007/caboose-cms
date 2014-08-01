@@ -106,7 +106,10 @@ module Caboose
     def admin_index
       return if !user_is_allowed('pages', 'view')            
       @domain = Domain.where(:domain => request.host_with_port).first
-      @home_page = @domain ? Page.index_page(@domain.site_id) : nil    
+      @home_page = @domain ? Page.index_page(@domain.site_id) : nil
+      if @domain && @home_page.nil?
+        @home_page = Caboose::Page.create(:site_id => @domain.site_id, :parent_id => -1, :title => 'Home')
+      end
       render :layout => 'caboose/admin'      
     end
 

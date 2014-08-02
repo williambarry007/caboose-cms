@@ -1,0 +1,38 @@
+
+<h1>New Permanent Redirect</h1>
+
+<form action='/admin/redirects' method='post' id='new_redirect_form'>
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' /> 
+<p>Regular expression? <input type='checkbox' name='is_regex' value='1' /></p>
+<p><input type='text' name='old_url' id='old_url' placeholder='Old URL' value='' style='width: 400px;' /></p>
+<p><input type='text' name='new_url' id='new_url' placeholder='New URL' value='' style='width: 400px;' /></p>
+<div id='message'></div>
+<p>
+  <input type='button' value='< Back' onclick="window.location='/admin/redirects';" />
+  <input type='submit' value='Add Redirect' />
+</p>
+</form>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+            
+$(document).ready(function() {
+  $('#new_redirect_form').submit(function() { add_redirect(); return false; });
+});
+
+function add_redirect()
+{
+  $('#message').html("<p class='loading'>Adding redirect...</p>");
+  $.ajax({
+    url: '/admin/redirects',
+    type: 'post',
+    data: $('#new_redirect_form').serialize(),
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;    
+    }
+  });
+}
+
+</script>
+<% end %>

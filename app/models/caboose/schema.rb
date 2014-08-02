@@ -173,6 +173,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :page_id , :integer  ],
         [ :action  , :string   ]
       ],
+      Caboose::PermanentRedirect => [
+        [ :site_id  , :integer ],
+        [ :priority , :integer , { :default => 0 }],
+        [ :is_regex , :boolean , { :default => false }],
+        [ :old_url  , :string  ],
+        [ :new_url  , :string  ]
+      ],
       Caboose::Permission => [
         [ :resource , :string ],
         [ :action   , :string ]

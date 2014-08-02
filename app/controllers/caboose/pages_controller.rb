@@ -53,6 +53,16 @@ module Caboose
 
       page = Page.page_with_uri(request.host_with_port, File.dirname(uri), false)
       if (page.nil? || !page)
+        
+        # Check for a 301 redirect
+        site_id = Site.id_for_domain(request.host_with_port)        
+        new_url = PermanentRedirect.match(site_id, request.fullpath)
+        if new_url
+          Caboose.log("Found a redirect: #{new_url}")
+          redirect_to new_url
+          return
+        end
+        
         respond_to do |format|          
           format.all { render :file => "caboose/extras/error404", :layout => "caboose/error404", :formats => [:html] }
         end         

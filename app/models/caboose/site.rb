@@ -10,4 +10,10 @@ class Caboose::Site < ActiveRecord::Base
     c = Caboose::SmtpConfig.where(:site_id => self.id).first
   end
   
+  def self.id_for_domain(domain)
+    d = Caboose::Domain.where(:domain => domain).first
+    return nil if d.nil?
+    return d.site_id
+  end
+  
 end

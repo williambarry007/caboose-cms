@@ -27,14 +27,21 @@ Caboose::Engine.routes.draw do
   post    "admin/sites/:id/domains"                        => "sites#admin_add_domain"
   put     "admin/sites/:id/domains/:domain_id/set-primary" => "sites#admin_set_primary_domain"
   delete  "admin/sites/:id/domains/:domain_id"             => "sites#admin_remove_domain"
-  
+                                                                                                                                     
   get     "admin/sites/options"              => "sites#options"
   get     "admin/sites"                      => "sites#admin_index"    
   get     "admin/sites/new"                  => "sites#admin_new"  
   get     "admin/sites/:id"                  => "sites#admin_edit"  
   put     "admin/sites/:id"                  => "sites#admin_update"  
   post    "admin/sites"                      => "sites#admin_add"  
-  delete  "admin/sites/:id"                  => "sites#admin_delete"    
+  delete  "admin/sites/:id"                  => "sites#admin_delete"
+    
+  get     "admin/redirects"      => "redirects#admin_index"    
+  get     "admin/redirects/new"  => "redirects#admin_new"  
+  get     "admin/redirects/:id"  => "redirects#admin_edit"  
+  put     "admin/redirects/:id"  => "redirects#admin_update"  
+  post    "admin/redirects"      => "redirects#admin_add"  
+  delete  "admin/redirects/:id"  => "redirects#admin_delete"
   
   get     "admin/users"                     => "users#index"  
   get     "admin/users/options"             => "users#options"

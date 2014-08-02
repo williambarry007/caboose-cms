@@ -1,0 +1,59 @@
+<%
+pr = @permanent_redirect
+%>
+<h1>Edit Permanent Redirect</h1>
+
+<p><div id='permanentredirect_<%= pr.id %>_priority' ></div></p>
+<p><div id='permanentredirect_<%= pr.id %>_is_regex' ></div></p>
+<p><div id='permanentredirect_<%= pr.id %>_old_url'  ></div></p>
+<p><div id='permanentredirect_<%= pr.id %>_new_url'  ></div></p>
+
+<div id='message'></div>
+<div id='controls'>
+<input type='button' value='Back'            onclick="window.location='/admin/redirects';" />
+<input type='button' value='Delete Redirect' onclick="delete_redirect(<%= pr.id %>);" />
+</div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'PermanentRedirect',
+    id: <%= pr.id %>,
+    update_url: '/admin/redirects/<%= pr.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [      
+      { name: 'priority'    , nice_name: 'Priority'    , type: 'text'     , value: <%= raw Caboose.json(pr.priority) %>, width: 400 },
+      { name: 'is_regex'    , nice_name: 'Regex'       , type: 'checkbox' , value: <%= pr.is_regex ? 1 : 0           %>, width: 400 },
+      { name: 'old_url'     , nice_name: 'Old URL'     , type: 'text'     , value: <%= raw Caboose.json(pr.old_url)  %>, width: 400 },
+      { name: 'new_url'     , nice_name: 'New URL'     , type: 'text'     , value: <%= raw Caboose.json(pr.new_url)  %>, width: 400 }
+    ]    
+  });  
+});
+
+function delete_redirect(pr_id, confirm)
+{        
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note confirm')
+      .append('Are you sure you want to delete the redirect? ')
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_redirect(pr_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').html("<p class='loading'>Deleting redirect...</p>");
+  $.ajax({
+    url: '/admin/redirects/' + pr_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

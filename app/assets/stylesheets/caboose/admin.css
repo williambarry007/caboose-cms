@@ -257,12 +257,14 @@ select.fake option {
   color: #757575;
 }
 
-#content input[type='checkbox'] {
+#content .mb_container input[type='checkbox'] {
   position: absolute;
   top: 4px;
   left: 0;
-  z-index: 19;
-  
+  z-index: 19;  
+}
+
+#content input[type='checkbox'] {
   margin: 0;
   padding: 0;
   width: 20px;

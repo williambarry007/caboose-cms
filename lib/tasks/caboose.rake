@@ -1,7 +1,7 @@
 require "caboose/version"
 
 namespace :caboose do  
-  
+    
   desc "Creates/verifies that all database tables and fields are correctly added."
   task :db => :environment do
     Caboose::Schema.create_schema

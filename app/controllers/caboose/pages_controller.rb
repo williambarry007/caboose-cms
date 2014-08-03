@@ -51,15 +51,14 @@ module Caboose
       uri.chop! if uri.end_with?('/')
       uri[0] = '' if uri.starts_with?('/')
 
-      page = Page.page_with_uri(request.host_with_port, File.dirname(uri), false)
-      if (page.nil? || !page)
+      page = Page.page_with_uri(request.host_with_port, File.dirname(uri), false)      
+      if page.nil? || !page
         
         # Check for a 301 redirect
         site_id = Site.id_for_domain(request.host_with_port)        
-        new_url = PermanentRedirect.match(site_id, request.fullpath)
-        if new_url
-          Caboose.log("Found a redirect: #{new_url}")
-          redirect_to new_url
+        new_url = PermanentRedirect.match(site_id, request.fullpath)        
+        if new_url          
+          redirect_to new_url, :status => 301
           return
         end
         

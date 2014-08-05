@@ -20,7 +20,7 @@ module Caboose
       end
 
       user = logged_in_user            
-      if !user.is_allowed(page, 'view')        
+      if !user.is_allowed(page, 'view')                
         if user.id == User::LOGGED_OUT_USER_ID	
           redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)		  		
           return
@@ -35,7 +35,7 @@ module Caboose
         return
       end
 
-      page = Caboose.plugin_hook('page_content', page)
+      page = Caboose.plugin_hook('page_content', page)      
       @page = page
       @user = user
       @editmode = !params['edit'].nil? && user.is_allowed('pages', 'edit') ? true : false

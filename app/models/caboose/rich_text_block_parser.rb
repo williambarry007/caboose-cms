@@ -4,8 +4,9 @@ module Caboose
     
     def self.parse(block, html, domain)
       
+      random_string = (0...10).map { ('a'..'z').to_a[rand(26)] }.join
       html = html.strip
-      page = Nokogiri::HTML("<div>#{html}</div>")
+      page = Nokogiri::HTML("<div class='#{random_string}'>#{html}</div>")
       if page.css('div').children.count == 1
         block.value = html
         block.save
@@ -13,7 +14,8 @@ module Caboose
       end
       
       nodes = []
-      page.css('div').children.each do |node|
+      page.css("div.#{random_string}").children.each do |node|
+        #Caboose.log(node.to_s)
         case node.name.downcase
           when 'h1'    then nodes << node           
           when 'h2'    then nodes << node

@@ -21,13 +21,14 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
       'children' => []
     }
         
-    item['children'] << { 'id' => 'users'            , 'text' => 'Users'              , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'        , 'view')
-    item['children'] << { 'id' => 'roles'            , 'text' => 'Roles'              , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'        , 'view')
-    item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'        , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'  , 'view')
-    item['children'] << { 'id' => 'sites'            , 'text' => 'Sites'              , 'href' => '/admin/sites'              , 'modal' => false } if user.is_allowed('sites'        , 'view')
-    item['children'] << { 'id' => 'blocktypes'       , 'text' => 'AB Test Variants'   , 'href' => '/admin/ab-variants'        , 'modal' => false } if user.is_allowed('abvariants'   , 'view')
-    item['children'] << { 'id' => 'variables'        , 'text' => 'Variables'          , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'     , 'view')
-    item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'        , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'   , 'view')    
+    item['children'] << { 'id' => 'users'            , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'        , 'view')
+    item['children'] << { 'id' => 'roles'            , 'text' => 'Roles'               , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'        , 'view')
+    item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'         , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'  , 'view')
+    item['children'] << { 'id' => 'sites'            , 'text' => 'Sites'               , 'href' => '/admin/sites'              , 'modal' => false } if user.is_allowed('sites'        , 'view')
+    item['children'] << { 'id' => 'blocktypes'       , 'text' => 'AB Test Variants'    , 'href' => '/admin/ab-variants'        , 'modal' => false } if user.is_allowed('abvariants'   , 'view')
+    item['children'] << { 'id' => 'variables'        , 'text' => 'Variables'           , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'     , 'view')
+    item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'         , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'   , 'view')
+    item['children'] << { 'id' => 'redirects'        , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'    , 'view')    
         
     nav << item if item['children'].count > 0
     

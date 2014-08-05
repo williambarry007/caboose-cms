@@ -7,30 +7,30 @@ class Caboose::Page < ActiveRecord::Base
   has_many :children, :class_name => 'Caboose::Page', :foreign_key => 'parent_id', :order => 'sort_order, title'
   has_many :page_permissions  
   has_many :blocks, :order => 'sort_order'
-  attr_accessible :id,
-    :site_id,
-    :parent_id, 
-    :title, 
-    :menu_title, 
-    # :content, # Changed from column in pages to blocks
-    :blocks,
-    :slug, 
-    :alias, 
-    :uri, 
-    :redirect_url, 
-    :hide, 
-    :content_format, 
-    :custom_css, 
-    :custom_js,
-    :linked_resources, 
-    :layout,
-    :seo_title, # 70 chars
-    :meta_keywords,
-    :meta_description, # 156 chars
-    :meta_robots, # Multi-select options: none, noindex, nofollow, nosnippet, noodp, noarchive
-    :canonical_url,
-    :facebook_description, # defaults to meta_description
-    :googleplus_description # defaults to meta_description      
+  attr_accessible :id      ,        
+    :site_id               ,
+    :parent_id             ,
+    :title                 ,
+    :menu_title            ,
+    :slug                  ,
+    :alias                 ,
+    :uri                   ,
+    :redirect_url          ,
+    :hide                  ,
+    :content_format        ,
+    :custom_css            ,
+    :custom_js             ,
+    :linked_resources      ,
+    :layout                ,
+    :sort_order            ,
+    :custom_sort_children  ,
+    :seo_title             ,
+    :meta_keywords         ,
+    :meta_description      ,
+    :meta_robots           ,
+    :canonical_url         ,
+    :fb_description        ,
+    :gp_description
    
   CONTENT_FORMAT_HTML  = 1 
   CONTENT_FORMAT_TEXT  = 2

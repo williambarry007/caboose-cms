@@ -196,12 +196,12 @@ PageContentController.prototype = {
      
     var show_mouseover = true;
     if (b.children && b.children.length > 0)
-    {
-      $.each(b.children, function(i, b2) {
-        if (b2.block_type_id = 34)
+    {      
+      $.each(b.children, function(i, b2) {        
+        if (b2.field_type == 'block')
           show_mouseover = false;
         that.set_clickable_helper(b2, b.id, b.allow_child_blocks);
-      });      
+      });            
     }
     if (b.allow_child_blocks)
     {

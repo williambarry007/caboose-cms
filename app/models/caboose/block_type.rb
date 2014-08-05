@@ -10,6 +10,7 @@ class Caboose::BlockType < ActiveRecord::Base
     :parent_id,
     :name, 
     :description,
+    :is_global,
     :block_type_category_id,
     :use_render_function,
     :use_render_function_for_layout,

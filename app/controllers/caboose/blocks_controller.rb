@@ -57,10 +57,10 @@ module Caboose
       blocks = []
       if params[:id]
         b = Block.find(params[:id])
-        blocks << { 'id' => b.id, 'children' => admin_tree_helper(b) }
+        blocks << { 'id' => b.id, 'children' => admin_tree_helper(b), 'field_type' => b.block_type.field_type }
       else
         Block.where("parent_id is null and page_id = ?", params[:page_id]).reorder(:sort_order).all.each do |b|      
-          blocks << { 'id' => b.id, 'allow_child_blocks' => b.block_type.allow_child_blocks, 'children' => admin_tree_helper(b) }
+          blocks << { 'id' => b.id, 'allow_child_blocks' => b.block_type.allow_child_blocks, 'children' => admin_tree_helper(b), 'field_type' => b.block_type.field_type }
         end
       end
       render :json => blocks
@@ -69,7 +69,7 @@ module Caboose
     def admin_tree_helper(b)
       arr = []
       b.children.each do |b2|
-        arr << { 'id' => b2.id, 'allow_child_blocks' => b2.block_type.allow_child_blocks, 'children' => admin_tree_helper(b2) }
+        arr << { 'id' => b2.id, 'allow_child_blocks' => b2.block_type.allow_child_blocks, 'children' => admin_tree_helper(b2), 'field_type' => b2.block_type.field_type }
       end
       return arr
     end      

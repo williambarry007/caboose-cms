@@ -13,7 +13,7 @@ module Caboose
       parse_url_params if Caboose.use_url_params
       
       # Get the site we're working with      
-      domain = Domain.where(request.host_with_port).first
+      domain = Domain.where(:domain => request.host_with_port).first
       @site = domain ? domain.site : nil
         
       # Make sure someone is logged in

@@ -172,6 +172,7 @@ module Caboose
         'caboose/fonts/big_noodle_titling_oblique.ttf',
         'caboose/fonts/big_noodle_titling.ttf',
         'caboose/fonts.css',
+        'caboose/icomoon_fonts.css',
         'caboose/login.css',
         'caboose/modal.css',
         'caboose/page_bar_generator.css',

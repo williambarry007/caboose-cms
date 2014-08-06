@@ -12,6 +12,10 @@ module Caboose
       # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
       
+      # Get the site we're working with      
+      domain = Domain.where(request.host_with_port).first
+      @site = domain ? domain.site : nil
+        
       # Make sure someone is logged in
       if !logged_in?      
         elo = User.find(User::LOGGED_OUT_USER_ID)        
@@ -21,7 +25,7 @@ module Caboose
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
       
       # Initialize AB Testing
-      AbTesting.init(request.session_options[:id]) if Caboose.use_ab_testing      
+      AbTesting.init(request.session_options[:id]) if Caboose.use_ab_testing            
       
       # Try to find the page 
       @page = Page.new

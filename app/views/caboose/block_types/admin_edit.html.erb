@@ -46,6 +46,13 @@ bt = @block_type
   <p>This type of page block doesn't have any fields.</p>
 <% end %>
 
+<h2>Icon</h2>
+<div class='icons'>
+<% Caboose::BlockTypeIcons.names.each do |icon| %>
+  <a href='#' id='icon_<%= icon %>' <% if bt.icon == icon %>class='selected'<% end %>><span class='icon-<%= icon %>'></span></a>
+<% end %>
+</div>
+
 <div id='message'></div>
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}/edit" : '' %>';" />
@@ -53,9 +60,16 @@ bt = @block_type
 </p>
 
 <% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/icomoon_fonts' %>
 <style type='text/css'>
 #blocktype_<%= bt.id %>_render_function  { font-family: Courier; font-size: 80%; width: 100%; }
 #blocktype_<%= bt.id %>_options_function { font-family: Courier; font-size: 80%; width: 100%; }
+div.icons { height: 400px; width: 80%; overflow-y: scroll; }
+div.icons span { display: block; float: left; padding: 10px 20px; font-size: 24pt; }
+div.icons a span { color: #000; border: #fff 1px solid; }
+div.icons a:hover span { background: #efefef; color: #000; border: #666 1px solid; }
+div.icons a.selected span, 
+div.icons a.selected:hover span { background: #fff69f; color: #000; border: #ff0000 1px solid; }
 </style>
 <% end %>
 <% content_for :caboose_js do %>
@@ -84,7 +98,25 @@ function delete_block_type(block_type_id, confirm)
   });
 }
 
+function select_icon(icon)
+{  
+  $.ajax({
+    url: '/admin/block-types/<%= @block_type.id %>',
+    type: 'put',
+    data: { icon: icon },
+    success: function(resp) {
+      $('div.icons a.selected').removeClass('selected');
+      $('#icon_' + icon).addClass('selected');      
+    }
+  });
+}
+
 $(document).ready(function() {
+  $('div.icons a').click(function(e) {
+    e.preventDefault();    
+    select_icon($(this).attr('id').substr(5));
+  });
+    
   m = new ModelBinder({
     name: 'BlockType',
     id: <%= @block_type.id %>,

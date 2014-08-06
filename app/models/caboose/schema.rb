@@ -84,6 +84,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :parent_id                       , :integer ],
         [ :name                            , :string  ],
         [ :description                     , :string  ],
+        [ :icon                            , :string  ],
         [ :is_global                       , :boolean , { :default => false }],
         [ :block_type_category_id          , :integer , { :default => 2 }],
         [ :render_function                 , :text    ],

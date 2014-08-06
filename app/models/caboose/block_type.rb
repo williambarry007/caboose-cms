@@ -25,6 +25,7 @@ class Caboose::BlockType < ActiveRecord::Base
     :options,
     :options_function,
     :options_url,
+    :icon,
     :share,      # Whether or not to share the block type in the existing block store.
     :downloaded  # Whether the full block type has been download or just the name and description.
     

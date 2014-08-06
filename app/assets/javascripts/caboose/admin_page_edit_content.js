@@ -135,6 +135,7 @@ PageContentController.prototype = {
   *****************************************************************************/
   
   render_blocks: function() {
+    $('.sortable').sortable('destroy');
     var that = this;                
     $.ajax({
       url: '/admin/pages/' + this.page_id + '/blocks/render-second-level',
@@ -143,6 +144,7 @@ PageContentController.prototype = {
           $('#block_' + b.id).replaceWith(b.html);                              
         });
         that.set_clickable();
+        that.sortable_blocks();
         that.selected_block_ids = [];
       }
     });

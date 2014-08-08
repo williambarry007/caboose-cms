@@ -1,0 +1,7 @@
+<div id='block_<%= block.id %>'>
+  <% if editing %>
+    <p style='border: #ccc 1px solid;'>Controller view content</p>
+  <% else %>
+    <%= raw controller_view_content %>
+  <% end %>
+</div>

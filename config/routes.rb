@@ -73,13 +73,18 @@ Caboose::Engine.routes.draw do
   get     "admin/images/s3"             => "images#admin_sign_s3"
   get     "admin/images/s3-result"      => "images#admin_s3_result"  
   get     "admin/images/new"            => "images#admin_new"
+  get     "admin/images/json"           => "images#admin_json"
   get     "admin/images/:id/process"    => "images#admin_process"
+  get     "admin/images/:id/finished"   => "images#admin_process_finished"
   get     "admin/images/:id"            => "images#admin_edit"  
   put     "admin/images/:id"            => "images#admin_update"
   post    "admin/images/:id/image"      => "images#admin_update_image"  
   post    "admin/images"                => "images#admin_add"
   delete  "admin/images/:id"            => "images#admin_delete"
   
+  post    "admin/media-categories"      => "media_categories#admin_add"
+  put     "admin/media-categories/:id"  => "media_categories#admin_update"      
+  delete  "admin/media-categories/:id"  => "media_categories#admin_delete"
   
   get     "admin/permissions"             => "permissions#index"
   get     "admin/permissions/options"     => "permissions#options"

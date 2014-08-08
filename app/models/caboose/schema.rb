@@ -136,14 +136,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name              , :string  ]        
       ],
       Caboose::MediaImage => [
-        [ :media_category_id , :integer ],
-        [ :name              , :string  ],
-        [ :description       , :text    ]
+        [ :media_category_id , :integer    ],
+        [ :name              , :string     ],
+        [ :description       , :text       ],
+        [ :image             , :attachment ]
       ],
       Caboose::MediaFile => [
-        [ :media_category_id , :integer ],
-        [ :name              , :string  ],
-        [ :description       , :text    ]
+        [ :media_category_id , :integer    ],
+        [ :name              , :string     ],
+        [ :description       , :text       ],
+        [ :file              , :attachment ]
       ],
       Caboose::Page => [
         [ :site_id               , :integer ],

@@ -16,7 +16,7 @@
 
 .mb_container input.mb_dirty,
 .mb_container textarea.mb_dirty {
-  background: #4D0101;  
+  background: #fff799;  
 }
 
 .mb_container select.mb_fake {

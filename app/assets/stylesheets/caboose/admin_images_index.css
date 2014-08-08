@@ -1,0 +1,33 @@
+
+ul.media { list-style: none; margin: 0; padding: 0; }
+ul.media li { list-style: none; margin: 4px; padding: 0; float: left; }
+ul.media a { 
+  display: block; 
+  width: 150px; 
+  height: 150px;
+  overflow: hidden; 
+  border: #666 4px solid; 
+  background-size: contain; 
+  background-repeat: no-repeat; 
+  background-position: center; 
+  background-color: #666; 
+  position: relative; 
+  text-align: center;
+}
+ul.media a:hover { 
+  background-color: #fff69f;
+  border-color: #fff69f; 
+}
+ul.media li a span { color: #fff; text-decoration: none; }
+ul.media li a:hover span { background: #efefef; color: #000; }
+ul.media li a span.name       { display: block; background: #666; color: #fff; text-decoration: none !important; border: 0; }
+ul.media li a:hover span.name { background: #fff69f; color: #000; }
+
+ul.media li a.selected span, 
+ul.media li a.selected:hover span { background: #fff69f; color: #000; border: #fff69f 1px solid; }
+
+ul.media li.category a span.icon { display: block; padding: 10px 20px; font-size: 24pt; color: #fff; }
+ul.media li.category a:hover span.icon { background: #fff69f; color: #000; }
+
+.progress { max-width: 600px; margin: 0.2em 0 0.2em 0; }
+.progress .bar { height:  1.2em; padding: 0.2em; color: white; display: none; }

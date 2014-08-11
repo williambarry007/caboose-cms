@@ -2,13 +2,15 @@
 <% if !@page.nil? && @page.title != 'Access Denied' %>
 <% content_for :js do %>
 <%= javascript_include_tag "caboose/application" %>
+<%= javascript_include_tag @site.name == 'application' ? 'application' : "@site.name/application" %>
 <script>window.loggedIn = <%= logged_in?.to_json %></script>
 <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
 <% @page.linked_resources_map[:js].each do |r| %><%= javascript_include_tag r %><% end %>
 <%= yield :caboose_js %>
 <% end %>  
 <% content_for :css do %>
-<%= stylesheet_link_tag('caboose/application') %>
+<%= stylesheet_link_tag 'caboose/application' %>
+<%= stylesheet_link_tag @site.name == 'application' ? 'application' : "@site.name/application" %>
 <% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
 <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
 <%= yield :caboose_css %>

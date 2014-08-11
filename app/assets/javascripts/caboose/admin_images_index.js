@@ -32,8 +32,8 @@ ImagesController.prototype = {
         that.cat = resp;        
       }        
     });        
-    $('#message').empty();
-    var ul = $('#media');
+    $('#message').empty();    
+    var ul = $('<ul/>');
     if (this.cat.children.length > 0 || this.cat.images.count > 0)
     {
       $.each(this.cat.children, function(i, cat2) {
@@ -46,14 +46,17 @@ ImagesController.prototype = {
       });
       $.each(this.cat.images, function(i, mi) {      
         ul.append($('<li/>').addClass('image').attr('id', 'image' + mi.id)
-          .append($('<a/>').attr('href', '/admin/images/' + mi.id)
+          .append($('<a/>')
+            .attr('href', '/admin/images/' + mi.id)
             .css('background-image', mi.tiny_url)
             .append($('<span/>').addClass('name').html(mi.name))
           )
         );
       });
     }
-    ul.replaceWith($('<p/>').html("This category is empty."));
+    else
+      ul = $('<p/>').html("This category is empty.");
+    $('#media').empty().append(ul);
   },
   
   // Adds a new media category  

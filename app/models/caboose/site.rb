@@ -16,4 +16,8 @@ class Caboose::Site < ActiveRecord::Base
     return d.site_id
   end
   
+  def self.sanitize_name(name)
+    self.name = self.name.downcase.gsub(' ', '_')
+  end
+  
 end

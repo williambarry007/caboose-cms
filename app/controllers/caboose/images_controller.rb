@@ -25,7 +25,7 @@ module Caboose
       
       id = params[:media_category_id]        
       cat = id ? MediaCategory.find(id) : MediaCategory.top_image_category(@site.id)      
-      render :json => cat.api_hash      
+      render :json => cat.api_hash
     end
 
     # GET /admin/images/new

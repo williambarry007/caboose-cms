@@ -159,35 +159,55 @@ class Caboose::Block < ActiveRecord::Base
         str = "<p class='note error'>#{msg}</p>"
       end            
     else
-      #view = ActionView::Base.new(ActionController::Base.view_paths, options2, )      
-      #view = ActionView::Base.new(options2[:view].view_renderer, {}, options2[:view].controller)      
-      begin        
-        full_name = block.block_type.full_name
-        full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0        
-        str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)        
-      rescue ActionView::MissingTemplate
-        begin          
-          str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)                    
-        rescue ActionView::MissingTemplate
+      
+      # Check the local site first      
+      site = options2[:site]
+      full_name = block.block_type.full_name
+      full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0
+        
+      begin                        
+        str = view.render(:partial => "../../sites/#{site.name}/blocks/#{full_name}", :locals => options2)        
+      rescue ActionView::MissingTemplate => ex
+        begin
+          str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.name}", :locals => options2)                    
+        rescue ActionView::MissingTemplate => ex
           begin                        
-            str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)            
-          rescue Exception => ex
-            msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
-            Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
-            str = "<p class='note error'>#{msg}</p>"
-          end
-        rescue Exception => ex          
-          msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
-          Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
-          str = "<p class='note error'>#{msg}</p>"
-        end
-      rescue Exception => ex
-        msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
-        Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
-        str = "<p class='note error'>#{msg}</p>"
-      end        
+            str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.field_type}", :locals => options2)            
+          rescue ActionView::MissingTemplate
+            begin
+              str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)        
+            rescue ActionView::MissingTemplate
+              begin          
+                str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)                    
+              rescue ActionView::MissingTemplate
+                begin                        
+                  str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)            
+                rescue Exception => ex                  
+                  str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
+                end
+              rescue Exception => ex                          
+                str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
+              end
+            rescue Exception => ex              
+              str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
+            end
+          rescue Exception => ex                  
+            str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
+          end                              
+        rescue Exception => ex                                                     
+          str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
+        end        
+      rescue Exception => ex        
+        str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
+      end                    
     end
     return str
+  end
+  
+  def block_message(block, ex)
+    msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
+    Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+    return msg
   end
 
   def render_from_function(options)

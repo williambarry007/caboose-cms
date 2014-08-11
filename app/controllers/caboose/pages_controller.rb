@@ -446,13 +446,10 @@ module Caboose
 
     # GET /admin/pages/sitemap-options
     def admin_sitemap_options
-      parent_id = params[:parent_id]      
-      d = Domain.where(:domain => request.host_with_port).first      
-      top_page = Page.index_page(d.site_id)
-      p = !parent_id.nil? ? Page.find(parent_id) : top_page
+      parent_id = params[:parent_id]
+      p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
       options = []
-      sitemap_helper(top_page, options)
-     	  
+      sitemap_helper(p, options)     	  
       render :json => options 		
     end
 

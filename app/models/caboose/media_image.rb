@@ -25,7 +25,7 @@ class Caboose::MediaImage < ActiveRecord::Base
     puts "Processing #{uri}..."
     
     self.image = URI.parse(uri)
-    self.save                
+    self.save
   end
   
   def api_hash

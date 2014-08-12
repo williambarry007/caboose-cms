@@ -159,6 +159,9 @@ module Caboose
         'tinymce/plugins/template/plugin.js',
         'tinymce/plugins/textcolor/plugin.js',
         'tinymce/plugins/caboose/plugin.js',
+        
+        # Site JS
+        '*/js/application.js',
 
         # CSS        
         'colorbox-rails.css',
@@ -180,7 +183,10 @@ module Caboose
         'caboose/station_modal.css',
         'caboose/station_sidebar.css',
         'caboose/tinymce.css',
-        'jquery.ui.all.css'
+        'jquery.ui.all.css',
+        
+        # Site CSS
+        '*/css/application.js'
         
       ]      
     end   

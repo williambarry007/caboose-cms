@@ -9,7 +9,7 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require colorbox-rails
- *= require jquery.ui.all
+ *= require jquery-ui
  *= require caboose/fonts
  *= require caboose/caboose
  *= require caboose/model_binder

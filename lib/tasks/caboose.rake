@@ -163,10 +163,10 @@ namespace :assets do
     # Clean up
     puts "Removing site assets from host assets..."
     Caboose::Site.all.each do |site|      
-      host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name, 'js')
-      host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name, 'css')
-      host_images = Rails.root.join('app', 'assets', 'images'      , site.name, 'images')
-      host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name, 'fonts')
+      host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
+      host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)
+      host_images = Rails.root.join('app', 'assets', 'images'      , site.name)
+      host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name)
                              
       `rm -rf #{host_js     }`
       `rm -rf #{host_css    }`

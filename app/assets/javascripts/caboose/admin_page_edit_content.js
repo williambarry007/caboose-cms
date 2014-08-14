@@ -207,6 +207,7 @@ PageContentController.prototype = {
     }
     if (b.allow_child_blocks)
     {
+      alert('Allowing child blocks');
       $('#block_' + b.id).after($('<div/>')          
         .addClass('new_block_link')
         .append($('<div/>').addClass('line'))

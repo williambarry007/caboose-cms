@@ -21,7 +21,8 @@ end
 
 <% if @block.block_type.use_render_function_for_layout %>
   <!-- Start -->
-  <%= raw @block.render(@block, {
+  <%
+  str = @block.render(@block, {
     :modal => true,
     :empty_text => '[Empty, click to edit]',
     :editing => true,    
@@ -33,7 +34,11 @@ end
     :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
     :logged_in_user => @logged_in_user,
     :site => @site
-  }) %>
+  })
+  str.gsub!('|CABOOSE_CSS|'        , yield(:css))
+  str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
+  str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)
+  %><%= raw str %>
   <!-- Stop -->
 <% elsif @block.block_type.field_type != 'block' %>
   <p><div id='block_<%= @block.id %>_value'></div></p>
@@ -43,7 +48,8 @@ end
       <% if b.block_type.field_type != 'block' && b.block_type.field_type != 'richtext' %>
         <p><div id='block_<%= b.id %>_value'></div></p>
       <% else %>
-        <%= raw @block.render(b, {
+        <%
+        str = @block.render(b, {
           :modal => true,
           :empty_text => '[Empty, click to edit]',
           :editing => true,
@@ -55,7 +61,11 @@ end
           :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
           :logged_in_user => @logged_in_user,
           :site => @site
-        }) %>
+        })
+        str.gsub!('|CABOOSE_CSS|'        , yield(:css))
+        str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
+        str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)
+        %><%= raw str %>
       <% end %>
     <% end %>
   <% else %>

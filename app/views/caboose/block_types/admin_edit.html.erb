@@ -18,6 +18,7 @@ bt = @block_type
 <p><div id='blocktype_<%= bt.id %>_fixed_placeholder'               ></div></p>
 <p><div id='blocktype_<%= bt.id %>_options_url'                     ></div></p>
 <p><div id='blocktype_<%= bt.id %>_options'                         ></div></p>
+<p><div id='blocktype_<%= bt.id %>_is_global'                       ></div></p>
 <p><div id='blocktype_<%= bt.id %>_use_render_function'             ></div></p>
 <p><div id='blocktype_<%= bt.id %>_use_render_function_for_layout'  ></div></p>
 <p><div id='blocktype_<%= bt.id %>_allow_child_blocks'              ></div></p>
@@ -127,6 +128,7 @@ $(document).ready(function() {
       { name: 'name'                           , nice_name: 'Name'                           , type: 'text'     , value: <%= raw Caboose.json(bt.name)                            %>, width: 400 },
       { name: 'description'                    , nice_name: 'Description'                    , type: 'text'     , value: <%= raw Caboose.json(bt.description)                     %>, width: 400 },
       { name: 'block_type_category_id'         , nice_name: 'Category'                       , type: 'select'   , value: <%= raw Caboose.json(bt.block_type_category_id)          %>, width: 400, options_url: '/admin/block-type-categories/tree-options' },
+      { name: 'is_global'                      , nice_name: 'Global'                         , type: 'checkbox' , value: <%= bt.is_global                      ? 'true' : 'false' %>, width: 400 },
       { name: 'use_render_function'            , nice_name: 'Use Render Function'            , type: 'checkbox' , value: <%= bt.use_render_function            ? 'true' : 'false' %>, width: 400 },
       { name: 'use_render_function_for_layout' , nice_name: 'Use Render Function for Layout' , type: 'checkbox' , value: <%= bt.use_render_function_for_layout ? 'true' : 'false' %>, width: 400 },
       { name: 'allow_child_blocks'             , nice_name: 'Allow Child Blocks'             , type: 'checkbox' , value: <%= bt.allow_child_blocks             ? 'true' : 'false' %>, width: 400 },

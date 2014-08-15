@@ -2,6 +2,8 @@
 class Caboose::Block < ActiveRecord::Base
   self.table_name = "blocks"
   
+  #after_find :get_master_value
+  
   belongs_to :page
   belongs_to :block_type
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
@@ -312,6 +314,31 @@ class Caboose::Block < ActiveRecord::Base
     self.children.each do |b|
       b.log_helper("#{prefix}-")
     end
+  end
+      
+  # Returns the master block for this global block 
+  def get_global_value(site_id)
+    return if !self.block_type.is_global    
+    return if !Caboose::Block.includes(:page).where("blocks.id <> ? and block_type_id = ? and pages.site_id = ?", self.id, self.block_type_id, site_id).exists?        
+    b = Caboose::Block.includes(:page).where("blocks.id <> ? and block_type_id = ? and pages.site_id = ?", self.id, self.block_type_id, site_id).reorder("blocks.id").first    
+    self.value = b.value
+    self.save
+    
+    self.children.each do |b2|
+      b2.get_global_value(site_id) if b2.block_type.is_global
+    end    
+  end
+  
+  # Updates all the global blocks for the given site
+  def update_global_value(value, site_id)
+    return if !self.block_type.is_global    
+    return if !Caboose::Block.includes(:page).where("blocks.id <> ? and block_type_id = ? and pages.site_id = ?", self.id, self.block_type_id, site_id).exists?        
+    
+    sql = ["update blocks set value = ? where id in (
+        select B.id from blocks B left join pages P on B.page_id = P.id
+        where B.id <> ? and B.block_type_id = ? and P.site_id = ?
+      )", value, self.id, self.block_type_id, site_id]       
+    ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, sql))            
   end
 
 end

@@ -193,8 +193,8 @@ module Caboose
       b = Block.new
       b.page_id = params[:page_id].to_i
       b.parent_id = params[:id] ? params[:id] : nil
-      b.block_type_id = params[:block_type_id] 
-                    
+      b.block_type_id = params[:block_type_id]
+                      
       if !params[:index].nil?      
         b.sort_order = params[:index].to_i
         
@@ -236,6 +236,11 @@ module Caboose
       
       # Ensure that all the children are created for the block
       b.create_children
+      
+      # Set the global values if necessary
+      if b.block_type.is_global        
+        b.get_global_value(@site.id)
+      end
 
       # Send back the response
       #resp.block = b
@@ -261,10 +266,16 @@ module Caboose
           when 'sort_order'    then b.sort_order    = v
           when 'name'          then b.name          = v
           when 'value'         then
-            if b.block_type.field_type == 'richtext' && (b.name.nil? || b.name.strip.length == 0)
-              b = RichTextBlockParser.parse(b, v, request.host_with_port)
-            else              
+            
+            if b.block_type.is_global              
               b.value = v
+              b.update_global_value(v, @site.id)              
+            else            
+              if b.block_type.field_type == 'richtext' && (b.name.nil? || b.name.strip.length == 0)
+                b = RichTextBlockParser.parse(b, v, request.host_with_port)
+              else              
+                b.value = v
+              end
             end
         end
       end

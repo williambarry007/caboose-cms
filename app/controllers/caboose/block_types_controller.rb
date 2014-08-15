@@ -72,6 +72,7 @@ module Caboose
           when 'parent_id'                       then bt.parent_id                      = v
           when 'name'                            then bt.name                           = v
           when 'description'                     then bt.description                    = v
+          when 'is_global'                       then bt.is_global                      = v
           when 'icon'                            then bt.icon                           = v
           when 'block_type_category_id'          then bt.block_type_category_id         = v
           when 'render_function'                 then bt.render_function                = v

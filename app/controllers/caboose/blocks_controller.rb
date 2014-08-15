@@ -3,6 +3,8 @@ require 'nokogiri'
 module Caboose
   class BlocksController < ApplicationController
     
+    helper :application
+    
     #===========================================================================
     # Admin actions
     #===========================================================================
@@ -135,7 +137,10 @@ module Caboose
             :empty_text => params[:empty_text],            
             :css => '|CABOOSE_CSS|',                     
             :js => '|CABOOSE_JAVASCRIPT|',
-            :csrf_meta_tags => '|CABOOSE_CSRF|'
+            :csrf_meta_tags => '|CABOOSE_CSRF|',
+            :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
+            :logged_in_user => @logged_in_user,
+            :site => @site
           })
         }
       end

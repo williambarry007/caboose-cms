@@ -57,7 +57,7 @@ class Caboose::Block < ActiveRecord::Base
   end
   
   def child_value(name)
-    b = child(name)
+    b = self.child(name)
     return nil if b.nil?
     return b.image if b.block_type.field_type == 'image'
     return b.file  if b.block_type.field_type == 'file'

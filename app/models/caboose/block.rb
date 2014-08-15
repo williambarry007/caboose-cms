@@ -208,9 +208,13 @@ class Caboose::Block < ActiveRecord::Base
     return str
   end
   
-  def block_message(block, ex)
-    msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
-    Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+  def block_message(block, ex)    
+    msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''
+    if ex.is_a?(String)
+      Caboose.log("#{msg}#{ex}")
+    else
+      Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+    end
     return msg
   end
 

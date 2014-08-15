@@ -24,12 +24,15 @@ b = @block
 <div class='icons'>
   <% Caboose::BlockTypeCategory.reorder(:name).all.each do |cat| %>
     <% next if cat.parent_id.nil? && cat.name == 'Layouts' %>
-    <h2 onclick="$('#cat<%= cat.id %>_container').slideToggle();"><%= cat.name %></h3>
-    <div id='cat<%= cat.id %>_container'>
-      <% cat.block_types.where("parent_id is null").reorder(:name).all.each do |bt| %>
-        <a href='#' onclick="add_child_block(<%= bt.id %>);"><span class='icon icon-<%= bt.icon %>'></span><span class='name'><%= bt.description %></span></a>
-      <% end %>
-    </div>
+    <% kids = cat.block_types.where("parent_id is null").reorder(:name).all %>
+    <% if kids && kids.count > 0 %>
+      <h2 onclick="$('#cat<%= cat.id %>_container').slideToggle();"><%= cat.name %></h3>
+      <div id='cat<%= cat.id %>_container'>
+        <% kids.each do |bt| %>
+          <a href='#' onclick="add_child_block(<%= bt.id %>);"><span class='icon icon-<%= bt.icon %>'></span><span class='name'><%= bt.description %></span></a>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 </div>
 </form>

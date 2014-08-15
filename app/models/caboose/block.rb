@@ -160,10 +160,14 @@ class Caboose::Block < ActiveRecord::Base
       end            
     else
       
-      # Check the local site first      
-      site = options2[:site]
       full_name = block.block_type.full_name
       full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0
+      
+      # Check the local site first      
+      site = options2[:site]
+      if site.nil?
+        self.block_message(block, "Error: site variable is nil.")
+      end
         
       begin                        
         str = view.render(:partial => "../../sites/#{site.name}/blocks/#{full_name}", :locals => options2)        

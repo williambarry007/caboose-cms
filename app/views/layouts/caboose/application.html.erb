@@ -6,6 +6,7 @@
 <script>window.loggedIn = <%= logged_in?.to_json %></script>
 <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
 <% @page.linked_resources_map[:js].each do |r| %><%= javascript_include_tag r %><% end %>
+<% if @page.custom_js && @page.custom_js.strip.length > 0 %><script type='text/javascript'><%= raw @page.custom_js %></script><% end %>
 <%= yield :caboose_js %>
 <% end %>  
 <% content_for :css do %>
@@ -13,6 +14,7 @@
 <%= stylesheet_link_tag @site.name == 'application' ? 'application' : "#{@site.name}/css/application" %>
 <% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
 <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
+<% if @page.custom_css && @page.custom_css.strip.length > 0 %><style><%= raw @page.custom_css %></style><% end %>
 <%= yield :caboose_css %>
 <% end %>
   <%  

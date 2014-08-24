@@ -6,8 +6,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
     {
       :roles_users             => :role_memberships,
       :permissions_roles       => :role_permissions,
-      :page_block_field_values => :fields,
-      :page_block_fields       => :field_types,
+      #:page_block_field_values => :fields,
+      #:page_block_fields       => :field_types,
       :page_block_types        => :block_types,
       :page_blocks             => :blocks
     }

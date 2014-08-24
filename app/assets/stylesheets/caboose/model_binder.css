@@ -27,7 +27,7 @@
   left: 0;
   color: transparent;
   background: transparent;
-  height: 50px !important;
+  /*height: 50px !important;*/
 }
 
 .mb_container select.mb_fake option {

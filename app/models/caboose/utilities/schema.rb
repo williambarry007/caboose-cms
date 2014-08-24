@@ -99,7 +99,8 @@ class Caboose::Utilities::Schema
     return if self.renamed_tables.nil?
     c = ActiveRecord::Base.connection
     self.renamed_tables.each do |old_name, new_name|
-      c.rename_table old_name, new_name if c.table_exists?(old_name)
+      next if !c.table_exists?(old_name) || c.table_exists?(new_name)      
+      c.rename_table old_name, new_name
     end
   end
   
@@ -110,7 +111,7 @@ class Caboose::Utilities::Schema
     self.renamed_columns.each do |model, cols|
       next if !c.table_exists? model.table_name
       cols.each do |old_name, new_name|
-        next if !c.column_exists? model.table_name, old_name
+        next if !c.column_exists?(model.table_name, old_name) || c.column_exists?(model.table_name, new_name)
         c.rename_column model.table_name, old_name, new_name
       end
     end

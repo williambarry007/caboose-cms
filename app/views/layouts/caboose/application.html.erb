@@ -1,5 +1,5 @@
 
-<% if !@page.nil? && @page.title != 'Access Denied' %>
+<% if @page && @page.title != 'Access Denied' %>
 <% content_for :js do %>
 <%= javascript_include_tag "caboose/application" %>
 <%= javascript_include_tag @site.name == 'application' ? 'application' : "#{@site.name}/js/application" %>

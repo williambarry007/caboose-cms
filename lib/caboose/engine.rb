@@ -127,6 +127,7 @@ module Caboose
         'colorbox-rails/jquery.colorbox-min.js',        
         'colorbox-rails.js',
         'colorbox-rails/colorbox-links.js',
+        'tinymce/plugins/caboose/plugin.js',
         
         'tinymce/preinit.js',        
         'tinymce/plugins/caboose/plugin.js',        

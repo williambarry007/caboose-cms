@@ -247,17 +247,15 @@ class Caboose::Block < ActiveRecord::Base
     return str
   end
         
-  def child_block_link        
-    return "<div class='new_block' id='new_block_#{self.id}'>New Block</div>"    
-  end
-  
-  def new_block_before_link        
-    return "<div class='new_block_before' id='new_block_before_#{self.id}'>New Block</div>"    
-  end
-  
-  def new_block_after_link        
-    return "<div class='new_block_after' id='new_block_after_#{self.id}'>New Block</div>"    
-  end
+  #def child_block_link        
+  #  return "<div class='new_block' id='new_block_#{self.id}'>New Block</div>"    
+  #end  
+  #def new_block_before_link        
+  #  return "<div class='new_block_before' id='new_block_before_#{self.id}'>New Block</div>"    
+  #end  
+  #def new_block_after_link        
+  #  return "<div class='new_block_after' id='new_block_after_#{self.id}'>New Block</div>"    
+  #end
   
   def title    
     str = "#{self.block_type.name}"

@@ -5,6 +5,10 @@ var ModelBinder = function(params) {
   all_model_binders[all_model_binders.length] = this;
 };
 
+ModelBinder.tinymce_init = function() {
+  alert('ModelBinder.tinymce_init');
+};
+
 ModelBinder.remove_from_all_model_binders = function(model_name, id) {
   var arr = [];
   $.each(all_model_binders, function(i, mb) {
@@ -14,8 +18,7 @@ ModelBinder.remove_from_all_model_binders = function(model_name, id) {
   all_model_binders = arr;  
 };
 
-ModelBinder.tinymce_current_control = function() {
-  var id = tinymce.activeEditor.id.toLowerCase();
+ModelBinder.tinymce_control = function(id) {  
   var control = false;
   $.each(all_model_binders, function(i, mb) {
     $.each(mb.controls, function(i, c) {        
@@ -24,6 +27,11 @@ ModelBinder.tinymce_current_control = function() {
     });
   });
   return control;
+};
+
+ModelBinder.tinymce_current_control = function() {
+  var id = tinymce.activeEditor.id.toLowerCase();
+  return ModelBinder.tinymce_control(id);    
 };
 
 ModelBinder.prototype = {
@@ -43,6 +51,7 @@ ModelBinder.prototype = {
     if (params['update_url'])         this.model.update_url = params['update_url'];
     if (params['success'])            this.success = params['success'];
     if (params['authenticity_token']) this.authenticity_token = params['authenticity_token'];
+    if (params['on_load'])            this.on_load = params['on_load'];
       
     var m = this.model;
     $.each(params['attributes'], function(i, attrib) {
@@ -76,7 +85,7 @@ ModelBinder.prototype = {
       
       this2.controls.push(control);    
     });
-    
+            
     if (this.on_load)
       this.on_load();
   },

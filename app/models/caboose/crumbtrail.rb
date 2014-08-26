@@ -1,10 +1,10 @@
 module Caboose
   class Crumbtrail
 
-    @_crumbtrail = []
+    @_crumbtrail = nil
     
-    def self.add(url, text = nil)
-      #@_crumbtrail = []
+    def add(url, text = nil)
+      @_crumbtrail = [] if @_crumbtrail.nil?
       if url.is_a?(Hash)
         url.each do |url2, text2|
           @_crumbtrail << [url2, text2]
@@ -14,7 +14,7 @@ module Caboose
       end
     end
     
-    def self.print(url = nil, text = nil)
+    def print(url = nil, text = nil)
       if url
         self.add(url, text)
       end

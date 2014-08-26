@@ -25,6 +25,8 @@ Attribute.prototype = {
   download_text: false,
   upload_text: false,
   image_refresh_delay: false,
+  minute_increment: 15,
+  hour_increment: 1,  
   
   update_url: false,
   options_url: false,

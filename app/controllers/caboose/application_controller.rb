@@ -29,7 +29,7 @@ module Caboose
       
       # Try to find the page 
       @page = Page.new
-      @crumb_trail  = []
+      @crumbtrail = Crumbtrail.new      
       @subnav       = {}
       @actions      = {}
       @tasks        = {}

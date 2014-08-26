@@ -185,8 +185,8 @@ PageContentController.prototype = {
             caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + parent_id + '/new?before_id=' + b.id);                        
           })
         )
-        .mouseover(function(e) { $(this).addClass('new_block_link_over');    e.stopPropagation(); })
-        .mouseout(function(e)  { $(this).removeClass('new_block_link_over'); e.stopPropagation(); })
+        .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
+        .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
       );      
     }
             
@@ -218,8 +218,8 @@ PageContentController.prototype = {
             caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + b.id + '/new?after_id=' + b.id);                        
           })
         )
-        .mouseover(function(e) { $(this).addClass('new_block_link_over');    e.stopPropagation(); })
-        .mouseout(function(e)  { $(this).removeClass('new_block_link_over'); e.stopPropagation(); })
+        .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
+        .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
       );
     }
     if (show_mouseover)

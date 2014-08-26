@@ -13,7 +13,7 @@ tinyMCE.init({
   plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table contextmenu directionality emoticons template paste textcolor caboose',
   toolbar1: 'caboose_save caboose_cancel | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
   image_advtab: true,
-  external_plugins: { 'caboose': '//#{Caboose::CDN_DOMAIN}/assets/tinymce/plugins/caboose/plugin.js' },
+  external_plugins: { 'caboose': '//#{Caboose::cdn_domain}/assets/tinymce/plugins/caboose/plugin.js' },
   setup: function(editor) {
     var control = ModelBinder.tinymce_control(editor.id);     
     editor.on('keyup', function(e) { control.tinymce_change(editor); });

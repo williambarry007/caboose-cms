@@ -21,7 +21,7 @@ module Caboose
     #		itemsPerPage:	Number of items you want to show per page. Defaults to 10 if not present.
     #		page: Current page number.  Defaults to 0 if not present.
     #
-    attr_accessor :original_params, :params, :options, :custom_url_vars    
+    attr_accessor :original_params, :params, :options, :custom_url_vars, :post_get    
   	
     #def initialize(post_get, params = nil, options = nil, &custom_url_vars = nil)
   	def initialize(post_get, params = nil, options = nil)
@@ -31,6 +31,7 @@ module Caboose
   	  
   		# Note: a few keys are required:
   		# base_url, page, itemCount, itemsPerPage
+  		@post_get = post_get
   		@original_params = {}
   		@params = {}
   		@options = {
@@ -83,7 +84,10 @@ module Caboose
   	end
   	
   	def set_item_count
-  	  @options['item_count'] = model_with_includes.where(where).count
+  	  m = model_with_includes.where(self.where)
+  	  n = self.near
+  	  m = m.near(n[0], n[1]) if n
+  	  @options['item_count'] = m.count
   	end
   	
   	def model_with_includes
@@ -146,21 +150,29 @@ module Caboose
   	end
   	
   	def items        		
-  		assoc = model_with_includes.where(where)
+  	  assoc = model_with_includes.where(self.where)
+      n = self.near
+      assoc = assoc.near(n[0], n[1]) if n  		
     	if @options['items_per_page'] != -1
-    	  assoc = assoc.limit(limit).offset(offset)
+    	  assoc = assoc.limit(self.limit).offset(self.offset)
     	end
-    	return assoc.reorder(reorder).all
+    	return assoc.reorder(self.reorder).all
   	end
   	
   	def all_items
-  	  return model_with_includes.where(where).all
+  	  m = model_with_includes.where(self.where)
+  	  n = self.near
+  	  m = m.near(n[0], n[1]) if n
+  	  return m.all
     end
   	
   	def item_values(attribute)
   	  arr = []
-  	  model_with_includes.where(where).all.each do |m|
-  	    arr << m[attribute]
+  	  m = model_with_includes.where(self.where)
+  	  n = self.near
+  	  m = m.near(n[0], n[1]) if n
+  	  m.all.each do |m2|  	  
+  	    arr << m2[attribute]
   	  end    	
     	return arr.uniq
     end  	  
@@ -305,6 +317,7 @@ module Caboose
       table = @options['model'].constantize.table_name      
   	  @params.each do |k,v|
         next if v.nil? || (v.kind_of?(String) && v.length == 0)
+        next if k.ends_with?('_near')
         
         col = nil        
         if @options['includes'] && @options['includes'].include?(k)           
@@ -394,6 +407,21 @@ module Caboose
   	  sql = [sql_str]  	   	  
   	  values.each { |v| sql << v }  	  
   	  return sql        	  
+    end
+    
+    def near      
+  	  @params.each do |k,v|
+        next if !k.ends_with?('_near')        
+        arr = k.split('_')
+        if arr.length == 3          
+          location = @post_get[arr[0]]
+          radius = @post_get[arr[1]]          
+          v = [location, radius] if location && radius && location.strip.length > 0 && radius.strip.length > 0
+        end                
+        next if v.nil? || !v.is_a?(Array) || v.count != 2
+        return v
+      end
+      return nil        	  
     end
     
     def limit

@@ -387,17 +387,17 @@ module Caboose
           v = v.kind_of?(Array) ? v.collect{ |v2| "%#{v2}%".upcase } : "%#{v}%".upcase
         elsif k.ends_with?('_null')
           col = "#{table}.#{k[0..-6]}" if col.nil?
-          sql2 = "#{col} ? null"
-          v = v == true ? 'is' : 'is not'          
+          sql2 = "#{col} #{v == true ? 'is' : 'is not'} null"
+          #v = v == true ? 'is' : 'is not'          
         else
           col = "#{table}.#{k}" if col.nil?
           sql2 = "#{col} = ?"
         end
-        
+                
         if v.kind_of?(Array)
           sql2 = "(" + v.collect{ |v2| "#{sql2}" }.join(" or ") + ")"
           v.each { |v2| values << v2 }
-        else              
+        elsif !k.ends_with?('_null')              
           values << v
         end
         sql << sql2                          

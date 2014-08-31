@@ -57,9 +57,9 @@ module Caboose
   def Caboose.teaser_text(str, length = 100)
     return "" if str.nil?    
     str2 = ActionController::Base.helpers.strip_tags(str)
-    if str2.length > 200
-      i = str2.index(' ', 200) - 1
-      i = 200 if i.nil?
+    if str2.length > length
+      i = str2.index(' ', length) - 1
+      i = length if i.nil?
       str2 = str2[0..i]
       str2[str2.length-1] = "" if str2.ends_with?(",")
       str2 = "#{str2}..."

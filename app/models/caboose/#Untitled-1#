@@ -1,0 +1,7 @@
+SELECT DISTINCT "job_postings".id, companies.package_id, date_available, title AS alias_0 
+FROM "job_postings" LEFT OUTER JOIN "job_posting_categories" ON "job_posting_categories"."job_posting_id" = "job_postings"."id" 
+LEFT OUTER JOIN "categories" ON "categories"."id" = "job_posting_categories"."category_id" 
+LEFT OUTER JOIN "companies" ON "companies"."id" = "job_postings"."company_id" 
+WHERE (job_postings.date_available is not null and job_postings.date_available >= '2014-08-31 22:11:44') 
+ORDER BY companies.package_id, date_available, title desc 
+LIMIT 10 OFFSET 0

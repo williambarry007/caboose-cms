@@ -121,8 +121,7 @@ module Caboose
       return false
     end
   	
-  	def table_name_of_association(assoc)
-      ap assoc
+  	def table_name_of_association(assoc)            
   	  return @options['model'].constantize.reflect_on_association(assoc.to_sym).class_name.constantize.table_name
   	end
   	

@@ -341,5 +341,11 @@ class Caboose::Page < ActiveRecord::Base
     end
     return resources
   end
+  
+  def head_title
+    str = ""
+    str << "#{page.title} | " if !page.title.nil? && page.title.strip.length > 0
+    str << page.site.description
+  end
 
 end

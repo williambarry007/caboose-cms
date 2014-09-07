@@ -344,8 +344,8 @@ class Caboose::Page < ActiveRecord::Base
   
   def head_title
     str = ""
-    str << "#{page.title} | " if !page.title.nil? && page.title.strip.length > 0
-    str << page.site.description
+    str << "#{self.title} | " if !self.title.nil? && self.title.strip.length > 0
+    str << self.site.description
   end
 
 end

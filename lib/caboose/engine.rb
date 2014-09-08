@@ -55,11 +55,16 @@ module Caboose
   
   # Strips html and returns the text that breaks closest to the given length
   def Caboose.teaser_text(str, length = 100)
-    return "" if str.nil?    
+    return '' if str.nil?    
     str2 = ActionController::Base.helpers.strip_tags(str).gsub("\n", ' ')
+    return '' if str2.nil? || str2.length == 0
     if str2.length > length
-      i = str2.index(' ', length) - 1
-      i = length if i.nil?
+      i = str2.index(' ', length)
+      if i.nil?
+        i = length
+      else
+        i = i - 1
+      end
       str2 = str2[0..i]
       str2[str2.length-1] = "" if str2.ends_with?(",")
       str2 = "#{str2}..."

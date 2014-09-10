@@ -39,7 +39,14 @@
     :logged_in_user => @logged_in_user,
     :site => @site
   })       
-  str.gsub!('|CABOOSE_CSS|'        , yield(:css))
+  
+  protocol = request.protocol
+  css = yield(:css)
+  css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
+  css.gsub!("<link href='//" , "<link href='#{protocol}")
+  
+  str.gsub!('|CABOOSE_CSS|'        , css)
+  str.gsub!('|CABOOSE_PROTOCOL|'   , protocol)  
   str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
   str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)  
   

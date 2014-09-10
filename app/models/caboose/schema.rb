@@ -30,7 +30,19 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::AbOption => [:text],
       Caboose::User => [:timezone],
       #Caboose::Field => [:child_block_id],
-      Caboose::BlockType => [:layout_function]
+      Caboose::BlockType => [:layout_function],
+      Caboose::CalendarEventGroup => [
+        :repeat_period , 
+        :repeat_sun    , 
+        :repeat_mon    , 
+        :repeat_tue    , 
+        :repeat_wed    , 
+        :repeat_thu    , 
+        :repeat_fri    , 
+        :repeat_sat    , 
+        :repeat_start  , 
+        :repeat_end    
+      ] 
     }
   end
 
@@ -118,6 +130,37 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :block_type_source_id , :integer ],
         [ :name                 , :string  ],
         [ :description          , :string  ]
+      ],
+      Caboose::Calendar => [
+        [ :site_id      , :integer  ],
+        [ :name         , :string   ],
+        [ :description  , :text     ]  
+      ],
+      Caboose::CalendarEvent => [
+        [ :calendar_id              , :integer  ],
+        [ :calendar_event_group_id  , :integer  ],
+        [ :name                     , :string   ],
+        [ :description              , :text     ],
+        [ :location                 , :string   ],
+        [ :begin_date               , :datetime ],
+        [ :end_date                 , :datetime ],
+        [ :all_day                  , :boolean  , { :default => false }],        
+        [ :repeats                  , :boolean  , { :default => false }]
+      ],
+      Caboose::CalendarEventGroup => [
+        [ :frequency    , :integer  , { :default => 1 }],
+        [ :period       , :string   , { :default => 'Week' }],        
+        [ :repeat_by    , :string   ],
+        [ :sun          , :boolean  , { :default => false }],
+        [ :mon          , :boolean  , { :default => false }],
+        [ :tue          , :boolean  , { :default => false }],
+        [ :wed          , :boolean  , { :default => false }],
+        [ :thu          , :boolean  , { :default => false }],
+        [ :fri          , :boolean  , { :default => false }],
+        [ :sat          , :boolean  , { :default => false }],
+        [ :date_start   , :date     ],
+        [ :repeat_count , :integer  ],
+        [ :date_end     , :date     ]
       ],
       Caboose::DatabaseSession => [
         [ :session_id  , :string   , :null => false ],

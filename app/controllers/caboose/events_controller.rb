@@ -64,13 +64,13 @@ module Caboose
             event.begin_date = DateTime.strptime("#{value} #{t}", '%m/%d/%Y %H:%M %z')                        
           when 'begin_time'
             d = event.begin_date ? event.begin_date.strftime('%Y-%m-%d') : DateTime.now.strftime('%Y-%m-%d')
-            event.begin_date = DateTime.strptime("#{d} #{value}", '%Y-%m-%d %H:%M %z')
+            event.begin_date = DateTime.strptime("#{d} #{value}", '%Y-%m-%d %I:%M %P')
           when 'end_date'
             t = event.end_date ? event.end_date.strftime('%H:%M %z') : '10:00 -0500'
             event.end_date = DateTime.strptime("#{value} #{t}", '%m/%d/%Y %H:%M %z')
           when 'end_time'
             d = event.end_date ? event.end_date.strftime('%Y-%m-%d') : DateTime.now.strftime('%Y-%m-%d')
-            event.end_date = DateTime.strptime("#{d} #{value}", '%Y-%m-%d %H:%M %z')
+            event.end_date = DateTime.strptime("#{d} #{value}", '%Y-%m-%d %I:%M %P')
           when 'repeats'
             g = event.calendar_event_group
             if value == true || value.to_i == 1

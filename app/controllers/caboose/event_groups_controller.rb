@@ -4,69 +4,38 @@ module Caboose
     
     helper :application
     
-    # GET /admin/calendars/:calendar_id/events/:id
-    def admin_edit
-      return unless user_is_allowed('calendars', 'edit')
-      @event = CalendarEvent.find(params[:id])      
-      render :layout => 'caboose/modal'
-    end
-    
-    # GET /admin/calendars/:calendar_id/events/new
-    def admin_new
-      return unless user_is_allowed('calendars', 'edit')
-      @calendar = Calendar.find(params[:calendar_id])
-      @begin_date = DateTime.iso8601(params[:begin_date])
-      render :layout => 'caboose/modal'
-    end
-    
-    # PUT /admin/calendars/:calendar_id/events/:id
+    # PUT /admin/calendars/:calendar_id/event-groups/:id
     def admin_update
       return unless user_is_allowed('calendars', 'edit')
       
       resp = StdClass.new
-      event = CalendarEvent.find(params[:id])
+      g = CalendarEventGroup.find(params[:id])
       
       save = true      
       params.each do |name, value|
         case name
-          when 'name'         then event.name         = value
-          when 'description'  then event.description  = value          
+          when 'frequency'    then g.frequency    = value
+          when 'period'       then g.period       = value        
+          when 'repeat_by'    then g.repeat_by    = value
+          when 'sun'          then g.sun          = value
+          when 'mon'          then g.mon          = value
+          when 'tue'          then g.tue          = value
+          when 'wed'          then g.wed          = value
+          when 'thu'          then g.thu          = value
+          when 'fri'          then g.fri          = value
+          when 'sat'          then g.sat          = value
+          when 'date_start'   then g.date_start   = DateTime.strptime(value, '%m/%d/%Y').to_date
+          when 'repeat_count' then g.repeat_count = value
+          when 'date_end'     then g.date_end     = DateTime.strptime(value, '%m/%d/%Y').to_date                                      
         end
       end
+      g.save
+      g.create_events
     
-      resp.success = save && event.save
+      resp.success = true
       render :json => resp
     end
-    
-    # POST /admin/calendars/:calendar_id/events
-    def admin_add
-      return unless user_is_allowed('calendars', 'edit')
-      
-      resp = StdClass.new      
-      event = CalendarEvent.new
-      event.calendar_id = params[:calendar_id]
-      event.name = params[:name]
-      event.begin_date = DateTime.iso8601("#{params[:begin_date]}T10:00:00-05:00") 
-      event.end_date   = DateTime.iso8601("#{params[:begin_date]}T10:00:00-05:00")      
-      event.all_day = true
-            
-      if event.name.nil? || event.name.strip.length == 0
-        resp.error = "Please enter an event name."
-      else
-        event.save
-        resp.redirect = "/admin/calendars/#{event.calendar_id}/events/#{event.id}"
-      end
-      render :json => resp
-    end
-    
-    # DELETE /admin/calendars/:id
-    def admin_delete
-      return unless user_is_allowed('calendars', 'delete')
-      Calendar.find(params[:id]).destroy      
-      resp = StdClass.new({ 'redirect' => "/admin/calendars" })                  
-      render :json => resp
-    end
-    
+     
     # GET /admin/event-groups/period-options
     def admin_period_options
       render :json => [

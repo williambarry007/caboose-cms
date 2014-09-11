@@ -25,7 +25,7 @@ g = @event.calendar_event_group
   <div id='repeat_by_container' <% if g.repeat_by != Caboose::CalendarEventGroup::PERIOD_MONTH %>style='display: none;'<% end %>>    
     <div id='calendareventgroup_<%= g.id %>_repeat_by'    ></div>
   </div>
-  <div id='week_container' <% if g.repeat_by != Caboose::CalendarEventGroup::PERIOD_WEEK %>style='display: none;'<% end %>>
+  <div id='week_container' <% if g.period != Caboose::CalendarEventGroup::PERIOD_WEEK %>style='display: none;'<% end %>>
     <table class='data'>
       <tr><th>S</th><th>M</th><th>T</th><th>W</th><th>R</th><th>F</th><th>S</th></tr>
       <tr>
@@ -59,7 +59,7 @@ g = @event.calendar_event_group
 
 var modal = false;
 $(window).ready(function() {
-  modal = new CabooseModal(600);
+  modal = new CabooseModal(460);
 });
 
 $(document).ready(function() {
@@ -72,9 +72,9 @@ $(document).ready(function() {
       { name: 'name'        , nice_name: 'Name'         , type: 'text'     , value: <%= raw Caboose.json(e.name        ) %>, width: 430 },        
       { name: 'description' , nice_name: 'Description'  , type: 'textarea' , value: <%= raw Caboose.json(e.description ) %>, width: 430, height: 100 },
       { name: 'location'    , nice_name: 'Location'     , type: 'text'     , value: <%= raw Caboose.json(e.location    ) %>, width: 430 },
-      { name: 'begin_date'  , nice_name: 'Begin date'   , type: 'date'     , value: <%= raw Caboose.json(e.begin_date.strftime('%m/%d/%Y') ) %>, width: 200 },
+      { name: 'begin_date'  , nice_name: 'Begin date'   , type: 'date'     , value: <%= raw Caboose.json(e.begin_date.strftime('%m/%d/%Y') ) %>, width: 200 , align: 'right' },
       { name: 'begin_time'  , nice_name: 'Begin time'   , type: 'time'     , value: <%= raw Caboose.json(e.begin_date.strftime('%I:%M %P') ) %>, width: 200 , fixed_placeholder: false },
-      { name: 'end_date'    , nice_name: 'End date'     , type: 'date'     , value: <%= raw Caboose.json(e.end_date.strftime('%m/%d/%Y')   ) %>, width: 200 },
+      { name: 'end_date'    , nice_name: 'End date'     , type: 'date'     , value: <%= raw Caboose.json(e.end_date.strftime('%m/%d/%Y')   ) %>, width: 200 , align: 'right' },
       { name: 'end_time'    , nice_name: 'End time'     , type: 'time'     , value: <%= raw Caboose.json(e.end_date.strftime('%I:%M %P')   ) %>, width: 200 , fixed_placeholder: false },
       { name: 'all_day'     , nice_name: 'All day'      , type: 'checkbox' , value: <%= raw e.all_day ? 1 : 0 %>, width: 100, after_update: after_all_day_update },
       { name: 'repeats'     , nice_name: 'Repeats'      , type: 'checkbox' , value: <%= raw e.repeats ? 1 : 0 %>, width: 100, after_update: after_repeats_update }      
@@ -121,7 +121,7 @@ function delete_event(event_id, confirm)
     type: 'delete',
     success: function(resp) {
       if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
-      if (resp.redirect) window.location = resp.redirect;
+      if (resp.redirect) modal.close();
     }
   });
 }

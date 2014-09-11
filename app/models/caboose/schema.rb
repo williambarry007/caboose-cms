@@ -31,7 +31,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::User => [:timezone],
       #Caboose::Field => [:child_block_id],
       Caboose::BlockType => [:layout_function],
-      Caboose::CalendarEventGroup => [
+      Caboose::CalendarEvent => [
         :repeat_period , 
         :repeat_sun    , 
         :repeat_mon    , 
@@ -42,6 +42,18 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :repeat_sat    , 
         :repeat_start  , 
         :repeat_end    
+      ],
+      Caboose::CalendarEventGroup => [
+        :repeat_period , 
+        :repeat_sun    , 
+        :repeat_mon    , 
+        :repeat_tue    , 
+        :repeat_wed    , 
+        :repeat_thu    , 
+        :repeat_fri    , 
+        :repeat_sat    , 
+        :repeat_start  , 
+        :repeat_end        
       ] 
     }
   end

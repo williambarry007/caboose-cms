@@ -4,7 +4,7 @@
 <form action='/admin/calendars/<%= @calendar.id %>' method='post' id='new_event_form'>
   <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'>
   <input type='hidden' name='begin_date' value='<%= @begin_date.strftime('%Y-%m-%d') %>'>
-  <p><input type='text' name='name' id='name'       placeholder='Name' style='width: 500px;'></p>    
+  <p><input type='text' name='name' id='name'       placeholder='Name' style='width: 430px;'></p>    
   <div id='message'></div>
   <p>
     <input type='button' value='Cancel' onclick="modal.close();" />
@@ -17,7 +17,7 @@
 <script type="text/javascript">
 
 $(window).load(function() {
-  modal = new CabooseModal(600);
+  modal = new CabooseModal(460);
 });
 
 function add_event()

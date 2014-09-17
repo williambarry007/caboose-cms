@@ -11,7 +11,8 @@ class Caboose::Block < ActiveRecord::Base
   has_attached_file :file, :path => '/uploads/:id.:extension'
   do_not_validate_attachment_file_type :file
   has_attached_file :image, 
-    :path => 'uploads/:id_:style.:extension', 
+    :path => 'uploads/:id_:style.:extension',
+    :default_url => "http://placehold.it/300x300",
     :styles => {
       :tiny  => '160x120>',
       :thumb => '400x300>',

@@ -28,11 +28,24 @@ BoundRichText = BoundControl.extend({
     var h = $('#'+this.el+'_placeholder').outerHeight();
     $('#'+this.el).attr('placeholder', 'empty').css('padding-top', '+=' + h).css('height', '-=' + h);
     
-    var this2 = this;
-    
-    setTimeout(function() {      
-      //tinymce.execCommand("mceAddEditor", false, this2.el);
-      var ed = tinymce.EditorManager.createEditor(this2.el);            
+    var this2 = this;          
+    //$('#'+this.el).ready(function(){
+    //  var ed = tinymce.get(this2.el);
+    //  if (ed)
+    //  {
+    //    //alert('Removing editor...');
+    //    //tinymce.remove(ed);
+    //    tinymce.execCommand("mceRemoveControl", true, this2.el);
+    //  }
+    //  tinymce.EditorManager.execCommand("mceAddEditor", true, this2.el);       
+    //});
+      
+    setTimeout(function() {
+      //tinymce.EditorManager.execCommand("mceAddEditor", false, this2.el);
+      //tinymce.EditorManager.execCommand("mceAddEditor", false, this2.el);
+      tinymce.execCommand("mceAddEditor", false, this2.el);      
+      //var ed = tinymce.EditorManager.createEditor(this2.el);
+      //alert(ed);
       //var ed = new tinymce.Editor(this2.el, {
       //    setup: function (editor) {
       //      editor.on('init', function (e) { alert('Test'); });  

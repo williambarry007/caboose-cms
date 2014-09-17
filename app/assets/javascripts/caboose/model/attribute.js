@@ -33,7 +33,7 @@ Attribute.prototype = {
   options: false,
   s3: false,
   
-  save: function(after) {
+  save: function(after) {          
     if (this.before_update) this.before_update();    
     var this2 = this;
     $.ajax({
@@ -59,7 +59,7 @@ Attribute.prototype = {
   
   populate_options: function(after) {
     if (!this.options_url)
-      return;    
+      return;        
     if (this.options)
     {
       if (after) after();

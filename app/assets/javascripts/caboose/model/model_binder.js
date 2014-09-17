@@ -34,12 +34,45 @@ ModelBinder.tinymce_current_control = function() {
   return ModelBinder.tinymce_control(id);    
 };
 
+//==============================================================================
+
+ModelBinder.options = {};
+ModelBinder.waiting_on_options = {};
+ModelBinder.wait_for_options = function(url, after) {  
+  if (ModelBinder.options[url])
+  {
+    after(ModelBinder.options[url]);      
+  }
+  else if (ModelBinder.waiting_on_options[url])
+  {
+    ModelBinder.waiting_on_options[url].push(after);
+  }
+  else
+  {
+    ModelBinder.waiting_on_options[url] = [after];      
+    var that = this;
+    $.ajax({
+      url: url,
+      type: 'get',
+			success: function(resp) {
+			  ModelBinder.options[url] = resp;			  
+        $.each(ModelBinder.waiting_on_options[url], function(i, after2) {        
+          after2(ModelBinder.options[url]);
+        });
+			}			
+		});
+  }    
+};
+
+//==============================================================================
+
 ModelBinder.prototype = {
   model: false,
   controls: [],
   on_load: false,
   success: false,
   authenticity_token: false,
+  options: {},
   
   init: function(params) {
     this.model = new Model({        
@@ -60,7 +93,7 @@ ModelBinder.prototype = {
     //this.model.populate_options();
 
     var this2 = this;
-    $.each(this.model.attributes, function(i, attrib) {
+    $.each(this.model.attributes, function(i, attrib) {      
       var opts = {
         model: this2.model,
         attribute: attrib,
@@ -71,7 +104,7 @@ ModelBinder.prototype = {
       if (attrib.type == 'text')                   control = new BoundText(opts);
       else if (attrib.type == 'select')            control = new BoundSelect(opts);
       else if (attrib.type == 'checkbox')          control = new BoundCheckbox(opts);
-      else if (attrib.type == 'checkbox-multiple') control = new BoundCheckboxMultiple(opts);
+      else if (attrib.type == 'checkbox-multiple') control = new BoundCheckboxMultiple(opts);      
       else if (attrib.type == 'textarea')          control = new BoundTextarea(opts);
       else if (attrib.type == 'richtext')          control = new BoundRichText(opts);
       else if (attrib.type == 'image')             control = new BoundImage(opts);

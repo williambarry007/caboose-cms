@@ -26,7 +26,8 @@ module Caboose
       return if !user_is_allowed('posts', 'view')
         
       @gen = Caboose::PageBarGenerator.new(params, {
-          'name'       => ''
+          'site_id'     => @site.id,
+          'name'        => ''
       },{
           'model'       => 'Caboose::Post',
           'sort'        => 'created_at DESC',
@@ -55,7 +56,11 @@ module Caboose
     def admin_edit_categories
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])
-      @categories = PostCategory.reorder(:name).all
+      @categories = PostCategory.where(:site_id => @site.id).reorder(:name).all
+      if @categories.nil? || @categories.count == 0
+        PostCategory.create(:site_id => @site.id, :name => 'General News')
+        @categories = PostCategory.where(:site_id => @site.id).reorder(:name).all
+      end
       render :layout => 'caboose/admin'
     end
   
@@ -114,6 +119,7 @@ module Caboose
       })
     
       post = Post.new
+      post.site_id = @site.id
       post.title = params[:title]      
       post.published = false
   

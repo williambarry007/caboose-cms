@@ -4,6 +4,7 @@ class Caboose::Site < ActiveRecord::Base
        
   has_many :site_memberships, :class_name => 'Caboose::SiteMembership', :dependent => :delete_all
   has_many :domains, :class_name => 'Caboose::Domain', :dependent => :delete_all
+  has_many :post_categories, :class_name => 'Caboose::PostCategory'
   attr_accessible :id, :name, :description
   
   def smtp_config

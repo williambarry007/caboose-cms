@@ -244,17 +244,19 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :action   , :string ]
       ],
       Caboose::Post => [
+        [ :site_id              , :integer    ],
         [ :title                , :text       ],
-        [ :body                 , :text 		   ],
+        [ :body                 , :text 		  ],
         [ :hide                 , :boolean    ],
-        [ :image_url            , :text 		   ],
+        [ :image_url            , :text 		  ],
         [ :published            , :boolean    ],
         [ :created_at           , :datetime   ],
         [ :updated_at           , :datetime   ],
         [ :image                , :attachment ]
       ],
       Caboose::PostCategory => [
-        [ :name , :string ]
+        [ :site_id  , :integer ],
+        [ :name     , :string  ]
       ],
       Caboose::PostCategoryMembership => [
         [ :post_id          , :integer ],

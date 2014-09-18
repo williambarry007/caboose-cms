@@ -4,8 +4,10 @@ class Caboose::Post < ActiveRecord::Base
   
   has_many :post_category_memberships
   has_many :post_categories, :through => :post_category_memberships
-    
-  attr_accessible :id, 
+  belongs_to :site
+  
+  attr_accessible :id,
+    :site_id,
     :category_id, 
     :title, 
     :body, 

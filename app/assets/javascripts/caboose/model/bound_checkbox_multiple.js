@@ -39,7 +39,37 @@ BoundCheckboxMultiple = BoundControl.extend({
   
   view: function() {
     var that = this;    
-    var tbody = $('<tbody/>');    
+    var tbody = $('<tbody/>');
+    
+    if (this.attribute.show_check_all)
+    {      
+      var all_checked = true
+      $.each(this.attribute.options, function(i, option) {        
+        if (that.attribute.value.indexOf(option.value) == -1)
+        {
+          all_checked = false;
+          return;
+        }
+      });  
+      var input = $('<input/>')
+        .attr('id', that.el + '_all')
+        .attr('type', 'checkbox')        
+        .val('all')
+        .css('position', 'relative')
+        .on('change', function() {
+          var checked = $(this).prop('checked');
+          that.save('all', checked);
+          $.each(that.attribute.options, function(i, option) {                        
+            $('#' + that.el + '_' + i).prop('checked', checked);
+          });          
+        });
+      if (all_checked)
+        input.attr('checked', 'true');          
+      tbody.append($('<tr/>')
+        .append($('<td/>').append(input))
+        .append($('<td/>').append($('<label/>').attr('for', that.el + '_all').html('Check All')))
+      );      
+    }
     $.each(that.attribute.options, function(i, option) {
       var checked = that.attribute.value.indexOf(option.value) > -1;
       tbody.append($('<tr/>')
@@ -50,7 +80,17 @@ BoundCheckboxMultiple = BoundControl.extend({
             .attr('checked', checked)
             .val(option.value)
             .css('position', 'relative')
-            .on('change', function() { that.save($(this).val(), $(this).prop('checked')); })
+            .on('change', function() {              
+              that.save($(this).val(), $(this).prop('checked'));              
+              if (that.attribute.show_check_all)
+              {
+                var all_checked = true;
+                $.each(that.attribute.options, function(j, option) {                   
+                  if ($('#' + that.el + '_' + j).prop('checked') == false) all_checked = false;
+                });
+                $('#' + that.el + '_all').prop('checked', all_checked);
+              }            
+            })            
           )
         )
         .append($('<td/>').append($('<label/>').attr('for', that.el + '_' + i).html(option.text)))

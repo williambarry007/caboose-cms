@@ -11,7 +11,7 @@ tinyMCE.init({
   height: '300px',
   convert_urls: false,
   plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table contextmenu directionality emoticons template paste textcolor caboose',
-  toolbar1: 'caboose_save caboose_cancel | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+  toolbar1: 'caboose_save caboose_cancel | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
   image_advtab: true,
   external_plugins: { 'caboose': '//#{Caboose::cdn_domain}/assets/tinymce/plugins/caboose/plugin.js' },
   setup: function(editor) {

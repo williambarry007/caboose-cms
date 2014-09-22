@@ -2,6 +2,7 @@
 //= require caboose/model/model
 //= require caboose/model/s3
 //= require caboose/model/attribute
+//= require caboose/model/index_table
 //= require caboose/model/model_binder
 //= require caboose/model/bound_control
 //= require caboose/model/bound_checkbox

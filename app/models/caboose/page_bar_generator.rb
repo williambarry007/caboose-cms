@@ -69,13 +69,12 @@ module Caboose
   		  long_key = @options['abbreviations'][key]  		  
         new_params[long_key] = post_get[key] ? post_get[key] : val
         keys_to_delete << key        
-  		}
+  		}  	
   		keys_to_delete.each { |k| @params.delete(k) }
-  		new_params.each { |k,v| @params[k] = v }
-  		@original_params.each { |k,v| @original_params[k] = post_get[k] ? post_get[k] : v }
-  		@params.each  { |k,v| @params[k]  = post_get[k] ? post_get[k] : v }        			
-  		@options.each { |k,v| @options[k] = post_get[k] ? post_get[k] : v }
-  		
+  		new_params.each { |k,v| @params[k] = v }  		
+  		@original_params.each { |k,v| @original_params[k] = post_get[k] ? post_get[k] : v }  		
+  		@params.each  { |k,v| @params[k]  = post_get[k] ? post_get[k] : v }  		
+  		@options.each { |k,v| @options[k] = ok(post_get[k]) ? post_get[k] : v }  		  		
   		#@custom_url_vars = custom_url_vars if !custom_url_vars.nil?
   		@use_url_params = @options['use_url_params'].nil? ? Caboose.use_url_params : @options['use_url_params']
       
@@ -148,10 +147,10 @@ module Caboose
       return true
   	end
   	
-  	def items        		
+  	def items
   	  assoc = model_with_includes.where(self.where)
       n = self.near
-      assoc = assoc.near(n[0], n[1]) if n  		
+      assoc = assoc.near(n[0], n[1]) if n        		
     	if @options['items_per_page'] != -1
     	  assoc = assoc.limit(self.limit).offset(self.offset)
     	end
@@ -438,6 +437,18 @@ module Caboose
       end
       str << " desc" if @options['desc'] == 1       
       return str
-    end             
+    end
+    
+    def to_json
+      {
+        :base_url       => @options['base_url'],
+        :sort           => @options['sort'],
+        :desc           => @options['desc'],
+        :item_count     => @options['item_count'],  		
+        :items_per_page => @options['items_per_page'],
+        :page           => @options['page'],		  		
+        :use_url_params => @use_url_params  				  		
+      }
+    end
   end
 end

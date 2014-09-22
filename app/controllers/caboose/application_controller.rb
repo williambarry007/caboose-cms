@@ -202,6 +202,15 @@ module Caboose
       return "" if s.nil?    
       return s.value
     end
+    
+    # RedirectsConverts querystrings into hashes    
+    def hashify_query_string
+      if request.query_string && request.query_string.length > 0
+        redirect_to request.url.gsub('?', '#')
+        return true
+      end
+      return false
+    end
       
   end
 end

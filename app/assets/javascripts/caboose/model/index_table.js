@@ -52,6 +52,10 @@ IndexTable.prototype = {
   
   // The post/get in the original request
   post_get: false,
+    
+  allow_bulk_edit: true,
+  allow_bulk_delete: true,
+  allow_duplicate: true,
       
   //============================================================================
   // End of required parameters
@@ -142,11 +146,13 @@ IndexTable.prototype = {
       data: that.pager_params,
       success: function(resp) {
         for (var thing in resp['pager'])
-          that.pager_params[thing] = resp['pager'][thing];        
+          that.pager_params[thing] = resp['pager'][thing];                
         that.models = resp['models'];
-        $.each(that.models, function(i, m) {
-          m.id = parseInt(m.id);                    
-        });
+        for (var i=0; i<that.models.length; i++)
+        {
+          var m = that.models[i];                              
+          m.id = parseInt(m.id);          
+        }
         that.print();
         
         // Set the history state
@@ -180,7 +186,11 @@ IndexTable.prototype = {
     }
     else
     {
-      var columns = this.column_checkboxes();      
+      var columns = this.column_checkboxes();            
+      var controls = $('<p/>');
+      if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', 'bulk_edit'  ).val('Bulk Edit'  ).click(function(e) { that.bulk_edit();   })).append(' ');
+      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', 'bulk_delete').val('Bulk Delete').click(function(e) { that.bulk_delete(); })).append(' ');
+      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', 'duplicate'  ).val('Duplicate'  ).click(function(e) { that.duplicate();   }));
       
       $('#' + that.container).empty()
         .append($('<a/>').attr('href', '#').html('Show/Hide Columns').click(function(e) { e.preventDefault(); $('#columns').slideToggle(); }))          
@@ -188,11 +198,7 @@ IndexTable.prototype = {
         .append($('<div/>').attr('id', 'table_container').append(table))        
         .append($('<div/>').attr('id', 'pager').append(pager))        
         .append($('<div/>').attr('id', 'message'))
-        .append($('<p/>')
-          .append($('<input/>').attr('type', 'button').attr('id', 'bulk_edit'  ).val('Bulk Edit'  ).click(function(e) { that.bulk_edit();   })).append(' ')
-          .append($('<input/>').attr('type', 'button').attr('id', 'bulk_delete').val('Bulk Delete').click(function(e) { that.bulk_delete(); })).append(' ')
-          .append($('<input/>').attr('type', 'button').attr('id', 'duplicate'  ).val('Duplicate'  ).click(function(e) { that.duplicate();   }))
-        );
+        .append(controls);        
       $('#columns').hide();
     }    
       
@@ -222,9 +228,11 @@ IndexTable.prototype = {
   
   table_headers: function()
   {
-    var that = this;
-    var tr = $('<tr/>').append($('<th/>').html('&nbsp;'));
-    //var url = this.base_url + this.base_url.indexOf('?') > -1 ? '&' : '?';
+    var that = this;    
+    var tr = $('<tr/>');
+    
+    if (this.allow_bulk_edit || this.allow_bulk_delete || this.allow_duplicate)   
+      tr.append($('<th/>').html('&nbsp;'));    
     
     $.each(this.fields, function(i, field) {
       if (field.show)
@@ -236,7 +244,7 @@ IndexTable.prototype = {
           sort: field.sort,
           desc: (that.pager_params.sort == field.sort ? (parseInt(that.pager_params.desc) == 1 ? '0' : '1') : '0')
         });
-        
+                
         var input = $('<input/>').attr('type', 'checkbox').attr('id', 'quick_edit_' + field.name).val(field.name)            
           .change(function() {
             that.quick_edit_field = $(this).prop('checked') ? $(this).val() : false;
@@ -259,27 +267,31 @@ IndexTable.prototype = {
   table_row: function(m)
   {
     var that = this;
-    var checkbox = $('<input/>').attr('type', 'checkbox').attr('id', 'model_' + m.id)        
-      .click(function(e) {           
-        e.stopPropagation();
-        var model_id = $(this).attr('id').replace('model_', '');          
-        if (model_id == 'NaN')
-          alert("Error: invalid model id.");
-        else
-        {
-          model_id = parseInt(model_id);
-          var checked = $(this).prop('checked');
-          var i = that.model_ids.indexOf(model_id);                    
-          if (checked && i == -1) that.model_ids.push(model_id);
-          if (!checked && i > -1) that.model_ids.splice(i, 1);
-        }
-      });
-    if (that.model_ids.indexOf(m.id) > -1)
-      checkbox.prop('checked', 'true');      
+    
+    var tr = $('<tr/>').attr('id', 'model_row_' + m.id); 
       
-    var tr = $('<tr/>')
-      .attr('id', 'model_row_' + m.id)                
-      .append($('<td/>').append(checkbox));
+    if (that.allow_bulk_edit || that.allow_bulk_delete || that.allow_duplicate)
+    {
+      var checkbox = $('<input/>').attr('type', 'checkbox').attr('id', 'model_' + m.id)        
+        .click(function(e) {           
+          e.stopPropagation();
+          var model_id = $(this).attr('id').replace('model_', '');          
+          if (model_id == 'NaN')
+            alert("Error: invalid model id.");
+          else
+          {
+            model_id = parseInt(model_id);
+            var checked = $(this).prop('checked');
+            var i = that.model_ids.indexOf(model_id);                    
+            if (checked && i == -1) that.model_ids.push(model_id);
+            if (!checked && i > -1) that.model_ids.splice(i, 1);
+          }
+        });
+      if (that.model_ids.indexOf(m.id) > -1)
+        checkbox.prop('checked', 'true');  
+      tr.append($('<td/>').append(checkbox));
+    }
+
     if (!that.quick_edit_field)
     {
       tr.click(function(e) {

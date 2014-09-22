@@ -237,12 +237,11 @@ IndexTable.prototype = {
     $.each(this.fields, function(i, field) {
       if (field.show)
       {
-        var arrow = that.pager_params.sort == field.sort ? (parseInt(that.pager_params.desc) == 1 ? ' &uarr;' : ' &darr;') : '';
-        //var link = url + "sort=" + field.sort + "&desc=" + (that.pager_params.sort == field.sort ? (parseInt(that.pager_params.desc) == 1 ? '0' : '1') : '0');
-        //var link = that.pager_url({
+        var s = field.sort ? field.sort : field.name;
+        var arrow = that.pager_params.sort == s ? (parseInt(that.pager_params.desc) == 1 ? ' &uarr;' : ' &darr;') : '';                
         var link = that.pager_hash({
-          sort: field.sort,
-          desc: (that.pager_params.sort == field.sort ? (parseInt(that.pager_params.desc) == 1 ? '0' : '1') : '0')
+          sort: s,
+          desc: (that.pager_params.sort == s ? (parseInt(that.pager_params.desc) == 1 ? '0' : '1') : '0')
         });
                 
         var input = $('<input/>').attr('type', 'checkbox').attr('id', 'quick_edit_' + field.name).val(field.name)            
@@ -255,7 +254,7 @@ IndexTable.prototype = {
         tr.append($('<th/>').append(input).append('<br/>')
           .append($('<a/>')
             .attr('href', link)            
-            .data('sort', field.sort)                        
+            .data('sort', s)                        
             .html(field.nice_name + arrow)            
           )
         );

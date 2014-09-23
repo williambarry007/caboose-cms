@@ -462,6 +462,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
       bt.field_type = 'richtext'
       bt.save
     end
+    if !Caboose::BlockType.where(:name => 'richtext2').exists?
+      Caboose::BlockType.create(:name => 'richtext2', :description => 'Rich Text (Non-Parsed)', :field_type => 'richtext', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)    
+    end
     if !Caboose::BlockType.where(:name => 'image').exists?
       bt = Caboose::BlockType.create(:name => 'image', :description => 'Image', :field_type => 'block')
       Caboose::BlockType.create(:parent_id => bt.id, :name => 'image_src'     , :description => 'Image'         , :field_type => 'image'  , :default => ''      , :width => 400, :fixed_placeholder => false)

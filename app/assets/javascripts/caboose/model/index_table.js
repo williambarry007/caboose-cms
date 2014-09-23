@@ -251,11 +251,21 @@ IndexTable.prototype = {
           });
         if (field.name == that.quick_edit_field)
           input.prop('checked', 'true');         
-        tr.append($('<th/>').append(input).append('<br/>')
+        tr.append($('<th/>')
+          .append(input).append('<br/>')
           .append($('<a/>')
+            .attr('id', 'quick_edit_' + field.name).val(field.name)
             .attr('href', link)            
             .data('sort', s)                        
-            .html(field.nice_name + arrow)            
+            .html(field.nice_name + arrow)
+            //.mousedown(function(e) {
+            //  if (e.which == 3) // right click
+            //  {
+            //    var field_name = $(this).attr('id').replace('quick_edit_', '');
+            //    that.quick_edit_field = that.quick_edit_field == field_name ? false : field_name;
+            //    that.refresh();
+            //  }
+            //})
           )
         );
       }        

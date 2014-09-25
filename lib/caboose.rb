@@ -61,6 +61,10 @@ module Caboose
 
   # Session length (in hours)
   mattr_accessor :session_length
-  @@session_length = 24  
+  @@session_length = 24
+
+  # Parse rich text blocks
+  mattr_accessor :parse_richtext_blocks
+  @@parse_richtext_blocks = true  
   
 end

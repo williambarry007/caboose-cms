@@ -270,8 +270,8 @@ module Caboose
             if b.block_type.is_global              
               b.value = v
               b.update_global_value(v, @site.id)              
-            else            
-              if !Caboose::parse_richtext_blocks && b.block_type.field_type == 'richtext' && (b.name.nil? || b.name.strip.length == 0) && (b.block_type.name != 'richtext2')                                
+            else              
+              if Caboose::parse_richtext_blocks == true && b.block_type.field_type == 'richtext' && (b.name.nil? || b.name.strip.length == 0) && (b.block_type.name != 'richtext2')                
                 b = RichTextBlockParser.parse(b, v, request.host_with_port)
               else              
                 b.value = v

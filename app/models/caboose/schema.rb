@@ -181,9 +181,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :updated_at  , :datetime , :null => true  ]
       ],
       Caboose::Domain => [
-        [ :site_id     , :integer ],
-        [ :domain      , :string  ],
-        [ :primary     , :boolean, { :default => false }]
+        [ :site_id            , :integer ],
+        [ :domain             , :string  ],
+        [ :primary            , :boolean, { :default => false }],
+        [ :under_construction , :boolean, { :default => false }]
       ],
       Caboose::MediaCategory => [
         [ :parent_id         , :integer ],
@@ -280,8 +281,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :value , :text   ]
       ],
       Caboose::Site => [
-        [ :name        , :string ],
-        [ :description , :text   ]
+        [ :name                     , :string ],
+        [ :description              , :text   ],
+        [ :under_construction_html  , :text   ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],

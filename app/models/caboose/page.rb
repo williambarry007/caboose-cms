@@ -67,7 +67,7 @@ class Caboose::Page < ActiveRecord::Base
   def self.page_with_uri(host_with_port, uri, get_closest_parent = true)
 
     d = Caboose::Domain.where(:domain => host_with_port).first
-    return false if d.nil?
+    return false if d.nil? || d.under_construction == true
     site_id = d.site_id    
     
     uri = uri.to_s.gsub(/^(.*?)\?.*?$/, '\1')

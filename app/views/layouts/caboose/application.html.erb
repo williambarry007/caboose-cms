@@ -26,7 +26,8 @@
     b.create_children
   end
   #b.log_helper
-  str = b.render(b, {      
+  str = b.render(b, {
+    :page => @page,
     :view => self,
     :controller_view_content => yield,
     :modal => false,

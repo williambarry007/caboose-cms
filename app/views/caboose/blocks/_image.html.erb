@@ -1,15 +1,15 @@
 <%
-img       = block.child('image_src')
-img_style = block.child('image_style').value.to_sym
-link      = block.child('link').value
-align     = block.child('align').value
-width     = block.child('width').value
-height    = block.child('height').value
-mt        = block.child('margin_top').value.downcase
-mr        = block.child('margin_right').value.downcase
-mb        = block.child('margin_bottom').value.downcase
-ml        = block.child('margin_left').value.downcase
-url = img && img.image ? img.image.url(img_style.downcase.to_sym) : nil
+img       = block.child_value('image_src')
+img_style = block.child_value('image_style')
+link      = block.child_value('link')
+align     = block.child_value('align')
+width     = block.child_value('width')
+height    = block.child_value('height')
+mt        = block.child_value('margin_top').downcase
+mr        = block.child_value('margin_right').downcase
+mb        = block.child_value('margin_bottom').downcase
+ml        = block.child_value('margin_left').downcase
+url = img ? img.url(img_style.downcase.to_sym) : nil
 
 img = nil
 if url && !url.include?('missing.png')  

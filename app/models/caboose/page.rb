@@ -7,6 +7,7 @@ class Caboose::Page < ActiveRecord::Base
   has_many :children, :class_name => 'Caboose::Page', :foreign_key => 'parent_id', :order => 'sort_order, title'
   has_many :page_permissions  
   has_many :blocks, :order => 'sort_order'
+  has_many :page_tags, :class_name => 'Caboose::PageTag', :dependent => :delete_all, :order => 'tag'
   attr_accessible :id      ,        
     :site_id               ,
     :parent_id             ,

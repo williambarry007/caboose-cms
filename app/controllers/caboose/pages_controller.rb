@@ -423,6 +423,15 @@ module Caboose
           Page.update_authorized_for_action(page.id, 'edit', value)
         when 'approvers'
           Page.update_authorized_for_action(page.id, 'approve', value)
+        when 'tags'
+          current_tags = page.page_tags.collect{ |t| t.tag }
+          new_tags = value.split(',').collect{ |v| v.strip.downcase }.reject{ |t| t.nil? || t.strip.length == 0 }          
+          
+          # Delete the tags not in new_tags
+          current_tags.each{ |t| PageTag.where(:page_id => page.id, :tag => t).destroy_all if !new_tags.include?(t) }
+          
+          # Add any new tags not in current_tags
+          new_tags.each{ |t| PageTag.create(:page_id => page.id, :tag => t) if !current_tags.include?(t) }
         end
       end
     

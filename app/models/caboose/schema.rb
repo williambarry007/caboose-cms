@@ -27,8 +27,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Block => [:block_type],
       #Caboose::FieldType => [:model_binder_options],
       Caboose::AbValue => [:i, :text],
-      Caboose::AbOption => [:text],
-      Caboose::User => [:timezone],
+      Caboose::AbOption => [:text],      
       #Caboose::Field => [:child_block_id],
       Caboose::BlockType => [:layout_function],
       Caboose::CalendarEvent => [
@@ -233,6 +232,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :page_id , :integer  ],
         [ :action  , :string   ]
       ],
+      Caboose::PageTag => [        
+        [ :page_id , :integer  ],
+        [ :tag     , :string   ]
+      ],
       Caboose::PermanentRedirect => [
         [ :site_id  , :integer ],
         [ :priority , :integer , { :default => 0 }],
@@ -300,21 +303,6 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :authentication       , :string ], # :plain, :login, :cram_md5.
         [ :enable_starttls_auto , :boolean , { :default => true }]
       ],
-      Caboose::Timezone => [
-        [ :country_code , :string ],
-        [ :name         , :string ]
-      ],
-      Caboose::TimezoneAbbreviation => [
-        [ :abbreviation , :string  ],
-        [ :name         , :string  ]
-      ],
-      Caboose::TimezoneOffset => [
-        [ :timezone_id  , :integer  ],
-        [ :abbreviation , :string   ],
-        [ :time_start   , :integer  ],
-        [ :gmt_offset   , :integer  ],
-        [ :dst          , :boolean  ]
-      ],
       Caboose::User => [
         [ :first_name           , :string     ],
         [ :last_name            , :string     ],
@@ -326,10 +314,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :state                , :string     ],
         [ :zip                  , :string     ],
         [ :phone                , :string     ],
-        [ :fax                  , :string     ],
-        [ :utc_offset           , :float      , { :default => -5 }],
-        #[ :timezone             , :string     , { :default => 'America/Chicago' }],
-        [ :timezone_id          , :integer    , { :defualt => 381 }], # Defaults to 'America/Chicago'
+        [ :fax                  , :string     ],        
+        [ :timezone             , :string     , { :default => 'Central Time (US & Canada)' }],        
         [ :password             , :string     ],
         [ :password_reset_id    , :string     ],
         [ :password_reset_sent  , :datetime   ],

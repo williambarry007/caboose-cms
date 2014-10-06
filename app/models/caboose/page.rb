@@ -293,9 +293,9 @@ class Caboose::Page < ActiveRecord::Base
     
     path = []      
     arr.each do |row|
-      if (row.alias.length > 0)
+      if row.alias && row.alias.strip.length > 0
         path = [row.alias]
-      elsif (row.slug.length > 0)
+      elsif row.slug && row.slug.strip.length > 0
         path << row.slug
       end
     end
@@ -310,6 +310,10 @@ class Caboose::Page < ActiveRecord::Base
 
     arr << p
     self.url_helper(p.parent_id, arr)
+  end
+  
+  def url
+    return Caboose::Page.url(self.id)
   end
   
   def self.slug(str)
@@ -347,6 +351,10 @@ class Caboose::Page < ActiveRecord::Base
     str = ""
     str << "#{self.title} | " if !self.title.nil? && self.title.strip.length > 0
     str << self.site.description if self.site && self.site.description
+  end
+  
+  def self.pages_with_tag(parent_id, tag)
+    self.includes(:page_tags).where(:hide => false, :parent_id => 1, :page_tags => { :tag => tag }).reorder('sort_order, title').all
   end
 
 end

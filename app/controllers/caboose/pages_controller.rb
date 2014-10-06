@@ -18,7 +18,9 @@ module Caboose
         
         # Make sure we're not under construction
         d = Caboose::Domain.where(:domain => request.host_with_port).first
-        if d.under_construction == true
+        if d.nil?
+          Caboose.log("Could not find domain for #{request.host_with_port}\nAdd this domain to the caboose site.")
+        elsif d.under_construction == true
           if d.site.under_construction_html && d.site.under_construction_html.strip.length > 0 
             render :text => d.site.under_construction_html
           else 

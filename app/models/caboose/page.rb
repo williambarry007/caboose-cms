@@ -299,7 +299,7 @@ class Caboose::Page < ActiveRecord::Base
         path << row.slug
       end
     end
-    return path.join('/')
+    return "/#{path.join('/')}"
   end
   
   def self.url_helper(page_id, arr)

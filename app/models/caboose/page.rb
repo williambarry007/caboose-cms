@@ -291,9 +291,12 @@ class Caboose::Page < ActiveRecord::Base
     self.url_helper(page_id, arr)
     arr.reverse!
     
+    ru = arr.last.redirect_url
+    return ru if ru && ru.strip.length > 0
+
     path = []      
     arr.each do |row|
-      if row.alias && row.alias.strip.length > 0
+      if row.alias && row.alias.strip.length > 0        
         path = [row.alias]
       elsif row.slug && row.slug.strip.length > 0
         path << row.slug
@@ -305,7 +308,7 @@ class Caboose::Page < ActiveRecord::Base
   def self.url_helper(page_id, arr)
     return if page_id <= 0
     
-    p = self.find_with_fields(page_id, [:id, :parent_id, :title, :menu_title, :alias, :slug])
+    p = self.find_with_fields(page_id, [:id, :parent_id, :title, :menu_title, :alias, :slug, :redirect_url])
     return if p.nil?
 
     arr << p

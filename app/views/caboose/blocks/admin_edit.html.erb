@@ -98,8 +98,17 @@ end
 <script type='text/javascript'>
 
 var modal = false;
+$(document).ready(function() {
+  if (modal)
+    modal.autosize();
+  else
+    modal = new CabooseModal(800);
+});
 $(window).load(function() {
-  modal = new CabooseModal(800);
+  if (modal)
+    modal.autosize();
+  else
+    modal = new CabooseModal(800);
 });
 
 <%

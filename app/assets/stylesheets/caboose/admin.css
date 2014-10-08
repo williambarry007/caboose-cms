@@ -496,6 +496,11 @@ Message boxes
   text-align: center;
   width: 90%;
   margin: 10px auto;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
 }
 
 #content .note input[type=button] {
@@ -533,7 +538,7 @@ Message boxes
 }
 
 #content .error {
-	background: #9c171b;
+	background: #814142;
 	color: #ffffff;
 }
 

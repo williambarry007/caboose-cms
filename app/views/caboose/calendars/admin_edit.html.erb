@@ -6,11 +6,11 @@
 <div id='calendar'>
   <h2><%= @d.strftime('%B %Y') %></h2>
   <p>
-    <input type='button' value='< Previous Month' onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= (@d - 1.month).strftime('%Y-%m-%d') %>';" />
-    <input type='button' value='Current Month'    onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= DateTime.now.strftime('%Y-%m-%d')   %>';" />
-    <input type='button' value='Next Month >'     onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= (@d + 1.month).strftime('%Y-%m-%d') %>';" />
+    <input type='button' value='< Previous Month' onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= (@d - 1.month).strftime('%Y-%m-%d') %>';" class="caboose-btn-white"/>
+    <input type='button' value='Current Month'    onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= DateTime.now.strftime('%Y-%m-%d')   %>';" class="caboose-btn-white" />
+    <input type='button' value='Next Month >'     onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= (@d + 1.month).strftime('%Y-%m-%d') %>';" class="caboose-btn-white" />
   </p>    
-  <p><a href='/admin/calendars/<%= @calendar.id %>/events/new' id='new_event'>New Event</a></p>    
+  <p><a href='/admin/calendars/<%= @calendar.id %>/events/new' id='new_event' class="caboose-btn">New Event</a></p>    
   <table>
     <tr>
       <th>Sun</th>
@@ -118,6 +118,11 @@ function delete_calendar(calendar_id, confirm)
 
 <% content_for :caboose_css do %>
 <style type='text/css'>
+textarea {
+  font-size: 16px !important;
+padding-top: 33px !important;
+padding-left: 10px !important;
+}
       
 #calendar table { border-collapse: collapse; width: 95%; }
 #calendar th { border: #666 1px solid; background: #666; color: #fff; margin: 0; padding: 4px 8px; }

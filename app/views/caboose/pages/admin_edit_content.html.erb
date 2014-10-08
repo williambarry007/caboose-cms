@@ -537,7 +537,7 @@ body > .container.padleftsmall {
 #caboose_page_sidebar_container #caboose-sidebar-tabs .caboose-tab-icon {
   width: 18px !important;
   height: 20px !important;
-  margin: 0 auto !important; 
+  margin: 0 auto 5px auto !important; 
   background-size: 100% !important; 
   background-repeat: no-repeat !important;
   background-position: center center !important;
@@ -548,14 +548,14 @@ body > .container.padleftsmall {
   opacity: 1.0 !important;
 }
 
-#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-pages { background-image: url("/assets/caboose/sidebar_pages.png") !important; }
-#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-write { background-image: url("/assets/caboose/sidebar_posts.png") !important; }
-#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-design { background-image: url("/assets/caboose/sidebar_design.png") !important; }
-#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-media { background-image: url("/assets/caboose/sidebar_media.png") !important; }
-#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-activity { background-image: url("/assets/caboose/sidebar_activity.png") !important; }
-#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-seo { background-image: url("/assets/caboose/sidebar_seo.png") !important; }
-#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-store { background-image: url("/assets/caboose/sidebar_store.png") !important; }
-#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-settings { background-image: url("/assets/caboose/sidebar_settings.png") !important; }
+#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-pages { background-image: url("//<%= Caboose::cdn_domain %>/assets/caboose/sidebar_pages.png") !important; }
+#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-write { background-image: url("//<%= Caboose::cdn_domain %>/assets/caboose/sidebar_posts.png") !important; }
+#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-design { background-image: url("//<%= Caboose::cdn_domain %>/assets/caboose/sidebar_design.png") !important; }
+#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-media { background-image: url("//<%= Caboose::cdn_domain %>/assets/caboose/sidebar_media.png") !important; }
+#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-activity { background-image: url("//<%= Caboose::cdn_domain %>/assets/caboose/sidebar_activity.png") !important; }
+#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-seo { background-image: url("//<%= Caboose::cdn_domain %>/assets/caboose/sidebar_seo.png") !important; }
+#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-store { background-image: url("//<%= Caboose::cdn_domain %>/assets/caboose/sidebar_store.png") !important; }
+#caboose_page_sidebar_container .caboose-tab-icon#caboose-icon-settings { background-image: url("//<%= Caboose::cdn_domain %>/assets/caboose/sidebar_settings.png") !important; }
 
 #caboose_page_sidebar_container #caboose-sidebar-tabs li.caboose-back-btn {
   padding: 10px !important;
@@ -598,6 +598,10 @@ body > .container.padleftsmall {
   transition: top 500ms ease;
   -moz-transition: top 500ms ease;
   -o-transition: top 500ms ease;
+}
+
+#caboose_page_sidebar_container #caboose-admin-header .caboose-back-btn {
+  margin-right: 10px !important;
 }
 
 #caboose_page_sidebar_container #caboose-admin-header.delay {
@@ -682,7 +686,7 @@ body > .container.padleftsmall {
   height: 60px !important;
   background-color: #141516 !important;
   width: 165px !important;
-  background-image: url('/assets/caboose/caboose_logo.png') !important;
+  background-image: url('//<%= Caboose::cdn_domain %>/assets/caboose/caboose_logo.png') !important;
   background-size: 30px;
   background-position: center center !important;
   background-repeat: no-repeat !important;

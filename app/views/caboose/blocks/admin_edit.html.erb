@@ -98,18 +98,18 @@ end
 <script type='text/javascript'>
 
 var modal = false;
-$(document).ready(function() {
-  if (modal)
+$(window).load(function() {  
+  keep_modal_autosized();
+});
+
+function keep_modal_autosized()
+{  
+  if (modal) 
     modal.autosize();
   else
     modal = new CabooseModal(800);
-});
-$(window).load(function() {
-  if (modal)
-    modal.autosize();
-  else
-    modal = new CabooseModal(800);
-});
+  setTimeout(function() { keep_modal_autosized(); }, 1000);
+}
 
 <%
 #b = @block, nil, { 

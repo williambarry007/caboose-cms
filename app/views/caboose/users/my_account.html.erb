@@ -5,7 +5,7 @@
 <p><div id='user_<%= @user.id %>_email'      ></div></p>
 <p><div id='user_<%= @user.id %>_phone'      ></div></p>
 <div id='message'></div>
-<p><input type='button' id='btn_cancel'   value='Close' onclick="parent.$.fn.colorbox.close();" /></p>
+<p><input type='button' id='btn_cancel' class="caboose-btn" value='Close' onclick="parent.$.fn.colorbox.close();" /></p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>

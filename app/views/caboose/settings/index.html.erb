@@ -4,12 +4,12 @@
 <table cellpadding='4' cellspacing='0' border='0'>
 <tr><td>Name: 	</td><td><input type='text' name='name' value='<%= @gen.params['name'] %>' style='width: 200px;' /></td></tr>
 </table>
-<p><input type='submit' value='Search' /></p>
+<p><input type='submit' value='Search' class="caboose-btn" /></p>
 </form>
 
 <% if (@settings.count > 0) %>
 
-  <table class='data'>
+  <table class='data' style="width: 96%;">
     <tr>
       <%= raw @gen.sortable_table_headings({
   				'name'  => 'Name',

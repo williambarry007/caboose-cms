@@ -1,8 +1,9 @@
 
 body {
-  font-family: Helvetica, Tahoma, Arial;  
+  font-family: "Avenir", Tahoma, Arial;  
 }
 
 input[type='text'].placeholder_js {
   color: #757575;
+
 }

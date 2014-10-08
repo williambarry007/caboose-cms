@@ -5,15 +5,15 @@
 <input type='submit' value='Search' />
 </form>
 
-<p><a href='/admin/calendars/new' id='new_calendar'>New Calendar</a></p>
+<p><a href='/admin/calendars/new' id='new_calendar' class="caboose-btn">New Calendar</a></p>
 
 <form action='/admin/calendars' method='post' id='new_calendar_form'>
   <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'>  
   <p><input type='text' name='name' id='name' placeholder='Name' style='width: 500px;'></p>  
   <div id='new_message'></div>
   <p>
-    <input type='button' value='Cancel' onclick="$('#new_calendar_form').slideToggle();">
-    <input type='submit' value='Add New Calendar' onclick="add_calendar(); return false;">
+    <input type='button' value='Cancel' onclick="$('#new_calendar_form').slideToggle();" class="caboose-btn-white">
+    <input type='submit' value='Add New Calendar' onclick="add_calendar(); return false;" class="caboose-btn-white">
   </p>
 </form>
 

@@ -1,0 +1,74 @@
+<div id='caboose-admin-header'>
+  <div class='caboose-logo'></div>
+  <ul>
+    <li class='caboose-back-btn'>
+      <a href='/' class='caboose-btn'>Back to Site</a>
+    </li>
+    <li class='caboose-cpanel-btn'>
+      <a href='/station' id='caboose_station' class='caboose_modal caboose-btn'>Menu</a>
+    </li>
+  </ul>
+  <div class='caboose-nav-options'>
+    <div class='caboose-nav-buttons'>
+      <div class='caboose-nav-unit'>
+        <a href='#' id='close_caboose_menu'>
+          <img src='//<%= Caboose::cdn_domain %>/assets/caboose/preview-icon.png' alt='Preview'>
+          <p>Preview</p>
+        </a>
+      </div>
+      <div class='caboose-nav-unit'>
+        <a href='#' id='close_caboose_menu'>
+          <img src='//<%= Caboose::cdn_domain %>/assets/caboose/preview-icon.png' alt='Preview'>
+          <p>Account</p>
+        </a>
+      </div>
+      <div class='caboose-nav-unit'>
+        <a href='/admin/pages/<%= @page.id %>/edit'>
+          <img src='//<%= Caboose::cdn_domain %>/assets/caboose/settings-icon.png' alt='Settings'>
+          <p>Settings</p>
+        </a>
+      </div>
+      <div class='caboose-nav-unit'>
+        <a href='#'>
+          <img src='//<%= Caboose::cdn_domain %>/assets/caboose/help-icon.png' alt='Help'>
+          <p>Logout</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id='caboose-admin-left-sidebar'>
+  <div class='caboose-sidebar-profile'>
+    <h2>All Aboard, Robby!</h2>
+  </div>
+  <ul id='caboose-sidebar-tabs'>
+
+      <li<%= raw request.fullpath == '/admin/pages' ? ' class=caboose-li-selected' : '' %>>
+        <a href='/admin/pages'><div class='caboose-tab-icon' id='caboose-icon-pages'></div>Manage Pages</a>
+      </li>
+      <li<%= raw request.fullpath == '/admin/posts' ? ' class=caboose-li-selected' : '' %>>
+        <a href='/admin/posts'><div class='caboose-tab-icon' id='caboose-icon-pages'></div>Write Posts</a>
+      </li>
+      <li<%= raw request.fullpath == '/admin/pages/#{@page.id}/seo' ? ' class=caboose-li-selected' : '' %>>
+        <a href='/admin/pages/#{@page.id}/seo'><div class='caboose-tab-icon' id='caboose-icon-pages'></div>SEO</a>
+      </li>
+      <li<%= raw request.fullpath == '/admin/pages/#{@page.id}/edit' ? ' class=caboose-li-selected' : '' %>>
+        <a href='/admin/pages/#{@page.id}/edit'><div class='caboose-tab-icon' id='caboose-icon-pages'></div>Settings</a>
+      </li>
+
+  </ul>
+  <a href='#' id='show_pages_button' style='display:none;'>Show Pages -></a>
+  <div class='caboose-sidebar-nine'>
+    <span>Powered by</span>
+    <a href='http://www.nine.is' target='_blank'><img src='//<%= Caboose::cdn_domain %>/assets/caboose/nine_logo.png' alt='The Nine'></a>
+  </div>
+</div>
+
+<div id='caboose-content-wrap'>
+  <div class='caboose-admin-page-list'>
+    <%= raw pages_list(@home_page) %>
+    <a href='#' id='close_pages_button'><- Close</a>
+  </div>
+</div>

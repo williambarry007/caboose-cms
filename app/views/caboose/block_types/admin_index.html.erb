@@ -3,16 +3,18 @@
   Block Types
 </div>
 
+
 <h1>Block Types</h1>
 
 <p>  
-  <a href='/admin/block-types/store'>Block Type Store</a> |
-  <a href='/admin/block-types/new'>New Block Type</a>
+  <a href='/admin/block-types/store' class="caboose-btn">Block Type Store</a> |
+  <a href='/admin/block-types/new' class="caboose-btn">New Block Type</a>
 </p>
+
 
 <% if (@block_types.count > 0) %>
 
-  <table class='data'>
+  <table class='data' style="width: 96%;">
     <tr>
       <th>Name</th>
       <th>Description</th>      
@@ -25,8 +27,11 @@
   <% end %>
   </table>  
 
+
+
 <% else %>
 
   <p>There are no block types.</p>
 
 <% end %>
+

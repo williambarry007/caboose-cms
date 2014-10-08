@@ -12,7 +12,7 @@ user_ids = [] if user_ids.nil?
 <p><div id='site_<%= @site.id %>_under_construction_html' ></div></p>
 
 <h2>Domains</h2>
-<p><a href='#' onclick="add_domain(<%= @site.id %>);">New Domain</a></p>
+<p><a href='#' onclick="add_domain(<%= @site.id %>);" class="caboose-btn">New Domain</a></p>
 <div id='new_domain_container'></div>
 <% if @site.domains && @site.domains.count > 0 %>
   <table class='data'>
@@ -27,7 +27,7 @@ user_ids = [] if user_ids.nil?
     <td><%= d.domain %></td>
     <td align='center'><input type='radio'    name='primary_domain' <%= d.primary? ? "checked='true'" : '' %> onclick="set_primary_domain(<%= s.id %>, <%= d.id %>);" /></td>
     <td align='center'><input type='checkbox' name='under_construction_<%= d.id %>' <%= d.under_construction ? "checked='true'" : '' %> onclick="set_under_construction(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
-    <td align='center'><input type='button'   value='Delete' onclick="delete_domain(<%= @site.id %>, <%= d.id %>);" /></td>    
+    <td align='center'><input type='button' class="caboose-btn-white" value='Delete' onclick="delete_domain(<%= @site.id %>, <%= d.id %>);" /></td>    
   </tr>
   <% end %>
   </table>
@@ -61,6 +61,11 @@ user_ids = [] if user_ids.nil?
 <style type='text/css'>
 #content input[type=checkbox] { position: relative; }
 #members { height: 200px; overflow-y: scroll; margin-bottom: 20px; }
+textarea {
+  font-size: 16px !important;
+padding-top: 33px !important;
+padding-left: 10px !important;
+}
 </style>
 <% end %>
 <% content_for :caboose_js do %>

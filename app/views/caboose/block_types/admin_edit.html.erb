@@ -27,9 +27,9 @@ bt = @block_type
 <p><div id='blocktype_<%= bt.id %>_options_function'                ></div></p>
 
 <h2>Children</h2>
-<p><a href='/admin/block-types/<%= @block_type.id %>/new'>New Child Block</a></p>
+<p><a href='/admin/block-types/<%= @block_type.id %>/new' class="caboose-btn-white">New Child Block</a></p>
 <% if @block_type.children.count > 0 %>
-  <table class='data'>
+  <table class='data' style="width:96%;">
     <tr>
       <th>Short Name</th>
       <th>Long Name</th>
@@ -56,21 +56,23 @@ bt = @block_type
 
 <div id='message'></div>
 <p>
-<input type='button' value='< Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}/edit" : '' %>';" />
-<input type='button' value='Delete Block Type' onclick="delete_block_type(<%= @block_type.id %>);" />
+<input type='button' class="caboose-btn" value='Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}/edit" : '' %>';" />
+<input type='button' class="caboose-btn" value='Delete Block Type' onclick="delete_block_type(<%= @block_type.id %>);" />
 </p>
 
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/icomoon_fonts' %>
 <style type='text/css'>
-#blocktype_<%= bt.id %>_render_function  { font-family: Courier; font-size: 80%; width: 100%; }
-#blocktype_<%= bt.id %>_options_function { font-family: Courier; font-size: 80%; width: 100%; }
+
+#blocktype_<%= bt.id %>_render_function  { font-family: Courier; font-size: 80%; width: 100%; padding-top: 40px;}
+#blocktype_<%= bt.id %>_options_function { font-family: Courier; font-size: 80%; width: 100%; padding-top: 40px;}
 div.icons { height: 400px; width: 80%; overflow-y: scroll; }
 div.icons span { display: block; float: left; padding: 10px 20px; font-size: 24pt; }
 div.icons a span { color: #000; border: #fff 1px solid; }
 div.icons a:hover span { background: #efefef; color: #000; border: #666 1px solid; }
 div.icons a.selected span, 
 div.icons a.selected:hover span { background: #fff69f; color: #000; border: #ff0000 1px solid; }
+
 </style>
 <% end %>
 <% content_for :caboose_js do %>

@@ -3,7 +3,7 @@
 
 <p><input type='text' id='title' name='title' placeholder='Title' style="width: 400px;" /></p>
 <div id='message'></div>
-<p><input type='submit' value='Add Post' onclick='add_post();' /></p>
+<p><input type='submit' value='Add Post' class="caboose-btn-white" onclick='add_post();' /></p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>

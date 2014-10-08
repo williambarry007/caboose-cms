@@ -162,6 +162,7 @@ module Caboose
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
+      @home_page = Page.find(1)
       if @page.block.nil?      
         redirect_to "/admin/pages/#{@page.id}/layout"
         return

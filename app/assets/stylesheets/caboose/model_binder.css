@@ -17,8 +17,8 @@
 
 .mb_container input.mb_dirty,
 .mb_container textarea.mb_dirty {
-  background: #fff799;
-  color: #000;  
+  background: #4D0101;
+  color: #fff !important;
 }
 
 .mb_container select.mb_fake {
@@ -28,12 +28,14 @@
   left: 0;
   color: transparent;
   background: transparent;
-  /*height: 50px !important;*/
+  height: 44px !important;
 }
 
 .mb_container select.mb_fake option {
   background: #fff;
   color: #000;
+  position: relative;
+  top: 4px;
 }
 
 .mb_container .mb_bound_input_check a,
@@ -94,7 +96,7 @@ div.mb_container form.mb_file_form div.mb_placeholder {
 
 .mb_container .mb_placeholder span {
   display: block;
-  font-size: 20px;
+  font-size: 16px;
   color: #757575;
 }
 

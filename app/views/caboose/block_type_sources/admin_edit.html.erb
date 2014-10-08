@@ -17,8 +17,10 @@ bts = @block_type_source
         
 <div id='message'></div>
 <p>
+
 <input type='button' value='< Back' onclick="window.location='/admin/block-types/store/sources';" />
 <input type='button' value='Refresh Block Type Summaries' onclick="refresh_block_types(<%= bts.id %>);" />
+
 <input type='button' value='Delete Source' onclick="delete_block_type_source(<%= bts.id %>);" />
 </p>
 

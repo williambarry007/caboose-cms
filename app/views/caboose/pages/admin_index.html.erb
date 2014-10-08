@@ -1,8 +1,61 @@
-<h1>Pages</h1>
 
+<h1 id='page_title'>Pages</h1>
+<div class="left-sidebar">
+  <div class="profile">
+    <h2>All Aboard, Robby!</h2>
+  </div>
+<ul id='tabs'>
+<%
+tabs = {
+  '<div class="tab-icon" id="general"></div>General'         => "/admin/pages/#{@page.id}/edit",
+  '<div class="tab-icon" id="permissions"></div>Permissions'     => "/admin/pages/#{@page.id}/permissions",
+  '<div class="tab-icon" id="contenticon"></div>Content'         => "/admin/pages/#{@page.id}/content",     
+  '<div class="tab-icon" id="css"></div>Custom CSS'      => "/admin/pages/#{@page.id}/css"
+}
+
+%>
+<% tabs.each do |text, href| %>
+<li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
+<% end %>
+<li class='back' style="text-align:center;"><input type='button' value='Back' class="caboose-btn-white" onclick="window.location='/admin/pages';" style="margin-top:10px;"/></li>
+</ul>
+<div class="nine">
+  <span>Powered by</span>
+  <a href="http://www.nine.is" target="_blank"><img src="//<%= Caboose::cdn_domain %>/assets/caboose/nine_logo.png" alt="The Nine"></a>
+</div>
+</div>
+
+<div id="content2">
+
+<div class="admin-page-list">
 <% if @domain %>
-  <p><a href='/admin/pages/new'>New Page</a></p>
+<!--   <p><a href='/admin/pages/new' class="caboose-btn-white">New Page</a></p> -->
   <%= raw pages_list(@home_page) %>
 <% else %>
   <p>It doesn't look like this site is configured for the current domain.  Please <a href='/admin/sites'>configure your sites</a>.</p>
-<% end %>  
+<% end %> 
+</div>
+
+<!-- <p><a href='/admin/pages/new' class="caboose-btn" style="margin-left:20px;">New Page</a></p> -->
+
+</div>
+
+<style>
+#top_nav .options {
+  display: block;
+}
+.footer#caboose {
+  padding-left: 200px;
+}
+</style>
+
+<% content_for :caboose_js do %>
+  <script>
+    $(document).ready(function() {
+      var new_link = "<li class='new_page_li'><a href='/admin/pages/new' class='new_page_link'>Add Page</a></li>";
+      $(".admin-page-list").children("ul").find("ul").first().append(new_link);
+    //  $(".admin-page-list").children("ul").children(".new_page_li").hide(); // hide the link for Home page siblings
+    });
+  </script>
+<% end %>
+

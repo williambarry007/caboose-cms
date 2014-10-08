@@ -18,9 +18,9 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 </div>
 <div id='message'></div>
 <div id='controls'>
-<input type='button' value='Back'           onclick="window.location='/admin/users';" />
-<input type='button' value='Reset Password' onclick="window.location='/admin/users/<%= @edituser.id %>/edit-password';" />
-<input type='button' value='Delete User'    onclick="delete_user(<%= @edituser.id %>);" />
+<input class="caboose-btn-white" type='button' value='Back'           onclick="window.location='/admin/users';" />
+<input class="caboose-btn-white" type='button' value='Reset Password' onclick="window.location='/admin/users/<%= @edituser.id %>/edit-password';" />
+<input class="caboose-btn-white" type='button' value='Delete User'    onclick="delete_user(<%= @edituser.id %>);" />
 </div>
 
 <% content_for :caboose_css do %>
@@ -95,6 +95,7 @@ function toggle_role(user_id, role_id, checked)
   text-align: right;
   margin: 0 4px 0 0;
   padding: 0;
+  margin-right: 30px;
 }
 #gravatar img {
   border: #fff 2px solid;

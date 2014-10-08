@@ -6,11 +6,7 @@
 
 @font-face {
   font-family: 'Avenir';
-  src: url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.eot');
-  src: url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.eot') format('embedded-opentype'),
-       url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.woff')       format('woff'),
-       url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.ttf')        format('truetype'),
-       url('//d1ygukj37mahb2.cloudfront.net/assets/avenir-medium.svg')        format('svg');
+  src: url('/assets/AvenirNext.ttf')        format('truetype');
   font-weight: normal;
   font-style: normal;
 }

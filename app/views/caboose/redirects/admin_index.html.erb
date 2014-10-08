@@ -1,0 +1,24 @@
+<h1>Permanent Redirects</h1>
+
+<p><a href='/admin/redirects/new'>New Redirect</a></p>
+
+<% if @redirects && @redirects.count > 0 %>
+  <table class='data'>
+    <tr>
+      <th>Priority</th>
+      <th>Is Regex</th>      
+      <th>Old URL</th>
+      <th>New URL</th>            
+    </tr>
+  <% @redirects.each do |pr| %>
+    <tr onclick="window.location='/admin/redirects/<%= pr.id %>';">
+      <td align='right'><%= pr.priority %></td>
+      <td><%= pr.is_regex ? 'Yes' : 'No' %></td>
+      <td><%= raw pr.old_url %></td>
+      <td><%= raw pr.new_url %></td>
+    </tr>
+  <% end %>
+  </table>  
+<% else %>
+  <p>There are no redirects right now.</p>
+<% end %>

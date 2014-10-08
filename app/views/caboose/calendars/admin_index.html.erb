@@ -1,0 +1,63 @@
+<h1>Calendars</h1>
+
+<form action='/admin/calendars' method='get' class='search_form'>
+<input type='text' name='name_like' placeholder='Name' />
+<input type='submit' value='Search' />
+</form>
+
+<p><a href='/admin/calendars/new' id='new_calendar'>New Calendar</a></p>
+
+<form action='/admin/calendars' method='post' id='new_calendar_form'>
+  <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'>  
+  <p><input type='text' name='name' id='name' placeholder='Name' style='width: 500px;'></p>  
+  <div id='new_message'></div>
+  <p>
+    <input type='button' value='Cancel' onclick="$('#new_calendar_form').slideToggle();">
+    <input type='submit' value='Add New Calendar' onclick="add_calendar(); return false;">
+  </p>
+</form>
+
+<% if @calendars.count > 0 %>
+  <table class='data'>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>      
+    </tr>
+    <% @calendars.each do |calendar| %>
+      <tr onclick="window.location='/admin/calendars/<%= calendar.id %>';">
+        <td><%= calendar.name %></td>
+        <td><%= calendar.description %></td>    
+      </tr>
+    <% end %>
+  </table>  
+<% else %>
+  <p>There are no calendars right now.</p>
+<% end %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  $('#new_calendar_form').hide();
+  $('#new_calendar').click(function(e) {
+    e.preventDefault();
+    $('#new_calendar_form').slideToggle();
+  });
+});
+
+function add_calendar() 
+{
+  $('#new_message').html("<p class='loading'>Adding calendar...</p>");
+  $.ajax({
+    url: '/admin/calendars',
+    type: 'post',
+    data: $('#new_calendar_form').serialize(),
+    success: function(resp) {
+      if (resp.error) $('#new_message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

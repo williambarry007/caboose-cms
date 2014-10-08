@@ -53,14 +53,18 @@ module Caboose
   # Define asset collections
   mattr_accessor :javascripts, :stylesheets
   @@javascripts = []
-  @@stylesheets = []
-  
-  # API key for timezonedb.com/api
-  mattr_accessor :timezonedb_api_key
-  @@timezonedb_api_key = ''
+  @@stylesheets = []    
 
   # Session length (in hours)
   mattr_accessor :session_length
-  @@session_length = 24  
+  @@session_length = 24
+
+  # Parse rich text blocks
+  mattr_accessor :parse_richtext_blocks
+  @@parse_richtext_blocks = true
+
+  # Default timezone
+  mattr_accessor :timezone
+  @@timezone = 'Central Time (US & Canada)'  
   
 end

@@ -2,7 +2,9 @@
 <%= render :partial => 'caboose/pages/admin_header' %>
 
 <p><div id='page_<%= @page.id %>_seo_title'></div></p>
+<p><div id='page_<%= @page.id %>_meta_keywords'></div></p>
 <p><div id='page_<%= @page.id %>_meta_description'></div></p>
+<p id='widths'></p>
 <p><div id='page_<%= @page.id %>_meta_robots'></div></p>
 <p><div id='page_<%= @page.id %>_canonical_url'></div></p>
 <p><div id='page_<%= @page.id %>_fb_description'></div></p>
@@ -18,19 +20,44 @@ $(document).ready(function() {
   m = new ModelBinder({
     name: 'Page',
     id: <%= @page.id %>,
-    update_url: '/pages/<%= @page.id %>',
+    update_url: '/admin/pages/<%= @page.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [      
       { name: 'seo_title'         , nice_name: 'SEO Title'            , type: 'text'      , value: <%= raw Caboose.json(@page.seo_title)        %>, width: 580 },        
       { name: 'meta_robots'       , nice_name: 'Meta Robots'          , type: 'text'      , value: <%= raw Caboose.json(@page.meta_robots)      %>, width: 580 },
       { name: 'canonical_url'     , nice_name: 'Canonical URL'        , type: 'text'      , value: <%= raw Caboose.json(@page.canonical_url)    %>, width: 580 },
+      { name: 'meta_keywords'     , nice_name: 'Meta Keywords'        , type: 'textarea'  , value: <%= raw Caboose.json(@page.meta_keywords)    %>, width: 580, height: 80 },
       { name: 'meta_description'  , nice_name: 'Meta Description'     , type: 'textarea'  , value: <%= raw Caboose.json(@page.meta_description) %>, width: 580, height: 80 },
       { name: 'fb_description'    , nice_name: 'Facebook Description' , type: 'textarea'  , value: <%= raw Caboose.json(@page.fb_description)   %>, width: 580, height: 80 },
       { name: 'gp_description'    , nice_name: 'Google+ Description'  , type: 'textarea'  , value: <%= raw Caboose.json(@page.gp_description)   %>, width: 580, height: 80 }
-    ]
+    ],
+    on_load: function() {      
+      $('#page_<%= @page.id %>_meta_description').keyup(function() {
+        update_widths();        
+      });      
+      update_widths();
+    }
   });  
   modal = new CabooseModal(600, 540);
+  
 });
+
+function update_widths()
+{
+  var str = $('#page_<%= @page.id %>_meta_description').val();
+  var count = str.length;
+  var width = getTextWidth(str);
+  $('#widths').html('' + count + ' character' + (count == 1 ? '' : 's') + "<br />" + width + " pixel" + (width == 1 ? '' : 's'));
+}
+      
+function getTextWidth(text) 
+{  
+  var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+  var context = canvas.getContext("2d");
+  context.font = "18px arial";
+  var metrics = context.measureText(text);
+  return metrics.width;
+}
 
 </script>
 <% end %>

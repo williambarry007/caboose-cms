@@ -9,6 +9,7 @@ user_ids = [] if user_ids.nil?
 
 <p><div id='site_<%= @site.id %>_name'        ></div></p>
 <p><div id='site_<%= @site.id %>_description' ></div></p>
+<p><div id='site_<%= @site.id %>_under_construction_html' ></div></p>
 
 <h2>Domains</h2>
 <p><a href='#' onclick="add_domain(<%= @site.id %>);">New Domain</a></p>
@@ -18,13 +19,15 @@ user_ids = [] if user_ids.nil?
   <tr>
     <th>Domain</th>
     <th>Primary</th>
+    <th>Under Construction</th>
     <th>Delete</th>
   </tr>
   <% @site.domains.all.each do |d| %>
   <tr>
     <td><%= d.domain %></td>
-    <td align='center'><input type='radio' name='primary_domain' <%= d.primary? ? "checked='true'" : '' %> onclick="set_primary_domain(<%= s.id %>, <%= d.id %>);" /></td>
-    <td align='center'><input type='button' value='Delete' onclick="delete_domain(<%= @site.id %>, <%= d.id %>);" /></td>    
+    <td align='center'><input type='radio'    name='primary_domain' <%= d.primary? ? "checked='true'" : '' %> onclick="set_primary_domain(<%= s.id %>, <%= d.id %>);" /></td>
+    <td align='center'><input type='checkbox' name='under_construction_<%= d.id %>' <%= d.under_construction ? "checked='true'" : '' %> onclick="set_under_construction(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
+    <td align='center'><input type='button'   value='Delete' onclick="delete_domain(<%= @site.id %>, <%= d.id %>);" /></td>    
   </tr>
   <% end %>
   </table>
@@ -71,8 +74,9 @@ $(document).ready(function() {
     update_url: '/admin/sites/<%= @site.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'name'        , nice_name: 'Name'        , type: 'text'     , value: <%= raw Caboose.json(@site.name)        %>, width: 400 },
-      { name: 'description' , nice_name: 'Description' , type: 'textarea' , value: <%= raw Caboose.json(@site.description) %>, width: 600, height: 75 }      
+      { name: 'name'                    , nice_name: 'Name'                     , type: 'text'     , value: <%= raw Caboose.json(@site.name)                    %>, width: 400 },
+      { name: 'description'             , nice_name: 'Description'              , type: 'textarea' , value: <%= raw Caboose.json(@site.description)             %>, width: 600, height: 75 },
+      { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html) %>, width: 600, height: 75 }      
     ]    
   });  
 });
@@ -96,6 +100,15 @@ function delete_site(site_id, confirm)
       if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
       if (resp.redirect) window.location = resp.redirect;
     }
+  });
+}
+
+function set_under_construction(site_id, domain_id, checked)
+{
+  $.ajax({
+    url: '/admin/sites/' + site_id + '/domains/' + domain_id,
+    type: 'put',
+    data: { under_construction: checked ? 1 : 0 }
   });
 }
 

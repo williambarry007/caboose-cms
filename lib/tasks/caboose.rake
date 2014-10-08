@@ -1,7 +1,7 @@
 require "caboose/version"
 
 namespace :caboose do  
-  
+    
   desc "Creates/verifies that all database tables and fields are correctly added."
   task :db => :environment do
     Caboose::Schema.create_schema
@@ -55,20 +55,6 @@ namespace :caboose do
   desc "Clears sessions older than the length specified in the caboose config from the sessions table"
   task :clear_old_sessions => :environment do
     ActiveRecord::SessionStore::Session.delete_all(["updated_at < ?", Caboose::session_length.hours.ago])        
-  end
-  
-  desc "Loads and refreshes the timezones from timezonedb.com"
-  task :load_timezones => :environment do
-    Caboose::Timezone.load_zones('/Users/william/Sites/repconnex/tmp/timezones')
-  end
-  
-  desc "Loads and refreshes the timezones from timezonedb.com"
-  task :test_timezones => :environment do
-    
-    d = DateTime.strptime("04/01/2014 10:00 am -0500", "%m/%d/%Y %I:%M %P %Z")
-    puts d    
-    d = DateTime.strptime("04/01/2014 10:00 am -0700", "%m/%d/%Y %I:%M %P %Z")
-    puts d
   end
   
   desc "Removes duplicate users"
@@ -127,11 +113,52 @@ namespace :assets do
   desc "Precompile assets, upload to S3, then remove locally"
   task :purl => :environment do
   
-    Rake::Task['assets:precompile'].invoke    
+    # Copy any site assets into the host app assets directory first
+    puts "Copying site assets into host assets..."
+    Caboose::Site.all.each do |site|
+      site_js     = Rails.root.join('sites', site.name, 'js')    
+      site_css    = Rails.root.join('sites', site.name, 'css')   
+      site_images = Rails.root.join('sites', site.name, 'images')
+      site_fonts  = Rails.root.join('sites', site.name, 'fonts') 
+          
+      host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
+      host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)
+      host_images = Rails.root.join('app', 'assets', 'images'      , site.name)
+      host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name)
+      
+      `mkdir -p #{host_js     }` if File.directory?(site_js) 
+      `mkdir -p #{host_css    }` if File.directory?(site_css) 
+      `mkdir -p #{host_images }` if File.directory?(site_images) 
+      `mkdir -p #{host_fonts  }` if File.directory?(site_fonts)
+                             
+      `cp -R #{site_js     } #{host_js     }` if File.directory?(site_js) 
+      `cp -R #{site_css    } #{host_css    }` if File.directory?(site_css) 
+      `cp -R #{site_images } #{host_images }` if File.directory?(site_images) 
+      `cp -R #{site_fonts  } #{host_fonts  }` if File.directory?(site_fonts) 
+    end
+    
+    puts "Running precompile..."
+    Rake::Task['assets:precompile'].invoke
+
+    puts "Removing assets from public/assets, but leaving manifest file..."    
     `mv #{Rails.root.join('public', 'assets', 'manifest.yml')} #{Rails.root.join('public', 'manifest.yml')}`
     `rm -rf #{Rails.root.join('public', 'assets')}`
     `mkdir #{Rails.root.join('public', 'assets')}`     
     `mv #{Rails.root.join('public', 'manifest.yml')} #{Rails.root.join('public', 'assets', 'manifest.yml')}`
+    
+    # Clean up
+    puts "Removing site assets from host assets..."
+    Caboose::Site.all.each do |site|      
+      host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
+      host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)
+      host_images = Rails.root.join('app', 'assets', 'images'      , site.name)
+      host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name)
+                             
+      `rm -rf #{host_js     }`
+      `rm -rf #{host_css    }`
+      `rm -rf #{host_images }` 
+      `rm -rf #{host_fonts  }`
+    end
 
   end
   

@@ -9,11 +9,15 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require colorbox-rails
- *= require jquery.ui.all
+ *= require jquery-ui
  *= require caboose/fonts
  *= require caboose/caboose
  *= require caboose/model_binder
+ *= require caboose/admin_crumbtrail
  */
+
+
+/* require caboose/admin_main */ 
 
 #cboxLoadedContent { margin-bottom: 0; }
 
@@ -805,13 +809,6 @@ Page Bar Generator
   color: #2B2C30;
 }
 
-#crumbtrail {
-  position: absolute;
-  top: -36px;
-  left: 54px;
-  color: #fff;
-}
 
-#crumbtrail a {
-  color: #fff; 
-}
+ 
+

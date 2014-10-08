@@ -1,0 +1,11 @@
+<div id='block_<%= block.id %>'>  
+  <% if block.children.count > 0 %>
+    <% block.children.each do |b| %><%= raw block.render(b, local_assigns) %><% end %>  
+  <% elsif editing %>
+    <%= raw empty_text %>
+  <% end %>
+  <% if editing && modal %>
+    <br style='clear: both;' />
+    <p><a href='/admin/pages/<%= block.page_id %>/blocks/<%= block.id %>/new'>Add a child block!</a></p>
+  <% end %>
+</div>

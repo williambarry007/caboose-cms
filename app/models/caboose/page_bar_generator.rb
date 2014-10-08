@@ -21,7 +21,7 @@ module Caboose
     #		itemsPerPage:	Number of items you want to show per page. Defaults to 10 if not present.
     #		page: Current page number.  Defaults to 0 if not present.
     #
-    attr_accessor :original_params, :params, :options, :custom_url_vars    
+    attr_accessor :original_params, :params, :options, :custom_url_vars, :post_get    
   	
     #def initialize(post_get, params = nil, options = nil, &custom_url_vars = nil)
   	def initialize(post_get, params = nil, options = nil)
@@ -31,6 +31,7 @@ module Caboose
   	  
   		# Note: a few keys are required:
   		# base_url, page, itemCount, itemsPerPage
+  		@post_get = post_get
   		@original_params = {}
   		@params = {}
   		@options = {
@@ -68,13 +69,12 @@ module Caboose
   		  long_key = @options['abbreviations'][key]  		  
         new_params[long_key] = post_get[key] ? post_get[key] : val
         keys_to_delete << key        
-  		}
+  		}  	
   		keys_to_delete.each { |k| @params.delete(k) }
-  		new_params.each { |k,v| @params[k] = v }
-  		@original_params.each { |k,v| @original_params[k] = post_get[k] ? post_get[k] : v }
-  		@params.each  { |k,v| @params[k]  = post_get[k] ? post_get[k] : v }        			
-  		@options.each { |k,v| @options[k] = post_get[k] ? post_get[k] : v }
-  		
+  		new_params.each { |k,v| @params[k] = v }  		
+  		@original_params.each { |k,v| @original_params[k] = post_get[k] ? post_get[k] : v }  		
+  		@params.each  { |k,v| @params[k]  = post_get[k] ? post_get[k] : v }  		
+  		@options.each { |k,v| @options[k] = ok(post_get[k]) ? post_get[k] : v }  		  		
   		#@custom_url_vars = custom_url_vars if !custom_url_vars.nil?
   		@use_url_params = @options['use_url_params'].nil? ? Caboose.use_url_params : @options['use_url_params']
       
@@ -83,7 +83,10 @@ module Caboose
   	end
   	
   	def set_item_count
-  	  @options['item_count'] = model_with_includes.where(where).count
+  	  m = model_with_includes.where(self.where)
+  	  n = self.near
+  	  m = m.near(n[0], n[1]) if n
+  	  @options['item_count'] = m.count
   	end
   	
   	def model_with_includes
@@ -117,8 +120,7 @@ module Caboose
       return false
     end
   	
-  	def table_name_of_association(assoc)
-      ap assoc
+  	def table_name_of_association(assoc)            
   	  return @options['model'].constantize.reflect_on_association(assoc.to_sym).class_name.constantize.table_name
   	end
   	
@@ -145,22 +147,30 @@ module Caboose
       return true
   	end
   	
-  	def items        		
-  		assoc = model_with_includes.where(where)
+  	def items
+  	  assoc = model_with_includes.where(self.where)
+      n = self.near
+      assoc = assoc.near(n[0], n[1]) if n        		
     	if @options['items_per_page'] != -1
-    	  assoc = assoc.limit(limit).offset(offset)
+    	  assoc = assoc.limit(self.limit).offset(self.offset)
     	end
-    	return assoc.reorder(reorder).all
+    	return assoc.reorder(self.reorder).all
   	end
   	
   	def all_items
-  	  return model_with_includes.where(where).all
+  	  m = model_with_includes.where(self.where)
+  	  n = self.near
+  	  m = m.near(n[0], n[1]) if n
+  	  return m.all
     end
   	
   	def item_values(attribute)
   	  arr = []
-  	  model_with_includes.where(where).all.each do |m|
-  	    arr << m[attribute]
+  	  m = model_with_includes.where(self.where)
+  	  n = self.near
+  	  m = m.near(n[0], n[1]) if n
+  	  m.all.each do |m2|  	  
+  	    arr << m2[attribute]
   	  end    	
     	return arr.uniq
     end  	  
@@ -305,6 +315,7 @@ module Caboose
       table = @options['model'].constantize.table_name      
   	  @params.each do |k,v|
         next if v.nil? || (v.kind_of?(String) && v.length == 0)
+        next if k.ends_with?('_near')
         
         col = nil        
         if @options['includes'] && @options['includes'].include?(k)           
@@ -374,17 +385,17 @@ module Caboose
           v = v.kind_of?(Array) ? v.collect{ |v2| "%#{v2}%".upcase } : "%#{v}%".upcase
         elsif k.ends_with?('_null')
           col = "#{table}.#{k[0..-6]}" if col.nil?
-          sql2 = "#{col} ? null"
-          v = v == true ? 'is' : 'is not'          
+          sql2 = "#{col} #{v == true ? 'is' : 'is not'} null"
+          #v = v == true ? 'is' : 'is not'          
         else
           col = "#{table}.#{k}" if col.nil?
           sql2 = "#{col} = ?"
         end
-        
+                
         if v.kind_of?(Array)
           sql2 = "(" + v.collect{ |v2| "#{sql2}" }.join(" or ") + ")"
           v.each { |v2| values << v2 }
-        else              
+        elsif !k.ends_with?('_null')              
           values << v
         end
         sql << sql2                          
@@ -394,6 +405,21 @@ module Caboose
   	  sql = [sql_str]  	   	  
   	  values.each { |v| sql << v }  	  
   	  return sql        	  
+    end
+    
+    def near      
+  	  @params.each do |k,v|
+        next if !k.ends_with?('_near')        
+        arr = k.split('_')
+        if arr.length == 3          
+          location = @post_get[arr[0]]
+          radius = @post_get[arr[1]]          
+          v = [location, radius] if location && radius && location.strip.length > 0 && radius.strip.length > 0
+        end                
+        next if v.nil? || !v.is_a?(Array) || v.count != 2
+        return v
+      end
+      return nil        	  
     end
     
     def limit
@@ -411,6 +437,18 @@ module Caboose
       end
       str << " desc" if @options['desc'] == 1       
       return str
-    end             
+    end
+    
+    def to_json
+      {
+        :base_url       => @options['base_url'],
+        :sort           => @options['sort'],
+        :desc           => @options['desc'],
+        :item_count     => @options['item_count'],  		
+        :items_per_page => @options['items_per_page'],
+        :page           => @options['page'],		  		
+        :use_url_params => @use_url_params  				  		
+      }
+    end
   end
 end

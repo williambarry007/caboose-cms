@@ -55,11 +55,16 @@ module Caboose
   
   # Strips html and returns the text that breaks closest to the given length
   def Caboose.teaser_text(str, length = 100)
-    return "" if str.nil?    
-    str2 = ActionController::Base.helpers.strip_tags(str)
-    if str2.length > 200
-      i = str2.index(' ', 200) - 1
-      i = 200 if i.nil?
+    return '' if str.nil?    
+    str2 = ActionController::Base.helpers.strip_tags(str).gsub("\n", ' ')
+    return '' if str2.nil? || str2.length == 0
+    if str2.length > length
+      i = str2.index(' ', length)
+      if i.nil?
+        i = length
+      else
+        i = i - 1
+      end
       str2 = str2[0..i]
       str2[str2.length-1] = "" if str2.ends_with?(",")
       str2 = "#{str2}..."
@@ -122,10 +127,12 @@ module Caboose
         'caboose/model/bound_s3_image.js',
         'caboose/model/bound_file.js',        
         'jquery.js',        
-        'jquery_ujs.js',        
+        'jquery_ujs.js',
+        'jquery-ui.js',
         'colorbox-rails/jquery.colorbox-min.js',        
         'colorbox-rails.js',
         'colorbox-rails/colorbox-links.js',
+        'tinymce/plugins/caboose/plugin.js',
         
         'tinymce/preinit.js',        
         'tinymce/plugins/caboose/plugin.js',        
@@ -158,6 +165,9 @@ module Caboose
         'tinymce/plugins/template/plugin.js',
         'tinymce/plugins/textcolor/plugin.js',
         'tinymce/plugins/caboose/plugin.js',
+        
+        # Site JS
+        '*/js/application.js',
 
         # CSS        
         'colorbox-rails.css',
@@ -171,13 +181,19 @@ module Caboose
         'caboose/fonts/big_noodle_titling_oblique.ttf',
         'caboose/fonts/big_noodle_titling.ttf',
         'caboose/fonts.css',
+        'caboose/icomoon_fonts.css',
         'caboose/login.css',
         'caboose/modal.css',
         'caboose/page_bar_generator.css',
         'caboose/register.css',
         'caboose/station_modal.css',
         'caboose/station_sidebar.css',
-        'caboose/tinymce.css'
+        'caboose/tinymce.css',
+        'jquery-ui.css',
+        
+        # Site CSS
+        '*/css/application.js'
+        
       ]      
     end   
   end

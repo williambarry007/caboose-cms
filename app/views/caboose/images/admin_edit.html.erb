@@ -1,0 +1,60 @@
+<%
+img = @media_image
+%>
+<div id='crumbtrail'>
+  <a href='/admin'>Admin</a> >
+  <a href='/admin/images'>Images</a>
+</div>
+
+<h1>Edit Image</h1>
+<img src='<%= img.image.url(:thumb) %>' style='float: right;' />
+<p><div id='mediaimage_<%= img.id %>_name'        ></div></p>
+<p><div id='mediaimage_<%= img.id %>_description' ></div></p>
+
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/images?media_category_id=<%= img.media_category_id %>';" />
+<input type='button' value='Delete Image' onclick="delete_image(<%= img.id %>);" />
+</p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+function delete_image(image_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append('Are you sure you want to delete the image? ')
+      .append($('<input/>').attr('type', 'button').val('Yes').click(function() { delete_image(image_id, true); })).append(" ")
+      .append($('<input/>').attr('type', 'button').val('No' ).click(function() { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').empty().append($('<p/>').addClass('loading').html('Deleting image...'));
+  $.ajax({
+    url: '/admin/images/' + image_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').empty().append($('<p/>').addClass('note error').html(resp.error));
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'MediaImage',
+    id: <%= img.id %>,
+    update_url: '/admin/images/<%= img.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'name'        , nice_name: 'Name'        , type: 'text'     , value: <%= raw Caboose.json(img.name)        %>, width: 400 },
+      { name: 'description' , nice_name: 'Description' , type: 'textarea' , value: <%= raw Caboose.json(img.description) %>, width: 400, height: 200 }      
+    ]
+  });
+});
+
+</script>
+<% end %>

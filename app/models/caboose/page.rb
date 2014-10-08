@@ -7,29 +7,31 @@ class Caboose::Page < ActiveRecord::Base
   has_many :children, :class_name => 'Caboose::Page', :foreign_key => 'parent_id', :order => 'sort_order, title'
   has_many :page_permissions  
   has_many :blocks, :order => 'sort_order'
-  attr_accessible :id,
-    :site_id,
-    :parent_id, 
-    :title, 
-    :menu_title, 
-    # :content, # Changed from column in pages to blocks
-    :blocks,
-    :slug, 
-    :alias, 
-    :uri, 
-    :redirect_url, 
-    :hide, 
-    :content_format, 
-    :custom_css, 
-    :custom_js,
-    :linked_resources, 
-    :layout,
-    :seo_title, # 70 chars
-    :meta_description, # 156 chars
-    :meta_robots, # Multi-select options: none, noindex, nofollow, nosnippet, noodp, noarchive
-    :canonical_url,
-    :facebook_description, # defaults to meta_description
-    :googleplus_description # defaults to meta_description      
+  has_many :page_tags, :class_name => 'Caboose::PageTag', :dependent => :delete_all, :order => 'tag'
+  attr_accessible :id      ,        
+    :site_id               ,
+    :parent_id             ,
+    :title                 ,
+    :menu_title            ,
+    :slug                  ,
+    :alias                 ,
+    :uri                   ,
+    :redirect_url          ,
+    :hide                  ,
+    :content_format        ,
+    :custom_css            ,
+    :custom_js             ,
+    :linked_resources      ,
+    :layout                ,
+    :sort_order            ,
+    :custom_sort_children  ,
+    :seo_title             ,
+    :meta_keywords         ,
+    :meta_description      ,
+    :meta_robots           ,
+    :canonical_url         ,
+    :fb_description        ,
+    :gp_description
    
   CONTENT_FORMAT_HTML  = 1 
   CONTENT_FORMAT_TEXT  = 2
@@ -66,7 +68,7 @@ class Caboose::Page < ActiveRecord::Base
   def self.page_with_uri(host_with_port, uri, get_closest_parent = true)
 
     d = Caboose::Domain.where(:domain => host_with_port).first
-    return false if d.nil?
+    return false if d.nil? || d.under_construction == true
     site_id = d.site_id    
     
     uri = uri.to_s.gsub(/^(.*?)\?.*?$/, '\1')
@@ -289,25 +291,32 @@ class Caboose::Page < ActiveRecord::Base
     self.url_helper(page_id, arr)
     arr.reverse!
     
+    ru = arr.last.redirect_url
+    return ru if ru && ru.strip.length > 0
+
     path = []      
     arr.each do |row|
-      if (row.alias.length > 0)
+      if row.alias && row.alias.strip.length > 0        
         path = [row.alias]
-      elsif (row.slug.length > 0)
+      elsif row.slug && row.slug.strip.length > 0
         path << row.slug
       end
     end
-    return path.join('/')
+    return "/#{path.join('/')}"
   end
   
   def self.url_helper(page_id, arr)
     return if page_id <= 0
     
-    p = self.find_with_fields(page_id, [:id, :parent_id, :title, :menu_title, :alias, :slug])
+    p = self.find_with_fields(page_id, [:id, :parent_id, :title, :menu_title, :alias, :slug, :redirect_url])
     return if p.nil?
 
     arr << p
     self.url_helper(p.parent_id, arr)
+  end
+  
+  def url
+    return Caboose::Page.url(self.id)
   end
   
   def self.slug(str)
@@ -339,6 +348,16 @@ class Caboose::Page < ActiveRecord::Base
       end
     end
     return resources
+  end
+  
+  def head_title
+    str = ""
+    str << "#{self.title} | " if !self.title.nil? && self.title.strip.length > 0
+    str << self.site.description if self.site && self.site.description
+  end
+  
+  def self.pages_with_tag(parent_id, tag)
+    self.includes(:page_tags).where(:hide => false, :parent_id => 1, :page_tags => { :tag => tag }).reorder('sort_order, title').all
   end
 
 end

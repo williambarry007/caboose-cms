@@ -5,6 +5,7 @@ PageContentController.prototype = {
 
   page_id: false,    
   new_block_type_id: false,
+  selected_block_ids: [],
   
   init: function(page_id)
   {
@@ -79,27 +80,54 @@ PageContentController.prototype = {
     caboose_modal_url('/admin/pages/' + this.page_id + '/blocks/' + block_id + '/new');    
   },
   
+  select_block: function(block_id)
+  {            
+    i = this.selected_block_ids.indexOf(block_id);
+    if (i == -1) // Not there
+    {
+      this.selected_block_ids.push(block_id);
+      $('#block_' + block_id).addClass('selected');
+    }
+    else
+    {
+      this.selected_block_ids.splice(i, 1);
+      $('#block_' + block_id).removeClass('selected');
+    }    
+  },
+  
   delete_block: function(block_id, confirm)
   {
     var that = this;        
     if (!confirm)
     {
+      if (this.selected_block_ids.indexOf(block_id) == -1)
+        this.selected_block_ids.push(block_id);
+      var other_count = this.selected_block_ids.length - 1;
+      
+      var message = "Are you sure you want to delete this block";      
+      if (other_count > 0)
+        message += " and the " + other_count + " other selected block" + (other_count == 1 ? '' : 's');
+      message += "?<br />";
+      
       var p = $('<p/>')
         .addClass('caboose_note')
-        .append("Are you sure you want to delete the block? ")
+        .append(message)
         .append($('<input/>').attr('type', 'button').val('Yes').click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(block_id, true); })).append(" ")
         .append($('<input/>').attr('type', 'button').val('No').click(function(e) {  e.preventDefault(); e.stopPropagation(); that.render_blocks(); }));
       $('#block_' + block_id).attr('onclick','').unbind('click');
       $('#block_' + block_id).empty().append(p);
       return;
     }
-    $.ajax({
-      url: '/admin/pages/' + this.page_id + '/blocks/' + block_id,
-      type: 'delete',
-      success: function(resp) {
-        that.render_blocks();      
-      }
-    });    
+    for (var i in this.selected_block_ids)
+    {               
+      $.ajax({
+        url: '/admin/pages/' + this.page_id + '/blocks/' + this.selected_block_ids[i],
+        type: 'delete',
+        async: false,
+        success: function(resp) {}
+      });
+    }
+    that.render_blocks();
   },
     
   /*****************************************************************************
@@ -107,6 +135,7 @@ PageContentController.prototype = {
   *****************************************************************************/
   
   render_blocks: function() {
+    $('.sortable').sortable('destroy');
     var that = this;                
     $.ajax({
       url: '/admin/pages/' + this.page_id + '/blocks/render-second-level',
@@ -115,6 +144,8 @@ PageContentController.prototype = {
           $('#block_' + b.id).replaceWith(b.html);                              
         });
         that.set_clickable();
+        that.sortable_blocks();
+        that.selected_block_ids = [];
       }
     });
   },
@@ -137,8 +168,9 @@ PageContentController.prototype = {
     var that = this;
         
     $('#block_' + b.id)      
-      .prepend($('<a/>').attr('id', 'block_' + b.id + '_sort_handle'  ).addClass('sort_handle'  ).append($('<span/>').addClass('ui-icon ui-icon-arrow-2-n-s')).click(function(e) { e.preventDefault(); e.stopPropagation(); }))
-      .prepend($('<a/>').attr('id', 'block_' + b.id + '_delete_handle').addClass('delete_handle').append($('<span/>').addClass('ui-icon ui-icon-close'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(b.id); }));
+      .prepend($('<a/>').attr('id', 'block_' + b.id + '_select_handle'  ).addClass('select_handle' ).append($('<span/>').addClass('ui-icon ui-icon-check'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.select_block(b.id); }))
+      .prepend($('<a/>').attr('id', 'block_' + b.id + '_sort_handle'    ).addClass('sort_handle'   ).append($('<span/>').addClass('ui-icon ui-icon-arrow-2-n-s')).click(function(e) { e.preventDefault(); e.stopPropagation(); }))
+      .prepend($('<a/>').attr('id', 'block_' + b.id + '_delete_handle'  ).addClass('delete_handle' ).append($('<span/>').addClass('ui-icon ui-icon-close'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(b.id); }));
       
     if (parent_allows_child_blocks && (!b.name || b.name.length == 0))
     {            
@@ -153,8 +185,8 @@ PageContentController.prototype = {
             caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + parent_id + '/new?before_id=' + b.id);                        
           })
         )
-        .mouseover(function(e) { $(this).addClass('new_block_link_over');    e.stopPropagation(); })
-        .mouseout(function(e)  { $(this).removeClass('new_block_link_over'); e.stopPropagation(); })
+        .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
+        .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
       );      
     }
             
@@ -166,15 +198,15 @@ PageContentController.prototype = {
      
     var show_mouseover = true;
     if (b.children && b.children.length > 0)
-    {
-      $.each(b.children, function(i, b2) {
-        if (b2.block_type_id = 34)
+    {      
+      $.each(b.children, function(i, b2) {        
+        if (b2.field_type == 'block')
           show_mouseover = false;
         that.set_clickable_helper(b2, b.id, b.allow_child_blocks);
-      });      
+      });            
     }
     if (b.allow_child_blocks)
-    {
+    {      
       $('#block_' + b.id).after($('<div/>')          
         .addClass('new_block_link')
         .append($('<div/>').addClass('line'))
@@ -186,8 +218,8 @@ PageContentController.prototype = {
             caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + b.id + '/new?after_id=' + b.id);                        
           })
         )
-        .mouseover(function(e) { $(this).addClass('new_block_link_over');    e.stopPropagation(); })
-        .mouseout(function(e)  { $(this).removeClass('new_block_link_over'); e.stopPropagation(); })
+        .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
+        .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
       );
     }
     if (show_mouseover)

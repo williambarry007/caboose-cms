@@ -18,7 +18,7 @@
         <td><%= raw p.id %></td>
         <td><%= p.published ? "Yes" : "No" %></td>
         <td><%= raw p.title %></td>
-        <td><%= raw truncate(p.body, :length => 80) %></td>
+        <td><%= raw Caboose.teaser_text(p.body, 100) %></td>
         <td><%= p.created_at.strftime("%m/%d/%Y") %></td>    
       </tr>
     <% end %>

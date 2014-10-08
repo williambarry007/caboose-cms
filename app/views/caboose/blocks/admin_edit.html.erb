@@ -8,24 +8,37 @@ crumbs = []
 b = @block
 while b
   href    = b.id == @block.id ? "#" : "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
-  onclick = b.id == @block.id ? " onclick=\"$('#block_#{@block.id}_block_type_id_container').slideToggle(100, function() { modal.autosize(); });\"" : ''
+  #onclick = b.id == @block.id ? " onclick=\"$('#advanced').slideToggle(100, function() { modal.autosize(); });\"" : ''  
   text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
-  crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"     
+  #crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"
+  crumbs << "<a href=\"#{href}\">#{text}</a>"
   b = b.parent
 end
 
 %>
 <!--<h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.name ? @block.name : @block.block_type.description %></h2>-->
 <h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
-<p id='block_type_container'><div id='block_<%= @block.id %>_block_type_id'></div></p>
 
 <% if @block.block_type.use_render_function_for_layout %>
   <!-- Start -->
-  <%= raw @block.render(@block, {
+  <%
+  str = @block.render(@block, {
     :modal => true,
     :empty_text => '[Empty, click to edit]',
-    :editing => true
-  }) %>
+    :editing => true,    
+    :view => self,
+    :controller_view_content => yield,
+    :css => '|CABOOSE_CSS|',
+    :js => '|CABOOSE_JAVASCRIPT|',
+    :csrf_meta_tags => '|CABOOSE_CSRF|',
+    :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
+    :logged_in_user => @logged_in_user,
+    :site => @site
+  })
+  str.gsub!('|CABOOSE_CSS|'        , yield(:css))
+  str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
+  str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)
+  %><%= raw str %>
   <!-- Stop -->
 <% elsif @block.block_type.field_type != 'block' %>
   <p><div id='block_<%= @block.id %>_value'></div></p>
@@ -35,11 +48,24 @@ end
       <% if b.block_type.field_type != 'block' && b.block_type.field_type != 'richtext' %>
         <p><div id='block_<%= b.id %>_value'></div></p>
       <% else %>
-        <%= raw @block.render(b, {
+        <%
+        str = @block.render(b, {
           :modal => true,
           :empty_text => '[Empty, click to edit]',
-          :editing => true
-        }) %>
+          :editing => true,
+          :view => self,
+          :controller_view_content => yield,
+          :css => '|CABOOSE_CSS|',
+          :js => '|CABOOSE_JAVASCRIPT|',
+          :csrf_meta_tags => '|CABOOSE_CSRF|',
+          :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
+          :logged_in_user => @logged_in_user,
+          :site => @site
+        })
+        str.gsub!('|CABOOSE_CSS|'        , yield(:css))
+        str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
+        str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)
+        %><%= raw str %>
       <% end %>
     <% end %>
   <% else %>
@@ -57,6 +83,7 @@ end
 <% end %>
 <input type='button' value='Move Up'   onclick="controller.move_up();" />
 <input type='button' value='Move Down' onclick="controller.move_down();" />
+<input type='button' value='Advanced'  onclick="window.location='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>/advanced';" />
 </p>
 
 <% content_for :caboose_css do %>
@@ -71,8 +98,17 @@ end
 <script type='text/javascript'>
 
 var modal = false;
+$(document).ready(function() {
+  if (modal)
+    modal.autosize();
+  else
+    modal = new CabooseModal(800);
+});
 $(window).load(function() {
-  modal = new CabooseModal(800);
+  if (modal)
+    modal.autosize();
+  else
+    modal = new CabooseModal(800);
 });
 
 <%
@@ -86,7 +122,7 @@ $(window).load(function() {
 %>
     
 var controller = false;
-$(document).ready(function() {
+$(document).ready(function() {  
   modal = new CabooseModal(800);
   controller = new BlockController({
     block: <%= raw Caboose.json(@block.js_hash) %>,    
@@ -96,9 +132,9 @@ $(document).ready(function() {
 });    
 
 </script>
-<% if @block.block_type.field_type == 'richtext' %>
+<% if @block.block_type.field_type == 'richtext' %>  
   <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>    
-  <%= tinymce :caboose, :width => '800px', :height => '300px' %>
+  <%= raw caboose_tinymce %>
 <% end %>
 
 <% end %>

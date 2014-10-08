@@ -23,18 +23,25 @@ Caboose::Engine.routes.draw do
   
   post    "admin/sites/:id/members"            => "sites#admin_add_member"
   delete  "admin/sites/:id/members/:user_id"   => "sites#admin_remove_member"
-  
-  post    "admin/sites/:id/domains"                        => "sites#admin_add_domain"
-  put     "admin/sites/:id/domains/:domain_id/set-primary" => "sites#admin_set_primary_domain"
-  delete  "admin/sites/:id/domains/:domain_id"             => "sites#admin_remove_domain"
-  
+   
+  post    "admin/sites/:site_id/domains"     => "domains#admin_add"
+  put     "admin/sites/:site_id/domains/:id" => "domains#admin_update"
+  delete  "admin/sites/:site_id/domains/:id" => "domains#admin_delete"
+                                                                                                                                     
   get     "admin/sites/options"              => "sites#options"
   get     "admin/sites"                      => "sites#admin_index"    
   get     "admin/sites/new"                  => "sites#admin_new"  
   get     "admin/sites/:id"                  => "sites#admin_edit"  
   put     "admin/sites/:id"                  => "sites#admin_update"  
   post    "admin/sites"                      => "sites#admin_add"  
-  delete  "admin/sites/:id"                  => "sites#admin_delete"    
+  delete  "admin/sites/:id"                  => "sites#admin_delete"
+    
+  get     "admin/redirects"      => "redirects#admin_index"    
+  get     "admin/redirects/new"  => "redirects#admin_new"  
+  get     "admin/redirects/:id"  => "redirects#admin_edit"  
+  put     "admin/redirects/:id"  => "redirects#admin_update"  
+  post    "admin/redirects"      => "redirects#admin_add"  
+  delete  "admin/redirects/:id"  => "redirects#admin_delete"
   
   get     "admin/users"                     => "users#index"  
   get     "admin/users/options"             => "users#options"
@@ -66,13 +73,18 @@ Caboose::Engine.routes.draw do
   get     "admin/images/s3"             => "images#admin_sign_s3"
   get     "admin/images/s3-result"      => "images#admin_s3_result"  
   get     "admin/images/new"            => "images#admin_new"
+  get     "admin/images/json"           => "images#admin_json"
   get     "admin/images/:id/process"    => "images#admin_process"
+  get     "admin/images/:id/finished"   => "images#admin_process_finished"
   get     "admin/images/:id"            => "images#admin_edit"  
   put     "admin/images/:id"            => "images#admin_update"
   post    "admin/images/:id/image"      => "images#admin_update_image"  
   post    "admin/images"                => "images#admin_add"
   delete  "admin/images/:id"            => "images#admin_delete"
   
+  post    "admin/media-categories"      => "media_categories#admin_add"
+  put     "admin/media-categories/:id"  => "media_categories#admin_update"      
+  delete  "admin/media-categories/:id"  => "media_categories#admin_delete"
   
   get     "admin/permissions"             => "permissions#index"
   get     "admin/permissions/options"     => "permissions#options"
@@ -92,11 +104,12 @@ Caboose::Engine.routes.draw do
   
   #get     "pages"                           => "pages#index"
   get     "pages/:id"                     => "pages#show"
-  get     "pages/:id/redirect"            => "pages#redirect"
+  get     "pages/:id/redirect"            => "pages#redirect"    
   get     "admin/pages/sitemap-options"   => "pages#admin_sitemap_options"
   get     "admin/pages/robots-options"    => "pages#admin_robots_options"
   get     "admin/pages/format-options"    => "pages#admin_content_format_options"
   get     "admin/pages/new"               => "pages#admin_new"
+  get     "admin/pages/:id/block-options" => "pages#admin_block_options"
   get     "admin/pages/:id/uri"           => "pages#admin_page_uri"
   get     "admin/pages/:id/delete"        => "pages#admin_delete_form"  
   get     "admin/pages/:id/sitemap"       => "pages#admin_sitemap"
@@ -132,6 +145,7 @@ Caboose::Engine.routes.draw do
   get     "admin/pages/:page_id/blocks/:id/tree"             => "blocks#admin_tree"
   get     "admin/pages/:page_id/blocks/:id/render"           => "blocks#admin_render"  
   get     "admin/pages/:page_id/blocks/:id/edit"             => "blocks#admin_edit"
+  get     "admin/pages/:page_id/blocks/:id/advanced"         => "blocks#admin_edit_advanced"
   put     "admin/pages/:page_id/blocks/:id/move-up"          => "blocks#admin_move_up"
   put     "admin/pages/:page_id/blocks/:id/move-down"        => "blocks#admin_move_down"
   get     "admin/pages/:page_id/blocks/:id"                  => "blocks#admin_show"
@@ -194,6 +208,24 @@ Caboose::Engine.routes.draw do
   get     "admin/posts"                           => "posts#admin_index"
   post    "admin/posts"                           => "posts#admin_add"  
   delete  "admin/posts/:id"                       => "posts#admin_delete"
+  
+  get     "admin/calendars"                         => "calendars#admin_index"
+  get     "admin/calendars/:id"                     => "calendars#admin_edit"
+  put     "admin/calendars/:id"                     => "calendars#admin_update"
+  post    "admin/calendars"                         => "calendars#admin_add"
+  delete  "admin/calendars"                         => "calendars#admin_delete"
+  
+  get     "admin/calendars/:calendar_id/events"     => "events#admin_index"
+  get     "admin/calendars/:calendar_id/events/new" => "events#admin_new"
+  get     "admin/calendars/:calendar_id/events/:id" => "events#admin_edit"
+  put     "admin/calendars/:calendar_id/events/:id" => "events#admin_update"
+  post    "admin/calendars/:calendar_id/events"     => "events#admin_add"
+  delete  "admin/calendars/:calendar_id/events/:id" => "events#admin_delete"
+  
+  put     "admin/calendars/:calendar_id/event-groups/:id" => "event_groups#admin_update"
+  get     "admin/event-groups/period-options"             => "event_groups#admin_period_options"
+  get     "admin/event-groups/frequency-options"          => "event_groups#admin_frequency_options"
+  get     "admin/event-groups/repeat-by-options"          => "event_groups#admin_repeat_by_options"
 
   get     "admin/ab-variants"                     => "ab_variants#admin_index"
   get     "admin/ab-variants/new"                 => "ab_variants#admin_new"

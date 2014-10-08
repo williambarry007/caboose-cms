@@ -1,16 +1,20 @@
 
-<% if !@page.nil? && @page.title != 'Access Denied' %>
+<% if @page && @page.title != 'Access Denied' %>
 <% content_for :js do %>
 <%= javascript_include_tag "caboose/application" %>
+<%= javascript_include_tag @site.name == 'application' ? 'application' : "#{@site.name}/js/application" %>
 <script>window.loggedIn = <%= logged_in?.to_json %></script>
 <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
 <% @page.linked_resources_map[:js].each do |r| %><%= javascript_include_tag r %><% end %>
+<% if @page.custom_js && @page.custom_js.strip.length > 0 %><script type='text/javascript'><%= raw @page.custom_js %></script><% end %>
 <%= yield :caboose_js %>
 <% end %>  
 <% content_for :css do %>
-<%= stylesheet_link_tag('caboose/application') %>
+<%= stylesheet_link_tag 'caboose/application' %>
+<%= stylesheet_link_tag @site.name == 'application' ? 'application' : "#{@site.name}/css/application" %>
 <% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
 <% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
+<% if @page.custom_css && @page.custom_css.strip.length > 0 %><style><%= raw @page.custom_css %></style><% end %>
 <%= yield :caboose_css %>
 <% end %>
   <%  
@@ -21,7 +25,9 @@
     b = @page.block
     b.create_children
   end
-  str = b.render(b, {     
+  #b.log_helper
+  str = b.render(b, {
+    :page => @page,
     :view => self,
     :controller_view_content => yield,
     :modal => false,
@@ -30,11 +36,20 @@
     :css => '|CABOOSE_CSS|',
     :js => '|CABOOSE_JAVASCRIPT|',
     :csrf_meta_tags => '|CABOOSE_CSRF|',
-    :logged_in_user => @logged_in_user
+    :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
+    :logged_in_user => @logged_in_user,
+    :site => @site
   })       
-  str.gsub!('|CABOOSE_CSS|'        , yield(:css))
+  
+  protocol = request.protocol
+  css = yield(:css)
+  css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
+  css.gsub!("<link href='//" , "<link href='#{protocol}")
+  
+  str.gsub!('|CABOOSE_CSS|'        , css)
+  str.gsub!('|CABOOSE_PROTOCOL|'   , protocol)  
   str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
-  str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)
+  str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)  
   
   %><%= raw str %><%
     

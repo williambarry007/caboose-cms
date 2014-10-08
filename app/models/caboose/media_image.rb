@@ -1,4 +1,5 @@
 require 'uri'
+require 'httparty'
 
 class Caboose::MediaImage < ActiveRecord::Base
 
@@ -16,9 +17,27 @@ class Caboose::MediaImage < ActiveRecord::Base
   attr_accessible :id, :media_category_id, :name, :description
 
   def process
-    puts "http://#{Caboose::cdn_domain}/media-images/#{self.id}#{File.extname(self.name.downcase)}"
-    self.image = URI.parse("http://#{Caboose::cdn_domain}/media-images/#{self.id}#{File.extname(self.name.downcase)}")
-    self.save    
+    
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
+    bucket = config['bucket']
+    
+    uri = "http://#{bucket}.s3.amazonaws.com/media-images/#{self.id}#{File.extname(self.name.downcase)}"
+    puts "Processing #{uri}..."
+    
+    self.image = URI.parse(uri)
+    self.save
+  end
+  
+  def api_hash
+    {
+      :id => self.id,
+      :name => self.name,
+      :description => self.description,
+      :tiny_url => self.image.url(:tiny),
+      :thumb_url => self.image.url(:thumb),
+      :large_url => self.image.url(:large),
+      :original_url => self.image.url(:original)
+    }
   end
   
 end

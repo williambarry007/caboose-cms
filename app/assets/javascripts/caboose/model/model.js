@@ -23,7 +23,7 @@ Model.prototype = {
   save: function(attrib, after) {
     if (!attrib.update_url)
       attrib.update_url = this.update_url;
-    attrib.save(after);
+    attrib.save(after);        
   },
   
   populate_options: function(after, i) {

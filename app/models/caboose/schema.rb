@@ -6,8 +6,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
     {
       :roles_users             => :role_memberships,
       :permissions_roles       => :role_permissions,
-      :page_block_field_values => :fields,
-      :page_block_fields       => :field_types,
+      #:page_block_field_values => :fields,
+      #:page_block_fields       => :field_types,
       :page_block_types        => :block_types,
       :page_blocks             => :blocks
     }
@@ -27,10 +27,33 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Block => [:block_type],
       #Caboose::FieldType => [:model_binder_options],
       Caboose::AbValue => [:i, :text],
-      Caboose::AbOption => [:text],
-      Caboose::User => [:timezone],
+      Caboose::AbOption => [:text],      
       #Caboose::Field => [:child_block_id],
-      Caboose::BlockType => [:layout_function]
+      Caboose::BlockType => [:layout_function],
+      Caboose::CalendarEvent => [
+        :repeat_period , 
+        :repeat_sun    , 
+        :repeat_mon    , 
+        :repeat_tue    , 
+        :repeat_wed    , 
+        :repeat_thu    , 
+        :repeat_fri    , 
+        :repeat_sat    , 
+        :repeat_start  , 
+        :repeat_end    
+      ],
+      Caboose::CalendarEventGroup => [
+        :repeat_period , 
+        :repeat_sun    , 
+        :repeat_mon    , 
+        :repeat_tue    , 
+        :repeat_wed    , 
+        :repeat_thu    , 
+        :repeat_fri    , 
+        :repeat_sat    , 
+        :repeat_start  , 
+        :repeat_end        
+      ] 
     }
   end
 
@@ -84,11 +107,14 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :parent_id                       , :integer ],
         [ :name                            , :string  ],
         [ :description                     , :string  ],
+        [ :icon                            , :string  ],
+        [ :is_global                       , :boolean , { :default => false }],
         [ :block_type_category_id          , :integer , { :default => 2 }],
         [ :render_function                 , :text    ],
         [ :use_render_function             , :boolean , { :default => false }],
         [ :use_render_function_for_layout  , :boolean , { :default => false }],
         [ :allow_child_blocks              , :boolean , { :default => false }],
+        [ :default_child_block_type_id     , :integer ],
         [ :field_type                      , :string  ],
         [ :default                         , :text    ],
         [ :width                           , :integer ],
@@ -116,6 +142,37 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name                 , :string  ],
         [ :description          , :string  ]
       ],
+      Caboose::Calendar => [
+        [ :site_id      , :integer  ],
+        [ :name         , :string   ],
+        [ :description  , :text     ]  
+      ],
+      Caboose::CalendarEvent => [
+        [ :calendar_id              , :integer  ],
+        [ :calendar_event_group_id  , :integer  ],
+        [ :name                     , :string   ],
+        [ :description              , :text     ],
+        [ :location                 , :string   ],
+        [ :begin_date               , :datetime ],
+        [ :end_date                 , :datetime ],
+        [ :all_day                  , :boolean  , { :default => false }],        
+        [ :repeats                  , :boolean  , { :default => false }]
+      ],
+      Caboose::CalendarEventGroup => [
+        [ :frequency    , :integer  , { :default => 1 }],
+        [ :period       , :string   , { :default => 'Week' }],        
+        [ :repeat_by    , :string   ],
+        [ :sun          , :boolean  , { :default => false }],
+        [ :mon          , :boolean  , { :default => false }],
+        [ :tue          , :boolean  , { :default => false }],
+        [ :wed          , :boolean  , { :default => false }],
+        [ :thu          , :boolean  , { :default => false }],
+        [ :fri          , :boolean  , { :default => false }],
+        [ :sat          , :boolean  , { :default => false }],
+        [ :date_start   , :date     ],
+        [ :repeat_count , :integer  ],
+        [ :date_end     , :date     ]
+      ],
       Caboose::DatabaseSession => [
         [ :session_id  , :string   , :null => false ],
         [ :data        , :text                      ],
@@ -123,9 +180,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :updated_at  , :datetime , :null => true  ]
       ],
       Caboose::Domain => [
-        [ :site_id     , :integer ],
-        [ :domain      , :string  ],
-        [ :primary     , :boolean, { :default => false }]
+        [ :site_id            , :integer ],
+        [ :domain             , :string  ],
+        [ :primary            , :boolean, { :default => false }],
+        [ :under_construction , :boolean, { :default => false }]
       ],
       Caboose::MediaCategory => [
         [ :parent_id         , :integer ],
@@ -133,14 +191,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name              , :string  ]        
       ],
       Caboose::MediaImage => [
-        [ :media_category_id , :integer ],
-        [ :name              , :string  ],
-        [ :description       , :text    ]
+        [ :media_category_id , :integer    ],
+        [ :name              , :string     ],
+        [ :description       , :text       ],
+        [ :image             , :attachment ]
       ],
       Caboose::MediaFile => [
-        [ :media_category_id , :integer ],
-        [ :name              , :string  ],
-        [ :description       , :text    ]
+        [ :media_category_id , :integer    ],
+        [ :name              , :string     ],
+        [ :description       , :text       ],
+        [ :file              , :attachment ]
       ],
       Caboose::Page => [
         [ :site_id               , :integer ],
@@ -160,6 +220,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :sort_order            , :integer , { :default => 0                }],
         [ :custom_sort_children  , :boolean , { :default => false            }],
         [ :seo_title             , :string  , { :limit => 70                 }],
+        [ :meta_keywords         , :text    ], 
         [ :meta_description      , :string  , { :limit => 156                }],
         [ :meta_robots           , :string  , { :default => 'index, follow'  }],
         [ :canonical_url         , :string  ],
@@ -171,22 +232,35 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :page_id , :integer  ],
         [ :action  , :string   ]
       ],
+      Caboose::PageTag => [        
+        [ :page_id , :integer  ],
+        [ :tag     , :string   ]
+      ],
+      Caboose::PermanentRedirect => [
+        [ :site_id  , :integer ],
+        [ :priority , :integer , { :default => 0 }],
+        [ :is_regex , :boolean , { :default => false }],
+        [ :old_url  , :string  ],
+        [ :new_url  , :string  ]
+      ],
       Caboose::Permission => [
         [ :resource , :string ],
         [ :action   , :string ]
       ],
       Caboose::Post => [
+        [ :site_id              , :integer    ],
         [ :title                , :text       ],
-        [ :body                 , :text 		   ],
+        [ :body                 , :text 		  ],
         [ :hide                 , :boolean    ],
-        [ :image_url            , :text 		   ],
+        [ :image_url            , :text 		  ],
         [ :published            , :boolean    ],
         [ :created_at           , :datetime   ],
         [ :updated_at           , :datetime   ],
         [ :image                , :attachment ]
       ],
       Caboose::PostCategory => [
-        [ :name , :string ]
+        [ :site_id  , :integer ],
+        [ :name     , :string  ]
       ],
       Caboose::PostCategoryMembership => [
         [ :post_id          , :integer ],
@@ -210,28 +284,24 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :value , :text   ]
       ],
       Caboose::Site => [
-        [ :name        , :string ],
-        [ :description , :text   ]
+        [ :name                     , :string ],
+        [ :description              , :text   ],
+        [ :under_construction_html  , :text   ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
         [ :user_id     , :integer ],
         [ :role        , :string  ]
       ],
-      Caboose::Timezone => [
-        [ :country_code , :string ],
-        [ :name         , :string ]
-      ],
-      Caboose::TimezoneAbbreviation => [
-        [ :abbreviation , :string  ],
-        [ :name         , :string  ]
-      ],
-      Caboose::TimezoneOffset => [
-        [ :timezone_id  , :integer  ],
-        [ :abbreviation , :string   ],
-        [ :time_start   , :integer  ],
-        [ :gmt_offset   , :integer  ],
-        [ :dst          , :boolean  ]
+      Caboose::SmtpConfig => [
+        [ :site_id              , :integer ],
+        [ :address              , :string  , { :default => 'localhost' }],
+        [ :port                 , :integer , { :default => 25 }],
+        [ :domain               , :string ],
+        [ :user_name            , :string ],
+        [ :password             , :string ],
+        [ :authentication       , :string ], # :plain, :login, :cram_md5.
+        [ :enable_starttls_auto , :boolean , { :default => true }]
       ],
       Caboose::User => [
         [ :first_name           , :string     ],
@@ -244,10 +314,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :state                , :string     ],
         [ :zip                  , :string     ],
         [ :phone                , :string     ],
-        [ :fax                  , :string     ],
-        [ :utc_offset           , :float      , { :default => -5 }],
-        #[ :timezone             , :string     , { :default => 'America/Chicago' }],
-        [ :timezone_id          , :integer    , { :defualt => 381 }], # Defaults to 'America/Chicago'
+        [ :fax                  , :string     ],        
+        [ :timezone             , :string     , { :default => 'Central Time (US & Canada)' }],        
         [ :password             , :string     ],
         [ :password_reset_id    , :string     ],
         [ :password_reset_sent  , :datetime   ],
@@ -381,6 +449,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
       bt = Caboose::BlockType.where(:name => 'richtext').first
       bt.field_type = 'richtext'
       bt.save
+    end
+    if !Caboose::BlockType.where(:name => 'richtext2').exists?
+      Caboose::BlockType.create(:name => 'richtext2', :description => 'Rich Text (Non-Parsed)', :field_type => 'richtext', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)    
     end
     if !Caboose::BlockType.where(:name => 'image').exists?
       bt = Caboose::BlockType.create(:name => 'image', :description => 'Image', :field_type => 'block')

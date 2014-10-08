@@ -3,6 +3,7 @@ body {
   font-family: "Avenir", Tahoma, Arial;  
 }
 
-.placeholder_js {
-  color: #808080;
+input[type='text'].placeholder_js {
+  color: #757575;
+
 }

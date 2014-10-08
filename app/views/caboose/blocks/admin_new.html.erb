@@ -12,12 +12,32 @@ end
 b = @block
 
 %>
+<!--
 <h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
 <h1>New Block</h1>
-<form action='/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>' method='post' id='new_block_form' onsubmit="add_child_block(); return false;">
+-->
+<form action='/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>' method='post' id='new_block_form' onsubmit="return false;">
 <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
+<input type='hidden' name='block_type_id' id='block_type_id' value='' />
 <% if @before_id %><input type='hidden' name='before_id' value='<%= @before_id %>' /><% end %>
 <% if @after_id  %><input type='hidden' name='after_id'  value='<%= @after_id  %>' /><% end %>
+<div class='icons'>
+  <% Caboose::BlockTypeCategory.reorder(:name).all.each do |cat| %>
+    <% next if cat.parent_id.nil? && cat.name == 'Layouts' %>
+    <% kids = cat.block_types.where("parent_id is null").reorder(:name).all %>
+    <% if kids && kids.count > 0 %>
+      <h2 onclick="$('#cat<%= cat.id %>_container').slideToggle();"><%= cat.name %></h3>
+      <div id='cat<%= cat.id %>_container'>
+        <% kids.each do |bt| %>
+          <a href='#' onclick="add_child_block(<%= bt.id %>);"><span class='icon icon-<%= bt.icon %>'></span><span class='name'><%= bt.description %></span></a>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+</form>
+
+<!--
 <p><select name='block_type_id'>
 <option value=''>-- Select a block type --</option>
 <% Caboose::BlockType.where("parent_id is null").reorder(:name).all.each do |bt| %>
@@ -29,22 +49,37 @@ b = @block
   <input type='submit' value='Add Block' />
   <input type='button' value='Cancel' onclick="modal.close();" />
 </p>
+-->
 
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/icomoon_fonts' %>
+<style>
+#modal_content div.icons { height: 400px; overflow-y: scroll; }
+#modal_content div.icons h2 { clear: both; padding: 20px 0px 10px 0; text-align: center; }
+#modal_content div.icons a { display: block; float: left; margin: 4px; border: #fff 0px solid; width: 120px; height: 100px; text-align: center; vertical-align: middle; border: #666 4px solid; }
+#modal_content div.icons a span.icon { display: block; padding: 10px 20px; font-size: 24pt; color: #fff; }
+#modal_content div.icons a span.name { display: block; }               
+#modal_content div.icons a:hover { background: #fff69f; color: #000; border: #666 0px solid; border: #666 4px solid; }
+#modal_content div.icons a:hover span.icon { color: #000; }
+#modal_content div.icons a:hover span.name { color: #000; }
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
 var modal = false;
 $(window).load(function() {
-  modal = new CabooseModal(800);  
-});
+  modal = new CabooseModal(550);  
+});                         
 
 $(document).ready(function() {
-  modal = new CabooseModal(800);  
+  modal = new CabooseModal(550);  
 });
 
-function add_child_block()
+function add_child_block(block_type_id)
 {
   modal.autosize("<p class='loading'>Adding block...</p>");
+  $('#block_type_id').val(block_type_id);
   $.ajax({
     url: '/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>',
     type: 'post',

@@ -14,7 +14,7 @@ BlockController.prototype = {
     for (var thing in options)
       this[thing] = options[thing];
 
-    this.set_block_type_editable();
+    //this.set_block_type_editable();
     this.set_block_value_editable(this.block);
     this.set_child_blocks_editable();
     this.set_clickable();
@@ -77,31 +77,43 @@ BlockController.prototype = {
 
   /****************************************************************************/
 
-  set_block_type_editable: function()
-  {        
-    var that = this;
-    var b = this.block;    
-    m = new ModelBinder({
-      name: 'Block',
-      id: b.id,
-      update_url: '/admin/pages/' + b.page_id + '/blocks/' + b.id,
-      authenticity_token: that.authenticity_token,
-      attributes: [{      
-        name: 'block_type_id',
-        nice_name: 'Block type',
-        type: 'select',
-        value: b.block_type_id,             
-        text: b.block_type.name,                  
-        width: 200,
-        fixed_placeholder: true,
-        options_url: '/admin/block-types/options',
-        after_update: function() { parent.controller.render_blocks(); window.location.reload(true); },
-        after_cancel: function() { parent.controller.render_blocks(); window.location.reload(true); },
-        on_load: function() { that.modal.autosize(); }
-      }]
-    });
-    $('#block_' + b.id + '_block_type_id_container').hide();
-  },
+  //set_block_type_editable: function()
+  //{        
+  //  var that = this;
+  //  var b = this.block;    
+  //  m = new ModelBinder({
+  //    name: 'Block',
+  //    id: b.id,
+  //    update_url: '/admin/pages/' + b.page_id + '/blocks/' + b.id,
+  //    authenticity_token: that.authenticity_token,
+  //    attributes: [{      
+  //      name: 'block_type_id',
+  //      nice_name: 'Block type',
+  //      type: 'select',
+  //      value: b.block_type_id,             
+  //      text: b.block_type.name,                  
+  //      width: 400,
+  //      fixed_placeholder: true,
+  //      options_url: '/admin/block-types/options',
+  //      after_update: function() { parent.controller.render_blocks(); window.location.reload(true); },
+  //      after_cancel: function() { parent.controller.render_blocks(); window.location.reload(true); },
+  //      on_load: function() { that.modal.autosize(); }
+  //    },{      
+  //      name: 'parent_id',
+  //      nice_name: 'Parent ID',
+  //      type: 'select',
+  //      value: b.parent_id,
+  //      text: b.parent_title,        
+  //      width: 400,
+  //      fixed_placeholder: true,        
+  //      options_url: '/admin/pages/' + b.page_id + '/block-options',        
+  //      after_update: function() { parent.controller.render_blocks(); },
+  //      after_cancel: function() { parent.controller.render_blocks(); },
+  //      on_load: function() { that.modal.autosize(); }
+  //    }]
+  //  });
+  //  $('#advanced').hide();
+  //},
   
   set_block_value_editable: function(b)
   {

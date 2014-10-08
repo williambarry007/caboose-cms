@@ -1,6 +1,7 @@
 
 .mb_container {
-  width: 100%;  
+  width: 100%;
+  overflow: hidden;
 }
 
 .mb_container div.mb_model_attribute_text {
@@ -103,7 +104,7 @@ div.mb_container form.mb_file_form div.mb_placeholder span {
 }
   
 .mb_container input[type='checkbox'] {
-  /*position: absolute;*/
+  position: absolute;
   top: 4px;
   left: 0;
   z-index: 19;

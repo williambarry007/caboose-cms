@@ -9,4 +9,3 @@
 //= require caboose/modal_integration
 //= require caboose/main
 //= require_tree ../../templates
-//= require application

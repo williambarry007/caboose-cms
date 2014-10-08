@@ -2,7 +2,6 @@
   <div class="content_body">                      
     <% if block.children.count > 0 %>
       <% block.children.each do |b| %><%= raw block.render(b, local_assigns) %><% end %>
-    <% end %>                          
-    <% if editing %><%= raw block.child_block_link %><% end %>    
+    <% end %>
   </div>
 </div>

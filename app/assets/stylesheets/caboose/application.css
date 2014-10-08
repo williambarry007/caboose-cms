@@ -12,8 +12,7 @@
  *= require caboose/fonts
  *= require caboose/page_bar_generator
  *= require caboose/caboose
- *= require caboose/model_binder 
- *= require application
+ *= require caboose/model_binder  
  */
 
 #cboxLoadedContent { margin-bottom: 0; }

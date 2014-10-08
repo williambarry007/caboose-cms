@@ -3,6 +3,8 @@ require 'nokogiri'
 module Caboose
   class BlocksController < ApplicationController
     
+    helper :application
+    
     #===========================================================================
     # Admin actions
     #===========================================================================
@@ -18,11 +20,28 @@ module Caboose
     # GET /admin/pages/:page_id/blocks/new
     def admin_new
       return unless user_is_allowed('pages', 'add')
+                  
+      if params[:id]
+        block_type_id = params[:block_type_id]
+        block_type_id = Block.find(params[:id]).block_type.default_child_block_type_id if block_type_id.nil?                 
+        if block_type_id                                  
+          b = Block.new
+          b.page_id = params[:page_id].to_i
+          b.parent_id = params[:id]
+          b.block_type_id = block_type_id
+          b.sort_order = Block.where(:parent_id => params[:id]).count              
+          b.save
+          b.create_children        
+          redirect_to "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+          return
+        end
+      end
+    
       @page = Page.find(params[:page_id])
       @block = params[:id] ? Block.find(params[:id]) : Block.new(:page_id => params[:page_id])
       @after_id = params[:after_id] ? params[:after_id] : nil
       @before_id = params[:before_id] ? params[:before_id] : nil
-      render :layout => 'caboose/modal'
+      render :layout => 'caboose/modal'                
     end
     
     # GET /admin/pages/:page_id/blocks/:id
@@ -40,19 +59,19 @@ module Caboose
       blocks = []
       if params[:id]
         b = Block.find(params[:id])
-        blocks << { 'id' => b.id, 'children' => admin_tree_helper(b) }
+        blocks << { 'id' => b.id, 'children' => admin_tree_helper(b), 'field_type' => b.block_type.field_type }
       else
         Block.where("parent_id is null and page_id = ?", params[:page_id]).reorder(:sort_order).all.each do |b|      
-          blocks << { 'id' => b.id, 'allow_child_blocks' => b.block_type.allow_child_blocks, 'children' => admin_tree_helper(b) }
+          blocks << { 'id' => b.id, 'allow_child_blocks' => b.block_type.allow_child_blocks, 'children' => admin_tree_helper(b), 'field_type' => b.block_type.field_type }
         end
       end
       render :json => blocks
-    end
-    
+    end        
+      
     def admin_tree_helper(b)
       arr = []
       b.children.each do |b2|
-        arr << { 'id' => b2.id, 'allow_child_blocks' => b2.block_type.allow_child_blocks, 'children' => admin_tree_helper(b2) }
+        arr << { 'id' => b2.id, 'allow_child_blocks' => b2.block_type.allow_child_blocks, 'children' => admin_tree_helper(b2), 'field_type' => b2.block_type.field_type }
       end
       return arr
     end      
@@ -118,7 +137,10 @@ module Caboose
             :empty_text => params[:empty_text],            
             :css => '|CABOOSE_CSS|',                     
             :js => '|CABOOSE_JAVASCRIPT|',
-            :csrf_meta_tags => '|CABOOSE_CSRF|'
+            :csrf_meta_tags => '|CABOOSE_CSRF|',
+            :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
+            :logged_in_user => @logged_in_user,
+            :site => @site
           })
         }
       end
@@ -149,6 +171,15 @@ module Caboose
       end
     end
     
+    # GET /admin/pages/:page_id/blocks/:id/advanced
+    def admin_edit_advanced
+      return unless user_is_allowed('pages', 'edit')
+      @page = Page.find(params[:page_id])
+      @block = Block.find(params[:id])
+      @block.create_children      
+      render :layout => 'caboose/modal'      
+    end
+    
     # POST /admin/pages/:page_id/blocks
     # POST /admin/pages/:page_id/blocks/:id
     def admin_create
@@ -162,8 +193,8 @@ module Caboose
       b = Block.new
       b.page_id = params[:page_id].to_i
       b.parent_id = params[:id] ? params[:id] : nil
-      b.block_type_id = params[:block_type_id] 
-                    
+      b.block_type_id = params[:block_type_id]
+                      
       if !params[:index].nil?      
         b.sort_order = params[:index].to_i
         
@@ -205,6 +236,11 @@ module Caboose
       
       # Ensure that all the children are created for the block
       b.create_children
+      
+      # Set the global values if necessary
+      if b.block_type.is_global        
+        b.get_global_value(@site.id)
+      end
 
       # Send back the response
       #resp.block = b
@@ -223,15 +259,23 @@ module Caboose
       params.each do |k,v|
         case k
           #when 'page_id'       then b.page_id       = v
-          when 'parent_id'     then b.parent_id     = v
+          when 'parent_id'     then 
+            b.parent_id  = v
+            b.sort_order = Block.where(:parent_id => v).count
           when 'block_type_id' then b.block_type_id = v
           when 'sort_order'    then b.sort_order    = v
           when 'name'          then b.name          = v
           when 'value'         then
-            if b.block_type.field_type == 'richtext'
-              b = RichTextBlockParser.parse(b, v, request.host_with_port)
-            else              
+            
+            if b.block_type.is_global              
               b.value = v
+              b.update_global_value(v, @site.id)              
+            else              
+              if Caboose::parse_richtext_blocks == true && b.block_type.field_type == 'richtext' && (b.name.nil? || b.name.strip.length == 0) && (b.block_type.name != 'richtext2')                
+                b = RichTextBlockParser.parse(b, v, request.host_with_port)
+              else              
+                b.value = v
+              end
             end
         end
       end
@@ -304,10 +348,21 @@ module Caboose
       if b.sort_order == 0
         resp.error = "The block is already at the top."
       else
-        b2 = Block.where("parent_id = ? and sort_order = ?", b.parent_id, b.sort_order - 1).first
-        b2.sort_order = b.sort_order
-        b2.save
-        b.sort_order = b.sort_order - 1
+        b2 = nil
+        
+        new_sort_order = b.sort_order - 1
+        while new_sort_order > 0 do
+          b2 = Block.where("parent_id = ? and sort_order = ?", b.parent_id, new_sort_order).first
+          break if b2
+          new_sort_order = new_sort_order - 1
+        end
+        if b2
+          b2.sort_order = new_sort_order + 1
+          b2.save
+        else
+          new_sort_order = 1
+        end
+        b.sort_order = new_sort_order
         b.save
         resp.success = "The block has been moved up successfully."
       end

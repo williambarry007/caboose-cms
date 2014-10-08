@@ -13,14 +13,28 @@ module Caboose
       
       # Find the page with an exact URI match 
       page = Page.page_with_uri(request.host_with_port, request.fullpath, false)
-
+      
       if (!page)
+        
+        # Make sure we're not under construction
+        d = Caboose::Domain.where(:domain => request.host_with_port).first
+        if d.nil?
+          Caboose.log("Could not find domain for #{request.host_with_port}\nAdd this domain to the caboose site.")
+        elsif d.under_construction == true
+          if d.site.under_construction_html && d.site.under_construction_html.strip.length > 0 
+            render :text => d.site.under_construction_html
+          else 
+            render :file => 'caboose/application/under_construction', :layout => false
+          end
+          return
+        end
+        
         asset
         return
       end
 
       user = logged_in_user            
-      if !user.is_allowed(page, 'view')        
+      if !user.is_allowed(page, 'view')                
         if user.id == User::LOGGED_OUT_USER_ID	
           redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)		  		
           return
@@ -35,7 +49,7 @@ module Caboose
         return
       end
 
-      page = Caboose.plugin_hook('page_content', page)
+      page = Caboose.plugin_hook('page_content', page)      
       @page = page
       @user = user
       @editmode = !params['edit'].nil? && user.is_allowed('pages', 'edit') ? true : false
@@ -51,8 +65,17 @@ module Caboose
       uri.chop! if uri.end_with?('/')
       uri[0] = '' if uri.starts_with?('/')
 
-      page = Page.page_with_uri(request.host_with_port, File.dirname(uri), false)
-      if (page.nil? || !page)
+      page = Page.page_with_uri(request.host_with_port, File.dirname(uri), false)      
+      if page.nil? || !page
+        
+        # Check for a 301 redirect
+        site_id = Site.id_for_domain(request.host_with_port)        
+        new_url = PermanentRedirect.match(site_id, request.fullpath)        
+        if new_url          
+          redirect_to new_url, :status => 301
+          return
+        end
+        
         respond_to do |format|          
           format.all { render :file => "caboose/extras/error404", :layout => "caboose/error404", :formats => [:html] }
         end         
@@ -106,7 +129,10 @@ module Caboose
     def admin_index
       return if !user_is_allowed('pages', 'view')            
       @domain = Domain.where(:domain => request.host_with_port).first
-      @home_page = @domain ? Page.index_page(@domain.site_id) : nil    
+      @home_page = @domain ? Page.index_page(@domain.site_id) : nil
+      if @domain && @home_page.nil?
+        @home_page = Caboose::Page.create(:site_id => @domain.site_id, :parent_id => -1, :title => 'Home')
+      end
       render :layout => 'caboose/admin'      
     end
 
@@ -332,7 +358,7 @@ module Caboose
           page[name.to_sym] = value
 
         when 'title', 'menu_title', 'hide', 'layout', 'redirect_url',
-          'seo_title', 'meta_description', 'fb_description', 'gp_description', 'canonical_url'
+          'seo_title', 'meta_keywords', 'meta_description', 'fb_description', 'gp_description', 'canonical_url'
           page[name.to_sym] = value
 
         when 'linked_resources'
@@ -356,14 +382,15 @@ module Caboose
           resp.attributes['content_format'] = { 'text' => value }
           
         when 'meta_robots'
-          if (value.include?('index') && value.include?('noindex'))
+          arr = value.split(',').collect { |v| v.strip }
+          if arr.include?('index') && arr.include?('noindex')
             resp.error = "You can't have both index and noindex"
             save = false
-          elsif (value.include?('follow') && value.include?('nofollow'))
+          elsif arr.include?('follow') && arr.include?('nofollow')
             resp.error = "You can't have both follow and nofollow"
             save = false
-          else
-            page.meta_robots = value.join(', ')
+          else            
+            page.meta_robots = arr.join(', ')
             resp.attributes['meta_robots'] = { 'text' => page.meta_robots }
           end
           
@@ -399,6 +426,15 @@ module Caboose
           Page.update_authorized_for_action(page.id, 'edit', value)
         when 'approvers'
           Page.update_authorized_for_action(page.id, 'approve', value)
+        when 'tags'
+          current_tags = page.page_tags.collect{ |t| t.tag }
+          new_tags = value.split(',').collect{ |v| v.strip.downcase }.reject{ |t| t.nil? || t.strip.length == 0 }          
+          
+          # Delete the tags not in new_tags
+          current_tags.each{ |t| PageTag.where(:page_id => page.id, :tag => t).destroy_all if !new_tags.include?(t) }
+          
+          # Add any new tags not in current_tags
+          new_tags.each{ |t| PageTag.create(:page_id => page.id, :tag => t) if !current_tags.include?(t) }
         end
       end
     
@@ -434,13 +470,10 @@ module Caboose
 
     # GET /admin/pages/sitemap-options
     def admin_sitemap_options
-      parent_id = params[:parent_id]      
-      d = Domain.where(:domain => request.host_with_port).first      
-      top_page = Page.index_page(d.site_id)
-      p = !parent_id.nil? ? Page.find(parent_id) : top_page
+      parent_id = params[:parent_id]
+      p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
       options = []
-      sitemap_helper(top_page, options)
-     	  
+      sitemap_helper(p, options)     	  
       render :json => options 		
     end
 
@@ -481,6 +514,24 @@ module Caboose
       p = Page.find(params[:id])
       render :json => { 'uri' => p.uri }
 		end
+		
+		# GET /admin/pages/:id/block-options        
+    def admin_block_options
+      return unless user_is_allowed('pages', 'edit')      
+      
+      options = []
+      Block.where("parent_id is null and page_id = ?", params[:id]).reorder(:sort_order).all.each do |b|
+        admin_block_options_helper(options, b, "") 
+      end      
+      render :json => options
+    end        
+      
+    def admin_block_options_helper(options, b, prefix)
+      options << { 'value' => b.id, 'text' => "#{prefix}#{b.title}" }      
+      b.children.each do |b2|
+        admin_block_options_helper(options, b2, "#{prefix} - ")        
+      end      
+    end
 		
   end
 end

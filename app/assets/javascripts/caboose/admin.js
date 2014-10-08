@@ -12,7 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require jquery.ui.all
+//= require jquery-ui
 //= require colorbox-rails
 //= require caboose/jquery.placeholder
 //= require caboose/modal_integration

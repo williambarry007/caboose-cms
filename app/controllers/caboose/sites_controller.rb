@@ -64,8 +64,9 @@ module Caboose
       save = true
       params.each do |name,value|
         case name
-          when 'name'         then site.name          = value
-          when 'description'  then site.description   = value               		  
+          when 'name'                     then site.name                    = value
+          when 'description'              then site.description             = value
+          when 'under_construction_html'  then site.under_construction_html = value
     	  end
     	end
     	
@@ -103,47 +104,47 @@ module Caboose
     end
     
     # POST /admin/sites/:id/domains
-    def admin_add_domain
-      return if !user_is_allowed('sites', 'edit')
-      
-      resp = Caboose::StdClass.new      
-      d = Domain.where(:domain => params[:domain]).first
-            
-      if d && d.site_id != params[:id]
-        resp.error = "That domain is already associated with another site."
-      elsif d && d.site_id == params[:id]
-        resp.refresh = true
-      elsif d.nil?
-        primary = Domain.where(:site_id => params[:id]).count == 0        
-        d = Domain.create(:site_id => params[:id], :domain => params[:domain], :primary => primary)
-        resp.refresh = true
-      end
-      render :json => resp
-    end
+    #def admin_add_domain
+    #  return if !user_is_allowed('sites', 'edit')
+    #  
+    #  resp = Caboose::StdClass.new      
+    #  d = Domain.where(:domain => params[:domain]).first
+    #        
+    #  if d && d.site_id != params[:id]
+    #    resp.error = "That domain is already associated with another site."
+    #  elsif d && d.site_id == params[:id]
+    #    resp.refresh = true
+    #  elsif d.nil?
+    #    primary = Domain.where(:site_id => params[:id]).count == 0        
+    #    d = Domain.create(:site_id => params[:id], :domain => params[:domain], :primary => primary)
+    #    resp.refresh = true
+    #  end
+    #  render :json => resp
+    #end
     
     # PUT /admin/sites/:id/domains/:domain_id/set-primary
-    def admin_set_primary_domain
-      return if !user_is_allowed('sites', 'edit')
-      
-      domain_id = params[:domain_id].to_i
-      Domain.where(:site_id => params[:id]).all.each do |d|
-        d.primary = d.id == domain_id ? true : false
-        d.save
-      end       
-      render :json => true
-    end
+    #def admin_set_primary_domain
+    #  return if !user_is_allowed('sites', 'edit')
+    #  
+    #  domain_id = params[:domain_id].to_i
+    #  Domain.where(:site_id => params[:id]).all.each do |d|
+    #    d.primary = d.id == domain_id ? true : false
+    #    d.save
+    #  end       
+    #  render :json => true
+    #end
     
     # DELETE /admin/sites/:id/domains/:domain_id
-    def admin_remove_domain
-      return if !user_is_allowed('sites', 'edit')
-      Domain.find(params[:domain_id]).destroy
-      if Domain.where(:site_id => params[:id]).count == 1
-        d = Domain.where(:site_id => params[:id]).first
-        d.primary = true
-        d.save
-      end
-      render :json => { 'refresh' => true }
-    end        
+    #def admin_remove_domain
+    #  return if !user_is_allowed('sites', 'edit')
+    #  Domain.find(params[:domain_id]).destroy
+    #  if Domain.where(:site_id => params[:id]).count == 1
+    #    d = Domain.where(:site_id => params[:id]).first
+    #    d.primary = true
+    #    d.save
+    #  end
+    #  render :json => { 'refresh' => true }
+    #end        
     
     # GET /admin/sites/options
     def options

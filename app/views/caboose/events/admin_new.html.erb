@@ -1,0 +1,38 @@
+
+<h1>New Event</h1>       
+
+<form action='/admin/calendars/<%= @calendar.id %>' method='post' id='new_event_form'>
+  <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'>
+  <input type='hidden' name='begin_date' value='<%= @begin_date.strftime('%Y-%m-%d') %>'>
+  <p><input type='text' name='name' id='name'       placeholder='Name' style='width: 430px;'></p>    
+  <div id='message'></div>
+  <p>
+    <input type='button' value='Cancel' onclick="modal.close();" />
+    <input type='submit' value='Add New Event' onclick="add_event(); return false;" />
+  </p>
+</form>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+$(window).load(function() {
+  modal = new CabooseModal(460);
+});
+
+function add_event()
+{  
+  $('#message').html("<p class='loading'>Adding event...</p>");
+  $.ajax({
+    url: '/admin/calendars/<%= @calendar.id %>/events',
+    type: 'post',
+    data: $('#new_event_form').serialize(),
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

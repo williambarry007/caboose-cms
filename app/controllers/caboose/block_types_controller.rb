@@ -72,11 +72,14 @@ module Caboose
           when 'parent_id'                       then bt.parent_id                      = v
           when 'name'                            then bt.name                           = v
           when 'description'                     then bt.description                    = v
+          when 'is_global'                       then bt.is_global                      = v
+          when 'icon'                            then bt.icon                           = v
           when 'block_type_category_id'          then bt.block_type_category_id         = v
           when 'render_function'                 then bt.render_function                = v
           when 'use_render_function'             then bt.use_render_function            = v
           when 'use_render_function_for_layout'  then bt.use_render_function_for_layout = v
           when 'allow_child_blocks'              then bt.allow_child_blocks             = v
+          when 'default_child_block_type_id'     then bt.default_child_block_type_id    = v
           when 'name'                            then bt.name                           = v
           when 'field_type'                      then bt.field_type                     = v                       
           when 'default'                         then bt.default                        = v

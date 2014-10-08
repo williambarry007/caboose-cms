@@ -25,13 +25,16 @@ Attribute.prototype = {
   download_text: false,
   upload_text: false,
   image_refresh_delay: false,
+  minute_increment: 15,
+  hour_increment: 1,
+  show_check_all: true,  
   
   update_url: false,
   options_url: false,
   options: false,
   s3: false,
   
-  save: function(after) {
+  save: function(after) {          
     if (this.before_update) this.before_update();    
     var this2 = this;
     $.ajax({
@@ -57,7 +60,7 @@ Attribute.prototype = {
   
   populate_options: function(after) {
     if (!this.options_url)
-      return;    
+      return;        
     if (this.options)
     {
       if (after) after();

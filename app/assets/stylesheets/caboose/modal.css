@@ -121,7 +121,8 @@ input, select, textarea {
 
 input.dirty,
 textarea.dirty {
-  background: #fff799;  
+  background: #fff799;
+  color: #000;  
 }
 
 select {

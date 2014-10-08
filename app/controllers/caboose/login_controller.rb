@@ -39,7 +39,7 @@ module Caboose
             login_user(login_resp.user, remember)            
             resp.redirect = return_url
             resp.modal = false
-            Caboose.plugin_hook('login_success')            
+            Caboose.plugin_hook('login_success', login_resp.user.id)            
           end
         end
       end

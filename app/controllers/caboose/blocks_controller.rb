@@ -267,14 +267,22 @@ module Caboose
           when 'name'          then b.name          = v
           when 'value'         then
             
-            if b.block_type.is_global              
-              b.value = v
-              b.update_global_value(v, @site.id)              
+            if b.block_type.is_global
+              if b.block_type.field_type == 'checkbox_multiple'
+                b.value = Block.parse_checkbox_multiple_value(b, v)
+              else                    
+                b.value = v
+              end                
+              b.update_global_value(b.value, @site.id)              
             else              
               if Caboose::parse_richtext_blocks == true && b.block_type.field_type == 'richtext' && (b.name.nil? || b.name.strip.length == 0) && (b.block_type.name != 'richtext2')                
                 b = RichTextBlockParser.parse(b, v, request.host_with_port)
-              else              
-                b.value = v
+              else
+                if b.block_type.field_type == 'checkbox_multiple'
+                  b.value = Block.parse_checkbox_multiple_value(b, v)
+                else                    
+                  b.value = v
+                end
               end
             end
         end

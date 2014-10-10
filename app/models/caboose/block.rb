@@ -339,5 +339,18 @@ class Caboose::Block < ActiveRecord::Base
       )", value, self.id, self.block_type_id, site_id]       
     ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, sql))            
   end
+  
+  # Parses the value given for a checkbox multiple block
+  def self.parse_checkbox_multiple_value(b, arr)
+    current_value = b.value ? b.value.split('|') : []
+    v = arr[0]
+    checked = arr[1].to_i == 1
+    if checked && !current_value.include?(v)
+      current_value << v      
+    elsif !checked && current_value.include?(v)
+      current_value.delete(v)
+    end
+    return current_value.join('|')
+  end
 
 end

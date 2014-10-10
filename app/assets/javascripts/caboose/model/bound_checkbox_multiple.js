@@ -27,7 +27,11 @@ BoundCheckboxMultiple = BoundControl.extend({
       div.css('height', '' + this.attribute.height + 'px').css('overflow-y', 'scroll');        
     $('#'+this.el).wrap(div);    
     $('#'+this.el+'_container').empty();        
-
+    if (this.attribute.value == null || this.attribute.value == false)
+      this.attribute.value = [];
+    if (typeof(this.attribute.value) == 'string')    
+      this.attribute.value = this.attribute.value.split('|');    
+    
     if (this.attribute.options_url)      
     {
       ModelBinder.wait_for_options(this.attribute.options_url, function(options) {
@@ -45,7 +49,7 @@ BoundCheckboxMultiple = BoundControl.extend({
     {      
       var all_checked = true
       $.each(this.attribute.options, function(i, option) {        
-        if (that.attribute.value.indexOf(option.value) == -1)
+        if (!that.attribute.value || that.attribute.value.indexOf(option.value) == -1)
         {
           all_checked = false;
           return;
@@ -71,7 +75,7 @@ BoundCheckboxMultiple = BoundControl.extend({
       );      
     }
     $.each(that.attribute.options, function(i, option) {
-      var checked = that.attribute.value.indexOf(option.value) > -1;
+      var checked = that.attribute.value != false && that.attribute.value != null && that.attribute.value.indexOf(option.value) > -1;
       tbody.append($('<tr/>')
         .append($('<td/>')
           .append($('<input/>')
@@ -96,7 +100,7 @@ BoundCheckboxMultiple = BoundControl.extend({
         .append($('<td/>').append($('<label/>').attr('for', that.el + '_' + i).html(option.text)))
       );
     });
-    $('#'+this.el+'_container').append($('<table/>').addClass('data').append(tbody));    
+    $('#'+this.el+'_container').append($('<table/>').addClass('data').addClass('checkbox_multiple').append(tbody));    
   },
     
   edit: function() {
@@ -104,7 +108,12 @@ BoundCheckboxMultiple = BoundControl.extend({
   },
   
   save: function(value, checked) {
-        
+
+    if (this.attribute.value == null || this.attribute.value == false)
+      this.attribute.value = [];    
+    if (typeof(this.attribute.value) == 'string')    
+      this.attribute.value = this.attribute.value.split('|');
+    
     var that = this;    
     var i = this.attribute.value.indexOf(value);
     if (checked && i == -1) this.attribute.value.push(value);

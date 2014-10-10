@@ -26,9 +26,7 @@ module Caboose
         end
         return
       else
-        Caboose.log("request.host_with_port = #{request.host_with_port}")
-        Caboose.log("request.fullpath = #{request.fullpath}")
-        Caboose.log("domain id = #{d.id}")
+        Caboose.log(request.inspect)        
       end
       
       if !page

@@ -24,7 +24,9 @@ module Caboose
         else 
           render :file => 'caboose/application/under_construction', :layout => false
         end
-        return      
+        return
+      else
+        Caboose.log("domain id = #{d.id}")
       end
       
       if !page

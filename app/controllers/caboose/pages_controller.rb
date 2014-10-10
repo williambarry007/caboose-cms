@@ -14,23 +14,20 @@ module Caboose
       # Find the page with an exact URI match 
       page = Page.page_with_uri(request.host_with_port, request.fullpath, false)
       
-      if (!page)
-        
-        # Make sure we're not under construction
-        d = Caboose::Domain.where(:domain => request.host_with_port).first        
-        if d.nil?
-          Caboose.log("Could not find domain for #{request.host_with_port}\nAdd this domain to the caboose site.")
-        elsif d.under_construction == true
-          if d.site.under_construction_html && d.site.under_construction_html.strip.length > 0 
-            render :text => d.site.under_construction_html
-          else 
-            render :file => 'caboose/application/under_construction', :layout => false
-          end
-          return
-        else
-          Caboose.log("domain id = #{d.id}")
+      # Make sure we're not under construction
+      d = Caboose::Domain.where(:domain => request.host_with_port).first        
+      if d.nil?
+        Caboose.log("Could not find domain for #{request.host_with_port}\nAdd this domain to the caboose site.")
+      elsif d.under_construction == true
+        if d.site.under_construction_html && d.site.under_construction_html.strip.length > 0 
+          render :text => d.site.under_construction_html
+        else 
+          render :file => 'caboose/application/under_construction', :layout => false
         end
-        
+        return      
+      end
+      
+      if !page
         asset
         return
       end

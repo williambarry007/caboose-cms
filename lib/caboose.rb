@@ -65,6 +65,14 @@ module Caboose
 
   # Default timezone
   mattr_accessor :timezone
-  @@timezone = 'Central Time (US & Canada)'  
+  @@timezone = 'Central Time (US & Canada)'
+
+  # Register layout
+  mattr_accessor :register_layout
+  @@register_layout = 'caboose/modal'
+
+  # Login layout
+  mattr_accessor :login_layout
+  @@login_layout = 'caboose/modal'  
   
 end

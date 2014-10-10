@@ -104,7 +104,8 @@ ModelBinder.prototype = {
       if (attrib.type == 'text')                   control = new BoundText(opts);
       else if (attrib.type == 'select')            control = new BoundSelect(opts);
       else if (attrib.type == 'checkbox')          control = new BoundCheckbox(opts);
-      else if (attrib.type == 'checkbox-multiple') control = new BoundCheckboxMultiple(opts);      
+      else if (attrib.type == 'checkbox-multiple') control = new BoundCheckboxMultiple(opts);
+      else if (attrib.type == 'checkbox_multiple') control = new BoundCheckboxMultiple(opts);      
       else if (attrib.type == 'textarea')          control = new BoundTextarea(opts);
       else if (attrib.type == 'richtext')          control = new BoundRichText(opts);
       else if (attrib.type == 'image')             control = new BoundImage(opts);

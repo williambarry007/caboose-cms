@@ -1,6 +1,6 @@
 module Caboose
   class LoginController < Caboose::ApplicationController
-    layout 'caboose/modal'
+    #layout 'caboose/modal'
     
     # GET /login
     def index
@@ -12,6 +12,7 @@ module Caboose
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       @modal = params[:modal].nil? ? false : params[:modal]
       redirect_to @return_url and return if logged_in?
+      render :layout => Caboose::login_layout
     end
     
     # POST /login
@@ -51,6 +52,7 @@ module Caboose
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       @modal = params[:modal].nil? ? false : params[:modal]
       redirect_to @return_url if logged_in?
+      render :layout => Caboose::login_layout
     end
         
     # POST /login/forgot-password
@@ -94,7 +96,8 @@ module Caboose
       redirect_to @return_url if logged_in?
             
       @reset_id = params[:reset_id]      
-      @user = Caboose::User.user_for_reset_id(@reset_id)            
+      @user = Caboose::User.user_for_reset_id(@reset_id)
+      render :layout => Caboose::login_layout
     end
     
     # POST /login/reset-password

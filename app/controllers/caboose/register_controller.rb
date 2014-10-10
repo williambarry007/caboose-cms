@@ -1,12 +1,13 @@
 module Caboose
   class RegisterController < Caboose::ApplicationController
-    layout 'caboose/modal'
+    #layout 'caboose/modal'
     
     # GET /register
     def index
       @return_url = params[:return_url].nil? ? "/" : params[:return_url];
       @modal = params[:modal].nil? ? false : params[:modal]
       redirect_to @return_url if logged_in?
+      render :layout => Caboose::register_layout 
     end
     
     # POST /register

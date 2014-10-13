@@ -104,6 +104,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :image                 , :attachment ]
       ],
       Caboose::BlockType => [
+        [ :site_id                         , :integer ],
         [ :parent_id                       , :integer ],
         [ :name                            , :string  ],
         [ :description                     , :string  ],

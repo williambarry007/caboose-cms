@@ -1,0 +1,55 @@
+<%
+bt = @block_type
+%>
+
+<h1>Edit Block Type Icon</h1>
+<p><input type='button' value='Close' onclick="modal.close();" /></p>
+
+<div class='icons'>
+<% Caboose::BlockTypeIcons.names.each do |icon| %>
+  <a href='#' id='icon_<%= icon %>' <% if bt.icon == icon %>class='selected'<% end %>><span class='icon-<%= icon %>'></span></a>
+<% end %>
+</div>
+
+<div id='message'></div>
+<p><input type='button' value='Close' onclick="modal.close();" /></p>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/icomoon_fonts' %>
+<style type='text/css'>
+div.icons { height: 500px; overflow-y: scroll; }
+div.icons span { display: block; float: left; width: 75px; margin: 1px; padding: 14px 0; font-size: 24pt; text-align: center; }
+div.icons a span { color: #fff; border: #fff 1px solid; }
+div.icons a:hover span { background: #efefef; color: #000; border: #666 1px solid; }
+div.icons a.selected span, 
+div.icons a.selected:hover span { background: #fff69f; color: #000; border: #ff0000 1px solid; }
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+function select_icon(icon)
+{  
+  $.ajax({
+    url: '/admin/block-types/<%= @block_type.id %>',
+    type: 'put',
+    data: { icon: icon },
+    success: function(resp) {
+      $('div.icons a.selected').removeClass('selected');
+      $('#icon_' + icon).addClass('selected');      
+    }
+  });
+}
+
+var modal = false;
+$(document).ready(function() {
+  modal = new CabooseModal(600);
+  $('div.icons a').click(function(e) {
+    e.preventDefault();    
+    select_icon($(this).attr('id').substr(5));
+  });  
+});
+
+</script>
+<% end %>

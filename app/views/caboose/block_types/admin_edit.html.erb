@@ -9,6 +9,7 @@ bt = @block_type
 <h1>Edit Block Type</h1>
 <p><div id='blocktype_<%= bt.id %>_description'                     ></div></p>
 <p><div id='blocktype_<%= bt.id %>_name'                            ></div></p>
+<p><div id='blocktype_<%= bt.id %>_site_id'                         ></div></p>
 <p><div id='blocktype_<%= bt.id %>_parent_id'                       ></div></p>
 <p><div id='blocktype_<%= bt.id %>_block_type_category_id'          ></div></p>
 <p><div id='blocktype_<%= bt.id %>_field_type'                      ></div></p>
@@ -47,30 +48,19 @@ bt = @block_type
   <p>This type of page block doesn't have any fields.</p>
 <% end %>
 
-<h2>Icon</h2>
-<div class='icons'>
-<% Caboose::BlockTypeIcons.names.each do |icon| %>
-  <a href='#' id='icon_<%= icon %>' <% if bt.icon == icon %>class='selected'<% end %>><span class='icon-<%= icon %>'></span></a>
-<% end %>
-</div>
-
 <div id='message'></div>
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}/edit" : '' %>';" />
+<input type='button' value='Edit Icon' onclick="caboose_modal_url('/admin/block-types/<%= @block_type.id %>/icon');" />
 <input type='button' value='Delete Block Type' onclick="delete_block_type(<%= @block_type.id %>);" />
 </p>
+<br />
 
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/icomoon_fonts' %>
 <style type='text/css'>
 #blocktype_<%= bt.id %>_render_function  { font-family: Courier; font-size: 80%; width: 100%; }
 #blocktype_<%= bt.id %>_options_function { font-family: Courier; font-size: 80%; width: 100%; }
-div.icons { height: 400px; width: 80%; overflow-y: scroll; }
-div.icons span { display: block; float: left; padding: 10px 20px; font-size: 24pt; }
-div.icons a span { color: #000; border: #fff 1px solid; }
-div.icons a:hover span { background: #efefef; color: #000; border: #666 1px solid; }
-div.icons a.selected span, 
-div.icons a.selected:hover span { background: #fff69f; color: #000; border: #ff0000 1px solid; }
 </style>
 <% end %>
 <% content_for :caboose_js do %>
@@ -124,6 +114,7 @@ $(document).ready(function() {
     update_url: '/admin/block-types/<%= @block_type.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
+      { name: 'site_id'                        , nice_name: 'Site'                           , type: 'select'   , value: <%= raw Caboose.json(bt.site_id ? bt.site_id : -1)       %>, width: 400, options_url: '/admin/block-types/site-options' },
       { name: 'parent_id'                      , nice_name: 'Parent'                         , type: 'select'   , value: <%= raw Caboose.json(bt.parent_id)                       %>, width: 400, options_url: '/admin/block-types/tree-options' },
       { name: 'name'                           , nice_name: 'Name'                           , type: 'text'     , value: <%= raw Caboose.json(bt.name)                            %>, width: 400 },
       { name: 'description'                    , nice_name: 'Description'                    , type: 'text'     , value: <%= raw Caboose.json(bt.description)                     %>, width: 400 },

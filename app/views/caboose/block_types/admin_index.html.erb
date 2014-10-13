@@ -14,11 +14,13 @@
 
   <table class='data'>
     <tr>
+      <th>Site</th>
       <th>Name</th>
       <th>Description</th>      
     </tr>
   <% @block_types.each do |bt| %>
     <tr onclick="window.location='/admin/block-types/<%= bt.id %>/edit';">
+      <td><%= bt.site_id ? (bt.site.description && bt.site.description.strip.length > 0 ? bt.site.description : bt.site.name) : 'Global' %></td> 
       <td><%= bt.name        %></td>
       <td><%= bt.description %></td>    
     </tr>

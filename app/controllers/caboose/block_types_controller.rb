@@ -36,6 +36,13 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
+    # GET /admin/block-types/:id/icon
+    def admin_edit_icon
+      return unless user_is_allowed('pages', 'edit')      
+      @block_type = BlockType.find(params[:id])
+      render :layout => 'caboose/modal'
+    end
+    
     # POST /admin/block-types
     def admin_create
       return unless user_is_allowed('pages', 'add')
@@ -69,6 +76,7 @@ module Caboose
 
       params.each do |k,v|
         case k
+          when 'site_id'                         then bt.site_id                        = v
           when 'parent_id'                       then bt.parent_id                      = v
           when 'name'                            then bt.name                           = v
           when 'description'                     then bt.description                    = v
@@ -120,6 +128,19 @@ module Caboose
         { 'value' => 'textarea'           , 'text' => 'Textarea'                     },
         { 'value' => 'block'              , 'text' => 'Block'                        }
       ]      
+      render :json => options
+    end
+    
+    # GET /admin/block-types/site-options
+    def admin_site_options
+      return unless user_is_allowed('pages', 'edit')
+      options = [{ 'value' => -1, 'text' => 'Global'}]
+      Site.reorder("description, name").all.each do |s| 
+        options << { 
+          'value' => s.id, 
+          'text' => s.description && s.description.strip.length > 0 ? s.description : s.name
+        }
+      end                  
       render :json => options
     end
     

@@ -9,6 +9,7 @@
   <option value=''>-- Select a layout --</option>
   <% cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id } %>
   <% Caboose::BlockType.where("block_type_category_id in (?)", cat_ids).reorder(:description).all.each do |bt| %>
+    <% next if bt.site_id && bt.site_id != @site.id %>
     <option value="<%= bt.id %>"><%= bt.description %></option>
   <% end %>
 </select></p>

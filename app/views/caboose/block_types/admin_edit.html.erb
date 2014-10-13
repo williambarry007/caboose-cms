@@ -36,7 +36,7 @@ bt = @block_type
 
 <div id='message'></div>
 <p>
-<input type='button' value='< Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}/edit" : '' %>';" />
+<input type='button' value='< Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}" : '' %>';" />
 <input type='button' value='Edit Icon' onclick="caboose_modal_url('/admin/block-types/<%= @block_type.id %>/icon');" />
 <input type='button' value='Delete Block Type' onclick="delete_block_type(<%= @block_type.id %>);" />
 </p>

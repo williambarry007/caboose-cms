@@ -1,14 +1,14 @@
 
 class Caboose::BlockType < ActiveRecord::Base
   self.table_name = "block_types"
-
-  belongs_to :site, :class_name => 'Caboose::Site'
+  
   belongs_to :default_child_block_type, :foreign_key => 'default_child_block_type_id', :class_name => 'Caboose::BlockType'
   belongs_to :block_type_category
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType'
-  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType', :dependent => :destroy    
-  attr_accessible :id,
-    :site_id,
+  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType', :dependent => :destroy
+  has_many :sites, :through => :block_type_site_memberships
+  has_many :block_type_site_memberships
+  attr_accessible :id,    
     :parent_id,
     :name, 
     :description,
@@ -105,5 +105,34 @@ class Caboose::BlockType < ActiveRecord::Base
       end
     end
     
+  end
+    
+  def toggle_site(site_id, value)          
+    if value.to_i > 0
+      self.add_to_site(site_id)
+    else
+      self.remove_from_site(site_id)
+    end
+  end
+    
+  def add_to_site(site_id)          
+    if site_id == 'all'
+      Caboose::BlockTypeSiteMembership.where(:block_type_id => self.id).destroy_all      
+      Caboose::Site.reorder(:name).all.each do |site|
+        Caboose::BlockTypeSiteMembership.create(:block_type_id => self.id, :site_id => site.id)
+      end                          
+    else
+      if !Caboose::BlockTypeSiteMembership.where(:block_type_id => self.id, :site_id => site_id.to_i).exists?
+        Caboose::BlockTypeSiteMembership.create(:block_type_id => self.id, :site_id => site_id.to_i)
+      end      
+    end
+  end
+  
+  def remove_from_site(site_id)
+    if site_id == 'all'
+      Caboose::BlockTypeSiteMembership.where(:block_type_id => self.id).destroy_all                          
+    else
+      Caboose::BlockTypeSiteMembership.where(:block_type_id => self.id, :site_id => site_id.to_i).destroy_all      
+    end
   end
 end

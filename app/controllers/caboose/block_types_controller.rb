@@ -13,8 +13,32 @@ module Caboose
       render :layout => 'caboose/admin'      
     end
     
-    # GET /admin/block-types/:id
-    def admin_show
+    # GET /admin/block-types/json
+    def admin_json
+      h = {        
+        'name'           => '',
+        'description'    => '',                
+      }
+      if params[:parent_id]
+        h['parent_id'] = ''
+      else
+        h['parent_id_null'] = true
+      end
+      pager = Caboose::Pager.new(params, h, {      
+        'model' => 'Caboose::BlockType',
+        'sort'  => 'description',
+        'desc'  => 'false',
+        'base_url' => "/admin/block-types",
+        'items_per_page' => 100
+      })      
+      render :json => {
+        :pager => pager,
+        :models => pager.items.as_json(:include => :sites)
+      }
+    end
+    
+    # GET /admin/block-types/:id/json
+    def admin_json_single
       return if !user_is_allowed('pages', 'view')
       block_type = BlockType.find(params[:id])
       render :json => block_type      
@@ -29,7 +53,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/block-types/:id/edit
+    # GET /admin/block-types/:id
     def admin_edit
       return unless user_is_allowed('pages', 'edit')      
       @block_type = BlockType.find(params[:id])
@@ -62,7 +86,7 @@ module Caboose
       bt.save      
       
       # Send back the response
-      resp.redirect = "/admin/block-types/#{bt.id}/edit"
+      resp.redirect = "/admin/block-types/#{bt.id}"
       render :json => resp
     end
     
@@ -75,8 +99,7 @@ module Caboose
       save = true      
 
       params.each do |k,v|
-        case k
-          when 'site_id'                         then bt.site_id                        = v
+        case k          
           when 'parent_id'                       then bt.parent_id                      = v
           when 'name'                            then bt.name                           = v
           when 'description'                     then bt.description                    = v
@@ -96,7 +119,8 @@ module Caboose
           when 'fixed_placeholder'               then bt.fixed_placeholder              = v
           when 'options'                         then bt.options                        = v
           when 'options_function'                then bt.options_function               = v
-          when 'options_url'                     then bt.options_url                    = v         
+          when 'options_url'                     then bt.options_url                    = v
+          when 'site_id'                         then bt.toggle_site(v[0], v[1])
         end
       end
     
@@ -134,13 +158,12 @@ module Caboose
     # GET /admin/block-types/site-options
     def admin_site_options
       return unless user_is_allowed('pages', 'edit')
-      options = [{ 'value' => -1, 'text' => 'Global'}]
-      Site.reorder("description, name").all.each do |s| 
-        options << { 
+      options = Site.reorder("description, name").all.collect do |s| 
+        { 
           'value' => s.id, 
           'text' => s.description && s.description.strip.length > 0 ? s.description : s.name
         }
-      end                  
+      end                        
       render :json => options
     end
     

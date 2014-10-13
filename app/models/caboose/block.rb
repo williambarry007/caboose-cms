@@ -175,21 +175,27 @@ class Caboose::Block < ActiveRecord::Base
       begin                        
         str = view.render(:partial => "../../sites/#{site.name}/blocks/#{full_name}", :locals => options2)        
       rescue ActionView::MissingTemplate => ex
+        #Caboose.log("Can't find partial: ../../sites/#{site.name}/blocks/#{full_name}")
         begin
           str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.name}", :locals => options2)                    
         rescue ActionView::MissingTemplate => ex
+          #Caboose.log("Can't find partial: ../../sites/#{site.name}/blocks/#{block.block_type.name}")
           begin                        
             str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.field_type}", :locals => options2)            
           rescue ActionView::MissingTemplate
+            #Caboose.log("Can't find partial: ../../sites/#{site.name}/blocks/#{block.block_type.field_type}")
             begin
               str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)        
             rescue ActionView::MissingTemplate
+              #Caboose.log("Can't find partial: caboose/blocks/#{full_name}")
               begin          
                 str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)                    
               rescue ActionView::MissingTemplate
+                #Caboose.log("Can't find partial: caboose/blocks/#{block.block_type.name}")
                 begin                        
                   str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)            
                 rescue Exception => ex                  
+                  #Caboose.log("Can't find partial: caboose/blocks/#{block.block_type.field_type}")
                   str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
                 end
               rescue Exception => ex                          

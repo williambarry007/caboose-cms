@@ -46,9 +46,14 @@ end
   <% if @block.children.count > 0 %>  
     <% @block.children.each do |b| %>
       <% if b.block_type.field_type != 'block' && b.block_type.field_type != 'richtext' %>
-        <p><div id='block_<%= b.id %>_value'></div></p>
+        <div style='margin-bottom: 10px;'><div id='block_<%= b.id %>_value'></div></div>
       <% else %>
         <%
+        Caboose.log(b.value)
+        Caboose.log(b.name)
+        Caboose.log(b.block_type.full_name)
+        Caboose.log(b.block_type.name)
+        Caboose.log(b.block_type.field_type)
         str = @block.render(b, {
           :modal => true,
           :empty_text => '[Empty, click to edit]',

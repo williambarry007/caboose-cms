@@ -18,7 +18,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/block-type-sources/:id/edit
+    # GET /admin/block-type-sources/:id
     def admin_edit
       return unless user_is_allowed('blocktypesources', 'edit')      
       @block_type_source = BlockTypeSource.find(params[:id])
@@ -40,7 +40,7 @@ module Caboose
       bts.save      
       
       # Send back the response
-      resp.redirect = "/admin/block-types/store/sources/#{bts.id}/edit"
+      resp.redirect = "/admin/block-types/store/sources/#{bts.id}"
       render :json => resp
     end
     

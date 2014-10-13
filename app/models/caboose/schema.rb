@@ -103,8 +103,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :file                  , :attachment ],
         [ :image                 , :attachment ]
       ],
-      Caboose::BlockType => [
-        [ :site_id                         , :integer ],
+      Caboose::BlockType => [        
         [ :parent_id                       , :integer ],
         [ :name                            , :string  ],
         [ :description                     , :string  ],
@@ -127,6 +126,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :share                           , :boolean , { :default => true  }],
         [ :downloaded                      , :boolean , { :default => false }]
       ],
+      Caboose::BlockTypeSiteMembership => [
+        [ :site_id        , :integer ],
+        [ :block_type_id  , :integer ]
+      ],      
       Caboose::BlockTypeCategory => [
         [ :parent_id  , :integer ],
         [ :name       , :string  ]

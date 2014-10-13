@@ -143,7 +143,7 @@ IndexTable.prototype = {
     $.ajax({ 
       url: that.refresh_url,
       type: 'get',
-      data: that.pager_params,
+      data: that.pager_params.params,
       success: function(resp) {
         for (var thing in resp['pager'])
           that.pager_params[thing] = resp['pager'][thing];                

@@ -1,0 +1,2 @@
+
+  select id from block_types where parent_id is null

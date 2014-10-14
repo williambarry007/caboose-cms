@@ -4,12 +4,9 @@
 </div>
 
 <h1>Block Types</h1>
-
-<p>  
-  <a href='/admin/block-types/store'>Block Type Store</a> |
-  <a href='/admin/block-types/new'>New Block Type</a>
-</p>
+<p><a href='/admin/block-types/store'>Block Type Store</a></p>
 <div id='block_types'></div>
+<% (0..100).each do |i| %><p>&nbsp;</p><% end %>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/model/all' %>
@@ -21,27 +18,31 @@ $(document).ready(function() {
     form_authenticity_token: '<%= form_authenticity_token %>',
     container: 'block_types',
     base_url: '/admin/block-types',            
-    fields: [                      
-      { name: 'parent_id'                      , sort: 'parent_id'                      , show: false , bulk_edit: false, nice_name: 'Parent'                         , type: 'select'            , value: function(bt) { return bt.parent_id;                       }, width: 400, options_url: '/admin/block-types/tree-options' },
-      { name: 'name'                           , sort: 'name'                           , show: true  , bulk_edit: false, nice_name: 'Name'                           , type: 'text'              , value: function(bt) { return bt.name;                            }, width: 400 },
-      { name: 'description'                    , sort: 'description'                    , show: true  , bulk_edit: false, nice_name: 'Description'                    , type: 'text'              , value: function(bt) { return bt.description;                     }, width: 400 },
-      { name: 'site_id'                        , sort: 'site_id'                        , show: true  , bulk_edit: false, nice_name: 'Site'                           , type: 'checkbox-multiple' , value: function(bt) { return bt.sites ? bt.sites.map(function(s) { return s.id }) : []; }, text: function(bt) { return bt.sites ? bt.sites.map(function(s) { return s.description }).join(', ') : ''; }, width: 400, height: 200, options_url: '/admin/block-types/site-options' },
-      { name: 'block_type_category_id'         , sort: 'block_type_category_id'         , show: false , bulk_edit: false, nice_name: 'Category'                       , type: 'select'            , value: function(bt) { return bt.block_type_category_id;          }, width: 400, options_url: '/admin/block-type-categories/tree-options' },
-      { name: 'is_global'                      , sort: 'is_global'                      , show: false , bulk_edit: false, nice_name: 'Global'                         , type: 'checkbox'          , value: function(bt) { return bt.is_global;                       }, width: 400 },
-      { name: 'use_render_function'            , sort: 'use_render_function'            , show: false , bulk_edit: false, nice_name: 'Use Render Function'            , type: 'checkbox'          , value: function(bt) { return bt.use_render_function;             }, width: 400 },
-      { name: 'use_render_function_for_layout' , sort: 'use_render_function_for_layout' , show: false , bulk_edit: false, nice_name: 'Use Render Function for Layout' , type: 'checkbox'          , value: function(bt) { return bt.use_render_function_for_layout;  }, width: 400 },
-      { name: 'allow_child_blocks'             , sort: 'allow_child_blocks'             , show: false , bulk_edit: false, nice_name: 'Allow Child Blocks'             , type: 'checkbox'          , value: function(bt) { return bt.allow_child_blocks;              }, width: 400 },
-      { name: 'default_child_block_type_id'    , sort: 'default_child_block_type_id'    , show: false , bulk_edit: false, nice_name: 'Default Child Block Type'       , type: 'select'            , value: function(bt) { return bt.default_child_block_type_id;     }, width: 400, options_url: '/admin/block-types/options' },
-      { name: 'render_function'                , sort: 'render_function'                , show: false , bulk_edit: false, nice_name: 'Render Function'                , type: 'textarea'          , value: function(bt) { return bt.render_function;                 }, width: 800, height: 200 },      
-      { name: 'field_type'                     , sort: 'field_type'                     , show: false , bulk_edit: false, nice_name: 'Field type'                     , type: 'select'            , value: function(bt) { return bt.field_type;                      }, width: 400, options_url: '/admin/block-types/field-type-options' },
-      { name: 'default'                        , sort: 'default'                        , show: false , bulk_edit: false, nice_name: 'Default value'                  , type: 'text'              , value: function(bt) { return bt.default;                         }, width: 400 },
-      { name: 'width'                          , sort: 'width'                          , show: false , bulk_edit: false, nice_name: 'Width'                          , type: 'text'              , value: function(bt) { return bt.width;                           }, width: 400 },
-      { name: 'height'                         , sort: 'height'                         , show: false , bulk_edit: false, nice_name: 'Height'                         , type: 'text'              , value: function(bt) { return bt.height;                          }, width: 400 },
-      { name: 'fixed_placeholder'              , sort: 'fixed_placeholder'              , show: false , bulk_edit: false, nice_name: 'Fixed placeholder'              , type: 'checkbox'          , value: function(bt) { return bt.fixed_placeholder;               }, width: 400 },
-      { name: 'options_url'                    , sort: 'options_url'                    , show: false , bulk_edit: false, nice_name: 'Options URL'                    , type: 'text'              , value: function(bt) { return bt.options_url;                     }, width: 400 },
-      { name: 'options_function'               , sort: 'options_function'               , show: false , bulk_edit: false, nice_name: 'Options Function'               , type: 'textarea'          , value: function(bt) { return bt.options_function;                }, width: 400, height: 100 },
-      { name: 'options'                        , sort: 'options'                        , show: false , bulk_edit: false, nice_name: 'Options'                        , type: 'textarea'          , value: function(bt) { return bt.options;                         }, width: 400, height: 100 }            
-    ]    
+    fields: [
+      { name: 'name'                           , sort: 'name'                           , show: true  , bulk_edit: false, nice_name: 'Name'                           , type: 'text'              , value: function(bt) { return bt.name;                                         }, width: 400 },
+      { name: 'description'                    , sort: 'description'                    , show: false , bulk_edit: false, nice_name: 'Description'                    , type: 'text'              , value: function(bt) { return bt.description;                                  }, width: 400 },
+      { name: 'field_type'                     , sort: 'field_type'                     , show: true  , bulk_edit: false, nice_name: 'Field type'                     , type: 'select'            , value: function(bt) { return bt.field_type;                                   }, width: 400, options_url: '/admin/block-types/field-type-options' },                        
+      { name: 'site_id'                        , sort: 'site_id'                        , show: false , bulk_edit: false, nice_name: 'Site'                           , type: 'checkbox-multiple' , value: function(bt) { return bt.sites ? bt.sites.map(function(s) { return s.id }) : []; }, text: function(bt) { return bt.sites ? bt.sites.map(function(s) { return s.description }).join(', ') : ''; }, width: 400, height: 200, options_url: '/admin/block-types/site-options' },
+      { name: 'parent_id'                      , sort: 'parent_id'                      , show: false , bulk_edit: false, nice_name: 'Parent'                         , type: 'select'            , value: function(bt) { return bt.parent_id;                                    }, width: 400, options_url: '/admin/block-types/tree-options' },
+      { name: 'block_type_category_id'         , sort: 'block_type_category_id'         , show: false , bulk_edit: false, nice_name: 'Category'                       , type: 'select'            , value: function(bt) { return bt.block_type_category_id;                       }, width: 400, options_url: '/admin/block-type-categories/tree-options' },
+      { name: 'is_global'                      , sort: 'is_global'                      , show: false , bulk_edit: false, nice_name: 'Global'                         , type: 'checkbox'          , value: function(bt) { return bt.is_global ? 'Yes' : 'No';                     }, width: 20 },
+      { name: 'use_render_function'            , sort: 'use_render_function'            , show: true  , bulk_edit: false, nice_name: 'Use Render Function'            , type: 'checkbox'          , value: function(bt) { return bt.use_render_function            ? 'Yes' : 'No' }, width: 20 },
+      { name: 'use_render_function_for_layout' , sort: 'use_render_function_for_layout' , show: true  , bulk_edit: false, nice_name: 'Use Render Function for Layout' , type: 'checkbox'          , value: function(bt) { return bt.use_render_function_for_layout ? 'Yes' : 'No' }, width: 20 },
+      { name: 'allow_child_blocks'             , sort: 'allow_child_blocks'             , show: true  , bulk_edit: false, nice_name: 'Allow Child Blocks'             , type: 'checkbox'          , value: function(bt) { return bt.allow_child_blocks             ? 'Yes' : 'No' }, width: 20 },
+      { name: 'default_child_block_type_id'    , sort: 'default_child_block_type_id'    , show: false , bulk_edit: false, nice_name: 'Default Child Block Type'       , type: 'select'            , value: function(bt) { return bt.default_child_block_type_id;                  }, width: 400, options_url: '/admin/block-types/options' },
+      { name: 'render_function'                , sort: 'render_function'                , show: false , bulk_edit: false, nice_name: 'Render Function'                , type: 'textarea'          , value: function(bt) { return bt.render_function;                              }, width: 800, height: 200 },            
+      { name: 'default'                        , sort: 'default'                        , show: false , bulk_edit: false, nice_name: 'Default value'                  , type: 'text'              , value: function(bt) { return bt.default;                                      }, width: 400 },
+      { name: 'width'                          , sort: 'width'                          , show: false , bulk_edit: false, nice_name: 'Width'                          , type: 'text'              , value: function(bt) { return bt.width;                                        }, width: 400 },
+      { name: 'height'                         , sort: 'height'                         , show: false , bulk_edit: false, nice_name: 'Height'                         , type: 'text'              , value: function(bt) { return bt.height;                                       }, width: 400 },
+      { name: 'fixed_placeholder'              , sort: 'fixed_placeholder'              , show: false , bulk_edit: false, nice_name: 'Fixed placeholder'              , type: 'checkbox'          , value: function(bt) { return bt.fixed_placeholder ? 'Yes' : 'No';             }, width: 400 },
+      { name: 'options_url'                    , sort: 'options_url'                    , show: false , bulk_edit: false, nice_name: 'Options URL'                    , type: 'text'              , value: function(bt) { return bt.options_url;                                  }, width: 400 },
+      { name: 'options_function'               , sort: 'options_function'               , show: false , bulk_edit: false, nice_name: 'Options Function'               , type: 'textarea'          , value: function(bt) { return bt.options_function;                             }, width: 400, height: 100 },
+      { name: 'options'                        , sort: 'options'                        , show: false , bulk_edit: false, nice_name: 'Options'                        , type: 'textarea'          , value: function(bt) { return bt.options;                                      }, width: 400, height: 100 }            
+    ],
+    new_model_text: 'New Block Type',
+    new_model_fields: [
+      { name: 'name', nice_name: 'Name', type: 'text', width: 400 }                      
+    ],    
   });
 });
     

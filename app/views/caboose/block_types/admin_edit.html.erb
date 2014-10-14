@@ -12,7 +12,6 @@ bt = @block_type
 <p><div id='blocktype_<%= bt.id %>_description'                     ></div></p>
 
 <h2>Children</h2>
-<p><a href='/admin/block-types/<%= @block_type.id %>/new'>New Child Block</a></p>
 <div id='block_types'></div>
 
 <h2>Advanced</h2>
@@ -82,9 +81,10 @@ $(document).ready(function() {
     container: 'block_types',
     base_url: '/admin/block-types',
     refresh_url: '/admin/block-types/json?parent_id=<%= @block_type.id %>',
+    add_url: '/admin/block-types?parent_id=<%= @block_type.id %>',
     allow_bulk_edit: false,
     allow_bulk_delete: false,
-    allow_duplicate: false,
+    allow_duplicate: false,    
     fields: [                      
       { name: 'parent_id'                      , sort: 'parent_id'                      , show: false , bulk_edit: false, nice_name: 'Parent'                         , type: 'select'            , value: function(bt) { return bt.parent_id;                       }, width: 400, options_url: '/admin/block-types/tree-options' },
       { name: 'name'                           , sort: 'name'                           , show: true  , bulk_edit: false, nice_name: 'Name'                           , type: 'text'              , value: function(bt) { return bt.name;                            }, width: 400 },
@@ -104,14 +104,18 @@ $(document).ready(function() {
       { name: 'options_url'                    , sort: 'options_url'                    , show: false , bulk_edit: false, nice_name: 'Options URL'                    , type: 'text'              , value: function(bt) { return bt.options_url;                     }, width: 400 },
       { name: 'options_function'               , sort: 'options_function'               , show: false , bulk_edit: false, nice_name: 'Options Function'               , type: 'textarea'          , value: function(bt) { return bt.options_function;                }, width: 400, height: 100 },
       { name: 'options'                        , sort: 'options'                        , show: false , bulk_edit: false, nice_name: 'Options'                        , type: 'textarea'          , value: function(bt) { return bt.options;                         }, width: 400, height: 100 }            
-    ]    
+    ],
+    new_model_text: 'New Child Block',
+    new_model_fields: [
+      { name: 'name', nice_name: 'Name', type: 'text', width: 400 }                      
+    ],    
   });
     
   m = new ModelBinder({
     name: 'BlockType',
     id: <%= @block_type.id %>,
     update_url: '/admin/block-types/<%= @block_type.id %>',
-    authenticity_token: '<%= form_authenticity_token %>',
+    authenticity_token: '<%= form_authenticity_token %>',    
     attributes: [      
       { name: 'parent_id'                      , nice_name: 'Parent'                         , type: 'select'   , value: <%= raw Caboose.json(bt.parent_id)                       %>, width: 400, options_url: '/admin/block-types/tree-options' },
       { name: 'name'                           , nice_name: 'Name'                           , type: 'text'     , value: <%= raw Caboose.json(bt.name)                            %>, width: 400 },

@@ -31,6 +31,9 @@ IndexTable.prototype = {
   // Example: function(model_id) { return '/admin/models/' + model_id + '/duplicate' },
   duplicate_url: false,
   
+  // Where to post new models
+  add_url: false,
+  
   // What to do when a row is clicked
   // Example: function (model_id) { return '/admin/models/' + model_id; }
   row_click_handler: false,
@@ -56,7 +59,13 @@ IndexTable.prototype = {
   allow_bulk_edit: true,
   allow_bulk_delete: true,
   allow_duplicate: true,
-      
+  
+  no_models_text: "There are no models right now.",
+  new_model_text: 'New',
+  new_model_fields: [
+    { name: 'name', nice_name: 'Name', type: 'text', width: 400 }                      
+  ],
+          
   //============================================================================
   // End of required parameters
   //============================================================================
@@ -64,15 +73,10 @@ IndexTable.prototype = {
   models: [],
   model_ids: [],
   quick_edit_field: false, // The field currently being edited
-  refresh_count: 0,
-
-  // Pager fields
-  pager_params: {    
-    //sort: '',
-    //desc: false,
-    //item_count: 0,  		
-    //items_per_page: 4,
-    //page: 1        
+  refresh_count: 0,  
+  pager: {
+    options: { page: 1 },
+    params: {}
   },
   
   init: function(params) {
@@ -82,7 +86,8 @@ IndexTable.prototype = {
     var that = this;
     if (!this.refresh_url       ) this.refresh_url       = this.base_url + '/json';
     if (!this.bulk_update_url   ) this.bulk_update_url   = this.base_url + '/bulk';    
-    if (!this.bulk_delete_url   ) this.bulk_delete_url   = this.base_url + '/bulk';                            
+    if (!this.bulk_delete_url   ) this.bulk_delete_url   = this.base_url + '/bulk';
+    if (!this.add_url           ) this.add_url           = this.base_url;
     if (!this.update_url        ) this.update_url        = function(model_id) { return this.base_url + '/' + model_id; };            
     if (!this.duplicate_url     ) this.duplicate_url     = function(model_id) { return this.base_url + '/' + model_id + '/duplicate'; };
     if (!this.row_click_handler ) this.row_click_handler = function(model_id) { window.location = this.base_url + '/' + model_id; };
@@ -122,8 +127,13 @@ IndexTable.prototype = {
     }
     
     // Set both hash and querystring values in the pager
-    for (var i in b)      
-      this.pager_params[i] = b[i];
+    for (var i in b)
+    {
+      if (i == 'sort' || i == 'desc' || i == 'page')      
+        this.pager.options[i] = b[i];
+      else
+        this.pager.params[i] = b[i];              
+    }
     
     // If there's a querystring, then redirect to hash
     //if (window.location.search.length > 0)
@@ -134,25 +144,26 @@ IndexTable.prototype = {
   },
 
   refresh: function()
-  {    
+  {
+    this.pager = { options: { page: 1 }, params: {}};
     this.parse_querystring();
         
     var that = this;
-    var $el = $('#columns').length > 0 ? $('#table_container') : $('#'+this.container);
-    $el.html("<p class='loading'>Refreshing...</p>");
+    var $el = $('#' + this.container + '_columns').length > 0 ? $('#' + this.container + '_table_container') : $('#' + this.container);
+    $el.html("<p class='loading'>Refreshing...</p>");        
     $.ajax({ 
       url: that.refresh_url,
       type: 'get',
-      data: that.pager_params.params,
-      success: function(resp) {
+      data: that.pager_params(),
+      success: function(resp) {        
         for (var thing in resp['pager'])
-          that.pager_params[thing] = resp['pager'][thing];                
+          that.pager[thing] = resp['pager'][thing];                
         that.models = resp['models'];
         for (var i=0; i<that.models.length; i++)
         {
           var m = that.models[i];                              
           m.id = parseInt(m.id);          
-        }
+        }        
         that.print();
         
         // Set the history state
@@ -172,34 +183,48 @@ IndexTable.prototype = {
   {
     var that = this;
     
+    if (that.models == null || that.models.length == 0)
+    {
+      $('#' + that.container).empty()
+        .append($('<p/>').append(that.new_model_link()))
+        .append($('<div/>').attr('id', that.container + '_new_form_container'))        
+        .append($('<p/>').append(that.no_models_text));            
+      return;
+    }
+
     var tbody = $('<tbody/>').append(this.table_headers());            
     $.each(that.models, function(i, m) {
       tbody.append(that.table_row(m));
     });                                
     var table = $('<table/>').addClass('data').css('margin-bottom', '10px').append(tbody);
-    var pager = this.pager();    
+    var pager_div = this.pager_div();    
         
-    if ($('#columns').length > 0)
+    if ($('#' + this.container + '_columns').length > 0)
     {
-      $('#table_container').empty().append(table);
-      $('#pager').empty().append(pager);
+      $('#' + this.container + '_table_container').empty().append(table);
+      $('#' + this.container + '_pager').empty().append(pager_div);
+      $('#' + this.container + '_new_form_container').empty();
     }
     else
     {
       var columns = this.column_checkboxes();            
       var controls = $('<p/>');
-      if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', 'bulk_edit'  ).val('Bulk Edit'  ).click(function(e) { that.bulk_edit();   })).append(' ');
-      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', 'bulk_delete').val('Bulk Delete').click(function(e) { that.bulk_delete(); })).append(' ');
-      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', 'duplicate'  ).val('Duplicate'  ).click(function(e) { that.duplicate();   }));
+      if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'  ).val('Bulk Edit'  ).click(function(e) { that.bulk_edit();   })).append(' ');
+      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete').val('Bulk Delete').click(function(e) { that.bulk_delete(); })).append(' ');
+      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'  ).val('Duplicate'  ).click(function(e) { that.duplicate();   }));
       
       $('#' + that.container).empty()
-        .append($('<a/>').attr('href', '#').html('Show/Hide Columns').click(function(e) { e.preventDefault(); $('#columns').slideToggle(); }))          
-        .append($('<div/>').attr('id', 'columns').append(columns))
-        .append($('<div/>').attr('id', 'table_container').append(table))        
-        .append($('<div/>').attr('id', 'pager').append(pager))        
-        .append($('<div/>').attr('id', 'message'))
+        .append($('<p/>')
+          .append(that.new_model_link()).append(' | ')          
+          .append($('<a/>').attr('href', '#').html('Show/Hide Columns').click(function(e) { e.preventDefault(); $('#' + that.container + '_columns').slideToggle(); }))
+        )
+        .append($('<div/>').attr('id', that.container + '_new_form_container'))        
+        .append($('<div/>').attr('id', that.container + '_columns').append(columns))
+        .append($('<div/>').attr('id', that.container + '_table_container').append(table))        
+        .append($('<div/>').attr('id', that.container + '_pager').append(pager_div))        
+        .append($('<div/>').attr('id', that.container + '_message'))
         .append(controls);        
-      $('#columns').hide();
+      $('#' + that.container + '_columns').hide();
     }    
       
     if (that.quick_edit_field)
@@ -238,10 +263,14 @@ IndexTable.prototype = {
       if (field.show)
       {
         var s = field.sort ? field.sort : field.name;
-        var arrow = that.pager_params.sort == s ? (parseInt(that.pager_params.desc) == 1 ? ' &uarr;' : ' &darr;') : '';                
+        console.log("field.name = " + field.name);
+        console.log("that.pager.options.sort = " + that.pager.options.sort);
+        console.log("that.pager.options.desc = " + that.pager.options.desc);
+        console.log("------------------------------");
+        var arrow = that.pager.options.sort == s ? (parseInt(that.pager.options.desc) == 1 ? ' &uarr;' : ' &darr;') : '';                
         var link = that.pager_hash({
           sort: s,
-          desc: (that.pager_params.sort == s ? (parseInt(that.pager_params.desc) == 1 ? '0' : '1') : '0')
+          desc: (that.pager.options.sort == s ? (parseInt(that.pager.options.desc) == 1 ? '0' : '1') : '0')
         });
                 
         var input = $('<input/>').attr('type', 'checkbox').attr('id', 'quick_edit_' + field.name).val(field.name)            
@@ -326,7 +355,7 @@ IndexTable.prototype = {
   column_checkboxes: function()
   {
     var that = this;
-    var div = $('<div/>').attr('id', 'columns');
+    var div = $('<div/>').attr('id', that.container + '_columns');
     $.each(this.fields, function(i, field) {
       var input = $('<input/>')
         .attr('type', 'checkbox')
@@ -471,22 +500,22 @@ IndexTable.prototype = {
     });    
   },
   
-  pager: function(summary)
+  pager_div: function(summary)
   {
     var that = this;
-    var pp = this.pager_params;
+    var p = this.pager;
     
-    // Set default parameter values if not present
-    if (!pp.items_per_page) pp.items_per_page = 10  
-    if (!pp.page) 		      pp.page           = 1   
+    // Set default parameter values if not present    
+    if (!p.options.items_per_page) p.options.items_per_page = 10  
+    if (!p.options.page) 		       p.options.page           = 1   
   		
-  	var page = parseInt(pp.page);
+  	var page = parseInt(p.options.page);
   			
   	// Max links to show (must be odd) 
   	var total_links = 5;
   	var prev_page = page - 1;
   	var next_page = page + 1;
-  	var total_pages = Math.ceil(parseFloat(pp.item_count)/parseFloat(pp.items_per_page));
+  	var total_pages = Math.ceil(parseFloat(p.options.item_count)/parseFloat(p.options.items_per_page));
   	var start = 1;
   	var stop = 1;
   	
@@ -517,35 +546,114 @@ IndexTable.prototype = {
   	{
   	  var div2 = $('<div/>').addClass('page_links');
   	  if (page > 1)
-  	    div2.append($('<a/>').attr('href', this.pager_hash({ page: prev_page })).html('Previous'));  	        	      	  
+  	    div2.append($('<a/>').attr('href', this.pager_hash({ page: prev_page })).html('Previous').click(function(e) { that.hash_click(e, this); }));  	        	      	  
   	  for (i=start; i<=stop; i++)
   	  {
   	  	if (page != i)
-  	  	  div2.append($('<a/>').attr('href', this.pager_hash({ page: i })).html(i));
+  	  	  div2.append($('<a/>').attr('href', this.pager_hash({ page: i })).html(i).click(function(e) { that.hash_click(e, this); }));
   	  	else
   	  	  div2.append($('<span/>').addClass('current_page').html(i));  	  		
   	  }  	  
   	  if (page < total_pages)
-  	    div2.append($('<a/>').attr('href', this.pager_hash({ page: next_page })).html('Next'));
+  	    div2.append($('<a/>').attr('href', this.pager_hash({ page: next_page })).html('Next').click(function(e) { that.hash_click(e, this); }));
   	  div.append(div2);
   	}
   	return div;
   },
   
+  hash_click: function(e, el) {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.hash = $(el).attr('href').substr(1);
+    this.refresh();
+  },
+  
+  pager_params: function(h)
+  {
+    var that = this;    
+    var p = $.extend({}, this.pager.params);
+    if (this.pager.options)
+    {      
+      if (this.pager.options.sort) p.sort = this.pager.options.sort;
+      if (this.pager.options.desc) p.desc = this.pager.options.desc ? 1 : 0;
+      if (this.pager.options.page) p.page = this.pager.options.page;
+    }
+    if (h)      
+    {
+      for (var i in h)
+      {        
+        //console.log('' + i + ' = ' + h[i]);        
+        //console.log(typeof(h[i]));        
+        //console.log('-------------------');
+        if (typeof(h[i]) == 'boolean')
+          p[i] = h[i] ? 1 : 0;
+        else
+          p[i] = h[i];
+      }
+    }
+    return p;
+  },
+  
   pager_hash: function(h)
+  {                           
+    var p = this.pager_params(h);                  
+  	var qs = [];
+  	$.each(p, function(k,v) { qs.push('' + k + '=' + encodeURIComponent(v)); });
+  	return '#' + qs.join('&');  	
+  },
+  
+  /****************************************************************************/
+  
+  new_model_link: function()
   {
     var that = this;
-    var pp = $.extend({}, this.pager_params);
-    for (var i in h)
-      pp[i] = h[i];
-              
-  	var qs = [];
-  	$.each(pp, function(k,v) {
-  	  if (k == 'base_url' || k == 'item_count' || k == 'items_per_page' || k == 'use_url_params')
-  	    return;
-  	  qs.push('' + k + '=' + encodeURIComponent(v)); 
-  	});
-  	return '#' + qs.join('&');  	
-  }
+    return $('<a/>').attr('href', '#').html(that.new_model_text).click(function(e) { e.preventDefault(); that.new_form(); });
+  },
+  
+  new_form: function()
+  {
+    var that = this;
+    if (!$('#' + that.container + '_new_form_container').is(':empty'))
+    {
+      $('#' + that.container + '_new_form_container').slideUp(function() {          
+        $('#' + that.container + '_new_form_container').empty();
+      });
+      return;
+    }      
+        
+    var form = $('<form/>').attr('id', 'new_form')
+      .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(that.form_authenticity_token));
+    $.each(this.new_model_fields, function(i, f) {
+      form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
+    });
+    form
+      .append($('<div/>').attr('id', 'new_message'))
+      .append($('<p>')        
+        .append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { $('#' + that.container + '_new_form_container').empty(); }))
+        .append(' ')
+        .append($('<input/>').attr('type', 'submit').val('Add').click(function(e) { that.add_model(); return false; }))
+      );                
+    $('#' + that.container + '_new_form_container').hide().empty().append(
+      $('<div/>').addClass('note').css('margin-bottom', '10px')
+        .append($('<h2/>').css('margin-top', 0).css('padding-top', 0).html(that.new_model_text))
+        .append(form)
+      ).slideDown();
+  },
+    
+  add_model: function() 
+  {
+    var that = this;
+    $('#new_message').html("<p class='loading'>Adding...</p>");
+    $.ajax({
+      url: this.add_url,
+      type: 'post',
+      data: $('#new_form').serialize(),
+      success: function(resp) {
+        if (resp.error) $('#new_message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.redirect || resp.refresh) that.refresh();
+      }
+    });
+  },
+  
   
 };

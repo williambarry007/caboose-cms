@@ -29,7 +29,7 @@ module Caboose
         'sort'  => 'description',
         'desc'  => 'false',
         'base_url' => "/admin/block-types",
-        'items_per_page' => 100
+        'items_per_page' => 10
       })      
       render :json => {
         :pager => pager,

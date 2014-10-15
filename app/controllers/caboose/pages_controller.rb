@@ -26,7 +26,7 @@ module Caboose
         end
         return
       else
-        Caboose.log(request.inspect)        
+        #Caboose.log(request.inspect)        
       end
       
       if !page

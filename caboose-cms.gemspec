@@ -50,6 +50,7 @@ Gem::Specification.new do |s|
   s.add_dependency "awesome_print"
   s.add_dependency "ejs"
   s.add_dependency "httparty"
+  s.add_dependency "authorize-net"
   #s.add_dependency "sass-rails"
   
 end

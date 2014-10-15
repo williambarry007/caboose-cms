@@ -1,6 +1,7 @@
 module Caboose
   class CheckoutController < Caboose::ApplicationController
-    helper :authorize_net
+    
+    #helper :authorize_net
     before_filter :ensure_line_items, :only => [:step_one, :step_two]
     protect_from_forgery :except => :relay
     

@@ -1,0 +1,19 @@
+<label>
+  <span for="product-sort">Sort by:</span>
+  
+  <select id="product-sort" style="margin: 0 !important">
+    <% @sort_options.each do |sort_option| %>
+      <option value="<%= sort_option[:value] %>" <%= 'selected' if params[:sort] == sort_option[:value] %>><%= sort_option[:name] %></option>
+    <% end %>
+  </select>
+</label>
+
+<% content_for :caboose_js do %>
+  <script>
+    $(document).ready(function() {
+      $('#product-sort').on('change', function(event) {
+        window.location = '/products?sort=' + $(this).val();
+      });
+    });
+  </script>
+<% end %>

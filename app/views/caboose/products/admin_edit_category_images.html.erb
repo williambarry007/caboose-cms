@@ -1,0 +1,233 @@
+<%
+p = @product    
+%>
+<%= render :partial => 'caboose/products/admin_header' %>
+
+<form action='/admin/products/<%= p.id %>/images' method='post' enctype='multipart/form-data' id='new_image_form' target='new_image_iframe'>
+<input type='hidden' name='authenticity_token' value="<%= form_authenticity_token %>" />
+<p><input type='file' name='new_image' id='new_image' />
+<input type='submit' value='Add Image' onclick='add_image();' /></p>
+</form>
+<div id='new_image_message'></div>
+<iframe id='new_image_iframe' name='new_image_iframe' style='display: none;'></iframe>
+<div id='message'></div>
+
+<div id='images'>
+  <% if p.product_images.count > 0 %>
+    <% p.product_images.each do |img| %>
+      <% 
+      #url = "https://s3.amazonaws.com/tuskwear/products/#{img.product_id}_#{img.id}_tiny.jpg" 
+      url = img.image.url(:tiny)
+      %>
+      <div id='img_<%= img.id %>_container'><a href="javascript:select_image(<%= img.id %>);"><img src='<%= url %>' width='75' /></a></div> 
+    <% end %>
+  <% else %>
+    <p>This product doesn't have any images yet.</p>
+  <% end %>
+</div>
+<div id='variants'></div>
+
+<%= render :partial => 'caboose/products/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#variants input[type='checkbox'] { position: relative; margin: 0; padding: 0; }
+#variants table td { border: 0; font-size: 85%; margin: 0; padding: 0px 8px; }
+#variants label { padding: 0; }
+#images div { display: inline-block; }
+#images div img { border: #000 4px solid; }
+#images div.selected img { border: #ff3333 4px solid; }
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal.autosize();
+});
+
+$(document).ready(function() {
+  modal = new CabooseModal(900);
+  <% if p.product_images.count > 0 %>
+  select_image(<%= p.product_images[0].id %>);
+  <% end %>
+});
+
+variants = false;
+image_variant_ids = {};
+
+function variant_option_value(variant_id, option_index)
+{
+  var val = false; 
+  $.each(variants, function(i, v) {
+    if (v.id == variant_id)
+    {
+      if (option_index == 1) val = v.option1;
+      if (option_index == 2) val = v.option2;
+      if (option_index == 3) val = v.option3;
+      return;
+    }
+  });
+  return val;
+}
+  
+function select_image(image_id, confirm)
+{
+  if (!variants)
+  {
+    modal.autosize("<p class='loading'>Getting attached product variants...</p>", 'variants');
+    $.ajax({
+      url: '/admin/products/<%= p.id %>/variants/json',
+      success: function(resp) { variants = resp; select_image(image_id); }
+    });
+    return;
+  }
+  if (!confirm)
+  {
+    $.ajax({
+      url: '/admin/product-images/' + image_id + '/variant-ids',
+      success: function(resp) { image_variant_ids = resp; select_image(image_id, true); }
+    });
+    return;
+  }
+  
+  $('#images div').removeClass('selected');
+  $('#img_' + image_id + '_container').addClass('selected');
+
+  var x = Math.ceil(variants.length/3);
+  var tbl1 = variants_subtable(image_id, 0, x);
+  var tbl2 = variants_subtable(image_id, x, x*2);
+  var tbl3 = variants_subtable(image_id, x*2, variants.length);
+  
+  var tr = $('<tr/>');
+  tr.append($('<td/>').attr('valign','top').append(tbl1));
+  tr.append($('<td/>').attr('valign','top').append(tbl2));
+  tr.append($('<td/>').attr('valign','top').append(tbl3)); 
+  var tbl = $('<table/>').append($('<tbody/>').append(tr));
+  
+  $('#variants').empty().append('<br/>');
+  $('#variants').append($('<div/>').attr('id','delete_message'));
+  $('#variants').append($('<input/>').attr('type','button').val('Delete Image').click(function() { delete_image(image_id); }));  
+  $('#variants').append(tbl);
+  modal.autosize();
+}
+
+function variants_subtable(image_id, x, y)
+{
+  var tbody = $('<tbody/>');
+  for (var i=x; i<y; i++)
+  {
+    var v = variants[i];  
+    checked = image_is_attached_to_variant(v.id);
+    
+    //var a = $('<a/>')
+    //  .attr('href', '#')
+    //  .attr('id', 'v_' + v.id)
+    //  .html(variant_title(v))
+    //  .click(function(e) {
+    //    e.preventDefault();
+    //    variant_id = $(this).attr('id').split('_')[1];
+    //    var attach = false;
+    //    if ($(this).hasClass('selected')) { attach = false; $(this).removeClass('selected'); }
+    //    else                              { attch = true;   $(this).addClass('selected');    }          
+    //    attach_image_to_variant(image_id, variant_id, attach); 
+    //  });
+    //tbody.append($('<tr/>').append($('<td/>').append(a)));
+        
+    tbody.append($('<tr/>')
+      .append($('<td/>')
+        .append($('<input/>')
+          .attr('type','checkbox')
+          .attr('id', 'v_' + v.id)
+          .attr('checked', checked)
+          .css('position','relative')     
+          .val('1')
+          .click(function() {
+            variant_id = $(this).attr('id').split('_')[1];
+            attach_image_to_variant(image_id, variant_id, $(this).is(':checked')); 
+          })
+        )        
+      )
+      .append($('<td/>').append($('<label/>').attr('for','v_' + v.id).html(variant_title(v))))
+    );
+  }
+  return $('<table/>').append(tbody);
+}
+
+function image_is_attached_to_variant(variant_id)
+{
+  has_value = false;
+  $.each(image_variant_ids, function(i, vid) { if (vid == variant_id) { has_value = true; return; }});
+  return has_value;
+}    
+
+function variant_title(v)
+{
+  arr = [];
+  if (v.option1) arr[arr.length] = v.option1;
+  if (v.option2) arr[arr.length] = v.option2;
+  if (v.option3) arr[arr.length] = v.option3;
+  return arr.join(' / ');
+}
+
+function attach_image_to_variant(image_id, variant_id, attach = true)
+{
+  if (attach)
+    image_variant_ids[image_variant_ids.length] = variant_id;
+  else
+  {
+    var i = image_variant_ids.indexOf(variant_id);
+    image_variant_ids.splice(i, 1);
+  }  
+  $.ajax({
+    url: '/admin/variants/' + variant_id + '/' + (attach ? 'attach-to-image' : 'unattach-from-image'),
+    type: 'put',
+    data: { product_image_id: image_id },
+    success: function(resp) {}
+  });
+}
+
+function add_image()
+{
+  $('#new_image_message').html("<p class='loading'>Adding image...</p>");
+  modal.autosize();
+}
+
+function delete_image(image_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note error').css('margin-bottom', '10px')
+      .append("Are you sure you want to delete the image?<br />This can't be undone.<br /><br />")
+      .append($('<input/>').attr('type', 'button').val('Yes').click(function() { delete_image(image_id, true); })).append(' ')
+      .append($('<input/>').attr('type', 'button').val('No').click(function() { $('#delete_message').empty(); modal.autosize(); }));      
+    modal.autosize(p, 'delete_message');
+    return;
+  }
+  modal.autosize("<p class='loading'>Deleting the image...</p>", 'delete_message');
+  $.ajax({
+    url: '/admin/product-images/' + image_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error)
+        modal.autosize("<p class='note error'>" + resp.error + "</p>", 'delete_message');
+      else
+        window.location.reload(true);
+    }
+  });
+}
+
+function array_unique(a)
+{
+  b = [];
+  $.each(a, function(i, x) {
+    var e = false;
+    $.each(b, function(j, y) { if (x == y) { e = true; return; }});
+    if (!e) b[b.length] = x;  
+  });
+  return b;
+}
+
+</script>
+<% end %>

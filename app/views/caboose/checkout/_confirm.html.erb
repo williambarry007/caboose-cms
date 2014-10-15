@@ -1,0 +1,61 @@
+  <section id='checkout-confirm'>
+    <div class='wrapper'>  
+      <section id="line-items">          
+        <table>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+          </tr>
+          <% @order.line_items.each do |li| %>
+            <tr data-id="<%= li.id %>">
+              <td valign='top'>
+                <% if li.variant.product_images.count > 0 %>              
+                  <figure style="background-image: url(<%= li.variant.product_images[0].image.url(:thumb) %>)"></figure>
+                <% end %>                    
+                <p><%= li.title %></p>
+              </td>
+              <td valign='top' align='right' class='qty'     ><%= li.quantity %></td>
+              <td valign='top' align='right' class='price'   ><%= number_to_currency(li.price, :precision => 2) %></td>
+              <td valign='top' align='right' class='subtotal'><%= number_to_currency(li.price, :precision => 2) %></td>
+            </tr>        
+          <% end %>                  
+          <tr><td colspan='3' align='right'>Subtotal:            </td><td align='right'><%= number_to_currency(@order.subtotal, :precision => 2)                   %></td></tr>            
+          <tr><td colspan='3' align='right'>Shipping & Handling: </td><td align='right'><%= number_to_currency(@order.shipping + @order.handling, :precision => 2) %></td></tr>
+          <% if @order.tax > 0 && @order.billing_address.state == 'AL' %>
+            <tr><td colspan='3' align='right'>Tax <small>(if in Alabama)</small>: </td><td align='right'><%= number_to_currency(@order.tax, :precision => 2) %></td></tr>
+          <% end %>      
+          <tr><td colspan='3' align='right'>Total:               </td><td align='right'><%= number_to_currency(@order.total, :precision => 2) %></td></tr>
+        </table>
+      </section>
+      <section id='shipping_address'>
+        <% sa = @order.shipping_address %>        
+        <address>
+          <%= "#{sa.first_name} #{sa.last_name}" %><br />
+          <%= sa.address1 %><br />
+          <%= "#{sa.address2}<br />" if sa.address2 and not sa.address2.empty? %>
+          <%= "#{sa.city}, #{sa.state} #{sa.zip}" %>
+        </address>        
+        <p><a href="/checkout/step-two">Edit shipping address</a></p>
+      </section>
+      <section id='billing_address'>        
+        <% ba = @order.billing_address %>        
+        <address>
+          <%= "#{ba.first_name} #{ba.last_name}" %><br />
+          <%= ba.address1 %><br />
+          <%= "#{ba.address2}<br />" if ba.address2 and not ba.address2.empty? %>
+          <%= "#{ba.city}, #{ba.state} #{ba.zip}" %>
+        </address>
+        <p><a href="/checkout/step-two">Edit billing address</a></p>
+      </section>
+      <section id='shipping_method'>
+        <p><%= @order.shipping_method %> - <%= number_to_currency(@order.shipping) %></p>
+        <p><a href="/checkout/step-three">Edit shipping method</a></p>
+      </section>
+      <section id='payment_method'>
+        <p id='confirm_card_number'></p>
+        <p><a href="#" id='edit_payment'>Edit payment</a></p>
+      </section>
+    </div>
+  </section>

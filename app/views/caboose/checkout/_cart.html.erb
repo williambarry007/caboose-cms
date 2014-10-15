@@ -1,0 +1,52 @@
+<table id="cart">
+	<tr>
+		<th>Item</th>
+		<th>Quantity</th>
+		<th>Subtotal</th>
+	</tr>
+	
+	<% @order.line_items.each do |line_item| %>
+		<tr>
+			<td>
+				<%= line_item.variant.product.title %> - <%= line_item.variant.title %>
+				
+				<% line_item.customizations.each do |customization| %>
+					<p><%= "- #{customization.variant.product.custom_input}: #{customization.custom_input}"%></p>
+				<% end %>
+			</td>
+			<td align="right"><%= line_item.quantity %></td>
+			<td align="right"><%= number_to_currency(line_item.subtotal) %></td>
+		</tr>
+	<% end %>
+	
+	<tr>
+		<td colspan="2" align="right">Subtotal</td>
+		<td align="right"><%= number_to_currency(@order.subtotal) %></td>
+	</tr>
+	
+	<% if @order.tax and @order.tax > 0 %>
+		<tr>
+			<td colspan="2" align="right">Tax <span class="float: right">+</span></td>
+			<td align="right"><%= number_to_currency(@order.tax) %></td>
+		</tr>
+	<% end %>
+	
+	<% if @order.shipping and @order.handling %>
+		<tr>
+		  <td colspan="2" align="right">Shipping &amp; Handling <span class="float: right">+</span></td>
+		  <td align="right"><%= number_to_currency(@order.shipping + @order.handling) %></td>
+		</tr>
+	<% end %>
+	
+	<% if @order.discounts.any? %>
+		<tr>
+		  <td colspan="2" align="right">Gift Card <span class="float: right">-</span></td>
+		  <td align="right"><%= number_to_currency(@order.discounts.first.amount_current) %></td>
+		</tr>
+	<% end %>
+	
+	<tr>
+	  <td colspan="2" align="right">Total <span class="float: right">=</span></td>
+	  <td align="right"><%= number_to_currency(@order.total) %></td>
+	</tr>
+</table>

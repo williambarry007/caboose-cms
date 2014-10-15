@@ -1,0 +1,41 @@
+<%
+p = @product
+%>
+<h1>New Product</h1>
+
+<form action='/admin/products' method='post' id='new_form'>
+<input type='hidden' name='authenticity_token' value="<%= form_authenticity_token %>" />
+<p><input type='text' name='title' value='' placeholder='Product Title' style='width: 400px;' /></p>
+<div id='message'><%= raw flash[:message] ? flash[:message] : "" %></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/products';" />
+<input type='submit' value='Add Product' onclick='add_product(); return false' />
+</p>
+</form>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+function add_product()
+{
+  modal.autosize("<p class='loading'>Adding product...</p>");
+  $.ajax({
+    url: '/admin/products',
+    type: 'post',
+    data: $('#new_form').serialize(),
+    success: function(resp) {
+      if (resp.error)
+        modal.autosize("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect)
+        window.location = resp.redirect    
+    }
+  });
+}
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+</script>
+<% end %>

@@ -1,0 +1,8 @@
+<figure></figure>
+
+<ul>
+  <% _.each(images, function(image) { %>
+    <li data-id="<%= image.id %>"><figure style="background-image: url(<%= image.urls.thumb %>)" data-url-large="<%= image.urls.large %>"></figure></li>
+  <% }); %>
+</ul>
+

@@ -1,0 +1,42 @@
+<h1>New Manual Order</h1>
+
+<p><select name='product_id' id='product_id' onchange='populate_variants();'>
+<option value=''>-- Select a product --</option>
+<% @products.each do |p| %>
+  <option value='<%= p.id %>'><%= p.title %></option>
+<% end %>
+</select>
+<span id='variant_id_container'></span>
+</p>
+
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/orders';" />
+<input type='button' value='Create Order' onclick='create_order();' />
+</p>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() { 
+  modal = new CabooseModal('95%');
+});
+
+function populate_variants()
+{
+  $('#variant_id_container').empty().append("<p class='loading'>Getting variants...</p>");
+  var product_id = $('#product_id').val();
+  $.ajax({
+    url: '/admin/products/' + product_id + '/variants/json',    
+    success: function(variants) {
+      var select = $('<select/>').attr('id', 'variant_id');
+      $.each(variants, function(i, v) {
+        select.append($('<option/>').val(v.id).html(v.title));
+      });
+      $('#variant_id_container').empty().append(select);
+    }
+  });
+}
+
+</script>
+<% end %>

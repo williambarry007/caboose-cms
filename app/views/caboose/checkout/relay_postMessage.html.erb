@@ -1,0 +1,19 @@
+<!DOCTYPE>
+<html>
+  <body>
+    <script id="response" type="application/json">
+      {
+        success: <%= @success %>,
+        message: '<%= @message %>'
+      }
+    </script>
+    
+    <script>
+      parent.postMessage({
+        success: <%= @success %>,
+        message: '<%= @message %>'
+      }, '<%= Caboose::store_url %>');
+    </script>
+  </body>
+</html>
+

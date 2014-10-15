@@ -1,0 +1,72 @@
+<%
+sa = @order.shipping_address
+shipping_address = sa.address1
+shipping_address << "<br />#{sa.address2}" if sa.address2 && sa.address2.length > 0
+shipping_address << "<br />#{sa.city}, #{sa.state} #{sa.zip}"
+%>
+<p align='center'><img src='https://dmwwflw4i3miv.cloudfront.net/logo.png' /></p>
+
+<h1>Order #<%= @order.id %></h1>
+
+<table class='data'>
+<tr>
+  <th>Customer</th>
+  <th>Shipping Address</th>
+  <th>Payment Status</th>
+</tr>
+<tr>
+  <td valign='top'>
+    <%= "#{@order.customer.first_name} #{@order.customer.last_name}" %><br />
+    <a href='mailto:<%= "#{@order.customer.email}" %>'><%= "#{@order.customer.email}" %></a><br />
+    <%= @order.customer.phone %>
+  </td>
+  <td valign='top'>
+    <%= "#{@order.shipping_address.name}" %><br />
+    <%= raw shipping_address %>
+  </td>
+  <td valign='top'>
+    <%= @order.financial_status %>    
+  </td>
+</tr>
+</table><br />
+
+<table class='data' width='100%'>
+<tr>
+  <th>Item</th>
+  <th>Status</th>
+  <th>Tracking Number</th>  
+  <th>Quantity</th>
+  <th>Subtotal</th>
+</tr>
+<% @order.line_items.each do |li| %>
+  <tr>
+    <td>
+      <%= li.variant.product.title %><br />
+      <%= li.variant.sku %><br />
+      <%= li.variant.title %>
+    </td>
+    <td              ><%= li.status           %></td>
+    <td              ><%= li.tracking_number  %></td>    
+    <td align='right'><%= li.quantity         %></td>
+    <td align='right'><%= number_to_currency(li.subtotal) %></td>
+  </tr>
+<% end %>
+<tr><td colspan='4' align='right'>Subtotal  </td><td align='right'><%= number_to_currency(@order.subtotal ) %></td></tr>
+<tr><td colspan='4' align='right'>Tax       </td><td align='right'><%= number_to_currency(@order.tax      ) %></td></tr>
+<tr><td colspan='4' align='right'><%= @order.shipping_method %> Shipping  </td><td align='right'><%= number_to_currency(@order.shipping ) %></td></tr>
+<tr><td colspan='4' align='right'>Handling  </td><td align='right'><%= number_to_currency(@order.handling ) %></td></tr>
+<tr><td colspan='4' align='right'>Discount  </td><td align='right'><%= number_to_currency(@order.discount ) %></td></tr>
+<tr><td colspan='4' align='right'>Total     </td><td align='right'><%= number_to_currency(@order.total    ) %></td></tr>
+</table>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal('100%');
+});
+
+</script>
+<% end %>

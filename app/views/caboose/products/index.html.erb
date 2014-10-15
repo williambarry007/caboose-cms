@@ -1,0 +1,46 @@
+
+<div id="catalogue">
+	<div class="container">
+		<div class="row-fluid">
+			<div class="span12">
+				<ul class="breadcrumb">
+					<li><a href="/">Home</a><span class="divider">/</span></li>
+					
+					<% @category.ancestry.each do |c| %>
+						<% if c != @category %> 
+							<li><a href="<%= c.url %>"><%= c.name %></a> <span class="divider">/</span></li>
+						<% else %>
+							<li><a href="<%= c.url %>"><%= c.name %></a></li>
+						<% end %>
+					<% end %>
+				</ul>
+			</div>
+		</div>
+		
+		<div class="row-fluid">
+			<div class="span12">
+				<h2><%= @category.name %></h2>
+				<ul class="thumbs">
+					
+					<% if @category.children && @category.children.count > 0 %>
+						<% @category.children.each do |cat| %>
+							<% if cat.id != 32 && cat.products != [] %>
+								<%= render partial: 'category_thumb', locals: {category: cat} %>
+							<% end %>
+						<% end %>
+					<% end %>
+					
+					<% if @category.products && @category.products.count > 0 %>
+						<% @category.products.each do |p| %>
+						  <% if p.status == "Active" && p.variants != [] %>
+								<%= render partial: 'product_thumb', locals: {product: p} %>
+							<% end %>
+						<% end %>
+					<% end %>
+					
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+  

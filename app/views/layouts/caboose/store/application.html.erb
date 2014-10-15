@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tuskwear</title>
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+  <style>
+  
+  .span12, .span11, .span10, .span9, .span8, .span7, .span6, .span5, .span4, .span3, .span2, .span1 { width: 99% !important; }
+
+  @media all and (min-width: 650px) {
+  	  .span12 { width: 99.9468% !important; }
+	  .span11 { width: 91.3997% !important; }
+	  .span10 { width: 82.8527% !important; }
+	  .span9 { width: 74.3057% !important; }
+	  .span8 { width: 65.7587% !important; }
+	  .span7 { width: 57.2117% !important; }
+	  .span6 { width: 48.6647% !important; }
+	  .span5 { width: 40.1177% !important;}
+	  .span4 {width: 31.5707% !important;}
+	  .span3 { width: 23.0237% !important ;}
+	  .span2 { width: 14.4767% !important;}
+	  .span1 { width: 5.9297% !important; }
+  }
+  </style>
+</head>
+<body>
+
+<%= yield %>
+
+</body>
+</html>

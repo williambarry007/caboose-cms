@@ -1,0 +1,58 @@
+<h1>Unmatched Products</h1>
+
+<p style="margin: 0 0 6px"><a href="/admin/products">All Products</a></p>
+
+<br />
+<form method="get" action="/admin/products/add-upcs">
+	<select name="vendor_id">
+		<option value="">Choose Vendor</option>
+		
+		<% Caboose::Vendor.all.each do |vendor| %>
+			<option value="<%= vendor.id %>"
+				<%= 'selected' if params[:vendor_id] and params[:vendor_id].to_i == vendor.id %>
+			><%= vendor.name %></option>
+		<% end %>
+	</select>
+	
+	<input type="submit" value="Filter">
+</form><br />
+
+<% content_for :caboose_js do %>
+	<script>
+		$(document).ready(function() {
+			$('form').one('submit', function(event) {
+				event.preventDefault();
+				
+				// Prevent the form from being submitted by button click
+				$('form input[type=submit]').attr('disabled', true);
+				
+				// If the vendor id has a value send it through; otherwise reload the page
+				if ($('form select').val() != "") {
+					$('form').submit();
+				} else {
+					window.location.href = '/admin/products/add-upcs';
+				}
+			});
+		});
+	</script>
+<% end %>
+
+<% if @products.count > 0 %>
+	<table class='data' id='properties_table'>
+		<tr>
+			<th>ID</th>
+			<th>Title</th>
+			<th>Vendor</th>
+		</tr>
+		
+		<% @products.each do |product| %>
+			<tr onclick="window.location='/admin/products/<%= product.id %>/general';">
+				<td><%= raw product.id %></td>
+				<td><%= raw product.title %></td>
+				<td><%= raw product.vendor.nil? ? 'Unknown' : product.vendor.name %></td>
+			</tr>
+		<% end %>
+	</table>
+<% else %>
+  <p>There are no products right now.</p>
+<% end %>

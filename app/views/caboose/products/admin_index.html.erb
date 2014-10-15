@@ -1,0 +1,95 @@
+<h1>Products</h1>
+
+<p style="margin: 12px 0">
+  <a href="/admin/vendors/new">New Vendor</a>
+  <span style="margin: 0 3px">|</span>
+  <a href="/admin/products/new">New Product</a>
+  <span style="margin: 0 3px">|</span>
+  <a href="/admin/products/sort">Sort Products</a>
+</p>
+
+<div class="media">
+	<aside class="right">
+		<form action="/admin/products" method="get" id="search_form" style="margin: 0 0 12px">
+			<input type="text" name="search_like" placeholder="Title or Vendor Name" value="<%= params[:search_like] %>" style="width: 350px" />
+			<input type="submit" value="Search" />
+			<input type="button" value="Clear" onclick="window.location='/admin/products'" />
+			
+			<ul>
+				<li><p>Find products that have:</p></li>
+				<li><label><input name="filters[missing_prices]" type="checkbox" <%= 'checked="checked"' if params[:filters] && params[:filters][:missing_prices] %> /> Missing prices</label></li>
+				<li><label><input name="filters[missing_images]" type="checkbox" <%= 'checked="checked"' if params[:filters] && params[:filters][:missing_images] %> /> Missing images</label></li>
+				<li><label><input name="filters[no_vendor]" type="checkbox" <%= 'checked="checked"' if params[:filters] && params[:filters][:no_vendor] %> /> No vendor</label></li>
+			</ul>
+		</form>
+	</aside>
+	
+	<section>
+		<% if @products.count > 0 %>
+			<table class='data' id='properties_table'>
+				<tr>
+					<%= raw @gen.sortable_table_headings({
+						'id'     => 'ID',
+						'title'  => 'Title',
+						'vendor' => 'Vendor'
+					}) %>
+				</tr>
+		
+				<% @products.each do |p| %>
+					<tr onclick="window.location='/admin/products/<%= p.id %>/general';">
+						<td><%= raw p.id %></td>
+						<td><%= raw p.title %></td>
+						<td><%= raw p.vendor.nil? ? 'Unknown' : p.vendor.name %></td>    
+					</tr>
+				<% end %>
+			</table>
+	
+			<p><%= raw @gen.generate %></p>
+		<% else %>
+			<p>There are no products right now.</p>
+		<% end %>
+	</section>
+</div>
+
+<% content_for :caboose_css do %>
+	<style>
+		ul {
+			list-style-type: none;
+			padding: 0;
+		}
+		input[type=checkbox] {
+			height: 16px;
+			left: auto !important;
+			margin: 0 0 12px !important;
+			position: relative !important;
+			top: auto !important;
+		}
+		label { cursor: pointer; }
+		label input[type=checkbox] {
+			height: 15px !important;
+			left: auto !important;
+			margin: 12px 0 !important;
+			position: relative !important;
+			top: auto !important;
+		}
+		
+		.media,
+		.media > section { overflow: hidden; }
+		.media > aside {
+			float: left;
+			margin-right: 12px;
+		}
+		.media > aside.right {
+			float: right;
+			margin-left: 12px;
+		}
+	</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+	<script type='text/javascript'>
+		$(document).ready(function() { 
+		  var modal = new CabooseModal(800);
+		});
+	</script>
+<% end %>

@@ -1,0 +1,31 @@
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag "caboose/admin_products" %>
+<% end %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/admin_products" %>
+<% end %>
+
+<h1>Edit Product - <%= @product.title %></h1>
+<ul id='modal_tabs'>
+<%
+tabs = {
+  "/admin/products/#{@product.id}/general"      => 'Product details',
+  "/admin/products/#{@product.id}/description"  => 'Long Description',
+  "/admin/products/#{@product.id}/categories"   => 'Categories'
+}
+if @product.options && @product.options.count > 0
+  tabs["/admin/products/#{@product.id}/options"      ] = 'Options <span style="font-size: 65%">(size, color, style, etc.)</span>'
+end
+tabs["/admin/products/#{@product.id}/variants"     ] = 'Inventory & variants'
+tabs["/admin/products/#{@product.id}/images"       ] = 'Images'
+#tabs["/admin/products/#{@product.id}/seo"          ] = 'SEO'
+tabs["/admin/products/#{@product.id}/delete"       ] = 'Delete Product'
+
+%>
+<% tabs.each do |href,text| %>
+<li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
+<% end %>
+<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/products';" /></li>
+</ul>
+<div id='modal_content2'>

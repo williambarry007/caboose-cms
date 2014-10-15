@@ -1,0 +1,15 @@
+<h3>Checkout</h3>
+<%= render :partial => '/caboose/checkout/cart' %>
+
+<h2>Shipping Address</h2>
+<%= render :partial => '/caboose/checkout/shipping_address' %>
+
+<h2>Shipping Method</h2>
+<%= render :partial => '/caboose/checkout/shipping_method_form' %>
+
+<% content_for :caboose_css do %>
+	<style>
+		form#shipping-rates label { display: inline; }
+		form#shipping-rates input[type=submit] { margin-top: 12px; }
+	</style>
+<% end %>

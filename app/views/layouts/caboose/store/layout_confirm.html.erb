@@ -1,0 +1,85 @@
+<%= render 'layouts/header' %>
+<%= render 'layouts/banner' %>
+<div class="page-content">
+		<div class="container">
+			<div class="row-fluid">
+				<div class="span12">
+					<ul class="breadcrumb">
+					  <li><a href="#">Home</a> <span class="divider">/</span></li>
+					  <li class="active">Payment Confirmation</li>
+					</ul>
+				</div>
+			</div>
+			
+			<div class="row-fluid confirm">
+				<form class="form-horizontal" action="confirm.html" method="post">
+				<h3 class="t-center">Payment Confirmation</h3>
+				<hr>
+				<div class="control-group">
+					<label class="control-label">Invoice</label>
+					<div class="controls">
+					  <input type="text" class="span8" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Email address</label>
+					<div class="controls">
+					  <input type="email" class="span8" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Name</label>
+					<div class="controls">
+					  <input type="text" class="span8" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Phone number</label>
+					<div class="controls">
+					  <input type="text" class="span8" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Bill</label>
+					<div class="controls">
+					  <input type="text" class="span8" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Date</label>
+					<div class="controls">
+					  <input type="text" class="span8" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Time</label>
+					<div class="controls">
+					  <input type="text" class="span8" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Bank</label>
+					<div class="controls">
+					  <input type="text" class="span8" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Notes</label>
+					<div class="controls">
+					  <textarea class="span8" rows="8"></textarea>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Attach file</label>
+					<div class="controls">
+					  <input type="file" id="fileInput" class="input-file">
+					</div>
+				</div>
+				<div class="form-actions">
+					<input type="submit" value="Submit" class="btn btn-warning">
+			   </div>
+			</form>
+			</div>
+		</div>
+	</div>
+	<%= render 'layouts/footer' %>

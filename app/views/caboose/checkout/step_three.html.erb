@@ -1,0 +1,23 @@
+<div id="checkout">  
+  <h2>Checkout</h2>
+  <%= raw checkout_nav(3) %>
+  <section id="checkout-shipping">  
+    <div class="wrapper">      
+      <p>Please select how you would like your products to be delivered</p>
+        <% @rates.each do |rate| %>
+          <button class="blue" data-shipping-code="<%= rate[:service_code] %>" data-shipping-method="<%= rate[:service_name] %>">
+            <%= number_to_currency(rate[:total_price], :precision => 2) %><br /><%= rate[:service_name] %>
+          </button>
+        <% end %>
+      </select>
+    </div>    
+  </section>  
+  <section id="checkout-continue">
+    <div id='message'></div>        
+    <a href="/">return to the store</a>
+  </section>
+</div>
+                                    
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/modules/checkout_step3' %>
+<% end %>

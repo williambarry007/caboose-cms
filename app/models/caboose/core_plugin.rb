@@ -5,22 +5,8 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
         
     nav << { 'id' => 'logout'       , 'text' => 'Logout'     , 'href' => '/logout'     , 'modal' => false }    
     nav << { 'id' => 'my-account'   , 'text' => 'My Account' , 'href' => '/my-account' , 'modal' => true }
-        
-    #item = {
-    #  'id' => 'profile',
-    #  'text' => 'Profile',
-    #  'children' => []
-    #}    
-    #item['children'] << { 'id' => 'my-account'   , 'text' => 'Edit Profile' , 'href' => '/my-account' , 'modal' => false }
-    #item['children'] << { 'id' => 'logout'       , 'text' => 'Logout'       , 'href' => '/logout'     , 'modal' => false }    
-    #nav << item
     
-    item = {
-      'id' => 'core',
-      'text' => 'Settings',
-      'children' => []
-    }
-        
+    item = { 'id' => 'core', 'text' => 'Settings', 'children' => [] }        
     item['children'] << { 'id' => 'users'            , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'        , 'view')
     item['children'] << { 'id' => 'roles'            , 'text' => 'Roles'               , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'        , 'view')
     item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'         , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'  , 'view')
@@ -28,35 +14,27 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'blocktypes'       , 'text' => 'AB Test Variants'    , 'href' => '/admin/ab-variants'        , 'modal' => false } if user.is_allowed('abvariants'   , 'view')
     item['children'] << { 'id' => 'variables'        , 'text' => 'Variables'           , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'     , 'view')
     item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'         , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'   , 'view')
-    item['children'] << { 'id' => 'redirects'        , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'    , 'view')    
-        
+    item['children'] << { 'id' => 'redirects'        , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'    , 'view')            
+    nav << item if item['children'].count > 0
+    
+    item = { 'id' => 'content', 'text' => 'Content', 'children' => [] }    
+    item['children'] << { 'id' => 'pages'        , 'text' => 'Pages'       , 'href' => '/admin/pages'        , 'modal' => false } if user.is_allowed('pages'       , 'view')
+    item['children'] << { 'id' => 'posts'        , 'text' => 'Posts'       , 'href' => '/admin/posts'        , 'modal' => false } if user.is_allowed('posts'       , 'view')
     nav << item if item['children'].count > 0
     
     item = {
-      'id' => 'content',
-      'text' => 'Content',
+      'id'       => 'store',
+      'text'     => 'Store',
       'children' => []
-    }
-    
-    item['children'] << { 'id' => 'pages'        , 'text' => 'Pages'       , 'href' => '/admin/pages'        , 'modal' => false } if user.is_allowed('pages'       , 'view')
-    item['children'] << { 'id' => 'posts'        , 'text' => 'Posts'       , 'href' => '/admin/posts'        , 'modal' => false } if user.is_allowed('posts'       , 'view')
-    
-    nav << item if item['children'].count > 0        
+    }      
+    item['children'] << { 'id' => 'categories', 'href' => '/admin/categories' , 'text' => 'Categories'  , 'modal' => false } if user.is_allowed('categories' , 'view')
+    item['children'] << { 'id' => 'vendors'   , 'href' => '/admin/vendors'    , 'text' => 'Vendors'     , 'modal' => false } if user.is_allowed('vendors'    , 'view')
+    item['children'] << { 'id' => 'products'  , 'href' => '/admin/products'   , 'text' => 'Products'    , 'modal' => false } if user.is_allowed('products'   , 'view')
+    item['children'] << { 'id' => 'orders'    , 'href' => '/admin/orders'     , 'text' => 'Orders'      , 'modal' => false } if user.is_allowed('orders'     , 'view')    
+    nav << item if item['children'].count > 0
+                
     return nav
   end
-  
-  #def self.admin_js
-  #  return "
-  #    $('#use_redirect_urls').click(function() {
-  #      uru = $('#use_redirect_urls');
-  #      val = (uru.html() == 'Enable' ? 1 : 0);        
-  #      $.ajax({
-  #        url: '/admin/settings/toggle-redirect-urls',
-  #        data: 'val='+val,
-  #        succes: function(resp) { uri.html(val == 1 ? 'Disable' : 'Enable'); }
-  #      });
-  #    });"
-  #end
 
   def self.block_types(block_types)
     block_types << {

@@ -1,0 +1,10 @@
+<%= render 'layouts/header' %>
+
+	
+<% if (yield && yield.strip.length > 0) %>
+<%= yield %>
+<% elsif (!@page.nil?) %>
+<%= raw @page.content %>  
+<% end %>
+
+<%= render 'layouts/footer' %>

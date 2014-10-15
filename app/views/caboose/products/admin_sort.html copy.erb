@@ -1,0 +1,155 @@
+<h1>Sort Products</h1>
+
+<section>
+  <aside>
+    <ul id="source" class="sortable">
+      <% @products.each do |product| %>
+        <li id="<%= product.id %>"><%= product.title %></li>
+      <% end %>
+    </ul>
+    
+    <!-- <input name="filter" type="button" value="Filter" />
+    <input name="clear" type="button" value="Clear" /><br /> -->
+    <input name="search" type="search" placeholder="Search for Products" />
+    
+    <select class="filter" name="vendor">
+      <option value="">-- Filter by Vendor --</option>
+      
+      <% @vendors.each do |vendor| %>
+        <option value="<%= vendor.id %>"><%= vendor.name %></option>
+      <% end %>
+    </select>
+  </aside>
+  
+  <article>
+    <ul id="destination" class="sortable">
+      <% @products.each do |product| %>
+        <li id="<%= product.id %>"><%= product.title %></li>
+      <% end %>
+    </ul>
+    
+    <input id="submit" type="button" value="Apply" /><br />
+  </article>
+</section>
+
+<% content_for :caboose_js do %>
+  <%= javascript_include_tag('underscore') %>
+  <%= javascript_include_tag('caboose/jquery-ui') %>
+  <%= javascript_include_tag('caboose/jquery-ui-multisortable') %>
+  
+  <script>
+    
+    window.products = <%= @products.to_json.html_safe %>;
+    window.results  = window.products; // Used to store filtered results
+    
+    // Delay method
+    var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+    
+    // Filter
+    function filter(event) {
+      var search_string = $('input[name=search]').val()
+        , vendor_id     = $('select[name=vendor]').val();
+        
+      window.results = _.filter(window.products, function(product) {
+        return search_string && product.title.toUpperCase().indexOf(search_string.toUpperCase()) > -1 || vendor_id && product.vendor_id == vendor_id
+      });
+      
+      console.log(window.results);
+    }
+    
+    $(document).ready(function() {
+      
+      // Define lists
+      var $lists = $('ul.sortable')
+        , $source = $('ul#source')
+        , $destination = $('ul#destination');
+      
+      $source.multisortable({
+        start: function(event, ui) {
+          
+        },
+        
+        connectWith: $destination
+      });
+      
+      $destination.multisortable({
+        receive: function(event, ui) {
+          // $source.sortable('cancel');
+        }
+      });
+      
+      // Filter events
+      $('#filter').on('click', filter);
+      $('select').on('change', filter);
+      
+      $('input[type=search]').on('keyup', function(event) {
+        delay(function() { filter(event) }, 1000);
+      });
+    });
+  </script>
+<% end %>
+
+<% content_for :caboose_css do %>
+  <style>
+  
+    /* Layout */
+    
+    section,
+    section article { overflow: hidden; }
+    
+    section aside {
+      float: left;
+      margin-right: 12px;
+    }
+    
+    /* Filters */
+    
+    input[type=search], select {
+      box-sizing: border-box;
+      margin: 6px 0;
+      width: 350px;
+      outline: none !important;
+    }
+    input[type=search] { height: 42px; }
+    select { display: block; }
+    
+    input[type=button] {
+      background: #ccc;
+      cursor: pointer;
+      margin: 12px 0;
+      padding: 6px;
+      outline: none !important;
+    }
+    
+    /* Lists */
+    
+    ul.sortable {
+      border: 1px solid #ccc;
+      height: 250px;
+      list-style: none;
+      margin: 0;
+      overflow: scroll;
+      padding: 0;
+      width: 350px;
+    }
+    ul.sortable li {
+      box-sizing: border-box;
+      cursor: pointer;
+      cursor: grab;
+      overflow: hidden;
+      padding: 6px;
+      white-space: nowrap;
+      width: 100%;
+    }
+    ul.sortable li.selected {
+      background: #3e9aff;
+      color: #fff;
+    }
+  </style>
+<% end %>

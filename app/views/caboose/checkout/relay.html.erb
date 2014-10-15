@@ -1,0 +1,23 @@
+<!DOCTYPE>
+<html>
+  <body>
+    <% if Caboose::payment_processor == 'payscape' %>
+      <script type="text/javascript">
+        parent.relay_handler({
+          "success": <%= @success %>,
+          "message": "<%= @message %>"
+        });
+      </script>
+    <% end %>
+    
+    <% if Caboose::payment_processor == 'authorize.net' %>
+      <script>
+        parent.postMessage({
+          "success": <%= @success %>,
+          "message": "<%= @message %>"
+        }, "<%= Caboose::store_url %>");
+      </script>
+    <% end %>
+  </body>
+</html>
+

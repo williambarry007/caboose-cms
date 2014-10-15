@@ -1,0 +1,11 @@
+<h1>Categories</h1>
+<a href='/admin/categories/new'>New Category</a>
+<%= category_list %>
+
+<% content_for :caboose_js do %>
+	<script type='text/javascript'>
+		$(document).ready(function() { 
+		  var modal = new CabooseModal(800);
+		});
+	</script>
+<% end %>

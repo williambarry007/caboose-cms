@@ -1,0 +1,59 @@
+<%
+p = @product
+v = @variant
+%>
+<%= render :partial => 'caboose/products/admin_header' %>
+  
+<div id='variant_<%= v.id %>_sku'></div>
+<div id='variant_<%= v.id %>_barcode'></div>                
+<div id='variant_<%= v.id %>_price'></div>
+<div id='variant_<%= v.id %>_quantity_in_stock'></div>
+<div id='variant_<%= v.id %>_taxable'></div>
+<div id='variant_<%= v.id %>_requires_shipping'></div>     
+    
+<div id='dimensions_container' style='display: hidden;'>
+  <h2>Dimensions</h2>              
+  <div id='variant_<%= v.id %>_weight'></div>
+  <div id='variant_<%= v.id %>_length'></div>
+  <div id='variant_<%= v.id %>_width'></div>
+  <div id='variant_<%= v.id %>_height'></div>
+  <div id='variant_<%= v.id %>_cylinder'></div>
+</div>
+
+<div id='message'></div>
+
+<%= render :partial => 'caboose/products/admin_footer' %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "admin_products" %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Variant',
+    id: <%= v.id %>,
+    update_url: '/admin/variants/<%= v.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'sku'                 , nice_name: 'SKU'                , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.sku                 ) %>, width: 250 },                         
+      { name: 'barcode'             , nice_name: 'Barcode'            , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.barcode             ) %>, width: 250 }, 
+      { name: 'price'               , nice_name: 'Price'              , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.price               ) %>, width: 250 }, 
+      { name: 'quantity_in_stock'   , nice_name: 'Quantity'           , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.quantity_in_stock   ) %>, width: 250 }, 
+      { name: 'weight'              , nice_name: 'Weight (grams)'     , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.weight              ) %>, width: 200 }, 
+      { name: 'length'              , nice_name: 'Length (in)'        , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.length              ) %>, width: 200 }, 
+      { name: 'width'               , nice_name: 'Width (in)'         , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.width               ) %>, width: 200 }, 
+      { name: 'height'              , nice_name: 'Height (in)'        , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.height              ) %>, width: 200 }, 
+      { name: 'cylinder'            , nice_name: 'Cylinder'           , type: 'checkbox' , align_right: true, value: <%= raw Caboose.json(v.cylinder            ) %>, width: 200 }, 
+      { name: 'requires_shipping'   , nice_name: 'Requires shipping'  , type: 'checkbox' , align_right: true, value: <%= raw Caboose.json(v.requires_shipping   ) %>, width: 250 }, 
+      { name: 'taxable'             , nice_name: 'Taxable'            , type: 'checkbox' , align_right: true, value: <%= raw Caboose.json(v.taxable             ) %>, width: 250 }               
+    ]
+  });
+});
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
+<% end %>

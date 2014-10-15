@@ -84,6 +84,23 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :ab_variant_id , :integer ],
         [ :ab_option_id  , :integer ]
       ],
+      Caboose::Address => [
+        [ :name          , :string  ],
+        [ :first_name    , :string  ],
+        [ :last_name     , :string  ],
+        [ :street        , :string  ],
+        [ :address1      , :string  ],
+        [ :address2      , :string  ],
+        [ :company       , :string  ],
+        [ :city          , :string  ],
+        [ :state         , :string  ],
+        [ :province      , :string  ],
+        [ :province_code , :string  ],
+        [ :zip           , :string  ],
+        [ :country       , :string  ],
+        [ :country_code  , :string  ],
+        [ :phone         , :string  ]
+      ],
       Caboose::Asset => [
         [ :page_id        , :integer    ],
         [ :user_id        , :integer    ],
@@ -177,17 +194,64 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :repeat_count , :integer  ],
         [ :date_end     , :date     ]
       ],
+      Caboose::Category => [        
+        [ :parent_id             , :integer   ],
+        [ :name                  , :string    ],
+        [ :url                   , :string    ],
+        [ :slug                  , :string    ],
+        [ :status                , :string    ],
+        [ :image_file_name       , :string    ],
+        [ :image_content_type    , :string    ],
+        [ :image_file_size       , :integer   ],
+        [ :image_updated_at      , :datetime  ],
+        [ :square_offset_x       , :integer   ],
+        [ :square_offset_y       , :integer   ],
+        [ :square_scale_factor   , :numeric   ],
+        [ :sort_order            , :integer   ]
+      ],
+      Caboose::CategoryMembership => [        
+        [ :category_id           , :integer ],
+        [ :product_id            , :integer ]      
+      ],
+      Caboose::CustomizationMembership => [
+        [ :product_id       , :integer ],
+        [ :customization_id , :integer ]
+      ],
       Caboose::DatabaseSession => [
         [ :session_id  , :string   , :null => false ],
         [ :data        , :text                      ],
         [ :created_at  , :datetime , :null => true  ],
         [ :updated_at  , :datetime , :null => true  ]
       ],
+      Caboose::Discount => [
+        [ :name                  , :string   ],
+        [ :code                  , :string   ],
+        [ :amount_current        , :numeric  ],
+        [ :amount_total          , :numeric  ],
+        [ :amount_flat           , :numeric  ],
+        [ :amount_percentage     , :numeric  ],
+        [ :no_shipping           , :boolean  ],
+        [ :no_tax                , :boolean  ]
+      ],
       Caboose::Domain => [
         [ :site_id            , :integer ],
         [ :domain             , :string  ],
         [ :primary            , :boolean, { :default => false }],
         [ :under_construction , :boolean, { :default => false }]
+      ],
+      Caboose::LineItem => [
+        [ :order_id              , :integer  ],
+        [ :variant_id            , :integer  ],
+        [ :parent_id             , :integer  ],
+        [ :quantity              , :integer   , :default => 0 ],
+        [ :status                , :string   ],
+        [ :tracking_number       , :string   ],
+        #[ :unit_price            , :numeric  ],
+        [ :price                 , :numeric   , :default => 0 ],
+        [ :notes                 , :text     ],
+        [ :custom1               , :string   ],
+        [ :custom2               , :string   ],
+        [ :custom3               , :string   ]
       ],
       Caboose::MediaCategory => [
         [ :parent_id         , :integer ],
@@ -205,6 +269,46 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name              , :string     ],
         [ :description       , :text       ],
         [ :file              , :attachment ]
+      ],
+      Caboose::Order => [
+        [ :email                 , :string   ],
+        [ :order_number          , :string   ],
+        [ :subtotal              , :numeric   , :default => 0 ],
+        [ :tax                   , :numeric   , :default => 0 ],
+        [ :shipping              , :numeric   , :default => 0 ],
+        [ :handling              , :numeric   , :default => 0 ],
+        [ :discount              , :numeric   , :default => 0 ],
+        [ :total                 , :numeric   , :default => 0 ],
+        [ :customer_id           , :integer  ],
+        [ :payment_id            , :integer  ],
+        [ :gateway_id            , :integer  ],
+        [ :financial_status      , :string   ],
+        [ :shipping_address_id   , :integer  ],
+        [ :billing_address_id    , :integer  ],
+        [ :notes                 , :text     ],
+        [ :status                , :string   ],
+        [ :date_created          , :datetime ],
+        [ :date_authorized       , :datetime ],
+        [ :date_captured         , :datetime ],
+        [ :date_cancelled        , :datetime ],
+        [ :referring_site        , :text     ],
+        [ :landing_page          , :string   ],
+        [ :landing_page_ref      , :string   ],
+        [ :shipping_method       , :string   ],
+        [ :shipping_method_code  , :string   ],
+        [ :transaction_id        , :string   ],
+        [ :auth_code             , :string   ],
+        [ :alternate_id          , :integer  ],
+        [ :auth_amount           , :numeric  ],
+        [ :date_shipped          , :datetime ],
+        [ :transaction_id        , :string   ],
+        [ :transaction_service   , :string   ],
+        [ :amount_discounted     , :numeric  ],
+        [ :decremented           , :boolean  ]
+      ],
+      Caboose::OrderDiscount => [
+        [ :order_id              , :integer ],
+        [ :discount_id           , :integer ]
       ],
       Caboose::Page => [
         [ :site_id               , :integer ],
@@ -270,6 +374,51 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :post_id          , :integer ],
         [ :post_category_id , :integer ]
       ],
+      Caboose::Product => [
+        [ :alternate_id          , :string    ],
+        [ :title                 , :string    ],
+        [ :caption               , :string    ],
+        [ :description           , :text      ],
+        [ :handle                , :string    ],
+        [ :vendor_id             , :integer   ],
+        [ :option1               , :string    ],
+        [ :option2               , :string    ],
+        [ :option3               , :string    ],
+        [ :category_id           , :integer   ],
+        [ :status                , :string    ],
+        [ :default1              , :string    ],
+        [ :default2              , :string    ],
+        [ :default3              , :string    ],
+        [ :seo_title             , :string    ],
+        [ :seo_description       , :string    ],
+        [ :alternate_id          , :string    ],
+        [ :date_available        , :datetime  ],
+        [ :custom_input          , :text      ],
+        [ :sort_order            , :integer   ],
+        [ :featured              , :boolean   , :default => false ]
+      ],
+      Caboose::ProductImage => [
+        [ :product_id            , :integer  ],
+        [ :title                 , :string   ],
+        [ :position              , :integer  ],
+        [ :image_file_name       , :string   ],
+        [ :image_content_type    , :string   ],
+        [ :image_file_size       , :integer  ],
+        [ :image_updated_at      , :datetime ],
+        [ :square_offset_x       , :integer  ],
+        [ :square_offset_y       , :integer  ],
+        [ :square_scale_factor   , :numeric  ]
+      ],
+      Caboose::ProductImageVariant => [
+        [ :product_image_id      , :integer ],
+        [ :variant_id            , :integer ]
+      ],
+      Caboose::Review => [
+        [ :product_id            , :integer   ],
+        [ :content               , :string    ],
+        [ :name                  , :string    ],
+        [ :rating                , :decimal   ] 
+      ],
       Caboose::Role => [
         [ :parent_id            , :integer  ],
         [ :name                 , :string   ],
@@ -283,6 +432,18 @@ class Caboose::Schema < Caboose::Utilities::Schema
 	    	[ :role_id        , :integer ],
 	    	[ :permission_id  , :integer ]
 	    ],
+	    Caboose::SearchFilter => [
+        [ :url                   , :string   ],
+        [ :title_like            , :string   ],
+        [ :search_like           , :string   ],
+        [ :category_id           , :integer  ],
+        [ :category              , :text     ],
+        [ :vendors               , :text     ],
+        [ :option1               , :text     ],
+        [ :option2               , :text     ],
+        [ :option3               , :text     ],        
+        [ :prices                , :text     ] 
+      ],
       Caboose::Setting => [
         [ :name  , :string ],
         [ :value , :text   ]
@@ -325,7 +486,40 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :password_reset_sent  , :datetime   ],
         [ :token                , :string     ],
         [ :date_created         , :datetime   ],
-        [ :image                , :attachment ]
+        [ :image                , :attachment ],
+        [ :is_guest             , :boolean    , { :default => false }]
+      ],
+      Caboose::Variant => [
+        [ :sku                   , :string   ],
+        [ :barcode               , :string   ],
+        [ :price                 , :numeric   , :default => 0 ],
+        [ :available             , :boolean  ],
+        #[ :quantity_in_stock     , :integer  ],
+        [ :quantity              , :integer   , :default => 0 ],
+        [ :ignore_quantity       , :boolean  ],
+        [ :allow_backorder       , :boolean  ],
+        [ :weight                , :decimal  ],
+        [ :length                , :decimal  ],
+        [ :width                 , :decimal  ],
+        [ :height                , :decimal  ],
+        [ :cylinder              , :boolean  ],
+        [ :option1               , :string   ],
+        [ :option2               , :string   ],
+        [ :option3               , :string   ],
+        [ :requires_shipping     , :boolean  ],
+        [ :taxable               , :boolean  ],
+        [ :product_id            , :integer  ],
+        [ :shipping_unit_value   , :numeric  ],
+        [ :alternate_id          , :string   ],
+        [ :status                , :string   ],
+        [ :option1_sort_order    , :integer  , { :defult => 0 }],
+        [ :option2_sort_order    , :integer  , { :defult => 0 }],
+        [ :option3_sort_order    , :integer  , { :defult => 0 }],
+        [ :sort_order            , :integer  , { :defult => 0 }]
+      ],
+      Caboose::Vendor => [
+        [ :name   , :string ],
+        [ :status , :string, { default: 'Active' } ]
       ]
     }
 
@@ -482,6 +676,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::MediaCategory.create(:site_id => site.id, :name => 'Images') if cat.nil?
       cat = Caboose::MediaCategory.where("parent_id is null and site_id = ? and name = ?", site.id, 'Files').first
       Caboose::MediaCategory.create(:site_id => site.id, :name => 'Files') if cat.nil?
+    end
+    
+    # Make sure a default category exists for all products
+    if !Caboose::Category.exists?(1)
+      Caboose::Category.create({
+        :id   => 1,
+        :name => 'All Products',
+        :url  => '/products',
+        :slug => 'products'
+      })
     end
 
   end

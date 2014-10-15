@@ -1,0 +1,63 @@
+<%
+p = @product
+%>
+
+<%= render :partial => 'caboose/products/admin_header' %>
+
+<div id='options'>
+<% if p.option1 %><div id='option1_container'><h2><%= p.option1 %></h2><ul id='option1'><% p.option1_values.each do |option| %><li id='values_<%= option %>'><%= option %></li><% end %></ul></div><% end %>
+<% if p.option2 %><div id='option2_container'><h2><%= p.option2 %></h2><ul id='option2'><% p.option2_values.each do |option| %><li id='values_<%= option %>'><%= option %></li><% end %></ul></div><% end %>
+<% if p.option3 %><div id='option3_container'><h2><%= p.option3 %></h2><ul id='option3'><% p.option3_values.each do |option| %><li id='values_<%= option %>'><%= option %></li><% end %></ul></div><% end %>
+</div>                                                               
+
+<div id='message'></div>
+
+<%= render :partial => 'caboose/products/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#options div { width: 33%; float: left; }
+#options ul { margin: 0 10px 0 0; padding: 0; list-style: none; }
+#options li { margin: 0; padding: 4px 8px; list-style: none; border: #ccc 1px solid; }
+#message { clear: left; }
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {  
+  $('#option1').sortable({    
+    update: function(event, ui) {
+      $.ajax({
+        url: '/admin/products/<%= p.id %>/variants/option1-sort-order',
+        type: 'put',
+        data: $('#option1').sortable('serialize'),
+        success: function(resp) {}
+      });        
+    }    
+  });
+  $('#option2').sortable({    
+    update: function(event, ui) {
+      $.ajax({
+        url: '/admin/products/<%= p.id %>/variants/option2-sort-order',
+        type: 'put',
+        data: $('#option2').sortable('serialize'),
+        success: function(resp) {}
+      });        
+    }    
+  });
+  $('#option3').sortable({    
+    update: function(event, ui) {
+      $.ajax({
+        url: '/admin/products/<%= p.id %>/variants/option3-sort-order',
+        type: 'put',
+        data: $('#option3').sortable('serialize'),
+        success: function(resp) {}
+      });        
+    }    
+  });
+});
+
+</script>
+<% end %>

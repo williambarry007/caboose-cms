@@ -1,0 +1,75 @@
+<%
+p = @product    
+%>
+<%= render :partial => 'caboose/products/admin_header' %>
+
+<p class='note'>Check which columns you want to show in the list of variants.</p>
+<table>
+  <tr>
+    <td valign='top'>
+<div id='variantcol_1_option1'           ></div>
+<div id='variantcol_1_option2'           ></div>
+<div id='variantcol_1_option3'           ></div>
+    </td><td valign='top'>
+<div id='variantcol_1_status'            ></div>
+<div id='variantcol_1_sku'               ></div>          
+<div id='variantcol_1_barcode'           ></div>
+<div id='variantcol_1_price'             ></div>
+<div id='variantcol_1_quantity_in_stock' ></div>
+    </td><td valign='top'>
+<div id='variantcol_1_weight'            ></div>
+<div id='variantcol_1_length'            ></div>
+<div id='variantcol_1_width'             ></div>
+<div id='variantcol_1_height'            ></div>
+<div id='variantcol_1_cylinder'          ></div>
+    </td><td valign='top'>
+<div id='variantcol_1_requires_shipping' ></div>
+<div id='variantcol_1_allow_backorder'   ></div>
+<div id='variantcol_1_taxable'           ></div>
+    </td>
+  </tr>
+</table>
+<div id='message'></div>
+<p><input type='button' value='< Back' onclick="window.location='/admin/products/<%= p.id %>/variants';" /></p>
+
+<%= render :partial => 'caboose/products/admin_footer' %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  <% p.variants.each do |v| %>
+  new ModelBinder({
+    name: 'VariantCol',
+    id: 1,
+    update_url: '/admin/products/<%= p.id %>/variant-cols',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      <% if p.option1 %>{ name: 'option1' , nice_name: <%= raw Caboose.json(p.option1) %> , type: 'checkbox', align: 'right', value: <%= @cols['option1'          ] == true ? true : false %>, width: 150 },<% end %>
+      <% if p.option2 %>{ name: 'option2' , nice_name: <%= raw Caboose.json(p.option2) %> , type: 'checkbox', align: 'right', value: <%= @cols['option1'          ] == true ? true : false %>, width: 150 },<% end %>
+      <% if p.option3 %>{ name: 'option3' , nice_name: <%= raw Caboose.json(p.option3) %> , type: 'checkbox', align: 'right', value: <%= @cols['option1'          ] == true ? true : false %>, width: 150 },<% end %>
+      { name: 'status'                    , nice_name: 'Status'                           , type: 'checkbox', align: 'right', value: <%= @cols['status'           ] == true ? true : false %>, width: 150 },
+      { name: 'sku'                       , nice_name: 'SKU'                              , type: 'checkbox', align: 'right', value: <%= @cols['sku'              ] == true ? true : false %>, width: 150 },                         
+      { name: 'barcode'                   , nice_name: 'Barcode'                          , type: 'checkbox', align: 'right', value: <%= @cols['barcode'          ] == true ? true : false %>, width: 150 }, 
+      { name: 'price'                     , nice_name: 'Price'                            , type: 'checkbox', align: 'right', value: <%= @cols['price'            ] == true ? true : false %>, width: 150 }, 
+      { name: 'quantity_in_stock'         , nice_name: 'Quantity'                         , type: 'checkbox', align: 'right', value: <%= @cols['quantity_in_stock'] == true ? true : false %>, width: 150 }, 
+      { name: 'weight'                    , nice_name: 'Weight (grams)'                   , type: 'checkbox', align: 'right', value: <%= @cols['weight'           ] == true ? true : false %>, width: 175 }, 
+      { name: 'length'                    , nice_name: 'Length (in)'                      , type: 'checkbox', align: 'right', value: <%= @cols['length'           ] == true ? true : false %>, width: 175 }, 
+      { name: 'width'                     , nice_name: 'Width (in)'                       , type: 'checkbox', align: 'right', value: <%= @cols['width'            ] == true ? true : false %>, width: 175 }, 
+      { name: 'height'                    , nice_name: 'Height (in)'                      , type: 'checkbox', align: 'right', value: <%= @cols['height'           ] == true ? true : false %>, width: 175 }, 
+      { name: 'cylinder'                  , nice_name: 'Cylinder'                         , type: 'checkbox', align: 'right', value: <%= @cols['cylinder'         ] == true ? true : false %>, width: 175 }, 
+      { name: 'requires_shipping'         , nice_name: 'Requires shipping'                , type: 'checkbox', align: 'right', value: <%= @cols['requires_shipping'] == true ? true : false %>, width: 200 }, 
+      { name: 'taxable'                   , nice_name: 'Taxable'                          , type: 'checkbox', align: 'right', value: <%= @cols['taxable'          ] == true ? true : false %>, width: 200 },
+      { name: 'allow_backorder'           , nice_name: 'Allow backorder'                  , type: 'checkbox', align: 'right', value: <%= @cols['allow_backorder'  ] == true ? true : false %>, width: 200 }, 
+      
+    ]
+  });
+  <% end %>
+});
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
+<% end %>

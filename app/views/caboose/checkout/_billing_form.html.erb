@@ -1,0 +1,47 @@
+<% if @order.discounts.any? && @order.total < @order.discounts.first.amount_current %>
+  <p style="margin: 24px 0 0">Gift Card covers purchase.</p>
+  <button onclick="window.location='/checkout/discount'" style="margin: 12px 0 0">&lt; Back</button>
+  <button onclick="window.location='/checkout/authorize-by-gift-card'" style="margin: 12px 0 0">Continue &gt;</button>
+<% else %>
+  <input id="billing-amount" type="hidden" value="<%= @order.total %>" />
+
+  <form id="billing-form" action="<%= @form_url %>" method="post" target="payment-request">
+  	<input name="billing-cc-exp" type="hidden" value="01<%= DateTime.now.year.to_s[2..4] %>" />
+	
+  	<div>
+  		<label for="billing-number">Card number:</label>
+  		<input id="billing-number" type="text" name="billing-cc-number" maxlength="16" />
+  	</div>
+	
+  	<div>
+  		<label for="billing-expiration-month">Expiration:</label>
+  		<select id="billing-expiration-month">
+  			<option value="01">01 - Jan</option>
+  			<option value="02">02 - Feb</option>
+  			<option value="03">03 - Mar</option>
+  			<option value="04">04 - Apr</option>
+  			<option value="05">05 - May</option>
+  			<option value="06">06 - Jun</option>
+  			<option value="07">07 - Jul</option>
+  			<option value="08">08 - Aug</option>
+  			<option value="09">09 - Sep</option>
+  			<option value="10">10 - Oct</option>
+  			<option value="11">11 - Nov</option>
+  			<option value="12">12 - Dec</option>
+  		</select>
+  		/
+  		<select id="billing-expiration-year" name="exp_year">
+  			<% (DateTime.now.year...DateTime.now.year + 20).each do |i| %>
+  				<option value="<%= i-2000 %>"><%= i %></option>
+  			<% end %>
+  		</select>
+  	</div>
+	
+  	<input type="button" value="< Back" onclick="window.location='/checkout/discount';" />
+  	<input type="submit" value="Continue >" />
+  </form>
+
+  <p><a href="/checkout/discount"><%= if @order.discounts.any? then 'Update Gift Card' else 'Add Gift Card' end %></a></p>
+
+  <iframe style="display: none" id="payment-request" name="payment-request"></iframe>
+<% end %>

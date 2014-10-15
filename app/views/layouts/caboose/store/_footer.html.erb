@@ -1,0 +1,55 @@
+	<div id="footer">
+		<div class="container">
+			<div class="row-fluid">
+				<div class="span12">
+					<h3 style='color:white;'>Tuskwear</h3>
+					<p>The Southern Lifestyle of a True Fan &trade;</p>
+					<div class="icon">
+						 <span class="twitter"><a href="http://www.twitter.com/tuskwear" class="social-icon"><i class="icon-twitter"></i></a></span>
+					<!--	<span class="linkedin"><a href="#" class="social-icon"><i class="icon-linkedin"></i></a></span> -->
+						<span class="facebook"><a href="http://www.facebook.com/tuskwearcollection" class="social-icon"><i class="icon-facebook"></i></a></span>
+
+						<span class="pinterest"><a href="http://pinterest.com/tuskwear" class="social-icon"><i class="icon-pinterest"></i></a></span>
+					<!--	<span class="google"><a href="#" class="social-icon"><i class="icon-google-plus"></i></a></span> -->
+					</div>
+					<div class="sitemap">
+						<ul>
+							<li><a href="/">HOME</a></li>
+							<li><a href="/about-us">ABOUT</a></li>
+							<li><a href="/products">PRODUCTS</a></li>
+							<li><a href="/contact">CONTACT</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="copyright">
+		<div class="container">
+			<div class="row-fluid">
+				<div class="span12">
+					<small>Site loved by <a href='http://nine.is'><img src='https://dmwwflw4i3miv.cloudfront.net/nine_logo.png' alt="nine.is" style='width: 55px; margin: 0 0 5px 2px;'></a></small>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id='caboose-bottom'></div>
+
+<%= yield :js %>
+<% if flash[:notice] %>
+<script type="text/javascript">
+	alert('<%= flash[:notice] %>');
+</script>
+<% end %>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-44242650-1', 'tuskwearcollection.com');
+ga('send', 'pageview');
+</script>
+</body>
+</html>

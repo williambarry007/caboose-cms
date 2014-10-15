@@ -1,0 +1,184 @@
+<h1>Group Variants</h1>
+
+<button id="toggle-filter">Toggle Filters</button>
+
+<div class="sidebar">
+	<aside>
+		<form id="filters" action="/admin/variants/group" method="get">
+			<h4><label for="title">Title</label></h4>
+			<input id="title" name="title" type="text" />
+			
+			<h4><label for="categories">Categories</label></h4>
+			<input id="category-filter" type="text" />
+			<select id="categories" name="category_ids[]" multiple>
+				<% @categories.each do |category| %>
+					<% next if category.name.nil? or category.name.empty? %>
+					<option value="<%= category.id %>"><%= category.url.gsub('/products/', '') %></option>
+				<% end %>
+			</select>
+			
+			<h4><label for="vendors">Vendors</label><h4>
+			<input id="vendor-filter" type="text" />
+			<select id="vendors" name="vendor_ids[]" multiple>
+				<% @vendors.each do |vendor| %>
+					<% next if vendor.name.nil? or vendor.name.empty? %>
+					<option value="<%= vendor.id %>"><%= vendor.name %></option>
+				<% end %>
+			</select>
+			
+			<fieldset>
+				<input type="button" value="Clear" />
+				<input type="submit" value="Filter" />
+			</fieldset>
+		</form>
+	</aside>
+	
+	<secton>
+		<h4>Variants</h4>
+		
+		<% if @variants.any? %>
+			<form id="variants" action="/admin/variants/group" method="post">
+				<fieldset>
+					<% @variants.each do |variant| %>
+						<label>
+							<input type="checkbox" value="<%= variant.id %>" />
+							<%= variant.product.name %>
+						</label>
+					<% end %>
+				</fieldset>
+			</form>
+		<% else %>
+			<p>No variants to show.</p>
+		<% end %>
+	</section>
+</div>
+
+<% content_for :caboose_css do %>
+	<style>
+		
+		/**
+		 * Sidebar
+		 */
+		
+		.sidebar,
+		.sidebar > section { overflow: hidden; }
+		
+		.sidebar > aside {
+			float: left;
+			margin-right: 12px;
+			width: 300px;
+		}
+		
+		/**
+		 * Forms
+		 */
+		
+		form#filters {
+			display: none;
+			margin: 24px 0;
+		}
+		
+		form#filters select {
+			height: 500px;
+			padding: 6px;
+		}
+		
+		form#filters label,
+		form#filters input[type=text],
+		form#filters select {
+			box-sizing: border-box;
+			display: block;
+			outline: none !important;
+			width: 100%;
+		}
+		
+		form#filters label + input,
+		form#filters input + label,
+		form#filters label + select,
+		form#filters select + label { margin: 12px 0 0; }
+		
+		input#category-filter,
+		input#vendor-filter { border-bottom: none; }
+		
+		form#filters fieldset {
+			border: none;
+			margin: 12px 0;
+			padding: 0;
+		}
+	</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+	<%= javascript_include_tag 'underscore' %>
+	
+	<script>
+		window.count      = <%= @variants.count %>;
+		window.categories = <%= @categories.collect { |category| "#{category.id}:#{category.url.gsub('/products/', '')}" }.compact.to_json.html_safe %>;
+		window.vendors    = <%= @vendors.collect { |vendor| "#{vendor.id}:#{vendor.name}" unless vendor.name.nil? or vendor.name.empty? }.compact.to_json.html_safe %>;
+		
+		$(document).ready(function() {
+			$('#toggle-filters').on('click', toggle_filters);
+			$('#category-filter').on('keyup', filter_categories);
+			$('#vendor-filter').on('keyup', filter_vendors);
+			if (window.count == 0) toggle_filters();
+		});
+		
+		function toggle_filters() {
+			$('form#filters').toggle();
+		}
+		
+		function filter_categories() {
+			var $categories = $('#categories');
+			
+			// Get value to test against from input
+			var string = $('#category-filter').val().toLowerCase();
+			
+			// Filter category names
+			var filtered_categories = _.filter(window.categories, function(category) { return category.toLowerCase().indexOf(string) != -1; });
+			
+			// Empty category select box
+			$categories.empty();
+			
+			// Append filtered category names
+			_.each(filtered_categories, function(category) {
+				var $option = $(document.createElement('option'))
+					, id      = category.split(':')[0]
+					, name    = category.split(':')[1];
+					
+				// Set attributes
+				$option.val(id);
+				$option.text(name);
+				
+				// Append to select
+				$categories.append($option);
+			});
+		}
+		
+		function filter_vendors() {
+			var $vendors = $('#vendors');
+			
+			// Get value to test against from input
+			var string = $('#vendor-filter').val().toLowerCase();
+			
+			// Filter vendor names
+			var filtered_vendors = _.filter(window.vendors, function(vendor) { return vendor.toLowerCase().indexOf(string) != -1; });
+			
+			// Empty vendor select box
+			$vendors.empty();
+			
+			// Append filtered vendor names
+			_.each(filtered_vendors, function(vendor) {
+				var $option = $(document.createElement('option'))
+					, id      = vendor.split(':')[0]
+					, name    = vendor.split(':')[1];
+					
+				// Set attributes
+				$option.val(id);
+				$option.text(name);
+				
+				// Append to select
+				$vendors.append($option);
+			});
+		}
+	</script>
+<% end %>

@@ -1,0 +1,38 @@
+<%= render 'layouts/header' %>
+<%= render 'layouts/banner' %>
+<div class="page-content contact">
+		<div class="container">
+			<div class="row-fluid">
+				<div class="span12">
+					<ul class="breadcrumb">
+					  <li><a href="#">Home</a> <span class="divider">/</span></li>
+					  <li class="active">Contact Us</li>
+					</ul>
+				</div>
+			</div>
+			
+			<div class="row-fluid">
+				<div class="span12 t-center">
+					<h3>Lorem ipsum dolor sit amet</h3>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque. Sed pharetra nibh eget orci convallis at posuere leo convallis. Sed blandit augue vitae augue scelerisque bibendum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque. Sed pharetra nibh eget orci convallis at posuere leo convallis. Sed blandit augue vitae augue scelerisque bibendum.</p>
+				</div>
+			</div>
+			<div class="row-fluid padd20-top-btm">
+				<div class="span5">
+					<h3>send message</h3>
+					<form method="post" action="contact.html">
+					<input type="text" name="name" class="span12" placeholder="Enter your name" required>
+					<input type="email" name="email" class="span12" placeholder="Enter your mail" required>
+					<input type="text" name="subject" class="span12" placeholder="Enter your subject" required>
+				</div>
+				<div class="span7">
+					<textarea name="message" class="span12" rows="10" placeholder="Type your message" required></textarea>
+					<input type="submit" name="submit" value="Send Message" class="btn btn-warning btn-block btn-large">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="maps"></div>
+<%= render 'layouts/footer' %>

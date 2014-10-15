@@ -1,0 +1,8 @@
+<div class="wrapper">
+  <div id="cart"></div>
+</div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/modules/cart' %>
+<%= javascript_include_tag 'caboose/modules/product' %>
+<% end %>

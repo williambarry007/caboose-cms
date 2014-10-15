@@ -73,6 +73,51 @@ module Caboose
 
   # Login layout
   mattr_accessor :login_layout
-  @@login_layout = 'caboose/modal'  
+  @@login_layout = 'caboose/modal'
+
+  # Whether or not to use the store
+  mattr_accessor :use_store
+  @@use_store = false
+  
+  # The root URL for the store
+  mattr_accessor :store_url
+  @@store_url = ''
+  
+  # The payment processor details
+  mattr_accessor :payment_processor
+  @@payment_processor = {
+    :name => 'stripe',
+    :api_key => '',
+    :username => '',
+    :password => ''
+  }    
+  
+  # Store shipping details
+  mattr_accessor :store_shipping
+  @@store_shipping = {
+    :ups    => { :username => '', :password => '', :key => '' },  
+    :usps   => { :username => 'avondalebrewing', :password => 'Missfancy2011', :key => '' },  
+    :origin => { :country  => '', :state => '', :city => '', :zip => '' },
+    :allowed_shipping_method_codes => [],
+    :default_shipping_method_code => ''  
+  }
+  
+  # Who gets the email when an order is received
+  mattr_accessor :store_fulfillment_email
+  @@store_fulfillment_email = ''
+  
+  # Who gets the email when an order is ready to be shipped
+  mattr_accessor :store_shipping_email
+  @@store_shipping_email = ''
+  
+  mattr_accessor :store_contact_email
+  @@store_contact_email = ''
+  
+  # How much to charge for handling (of the order subtotal)
+  mattr_accessor :store_handling_percentage
+  @@store_handling_percentage = ''
+  
+  mattr_accessor :from_address  
+  @@from_address = ''
   
 end

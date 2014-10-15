@@ -1,0 +1,43 @@
+<h3>Checkout2</h3>
+<%= render :partial => '/caboose/checkout/cart' %>
+<%= render :partial => '/caboose/checkout/address_form' %>
+
+<% content_for :caboose_css do %>
+<style>
+
+/* Table */
+
+table#cart { border-collapse: collapse; }
+table#cart td { border: #666 1px dotted; padding: 4px 8px; }
+table#cart th { font-weight: bold; text-align: center; }
+
+/* Form */
+
+form#address {
+  overflow: hidden;
+  width: 100%;
+}
+
+form#address label {
+  display: inline-block;
+  margin-right: 12px;
+  min-width: 100px;
+  text-align: right;
+}
+form#address input { width: 200px; }
+
+form#address fieldset {
+  width: 100%;
+  min-width: 320px;
+}
+form#address fieldset#billing { display: none; }
+
+@media all and (min-width: 768px) {
+  form#address fieldset {
+    float: left;
+    width: 50%;
+  }
+}
+
+</style>
+<% end %>

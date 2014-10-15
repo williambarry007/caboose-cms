@@ -1,0 +1,433 @@
+<% content_for :caboose_css do %>
+	<style>
+		
+		/**
+		 * Sidebar
+		 */
+		
+		.sidebar { padding: 0 12px; }
+		.sidebar, .sidebar > section { overflow: hidden; }
+		
+		.sidebar > aside {
+			float: left;
+			margin-right: 12px;
+			width: 300px;
+		}
+		
+		/**
+		 * Media
+		 */
+		
+		.media, .media > section { overflow: hidden; }
+		
+		.media > aside {
+			float: left;
+			margin-right: 6px;
+		}	
+		
+		/**
+		 * Forms
+		 */
+		
+		form { overflow: hidden; }
+		form *, button { outline: none !important; }
+		button { cursor: pointer; }
+		
+		/* filters */
+		
+		form#filters { display: none; }
+		
+		form#filters fieldset {
+			border: none;
+			margin: 12px 0;
+			padding: 0;
+		}
+		
+		form#filters select {
+			height: 350px;
+			padding: 6px;
+		}
+		
+		form#filters label,
+		form#filters input[type=text],
+		form#filters select {
+			box-sizing: border-box;
+			display: block;
+			width: 100%;
+		}
+		
+		form#filters label + input,
+		form#filters input + label,
+		form#filters label + select,
+		form#filters select + label { margin: 12px 0 0; }
+		
+		input#category-filter,
+		input#vendor-filter { border-bottom: none; }
+		
+		/*select#categories.filtered option { display: none; }
+		select#categories.filtered option.show { display: block; }*/
+		
+		/* variants */
+		
+		form#variants fieldset {
+			border: none;
+			margin: 0;
+			padding: 0;
+		}
+		form#variants fieldset + fieldset { margin: 24px 0 0; }
+		
+		form#variants label {
+			background: #eee;
+			display: block;
+			margin: 0 0 12px;
+			padding: 12px;
+		}
+		form#variants label,
+		form#variants label * { cursor: pointer; }
+		
+		form#variants input[type=checkbox] {
+			height: 16px;
+			left: auto;
+			position: relative;
+			top: auto;
+		}
+		
+		form#variants ul.info {
+			font-size: 12px;
+			list-style-type: none;
+			padding: 0 0 0 12px;
+		}
+		
+		form#variants ul.info li { margin: 0 0 6px; }
+		
+	</style>
+<% end %>
+
+<%= render partial: 'caboose/products/admin_header' %>
+
+<button id="toggle-filters">Toggle Filters</button>
+<button id="toggle-info">Toggle Variant Info</button>
+
+<div class="sidebar">
+	<aside>
+		<form id="filters" action="/admin/products/<%= @product.id %>/variants/group" method="get">
+			<h4><label for="title">Title</label></h4>
+			<input id="title" name="title" type="text" />
+			
+			<h4><label for="categories">Categories</label></h4>
+			<input id="category-filter" type="text" autocomplete="off" />
+			<select id="categories" name="category_ids[]" multiple>
+				
+				<% @categories.each do |category| %>
+					<option value="<%= category.id %>"
+						<%= 'selected="selected"' if params[:category_ids] and params[:category_ids].include?(category.id.to_s) %>
+					><%= category.url.gsub('/products/', '') %></option>
+				<% end %>
+			</select>
+			
+			<h4><label for="vendors">Vendors</label><h4>
+			<input id="vendor-filter" type="text" autocomplete="off" />
+			<select id="vendors" name="vendor_ids[]" multiple>
+				<% @vendors.each do |vendor| %>
+					<option value="<%= vendor.id %>"
+						<%= 'selected="selected"' if params[:vendor_ids] and params[:vendor_ids].include?(vendor.id.to_s) %>
+					><%= vendor.name %></option>
+				<% end %>
+			</select>
+			
+			<fieldset>
+				<input id="clear" type="button" value="Clear" />
+				<input type="submit" value="Filter" />
+			</fieldset>
+		</form>
+	</aside>
+	
+	<section>
+		<h4>Variants</h4>
+		
+		<% if @variants.any? %>
+			<form id="variants" action="/admin/products/<%= @product.id %>/variants/add" method="post" data-product-id="<%= @product.id %>">
+				<fieldset>
+					<input class="remove" type="button" value="Remove these variants" />
+					<input class="check" type="button" value="Toggle Variants" />
+					<input type="submit" value="Add To Product" />
+				</fieldset>
+				
+				<fieldset>
+					<% @variants.each do |variant| %>
+						<label>
+							<div class="media">
+								<aside><input name="variant_ids[]" type="checkbox" value="<%= variant.id %>" /></aside>
+								
+								<section>
+									<%= variant.product.title %>
+									
+									<ul class="info">
+										<li><strong>SKU:</strong> <%= variant.sku %></li>
+										<li><strong>Vendor:</strong> <%= variant.product.vendor.name %></li>
+										
+										<% if variant.option1 %>
+											<li><strong><%= variant.product.option1 %>:</strong> <%= variant.option1 %></li>
+										<% end %>
+										
+										<% if variant.option2 %>
+											<li><strong><%= variant.product.option2 %>:</strong> <%= variant.option2 %></li>
+										<% end %>
+										
+										<% if variant.option3 %>
+											<li><strong><%= variant.product.option3 %>:</strong> <%= variant.option3 %></li>
+										<% end %>
+									</ul>
+								</section>
+							</div>
+						</label>
+					<% end %>
+				</fieldset>
+				
+				<fieldset>
+					<input class="remove" type="button" value="Remove these variants" />
+					<input class="check" type="button" value="Toggle Variants" />
+					<input type="submit" value="Add To Product" />
+				</fieldset>
+			</form>
+		<% else %>
+			<p>No variants to show.</p>
+		<% end %>
+	</section>
+</div>
+
+<%= render partial: 'caboose/products/admin_footer' %>
+
+<% content_for :caboose_js do %>
+	<%= javascript_include_tag 'underscore' %>
+	
+	<script>
+		window.count = <%= @variants.count %>;
+		
+		// Define categories
+		window.categories = <%= @categories.collect { |category|
+			{ id: category.id.to_s, url: category.url.gsub('/products/', ''), selected: false }
+		}.compact.to_json.html_safe %>;
+		
+		// Define vendors
+		window.vendors = <%= @vendors.collect { |vendor|
+			{ id: vendor.id.to_s, name: vendor.name, selected: false }
+		}.compact.to_json.html_safe %>;
+		
+		$(document).ready(function() {
+			
+			// Events
+			$('form#variants').on('submit', check_for_variants);
+			$('button#toggle-filters').on('click', toggle_filters);
+			$(document).on('click', '#categories option', persist_categories);
+			$(document).on('click', '#vendors option', persist_vendors);
+			$('input#category-filter').on('keyup', filter_categories);
+			$('input#vendor-filter').on('keyup', filter_vendors);
+			$('form#filters input#clear').on('click', clear_filters);
+			$('button#toggle-info').on('click', toggle_variant_info);
+			$('form#variants input.remove').on('click', remove_variants);
+			$('form#variants input.check').on('click', toggle_variants);
+			
+			// Show filters if there are no variants
+			if (window.count == 0) toggle_filters();
+			
+			// Check for filters to persist initially
+			
+			$('#categories option:selected').each(function(value, option) {
+				window.categories[ _.indexOf(_.pluck(window.categories, 'id'), $(this).val()) ].selected = true;
+			});
+			
+			$('#vendors option:selected').each(function(value, option) {
+				window.vendors[ _.indexOf(_.pluck(window.vendors, 'id'), $(this).val()) ].selected = true;
+			});
+		});
+		
+		// submit form#variants
+		function check_for_variants(event) {
+			event.preventDefault();
+			
+			var $form = $('form#variants');
+			
+			if ($('input:checked', $form).length) {
+				$form.off('submit').submit();
+			} else {
+				alert('No variants selected');
+			}
+		}
+		
+		// click button#toggle
+		function toggle_filters() {
+			$('form#filters').toggle();
+		}
+		
+		// click #categories option
+		function persist_categories() {
+			var selected_ids          = _.map($('#categories option:selected'), function(option) { return option.value })
+				, persisted_categories  = _.where(window.categories, {selected: true})
+				, clicked_id            = $(this).val()
+				, clicked_selected      = $(this).prop('selected');
+				
+			// Make sure the clicked_id is in the selected_ids selected or no
+			// It will be disabled if the selected status is false
+			if (!_.contains(selected_ids, clicked_id)) selected_ids.push(clicked_id);
+			
+			// Set the selected status
+			_.each(persisted_categories, function(category) {
+				
+				// Only change the selected status if it's listed on the page; for usability
+				if ($('#categories option[value=' + category.id + ']').length) {
+					category.selected = _.contains(selected_ids, category.id);
+				}
+			});
+			
+			// For each selected ID set the selected status
+			_.each(selected_ids, function(id) {
+				var selected = id == clicked_id ? clicked_selected : true;
+				window.categories[ _.indexOf(_.pluck(window.categories, 'id'), id) ].selected = selected;
+			});
+		}
+		
+		// click #vendors option
+		function persist_vendors() {
+			var selected_ids      = _.map($('#vendors option:selected'), function(option) { return option.value })
+				, persisted_vendors = _.where(window.vendors, {selected: true})
+				, clicked_id        = $(this).val()
+				, clicked_selected  = $(this).prop('selected');
+			
+			// Make sure the clicked_id is in the selected_ids selected or no
+			// It will be disabled if the selected status is false
+			if (!_.contains(selected_ids, clicked_id)) selected_ids.push(clicked_id);
+			
+			// Set the selected status
+			_.each(persisted_vendors, function(vendor) {
+				
+				// Only change the selected status if it's listed on the page; for usability
+				if ($('#vendors option[value=' + vendor.id + ']').length) {
+					vendor.selected = _.contains(selected_ids, vendor.id);
+				}
+			});
+			
+			// For each selected ID set the selected status
+			_.each(selected_ids, function(id) {
+				var selected = id == clicked_id ? clicked_selected : true;
+				window.vendors[ _.indexOf(_.pluck(window.vendors, 'id'), id) ].selected = selected;
+			});
+		}
+		
+		// keyup #category-filter
+		function filter_categories() {
+			var $categories = $('#categories');
+			
+			// Get value to test against from input
+			var string = $('#category-filter').val().toLowerCase();
+			
+			// Filter category names
+			var filtered_categories = _.filter(window.categories, function(category) {
+				return category.url.toLowerCase().indexOf(string) != -1;
+			});
+			
+			// Empty category select box
+			$categories.empty();
+			
+			// Append filtered category names
+			_.each(filtered_categories, function(category) {
+				var $option = $('<option/>');
+				
+				// Add value and text
+				$option.val(category.id);
+				$option.text(category.url);
+				
+				// Mark as selected if it was persisted
+				if (category.selected) $option.attr('selected', 'selected');
+				
+				// Append to container
+				$categories.append($option);
+			});
+		}
+		
+		// keyup #vendor-filter
+		function filter_vendors() {
+			var $vendors = $('#vendors');
+			
+			// Get value to test against from input
+			var string = $('#vendor-filter').val().toLowerCase();
+			
+			// Filter category names
+			var filtered_vendors = _.filter(window.vendors, function(vendor) {
+				return vendor.name.toLowerCase().indexOf(string) != -1;
+			});
+			
+			// Empty category select box
+			$vendors.empty();
+			
+			// Append filtered category names
+			_.each(filtered_vendors, function(vendor) {
+				var $option = $('<option/>');
+				
+				// Add value and text
+				$option.val(vendor.id);
+				$option.text(vendor.name);
+				
+				// Mark as selected if it was persisted
+				if (vendor.selected) $option.attr('selected', 'selected');
+				
+				// Append to container
+				$vendors.append($option);
+			});
+		}
+		
+		// form#filters input#clear
+		function clear_filters() {
+			var $filters = $('form#fitlers');
+			
+			// Clear all textboxes
+			$('form#filters input[type=text]').val('');
+			
+			// Clear all selects
+			$('form#filters option:selected').removeAttr('selected');
+			
+			// Clear persisted options
+			_.each(window.categories, function(category) { category.selected = false });
+			_.each(window.vendors, function(vendor) { vendor.selected = false });
+		}
+		
+		// click button#toggle-info
+		function toggle_variant_info() {
+			$('ul.info').toggle();
+		}
+		
+		// click form#variants input.check
+		function toggle_variants() {
+			var $variants = $('form#variants input[type=checkbox]:checked');
+			
+			// If there are checked checkboxes, uncheck them; Otherwise, check everything
+			if ($variants.length > 0) {
+				$variants.prop('checked', false)
+			} else {
+				$('form#variants input[type=checkbox]').prop('checked', true);
+			}
+		}
+		
+		// click form#variants input.remove
+		function remove_variants() {
+			var confirmed = confirm('Are you sure you want remove these items?');
+			
+			if (confirmed) {
+				var $variants = $('form#variants input[type=checkbox]:checked');
+				
+				if ($variants.length > 0) {
+					$.ajax({
+						type: 'post',
+						url: '/admin/products/' + $('form#variants').data('product-id') + '/variants/remove',
+						data: $('form#variants').serialize(),
+						success: function(response) {
+							console.log('foobar');
+						}
+					})
+				} else {
+					alert('No variants selected');
+				}
+			}
+		}
+	</script>
+<% end %>

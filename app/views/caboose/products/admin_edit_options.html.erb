@@ -1,0 +1,51 @@
+<%
+p = @product
+has_options = p.options && p.options.count > 0
+may_delete1 = p.variants.collect{|v| v.option1 }.uniq.count == 1
+may_delete2 = p.variants.collect{|v| v.option2 }.uniq.count == 1
+may_delete3 = p.variants.collect{|v| v.option3 }.uniq.count == 1
+%>
+<%= render :partial => 'caboose/products/admin_header' %>
+
+<p class='note' style='font-size: 85%; font-weight: normal; line-height: 140%;'>Product options allow you to present a group of similar products as a single 
+product to the end user.  Common options include color, size, and style.  
+But an option can be anything.  So for example, you could create a "Sleave" option for 
+shirts that are either long or short sleeved.  Or you could create a "Tip" option 
+for chopsticks that are either rounded or squared at the tip.  It's up to you.</p>
+
+<table>
+<tr><td><div id='product_<%= p.id %>_option1'></div></td><td><div id='product_<%= p.id %>_default1'></div></td></tr>
+<tr><td><div id='product_<%= p.id %>_option2'></div></td><td><div id='product_<%= p.id %>_default2'></div></td></tr>
+<tr><td><div id='product_<%= p.id %>_option3'></div></td><td><div id='product_<%= p.id %>_default3'></div></td></tr>
+</table>
+
+<div id='message'></div>
+
+<%= render :partial => 'caboose/products/admin_footer' %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Product',
+    id: <%= p.id %>,
+    update_url: '/admin/products/<%= p.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'option1'  , nice_name: 'Option 1'      , type: 'text', value: <%= raw Caboose.json(p.option1)  %>, width: 250, fixed_placeholder: true },                         
+      { name: 'option2'  , nice_name: 'Option 2'      , type: 'text', value: <%= raw Caboose.json(p.option2)  %>, width: 250, fixed_placeholder: true }, 
+      { name: 'option3'  , nice_name: 'Option 3'      , type: 'text', value: <%= raw Caboose.json(p.option3)  %>, width: 250, fixed_placeholder: true },
+      { name: 'default1' , nice_name: 'Default value' , type: 'text', value: <%= raw Caboose.json(p.default1) %>, width: 285, fixed_placeholder: true },                         
+      { name: 'default2' , nice_name: 'Default value' , type: 'text', value: <%= raw Caboose.json(p.default2) %>, width: 285, fixed_placeholder: true }, 
+      { name: 'default3' , nice_name: 'Default value' , type: 'text', value: <%= raw Caboose.json(p.default3) %>, width: 285, fixed_placeholder: true } 
+    ]
+  });
+});
+
+</script>
+<% end %>

@@ -1,0 +1,111 @@
+<% if logged_in? %>
+	<form action="/checkout/shipping" method="post" id="address">
+		<section>
+			<fieldset id="shipping">
+				<h3>Shipping Address</h3>
+			
+				<table>
+					<div>
+						<label for="shipping-first-name">First Name:</label>
+						<input id="shipping-first-name" name="shipping[first_name]" type="text" value="<%= @order.shipping_address.first_name if @order.shipping_address %>" />
+					</div>
+				
+					<div>
+						<label for="shipping-last-name">Last Name:</label>
+						<input id="shipping-last-name" name="shipping[last_name]" type="text" value="<%= @order.shipping_address.last_name if @order.shipping_address %>" />
+					</div>
+				
+					<div>
+						<label for="shipping-company">Company:</label>
+						<input id="shipping-company" name="shipping[company]" type="text" value="<%= @order.shipping_address.company if @order.shipping_address and @order.shipping_address.company %>" />
+					</div>
+				
+					<div>
+						<label for="shipping-address1">Address 1:</label>
+						<input id="shipping-address1" name="shipping[address1]" type="text" value="<%= @order.shipping_address.address1 if @order.shipping_address %>" />
+					</div>
+				
+					<div>
+						<label for="shipping-address2">Address 2:</label>
+						<input id="shipping-address2" name="shipping[address2]" type="text" value="<%= @order.shipping_address.address2 if @order.shipping_address %>" />
+					</div>
+				
+					<div>
+						<label for="shipping-city">City:</label>
+						<input id="shipping-city" name="shipping[city]" type="text" value="<%= @order.shipping_address.city if @order.shipping_address %>" />
+					</div>
+				
+					<div>
+						<label for="shipping-state">State:</label>
+						<select id="shipping-state" name="shipping[state]">
+							<% Caboose::States.all.each do |abbr, name| %>
+								<option value="<%= abbr %>"><%= name %></option>
+							<% end %>
+						</select>
+					</div>
+				
+					<div>
+						<label for="shipping-zip">Zip:</label>
+						<input id="shipping-zip" name="shipping[zip]" type="text" value="<%= @order.shipping_address.zip if @order.shipping_address %>" />
+					</div>
+				
+					<label>Use as billing:</label>
+					<input id="use-as-billing" name="shipping[use_as_billing]" type="checkbox" checked />
+				</table>
+			</fieldset>
+		
+			<fieldset id="billing">
+				<h3>Billing Address</h3>
+			
+				<table>
+					<div>
+						<label for="billing-first-name">First Name:</label>
+						<input id="billing-first-name" name="billing[first_name]" type="text" value="<%= @order.billing_address.first_name if @order.billing_address %>" />
+					</div>
+				
+					<div>
+						<label for="billing-last-name">Last Name:</label>
+						<input id="billing-last-name" name="billing[last_name]" type="text" value="<%= @order.billing_address.last_name if @order.billing_address %>" />
+					</div>
+				
+					<div>
+						<label for="billing-company">Company:</label>
+						<input id="billing-company" name="billing[company]" type="text" value="<%= @order.billing_address.company if @order.billing_address and @order.billing_address.company %>" />
+					</div>
+				
+					<div>
+						<label for="billing-address1">Address 1:</label>
+						<input id="billing-address1" name="billing[address1]" type="text" value="<%= @order.billing_address.address1 if @order.billing_address %>" />
+					</div>
+				
+					<div>
+						<label for="billing-address2">Address 2:</label>
+						<input id="billing-address2" name="billing[address2]" type="text" value="<%= @order.billing_address.address2 if @order.billing_address %>" />
+					</div>
+				
+					<div>
+						<label for="billing-city">City:</label>
+						<input id="billing-city" name="billing[city]" type="text" value="<%= @order.billing_address.city if @order.billing_address %>" />
+					</div>
+				
+					<div>
+						<label for="">State:</label>
+						<select name="billing[state]">
+							<% Caboose::States.all.each do |abbr, name| %>
+								<option value="<%= abbr %>"><%= name %></option>
+							<% end %>
+						</select>
+					</div>
+				
+					<div>
+						<label for="">Zip:</label>
+						<input id="billing-zip" name="billing[zip]" type="text" value="<%= @order.billing_address.zip if @order.billing_address %>" />
+					</div>
+				</table>
+			</fieldset>
+		</section>
+		
+		<div id="message"></div>
+		<input type="submit" value="Continue >" />
+	</form>
+<% end %>

@@ -15,5 +15,13 @@ module Caboose
       return 0
     end
     
+    def active_products
+      Caboose::Product.active
+    end
+    
+    def caboose_sort_options
+      render :partial => '/caboose/products/sort_options'
+    end
+    
   end
 end

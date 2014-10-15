@@ -1,0 +1,30 @@
+<h1>Vendors</h1>
+
+<p><a href="/admin/vendors/new">New Vendor</a></p>
+
+<form action="/admin/vendors" method="get" style="margin: 0 0 12px">
+  <input name="name_like" value="<%= params[:name_like] %>" placeholder="Search for vendor" />
+  <input type="submit" value="Search" />
+</form>
+
+<% if @vendors.count > 0 %>
+  <table class="data" style="width: 350px">
+    <tr>
+      <%= raw @pager.sortable_table_headings({
+        'id'     => 'ID',
+        'name'  => 'Name'
+      }) %>
+    </tr>
+    
+    <% @vendors.each do |vendor| %>
+      <tr onclick="window.location='/admin/vendors/<%= vendor.id %>/edit';">
+        <td style="text-align: center"><%= raw vendor.id %></td>
+        <td><%= raw vendor.name %></td>
+      </tr>
+    <% end %>
+  </table>
+  
+  <p><%= raw @pager.generate %></p>
+<% else %>
+  <p>There are no products right now.</p>
+<% end %>

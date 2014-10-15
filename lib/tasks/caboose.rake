@@ -162,4 +162,16 @@ namespace :assets do
 
   end
   
+  desc "Fix variant sort order"
+  task :set_variant_sort_order => :environment do
+    Caboose::Product.all.each do |p|
+      puts "Setting sort order for product #{p.id}..."
+      i = 1
+      Caboose::Variant.where(:product_id => p.id).reorder(:id).all.each do |v|
+        v.update_attribute('sort_order', i)
+        i = i + 1
+      end
+    end
+  end
+  
 end

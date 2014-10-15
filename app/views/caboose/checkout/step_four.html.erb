@@ -1,0 +1,93 @@
+<div id="checkout">
+  <h2>Checkout</h2>
+  <%= raw checkout_nav(4) %>
+  <%= render :partial => 'caboose/checkout/confirm' %>  
+  <section id="checkout-payment">  
+    <div class="wrapper">      
+      <% if Caboose::payment_processor == 'authorize.net' %>
+        <form id="payment" target="relay" action="<%= Caboose::PaymentProcessor.form_url(@order) %>" method="post">
+          <%= sim_fields(@sim_transaction) %>
+          
+          <label>Card Number</label>
+          <input name="x_card_num" type="text" maxlength="16" />
+          <!--<br />
+          <label>Security Code</label><br />
+          <input id="x_card_code" name="x_card_code" type="text" />-->
+          <br />          
+          
+          <label>Expiration</label>
+          <input id="expiration" name="x_exp_date" type="hidden" />
+          <select id="month" name="month">                                      
+            <option value="01">01 - Jan</option>
+            <option value="02">02 - Feb</option>
+            <option value="03">03 - Mar</option>
+            <option value="04">04 - Apr</option>
+            <option value="05">05 - May</option>
+            <option value="06">06 - Jun</option>
+            <option value="07">07 - Jul</option>
+            <option value="08">08 - Aug</option>
+            <option value="09">09 - Sep</option>
+            <option value="10">10 - Oct</option>
+            <option value="11">11 - Nov</option>
+            <option value="12">12 - Dec</option>
+          </select>
+          /
+          <select id="year" name="year">
+            <% (DateTime.now.year...DateTime.now.year + 20).each do |i| %>
+              <option value="<%= i-2000 %>"><%= i %></option>
+            <% end %>
+          </select><br />
+          <br />
+          <input type="submit" value="Submit" />
+        </form>
+      <% end %>
+                              
+      <% if Caboose::payment_processor == 'payscape' %>
+        <form id="payment" action="<%= @form_url %>" method="post" target="relay">
+          <input id="billing-amount" type="hidden" value="<%= @order.total %>" />
+          <input id="expiration" name="billing-cc-exp" type="hidden" />          
+          <div>
+            <label for="billing-cc-number">Card number:</label>
+            <input id="billing-cc-number" name="billing-cc-number" type="text" maxlength="16" />
+          </div>          
+          <div>
+            <label for="billing-expiration-month">Expiration:</label>
+            <select name="month">
+              <option value="01">01 - Jan</option>
+              <option value="02">02 - Feb</option>
+              <option value="03">03 - Mar</option>
+              <option value="04">04 - Apr</option>
+              <option value="05">05 - May</option>
+              <option value="06">06 - Jun</option>
+              <option value="07">07 - Jul</option>
+              <option value="08">08 - Aug</option>
+              <option value="09">09 - Sep</option>
+              <option value="10">10 - Oct</option>
+              <option value="11">11 - Nov</option>
+              <option value="12">12 - Dec</option>
+            </select>
+            /
+            <select name="year">
+              <% (DateTime.now.year...DateTime.now.year + 20).each do |i| %>
+                <option value="<%= i-2000 %>"><%= i %></option>
+              <% end %>
+            </select>
+          </div>
+          
+          <!--<input type="submit" value="Submit" />-->
+        </form>
+      <% end %>
+    </div>    
+  </section>
+  <section id="checkout-continue">
+    <div id='message'></div>
+    <button class="blue">Continue</button>
+    <em>or</em>
+    <a href="/">return to the store</a>
+  </section>
+  <iframe id="relay" name="relay"></iframe>
+</div>
+
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/modules/checkout_step4' %>
+<% end %>

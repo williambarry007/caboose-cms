@@ -1,0 +1,38 @@
+<%
+p = @product
+%>
+<%= render :partial => 'caboose/products/admin_header' %>
+<div id='message'><%= raw flash[:message] ? flash[:message] : "" %></div>
+
+<p><div id='product_<%= p.id %>_description'></div></p>
+
+<%= render :partial => 'caboose/products/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Product',
+    id: <%= p.id %>,
+    update_url: '/admin/products/<%= p.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [{
+      name: 'description',
+      nice_name: 'Description',
+      type: 'richtext',
+      value: <%= raw Caboose.json(p.description) %>,
+      width: 500 
+    }]
+  });
+});
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
+<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+<%= tinymce :caboose, :width => '575px', :height => '240px' %>
+<% end %>

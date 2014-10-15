@@ -1,0 +1,53 @@
+<div class="wrapper">
+  <form  action="/checkout/address" method="put">
+    <section>
+      <fieldset id="shipping">
+        <h3>Shipping Address</h3>
+        <label><span>First Name</span> <input name="shipping[first_name]" type="text" value="<%= shippingAddress ? shippingAddress.first_name : "" %>" /></label>
+        <label><span>Last Name</span> <input name="shipping[last_name]" type="text" value="<%= shippingAddress ? shippingAddress.last_name : "" %>" /></label>
+        <label><span>Company</span> <input name="shipping[company]" type="text" value="<%= shippingAddress ? shippingAddress.company : "" %>" /></label>
+        <label><span>Address 1</span> <input name="shipping[address1]" type="text" value="<%= shippingAddress ? shippingAddress.address1 : "" %>" /></label>
+        <label><span>Address 2</span> <input name="shipping[address2]" type="text" value="<%= shippingAddress ? shippingAddress.address2 : "" %>" /></label>
+        <label><span>City</span> <input name="shipping[city]" type="text" value="<%= shippingAddress ? shippingAddress.city : "" %>" /></label>
+        
+        <label>
+          <span>State</span>
+          
+          <select name="shipping[state]">
+            <% _.each(states, function(state, abbr) { %>
+              <option value="<%= abbr %>" <%= shippingAddress && shippingAddress.state == abbr ? 'selected' : "" %>><%= state %></option>
+            <% }); %>
+          </select>
+        </label>
+        
+        <label><span>Zip</span> <input name="shipping[zip]" type="text" value="<%= shippingAddress ? shippingAddress.zip : "" %>" /></label>
+        <label><input name="use_as_billing" type="checkbox" value="false" /> Use as billing address</label>
+      </fieldset>
+    </section>
+    
+    <section>
+      <fieldset id="billing">
+        <h3>Billing Address</h3>
+        <label><span>First Name</span> <input name="billing[first_name]" type="text" value="<%= billingAddress ? billingAddress.first_name : "" %>" /></label>
+        <label><span>Last Name</span> <input name="billing[last_name]" type="text" value="<%= billingAddress ? billingAddress.last_name : "" %>" /></label>
+        <label><span>Company</span> <input name="billing[company]" type="text" value="<%= billingAddress ? billingAddress.company : "" %>" /></label>
+        <label><span>Address 1</span> <input name="billing[address1]" type="text" value="<%= billingAddress ? billingAddress.address1 : "" %>" /></label>
+        <label><span>Address 2</span> <input name="billing[address2]" type="text" value="<%= billingAddress ? billingAddress.address2 : "" %>" /></label>
+        <label><span>City</span> <input name="billing[city]" type="text" value="<%= billingAddress ? billingAddress.city : "" %>" /></label>
+        
+        <label>
+          <span>State</span>
+          
+          <select name="billing[state]">
+            <% _.each(states, function(state, abbr) { %>
+              <option value="<%= abbr %>" <%= billingAddress && billingAddress.state == abbr ? 'selected' : "" %>><%= state %></option>
+            <% }); %>
+          </select>
+        </label>
+        
+        <label><span>Zip</span> <input name="billing[zip]" type="text" value="<%= billingAddress ? billingAddress.zip : "" %>" /></label>
+      </fieldset>
+    </section>
+  </form>
+</div>
+

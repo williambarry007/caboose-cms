@@ -1,0 +1,68 @@
+<%
+p = @product
+v = @variant    
+%>
+<%= render :partial => 'caboose/products/admin_header' %>
+
+<p style='font-size: 75%;'><a href='/admin/products/<%= p.id %>/options'>Need options like color or size?</a></p>
+
+<table>
+  <tr>
+    <td valign='top'>
+<div id='variant_<%= v.id %>_alternate_id'       ></div>
+<div id='variant_<%= v.id %>_sku'                ></div>
+<div id='variant_<%= v.id %>_barcode'            ></div>                
+<div id='variant_<%= v.id %>_price'              ></div>
+<div id='variant_<%= v.id %>_quantity_in_stock'  ></div>
+<div id='variant_<%= v.id %>_allow_backorder'    ></div>
+<div id='variant_<%= v.id %>_taxable'            ></div>
+    </td><td valign='top'>
+<div id='variant_<%= v.id %>_status'             ></div>
+<div id='variant_<%= v.id %>_requires_shipping'  ></div>
+<div id='variant_<%= v.id %>_weight'             ></div>
+<div id='variant_<%= v.id %>_cylinder'           ></div>
+<div id='variant_<%= v.id %>_length'             ></div>
+<div id='variant_<%= v.id %>_width'              ></div>
+<div id='variant_<%= v.id %>_height'             ></div>
+    </td>
+  </tr>
+</table>
+<div id='message'></div>
+
+<%= render :partial => 'caboose/products/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Variant',
+    id: <%= v.id %>,
+    update_url: '/admin/variants/<%= v.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'status'                    , nice_name: 'Status'                           , type: 'select'   , align: 'right' , value: <%= raw Caboose.json(v.status                     ) %>, text: <%= raw Caboose.json(v.status) %>, width: 250, options_url: '/admin/variants/status-options' },
+      { name: 'alternate_id'              , nice_name: 'Alternate ID'                     , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.alternate_id               ) %>, width: 250 },
+      { name: 'sku'                       , nice_name: 'SKU'                              , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.sku                        ) %>, width: 250 },                         
+      { name: 'barcode'                   , nice_name: 'Barcode'                          , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.barcode                    ) %>, width: 250 }, 
+      { name: 'price'                     , nice_name: 'Price'                            , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(sprintf("%.2f", v.price || 0 ) ) %>, width: 250 }, 
+      { name: 'quantity_in_stock'         , nice_name: 'Quantity'                         , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.quantity_in_stock          ) %>, width: 250 }, 
+      { name: 'weight'                    , nice_name: 'Weight (grams)'                   , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.weight                     ) %>, width: 250 }, 
+      { name: 'length'                    , nice_name: 'Length (in)'                      , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.length                     ) %>, width: 250 }, 
+      { name: 'width'                     , nice_name: 'Width (in)'                       , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.width                      ) %>, width: 250 }, 
+      { name: 'height'                    , nice_name: 'Height (in)'                      , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.height                     ) %>, width: 250 }, 
+      { name: 'cylinder'                  , nice_name: 'Cylinder'                         , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.cylinder                   ) %>, width: 250 }, 
+      { name: 'requires_shipping'         , nice_name: 'Requires shipping'                , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.requires_shipping          ) %>, width: 250 }, 
+      { name: 'taxable'                   , nice_name: 'Taxable'                          , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.taxable                    ) %>, width: 250 },
+      { name: 'allow_backorder'           , nice_name: 'Allow backorder'                  , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.allow_backorder            ) %>, width: 250 }             
+    ]
+  });
+});
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
+<% end %>

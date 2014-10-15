@@ -77,6 +77,7 @@ module Caboose
     require 'jquery-rails'    
     initializer 'caboose.assets.precompile' do |app|            
       app.config.assets.precompile += [      
+        
         # Images
         'caboose/caboose_logo_small.png',
         'caboose/caboose_nav_black.png',
@@ -88,12 +89,21 @@ module Caboose
         'caboose/loading_small_white_on_black.gif',
         'caboose/loading_white_on_black.gif',
         'caboose/search.png',
+        
         # Javascript
         'caboose/admin_block_edit.js',
+        'caboose/admin_images_index.js',
         'caboose/admin_page_edit_content.js',
         'caboose/admin_page_new_blocks.js',
+        'caboose/admin_products.js',
         'caboose/admin.js',
         'caboose/application.js',
+        'caboose/cart.js',
+        'caboose/checkout_step1.js',
+        'caboose/checkout_step2.js',
+        'caboose/checkout_step3.js',
+        'caboose/checkout_step4.js',   
+        'caboose/main.js',
         'caboose/modal_integration.js',
         'caboose/modal.js',
         'caboose/model/all.js',
@@ -109,6 +119,7 @@ module Caboose
         'caboose/model/bound_text.js',
         'caboose/model/bound_textarea.js',
         'caboose/model/class.js',
+        'caboose/model/index_table.js',
         'caboose/model/model_binder.js',
         'caboose/model/model.js',
         'caboose/model/s3.js',
@@ -125,7 +136,8 @@ module Caboose
         'caboose/jquery.detect.js',
         'caboose/model/s3.js',
         'caboose/model/bound_s3_image.js',
-        'caboose/model/bound_file.js',        
+        'caboose/model/bound_file.js',
+        'caboose/product.js',        
         'jquery.js',        
         'jquery_ujs.js',
         'jquery-ui.js',
@@ -174,6 +186,10 @@ module Caboose
         'caboose/model_binder.css',
         'colorbox-rails/colorbox-rails.css',        
         'caboose/admin_page_edit_content.css',
+        'caboose/admin_crumbtrail.css',
+        'caboose/admin_images_index.css',
+        'caboose/admin_main.css',
+        'caboose/admin_page_edit_content.css',        
         'caboose/admin.css',
         'caboose/application.css',
         'caboose/bound_input.css',
@@ -184,8 +200,11 @@ module Caboose
         'caboose/icomoon_fonts.css',
         'caboose/login.css',
         'caboose/modal.css',
+        'caboose/model_binder.css',        
         'caboose/page_bar_generator.css',
+        'caboose/print.css',
         'caboose/register.css',
+        'caboose/responsive.css',
         'caboose/station_modal.css',
         'caboose/station_sidebar.css',
         'caboose/tinymce.css',
@@ -198,3 +217,22 @@ module Caboose
     end   
   end
 end
+    
+#initializer 'caboose_store.payment_processor', :after => :finish_hook do |app|
+#  case Caboose::payment_processor
+#    when 'authorize.net'
+#      Caboose::PaymentProcessor = Caboose::PaymentProcessors::Authorizenet
+#    when 'payscape'
+#      Caboose::PaymentProcessor = Caboose::PaymentProcessors::Payscape
+#  end
+#end
+#
+#initializer 'caboose_store.cart', :after => :finish_hook do |app|
+#  ActiveSupport.on_load(:action_controller) do
+#    include Caboose::BootStrapper
+#  end
+#  
+#  Caboose::User.class_eval do
+#    self.primary_key = :id
+#  end
+#end

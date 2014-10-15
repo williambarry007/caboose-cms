@@ -1,0 +1,35 @@
+<% p = @product %>
+
+<div class="page-content">
+  <div class="container">
+    <div class="row-fluid">
+      <div class="span12">
+        <ul class="breadcrumb">
+          <li><a href="/">Home</a>
+            <% if p.categories[1] %>
+              <span class="divider">/</span></li>
+              <% p.categories[1].ancestry.each do |c| %>
+                <% if c != p.categories[1] %> 
+                  <li><a href="<%= c.url %>"><%= c.name %></a> <span class="divider">/</span></li>
+                <% else %>
+                  <li><a href="<%= c.url %>"><%= c.name %></a></li>
+                <% end %>
+              <% end %>
+            <% else %>
+              </li>
+            <% end %>
+        </ul>
+      </div>
+    </div>    
+    <div class="row-fluid">
+      <div class="span12 single-item">
+        <div class="row-fluid">            
+          <div class="span7">
+            <h3><%= p.title %></h3>
+            <p>This product is not currently available.</p>              
+          </div>
+        </div>                    
+      </div>        
+    </div>
+  </div>
+</div>

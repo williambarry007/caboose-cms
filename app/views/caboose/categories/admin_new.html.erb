@@ -1,0 +1,62 @@
+<h1>New Category</h1>
+
+<form action="/admin/categories" method="post" id="new_form">
+	<!-- <select name="parent_id">
+	  <option value="">-- Parent Category --</option>
+	  <%=
+		#raw categories_options(@root_category)
+		%>
+	</select> -->
+		
+	<%= category_select('parent_id') %>
+	
+	<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
+	<input type="text" name="name" placeholder="Category Name" />
+	
+	<div id="message"></div>
+	
+	<input type="button" value="< Back" onclick="window.location='/admin/categories';" />
+	<input type="submit" value="Add Category" onclick="add_category(); return false" />
+</form>
+
+<% content_for :caboose_css do %>
+	<style>
+		form { width: 400px; }
+		form input[type=text], select { width: 100%; }
+		form input[type=text] {
+			box-sizing: border-box;
+			margin: 12px 0;
+			height: 42px;
+			line-height: 42px;
+		}
+		select,
+		form input[type=button],
+		form input[type=submit] { cursor: pointer; }
+	</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+	<%= javascript_include_tag "caboose/model/all" %>
+	
+	<script type='text/javascript'>
+		function add_category() {
+			modal.autosize("<p class='loading'>Adding category...</p>");
+			
+			$.ajax({
+				url: '/admin/categories',
+				type: 'post',
+				data: $('#new_form').serialize(),
+				success: function(resp) {
+					if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
+					if (resp.redirect) window.location = resp.redirect    
+				}
+			});
+		}
+		
+		var modal = false;
+		
+		$(window).load(function() {
+			modal = new CabooseModal(800);
+		});
+	</script>
+<% end %>

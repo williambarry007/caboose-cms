@@ -53,7 +53,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :repeat_sat    , 
         :repeat_start  , 
         :repeat_end        
-      ] 
+      ],
+      Caboose::Variant => [:quantity]
     }
   end
 
@@ -494,8 +495,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :barcode               , :string   ],
         [ :price                 , :numeric   , :default => 0 ],
         [ :available             , :boolean  ],
-        #[ :quantity_in_stock     , :integer  ],
-        [ :quantity              , :integer   , :default => 0 ],
+        [ :quantity_in_stock     , :integer   , :default => 0 ],        
         [ :ignore_quantity       , :boolean  ],
         [ :allow_backorder       , :boolean  ],
         [ :weight                , :decimal  ],

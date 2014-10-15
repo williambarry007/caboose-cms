@@ -41,8 +41,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 3.2.13"
   s.add_dependency "underscore-rails"
   s.add_dependency "jquery-rails", "~> 3.1.1"
-  s.add_dependency "jquery-ui-rails", "~> 5.0.0"  
-  #s.add_dependency "activesupport", "= 3.2.19"
+  s.add_dependency "jquery-ui-rails", "~> 5.0.0"    
   s.add_dependency "tinymce-rails"
   s.add_dependency "trollop"
   s.add_dependency "colorbox-rails", "~> 0.1.2"
@@ -51,6 +50,13 @@ Gem::Specification.new do |s|
   s.add_dependency "ejs"
   s.add_dependency "httparty"
   s.add_dependency "authorize-net"
-  #s.add_dependency "sass-rails"
-  
+  s.add_dependency "prawn"    
+  #s.add_dependency "aws-sdk"
+  s.add_dependency "active_shipping"
+  #s.add_dependency "oauth"
+  #s.add_dependency "roxml"
+  s.add_dependency "nokogiri"
+  #s.add_dependency "spreadsheet"
+  #s.add_dependency "thin"
+
 end

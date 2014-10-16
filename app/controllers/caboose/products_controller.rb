@@ -323,7 +323,7 @@ module Caboose
       })
       render :json => {
         :pager => pager,
-        :models => pager.items.as_json(:includes => [:vendor, :categories])
+        :models => pager.items
       }      
     end
     
@@ -348,7 +348,7 @@ module Caboose
     # GET /admin/products/:id/json
     def admin_json_single
       p = Product.find(params[:id])
-      render :json => p.as_json(:includes => [:vendor, :categories])
+      render :json => p      
     end
     
     # GET /admin/products/:id/general

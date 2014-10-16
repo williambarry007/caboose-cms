@@ -63,6 +63,8 @@ module Caboose
     
     def as_json(options={})
       self.attributes.merge({
+        :vendor => self.vendor,
+        :categories => self.categories,
         :variants => self.variants,
         :images => self.product_images
       })

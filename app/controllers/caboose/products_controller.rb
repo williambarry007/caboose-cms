@@ -106,19 +106,25 @@ module Caboose
       }
     end
     
+    #=============================================================================
+    # API actions
+    #=============================================================================
+    
     # GET /api/products
-    def api_list
+    def api_index
       render :json => Product.where(:status => 'Active')
     end
     
     # GET /api/products/:id
     def api_details
-      render :json => Product.find(params[:id])
+      p = Product.where(:id => params[:id]).first
+      render :json => p ? p : { :error => 'Invalid product ID' }
     end
     
     # GET /api/products/:id/variants
     def api_variants
-      render :json => Product.find(params[:id]).variants
+      p = Product.where(:id => params[:id]).first
+      render :json => p ? p.variants : { :error => 'Invalid product ID' }
     end
     
     #=============================================================================

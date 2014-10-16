@@ -372,8 +372,12 @@ Caboose::Engine.routes.draw do
   delete  "/admin/orders/:id"                         => "orders#admin_delete"
 	
   # API
-  get "caboose/block-types"       => "block_types#api_block_type_list"
-  get "caboose/block-types/:name" => "block_types#api_block_type"
+  get "/api/products"               => "products#api_index"
+  get "/api/products/:id"           => "products#api_details"
+  get "/api/products/:id/variants"  => "products#api_variants"
+  
+  get "caboose/block-types"         => "block_types#api_block_type_list"
+  get "caboose/block-types/:name"   => "block_types#api_block_type"
         
   match '*path' => 'pages#show'
   root :to => 'pages#show'

@@ -108,12 +108,13 @@ $(window).load(function() {
   keep_modal_autosized();
 });
 
+var autosize_count = 0;
 function keep_modal_autosized()
-{  
-  if (modal) 
-    modal.autosize();
-  else
-    modal = new CabooseModal(800);
+{
+  if (autosize_count > 3) return;
+  if (modal) modal.autosize();
+  else modal = new CabooseModal(800);
+  autosize_count = autosize_count + 1;
   setTimeout(function() { keep_modal_autosized(); }, 1000);
 }
 

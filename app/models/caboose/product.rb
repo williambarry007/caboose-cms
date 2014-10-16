@@ -141,5 +141,25 @@ module Caboose
     def option3_values
       self.variants.where(:status => 'Active').reorder(:option3_sort_order).pluck(:option3).uniq.reject { |x| x.nil? || x.empty? }
     end
+    
+    def toggle_category(cat_id, value)            
+      if value.to_i > 0 # Add to category                   
+        if cat_id == 'all'
+          CategoryMembership.where(:product_id => self.id).destroy_all      
+          Category.reorder(:name).all.each{ |cat| CategoryMembership.create(:product_id => self.id, :category_id => cat.id) }                          
+        else
+          if !CategoryMembership.where(:product_id => self.id, :category_id => cat_id.to_i).exists?
+            CategoryMembership.create(:product_id => self.id, :category_id => cat_id.to_i)
+          end      
+        end
+      else # Remove from category    
+        if cat_id == 'all'
+          CategoryMembership.where(:product_id => self.id).destroy_all                          
+        else
+          CategoryMembership.where(:product_id => self.id, :category_id => cat_id.to_i).destroy_all      
+        end
+      end
+    end
+    
   end
 end

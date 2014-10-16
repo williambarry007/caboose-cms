@@ -72,7 +72,8 @@ IndexTable.prototype = {
   //============================================================================
   
   models: [],
-  model_ids: [],  
+  model_ids: [],
+  quick_edit_field: false, // The field currently being edited
   quick_edit_model_id: false, // The id of the model currently being edited  
   refresh_count: 0,  
   pager: {
@@ -267,7 +268,29 @@ IndexTable.prototype = {
         .append(controls);        
       $('#' + that.container + '_columns').hide();
     }    
-
+        
+    if (that.quick_edit_field)
+    {
+      $.each(that.models, function(i, m) {
+        $.each(that.fields, function(j, field) {
+          if (field.show && field.name == that.quick_edit_field)
+          {            
+            var attrib = $.extend({}, field);
+            attrib['value'] = field.value(m);
+            attrib['fixed_placeholder'] = false;
+            //if (field.text)
+            //  attrib['text'] = field.text(m);
+            new ModelBinder({
+              name: 'Model',
+              id: m.id,
+              update_url: that.update_url(m.id),
+              authenticity_token: that.form_authenticity_token,
+              attributes: [attrib]              
+            });
+          }
+        });
+      });
+    }
     if (that.quick_edit_model_id)
     {      
       var m = that.model_for_id(that.quick_edit_model_id);
@@ -308,15 +331,15 @@ IndexTable.prototype = {
           desc: (that.pager.options.sort == s ? (parseInt(that.pager.options.desc) == 1 ? '0' : '1') : '0')
         });
                 
-        //var input = $('<input/>').attr('type', 'checkbox').attr('id', 'quick_edit_' + field.name).val(field.name)            
-        //  .change(function() {
-        //    that.quick_edit_field = $(this).prop('checked') ? $(this).val() : false;
-        //    that.refresh(); 
-        //  });
-        //if (field.name == that.quick_edit_field)
-        //  input.prop('checked', 'true');         
+        var input = $('<input/>').attr('type', 'checkbox').attr('id', 'quick_edit_' + field.name).val(field.name)            
+          .change(function() {
+            that.quick_edit_field = $(this).prop('checked') ? $(this).val() : false;
+            that.refresh(); 
+          });
+        if (field.name == that.quick_edit_field)
+          input.prop('checked', 'true');         
         tr.append($('<th/>')
-          //.append(input).append('<br/>')
+          .append(input).append('<br/>')
           .append($('<a/>')
             .attr('id', 'quick_edit_' + field.name).val(field.name)
             .attr('href', link)            
@@ -355,17 +378,21 @@ IndexTable.prototype = {
       if (that.model_ids.indexOf(m.id) > -1)
         checkbox.prop('checked', 'true');  
       tr.append($('<td/>').append(checkbox));
-    }    
-    tr.click(function(e) {
-      var model_id = $(this).attr('id').replace('model_row_', ''); 
-      that.row_click_handler(model_id, e);
-    });
-          
+    }
+
+    if (!that.quick_edit_field)
+    {
+      tr.click(function(e) {
+        var model_id = $(this).attr('id').replace('model_row_', ''); 
+        that.row_click_handler(model_id, e);
+      });
+    }
+      
     $.each(that.fields, function(j, field) {
       if (field.show)
       {
         var td = $('<td/>');
-        if (field.editable && that.quick_edit_model_id == m.id)
+        if (field.editable && (that.quick_edit_model_id == m.id || that.quick_edit_field == field.name))
           td.append($('<div/>').attr('id', 'model_' + m.id + '_' + field.name));
         else                        
           td.html(field.text ? field.text(m) : field.value(m));

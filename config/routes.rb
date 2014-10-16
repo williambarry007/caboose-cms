@@ -50,7 +50,7 @@ Caboose::Engine.routes.draw do
   post    "admin/users/import"              => "users#import"  
   get     "admin/users/:id/su"              => "users#admin_su"
   get     "admin/users/:id/edit-password"   => "users#edit_password"
-  get     "admin/users/:id/edit"            => "users#edit"  
+  get     "admin/users/:id"                 => "users#edit"  
   put     "admin/users/:id"                 => "users#update"
   post    "admin/users"                     => "users#create"
   delete  "admin/users/:id"                 => "users#destroy"
@@ -61,7 +61,7 @@ Caboose::Engine.routes.draw do
   get     "admin/roles"                   => "roles#index"
   get     "admin/roles/options"           => "roles#options"
   get     "admin/roles/new"               => "roles#new"
-  get     "admin/roles/:id/edit"          => "roles#edit"
+  get     "admin/roles/:id"               => "roles#edit"
   put     "admin/roles/:id"               => "roles#update"
   post    "admin/roles"                   => "roles#create"
   delete  "admin/roles/:id"               => "roles#destroy"
@@ -89,7 +89,7 @@ Caboose::Engine.routes.draw do
   get     "admin/permissions"             => "permissions#index"
   get     "admin/permissions/options"     => "permissions#options"
   get     "admin/permissions/new"         => "permissions#new"
-  get     "admin/permissions/:id/edit"    => "permissions#edit"
+  get     "admin/permissions/:id"         => "permissions#edit"
   put     "admin/permissions/:id"         => "permissions#update"  
   post    "admin/permissions"             => "permissions#create"
   delete  "admin/permissions/:id"         => "permissions#destroy"
@@ -97,7 +97,7 @@ Caboose::Engine.routes.draw do
   get     "admin/settings"                => "settings#index"
   get     "admin/settings/options"        => "settings#options"
   get     "admin/settings/new"            => "settings#new"
-  get     "admin/settings/:id/edit"       => "settings#edit"
+  get     "admin/settings/:id"            => "settings#edit"
   put     "admin/settings/:id"            => "settings#update"  
   post    "admin/settings"                => "settings#create"
   delete  "admin/settings/:id"            => "settings#destroy"
@@ -112,8 +112,7 @@ Caboose::Engine.routes.draw do
   get     "admin/pages/:id/block-options" => "pages#admin_block_options"
   get     "admin/pages/:id/uri"           => "pages#admin_page_uri"
   get     "admin/pages/:id/delete"        => "pages#admin_delete_form"  
-  get     "admin/pages/:id/sitemap"       => "pages#admin_sitemap"
-  get     "admin/pages/:id/edit"          => "pages#admin_edit_general"
+  get     "admin/pages/:id/sitemap"       => "pages#admin_sitemap"  
   get     "admin/pages/:id/permissions"   => "pages#admin_edit_permissions"
   get     "admin/pages/:id/css"           => "pages#admin_edit_css"
   get     "admin/pages/:id/js"            => "pages#admin_edit_js"
@@ -127,7 +126,8 @@ Caboose::Engine.routes.draw do
   get     "admin/pages/:id/layout"        => "pages#admin_edit_layout"
   put     "admin/pages/:id/layout"        => "pages#admin_update_layout"
   put     "admin/pages/:id/viewers"       => "pages#admin_update_viewers"
-  put     "admin/pages/:id/editors"       => "pages#admin_update_editors"  
+  put     "admin/pages/:id/editors"       => "pages#admin_update_editors"
+  get     "admin/pages/:id"               => "pages#admin_edit_general"  
   put     "admin/pages/:id"               => "pages#admin_update"
   get     "admin/pages"                   => "pages#admin_index"
   post    "admin/pages"                   => "pages#admin_create"  
@@ -283,12 +283,12 @@ Caboose::Engine.routes.draw do
   
   get  '/admin/products/add-upcs' => 'products#admin_add_upcs'
   
-  get  '/admin/vendors'                => 'vendors#admin_index'
-  get  '/admin/vendors/status-options' => 'vendors#status_options'
+  get  '/admin/vendors/status-options' => 'vendors#status_options'    
   get  '/admin/vendors/new'            => 'vendors#admin_new'
-  get  '/admin/vendors/:id/edit'       => 'vendors#admin_edit'
-  post '/admin/vendors/create'         => 'vendors#admin_create'
-  put  '/admin/vendors/:id/update'     => 'vendors#admin_update'
+  get  '/admin/vendors/:id'            => 'vendors#admin_edit'
+  put  '/admin/vendors/:id'            => 'vendors#admin_update'
+  post '/admin/vendors'                => 'vendors#admin_add'  
+  get  '/admin/vendors'                => 'vendors#admin_index'
   
   # Orders
   
@@ -298,35 +298,38 @@ Caboose::Engine.routes.draw do
   
   post    "/reviews/add"                                => "reviews#add"  
 
-  get     "/admin/products"                             => "products#admin_index"
-  get     '/admin/products/sort'                        => 'products#admin_sort'
-  put     '/admin/products/update-sort-order'           => 'products#admin_update_sort_order'  
-  put     "/admin/products/update-vendor-status/:id"    => "products#admin_update_vendor_status"
-  get     "/admin/products/new"                         => "products#admin_new"
-  get     "/admin/products/status-options"              => "products#admin_status_options"  
-  get     "/admin/products/:id/general"                 => "products#admin_edit_general"    
-  get     "/admin/products/:id/description"             => "products#admin_edit_description"
-  get     "/admin/products/:id/categories"              => "products#admin_edit_categories"
-  post    "/admin/products/:id/categories"              => "products#admin_add_to_category"
-  delete  "/admin/products/:id/categories/:category_id" => "products#admin_remove_from_category"
-  get     "/admin/products/:id/variants"                => "products#admin_edit_variants"
-  get     "/admin/products/:id/variants/json"           => "products#admin_variants_json"
-  get     "/admin/products/:id/variant-cols"            => "products#admin_edit_variant_columns"
-  put     "/admin/products/:id/variant-cols"            => "products#admin_update_variant_columns"
-  get     "/admin/products/:id/variants/sort-order"     => "products#admin_edit_variant_sort_order"
+  get     "/admin/products"                                 => "products#admin_index"
+  get     "/admin/products/json"                            => "products#admin_json"
+  get     '/admin/products/sort'                            => 'products#admin_sort'
+  put     '/admin/products/update-sort-order'               => 'products#admin_update_sort_order'  
+  put     "/admin/products/update-vendor-status/:id"        => "products#admin_update_vendor_status"
+  get     "/admin/products/new"                             => "products#admin_new"
+  get     "/admin/products/status-options"                  => "products#admin_status_options"    
+  get     "/admin/products/:id/general"                     => "products#admin_edit_general"    
+  get     "/admin/products/:id/description"                 => "products#admin_edit_description"
+  get     "/admin/products/:id/categories"                  => "products#admin_edit_categories"
+  post    "/admin/products/:id/categories"                  => "products#admin_add_to_category"
+  delete  "/admin/products/:id/categories/:category_id"     => "products#admin_remove_from_category"
+  get     "/admin/products/:id/variants"                    => "products#admin_edit_variants"
+  get     "/admin/products/:id/variants/json"               => "products#admin_variants_json"
+  get     "/admin/products/:id/variant-cols"                => "products#admin_edit_variant_columns"
+  put     "/admin/products/:id/variant-cols"                => "products#admin_update_variant_columns"
+  get     "/admin/products/:id/variants/sort-order"         => "products#admin_edit_variant_sort_order"
   put     '/admin/products/:id/variants/option1-sort-order' => 'products#admin_update_variant_option1_sort_order'
   put     '/admin/products/:id/variants/option2-sort-order' => 'products#admin_update_variant_option2_sort_order'
   put     '/admin/products/:id/variants/option3-sort-order' => 'products#admin_update_variant_option3_sort_order'
-  get     "/admin/products/:id/images"                  => "products#admin_edit_images"
-  post    "/admin/products/:id/images"                  => "products#admin_add_image"
-  get     "/admin/products/:id/collections"             => "products#admin_edit_collections"
-  get     "/admin/products/:id/seo"                     => "products#admin_edit_seo"
-  get     "/admin/products/:id/options"                 => "products#admin_edit_options"
-  get     "/admin/products/:id/delete"                  => "products#admin_delete_form"
-  put     "/admin/products/:id"                         => "products#admin_update"
-  post    "/admin/products"                             => "products#admin_add"
-  delete  "/admin/products/:id"                         => "products#admin_delete"
-  put     "/admin/products/:id/update-vendor"           => "products#admin_update_vendor"
+  get     "/admin/products/:id/images"                      => "products#admin_edit_images"
+  post    "/admin/products/:id/images"                      => "products#admin_add_image"
+  get     "/admin/products/:id/collections"                 => "products#admin_edit_collections"
+  get     "/admin/products/:id/seo"                         => "products#admin_edit_seo"
+  get     "/admin/products/:id/options"                     => "products#admin_edit_options"
+  get     "/admin/products/:id/delete"                      => "products#admin_delete_form"
+  get     "/admin/products/:id/json"                        => "products#admin_json_single"
+  get     "/admin/products/:id"                             => "products#admin_edit_general"
+  put     "/admin/products/:id"                             => "products#admin_update"
+  post    "/admin/products"                                 => "products#admin_add"
+  delete  "/admin/products/:id"                             => "products#admin_delete"
+  put     "/admin/products/:id/update-vendor"               => "products#admin_update_vendor"
   
   get     "/admin/products/:product_id/variants/:variant_id/edit"   => "variants#admin_edit"
   get     "/admin/variants/status-options"            => "variants#admin_status_options"
@@ -341,7 +344,7 @@ Caboose::Engine.routes.draw do
   get     "/admin/categories"                         => "categories#admin_index"
   get     "/admin/categories/new"                     => "categories#admin_new"
   get     "/admin/categories/options"                 => "categories#admin_options"  
-  get     "/admin/categories/:id/edit"                => "categories#admin_edit"  
+  get     "/admin/categories/:id"                     => "categories#admin_edit"  
   put     "/admin/categories/:id"                     => "categories#admin_update"  
   get     '/admin/categories/status-options'          => 'categories#admin_status_options'
   post    "/admin/categories/:id"                     => "categories#admin_update"  

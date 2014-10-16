@@ -103,6 +103,23 @@ module Caboose
       end
       render :json => options
     end
+    
+    # GET /admin/categories/options
+    def admin_options      
+      options = []
+      cat = Category.find(1)
+      cat.children.each do |c|
+        admin_options_helper(options, c, '')
+      end            
+      render :json => options
+    end
+        
+    def admin_options_helper(options, cat, prefix)
+      options << { :value => cat.id, :text => "#{prefix}#{cat.name}" }      
+      cat.children.each do |c|
+        admin_options_helper(options, c, "#{prefix} - ")
+      end      
+    end
   end
 end
 

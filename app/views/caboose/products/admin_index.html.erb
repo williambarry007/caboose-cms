@@ -1,95 +1,87 @@
 <h1>Products</h1>
 
 <p style="margin: 12px 0">
-  <a href="/admin/vendors/new">New Vendor</a>
-  <span style="margin: 0 3px">|</span>
-  <a href="/admin/products/new">New Product</a>
-  <span style="margin: 0 3px">|</span>
-  <a href="/admin/products/sort">Sort Products</a>
+  <a href="/admin/vendors/new">New Vendor</a><span style="margin: 0 3px">|</span>
+  <a href="/admin/products/new">New Product</a><span style="margin: 0 3px">|</span>
+  <a href="/admin/products/sort">Sort Products</a><span style="margin: 0 3px">|</span>
+  <a href='#'>Search Form</a>
 </p>
 
-<div class="media">
-	<aside class="right">
-		<form action="/admin/products" method="get" id="search_form" style="margin: 0 0 12px">
-			<input type="text" name="search_like" placeholder="Title or Vendor Name" value="<%= params[:search_like] %>" style="width: 350px" />
-			<input type="submit" value="Search" />
-			<input type="button" value="Clear" onclick="window.location='/admin/products'" />
-			
-			<ul>
-				<li><p>Find products that have:</p></li>
-				<li><label><input name="filters[missing_prices]" type="checkbox" <%= 'checked="checked"' if params[:filters] && params[:filters][:missing_prices] %> /> Missing prices</label></li>
-				<li><label><input name="filters[missing_images]" type="checkbox" <%= 'checked="checked"' if params[:filters] && params[:filters][:missing_images] %> /> Missing images</label></li>
-				<li><label><input name="filters[no_vendor]" type="checkbox" <%= 'checked="checked"' if params[:filters] && params[:filters][:no_vendor] %> /> No vendor</label></li>
-			</ul>
-		</form>
-	</aside>
+<form action="/admin/products" method="get" id="search_form" style="margin: 0 0 12px">
+	<input type="text" name="search_like" placeholder="Title or Vendor Name" value="<%= params[:search_like] %>" style="width: 350px" />
+	<input type="submit" value="Search" />
+	<input type="button" value="Clear" onclick="window.location='/admin/products'" />
+</form>
 	
-	<section>
-		<% if @products.count > 0 %>
-			<table class='data' id='properties_table'>
-				<tr>
-					<%= raw @gen.sortable_table_headings({
-						'id'     => 'ID',
-						'title'  => 'Title',
-						'vendor' => 'Vendor'
-					}) %>
-				</tr>
-		
-				<% @products.each do |p| %>
-					<tr onclick="window.location='/admin/products/<%= p.id %>/general';">
-						<td><%= raw p.id %></td>
-						<td><%= raw p.title %></td>
-						<td><%= raw p.vendor.nil? ? 'Unknown' : p.vendor.name %></td>    
-					</tr>
-				<% end %>
-			</table>
-	
-			<p><%= raw @gen.generate %></p>
-		<% else %>
-			<p>There are no products right now.</p>
-		<% end %>
-	</section>
-</div>
-
-<% content_for :caboose_css do %>
-	<style>
-		ul {
-			list-style-type: none;
-			padding: 0;
-		}
-		input[type=checkbox] {
-			height: 16px;
-			left: auto !important;
-			margin: 0 0 12px !important;
-			position: relative !important;
-			top: auto !important;
-		}
-		label { cursor: pointer; }
-		label input[type=checkbox] {
-			height: 15px !important;
-			left: auto !important;
-			margin: 12px 0 !important;
-			position: relative !important;
-			top: auto !important;
-		}
-		
-		.media,
-		.media > section { overflow: hidden; }
-		.media > aside {
-			float: left;
-			margin-right: 12px;
-		}
-		.media > aside.right {
-			float: right;
-			margin-left: 12px;
-		}
-	</style>
-<% end %>
+<div id='products'></div>
 
 <% content_for :caboose_js do %>
-	<script type='text/javascript'>
-		$(document).ready(function() { 
-		  var modal = new CabooseModal(800);
-		});
-	</script>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'products',
+    base_url: '/admin/products',
+    allow_bulk_edit: false,
+    allow_bulk_delete: false,
+    allow_duplicate: false,
+    fields: [
+      { show: true , name: 'id'              , nice_name: 'ID'                   , sort: 'id'              , type: 'text'               , value: function(p) { return p.id              }, width: 500, editable: false },
+      { show: true , name: 'title'           , nice_name: 'Title'                , sort: 'title'           , type: 'text'               , value: function(p) { return p.title           }, width: 200 },
+      { show: true , name: 'caption'         , nice_name: 'Caption'              , sort: 'caption'         , type: 'text'               , value: function(p) { return p.caption         }, width: 200 },   
+      { show: true , name: 'status'          , nice_name: 'Status'               , sort: 'status'          , type: 'select'             , value: function(p) { return p.status          }, width: 200, options_url: '/admin/products/status-options' },
+      { show: true , name: 'handle'          , nice_name: 'URL Handle'           , sort: 'handle'          , type: 'text'               , value: function(p) { return p.handle          }, width: 200 },
+      { show: true , name: 'seo_title'       , nice_name: 'SEO Page Title'       , sort: 'seo_title'       , type: 'text'               , value: function(p) { return p.seo_title       }, width: 200 },
+      { show: false, name: 'seo_description' , nice_name: 'SEO Meta Description' , sort: 'seo_description' , type: 'textarea'           , value: function(p) { return p.seo_description }, width: 200, height: 150 },
+      { show: true , name: 'alternate_id'    , nice_name: 'Alternate ID'         , sort: 'alternate_id'    , type: 'text'               , value: function(p) { return p.alternate_id    }, width: 200 },
+      { show: true , name: 'date_available'  , nice_name: 'Date Available'       , sort: 'date_available'  , type: 'date'               , value: function(p) { return p.date_available  }, width: 200 },
+      { show: false, name: 'featured'        , nice_name: 'Featured'             , sort: 'featured'        , type: 'checkbox'           , value: function(p) { return p.featured        }, width: 200 },
+      { show: false, name: 'category_id'     , nice_name: 'Categories'           , sort: 'categories.name' , type: 'checkbox-multiple'  , value: function(p) { return p.categories ? p.categories.map(function(c) { return c.id }) : []; }, text: function(p) { return p.categories ? p.categories.map(function(c) { return c.name }).join(', ') : ''; }, width: 200, height: 200, options_url: '/admin/categories/options' },                        
+    ],
+    new_model_text: 'New Product',
+    new_model_fields: [
+      { name: 'name', nice_name: 'Name', type: 'text', width: 400 }                      
+    ],    
+  });
+});
+    
+</script>
+<% end %>
+
+<% content_for :caboose_css do %>
+<style>
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+input[type=checkbox] {
+	height: 16px;
+	left: auto !important;
+	margin: 0 0 12px !important;
+	position: relative !important;
+	top: auto !important;
+}
+label { cursor: pointer; }
+label input[type=checkbox] {
+	height: 15px !important;
+	left: auto !important;
+	margin: 12px 0 !important;
+	position: relative !important;
+	top: auto !important;
+}
+
+.media,
+.media > section { overflow: hidden; }
+.media > aside {
+	float: left;
+	margin-right: 12px;
+}
+.media > aside.right {
+	float: right;
+	margin-left: 12px;
+}
+</style>
 <% end %>

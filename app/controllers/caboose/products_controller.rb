@@ -295,6 +295,38 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
+    # GET /admin/products/json
+    def admin_json
+      return if !user_is_allowed('products', 'view')
+      
+      # Temporary patch for vendor name sorting; Fix this
+      params[:sort] = 'store_vendors.name' if params[:sort] == 'vendor'
+      
+      pager = Caboose::PageBarGenerator.new(params, {
+        'vendor_name'  => '',
+        'search_like'  => '', 
+        'price'        => params[:filters] && params[:filters][:missing_prices] ? 0 : ''
+      }, {
+        'model'          => 'Caboose::Product',
+        'sort'           => 'title',
+        'desc'           => false,
+        'base_url'       => '/admin/products',
+        'items_per_page' => 25,
+        'use_url_params' => false,        
+        'abbreviations' => {
+          'search_like' => 'store_products.title_concat_vendor_name_like'
+        },        
+        'includes' => {
+          'vendor_name'  => [ 'vendor'   , 'name'  ],
+          'price'        => [ 'variants' , 'price' ]
+        }
+      })
+      render :json => {
+        :pager => pager,
+        :models => pager.items.as_json(:includes => [:vendor, :categories])
+      }      
+    end
+    
     # GET /admin/products/add-upcs - TODO remove this; it's a temporary thing for woods-n-water
     def admin_add_upcs
       params[:vendor_id] if params[:vendor_id] and params[:vendor_id].empty?
@@ -312,7 +344,13 @@ module Caboose
       
       render :layout => 'caboose/admin'
     end
-      
+    
+    # GET /admin/products/:id/json
+    def admin_json_single
+      p = Product.find(params[:id])
+      render :json => p.as_json(:includes => [:vendor, :categories])
+    end
+    
     # GET /admin/products/:id/general
     def admin_edit_general
       return if !user_is_allowed('products', 'edit')    
@@ -533,43 +571,20 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
-          when 'alternate_id'
-            product.alternate_id = value
-          when 'date_available'
-            if value.strip.length == 0
-              product.date_available = nil
-            else
-              begin
-                product.date_available = DateTime.parse(value)
-              rescue
-                resp.error = "Invalid date"
-                save = false
-              end
-            end
-          when 'title'
-            product.title = value
-          when 'caption'
-            product.caption = value
-          when 'featured'
-            product.featured = value
-          when 'description'
-            product.description = value
-          when 'category_id'
-            product.category_id = value
-          when 'vendor_id'  
-            product.vendor_id = value
-          when 'handle'
-            product.handle = value
-          when 'seo_title'
-            product.seo_title = value
-          when 'seo_description'
-            product.seo_description = value
-          when 'option1'
-            product.option1 = value
-          when 'option2'
-            product.option2 = value
-          when 'option3'
-            product.option3 = value
+          when 'alternate_id'     then product.alternate_id    = value          
+          when 'title'            then product.title           = value
+          when 'caption'          then product.caption         = value
+          when 'featured'         then product.featured        = value
+          when 'description'      then product.description     = value          
+          when 'vendor_id'        then product.vendor_id       = value
+          when 'handle'           then product.handle          = value
+          when 'seo_title'        then product.seo_title       = value
+          when 'seo_description'  then product.seo_description = value
+          when 'status'           then product.status          = value
+          when 'category_id'      then product.toggle_category(value[0], value[1])
+          when 'option1'          then product.option1         = value
+          when 'option2'          then product.option2         = value
+          when 'option3'          then product.option3         = value
           when 'default1'
             product.default1 = value
             Variant.where(:product_id => product.id, :option1 => nil).each do |p|
@@ -587,9 +602,18 @@ module Caboose
             Variant.where(:product_id => product.id, :option3 => nil).each do |p|
               p.option3 = value
               p.save
+            end          
+          when 'date_available'
+            if value.strip.length == 0
+              product.date_available = nil
+            else
+              begin
+                product.date_available = DateTime.parse(value)
+              rescue
+                resp.error = "Invalid date"
+                save = false
+              end
             end
-          when 'status'
-            product.status = value
         end
       end
       resp.success = save && product.save

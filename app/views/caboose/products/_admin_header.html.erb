@@ -7,7 +7,7 @@
 <% end %>
 
 <h1>Edit Product - <%= @product.title %></h1>
-<ul id='modal_tabs'>
+<ul id='tabs'>
 <%
 tabs = {
   "/admin/products/#{@product.id}/general"      => 'Product details',
@@ -29,4 +29,4 @@ tabs["/admin/products/#{@product.id}/delete"              ] = 'Delete Product'
 <% end %>
 <li class='back'><input type='button' value='< Back' onclick="window.location='/admin/products';" /></li>
 </ul>
-<div id='modal_content2'>
+<div id='content2'>

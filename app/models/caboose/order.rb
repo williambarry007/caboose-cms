@@ -175,8 +175,8 @@ module Caboose
     end
     
     def calculate_handling
-      return 0 if !Caboose::handling_percentage
-      self.shipping * Caboose::handling_percentage
+      return 0 if !Caboose::store_handling_percentage
+      self.shipping * Caboose::store_handling_percentage
     end
     
     def calculate_total

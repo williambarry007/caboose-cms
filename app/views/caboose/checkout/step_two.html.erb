@@ -2,48 +2,53 @@
 sa = @order.shipping_address
 ba = @order.billing_address
 %>
-<div id="checkout">
+
+<div id="checkout" class='constrain'>
   <h2>Checkout</h2>
-  <%= raw checkout_nav(2) %>  
-  <form  action="/checkout/address" method="put" id='address_form'>
-    <section id="checkout-address">  
-      <div class="wrapper">      
-        <section>
-          <fieldset id="shipping">
-            <h3>Shipping Address</h3>
-            <label><span>First Name </span> <input name="shipping[first_name]" type="text" value="<%= sa ? sa.first_name : "" %>" /></label>
-            <label><span>Last Name  </span> <input name="shipping[last_name]"  type="text" value="<%= sa ? sa.last_name  : "" %>" /></label>
-            <label><span>Company    </span> <input name="shipping[company]"    type="text" value="<%= sa ? sa.company    : "" %>" /></label>
-            <label><span>Address 1  </span> <input name="shipping[address1]"   type="text" value="<%= sa ? sa.address1   : "" %>" /></label>
-            <label><span>Address 2  </span> <input name="shipping[address2]"   type="text" value="<%= sa ? sa.address2   : "" %>" /></label>
-            <label><span>City       </span> <input name="shipping[city]"       type="text" value="<%= sa ? sa.city       : "" %>" /></label>        
-            <label><span>State      </span> <select name="shipping[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= sa && sa.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>        
-            <label><span>Zip        </span> <input name="shipping[zip]"       type="text"  value="<%= sa ? sa.zip        : "" %>" /></label>
-            <label><input name="use_as_billing" type="checkbox" value="false" /> Use as billing address</label>
-          </fieldset>
-        </section>    
-        <section>
-          <fieldset id="billing">
-            <h3>Billing Address</h3>
-            <label><span>First Name </span> <input name="billing[first_name]" type="text" value="<%= ba ? ba.first_name : "" %>" /></label>
-            <label><span>Last Name  </span> <input name="billing[last_name]"  type="text" value="<%= ba ? ba.last_name  : "" %>" /></label>
-            <label><span>Company    </span> <input name="billing[company]"    type="text" value="<%= ba ? ba.company    : "" %>" /></label>
-            <label><span>Address 1  </span> <input name="billing[address1]"   type="text" value="<%= ba ? ba.address1   : "" %>" /></label>
-            <label><span>Address 2  </span> <input name="billing[address2]"   type="text" value="<%= ba ? ba.address2   : "" %>" /></label>
-            <label><span>City       </span> <input name="billing[city]"       type="text" value="<%= ba ? ba.city       : "" %>" /></label>
-            <label><span>State      </span> <select name="billing[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= ba && ba.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>                
-            <label><span>Zip        </span> <input name="billing[zip]"        type="text" value="<%= ba ? ba.zip        : "" %>" /></label>
-          </fieldset>
-        </section>        
-      </div>            
-    </section>
-    <section id="checkout-continue">
-      <div id='message'></div>
-      <button class="blue">Continue</button>
-      <em>or</em>
-      <a href="/">return to the store</a>
-    </section>
-  </form>  
+  <%= raw checkout_nav(2) %>
+  <% if @logged_in_user.id == 1 %>    
+    <p class='note error'>You are logged in as the admin user. Please <a href='/logout'>logout</a> and complete your order as a different user.</p>
+  <% else %>
+    <form  action="/checkout/address" method="put" id='address_form'>
+      <section id="checkout-address">  
+        <div class="wrapper">      
+          <section>
+            <fieldset id="shipping">
+              <h3>Shipping Address</h3>
+              <label><span>First Name </span> <input name="shipping[first_name]" type="text" value="<%= sa ? sa.first_name : "" %>" /></label>
+              <label><span>Last Name  </span> <input name="shipping[last_name]"  type="text" value="<%= sa ? sa.last_name  : "" %>" /></label>
+              <label><span>Company    </span> <input name="shipping[company]"    type="text" value="<%= sa ? sa.company    : "" %>" /></label>
+              <label><span>Address 1  </span> <input name="shipping[address1]"   type="text" value="<%= sa ? sa.address1   : "" %>" /></label>
+              <label><span>Address 2  </span> <input name="shipping[address2]"   type="text" value="<%= sa ? sa.address2   : "" %>" /></label>
+              <label><span>City       </span> <input name="shipping[city]"       type="text" value="<%= sa ? sa.city       : "" %>" /></label>        
+              <label><span>State      </span> <select name="shipping[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= sa && sa.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>        
+              <label><span>Zip        </span> <input name="shipping[zip]"       type="text"  value="<%= sa ? sa.zip        : "" %>" /></label>
+              <label><input name="use_as_billing" type="checkbox" value="false" /> Use as billing address</label>
+            </fieldset>
+          </section>    
+          <section>
+            <fieldset id="billing">
+              <h3>Billing Address</h3>
+              <label><span>First Name </span> <input name="billing[first_name]" type="text" value="<%= ba ? ba.first_name : "" %>" /></label>
+              <label><span>Last Name  </span> <input name="billing[last_name]"  type="text" value="<%= ba ? ba.last_name  : "" %>" /></label>
+              <label><span>Company    </span> <input name="billing[company]"    type="text" value="<%= ba ? ba.company    : "" %>" /></label>
+              <label><span>Address 1  </span> <input name="billing[address1]"   type="text" value="<%= ba ? ba.address1   : "" %>" /></label>
+              <label><span>Address 2  </span> <input name="billing[address2]"   type="text" value="<%= ba ? ba.address2   : "" %>" /></label>
+              <label><span>City       </span> <input name="billing[city]"       type="text" value="<%= ba ? ba.city       : "" %>" /></label>
+              <label><span>State      </span> <select name="billing[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= ba && ba.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>                
+              <label><span>Zip        </span> <input name="billing[zip]"        type="text" value="<%= ba ? ba.zip        : "" %>" /></label>
+            </fieldset>
+          </section>        
+        </div>            
+      </section>
+      <section id="checkout-continue">
+        <div id='message'></div>
+        <button class="blue">Continue</button>
+        <em>or</em>
+        <a href="/">return to the store</a>
+      </section>
+    </form>
+  <% end %>
 </div>
 
 <%= content_for :caboose_js do %>

@@ -103,13 +103,20 @@ Caboose.Store.Modules.Cart = (function() {
             if (self.$addToCart.length) self.$addToCart.trigger('added');
             
             if (!self.$addToCart.find('.message').length) {
-              self.$addToCart.append($('<p/>').hide().addClass('message').text('Successfully added to cart'));
+              self.$addToCart
+                .append($('<div/>').hide().addClass('message')
+                  .append($('<p/>').text('Successfully added to cart'))
+                  .append($('<p/>')
+                    .append($('<a/>').attr('href', '/cart').html('View cart')).append(' | ')
+                    .append($('<a/>').attr('href', '/checkout').html('Continue to checkout'))
+                  )
+                );                
               self.$addToCart.find('.message').fadeIn();
               Caboose.Store.Modules.Product.$product.trigger('added-to-cart');
               
-              setTimeout(function() {
-                self.$addToCart.find('.message').fadeOut(function() { $(this).remove() });
-              }, 1000);
+              //setTimeout(function() {
+              //  self.$addToCart.find('.message').fadeOut(function() { $(this).remove() });
+              //}, 5000);
             }
           } else {
             alert(response.errors[0]);

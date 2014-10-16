@@ -2,49 +2,42 @@
   <h2>Checkout</h2>
   <%= raw checkout_nav(1) %>
   
-  <section id="checkout-login">
-    <div class="wrapper" class='login-choices'>
-      <ul>
-        <li><p>Already a member                       </p><button data-login-action="signin"   id='signin_button'   >Sign in</button></li>    
-        <li><p>Sign up for all of our member benefits </p><button data-login-action="register" id='register_button' >New Customer</button></li>
-        <li><p>No thanks                              </p><button data-login-action="guest"    id='guest_button'    >Continue As Guest</button></li>
-      </ul>
-    </div>
-    
-    <section id='checkout-login-form'>    
-      <div class="wrapper" id='signin_form_container'>  
-        <form action="/login" method="post" id='signin_form'>
-          <input name="username" type="text" placeholder="Email" />
-          <input name="password" type="password" placeholder="Password" />
-          <input type="submit" value="Submit" />
-        </form>
+  <% if @logged_in_user.id == 1 %>
+    <p class='note error'>You are logged in as the admin user. Please <a href='/logout'>logout</a> and complete your order as a different user.</p>
+  <% else %>
+    <section id="checkout-login">
+      <div class="wrapper" class='login-choices'>
+        <ul>
+          <li><p>Already a member?          </p><button data-login-action="signin"   id='signin_button'   >Sign in</button></li>    
+          <li><p>Continue as a new customer </p><button data-login-action="register" id='register_button' >New Customer</button></li>        
+        </ul>
       </div>
       
-      <div class="wrapper" id='register_form_container'>  
-        <form action="/register" method="post" id='register_form'>
-          <input name="first_name" type="text" placeholder="First Name" />
-          <input name="last_name" type="text" placeholder="Last Name" />
-          <input name="email" type="text" placeholder="Email" />
-          <input name="phone" type="text" placeholder="Phone" />
-          <input name="pass1" type="password" placeholder="Password" />
-          <input name="pass2" type="password" placeholder="Confirm Password" />
-          <input type="submit" value="Submit" />
-        </form>
-      </div>
-      
-      <div class="wrapper" id='guest_form_container'>  
-        <form action="/checkout/attach-guest" method="post" id='guest_form'>
-          <input name="email" type="text" placeholder="Email" />
-          <input name="confirm_email" type="email" placeholder="Confirm email" />
-          <input type="submit" value="Submit" />
-        </form>
-      </div>
-      
-      <div class="wrapper">
-        <div id='message'></div>
-      </div>
+      <section id='checkout-login-form'>    
+        <div class="constrain" id='signin_form_container'>  
+          <form action="/login" method="post" id='signin_form'>
+            <p><input name="username" type="text"     placeholder="Email"    /></p>
+            <p><input name="password" type="password" placeholder="Password" /></p>
+            <p><input type="submit" value="Continue" /></p>
+          </form>
+        </div>      
+        <div class="constrain" id='register_form_container'>  
+          <form action="/register" method="post" id='register_form'></p>
+            <p><input name="first_name" type="text"     placeholder="First Name" /></p>
+            <p><input name="last_name"  type="text"     placeholder="Last Name"  /></p>
+            <p><input name="email"      type="text"     placeholder="Email"      /></p>
+            <p><input name="phone"      type="text"     placeholder="Phone"      /></p>
+            <p><input name="pass1"      type="password" placeholder="Password"   /></p>
+            <p><input name="pass2"      type="password" placeholder="Confirm Password" /></p>
+            <p><input type="submit" value="Continue" /></p>
+          </form>
+        </div>      
+        <div class="wrapper">
+          <div id='message'></div>
+        </div>
+      </section>
     </section>
-  </section>
+  <% end %>
   
   <section id="checkout-continue">        
     <a href="/">return to the store</a>

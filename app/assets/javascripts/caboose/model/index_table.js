@@ -8,36 +8,20 @@ IndexTable.prototype = {
   
   form_authenticity_token: false,
   
-  // Container for the table
-  container: 'models',
-  
   // Base URL used for default refresh/update/delete/bulk URLs
   base_url: false,
     
-  // Where to get model json data  
-  refresh_url: false,
-  refresh_single_url: false,
+  // Where to get json data for all the models  
+  refresh_url: false,  
   
   // Where to send bulk updates
   bulk_update_url: false,
   
   // Where to send bulk deletes
   bulk_delete_url: false,
-    
-  // Where to send normal updates  
-  // Example: function(model_id) { return '/admin/models/' + model_id; }
-  update_url: false,
-  
-  // Where to send duplicate calls
-  // Example: function(model_id) { return '/admin/models/' + model_id + '/duplicate' },
-  duplicate_url: false,
   
   // Where to post new models
   add_url: false,
-  
-  // What to do when a row is clicked
-  // Example: function (model_id) { return '/admin/models/' + model_id; }
-  row_click_handler: false,
   
   // Array of fields you want to show in the table (given as model binder attributes with additional text and value functions)
   // [{ 
@@ -54,68 +38,76 @@ IndexTable.prototype = {
   // }]
   fields: [],
   
-  // The post/get in the original request
-  post_get: false,
+  //============================================================================
+  // Additional parameters
+  //============================================================================
+
+  // Container for the table
+  container: 'models',
+  
+  // Where to get json data for a single model
+  refresh_single_url: function(model_id, it) { return it.base_url + '/' + model_id + '/json'; },
+    
+  // Where to send normal updates    
+  update_url: function(model_id, it) { return it.base_url + '/' + model_id; },
+  
+  // Where to send duplicate calls  
+  duplicate_url: function(model_id, it) { return it.base_url + '/' + model_id + '/duplicate'; },
+  
+  // What to do when the edit button is clicked for a model 
+  edit_click_handler: function(model_id, it) { window.location = it.base_url + '/' + model_id; },
+  
+  // What to do when a row is click. Default is quick edit mode.
+  row_click_handler: function(model_id, it, e) {                  
+    if (it.quick_edit_model_id == model_id)
+    {
+      if ($(e.target).prop('tagName') == 'TD')
+        it.quick_edit_model_id = false;          
+      else
+        return;
+    }
+    else        
+      it.quick_edit_model_id = model_id;
+    it.print();       
+  },    
     
   allow_bulk_edit: true,
   allow_bulk_delete: true,
   allow_duplicate: true,
-  
+  allow_advanced_edit: true,  
   no_models_text: "There are no models right now.",
   new_model_text: 'New',
-  new_model_fields: [
-    { name: 'name', nice_name: 'Name', type: 'text', width: 400 }                      
-  ],
+  new_model_fields: [{ name: 'name', nice_name: 'Name', type: 'text', width: 400 }],
           
   //============================================================================
-  // End of required parameters
+  // End of parameters
   //============================================================================
   
-  models: [],
-  model_ids: [],  
-  quick_edit_model_id: false, // The id of the model currently being edited  
-  refresh_count: 0,  
-  pager: {
-    options: { page: 1 },
+  models: [], // The models we get from the server
+  model_ids: [], // IDs of currently selected models
+  quick_edit_model_id: false, // The id of the model currently being edited      
+  pager: { 
+    options: { page: 1 }, 
     params: {}
   },
   
+  // Constructor
   init: function(params) {
     for (var thing in params)
       this[thing] = params[thing];    
         
     var that = this;
-    if (!this.refresh_url       ) this.refresh_url        = this.base_url + '/json';
-    if (!this.bulk_update_url   ) this.bulk_update_url    = this.base_url + '/bulk';    
-    if (!this.bulk_delete_url   ) this.bulk_delete_url    = this.base_url + '/bulk';
-    if (!this.add_url           ) this.add_url            = this.base_url;
-    if (!this.update_url        ) this.update_url         = function(model_id) { return that.base_url + '/' + model_id; };            
-    if (!this.duplicate_url     ) this.duplicate_url      = function(model_id) { return that.base_url + '/' + model_id + '/duplicate'; };
-    if (!this.refresh_single_url) this.refresh_single_url = function(model_id) { return that.base_url + '/' + model_id + '/json'; };
-    if (!this.row_click_handler ) this.row_click_handler  = function(model_id, e) {                  
-      if (that.quick_edit_model_id == model_id)
-      {
-        if ($(e.target).prop('tagName') == 'TD')
-          that.quick_edit_model_id = false;          
-        else
-          return;
-      }
-      else        
-        that.quick_edit_model_id = model_id;
-      that.print();       
-    };
-    this.init_fields();
-
-    $(window).on('hashchange', function() { that.refresh(); });        
-    this.refresh();
-  },
-  
-  init_fields: function()
-  {
-    var that = this;
+    if (!this.refresh_url          ) this.refresh_url           = this.base_url + '/json';
+    if (!this.bulk_update_url      ) this.bulk_update_url       = this.base_url + '/bulk';    
+    if (!this.bulk_delete_url      ) this.bulk_delete_url       = this.base_url + '/bulk';
+    if (!this.add_url              ) this.add_url               = this.base_url;
+         
     $.each(this.fields, function(i, f) {
       if (f.editable == null) f.editable = true;
     });
+
+    $(window).on('hashchange', function() { that.refresh(); });        
+    this.refresh();
   },
   
   parse_querystring: function()
@@ -173,11 +165,11 @@ IndexTable.prototype = {
     var that = this;
     var $el = $('#' + this.container + '_columns').length > 0 ? $('#' + this.container + '_table_container') : $('#' + this.container);
     $el.html("<p class='loading'>Refreshing...</p>");        
-    $.ajax({ 
+    $.ajax({
       url: that.refresh_url,
       type: 'get',
       data: that.pager_params(),
-      success: function(resp) {        
+      success: function(resp) {
         for (var thing in resp['pager'])
           that.pager[thing] = resp['pager'][thing];                
         that.models = resp['models'];
@@ -186,16 +178,7 @@ IndexTable.prototype = {
           var m = that.models[i];                              
           m.id = parseInt(m.id);          
         }        
-        that.print();
-        
-        // Set the history state
-        //var qs = that.pager_querystring();
-        //if (that.refresh_count > 0 && qs != window.location.hash)
-        //{
-        //  if(history.pushState) history.pushState(null, null, '#' + qs);
-        //  else                  location.hash = '#' + qs;
-        //}
-        that.refresh_count += 1;
+        that.print();                        
       },
       error: function() { $('#' + this.container).html("<p class='note error'>Error retrieving data.</p>"); }
     });
@@ -205,7 +188,7 @@ IndexTable.prototype = {
   {            
     var that = this;                
     $.ajax({ 
-      url: that.refresh_single_url(model_id),
+      url: that.refresh_single_url(model_id, that),
       type: 'get',      
       success: function(resp) {
         for (var i=0; i<that.models.length; i++)
@@ -281,7 +264,7 @@ IndexTable.prototype = {
           new ModelBinder({
             name: 'Model',
             id: m.id,
-            update_url: that.update_url(m.id),
+            update_url: that.update_url(m.id, that),
             authenticity_token: that.form_authenticity_token,
             attributes: [attrib]            
           });
@@ -290,13 +273,41 @@ IndexTable.prototype = {
     }
   },
   
+  all_models_selected: function()
+  {    
+    var that = this;
+    var all_checked = true;
+    $.each(that.models, function(i, m) {
+      if (that.model_ids.indexOf(m.id) == -1)
+      {
+        all_checked = false;
+        return false;
+      }
+    });
+    return all_checked;
+  },      
+  
   table_headers: function()
   {
     var that = this;    
     var tr = $('<tr/>');
     
-    if (this.allow_bulk_edit || this.allow_bulk_delete || this.allow_duplicate)   
-      tr.append($('<th/>').html('&nbsp;'));    
+    if (this.allow_bulk_edit || this.allow_bulk_delete || this.allow_duplicate)
+    {
+      var input = $('<input/>').attr('type', 'checkbox').attr('id', that.container + '_check_all').val(1)            
+        .change(function() {
+          var checked = $(this).prop('checked');
+          that.model_ids = [];          
+          $.each(that.models, function(i, m) {
+            $('#model_' + m.id).prop('checked', checked);
+            if (checked) that.model_ids.push(m.id);
+          });
+        });      
+      input.prop('checked', that.all_models_selected());
+      tr.append($('<th/>').append(input));
+    }
+    if (this.allow_advanced_edit)
+      tr.append($('<th/>').html('&nbsp;'));
     
     $.each(this.fields, function(i, field) {
       if (field.show)
@@ -351,14 +362,25 @@ IndexTable.prototype = {
             if (checked && i == -1) that.model_ids.push(model_id);
             if (!checked && i > -1) that.model_ids.splice(i, 1);
           }
+          $('#' + that.container + '_check_all').prop('checked', that.all_models_selected());      
         });
       if (that.model_ids.indexOf(m.id) > -1)
         checkbox.prop('checked', 'true');  
       tr.append($('<td/>').append(checkbox));
-    }    
+    }
+    if (this.allow_advanced_edit)
+    {      
+      tr.append($('<td/>')
+        .addClass('edit_button')
+        .mouseover(function() { $(this).addClass('edit_button_over'); })
+        .mouseout( function() { $(this).removeClass('edit_button_over'); })
+        .click(function(e) { e.stopPropagation(); that.edit_click_handler(m.id, that, e); })
+        .append($('<span/>').addClass('ui-icon ui-icon-pencil'))
+      );
+    }                
     tr.click(function(e) {
       var model_id = $(this).attr('id').replace('model_row_', ''); 
-      that.row_click_handler(model_id, e);
+      that.row_click_handler(model_id, that, e);
     });
           
     $.each(that.fields, function(j, field) {
@@ -513,7 +535,7 @@ IndexTable.prototype = {
     }    
     $('#message').html("<p class='loading'>Duplicating...</p>");
     $.ajax({
-      url: that.duplicate_url(that.model_ids[0]),
+      url: that.duplicate_url(that.model_ids[0], that),
       type: 'post',
       data: { count: count },
       success: function(resp) {

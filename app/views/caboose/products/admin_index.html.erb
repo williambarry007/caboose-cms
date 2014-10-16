@@ -26,8 +26,9 @@ $(document).ready(function() {
     container: 'products',
     base_url: '/admin/products',
     allow_bulk_edit: false,
-    allow_bulk_delete: false,
+    allow_bulk_delete: true,
     allow_duplicate: false,
+    allow_advanced_edit: true,
     fields: [
       { show: true , name: 'id'              , nice_name: 'ID'                   , sort: 'id'              , type: 'text'               , value: function(p) { return p.id              }, width: 500, editable: false },
       { show: true , name: 'title'           , nice_name: 'Title'                , sort: 'title'           , type: 'text'               , value: function(p) { return p.title           }, width: 200 },

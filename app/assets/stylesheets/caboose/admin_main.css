@@ -291,6 +291,14 @@ select.fake option {
   padding: 8px 12px;
 }
 
+#content table.data td.edit_button {
+  
+}
+
+#content table.data td.edit_button_over {
+  background: #f9ad81 !important;
+}
+
 #content table.data tr:nth-child(even) td {
   background-color: #efefef;
 }

@@ -140,7 +140,7 @@ module Caboose
     # GET /admin/pages/new
     def admin_new
       return unless user_is_allowed('pages', 'add')
-      @parent_id = params[:parent_id] ? params[:parent_id] : 1
+      @parent_id = params[:parent_id] ? params[:parent_id] : Page.where(:site_id => @site.id, :parent_id => -1).first.id
       @parent = Page.find(@parent_id)
       render :layout => 'caboose/admin'
     end
@@ -283,7 +283,7 @@ module Caboose
       end
       	
       parent = Caboose::Page.find(parent_id)                  		
-      page = Caboose::Page.new
+      page = Caboose::Page.new      
       
       if parent.nil?
         d = Domain.where(:domain => request.host_with_port).first.site_id
@@ -317,7 +317,7 @@ module Caboose
       Caboose::Page.update_authorized_for_action(page.id, 'edit', editors)
 
       # Send back the response
-      resp.redirect = "/admin/pages/#{page.id}/edit"
+      resp.redirect = "/admin/pages/#{page.id}"
       render json: resp
     end
     

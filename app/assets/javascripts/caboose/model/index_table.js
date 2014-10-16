@@ -105,7 +105,9 @@ IndexTable.prototype = {
     $.each(this.fields, function(i, f) {
       if (f.editable == null) f.editable = true;
     });
-
+    this.init_local_storage();    
+    this.get_visible_columns();
+    
     $(window).on('hashchange', function() { that.refresh(); });        
     this.refresh();
   },
@@ -414,7 +416,8 @@ IndexTable.prototype = {
               f.show = checked;
               that.print();
             }      
-          });               
+          });
+          that.set_visible_column(field_name, checked);
         });        
       if (field.show)
         input.prop('checked', 'true');      
@@ -425,6 +428,36 @@ IndexTable.prototype = {
       );
     });
     return div;
+  },
+  
+  init_local_storage: function()
+  {    
+    if (!localStorage) return;
+    var that = this;
+    
+    var cols = localStorage.getItem(this.container + '_cols');
+    if (!cols)
+    {
+      cols = {};
+      $.each(this.fields, function(i, f) { cols[f.name] = f.show; });
+      localStorage.setItem(this.container + '_cols', JSON.stringify(cols));      
+    } 
+  },
+  
+  get_visible_columns: function()
+  {
+    if (!localStorage) return;        
+    var cols = JSON.parse(localStorage.getItem(this.container + '_cols'));
+    $.each(this.fields, function(i, f) { f.show = cols[f.name]; });        
+  },
+  
+  set_visible_column: function(col, checked)
+  {
+    if (!localStorage) return;
+    var that = this;    
+    var cols = JSON.parse(localStorage.getItem(this.container + '_cols'));
+    cols[col] = checked;
+    localStorage.setItem(this.container + '_cols', JSON.stringify(cols));            
   },
 
   bulk_edit: function()

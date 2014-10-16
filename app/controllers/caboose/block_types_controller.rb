@@ -41,7 +41,7 @@ module Caboose
     def admin_json_single
       return if !user_is_allowed('pages', 'view')
       block_type = BlockType.find(params[:id])
-      render :json => block_type      
+      render :json => block_type.as_json(:include => :sites)      
     end
 
     # GET /admin/block-types/new

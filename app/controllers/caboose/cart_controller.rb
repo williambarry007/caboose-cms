@@ -7,8 +7,7 @@ module Caboose
     end
     
     # GET /cart
-    def index
-      
+    def index      
     end
     
     # GET /cart/items

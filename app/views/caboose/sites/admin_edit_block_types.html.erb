@@ -1,0 +1,45 @@
+<%
+s = @site
+%>
+<%= render :partial => 'caboose/sites/admin_header' %>
+
+<h2>Block Types</h2>
+<div id='block_types'>
+<table class='data'>
+<tr><th>&nbsp;</th><th>Name</th><th>Description</th></tr>
+<% bt_ids = @site.block_type_site_memberships.collect{ |bt| bt.block_type_id } %>
+<% Caboose::BlockType.where("parent_id is null").reorder('name').all.each do |bt| %>
+  <tr>
+    <td align='center'><input type='checkbox' name='block_type_id_<%= bt.id %>' <%= bt_ids.include?(bt.id) ? "checked='true'" : '' %> onclick="toggle_block_type_site_membership(<%= @site.id %>, <%= bt.id %>, $(this).prop('checked'));" /></td>
+    <td><%= bt.name %></td>
+    <td><%= bt.description %></td>
+  </tr>
+<% end %>
+</table><br/>
+</div>
+      
+<div id='message'></div>
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+      
+});
+
+function toggle_block_type_site_membership(site_id, block_type_id, checked)
+{
+  $.ajax({
+    url: '/admin/block-types/' + block_type_id,
+    type: 'put',
+    data: {
+      site_id: [site_id, checked ? 1 : 0]
+    },        
+    succes: function(resp) {}
+  });
+}
+
+</script>
+<% end %>

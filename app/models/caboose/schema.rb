@@ -495,6 +495,24 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :max_width      , :decimal ],
         [ :max_height     , :decimal ]
       ],
+      Caboose::StoreConfig => [
+        [ :site_id                , :integer ],     
+        [ :pp_name                , :string  ],
+        [ :pp_username            , :string  ],
+        [ :pp_password            , :string  ],
+        [ :use_usps               , :boolean , { :default => false } ],
+        [ :usps_secret_key        , :string  ],
+        [ :usps_publishable_key   , :string  ],
+        [ :allowed_shipping_codes , :string  ],
+        [ :default_shipping_code  , :string  ],    
+        [ :origin_country         , :string  ],
+        [ :origin_state           , :string  ],
+        [ :origin_city            , :string  ],
+        [ :origin_zip             , :string  ],
+        [ :fulfillment_email      , :string  ],
+        [ :shipping_email         , :string  ],
+        [ :handling_percentage    , :string  ]
+      ],
       Caboose::User => [
         [ :first_name           , :string     ],
         [ :last_name            , :string     ],

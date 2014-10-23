@@ -1,0 +1,40 @@
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#gravatar {
+  float: right;
+  width: 150px;
+  text-align: right;
+  margin: 0 4px 0 0;
+  padding: 0;
+}
+#gravatar img {
+  border: #fff 2px solid;
+}
+#content input[type=checkbox] { position: relative; }
+#members { height: 200px; overflow-y: scroll; margin-bottom: 20px; }
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<% end %>
+
+<h1 id='page_title'>Edit Site</h1>
+<ul id='tabs'>
+<%
+tabs = {
+  'General'      => "/admin/sites/#{@site.id}",
+  'Block Types'  => "/admin/sites/#{@site.id}/block-types",
+  'Store Config' => "/admin/sites/#{@site.id}/store",
+  'SMTP Config'  => "/admin/sites/#{@site.id}/smtp",  
+  'Delete Site'  => "/admin/sites/#{@site.id}/delete" 
+}
+
+%>
+<% tabs.each do |text, href| %>
+<li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
+<% end %>
+<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/sites';" /></li>
+</ul>
+<div id='content2'>

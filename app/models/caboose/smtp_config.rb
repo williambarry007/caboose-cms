@@ -13,7 +13,6 @@ class Caboose::SmtpConfig < ActiveRecord::Base
     :authentication       ,
     :enable_starttls_auto
 
-
   AUTH_PLAIN = 'plain'
   AUTH_LOGIN = 'login'
   AUTH_MD5 = 'cram_md5'

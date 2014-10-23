@@ -5,7 +5,7 @@ user_ids  = Caboose::SiteMembership.where(:site_id => s.id, :role => Caboose::Si
 admin_ids = [] if admin_ids.nil?
 user_ids = [] if user_ids.nil?
 %>
-<h1>Edit Site</h1>
+<%= render :partial => 'caboose/sites/admin_header' %>
 
 <p><div id='site_<%= @site.id %>_name'        ></div></p>
 <p><div id='site_<%= @site.id %>_description' ></div></p>
@@ -51,35 +51,9 @@ user_ids = [] if user_ids.nil?
 </table>
 </div>
 
-<h2>Block Types</h2>
-<div id='block_types'>
-<table class='data'>
-<tr><th>&nbsp;</th><th>Name</th><th>Description</th></tr>
-<% bt_ids = @site.block_type_site_memberships.collect{ |bt| bt.block_type_id } %>
-<% Caboose::BlockType.where("parent_id is null").reorder('name').all.each do |bt| %>
-  <tr>
-    <td align='center'><input type='checkbox' name='block_type_id_<%= bt.id %>' <%= bt_ids.include?(bt.id) ? "checked='true'" : '' %> onclick="toggle_block_type_site_membership(<%= @site.id %>, <%= bt.id %>, $(this).prop('checked'));" /></td>
-    <td><%= bt.name %></td>
-    <td><%= bt.description %></td>
-  </tr>
-<% end %>
-</table><br/>
-</div>
+<%= render :partial => 'caboose/sites/admin_footer' %>
 
-<div id='message'></div>
-<div id='controls'>
-<input type='button' value='Back'           onclick="window.location='/admin/sites';" />
-<input type='button' value='Delete Site'    onclick="delete_site(<%= @site.id %>);" />
-</div>
-
-<% content_for :caboose_css do %>
-<style type='text/css'>
-#content input[type=checkbox] { position: relative; }
-#members { height: 200px; overflow-y: scroll; margin-bottom: 20px; }
-</style>
-<% end %>
 <% content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -93,30 +67,8 @@ $(document).ready(function() {
       { name: 'description'             , nice_name: 'Description'              , type: 'textarea' , value: <%= raw Caboose.json(@site.description)             %>, width: 600, height: 75 },
       { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html) %>, width: 600, height: 75 }      
     ]    
-  });  
+  });       
 });
-
-function delete_site(site_id, confirm)
-{        
-  if (!confirm)
-  {
-    var p = $('<p/>').addClass('note confirm')
-      .append('Are you sure you want to delete the site? ')
-      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_site(site_id, true); })).append(' ')
-      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
-    $('#message').empty().append(p);
-    return;
-  }
-  $('#message').html("<p class='loading'>Deleting site...</p>");
-  $.ajax({
-    url: '/admin/sites/' + site_id,
-    type: 'delete',
-    success: function(resp) {
-      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
-      if (resp.redirect) window.location = resp.redirect;
-    }
-  });
-}
 
 function set_under_construction(site_id, domain_id, checked)
 {
@@ -145,18 +97,6 @@ function remove_site_membership(site_id, user_id)
   $.ajax({
     url: '/admin/sites/' + site_id +'/members/' + user_id,
     type: 'delete',    
-    succes: function(resp) {}
-  });
-}
-
-function toggle_block_type_site_membership(site_id, block_type_id, checked)
-{
-  $.ajax({
-    url: '/admin/block-types/' + block_type_id,
-    type: 'put',
-    data: {
-      site_id: [site_id, checked ? 1 : 0]
-    },        
     succes: function(resp) {}
   });
 }
@@ -221,19 +161,4 @@ function set_primary_domain(site_id, domain_id)
 }
 
 </script>
-<% end %>
-
-<% content_for :caboose_css do %>
-<style type='text/css'>
-#gravatar {
-  float: right;
-  width: 150px;
-  text-align: right;
-  margin: 0 4px 0 0;
-  padding: 0;
-}
-#gravatar img {
-  border: #fff 2px solid;
-}
-</style>
 <% end %>

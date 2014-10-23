@@ -1,0 +1,39 @@
+<%
+s = @site
+%>
+<%= render :partial => 'caboose/sites/admin_header' %>
+      
+<div id='message'></div>
+<div id='controls'>
+<input type='button' value='Delete Site'    onclick="delete_site(<%= @site.id %>);" />
+</div>
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+function delete_site(site_id, confirm)
+{        
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note confirm')
+      .append('Are you sure you want to delete the site? ')
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_site(site_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').html("<p class='loading'>Deleting site...</p>");
+  $.ajax({
+    url: '/admin/sites/' + site_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

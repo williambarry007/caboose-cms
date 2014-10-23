@@ -33,7 +33,33 @@ module Caboose
     # GET /admin/sites/1/edit
     def admin_edit
       return if !user_is_allowed('sites', 'edit')
+      @site = Site.find(params[:id])      
+    end
+    
+    # GET /admin/sites/1/edit/store
+    def admin_edit_store_config
+      return if !user_is_allowed('sites', 'edit')
       @site = Site.find(params[:id])
+      StoreConfig.create(:site_id => @site.id) if @site.store_config.nil?      
+    end
+    
+    # GET /admin/sites/1/edit/smtp
+    def admin_edit_smtp_config
+      return if !user_is_allowed('sites', 'edit')
+      @site = Site.find(params[:id])      
+      SmtpConfig.create(:site_id => @site.id)  if @site.smtp_config.nil?
+    end
+    
+    # GET /admin/sites/1/edit/block-types
+    def admin_edit_block_types
+      return if !user_is_allowed('sites', 'edit')
+      @site = Site.find(params[:id])      
+    end
+    
+    # GET /admin/sites/1/edit/delete
+    def admin_delete_form
+      return if !user_is_allowed('sites', 'edit')
+      @site = Site.find(params[:id])      
     end
         
     # POST /admin/sites
@@ -46,8 +72,10 @@ module Caboose
       
       if site.name.length == 0
         resp.error = "Please enter a valid domain."      
-      else
+      else        
         site.save
+        StoreConfig.create(:site_id => site.id)
+        SmtpConfig.create( :site_id => site.id)
         resp.redirect = "/admin/sites/#{site.id}"
       end
       
@@ -150,6 +178,26 @@ module Caboose
     def options
       return if !user_is_allowed('sites', 'view')
       options = Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }}
+      render :json => options
+    end
+    
+    # GET /admin/sites/payment-processor-options
+    def payment_processor_options
+      return if !user_is_allowed('sites', 'view')
+      options = [ 
+        { 'value' => 'stripe', 'text' => 'Stripe' }
+      ]
+      render :json => options
+    end
+    
+    # GET /admin/sites/smtp-auth-options
+    def smtp_auth_options
+      return if !user_is_allowed('sites', 'view')
+      options = [
+        { 'value' => SmtpConfig::AUTH_PLAIN , 'text' => SmtpConfig::AUTH_PLAIN },
+        { 'value' => SmtpConfig::AUTH_LOGIN , 'text' => SmtpConfig::AUTH_LOGIN },
+        { 'value' => SmtpConfig::AUTH_MD5   , 'text' => SmtpConfig::AUTH_MD5   }                  
+      ]
       render :json => options
     end
     

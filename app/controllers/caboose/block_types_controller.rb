@@ -23,13 +23,15 @@ module Caboose
         h['parent_id'] = ''
       else
         h['parent_id_null'] = true
+        params[:parent_id_null] = nil if params[:parent_id_null]
       end
       pager = Caboose::Pager.new(params, h, {      
         'model' => 'Caboose::BlockType',
         'sort'  => 'description',
         'desc'  => 'false',
         'base_url' => "/admin/block-types",
-        'items_per_page' => 10
+        'items_per_page' => 10,
+        'skip' => ['parent_id_null']
       })      
       render :json => {
         :pager => pager,

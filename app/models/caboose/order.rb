@@ -12,7 +12,8 @@ module Caboose
     belongs_to :billing_address, :class_name => 'Address'
     has_many :discounts, :through => :order_discounts
     has_many :order_discounts
-    has_many :line_items, :after_add => :line_item_added, :after_remove => :line_item_removed
+    has_many :line_items, :after_add => :line_item_added, :after_remove => :line_item_removed, :order => :id
+    has_many :packages, :class_name => 'Caboose::OrderPackage'
     
     attr_accessible :id,
       :order_number,

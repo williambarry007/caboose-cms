@@ -76,11 +76,8 @@ module Caboose
     
     def as_json(options={})
       self.attributes.merge({
-        :images => if self.product_images.any?
-          self.product_images
-        else
-          [self.product.product_images.first]
-        end
+        :images => self.product_images.any? ? self.product_images : [self.product.product_images.first],
+        :title => "#{self.product.title} (#{self.options.join(', ')})"
       })
     end
     

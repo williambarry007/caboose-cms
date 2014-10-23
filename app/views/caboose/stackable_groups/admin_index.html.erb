@@ -1,0 +1,43 @@
+<h1>Stackable Groups</h1>
+	
+<div id='stackable_groups'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'stackable_groups',
+    base_url: '/admin/stackable-groups',
+    delete_url: function(sg_id) { '/admin/stackable-groups/' + sg_id; }, 
+    allow_bulk_edit: false,
+    allow_bulk_delete: true,
+    allow_duplicate: false,
+    allow_advanced_edit: true,
+    fields: [
+      { show: true, name: 'name'          , nice_name: 'Name'         , sort: 'name'          , type: 'text', value: function(sg) { return sg.name          }, width: 100 },           
+      { show: true, name: 'extra_length'  , nice_name: 'Extra length (in)' , sort: 'extra_length'  , type: 'text', value: function(sg) { return sg.extra_length  }, width: 100 },
+      { show: true, name: 'extra_width'   , nice_name: 'Extra width (in)'  , sort: 'extra_width'   , type: 'text', value: function(sg) { return sg.extra_width   }, width: 100 },
+      { show: true, name: 'extra_height'  , nice_name: 'Extra height (in)' , sort: 'extra_height'  , type: 'text', value: function(sg) { return sg.extra_height  }, width: 100 },
+      { show: true, name: 'max_length'    , nice_name: 'Max length (in)'   , sort: 'max_length'    , type: 'text', value: function(sg) { return sg.max_length    }, width: 100 },
+      { show: true, name: 'max_width'     , nice_name: 'Max width (in)'    , sort: 'max_width'     , type: 'text', value: function(sg) { return sg.max_width     }, width: 100 },
+      { show: true, name: 'max_height'    , nice_name: 'Max height (in)'   , sort: 'max_height'    , type: 'text', value: function(sg) { return sg.max_height    }, width: 100 }            
+    ],
+    new_model_text: 'New Stackable Group',
+    new_model_fields: [
+      { name: 'name', nice_name: 'Name', type: 'text', width: 400 }                      
+    ],    
+  });
+});
+    
+</script>
+<% end %>
+
+<% content_for :caboose_css do %>
+<style>
+
+</style>
+<% end %>

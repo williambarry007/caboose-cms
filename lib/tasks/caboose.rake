@@ -92,7 +92,13 @@ namespace :caboose do
       max = rows[0]['max']
       max = max.to_i if !max.nil?
       
-      rows = c.execute("select nextval('#{tbl}_id_seq')")
+      rows = nil
+      begin
+        rows = c.execute("select nextval('#{tbl}_id_seq')")
+      rescue
+        next
+      end
+        
       nextval = rows[0]['nextval']
       nextval = nextval.to_i if !nextval.nil?
       

@@ -1,7 +1,5 @@
 <div id="checkout">
-  <h2>Checkout</h2>
-  <%= raw checkout_nav(1) %>
-  
+
   <% if @logged_in_user.id == 1 %>
     <p class='note error'>You are logged in as the admin user. Please <a href='/logout'>logout</a> and complete your order as a different user.</p>
   <% else %>
@@ -48,5 +46,6 @@
 <%= javascript_include_tag 'caboose/checkout_step1' %>
 <% end %>
 <%= content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/message_boxes' %>
 <%= stylesheet_link_tag 'caboose/checkout' %>
 <% end %>

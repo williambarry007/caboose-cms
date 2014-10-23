@@ -20,6 +20,9 @@ IndexTable.prototype = {
   // Where to send bulk deletes
   bulk_delete_url: false,
   
+  // When to send bulk import CSV data
+  bulk_import_url: false,
+  
   // Where to post new models
   add_url: false,
   
@@ -73,8 +76,10 @@ IndexTable.prototype = {
     
   allow_bulk_edit: true,
   allow_bulk_delete: true,
-  allow_duplicate: true,
-  allow_advanced_edit: true,  
+  allow_bulk_import: true,
+  allow_duplicate: true,  
+  allow_advanced_edit: true,
+  bulk_import_fields: false,  
   no_models_text: "There are no models right now.",
   new_model_text: 'New',
   new_model_fields: [{ name: 'name', nice_name: 'Name', type: 'text', width: 400 }],
@@ -236,8 +241,9 @@ IndexTable.prototype = {
       var columns = this.column_checkboxes();            
       var controls = $('<p/>');
       if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'  ).val('Bulk Edit'  ).click(function(e) { that.bulk_edit();   })).append(' ');
-      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete').val('Bulk Delete').click(function(e) { that.bulk_delete(); })).append(' ');
-      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'  ).val('Duplicate'  ).click(function(e) { that.duplicate();   }));
+      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete').val('Delete'     ).click(function(e) { that.bulk_delete(); })).append(' ');
+      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'  ).val('Duplicate'  ).click(function(e) { that.duplicate();   })).append(' ');
+      if (this.allow_bulk_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import').val('Bulk Import').click(function(e) { that.bulk_import(); })).append(' ');
       
       $('#' + that.container).empty()
         .append($('<p/>')
@@ -465,7 +471,7 @@ IndexTable.prototype = {
     var that = this;
     if (this.model_ids.length == 0)
     {
-      $('#message').html("<p class='note error'>Please select at least one row.</p>");
+      $('#' + that.container + '_message').html("<p class='note error'>Please select at least one row.</p>");
       return;
     }   
     var div = $('<div/>')
@@ -475,8 +481,8 @@ IndexTable.prototype = {
       if (field.bulk_edit == true)
         div.append($('<p/>').append($('<div/>').attr('id', 'bulkmodel_1_' + field.name)));
     });      
-    div.append($('<input/>').attr('type','button').val('Finished').click(function() { $('#message').empty(); }));    
-    $('#message').empty().append(div);
+    div.append($('<input/>').attr('type','button').val('Finished').click(function() { $('#' + that.container + '_message').empty(); }));    
+    $('#' + that.container + '_message').empty().append(div);
         
     var params = this.model_ids.map(function(model_id) { return 'model_ids[]=' + model_id; }).join('&');
     var attribs = [];
@@ -505,16 +511,16 @@ IndexTable.prototype = {
     var that = this;
     if (this.model_ids.length == 0)
     {
-      $('#message').html("<p class='note error'>Please select at least one row.</p>");
+      $('#' + that.container + '_message').html("<p class='note error'>Please select at least one row.</p>");
       return;
     } 
     if (!confirm)
     {
       var p = $('<p/>').addClass('note').addClass('warning')
         .append('Are you sure you want to delete the selected rows? ')      
-        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.bulk_delete(true); }))
-        .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
-      $('#message').empty().append(p);
+        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.bulk_delete(true); })).append(' ')
+        .append($('<input/>').attr('type','button').val('No').click(function() { $('#' + that.container + '_message').empty(); }));
+      $('#' + that.container + '_message').empty().append(p);
       return;
     }        
     var params = this.model_ids.map(function(model_id) { return 'model_ids[]=' + model_id; }).join('&');
@@ -526,10 +532,57 @@ IndexTable.prototype = {
         model_ids: that.model_ids
       },
       success: function(resp) {
-        $('#message').empty();
+        $('#' + that.container + '_message').empty();
         that.refresh();        
       }      
     });        
+  },
+  
+  bulk_import: function(data, data_url)
+  {
+    var that = this;
+    if (!data && !data_url)
+    {
+      var div = $('<div/>').addClass('note')
+        .append($('<h2/>').html('Bulk Import'))
+        .append($('<p/>').html("Enter either the URL where CSV data can be downloaded or the CSV data.</p>"))
+        .append($('<p/>')
+          .append('CSV Data URL').append('<br />')
+          .append($('<input/>').attr('id', that.container + '_bulk_import_data_url').attr('placeholder', 'CSV Data URL').css('width', '100%'))
+        )
+        .append($('<p/>')
+          .append('CSV Data').append('<br />')
+          .append($('<textarea/>').attr('id', that.container + '_bulk_import_data').attr('placeholder', 'CSV Data').css('width', '100%').css('height', '150px'))
+        )
+        .append($('<p/>')
+          .append($('<input/>').attr('type','button').val('Cancel').click(function() { $('#' + that.container + '_message').empty(); })).append(' ')
+          .append($('<input/>').attr('type','button').val('Add').click(function() { that.bulk_import($('#' + that.container + '_bulk_import_data').val(), $('#' + that.container + '_bulk_import_data_url').val()); }))
+        );        
+      if (that.bulk_import_fields)
+        div.append($('<p/>').css('font-size', '75%').html("Format: " + that.bulk_import_fields.join(', ')));
+      
+      $('#' + that.container + '_message').empty().append(div);
+      return;
+    }
+    $('#' + that.container + '_message').empty().append("<p class='loading'>Adding...</p>");
+    $.ajax({
+      url: this.bulk_import_url,
+      type: 'post',
+      data: { 
+        csv_data: data,
+        csv_data_url: data_url
+      },
+      success: function(resp) {
+        if (resp.error)
+          $('#' + that.container + '_message').html("<p class='note error'>" + resp.error + "</p>");        
+        else
+        {
+          $('#' + that.container + '_message').html("<p class='note success'>Added successfully.</p>");
+          setTimeout(function() { $('#' + that.container + '_message').empty(); }, 3000);
+          that.refresh();
+        }
+      }        
+    });                      
   },
   
   model_for_id: function(model_id)
@@ -546,13 +599,13 @@ IndexTable.prototype = {
     if (this.model_ids.length == 0)
     {
       var p = $('<p/>').addClass('note error').html("Please select a row.");
-      $('#message').empty().append(p);
+      $('#' + that.container + '_message').empty().append(p);
       return;
     }
     if (this.model_ids.length > 1)
     {
       var p = $('<p/>').addClass('note error').html("Please select a single row.");
-      $('#message').empty().append(p);
+      $('#' + that.container + '_message').empty().append(p);
       return;
     }
     if (!count)
@@ -561,19 +614,19 @@ IndexTable.prototype = {
         .append('How many times do you want this duplicated?')          
         .append($('<input/>').attr('type', 'text').attr('id', 'count').css('width', '50'))
         .append('<br />')
-        .append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { $('#message').empty(); })).append(' ')
+        .append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { $('#' + that.container + '_message').empty(); })).append(' ')
         .append($('<input/>').attr('type', 'button').val('Duplicate').click(function(e) { that.duplicate($('#count').val()); return false; }));
-      $('#message').empty().append(p);
+      $('#' + that.container + '_message').empty().append(p);
       return;      
     }    
-    $('#message').html("<p class='loading'>Duplicating...</p>");
+    $('#' + that.container + '_message').html("<p class='loading'>Duplicating...</p>");
     $.ajax({
       url: that.duplicate_url(that.model_ids[0], that),
       type: 'post',
       data: { count: count },
       success: function(resp) {
-        if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) { $('#message').empty(); that.refresh(); }
+        if (resp.error) $('#' + that.container + '_message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) { $('#' + that.container + '_message').empty(); that.refresh(); }
       }
     });    
   },
@@ -648,8 +701,10 @@ IndexTable.prototype = {
   
   pager_params: function(h)
   {
-    var that = this;    
-    var p = $.extend({}, this.pager.params);
+    var that = this;
+    var skip = this.pager.options && this.pager.options.skip ? this.pager.options.skip : [];    
+    var p = {};
+    for (var i in this.pager.params) if (skip.indexOf(i) == -1) p[i] = this.pager.params[i];
     if (this.pager.options)
     {      
       if (this.pager.options.sort) p.sort = this.pager.options.sort;
@@ -657,17 +712,14 @@ IndexTable.prototype = {
       if (this.pager.options.page) p.page = this.pager.options.page;
     }
     if (h)      
-    {
+    {                  
       for (var i in h)
-      {        
-        //console.log('' + i + ' = ' + h[i]);        
-        //console.log(typeof(h[i]));        
-        //console.log('-------------------');
+      {                 
         if (typeof(h[i]) == 'boolean')
           p[i] = h[i] ? 1 : 0;
         else
           p[i] = h[i];
-      }
+      }      
     }
     return p;
   },
@@ -705,7 +757,7 @@ IndexTable.prototype = {
       form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
     });
     form
-      .append($('<div/>').attr('id', 'new_message'))
+      .append($('<div/>').attr('id', that.container + '_new_message'))
       .append($('<p>')        
         .append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { $('#' + that.container + '_new_form_container').empty(); }))
         .append(' ')
@@ -721,13 +773,13 @@ IndexTable.prototype = {
   add_model: function() 
   {
     var that = this;
-    $('#new_message').html("<p class='loading'>Adding...</p>");
+    $('#' + that.container + '_new_message').html("<p class='loading'>Adding...</p>");
     $.ajax({
       url: this.add_url,
       type: 'post',
       data: $('#new_form').serialize(),
       success: function(resp) {
-        if (resp.error) $('#new_message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.error) $('#' + that.container + '_new_message').html("<p class='note error'>" + resp.error + "</p>");
         if (resp.redirect || resp.refresh) that.refresh();
       }
     });

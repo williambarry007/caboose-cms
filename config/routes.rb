@@ -243,12 +243,12 @@ Caboose::Engine.routes.draw do
   delete  "admin/ab-options/:id"                  => "ab_options#admin_delete"
   
   # Cart  
-  get    '/cart'            => 'cart#index'
-  get    '/cart/items'      => 'cart#list'
-  get    '/cart/item-count' => 'cart#item_count'
-  post   '/cart/items'      => 'cart#add'
-  put    '/cart/items/:id'  => 'cart#update'
-  delete '/cart/items/:id'  => 'cart#remove'
+  get    '/cart'               => 'cart#index'
+  get    '/cart/items'         => 'cart#list'
+  get    '/cart/item-count'    => 'cart#item_count'
+  post   '/cart'               => 'cart#add'
+  put    '/cart/:line_item_id' => 'cart#update'
+  delete '/cart/:line_item_id' => 'cart#remove'
   
   # Checkout  
   get  '/checkout'                 => 'checkout#index'
@@ -341,6 +341,15 @@ Caboose::Engine.routes.draw do
   post    "/admin/products/:id/variants"              => "variants#admin_add"
   delete  "/admin/variants/:id"                       => "variants#admin_delete"
   
+  get    "/admin/stackable-groups/options"            => "stackable_groups#admin_options"  
+  get    "/admin/stackable-groups/json"               => "stackable_groups#admin_json"
+  get    "/admin/stackable-groups/:id/json"           => "stackable_groups#admin_json_single"
+  get    "/admin/stackable-groups"                    => "stackable_groups#admin_index"
+  put    "/admin/stackable-groups/:id"                => "stackable_groups#admin_update"
+  post   "/admin/stackable-groups"                    => "stackable_groups#admin_add"
+  delete "/admin/stackable-groups/bulk"               => "stackable_groups#admin_bulk_delete"
+  delete "/admin/stackable-groups/:id"                => "stackable_groups#admin_delete"
+
   get     "/admin/categories"                         => "categories#admin_index"
   get     "/admin/categories/new"                     => "categories#admin_new"
   get     "/admin/categories/options"                 => "categories#admin_options"  

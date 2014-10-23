@@ -1,8 +1,21 @@
-<div class="wrapper">
-  <div id="cart"></div>
-</div>
+<div class="constrain">
+  <div id='cart'></div>
+</div> 
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/message_boxes' %>
+<%= stylesheet_link_tag 'caboose/model_binder' %>
+<%= stylesheet_link_tag 'caboose/cart' %>
+<% end %>
 
 <% content_for :caboose_js do %>
-<%= javascript_include_tag 'caboose/cart' %>
-<%= javascript_include_tag 'caboose/product' %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/cart2' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  var controller = new Cart();  
+});
+
+</script>
 <% end %>

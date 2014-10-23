@@ -36,8 +36,18 @@ module Caboose
     def step_three
       redirect_to '/checkout/step-one' and return if !logged_in?
       redirect_to '/checkout/step-two' and return if @order.shipping_address.nil? || @order.billing_address.nil?
+            
+      # Remove any order packages      
+      LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
+      OrderPackage.where(:order_id => @order.id).destroy_all      
+      
+      # Calculate what shipping packages we'll need      
+      OrderPackage.create_for_order(@order)
+      
+      # Now get the rates for those packages
+      Caboose.log("Getting rates...")      
       @rates = ShippingCalculator.rates(@order)
-      @selected_rate = ShippingCalculator.rate(@order)
+      Caboose.log(@rates.inspect)      
     end
     
     # GET /checkout/step-four

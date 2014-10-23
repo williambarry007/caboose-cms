@@ -577,20 +577,21 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
-          when 'alternate_id'     then product.alternate_id    = value          
-          when 'title'            then product.title           = value
-          when 'caption'          then product.caption         = value
-          when 'featured'         then product.featured        = value
-          when 'description'      then product.description     = value          
-          when 'vendor_id'        then product.vendor_id       = value
-          when 'handle'           then product.handle          = value
-          when 'seo_title'        then product.seo_title       = value
-          when 'seo_description'  then product.seo_description = value
-          when 'status'           then product.status          = value
-          when 'category_id'      then product.toggle_category(value[0], value[1])
-          when 'option1'          then product.option1         = value
-          when 'option2'          then product.option2         = value
-          when 'option3'          then product.option3         = value
+          when 'alternate_id'       then product.alternate_id       = value          
+          when 'title'              then product.title              = value
+          when 'caption'            then product.caption            = value
+          when 'featured'           then product.featured           = value
+          when 'description'        then product.description        = value          
+          when 'vendor_id'          then product.vendor_id          = value
+          when 'handle'             then product.handle             = value
+          when 'seo_title'          then product.seo_title          = value
+          when 'seo_description'    then product.seo_description    = value
+          when 'status'             then product.status             = value
+          when 'category_id'        then product.toggle_category(value[0], value[1])
+          when 'stackable_group_id' then product.stackable_group_id = value
+          when 'option1'            then product.option1            = value
+          when 'option2'            then product.option2            = value
+          when 'option3'            then product.option3            = value
           when 'default1'
             product.default1 = value
             Variant.where(:product_id => product.id, :option1 => nil).each do |p|
@@ -666,6 +667,19 @@ module Caboose
     
     # GET /products/status-options
     def admin_status_options
+      arr = ['Active', 'Inactive', 'Deleted']
+      options = []
+      arr.each do |status|
+        options << {
+          :value => status,
+          :text => status
+        }
+      end
+      render :json => options
+    end
+    
+    # GET /products/stackable-group-options
+    def admin_stackable_group_options
       arr = ['Active', 'Inactive', 'Deleted']
       options = []
       arr.each do |status|

@@ -3,18 +3,19 @@ module Caboose
     self.table_name = 'store_line_items'
     
     belongs_to :variant
-    belongs_to :order, :dependent => :destroy
+    belongs_to :order
+    belongs_to :order_package, :class_name => 'OrderPackage'
     belongs_to :parent, :class_name => 'LineItem', :foreign_key => 'parent_id'
     has_many :children, :class_name => 'LineItem', :foreign_key => 'parent_id'
     
     attr_accessible :id,
+      :order_package_id,
       :variant_id,
       :quantity,
       :price,
       :notes,
       :order_id,
-      :status,
-      :tracking_number,
+      :status,      
       :custom1,
       :custom2,
       :custom3
@@ -66,15 +67,28 @@ module Caboose
     end
     
     def as_json(options={})
-      self.attributes.merge({
+      self.attributes.merge({        
         :variant => self.variant,
-        :title => self.title,
-        :product => { :images => self.variant.product.product_images }
+        :title   => self.title
       })
     end
     
     def subtotal
       return self.quantity * self.price
+    end
+    
+    def copy
+      LineItem.new(      
+        :variant_id      => self.variant_id      ,
+        :quantity        => self.quantity        ,
+        :price           => self.price           ,
+        :notes           => self.notes           ,
+        :order_id        => self.order_id        ,
+        :status          => self.status          ,        
+        :custom1         => self.custom1         ,
+        :custom2         => self.custom2         ,
+        :custom3         => self.custom3
+      )
     end
   end
 end

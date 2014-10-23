@@ -3,6 +3,7 @@ module Caboose
     self.table_name = 'store_products'
     self.primary_key = 'id'
     
+    belongs_to :stackable_group, :class_name => 'Caboose::StackableGroup'
     belongs_to :vendor, :class_name => 'Caboose::Vendor'
     has_many :customizations, :class_name => 'Caboose::Product', :through => :customization_memberships
     has_many :customization_memberships, :class_name => 'Caboose::CustomizationMembership'
@@ -66,7 +67,7 @@ module Caboose
         :vendor => self.vendor,
         :categories => self.categories,
         :variants => self.variants,
-        :images => self.product_images
+        :images => self.product_images        
       })
     end
     

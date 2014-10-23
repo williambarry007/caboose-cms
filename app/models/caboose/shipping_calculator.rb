@@ -3,72 +3,48 @@ include ActiveMerchant::Shipping
 
 module Caboose
   class ShippingCalculator
+    
     def self.rates(order)
-      return [] if Caboose::shipping.nil?
+      return [] if Caboose::store_shipping.nil?
       
-      total  = 0.0
-      weight = 0.0
-      
-      order.line_items.each do |li|
-        total  = total + (li.variant.shipping_unit_value.nil? ? 0 : li.variant.shipping_unit_value)
-        weight = weight + (li.variant.weight || 0)
-      end
-      
-      length = 0
-      width  = 0
-      height = 0
-      
-      if total <= 5
-        length = 15.5
-        width  = 9.5
-        height = 6
-      elsif total <= 10
-        length = 12
-        width  = 8
-        height = 5
-      else
-        length = 20
-        width  = 16
-        height = 14
-      end
-      
+      ss = Caboose::store_shipping
       origin = Location.new(
-        :country => Caboose::shipping[:origin][:country],
-        :state   => Caboose::shipping[:origin][:state],
-        :city    => Caboose::shipping[:origin][:city],
-        :zip     => Caboose::shipping[:origin][:zip]
-      )
-      
+        :country => ss[:origin][:country],
+        :state   => ss[:origin][:state],
+        :city    => ss[:origin][:city],
+        :zip     => ss[:origin][:zip]
+      )      
       destination = Location.new(
-        :country     => Caboose::shipping[:origin][:country],
+        :country     => ss[:origin][:country],
         :state       => order.shipping_address.state,
         :city        => order.shipping_address.city,
         :postal_code => order.shipping_address.zip
-      )
-      
-      packages = [Package.new(weight, [length, width, height], :units => :imperial)]
-      
-      ups = UPS.new(
-        :key            => Caboose::shipping[:ups][:key],
-        :login          => Caboose::shipping[:ups][:username],
-        :password       => Caboose::shipping[:ups][:password],
-        :origin_account => Caboose::shipping[:ups][:origin_account]
-      )
-      
-      ups_response = ups.find_rates(origin, destination, packages)
-      
-      rates = ups_response.rates.collect do |rate|
-        next if Caboose::allowed_shipping_method_codes && !Caboose::allowed_shipping_method_codes.index(rate.service_code)
-        
-        {
-          :service_code    => rate.service_code,
-          :service_name    => rate.service_name,
-          :total_price     => rate.total_price.to_d / 100,
-          :negotiated_rate => rate.negotiated_rate
-        }
-      end
-      
-      return rates.compact
+      )      
+      ups = ss[:ups] ? UPS.new(:key => ss[:ups][:key], :login => ss[:ups][:username], :password => ss[:ups][:password], :origin_account => ss[:ups][:origin_account]) : nil        
+      usps = ss[:usps] ? USPS.new(:login => ss[:usps][:username]) : nil                        
+                  
+      all_rates = []
+      order.packages.each do |op|              
+        sp = op.shipping_package
+        package = op.activemerchant_package
+        rates = []
+        if ups                  
+          resp = ups.find_rates(origin, destination, package)      
+          resp.rates.sort_by(&:price).each do |rate|
+            next if rate.service_code != sp.service_code            
+            rates << { :carrier => 'UPS', :service_code => rate.service_code, :service_name => rate.service_name, :price => rate.total_price.to_d / 100 }
+          end
+        end
+        if usps
+          resp = usps.find_rates(origin, destination, package)
+          resp.rates.sort_by(&:price).each do |rate|
+            next if rate.service_code != sp.service_code            
+            rates << { :carrier => 'USPS', :service_code => rate.service_code, :service_name => rate.service_name, :total_price  => rate.total_price.to_d / 100 }
+          end
+        end
+        all_rates << [op, rates]
+      end            
+      return all_rates
     end
     
     def self.rate(order)
@@ -76,6 +52,71 @@ module Caboose
       self.rates(order).each { |rate| return rate if rate[:service_code] == order.shipping_method_code }
       return nil
     end
+                
+    # Calculates the packages required for all the items in the order
+    #def self.packages_for_order(order)
+    #
+    #  # Make sure all the items in the order have attributes set
+    #  order.line_items.each do |li|              
+    #    v = li.variant
+    #    Caboose.log("Error: variant #{v.id} has a zero weight") and return false if v.weight.nil? || v.weight == 0
+    #    next if v.volume && v.volume > 0
+    #    Caboose.log("Error: variant #{v.id} has a zero length") and return false if v.length.nil? || v.length == 0
+    #    Caboose.log("Error: variant #{v.id} has a zero width" ) and return false if v.width.nil?  || v.width  == 0
+    #    Caboose.log("Error: variant #{v.id} has a zero height") and return false if v.height.nil? || v.height == 0        
+    #    v.volume = v.length * v.width * v.height
+    #    v.save
+    #  end
+    #        
+    #  # Reorder the items in the order by volume            
+    #  h = {}
+    #  order.line_items.each do |li|
+    #    (1..li.quantity).each do |i|        
+    #      v = li.variant          
+    #      h[v.volume] = v          
+    #    end
+    #  end      
+    #  variants = h.sort_by{ |k,v| k }.collect{ |x| x[1] }
+    #  
+    #  all_packages = ShippingPackage.reorder(:price).all
+    #  packages = []
+    #  
+    #  # Now go through each variant and fit it in a new or existing package
+    #  variants.each do |v|
+    #    
+    #    # See if the item will fit in any of the existing packages
+    #    it_fits = false
+    #    packages.each do |h|
+    #      it_fits = h.shipping_package.fits(h.variants, v)
+    #      if it_fits
+    #        h.variants << v
+    #        break
+    #      end
+    #    end        
+    #    next if it_fits
+    #    
+    #    # Otherwise find the cheapest package the item will fit into
+    #    all_packages.each do |p|          
+    #      if p.fits(v)
+    #        packages << StdClass.new('shipping_package' => p, 'variants' => [v])
+    #        break
+    #      end
+    #    end
+    #           
+    #  end
+    #  
+    #  return packages
+    #  
+    #  #arr = []
+    #  #packages.each do |h|
+    #  #  p = h.package
+    #  #  weight = 0.0
+    #  #  h.variants.each{ |v| weight = weight + v.weight }
+    #  #  weight = weight * 0.035274        
+    #  #  arr << Package.new(weight, [p.length, p.width, p.height], :units => :imperial)      
+    #  #end      
+    #  #return arr
+    #                  
+    #end
   end
 end
-

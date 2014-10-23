@@ -1,13 +1,8 @@
 module Caboose
   class CartController < Caboose::ApplicationController
-    before_filter :get_line_item, :only => [:update, :remove]
-    
-    def get_line_item
-      @line_item = @order.line_items.find(params[:id])
-    end
     
     # GET /cart
-    def index      
+    def index
     end
     
     # GET /cart/items
@@ -20,31 +15,43 @@ module Caboose
       render :json => { :item_count => @order.line_items.count }
     end
     
-    # POST /cart/add
+    # POST /cart
     def add
-      if @order.line_items.exists?(:variant_id => params[:variant_id])
-        @line_item = @order.line_items.find_by_variant_id(params[:variant_id])
-        @line_item.quantity += params[:quantity] ? params[:quantity].to_i : 1
-      else
-        @line_item = LineItem.new
-        @line_item.variant_id = params[:variant_id]
-        @line_item.order_id = @order.id
-        @line_item.status = 'pending'
-        @line_item.quantity = params[:quantity] ? params[:quantity].to_i : 1
-      end
+      variant_id = params[:variant_id]
+      qty = params[:quantity] ? params[:quantity].to_i : 1
       
-      render :json => { :success => @line_item.save, :errors => @line_item.errors.full_messages, :item_count => @order.line_items.count }
+      if @order.line_items.exists?(:variant_id => variant_id)
+        li = @order.line_items.find_by_variant_id(variant_id)
+        li.quantity += qty
+      else
+        li = LineItem.new(
+          :order_id   => @order.id,
+          :variant_id => variant_id,
+          :quantity   => qty,
+          :status     => 'pending'
+        )
+      end            
+      render :json => { 
+        :success => li.save, 
+        :errors => li.errors.full_messages,
+        :item_count => @order.line_items.count 
+      }
     end
     
-    # PUT cart/update
+    # PUT /cart/:line_item_id
     def update
-      @line_item.quantity = params[:quantity].to_i
-      render :json => { :success => @line_item.save, :errors => @line_item.errors.full_messages, :line_item => @line_item, :order_subtotal => @order.calculate_subtotal }
+      li = LineItem.find(params[:line_item_id])
+      li.quantity = params[:quantity].to_i
+      li.save
+      li.destroy if li.quantity == 0
+      @order.calculate_subtotal
+      render :json => { :success => true }
     end
     
-    # DELETE cart/delete
+    # DELETE /cart/:line_item_id
     def remove
-      render :json => { :success => !!@order.line_items.delete(@line_item), :item_count => @order.line_items.count }
+      li = LineItem.find(params[:line_item_id]).destroy
+      render :json => { :success => true, :item_count => @order.line_items.count }
     end
   end
 end

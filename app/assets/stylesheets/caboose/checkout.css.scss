@@ -2,13 +2,13 @@
 // Checkout
 //
 
-#checkout { padding-top: 75px }
+#checkout { }
 #checkout * { box-sizing: border-box }
 
 #checkout input[type=text],
 #checkout input[type=password],
 #checkout input[type=email] {
-  outline: none !important;
+  border-width: 1px;  
   height: 36px;
 }
 
@@ -199,7 +199,6 @@
 }
 
 #checkout #checkout-address {
-  margin: 42px 0;
   .wrapper { overflow: hidden }
   h1, h2, h3, h4, h5, h6 {
     text-align: left;

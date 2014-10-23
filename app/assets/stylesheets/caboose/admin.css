@@ -12,6 +12,7 @@
  *= require jquery-ui
  *= require caboose/fonts
  *= require caboose/caboose
+ *= require caboose/message_boxes
  *= require caboose/model_binder
  *= require caboose/admin_main
  *= require caboose/admin_crumbtrail

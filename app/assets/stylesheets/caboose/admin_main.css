@@ -337,48 +337,6 @@ Modeljs
 }
 
 /*******************************************************************************
-Message boxes
-*******************************************************************************/
-
-#content .note {
-	padding: 20px;
-	background: #fef49c;
-	color: #000000;
-	font-weight: bold;
-	font-size: 1.4em;	
-}
-
-#content .note_small {
-  display: block;
-	padding: 4px 10px;
-	background: #fef49c;
-	color: #000000;
-	font-size: 1em;	
-}
-
-#content .error {
-	background: #9c171b;
-	color: #ffffff;
-}
-
-#content .error a {
-	color: #fff;	
-}
-
-#content .error a:hover {
-	color: #000;	
-}
-
-#content .success {
-	background: #009900;
-	color: #ffffff;
-}
-
-#content .success a {
-	color: #ffffff;	
-}
-
-/*******************************************************************************
 Page Bar Generator
 *******************************************************************************/
 

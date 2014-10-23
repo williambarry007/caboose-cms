@@ -1,0 +1,49 @@
+
+/*******************************************************************************
+Message boxes
+*******************************************************************************/
+
+.loading {
+  background-image: url('/assets/caboose/loading_black_on_white.gif');
+  background-position: 0 center;
+  background-repeat: no-repeat;
+  color: #000;  
+  font-weight: normal;
+  font-size: 16pt;
+  padding: 10px 10px 10px 40px;
+}
+
+.note {
+  padding: 20px;
+  margin-bottom: 10px;
+  background: #fef49c;
+  color: #000000;
+  font-weight: bold;
+  font-size: 1.4em;
+  border-radius: 3px;
+
+  h2 { margin: 0 0 10px 0; padding: 0; }	
+}
+
+.note_small {
+  display: block;
+  padding: 4px 10px;
+  background: #fef49c;
+  color: #000000;
+  font-size: 1em;	
+  border-radius: 3px;
+}
+
+.error {
+  background: #9c171b;
+  color: #ffffff;
+  a { color: #fff; }
+  a:hover { color: #000; }
+}
+
+.success {
+  background: #009900;
+  color: #ffffff;
+  a { color: #ffffff;	}
+}
+ 

@@ -58,5 +58,6 @@ Gem::Specification.new do |s|
   s.add_dependency "nokogiri"
   #s.add_dependency "spreadsheet"
   #s.add_dependency "thin"
+  s.add_dependency 'box_packer'
 
 end

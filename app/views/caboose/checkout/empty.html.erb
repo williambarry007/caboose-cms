@@ -1,2 +1,9 @@
-<h3>Your cart is empty.</h3>
-<p><a href="/">Back to Store</a></p>
+
+<div id='checkout' class='constrain'>
+  <p>&nbsp;</p>
+  <p class='note'>Your cart is empty. <a href="/products">Go back to the store</a></p>
+</div>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/message_boxes' %>
+<% end %>

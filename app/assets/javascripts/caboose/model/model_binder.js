@@ -126,16 +126,16 @@ ModelBinder.prototype = {
   
   control_with_id: function(id)
   {
-    attrib = false
+    var control = false
     var this2 = this;
-    $.each(this.controls, function(i, c) {        
+    $.each(this.controls, function(i, c) {
       if (id == (this2.model.name + "_" + this2.model.id + "_" + c.attribute.name).toLowerCase())
       {        
-        attrib = c.attribute; 
+        control = c; 
         return false;
       }
     });
-    return attrib;
+    return control;
   },
   
   cancel: function()

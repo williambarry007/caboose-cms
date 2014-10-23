@@ -1,0 +1,41 @@
+
+#cart {
+
+  margin: 20px 0 10px 0; 
+  table { border-collapse: collapse; width: 100%; }
+  table th { font-weight: bold; text-align: center; }
+  table td { border: #ccc 1px solid; padding: 10px; }
+  
+  input[type="text"] {    
+    border-color: #b9b9b9;
+    border-radius: 0;
+    border-width: 1px;
+    color: #565656;
+    font: 1em "Klinic Slab",serif;
+    padding: 8px 6px 6px;
+    text-align: right !important;
+  }
+    
+  input[type="button"] {
+    background-color: #c25454;    
+    background-position: 6px center;
+    background-repeat: no-repeat;
+    background-size: 30px auto;
+    border-radius: 0;
+    border-width: 0;
+    color: #fff;
+    cursor: pointer;
+    display: block-inline;
+    font: 20px/1em "Klinic Slab",serif;
+    margin-top: 20px;
+    padding: 8px 15px 6px 15px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  
+  p.controls {
+    text-align: right;
+    margin-bottom: 20px; 
+  }
+}

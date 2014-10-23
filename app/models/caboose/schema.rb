@@ -242,12 +242,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::LineItem => [
         [ :order_id              , :integer  ],
+        [ :order_package_id      , :integer  ],
         [ :variant_id            , :integer  ],
         [ :parent_id             , :integer  ],
         [ :quantity              , :integer   , :default => 0 ],
         [ :status                , :string   ],
-        [ :tracking_number       , :string   ],
-        #[ :unit_price            , :numeric  ],
+        [ :tracking_number       , :string   ],        
         [ :price                 , :numeric   , :default => 0 ],
         [ :notes                 , :text     ],
         [ :custom1               , :string   ],
@@ -311,6 +311,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :order_id              , :integer ],
         [ :discount_id           , :integer ]
       ],
+      Caboose::OrderPackage => [
+        [ :order_id             , :integer ],
+        [ :shipping_package_id  , :integer ],
+        [ :status               , :string  ],
+        [ :tracking_number      , :string  ]      
+      ],      
       Caboose::Page => [
         [ :site_id               , :integer ],
         [ :parent_id             , :integer ],
@@ -396,7 +402,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_available        , :datetime  ],
         [ :custom_input          , :text      ],
         [ :sort_order            , :integer   ],
-        [ :featured              , :boolean   , :default => false ]
+        [ :featured              , :boolean   , :default => false ],
+        [ :stackable_group_id    , :integer   ]
       ],
       Caboose::ProductImage => [
         [ :product_id            , :integer  ],
@@ -449,6 +456,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name  , :string ],
         [ :value , :text   ]
       ],
+      Caboose::ShippingPackage => [
+        [ :carrier      , :string  ],
+        [ :service_code , :string  ],
+        [ :service_name , :string  ],
+        [ :length       , :decimal ],
+        [ :width        , :decimal ],
+        [ :height       , :decimal ],
+        [ :volume       , :decimal ],
+        [ :price        , :decimal ]        
+      ],
       Caboose::Site => [
         [ :name                     , :string ],
         [ :description              , :text   ],
@@ -468,6 +485,15 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :password             , :string ],
         [ :authentication       , :string ], # :plain, :login, :cram_md5.
         [ :enable_starttls_auto , :boolean , { :default => true }]
+      ],
+      Caboose::StackableGroup => [       
+        [ :name           , :string  ],
+        [ :extra_length   , :decimal ],
+        [ :extra_width    , :decimal ],
+        [ :extra_height   , :decimal ],
+        [ :max_length     , :decimal ],
+        [ :max_width      , :decimal ],
+        [ :max_height     , :decimal ]
       ],
       Caboose::User => [
         [ :first_name           , :string     ],
@@ -502,6 +528,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :length                , :decimal  ],
         [ :width                 , :decimal  ],
         [ :height                , :decimal  ],
+        [ :volume                , :decimal  ],
         [ :cylinder              , :boolean  ],
         [ :option1               , :string   ],
         [ :option2               , :string   ],
@@ -686,6 +713,21 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :url  => '/products',
         :slug => 'products'
       })
+    end
+        
+    if !Caboose::ShippingPackage.where(:carrier => 'USPS', :service_code => "29").exists?
+      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "29", :service_name => "USPS Priority Mail 1-Day Padded Flat Rate Envelope", :price=>610  , :volume => 180)
+    end
+    if !Caboose::ShippingPackage.where(:carrier => 'USPS', :service_code => "28").exists?
+      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "28", :service_name => "USPS Priority Mail 1-Day Small Flat Rate Box"      , :price=>595  , :length => 8.625   , :width => 5.375  , :height => 1.625 , :volume => 75.334)
+    end
+    if !Caboose::ShippingPackage.where(:carrier => 'USPS', :service_code => "17").exists?
+      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "17", :service_name => "USPS Priority Mail 1-Day Medium Flat Rate Box"     , :price=>1265 , :length => 11      , :width => 8.5    , :height => 5.5   , :volume => 514.25)
+      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "17", :service_name => "USPS Priority Mail 1-Day Medium Flat Rate Box"     , :price=>1265 , :length => 13.625  , :width => 11.875 , :height => 3.375 , :volume => 546.06)
+    end
+    if !Caboose::ShippingPackage.where(:carrier => 'USPS', :service_code => "22").exists?
+      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "22", :service_name => "USPS Priority Mail 1-Day Large Flat Rate Box"      , :price=>1790 , :length => 12      , :width => 12     , :height => 5.5   , :volume => 792   )
+      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "22", :service_name => "USPS Priority Mail 1-Day Large Flat Rate Box"      , :price=>1790 , :length => 23.6875 , :width => 11.75  , :height => 3     , :volume => 834.98)
     end
 
   end

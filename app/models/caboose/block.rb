@@ -2,7 +2,7 @@
 class Caboose::Block < ActiveRecord::Base
   self.table_name = "blocks"
   
-  #after_find :get_master_value
+  #after_find :get_master_value # TODO
   
   belongs_to :page
   belongs_to :block_type

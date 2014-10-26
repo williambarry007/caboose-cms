@@ -5,10 +5,14 @@ link      = block.child_value('link')
 align     = block.child_value('align')
 width     = block.child_value('width')
 height    = block.child_value('height')
-mt        = block.child_value('margin_top').downcase
-mr        = block.child_value('margin_right').downcase
-mb        = block.child_value('margin_bottom').downcase
-ml        = block.child_value('margin_left').downcase
+mt        = block.child_value('margin_top')
+mr        = block.child_value('margin_right')
+mb        = block.child_value('margin_bottom')
+ml        = block.child_value('margin_left')
+mt.downcase! if mt 
+mr.downcase! if mr 
+mb.downcase! if mb 
+ml.downcase! if ml 
 url = img ? img.url(img_style.downcase.to_sym) : nil
 
 img = nil

@@ -16,7 +16,8 @@ class Caboose::Block < ActiveRecord::Base
     :styles => {
       :tiny  => '160x120>',
       :thumb => '400x300>',
-      :large => '640x480>'
+      :large => '640x480>',
+      :huge  => '1400x1050>'
     }
   do_not_validate_attachment_file_type :image
   

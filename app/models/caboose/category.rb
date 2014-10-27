@@ -13,18 +13,17 @@ module Caboose
     has_many :products, :through => :category_memberships, :order => 'title'
     has_many :category_memberships
     
-    has_attached_file :image,
-      :path => 'categories/:id_:style.jpg',
-      :default_url => '/categories/default.jpg',
+    has_attached_file :image,      
+      :url => '/assets/categories/:id_:style.:extension',      
+      :default_url => 'http://placehold.it/300x300',
       :s3_protocol => :https,
       :styles => {
-        tiny:   '100x100>',
-        thumb:  '250x250>',
-        medium: '400x400>',
-        large:  '800x800>',
-        huge:   '1200x1200>'
+        :tiny   => '100x100>',
+        :thumb  => '250x250>',
+        :medium => '400x400>',
+        :large  => '800x800>',
+        :huge   => '1200x1200>'
       }
-      
     validates_attachment_content_type :image, :content_type => %w(image/jpeg image/jpg image/png)
     
     attr_accessible :id,

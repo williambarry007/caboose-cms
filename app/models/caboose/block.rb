@@ -8,10 +8,10 @@ class Caboose::Block < ActiveRecord::Base
   belongs_to :block_type
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
   has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :dependent => :delete_all, :order => 'sort_order'
-  has_attached_file :file, :path => '/uploads/:id.:extension'
+  has_attached_file :file, :url => '/assets/uploads/:id.:extension'
   do_not_validate_attachment_file_type :file
-  has_attached_file :image, 
-    :path => 'uploads/:id_:style.:extension',
+  has_attached_file :image,     
+    :url => '/assets/uploads/:id_:style.:extension',
     :default_url => "http://placehold.it/300x300",
     :styles => {
       :tiny  => '160x120>',

@@ -4,8 +4,8 @@ class Caboose::User < ActiveRecord::Base
   has_many :role_memberships
   has_many :roles, :through => :role_memberships
   has_attached_file :image, 
-    :path => 'users/:id_:style.:extension',
-    :default_url => "#{Caboose::cdn_domain}/images/default_user_image.jpg",    
+    :url => '/assets/users/:id_:style.:extension',    
+    :default_url => 'http://placehold.it/300x300',    
     :styles => {
       :tiny  => '150x200>',
       :thumb => '300x400>',

@@ -19,9 +19,9 @@ module Caboose
       :square_offset_y,
       :square_scale_factor
       
-    has_attached_file :image,
-      :path        => "products/:product_id_:id_:style.:extension",
-      :default_url => '/products/:id_:style.:extension',
+    has_attached_file :image,      
+      :url         => '/assets/products/:product_id_:id_:style.:extension',      
+      :default_url => 'http://placehold.it/300x300',
       :s3_protocol => :https,
       :styles      => {
         tiny:   '100x100>',

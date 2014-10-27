@@ -20,7 +20,7 @@ module Caboose
       :square_scale_factor
       
     has_attached_file :image,      
-      :url         => '/assets/products/:product_id_:id_:style.:extension',      
+      :path => 'products/:product_id_:id_:style.:extension',      
       :default_url => 'http://placehold.it/300x300',
       :s3_protocol => :https,
       :styles      => {

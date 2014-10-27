@@ -6,7 +6,7 @@ class Caboose::MediaImage < ActiveRecord::Base
   self.table_name = "media_images"
   belongs_to :media_category  
   has_attached_file :image, 
-    :url => '/assets/media-images/:id_:style.:extension',
+    :path => 'media-images/:id_:style.:extension',
     :default_url => 'http://placehold.it/300x300',    
     :styles => {
       :tiny  => '150x200>',

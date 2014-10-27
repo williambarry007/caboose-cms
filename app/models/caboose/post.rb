@@ -14,7 +14,7 @@ class Caboose::Post < ActiveRecord::Base
     :published,
     :created_at
   has_attached_file :image, 
-    :url => '/assets/posts/:id_:style.:extension',
+    :path => 'posts/:id_:style.:extension',
     :default_url => 'http://placehold.it/300x300',
     :styles => {
       :tiny  => '75x75>',

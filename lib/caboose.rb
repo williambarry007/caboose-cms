@@ -125,10 +125,15 @@ end
 # These are used so that both local filestorage and S3 can work without having to change paperclip paths in models
 Paperclip.interpolates :path_prefix do |attachment, style|  
   return "#{Rails.root}/public/" if Caboose::cdn_domain.nil? || Caboose::cdn_domain == '/'
-  return ''   
+  return ''
 end
 
 Paperclip.interpolates :model_url do |attachment, style|
-  return "/#{attachment.path}" if Caboose::cdn_domain.nil? || Caboose::cdn_domain == '/'      
+  # Local file storeage
+  if Caboose::cdn_domain.nil? || Caboose::cdn_domain == '/'
+    p = attachment.path.gsub("#{Rails.root}/public/", '')
+    return "/#{p}"
+  end  
+  # Otherwise S3
   return "#{Caboose::cdn_domain}/#{attachment.path}"
 end

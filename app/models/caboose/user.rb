@@ -4,7 +4,7 @@ class Caboose::User < ActiveRecord::Base
   has_many :role_memberships
   has_many :roles, :through => :role_memberships
   has_attached_file :image, 
-    :path => 'users/:id_:style.:extension',    
+    :path => ':path_prefixusers/:id_:style.:extension',    
     :default_url => 'http://placehold.it/300x300',    
     :styles => {
       :tiny  => '150x200>',

@@ -14,7 +14,7 @@ module Caboose
     has_many :category_memberships
     
     has_attached_file :image,    
-      :url => ':cdn_domain/categories/:id_:style.:extension',      
+      :path => ':path_prefixcategories/:id_:style.:extension',      
       :default_url => 'http://placehold.it/300x300',
       :s3_protocol => :https,
       :styles => {

@@ -122,7 +122,13 @@ module Caboose
   
 end
 
+# These are used so that both local filestorage and S3 can work without having to change paperclip paths in models
 Paperclip.interpolates :path_prefix do |attachment, style|  
   return "#{Rails.root}/public/" if Caboose::cdn_domain.nil? || Caboose::cdn_domain == '/'
   return ''   
+end
+
+Paperclip.interpolates :model_url do |attachment, style|
+  return "/#{attachment.path}" if Caboose::cdn_domain.nil? || Caboose::cdn_domain == '/'      
+  return "#{Caboose::cdn_domain}/#{attachment.path}"
 end

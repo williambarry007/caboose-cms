@@ -121,3 +121,12 @@ module Caboose
   @@from_address = ''
   
 end
+
+Paperclip.interpolates :cdn_domain do |attachment, style|
+  return Caboose::cdn_domain == '/' ? '' : Caboose::cdn_domain
+end
+
+Paperclip.interpolates :path_without_cdn do |attachment, style|
+  x = Caboose::cdn_domain.nil? || Caboose::cdn_domain == '/' ? 1 : Caboose::cdn_domain.length
+  return attachment.url && attachment.url.length > 0 ? attachment.url[x..-1] : '' 
+end

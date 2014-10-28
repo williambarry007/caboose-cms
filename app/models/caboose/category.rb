@@ -13,8 +13,8 @@ module Caboose
     has_many :products, :through => :category_memberships, :order => 'title'
     has_many :category_memberships
     
-    has_attached_file :image,      
-      :path => 'categories/:id_:style.:extension',      
+    has_attached_file :image,    
+      :url => ':cdn_domain/categories/:id_:style.:extension',      
       :default_url => 'http://placehold.it/300x300',
       :s3_protocol => :https,
       :styles => {

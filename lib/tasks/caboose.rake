@@ -30,27 +30,6 @@ namespace :caboose do
     admin_user.password = Digest::SHA1.hexdigest(Caboose::salt + 'caboose')
     admin_user.save    
   end
-
-  desc "Sync production db to development"
-  task :sync_dev_db, :app_name, :dump_dir do |t, args|  
-    app_name = args[:app_name] ? " --app #{args[:app_name]}" : ''
-    dump_dir = args[:dump_dir] ? args[:dump_dir] : "#{Rails.root}/db/backups"
-    `mkdir -p #{dump_dir}` if !File.exists?(dump_dir)
-    
-    # Get the db conf
-    ddb = Rails.application.config.database_configuration['development']
-    pdb = Rails.application.config.database_configuration['production']            
-    dump_file = "#{dump_dir}/#{pdb['database']}_#{DateTime.now.strftime('%FT%T')}.dump"    
-        
-    puts "Capturing production database..."
-    `heroku pgbackups:capture --expire#{app_name}`
-    
-    puts "Downloading production database dump file..."
-    `curl -o #{dump_file} \`heroku pgbackups:url#{app_name}\``
-    
-    puts "Restoring development database from dump file..."
-    `pg_restore --verbose --clean --no-acl --no-owner -h #{ddb['host']} -U #{ddb['username']} -d #{ddb['database']} #{dump_file}`
-  end
                  
   desc "Clears sessions older than the length specified in the caboose config from the sessions table"
   task :clear_old_sessions => :environment do

@@ -137,9 +137,8 @@ PageContentController.prototype = {
     $.ajax({
       url: '/admin/pages/' + this.page_id + '/blocks/' + block_id + '/move-up',
       type: 'put',      
-      success: function(resp) {
-        that.stop_loadify();
-        if (resp.success) that.render_blocks();      
+      success: function(resp) {        
+        if (resp.success) that.render_blocks(function() { that.stop_loadify(); });      
       }
     });    
   },
@@ -151,9 +150,8 @@ PageContentController.prototype = {
     $.ajax({
       url: '/admin/pages/' + this.page_id + '/blocks/' + block_id + '/move-down',
       type: 'put',      
-      success: function(resp) {
-        that.stop_loadify();
-        if (resp.success) that.render_blocks();      
+      success: function(resp) {        
+        if (resp.success) that.render_blocks(function() { that.stop_loadify(); });      
       }
     });    
   },
@@ -187,12 +185,13 @@ PageContentController.prototype = {
   Block Rendering
   *****************************************************************************/
   
-  render_blocks: function() {
+  render_blocks: function(before_render) {
     $('.sortable').sortable('destroy');
     var that = this;                
     $.ajax({
       url: '/admin/pages/' + this.page_id + '/blocks/render-second-level',
       success: function(blocks) {
+        if (before_render) before_render();
         $(blocks).each(function(i, b) {
           $('#block_' + b.id).replaceWith(b.html);                              
         });

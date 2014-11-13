@@ -179,9 +179,10 @@ PageContentController.prototype = {
     var that = this;                
     $.ajax({      
       url: '/admin/pages/' + this.page_id + '/blocks/tree',
-      success: function(blocks) {        
+      success: function(blocks) {
+        var count = blocks.length;        
         $(blocks).each(function(i,b) {
-          that.set_clickable_helper(b, false, false);
+          that.set_clickable_helper(b, false, false, (i == count-1));
         });        
       }
     });    

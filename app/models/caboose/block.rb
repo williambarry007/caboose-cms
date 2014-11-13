@@ -29,29 +29,24 @@ class Caboose::Block < ActiveRecord::Base
     :name,
     :value        
     
-  after_initialize do |b|
-    # Do whatever we need to do to set the value to be correct for the field type we have.
-    # Most field types are fine with the raw value in the database
-    if b.block_type.nil?
-      bt = Caboose::BlockType.where(:field_type => 'text').first
-      b.block_type_id = bt.id
-    end
-    if b.block_type.field_type.nil?
-      b.block_type.field_type = 'text'
-      b.save
-    end
-    case b.block_type.field_type
-      when 'checkbox' then b.value = (b.value == 1 || b.value == '1' || b.value == true ? true : false)
-    end
-  end
-  
+  after_initialize :caste_value
   before_save :caste_value
-  def caste_value  
-    case self.block_type.field_type
+  
+  def caste_value
+    if self.block_type.nil?
+      bt = Caboose::BlockType.where(:field_type => 'text').first
+      if bt.nil?
+        bt = Caboose::BlockType.create(:name => 'text', :description => 'Text', :field_type => 'text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)
+      end      
+      self.block_type_id = bt.id
+    end
+    if self.block_type.field_type.nil?
+      self.block_type.field_type = 'text'      
+    end
+    v = self.value
+    case self.block_type.field_type      
       when 'checkbox'
-        if self.value.nil? then self.value = false
-        else self.value = (self.value == 1 || self.value == '1' || self.value == true ? 1 : 0)
-        end
+        self.value = v ? (v == 1 || v == '1' || v == true ? 1 : 0) : 0        
     end
   end
   
@@ -358,6 +353,46 @@ class Caboose::Block < ActiveRecord::Base
       current_value.delete(v)
     end
     return current_value.join('|')
+  end
+  
+  # Move a block up
+  def move_up    
+    siblings = Caboose::Block.where(:parent_id => self.parent_id).reorder(:sort_order).all        
+    siblings.each_with_index do |b2, i|      
+      b2.sort_order = i
+      b2.save
+    end
+    changed = false
+    siblings.each_with_index do |b2, i|      
+      if i > 0 && b2.id == self.id                
+        siblings[i-1].sort_order = i
+        siblings[i-1].save        
+        b2.sort_order = i - 1
+        b2.save
+        changed = true
+      end      
+    end
+    return changed            
+  end
+  
+  # Move a block down
+  def move_down
+    siblings = Caboose::Block.where(:parent_id => self.parent_id).reorder(:sort_order).all        
+    siblings.each_with_index do |b2, i|      
+      b2.sort_order = i
+      b2.save
+    end
+    changed = false
+    siblings.each_with_index do |b2, i|      
+      if i < (siblings.count-1) && b2.id == self.id                
+        siblings[i+1].sort_order = i
+        siblings[i+1].save        
+        b2.sort_order = i + 1
+        b2.save
+        changed = true
+      end      
+    end
+    return changed            
   end
 
 end

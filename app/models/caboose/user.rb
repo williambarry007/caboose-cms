@@ -14,6 +14,8 @@ class Caboose::User < ActiveRecord::Base
   do_not_validate_attachment_file_type :image
   attr_accessible :id, :email, :first_name, :last_name, :username, :token, :password, :phone, :timezone
   
+  validates :email, :presence => true
+  
   ADMIN_USER_ID = 1
   LOGGED_OUT_USER_ID = 2
   

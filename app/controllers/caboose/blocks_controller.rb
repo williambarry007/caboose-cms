@@ -353,27 +353,34 @@ module Caboose
       
       resp = StdClass.new
       b = Block.find(params[:id])
-      if b.sort_order == 0
+      changed = b.move_up
+      if !changed
         resp.error = "The block is already at the top."
       else
-        b2 = nil
-        
-        new_sort_order = b.sort_order - 1
-        while new_sort_order > 0 do
-          b2 = Block.where("parent_id = ? and sort_order = ?", b.parent_id, new_sort_order).first
-          break if b2
-          new_sort_order = new_sort_order - 1
-        end
-        if b2
-          b2.sort_order = new_sort_order + 1
-          b2.save
-        else
-          new_sort_order = 1
-        end
-        b.sort_order = new_sort_order
-        b.save
         resp.success = "The block has been moved up successfully."
       end
+        
+      #if b.sort_order == 0
+      #  resp.error = "The block is already at the top."
+      #else
+      #  b2 = nil
+      #  
+      #  new_sort_order = b.sort_order - 1
+      #  while new_sort_order > 0 do
+      #    b2 = Block.where("parent_id = ? and sort_order = ?", b.parent_id, new_sort_order).first
+      #    break if b2
+      #    new_sort_order = new_sort_order - 1
+      #  end
+      #  if b2
+      #    b2.sort_order = new_sort_order + 1
+      #    b2.save
+      #  else
+      #    new_sort_order = 1
+      #  end
+      #  b.sort_order = new_sort_order
+      #  b.save
+      #  resp.success = "The block has been moved up successfully."
+      #end
 
       render :json => resp
     end

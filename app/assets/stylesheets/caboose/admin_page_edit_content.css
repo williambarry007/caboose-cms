@@ -11,15 +11,24 @@
 #blocks .ui-selected  { background: #fff799; }
 #blocks .sortable-placeholder { height: 40px; background: #fff799; border: #ccc 1px solid; }
 
-#blocks li .select_handle { display: none; }
-#blocks li .sort_handle   { display: none; }
-#blocks li .delete_handle { display: none; }
-#blocks li:hover .select_handle { position: absolute; top: 0; right: 44px; display: block; width: 20px; height: 20px; background-color: #ccc; }
-#blocks li:hover .sort_handle   { position: absolute; top: 0; right: 22px; display: block; width: 20px; height: 20px; background-color: #ccc; }
-#blocks li:hover .delete_handle { position: absolute; top: 0; right:  0px; display: block; width: 20px; height: 20px; background-color: #ccc; }
-#blocks li:hover .select_handle span { margin: 2px 1px; }
-#blocks li:hover .sort_handle   span { margin: 2px 1px; }
-#blocks li:hover .delete_handle span { margin: 2px 1px; }
+/*
+#blocks li .sort_handle      { display: none; }
+#blocks li:hover .sort_handle      { position: absolute; top: 0; right: 22px; display: block; width: 20px; height: 20px; background-color: #ccc; }
+#blocks li:hover .sort_handle      span { margin: 2px 1px; }
+*/
+
+#blocks li .select_handle    { display: none; }
+#blocks li .move_up_handle   { display: none; }
+#blocks li .move_down_handle { display: none; }
+#blocks li .delete_handle    { display: none; }
+#blocks li:hover .select_handle    { position: absolute; top: 0; right: 66px; display: block; width: 20px; height: 20px; background-color: #ccc; }
+#blocks li:hover .move_up_handle   { position: absolute; top: 0; right: 44px; display: block; width: 20px; height: 20px; background-color: #ccc; }
+#blocks li:hover .move_down_handle { position: absolute; top: 0; right: 22px; display: block; width: 20px; height: 20px; background-color: #ccc; }
+#blocks li:hover .delete_handle    { position: absolute; top: 0; right:  0px; display: block; width: 20px; height: 20px; background-color: #ccc; }
+#blocks li:hover .select_handle    span { margin: 2px 1px; }
+#blocks li:hover .move_up_handle   span { margin: 2px 1px; }
+#blocks li:hover .move_down_handle span { margin: 2px 1px; }
+#blocks li:hover .delete_handle    span { margin: 2px 1px; }
 
 .sortable_placeholder {
   background: #ccc;

@@ -1,6 +1,10 @@
 require "caboose/engine"
 
 module Caboose
+  
+  def self.root
+    File.expand_path '../..', __FILE__
+  end
       
   mattr_accessor :salt
   @@salt = "This needs to be changed pronto."

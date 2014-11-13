@@ -1,6 +1,11 @@
 require "caboose/version"
 
-namespace :caboose do  
+namespace :caboose do
+
+  desc "Run rspec tests on Caboose"
+  task :test => :environment do    
+    system("rspec #{Caboose::root}/spec")    
+  end
     
   desc "Creates/verifies that all database tables and fields are correctly added."
   task :db => :environment do

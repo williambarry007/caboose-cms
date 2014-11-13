@@ -187,7 +187,7 @@ PageContentController.prototype = {
     });    
   },
   
-  set_clickable_helper: function(b, parent_id, parent_allows_child_blocks)
+  set_clickable_helper: function(b, parent_id, parent_allows_child_blocks, is_last_child)
   {
     var that = this;
         
@@ -212,7 +212,24 @@ PageContentController.prototype = {
         )
         .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
         .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
-      );      
+      );
+      if (is_last_child && is_last_child == true)
+      {
+        $('#block_' + b.id).append($('<div/>')          
+          .addClass('new_block_link')
+          .append($('<div/>').addClass('line'))
+          .append($('<a/>')
+            .attr('href', '#')
+            .html("New Block")
+            .click(function(e) { 
+              e.preventDefault(); e.stopPropagation();
+              caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + parent_id + '/new?after_id=' + b.id);                        
+            })
+          )
+          .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
+          .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
+        );
+      }
     }
             
     $('#block_' + b.id).attr('onclick','').unbind('click');    
@@ -223,30 +240,31 @@ PageContentController.prototype = {
      
     var show_mouseover = true;
     if (b.children && b.children.length > 0)
-    {      
+    {
+      var count = b.children.length;
       $.each(b.children, function(i, b2) {        
         if (b2.field_type == 'block')
           show_mouseover = false;
-        that.set_clickable_helper(b2, b.id, b.allow_child_blocks);
+        that.set_clickable_helper(b2, b.id, b.allow_child_blocks, i == (count-1));
       });            
     }
-    if (b.allow_child_blocks)
-    {      
-      $('#block_' + b.id).after($('<div/>')          
-        .addClass('new_block_link')
-        .append($('<div/>').addClass('line'))
-        .append($('<a/>')
-          .attr('href', '#')
-          .html("New Block")
-          .click(function(e) { 
-            e.preventDefault(); e.stopPropagation();
-            caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + b.id + '/new?after_id=' + b.id);                        
-          })
-        )
-        .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
-        .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
-      );
-    }
+    //if (b.allow_child_blocks)
+    //{      
+    //  $('#block_' + b.id).after($('<div/>')          
+    //    .addClass('new_block_link')
+    //    .append($('<div/>').addClass('line'))
+    //    .append($('<a/>')
+    //      .attr('href', '#')
+    //      .html("New Block")
+    //      .click(function(e) { 
+    //        e.preventDefault(); e.stopPropagation();
+    //        caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + b.id + '/new?after_id=' + b.id);                        
+    //      })
+    //    )
+    //    .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
+    //    .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
+    //  );
+    //}
     if (show_mouseover)
     {
       $('#block_' + b.id).mouseover(function(el) { $('#block_' + b.id).addClass(   'block_over'); });

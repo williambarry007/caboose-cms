@@ -132,26 +132,55 @@ PageContentController.prototype = {
   
   move_block_up: function(block_id)
   {
-    var that = this;                   
+    var that = this;
+    this.loadify($('#block_' + block_id + '_move_up_handle span'));    
     $.ajax({
       url: '/admin/pages/' + this.page_id + '/blocks/' + block_id + '/move-up',
       type: 'put',      
       success: function(resp) {
+        that.stop_loadify();
         if (resp.success) that.render_blocks();      
       }
     });    
   },
   
   move_block_down: function(block_id)
-  {
-    var that = this;                   
+  {   
+    var that = this;
+    this.loadify($('#block_' + block_id + '_move_down_handle span'));
     $.ajax({
       url: '/admin/pages/' + this.page_id + '/blocks/' + block_id + '/move-down',
       type: 'put',      
       success: function(resp) {
+        that.stop_loadify();
         if (resp.success) that.render_blocks();      
       }
     });    
+  },
+  
+  loadify: function(el)
+  {
+    var that = this;
+    if      (el.hasClass('ui-icon-arrowrefresh-1-e')) el.removeClass('ui-icon-arrowrefresh-1-e').addClass('ui-icon-arrowrefresh-1-s');
+    else if (el.hasClass('ui-icon-arrowrefresh-1-s')) el.removeClass('ui-icon-arrowrefresh-1-s').addClass('ui-icon-arrowrefresh-1-w');
+    else if (el.hasClass('ui-icon-arrowrefresh-1-w')) el.removeClass('ui-icon-arrowrefresh-1-w').addClass('ui-icon-arrowrefresh-1-n');
+    else if (el.hasClass('ui-icon-arrowrefresh-1-n')) el.removeClass('ui-icon-arrowrefresh-1-n').addClass('ui-icon-arrowrefresh-1-e');
+    else el.addClass('ui-icon-arrowrefresh-1-e');
+    this.loadify_el = el;
+    this.loadify_timer = setTimeout(function() { that.loadify(el); }, 200);                       
+  },
+  
+  stop_loadify: function()
+  {
+    if (this.loadify_el)
+    {
+      this.loadify_el.removeClass('ui-icon-arrowrefresh-1-e')
+        .removeClass('ui-icon-arrowrefresh-1-s')
+        .removeClass('ui-icon-arrowrefresh-1-w')
+        .removeClass('ui-icon-arrowrefresh-1-n');
+    } 
+    if (this.loadify_timer)
+      clearTimeout(this.loadify_timer);                
   },
     
   /*****************************************************************************

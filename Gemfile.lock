@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    caboose-cms (0.5.29)
+    caboose-cms (0.5.35)
       active_shipping
       authorize-net
       awesome_print

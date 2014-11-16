@@ -1,4 +1,7 @@
-
+/*    
+ *= require caboose/spectrum 
+ */
+ 
 .mb_container {
   width: 100%;
   overflow: hidden;

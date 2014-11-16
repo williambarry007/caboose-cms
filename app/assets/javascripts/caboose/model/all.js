@@ -1,3 +1,4 @@
+//= require caboose/spectrum
 //= require caboose/model/class
 //= require caboose/model/model
 //= require caboose/model/s3
@@ -5,6 +6,7 @@
 //= require caboose/model/index_table
 //= require caboose/model/model_binder
 //= require caboose/model/bound_control
+//= require caboose/model/bound_color
 //= require caboose/model/bound_checkbox
 //= require caboose/model/bound_checkbox_multiple
 //= require caboose/model/bound_date

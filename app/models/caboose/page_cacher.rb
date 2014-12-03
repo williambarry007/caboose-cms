@@ -5,7 +5,14 @@ module Caboose
     def self.refresh
       PageCache.where(:refresh => true).all.each do |pc|
         self.delay.cache(pc.page_id)
-      end      
+      end
+      
+      # Make sure all pages are cached
+      query = ["select id from pages where id not in (select distinct(page_id) from page_cache"]
+      rows = ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
+      if rows
+        rows.each{ |row| self.delay.cache(row['id']) }
+      end
     end
     
     def self.cache_all
@@ -19,6 +26,7 @@ module Caboose
       p = (page_id.is_a?(Integer) ? Page.where(:id => page_id).first : page_id)
       return if p.nil?
       return if p.site_id.nil?
+      return if p.site.nil?
       return if p.block.nil?
             
       @render_functions = {} if @render_functions.nil?

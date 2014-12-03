@@ -102,7 +102,8 @@ module Caboose
         f.gsub!(/block\.partial\((.*?),(.*?)\)/ , 'render :partial => \1')
         f.gsub!(/block\.render\((.*?),(.*?)\)/  , 'render_block_type(block, \1, page, view, controller_view_content, modal, empty_text, editing, css, js, csrf_meta_tags, csrf_meta_tags2, logged_in_user, site)')        
         f.gsub!(/\=\s*render_block_type\(/      , 'render_block_type(')
-        f.gsub!(/\=\s*raw render_block_type\(/  , 'render_block_type(')        
+        f.gsub!(/\=\s*raw render_block_type\(/  , 'render_block_type(')
+        f.gsub!(/block.children.where\(([^\)]*?)\)\.all/, 'block.children_where(\1)')                
                 
         #@render_functions[bt.id] = "<% def render_block_type_#{bt.id}(block, page, view, controller_view_content, modal, empty_text, editing, css, js, csrf_meta_tags, csrf_meta_tags2, logged_in_user, site) %>#{f}<% end %>"
           

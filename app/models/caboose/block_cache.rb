@@ -27,6 +27,22 @@ module Caboose
       end
       return nil    
     end
+    
+    def children_where(h)
+      arr = []      
+      self.children.each do |b|
+        matches = true
+        h.each do |k,v|
+          if b.send(k) != v
+            matches = false
+            break
+          end
+        end
+        arr << b if matches
+      end
+      return nil if arr.count == 0
+      return arr
+    end
                                               
     #def render(block, options = nil)                    
     #  block = self.child(block) if block && block.is_a?(String)

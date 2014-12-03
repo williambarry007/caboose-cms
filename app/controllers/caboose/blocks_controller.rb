@@ -287,7 +287,15 @@ module Caboose
             end
         end
       end
-    
+      
+      # Trigger the page cache to be updated
+      pc = PageCache.where(:page_id => b.page_id).first
+      if pc
+        pc.refresh = true
+        pc.save
+        PageCacher.delay.refresh
+      end
+                
       resp.success = save && b.save
       b.create_children
       render :json => resp      

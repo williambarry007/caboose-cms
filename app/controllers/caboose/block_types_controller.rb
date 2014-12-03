@@ -125,6 +125,11 @@ module Caboose
           when 'site_id'                         then bt.toggle_site(v[0], v[1])
         end
       end
+      
+      # Trigger the page cache to be updated      
+      query = ["update page_cache set refresh = true where page_id in (select distinct(page_id) from blocks where block_type_id = ?)", bt.id]
+      ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))      
+      PageCacher.delay.refresh
     
       resp.success = save && bt.save
       render :json => resp

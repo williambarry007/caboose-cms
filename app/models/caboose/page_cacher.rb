@@ -2,6 +2,12 @@
 module Caboose
   class PageCacher
     
+    def self.refresh
+      PageCache.where(:refresh => true).all.each do |pc|
+        self.delay.cache(pc.page_id)
+      end      
+    end
+    
     def self.cache_all
       Page.reorder(:id).all.each do |p|
         puts "Caching #{p.title}..."
@@ -50,6 +56,7 @@ module Caboose
       pc = PageCache.new(:page_id => p.id) if pc.nil?
       pc.render_function = str
       pc.block = Marshal.dump(BlockCache.new(p.block))
+      pc.refresh = false
       pc.save              
     end
     

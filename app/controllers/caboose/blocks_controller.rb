@@ -294,6 +294,8 @@ module Caboose
         pc.refresh = true
         pc.save
         PageCacher.delay.refresh
+      else
+        PageCacher.delay.cache(b.page_id)
       end
                 
       resp.success = save && b.save

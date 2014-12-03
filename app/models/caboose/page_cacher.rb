@@ -11,7 +11,7 @@ module Caboose
       query = ["select id from pages where id not in (select distinct(page_id) from page_cache)"]
       rows = ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
       if rows
-        rows.each{ |row| self.delay.cache(row['id']) }
+        rows.each{ |row| self.delay.cache(row['id'].to_i) }
       end
     end
     

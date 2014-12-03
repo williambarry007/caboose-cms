@@ -2,8 +2,13 @@ require "caboose/version"
 
 namespace :caboose do
 
-  desc "Cache pages"
+  desc "Update expired caches and cache pages that aren't cached"
   task :cache_pages => :environment do    
+    Caboose::PageCacher.refresh    
+  end
+  
+  desc "Cache all pages"
+  task :cache_all_pages => :environment do    
     Caboose::PageCacher.cache_all    
   end
   

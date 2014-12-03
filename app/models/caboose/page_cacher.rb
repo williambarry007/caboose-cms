@@ -16,10 +16,11 @@ module Caboose
     end
     
     def self.cache_all
-      Page.reorder(:id).all.each do |p|
-        puts "Caching #{p.title}..."
-        self.cache(p)
-      end      
+      query = ["select id from pages order by id"]
+      rows = ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
+      if rows
+        rows.each{ |row| self.delay.cache(row['id'].to_i) }
+      end            
     end
       
     def self.cache(page_id)    

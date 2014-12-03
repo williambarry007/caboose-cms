@@ -8,7 +8,7 @@ module Caboose
       end
       
       # Make sure all pages are cached
-      query = ["select id from pages where id not in (select distinct(page_id) from page_cache"]
+      query = ["select id from pages where id not in (select distinct(page_id) from page_cache)"]
       rows = ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
       if rows
         rows.each{ |row| self.delay.cache(row['id']) }
@@ -97,7 +97,7 @@ module Caboose
           elsif File.file?("#{Caboose.root}/app/views/caboose/blocks/_#{bt.name}.html.erb"         ) then f = "#{Caboose.root}/app/views/caboose/blocks/_#{bt.name}.html.erb"
           elsif File.file?("#{Caboose.root}/app/views/caboose/blocks/_#{bt.field_type}.html.erb"   ) then f = "#{Caboose.root}/app/views/caboose/blocks/_#{bt.field_type}.html.erb"
           end
-          f = File.read(f)
+          f = (f && f.to_s.strip.length > 0 ? File.read(f) : '')
         end
         f.gsub!(/block\.partial\((.*?),(.*?)\)/ , 'render :partial => \1')
         f.gsub!(/block\.render\((.*?),(.*?)\)/  , 'render_block_type(block, \1, page, view, controller_view_content, modal, empty_text, editing, css, js, csrf_meta_tags, csrf_meta_tags2, logged_in_user, site)')        

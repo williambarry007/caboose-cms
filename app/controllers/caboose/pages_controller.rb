@@ -5,14 +5,14 @@ module Caboose
     helper :application
     
     def before_action
-      @page = Page.page_with_uri(request.host_with_port, '/admin')
+      @page = Page.page_with_uri(request.host_with_port, '/admin')      
     end    
 
     # GET /pages/:id
     def show
       
       # Find the page with an exact URI match 
-      page = Page.page_with_uri(request.host_with_port, request.fullpath, false)
+      page = Page.page_with_uri(request.host_with_port, request.fullpath, false)            
       
       # Make sure we're not under construction
       d = Caboose::Domain.where(:domain => request.host_with_port).first        

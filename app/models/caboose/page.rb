@@ -8,6 +8,7 @@ class Caboose::Page < ActiveRecord::Base
   has_many :page_permissions  
   has_many :blocks, :order => 'sort_order'
   has_many :page_tags, :class_name => 'Caboose::PageTag', :dependent => :delete_all, :order => 'tag'
+  has_one :page_cache
   attr_accessible :id      ,        
     :site_id               ,
     :parent_id             ,

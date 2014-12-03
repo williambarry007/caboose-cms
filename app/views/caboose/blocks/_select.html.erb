@@ -1,0 +1,12 @@
+<%
+text = block.value
+if text.nil? || text.strip.length == 0
+  text = empty_text ? "<p>#{empty_text}</p>" : "" 
+end
+
+%>
+<% if editing %>
+  <div id='block_<%= block.id %>'><%= raw text %></div>
+<% else %>
+  <%= raw text %>
+<% end %>

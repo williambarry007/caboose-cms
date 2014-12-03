@@ -33,21 +33,20 @@ class Caboose::Block < ActiveRecord::Base
   before_save :caste_value
   
   def caste_value
-    if self.block_type.nil?
+    if self.block_type_id.nil?
       bt = Caboose::BlockType.where(:field_type => 'text').first
       if bt.nil?
         bt = Caboose::BlockType.create(:name => 'text', :description => 'Text', :field_type => 'text', :default => '', :width => 800, :height => 400, :fixed_placeholder => false)
       end      
       self.block_type_id = bt.id
     end
-    if self.block_type.field_type.nil?
-      self.block_type.field_type = 'text'      
-    end
-    v = self.value
-    case self.block_type.field_type      
-      when 'checkbox'
-        self.value = v ? (v == 1 || v == '1' || v == true ? 1 : 0) : 0        
-    end
+    #if self.block_type_id.field_type.nil?
+    #  self.block_type.field_type = 'text'      
+    #end        
+    #if self.block_type.field_type == 'checkbox'
+    #  v = self.value
+    #  self.value = v ? (v == 1 || v == '1' || v == true ? 1 : 0) : 0        
+    #end
   end
   
   def full_name
@@ -137,19 +136,10 @@ class Caboose::Block < ActiveRecord::Base
     end
     options2[:block] = block
 
-    view = options2[:view]
-    view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?    
-    if block.block_type.use_render_function && block.block_type.render_function            
-      #str = block.render_from_function(options2)
+    view = options2[:view]     
+    view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?
       
-      #locals = OpenStruct.new(options)      
-      #locals = OpenStruct.new(options2)
-      #str = ERB.new(block_type.render_function).result(locals.instance_eval { binding })        
-      #return erb.result(locals.instance_eval { binding })
-      
-      #eval("def render_my_function\n#{block.block_type.render_function}\nend\n\n, :locals => options2)
-      #Caboose.log(block.id)
-      
+    if block.block_type.use_render_function && block.block_type.render_function
       begin
         str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
       rescue Exception => ex
@@ -209,7 +199,7 @@ class Caboose::Block < ActiveRecord::Base
       rescue Exception => ex        
         str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
       end                    
-    end
+    end    
     return str
   end
   

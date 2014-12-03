@@ -6,12 +6,13 @@ module Caboose
     helper_method :logged_in?
     helper :all
     
-    @find_page = true
+    @find_page = true    
     
-    def before_before_action
-      
+    def before_before_action            
       # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
+      
+      @use_page_cache = !request.fullpath.starts_with?('/admin')
       
       # Get the site we're working with      
       domain = Domain.where(:domain => request.host_with_port).first

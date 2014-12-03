@@ -2,6 +2,11 @@ require "caboose/version"
 
 namespace :caboose do
 
+  desc "Cache pages"
+  task :cache_pages => :environment do    
+    Caboose::PageCacher.cache_all    
+  end
+  
   desc "Run rspec tests on Caboose"
   task :test => :environment do    
     system("rspec #{Caboose::root}/spec")    

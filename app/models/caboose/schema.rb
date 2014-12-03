@@ -54,6 +54,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :repeat_start  , 
         :repeat_end        
       ],
+      #Caboose::PageCache => [:block],
       Caboose::Variant => [:quantity]
     }
   end
@@ -341,6 +342,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :canonical_url         , :string  ],
         [ :fb_description        , :string  , { :limit => 156 }],
         [ :gp_description        , :string  , { :limit => 156 }]
+      ],
+      Caboose::PageCache => [
+        [ :page_id               , :integer ],
+        [ :render_function       , :text    ],
+        [ :block                 , :binary  ],
+        [ :refresh               , :boolean , { :default => false }]        
       ],
       Caboose::PagePermission => [
         [ :role_id , :integer  ],

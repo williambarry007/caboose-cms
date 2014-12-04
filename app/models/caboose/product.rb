@@ -2,7 +2,8 @@ module Caboose
   class Product < ActiveRecord::Base
     self.table_name = 'store_products'
     self.primary_key = 'id'
-    
+
+    belongs_to :site    
     belongs_to :stackable_group, :class_name => 'Caboose::StackableGroup'
     belongs_to :vendor, :class_name => 'Caboose::Vendor'
     has_many :customizations, :class_name => 'Caboose::Product', :through => :customization_memberships
@@ -17,6 +18,7 @@ module Caboose
     #default_scope order('store_products.sort_order')
     
     attr_accessible :id,
+      :site_id,
       :alternate_id,
       :title,
       :description,

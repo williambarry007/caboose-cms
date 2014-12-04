@@ -7,7 +7,8 @@
 module Caboose
   class Category < ActiveRecord::Base
     self.table_name = 'store_categories'
-    
+
+    belongs_to :site    
     belongs_to :parent, :class_name => 'Category', :foreign_key => 'parent_id'
     has_many :children, :class_name => 'Category', :foreign_key => 'parent_id', :order => 'name'
     has_many :products, :through => :category_memberships, :order => 'title'
@@ -27,6 +28,7 @@ module Caboose
     validates_attachment_content_type :image, :content_type => %w(image/jpeg image/jpg image/png)
     
     attr_accessible :id,
+      :site_id,
       :parent_id,
       :name,
       :url,

@@ -55,7 +55,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :repeat_end        
       ],
       #Caboose::PageCache => [:block],
-      Caboose::Variant => [:quantity]
+      Caboose::Variant => [:quantity],
+      Caboose::Vendor => [:vendor]
     }
   end
 
@@ -196,7 +197,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :repeat_count , :integer  ],
         [ :date_end     , :date     ]
       ],
-      Caboose::Category => [        
+      Caboose::Category => [
+        [ :site_id               , :integer   ],
         [ :parent_id             , :integer   ],
         [ :name                  , :string    ],
         [ :url                   , :string    ],
@@ -226,6 +228,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :updated_at  , :datetime , :null => true  ]
       ],
       Caboose::Discount => [
+        [ :site_id               , :integer  ],
         [ :name                  , :string   ],
         [ :code                  , :string   ],
         [ :amount_current        , :numeric  ],
@@ -273,6 +276,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :file              , :attachment ]
       ],
       Caboose::Order => [
+        [ :site_id               , :integer  ],
         [ :email                 , :string   ],
         [ :order_number          , :string   ],
         [ :subtotal              , :numeric   , :default => 0 ],
@@ -389,6 +393,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :post_category_id , :integer ]
       ],
       Caboose::Product => [
+        [ :site_id               , :integer   ],
         [ :alternate_id          , :string    ],
         [ :title                 , :string    ],
         [ :caption               , :string    ],
@@ -460,8 +465,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :prices                , :text     ] 
       ],
       Caboose::Setting => [
-        [ :name  , :string ],
-        [ :value , :text   ]
+        [ :site_id  , :integer ],
+        [ :name     , :string  ],
+        [ :value    , :text    ]
       ],
       Caboose::ShippingPackage => [
         [ :carrier      , :string  ],
@@ -521,6 +527,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :handling_percentage    , :string  ]
       ],
       Caboose::User => [
+        [ :site_id              , :integer    ],
         [ :first_name           , :string     ],
         [ :last_name            , :string     ],
         [ :username             , :string     ],
@@ -542,6 +549,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :is_guest             , :boolean    , { :default => false }]
       ],
       Caboose::Variant => [
+        [ :product_id            , :integer  ],
+        [ :alternate_id          , :string   ],
         [ :sku                   , :string   ],
         [ :barcode               , :string   ],
         [ :price                 , :numeric   , :default => 0 ],
@@ -559,10 +568,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :option2               , :string   ],
         [ :option3               , :string   ],
         [ :requires_shipping     , :boolean  ],
-        [ :taxable               , :boolean  ],
-        [ :product_id            , :integer  ],
-        [ :shipping_unit_value   , :numeric  ],
-        [ :alternate_id          , :string   ],
+        [ :taxable               , :boolean  ],        
+        [ :shipping_unit_value   , :numeric  ],        
         [ :status                , :string   ],
         [ :option1_sort_order    , :integer  , { :defult => 0 }],
         [ :option2_sort_order    , :integer  , { :defult => 0 }],
@@ -570,8 +577,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :sort_order            , :integer  , { :defult => 0 }]
       ],
       Caboose::Vendor => [
-        [ :name   , :string ],
-        [ :status , :string, { default: 'Active' } ]
+        [ :site_id , :integer ],
+        [ :name    , :string  ],
+        [ :status  , :string, { default: 'Active' } ]
       ]
     }
 

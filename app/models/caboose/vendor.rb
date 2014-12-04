@@ -2,9 +2,14 @@
 module Caboose
   class Vendor < ActiveRecord::Base
     self.table_name = 'store_vendors'
-    
+
+    belongs_to :site    
     has_many :products
-    attr_accessible :id, :name, :status, :sort_order
+    attr_accessible :id,
+      :site_id,
+      :name, 
+      :status,
+      :sort_order
     after_save :clear_filters
     
     def self.active

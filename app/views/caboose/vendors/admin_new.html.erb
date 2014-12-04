@@ -1,9 +1,9 @@
 <h1>New Vendor</h1>
 
-<form id="new-vendor" action="/admin/vendors/create" method="post">
+<form id="new-vendor" action="/admin/vendors" method="post">
   <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
   <input id="name" name="name" type="text" placeholder="Vendor Name" style="width: 400px" />
-  
+  <div id='message'></div>  
   <p>
     <input type="button" value="< Back" onclick="window.location='/admin/products'" />
     <input type="submit" value="Add Vendor" />
@@ -11,24 +11,24 @@
 </form>
 
 <% content_for :caboose_js do %>
-  <script>
-    $(document).ready(function() {
-      $('#new-vendor').on('submit', function(event) {
-        event.preventDefault();
-        
-        $.ajax({
-          url: '/admin/vendors/create',
-          type: 'post',
-          data: $(event.delegateTarget).serialize(),
-          success: function(response) {
-            if (response.success) {
-              window.location = response.redirect;
-            } else {
-              alert(response.message);
-            }
-          }
-        });
-      });
+<script>
+$(document).ready(function() {
+  $('#new-vendor').on('submit', function(event) {
+    $('#message').html("<p class='loading'>Adding vendor...</p>");
+    event.preventDefault();
+    
+    $.ajax({
+      url: '/admin/vendors',
+      type: 'post',
+      data: $('#new-vendor').serialize(),
+      success: function(resp) {
+        if (resp.error)
+          $('#message').html("<p class='note error'>" + resp.error + "</p>");
+        else if (resp.redirect)
+          window.location = resp.redirect;
+      }
     });
-  </script>
+  });
+});
+</script>
 <% end %>

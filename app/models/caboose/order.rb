@@ -6,7 +6,8 @@ module Caboose
   class Order < ActiveRecord::Base
     self.table_name  = 'store_orders'
     self.primary_key = 'id'
-    
+
+    belongs_to :site    
     belongs_to :customer, :class_name => 'Caboose::User'
     belongs_to :shipping_address, :class_name => 'Address'
     belongs_to :billing_address, :class_name => 'Address'
@@ -16,6 +17,7 @@ module Caboose
     has_many :packages, :class_name => 'Caboose::OrderPackage'
     
     attr_accessible :id,
+      :site_id,
       :order_number,
       :subtotal,
       :tax,      

@@ -29,7 +29,7 @@ module Caboose
       url_without_params = request.fullpath.split('?').first
       
       # Find the category
-      category = Category.where(:url => url_without_params).first
+      category = Category.where(:site_id => @site.id, :url => url_without_params).first
       
       # Set category ID
       params['category_id'] = category.id
@@ -42,6 +42,7 @@ module Caboose
       
       # Otherwise looking at a category or search parameters
       @pager = Caboose::Pager.new(params, {
+        'site_id'        => @site.id,
         'category_id'    => '',
         'vendor_id'      => '',
         'vendor_name'    => '',
@@ -165,10 +166,10 @@ module Caboose
       @variants = products.collect { |product| product.variants }.flatten
       
       # Grab all categories; except for "all" and "uncategorized"
-      @categories = Category.where('parent_id IS NOT NULL AND name IS NOT NULL').order(:url)
+      @categories = Category.where('site_id = ? and parent_id IS NOT NULL AND name IS NOT NULL', @site.id).order(:url)
       
       # Grab all vendors
-      @vendors = Vendor.where('name IS NOT NULL').order(:name)
+      @vendors = Vendor.where('site_id = ? and name IS NOT NULL', @site.id).order(:name)
       
       render :layout => 'caboose/admin'
     end
@@ -265,6 +266,7 @@ module Caboose
       params[:sort] = 'store_vendors.name' if params[:sort] == 'vendor'
       
       @gen = Caboose::PageBarGenerator.new(params, {
+        'site_id'      => @site.id,
         'vendor_name'  => '',
         'search_like'  => '', 
         'price'        => params[:filters] && params[:filters][:missing_prices] ? 0 : ''
@@ -309,6 +311,7 @@ module Caboose
       params[:sort] = 'store_vendors.name' if params[:sort] == 'vendor'
       
       pager = Caboose::PageBarGenerator.new(params, {
+        'site_id'      => @site.id,
         'vendor_name'  => '',
         'search_like'  => '', 
         'price'        => params[:filters] && params[:filters][:missing_prices] ? 0 : ''
@@ -577,6 +580,7 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
+          when 'site_id'            then product.site_id            = value
           when 'alternate_id'       then product.alternate_id       = value          
           when 'title'              then product.title              = value
           when 'caption'            then product.caption            = value
@@ -642,12 +646,15 @@ module Caboose
         :redirect => nil
       )
       
-      title = params[:title]
+      name = params[:name]
       
-      if title.length == 0
+      if name.length == 0
         resp.error = "The title cannot be empty."
       else
-        p = Product.new(:title => title)
+        p = Product.new(
+          :site_id => @site.id,
+          :title => name
+        )
         p.save
         resp.redirect = "/admin/products/#{p.id}/general"
       end

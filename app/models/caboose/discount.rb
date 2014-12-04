@@ -3,7 +3,10 @@ module Caboose
     self.table_name  = 'store_discounts'
     self.primary_key = 'id'
     
+    belongs_to :site
+    
     attr_accessible :id,
+      :site_id,
       :name,              # The name of this discount
       :code,              # The code the customer has to input to apply for this discount
       :amount_current,

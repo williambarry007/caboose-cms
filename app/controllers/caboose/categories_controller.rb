@@ -114,21 +114,19 @@ module Caboose
     
     # GET /admin/categories/options
     def admin_options      
-      options = []
-      cat = Category.where("site_id = ? and parent_id is null").first
+      @options = []
+      cat = Category.where("site_id = ? and parent_id is null", @site.id).first      
       if cat.nil?
         cat = Category.create(:site_id => @site.id, :name => 'All Products', :url => '/')
-      end        
-      cat.children.each do |c|
-        admin_options_helper(options, c, '')
-      end            
-      render :json => options
+      end
+      admin_options_helper(cat, '')
+      render :json => @options
     end
         
-    def admin_options_helper(options, cat, prefix)
-      options << { :value => cat.id, :text => "#{prefix}#{cat.name}" }      
+    def admin_options_helper(cat, prefix)
+      @options << { :value => cat.id, :text => "#{prefix}#{cat.name}" }      
       cat.children.each do |c|
-        admin_options_helper(options, c, "#{prefix} - ")
+        admin_options_helper(c, "#{prefix} - ")
       end      
     end
   end

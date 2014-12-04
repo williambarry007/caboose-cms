@@ -1,6 +1,29 @@
+<%
+
+top_cat = Caboose::Category.where("site_id = ? and parent_id is null", @site.id).first      
+if top_cat.nil?
+  top_cat = Category.create(:site_id => @site.id, :name => 'All Products', :url => '/')
+end
+        
+def category_list(cat)  
+  str = "<ul>"
+  str << category_list_items(cat)
+  str << "</ul>"
+  return str
+end
+      
+def category_list_items(cat)     
+  str = "<li><a href='/admin/categories/#{cat.id}'>#{cat.name}</a>"        
+  cat.children.each{ |kid| str << category_list(kid) } if cat.children && cat.children.count > 0    
+  str << "</li>"
+  return str
+end
+    
+%>
+
 <h1>Categories</h1>
 <a href='/admin/categories/new'>New Category</a>
-<%= category_list %>
+<%= category_list(top_cat) %>
 
 <% content_for :caboose_js do %>
 	<script type='text/javascript'>

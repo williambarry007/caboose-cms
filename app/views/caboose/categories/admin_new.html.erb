@@ -1,20 +1,13 @@
 <h1>New Category</h1>
 
 <form action="/admin/categories" method="post" id="new_form">
-	<!-- <select name="parent_id">
-	  <option value="">-- Parent Category --</option>
-	  <%=
-		#raw categories_options(@root_category)
-		%>
-	</select> -->
-		
-	<%= category_select('parent_id') %>
-	
-	<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
-	<input type="text" name="name" placeholder="Category Name" />
-	
-	<div id="message"></div>
-	
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
+  <p><select name='parent_id' id='parent_id'></select><%
+  # category_select('parent_id') 
+  %></p>		
+	<p><input type="text" name="name" id='name' placeholder="Category Name" /></p>
+  <p><input type='checkbox' name='stay' id='stay' value='1' /> Stay here so I can add another category</p>	
+	<div id="message"></div>	
 	<input type="button" value="< Back" onclick="window.location='/admin/categories';" />
 	<input type="submit" value="Add Category" onclick="add_category(); return false" />
 </form>
@@ -36,27 +29,58 @@
 <% end %>
 
 <% content_for :caboose_js do %>
-	<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/model/all" %>	
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  get_category_options();
+});
+
+function add_category() {
+  $('#message').html("<p class='loading'>Adding category...</p>");
+	var stay = $('#stay').prop('checked');
 	
-	<script type='text/javascript'>
-		function add_category() {
-			modal.autosize("<p class='loading'>Adding category...</p>");
-			
-			$.ajax({
-				url: '/admin/categories',
-				type: 'post',
-				data: $('#new_form').serialize(),
-				success: function(resp) {
-					if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
-					if (resp.redirect) window.location = resp.redirect    
-				}
-			});
+	$.ajax({
+		url: '/admin/categories',
+		type: 'post',
+		data: $('#new_form').serialize(),
+		success: function(resp) {
+			if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
+			if (resp.redirect)
+			{
+			  if (stay)
+        {
+          $('#name').val('');          
+          get_category_options();
+          $('#message').html("<p class='note succes'>The category has been added successfully.</p>");
+          setTimeout(function() { $('#message').empty(); }, 2000);
+        }
+        else if (resp.redirect)
+          window.location = resp.redirect;
+      }
 		}
-		
-		var modal = false;
-		
-		$(window).load(function() {
-			modal = new CabooseModal(800);
-		});
-	</script>
+	});
+}
+
+function get_category_options()
+{
+  var select = $('#parent_id');
+  var current_value = select.val();
+  
+  $.ajax({
+		url: '/admin/categories/options',
+		type: 'get',		
+		success: function(options) {		  
+		  select.empty();
+		  $.each(options, function(i, option) {		    
+		    var opt = $('<option/>').val(option['value']).html(option['text']);
+		    if (option['value'] == current_value)
+		      opt.prop('selected', true);
+		    select.append(opt);		  
+		  });
+		}
+	});
+}
+
+</script>
 <% end %>

@@ -8,6 +8,11 @@ module Caboose
     # GET /admin/categories
     def admin_index
       return unless user_is_allowed('categories', 'view')
+      
+      @top_cat = Caboose::Category.where("site_id = ? and parent_id is null", @site.id).first      
+      if @top_cat.nil?
+        @top_cat = Caboose::Category.create(:site_id => @site.id, :name => 'All Products', :url => '/')
+      end
       render :layout => 'caboose/admin'
     end
     

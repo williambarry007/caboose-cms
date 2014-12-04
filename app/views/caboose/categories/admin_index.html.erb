@@ -1,9 +1,4 @@
 <%
-
-top_cat = Caboose::Category.where("site_id = ? and parent_id is null", @site.id).first      
-if top_cat.nil?
-  top_cat = Caboose::Category.create(:site_id => @site.id, :name => 'All Products', :url => '/')
-end
         
 def category_list(cat)  
   str = "<ul>"
@@ -23,12 +18,10 @@ end
 
 <h1>Categories</h1>
 <a href='/admin/categories/new'>New Category</a>
-<%= category_list(top_cat) %>
+<%= category_list(@top_cat) %>
 
 <% content_for :caboose_js do %>
-	<script type='text/javascript'>
-		$(document).ready(function() { 
-		  var modal = new CabooseModal(800);
-		});
-	</script>
+<script type='text/javascript'>
+	
+</script>
 <% end %>

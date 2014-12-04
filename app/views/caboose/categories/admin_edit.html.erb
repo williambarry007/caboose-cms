@@ -39,7 +39,7 @@ $(document).ready(function() {
     update_url: '/admin/categories/<%= @category.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'parent_id'  , nice_name: 'Parent'  , type: 'select'  , value: <%= raw Caboose.json(@category.parent_id           %> , width: 400 , options_url: '/admin/categories/options' },
+      { name: 'parent_id'  , nice_name: 'Parent'  , type: 'select'  , value: <%= raw Caboose.json(@category.parent_id)          %> , width: 400 , options_url: '/admin/categories/options' },
       { name: 'name'       , nice_name: 'Name'    , type: 'text'    , value: <%= raw Caboose.json(@category.name)               %> , width: 400 },
       { name: 'slug'       , nice_name: 'Slug'    , type: 'text'    , value: <%= raw Caboose.json(@category.slug)               %> , width: 400 }, 
       { name: 'status'     , nice_name: 'Status'  , type: 'select'  , value: <%= raw Caboose.json(@category.status)             %> , width: 400  , text: <%= raw Caboose.json(@category.status) %>, options_url: '/admin/categories/status-options' },

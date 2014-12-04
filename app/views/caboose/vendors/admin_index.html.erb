@@ -12,14 +12,16 @@
     <tr>
       <%= raw @pager.sortable_table_headings({
         'id'     => 'ID',
-        'name'  => 'Name'
+        'name'   => 'Name',
+        'status' => 'Status'
       }) %>
     </tr>
     
     <% @vendors.each do |vendor| %>
-      <tr onclick="window.location='/admin/vendors/<%= vendor.id %>/edit';">
+      <tr onclick="window.location='/admin/vendors/<%= vendor.id %>';">
         <td style="text-align: center"><%= raw vendor.id %></td>
         <td><%= raw vendor.name %></td>
+        <td><%= raw vendor.status %></td>
       </tr>
     <% end %>
   </table>

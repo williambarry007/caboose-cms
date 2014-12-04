@@ -1,24 +1,47 @@
 <h1>Edit Vendor</h1>
 <p><div id="vendor_<%= @vendor.id %>_name"></div></p>
 <p><div id="vendor_<%= @vendor.id %>_status"></div></p>
-<input type="button" value="< Back" onclick="window.location=/admin/vendors" />
-<input type="button" value="Delete" onclick="window.location=/admin/vendors/<%= @vendor.id %>/delete" />
+<div id='message'></div>
+<input type="button" value="< Back" onclick="window.location='/admin/vendors';" />
+<input type="button" value="Delete" onclick="delete_vendor(<%= @vendor.id %>);" />
 
 <% content_for :caboose_js do %>
-  <%= javascript_include_tag "caboose/model/all" %>
-  
-  <script>
-    $(document).ready(function() {
-      m = new ModelBinder({
-        id: <%= @vendor.id %>,
-        name: 'Vendor',
-        update_url: '/admin/vendors/<%= @vendor.id %>/update',
-        authenticity_token: '<%= form_authenticity_token %>',
-        attributes: [
-          { name: 'name'   , nice_name: 'Name'   , type: 'text'   , value: <%= Caboose.json(@vendor.name).html_safe %>, width: 500 },
-          { name: 'status' , nice_name: 'Status' , type: 'select' , text: <%= raw Caboose.json(@vendor.status).html_safe %>, value: <%= Caboose.json(@vendor.status).html_safe %>, width: 500, options_url: '/admin/vendors/status-options' }
-        ]
-      })
-    });
-  </script>
+<%= javascript_include_tag "caboose/model/all" %>
+<script>
+$(document).ready(function() {
+  m = new ModelBinder({
+    id: <%= @vendor.id %>,
+    name: 'Vendor',
+    update_url: '/admin/vendors/<%= @vendor.id %>/update',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'name'   , nice_name: 'Name'   , type: 'text'   , value: <%= Caboose.json(@vendor.name).html_safe %>, width: 500 },
+      { name: 'status' , nice_name: 'Status' , type: 'select' , text: <%= raw Caboose.json(@vendor.status).html_safe %>, value: <%= Caboose.json(@vendor.status).html_safe %>, width: 500, options_url: '/admin/vendors/status-options' }
+    ]
+  })
+});
+
+function delete_vendor(vendor_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note confirm')
+      .append('Are you sure you want to delete the vendor? ')
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_vendor(vendor_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').html("<p class='loading'>Deleting vendor...</p>");
+  $.ajax({
+    url: '/admin/vendors/' + vendor_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
 <% end %>

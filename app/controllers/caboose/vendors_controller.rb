@@ -53,9 +53,21 @@ module Caboose
       vendor = Vendor.new(
         :site_id => @site.id,
         :name    => params[:name],
-        :status  => 'Inactive'
+        :status  => 'Active'
       )      
       render :json => { :success => vendor.save, :redirect => "/admin/vendors/#{vendor.id}" }
+    end
+    
+    # DELETE /admin/vendors/:id
+    def admin_delete
+      return if !user_is_allowed('vendors', 'delete')
+      v = Vendor.find(params[:id])
+      v.destroy
+      
+      resp = StdClass.new({
+        'redirect' => '/admin/vendors'
+      })
+      render :json => resp
     end
     
     # GET /admin/vendors/status-options

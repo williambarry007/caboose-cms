@@ -2,11 +2,12 @@
 
 <form id="new-vendor" action="/admin/vendors" method="post">
   <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
-  <input id="name" name="name" type="text" placeholder="Vendor Name" style="width: 400px" />
-  <div id='message'></div>  
+  <p><input id="name" name="name" id='name' type="text" placeholder="Vendor Name" style="width: 400px" /></p>
+  <p><input type='checkbox' name='stay' id='stay' value='1' /> Stay here so I can add another vendor</p>
+  <div id='message'></div>
   <p>
-    <input type="button" value="< Back" onclick="window.location='/admin/products'" />
-    <input type="submit" value="Add Vendor" />
+    <input type="button" value="< Back" onclick="window.location='/admin/vendors';" />
+    <input type="submit" value="Add Vendor" />    
   </p>
 </form>
 
@@ -14,9 +15,10 @@
 <script>
 $(document).ready(function() {
   $('#new-vendor').on('submit', function(event) {
-    $('#message').html("<p class='loading'>Adding vendor...</p>");
     event.preventDefault();
+    var stay = $('#stay').prop('checked');
     
+    $('#message').html("<p class='loading'>Adding vendor...</p>");        
     $.ajax({
       url: '/admin/vendors',
       type: 'post',
@@ -24,8 +26,17 @@ $(document).ready(function() {
       success: function(resp) {
         if (resp.error)
           $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        else if (resp.redirect)
-          window.location = resp.redirect;
+        else
+        {
+          if (stay)
+          {
+            $('#name').val('');
+            $('#message').html("<p class='note succes'>The vendor has been added successfully.</p>");
+            setTimeout(function() { $('#message').empty(); }, 2000);
+          }
+          else if (resp.redirect)
+            window.location = resp.redirect;
+        }
       }
     });
   });

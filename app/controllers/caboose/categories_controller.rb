@@ -34,7 +34,7 @@ module Caboose
           :site_id   => @site.id,
           :parent_id => p.id,
           :name      => params[:name],
-          :status    => 'Inactive'
+          :status    => 'Active'
         )
         cat.slug = cat.generate_slug
         cat.url  = "#{p.url}/#{cat.slug}"

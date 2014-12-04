@@ -15,7 +15,7 @@ module Caboose
     def category_list_items(category)
       
       # Link to category
-      link = link_to(category.name, "/admin/categories/#{category.id}/edit")
+      link = link_to(category.name, "/admin/categories/#{category.id}")
       
       # Recursively find category children
       children = content_tag :ul, category.children.collect { |child| category_list_items(child) }.join.to_s.html_safe if category.children.any?

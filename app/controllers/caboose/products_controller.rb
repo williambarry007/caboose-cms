@@ -7,8 +7,8 @@ module Caboose
 end
 
 module Caboose
-  class ProductsController < Caboose::ApplicationController  
-    
+  class ProductsController < Caboose::ApplicationController
+        
     # GET /products || GET /products/:id
     def index
       
@@ -22,20 +22,24 @@ module Caboose
         @reviews        = Review.where(:product_id => @product.id).limit(10).order("id DESC") || nil
         @logged_in_user = logged_in_user
         
-        render 'caboose/products/details' and return
+        render 'caboose/products/details' and return        
       end
       
       # Filter params from url
       url_without_params = request.fullpath.split('?').first
       
       # Find the category
-      category = Category.where(:site_id => @site.id, :url => url_without_params).first
-      
+      cat = Category.where(:site_id => @site.id, :url => url_without_params).first
+      if cat.nil?
+        cat = Category.where(:site_id => @site.id, :url => '/products').first
+        cat = Category.create(:site_id => @site.id, :url => '/products') if cat.nil?          
+      end
+            
       # Set category ID
-      params['category_id'] = category.id
+      params['category_id'] = cat.id
       
       # If this is the top-most category, collect all it's immediate children IDs
-      params['category_id'] = category.children.collect { |child| child.id } if category.id == 1
+      params['category_id'] = cat.children.collect { |child| child.id } if cat.id == 1
       
       # Shove the original category ID into the first position if the param is an array
       params['category_id'].unshift(category.id) if params['category_id'].is_a?(Array)
@@ -90,7 +94,7 @@ module Caboose
       @products = @pager.items
       @category = if @filter['category_id'] then Category.find(@filter['category_id'].to_i) else nil end
       
-      @pager.set_item_count
+      @pager.set_item_count            
     end
     
     def show

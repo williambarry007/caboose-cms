@@ -212,7 +212,7 @@ class Caboose::Block < ActiveRecord::Base
     end
     return msg
   end
-
+                  
   def render_from_function(options)
     self.create_children    
     #locals = OpenStruct.new(:block => self, :empty_text => empty_text, :editing => editing)
@@ -232,14 +232,32 @@ class Caboose::Block < ActiveRecord::Base
     options2[:block] = self
     
     view = ActionView::Base.new(ActionController::Base.view_paths)
+    site = options[:site]
+    
     begin
-      str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)
-    rescue
-      Caboose.log("Partial caboose/blocks/#{name} doesn't exist.")
+      str = view.render(:partial => "../../sites/#{site.name}/blocks/#{name}", :locals => options2)
+    rescue ActionView::MissingTemplate => ex      
+      begin
+        str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)
+      rescue
+        Caboose.log("Partial caboose/blocks/#{name} doesn't exist.")
+        str = "<p class='note error'>#{self.partial_message(block, ex)}</p>"
+      end      
     end
+      
     return str
   end
         
+  def partial_message(name, ex)    
+    msg = "Error with partial #{name}:\n"
+    if ex.is_a?(String)
+      Caboose.log("#{msg}#{ex}")
+    else
+      Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
+    end
+    return msg
+  end
+  
   #def child_block_link        
   #  return "<div class='new_block' id='new_block_#{self.id}'>New Block</div>"    
   #end  

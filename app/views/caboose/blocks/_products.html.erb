@@ -1,0 +1,10 @@
+<div id='block_<%= block.id %>'>
+
+  <%= block.partial('product_crumbtrail', local_assigns) %>	
+  <% if @product %>    
+    <%= block.partial('product_details', local_assigns) %>  
+  <% else %>  
+    <%= block.partial('product_category', local_assigns) %>
+	<% end %>
+	
+</div>

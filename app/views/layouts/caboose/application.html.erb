@@ -17,7 +17,8 @@
 <%= yield :caboose_css %>
 <% end %>
   <%  
-  b = @page.block  
+  b = @page.block
+  Caboose.log(@page.block.inspect)
   if b.nil?
     bt = Caboose::BlockType.where(:name => 'layout_basic').first
     Caboose::Block.create(:page_id => @page.id, :block_type_id => bt.id)    
@@ -41,28 +42,28 @@
   }
     
   str = nil    
-  if @use_page_cache
-    pc = Caboose::PageCache.where(:page_id => @page.id).first  
-    if pc # If the page is cached, send it to the user    
-           
-      require_dependency "#{Caboose.root}/app/models/caboose/block_cache.rb"
-      require_dependency "#{Caboose.root}/app/models/caboose/block_cache_file.rb"
-      require_dependency "#{Caboose.root}/app/models/caboose/block_cache_image.rb"
-    
-      @block = Marshal.load(pc.block)    
-      @view                    = options[:view                    ]
-      @controller_view_content = options[:controller_view_content ]
-      @modal                   = options[:modal                   ]
-      @empty_text              = options[:empty_text              ]
-      @editing                 = options[:editing                 ]
-      @css                     = options[:css                     ]
-      @js                      = options[:js                      ]
-      @csrf_meta_tags          = options[:csrf_meta_tags          ]
-      @csrf_meta_tags2         = options[:csrf_meta_tags2         ]
-      
-      str = render(:inline => pc.render_function)            
-    end
-  end
+  #if @use_page_cache
+  #  pc = Caboose::PageCache.where(:page_id => @page.id).first  
+  #  if pc # If the page is cached, send it to the user    
+  #         
+  #    require_dependency "#{Caboose.root}/app/models/caboose/block_cache.rb"
+  #    require_dependency "#{Caboose.root}/app/models/caboose/block_cache_file.rb"
+  #    require_dependency "#{Caboose.root}/app/models/caboose/block_cache_image.rb"
+  #  
+  #    @block = Marshal.load(pc.block)    
+  #    @view                    = options[:view                    ]
+  #    @controller_view_content = options[:controller_view_content ]
+  #    @modal                   = options[:modal                   ]
+  #    @empty_text              = options[:empty_text              ]
+  #    @editing                 = options[:editing                 ]
+  #    @css                     = options[:css                     ]
+  #    @js                      = options[:js                      ]
+  #    @csrf_meta_tags          = options[:csrf_meta_tags          ]
+  #    @csrf_meta_tags2         = options[:csrf_meta_tags2         ]
+  #    
+  #    str = render(:inline => pc.render_function)            
+  #  end
+  #end
   
   # Render the blocks if we don't have it cached    
   str = b.render(b, options) if str.nil?

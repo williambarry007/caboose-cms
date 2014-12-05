@@ -56,7 +56,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       #Caboose::PageCache => [:block],
       Caboose::Variant => [:quantity],
-      Caboose::Vendor => [:vendor]
+      Caboose::Vendor => [:vendor, :vendor_id]
     }
   end
 
@@ -200,6 +200,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Category => [
         [ :site_id               , :integer   ],
         [ :parent_id             , :integer   ],
+        [ :alternate_id          , :string    ],
         [ :name                  , :string    ],
         [ :url                   , :string    ],
         [ :slug                  , :string    ],
@@ -419,6 +420,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::ProductImage => [
         [ :product_id            , :integer  ],
+        [ :alternate_id          , :string   ],
         [ :title                 , :string   ],
         [ :position              , :integer  ],
         [ :image_file_name       , :string   ],
@@ -577,9 +579,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :sort_order            , :integer  , { :defult => 0 }]
       ],
       Caboose::Vendor => [
-        [ :site_id , :integer ],
-        [ :name    , :string  ],
-        [ :status  , :string, { default: 'Active' } ]
+        [ :site_id      , :integer    ],
+        [ :alternate_id , :string     ],
+        [ :name         , :string     ],
+        [ :status       , :string     , { :default => 'Active' } ],
+        [ :image        , :attachment ]
       ]
     }
 

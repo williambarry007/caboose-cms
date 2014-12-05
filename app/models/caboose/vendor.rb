@@ -5,13 +5,23 @@ module Caboose
 
     belongs_to :site    
     has_many :products
-    attr_accessible :id,
+    has_attached_file :image, 
+      :path => ':path_prefixvendors/:id_:style.:extension',    
+      :default_url => 'http://placehold.it/300x300',    
+      :styles => {
+        :tiny  => '150x200>',
+        :thumb => '300x400>',
+        :large => '600x800>'
+      }
+    do_not_validate_attachment_file_type :image
+    attr_accessible :id,    
       :site_id,
+      :alternate_id,
       :name, 
       :status,
       :sort_order
     after_save :clear_filters
-    
+
     def self.active
       where(:status => 'Active')
     end

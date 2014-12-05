@@ -5,9 +5,9 @@ module Caboose
     belongs_to :product
     has_many :product_image_variants
     has_many :variants, :through => :product_image_variants
-    
-    
+        
     attr_accessible :id,
+      :alternate_id,
       :product_id,
       :title,
       :position,
@@ -30,11 +30,11 @@ module Caboose
         large:  '800x800>',
         huge:   '1200x1200>'
       }
+    do_not_validate_attachment_file_type :image
+    #validates_attachment_content_type :image, :content_type => ["image/jpg", "image/jpeg", "image/png"]
     
     default_scope order('position ASC')
-    
-    validates_attachment_content_type :image, :content_type => ["image/jpg", "image/jpeg", "image/png"]
-    
+            
     def process
       config = AssetSync.config
       bucket = config.fog_directory

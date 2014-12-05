@@ -30,6 +30,7 @@ module Caboose
     attr_accessible :id,
       :site_id,
       :parent_id,
+      :alternate_id,
       :name,
       :url,
       :slug,
@@ -42,6 +43,9 @@ module Caboose
       :square_offset_x,
       :square_offset_y,
       :square_scale_factor
+      
+    STATUS_ACTIVE = 'Active'
+    STATUS_INACTIVE = 'Inactive'
     
     #
     # Class Methods
@@ -77,7 +81,7 @@ module Caboose
     end
     
     def active_products
-      self.products.where(:status => 'Active')
+      self.products.where(:status => 'Active')      
     end
     
     def ancestry

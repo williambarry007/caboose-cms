@@ -303,7 +303,7 @@ Caboose::Engine.routes.draw do
   get  '/admin/orders/:id/refund'              => 'orders#admin_refund'
   post '/admin/orders/:id/resend-confirmation' => 'orders#admin_resend_confirmation'
   
-  post    "/reviews/add"                                => "reviews#add"  
+  post    "/reviews/add"                                => "reviews#add"                                                                         
 
   get     "/admin/products"                                 => "products#admin_index"
   get     "/admin/products/json"                            => "products#admin_json"
@@ -317,14 +317,22 @@ Caboose::Engine.routes.draw do
   get     "/admin/products/:id/categories"                  => "products#admin_edit_categories"
   post    "/admin/products/:id/categories"                  => "products#admin_add_to_category"
   delete  "/admin/products/:id/categories/:category_id"     => "products#admin_remove_from_category"
-  get     "/admin/products/:id/variants"                    => "products#admin_edit_variants"
-  get     "/admin/products/:id/variants/json"               => "products#admin_variants_json"
-  get     "/admin/products/:id/variant-cols"                => "products#admin_edit_variant_columns"
-  put     "/admin/products/:id/variant-cols"                => "products#admin_update_variant_columns"
-  get     "/admin/products/:id/variants/sort-order"         => "products#admin_edit_variant_sort_order"
-  put     '/admin/products/:id/variants/option1-sort-order' => 'products#admin_update_variant_option1_sort_order'
-  put     '/admin/products/:id/variants/option2-sort-order' => 'products#admin_update_variant_option2_sort_order'
-  put     '/admin/products/:id/variants/option3-sort-order' => 'products#admin_update_variant_option3_sort_order'
+  
+  get     "/admin/products/:product_id/variants"                         => "variants#admin_index"
+  get     "/admin/products/:product_id/variants/json"                    => "variants#admin_json"  
+  get     "/admin/products/:product_id/variants/sort-order"              => "products#admin_edit_variant_sort_order"
+  put     '/admin/products/:product_id/variants/option1-sort-order'      => 'products#admin_update_option1_sort_order'
+  put     '/admin/products/:product_id/variants/option2-sort-order'      => 'products#admin_update_option2_sort_order'
+  put     '/admin/products/:product_id/variants/option3-sort-order'      => 'products#admin_update_option3_sort_order'
+  get     "/admin/products/:product_id/variants/:variant_id/edit"        => "variants#admin_edit"    
+  put     "/admin/products/:product_id/variants/:id/attach-to-image"     => "variants#admin_attach_to_image"
+  put     "/admin/products/:product_id/variants/:id/unattach-from-image" => "variants#admin_unattach_from_image"
+  put     "/admin/products/:product_id/variants/:id"                     => "variants#admin_update"  
+  get     "/admin/products/:id/variants/new"                             => "variants#admin_new"  
+  post    "/admin/products/:id/variants"                                 => "variants#admin_add"
+  delete  "/admin/variants/:id"                                          => "variants#admin_delete"
+  get     "/admin/variants/status-options"                               => "variants#admin_status_options"
+  
   get     "/admin/products/:id/images"                      => "products#admin_edit_images"
   post    "/admin/products/:id/images"                      => "products#admin_add_image"
   get     "/admin/products/:id/collections"                 => "products#admin_edit_collections"
@@ -337,16 +345,6 @@ Caboose::Engine.routes.draw do
   post    "/admin/products"                                 => "products#admin_add"
   delete  "/admin/products/:id"                             => "products#admin_delete"
   put     "/admin/products/:id/update-vendor"               => "products#admin_update_vendor"
-  
-  get     "/admin/products/:product_id/variants/:variant_id/edit"   => "variants#admin_edit"
-  get     "/admin/variants/status-options"            => "variants#admin_status_options"
-  get     "/admin/variants/:variant_id/edit"          => "variants#admin_edit"
-  put     "/admin/variants/:id/attach-to-image"       => "variants#admin_attach_to_image"
-  put     "/admin/variants/:id/unattach-from-image"   => "variants#admin_unattach_from_image"
-  put     "/admin/variants/:id"                       => "variants#admin_update"  
-  get     "/admin/products/:id/variants/new"          => "variants#admin_new"  
-  post    "/admin/products/:id/variants"              => "variants#admin_add"
-  delete  "/admin/variants/:id"                       => "variants#admin_delete"
   
   get    "/admin/stackable-groups/options"            => "stackable_groups#admin_options"  
   get    "/admin/stackable-groups/json"               => "stackable_groups#admin_json"

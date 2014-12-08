@@ -3,22 +3,7 @@ p = @product
 %>
 <%= render :partial => 'caboose/products/admin_header' %>
 
-<div id='categories'>
-<table>
-  <tr>
-    <% @top_categories.each do |cat| %>
-      <% next if cat.children && cat.children.count > 0 %>
-      <td valign='top'><%= raw category_checkboxes([cat], @selected_ids) %></td>
-    <% end %>
-  </tr>
-  <tr>
-    <% @top_categories.each do |cat| %>
-      <% next if cat.children.nil? || cat.children.count == 0 %>
-      <td valign='top'><%= raw category_checkboxes([cat], @selected_ids) %></td>
-    <% end %>
-  </tr>
-</table>
-</div>
+<div id='product_<%= p.id %>_category_id'></div>
 
 <%= render :partial => 'caboose/products/admin_footer' %>
 
@@ -35,39 +20,26 @@ p = @product
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
+var mb = false;
 $(document).ready(function() {
-  $('#categories input').click(function() {
-    var cat_id = $(this).attr('id').split('_')[1];
-    if ($(this).is(':checked'))
-      add_product_to_category(<%= p.id %>, cat_id);
-    else
-      remove_product_from_category(<%= p.id %>, cat_id);        
+  mb = new ModelBinder({
+    name: 'Product',
+    id: <%= p.id %>,
+    update_url: '/admin/products/<%= p.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      {
+        name: 'category_id',
+        nice_name: 'Categories',
+        type: 'checkbox-multiple',        
+        options_url: '/admin/categories/options',
+        value: <%= raw Caboose.json(p.categories.collect{ |cat| cat.id }) %>,
+        fixed_placeholder: false,
+        width: 400
+      }      
+    ]
   });  
 });
-
-var modal = false;
-$(window).load(function() {
-  modal = new CabooseModal(800);
-});
-
-function add_product_to_category(product_id, cat_id)
-{
-  $.ajax({
-    url: '/admin/products/' + product_id + '/categories',
-    type: 'post',
-    data: { category_id: cat_id },
-    success: function(resp) {}
-  });
-}
-
-function remove_product_from_category(product_id, cat_id)
-{
-  $.ajax({
-    url: '/admin/products/' + product_id + '/categories/' + cat_id,
-    type: 'delete',
-    success: function(resp) {}
-  });
-}
 
 </script>
 <% end %>

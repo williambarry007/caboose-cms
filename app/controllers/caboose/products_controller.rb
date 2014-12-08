@@ -378,41 +378,6 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/:id/variants
-    # GET /admin/products/:id/variants/:variant_id
-    def admin_edit_variants   
-      return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:id])
-      
-      if @product.variants.nil? || @product.variants.count == 0
-        v = Variant.new
-        v.option1 = @product.default1 if @product.option1
-        v.option2 = @product.default2 if @product.option2
-        v.option3 = @product.default3 if @product.option3
-        v.status  = 'Active'
-        @product.variants = [v]
-        @product.save
-      end
-      @variant = params[:variant_id] ? Variant.find(params[:variant_id]) : @product.variants[0]
-      session['variant_cols'] = self.default_variant_cols if session['variant_cols'].nil?
-      @cols = session['variant_cols']
-      
-      @highlight_variant_id = params[:highlight] ? params[:highlight].to_i : nil        
-      
-      if @product.options.nil? || @product.options.count == 0
-        render 'caboose/products/admin_edit_variants_single', :layout => 'caboose/admin'  
-      else
-        render 'caboose/products/admin_edit_variants', :layout => 'caboose/admin'
-      end          
-    end
-    
-    # GET /admin/products/:id/variants/json
-    def admin_variants_json
-      render :json => false if !user_is_allowed('products', 'edit')    
-      p = Product.find(params[:id])
-      render :json => p.variants
-    end
-    
     # GET /admin/products/:id/variant-cols  
     def admin_edit_variant_columns
       return if !user_is_allowed('products', 'edit')    
@@ -560,13 +525,6 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/:id/variants/sort-order  
-    def admin_edit_variant_sort_order
-      return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:id])      
-      render :layout => 'caboose/admin'
-    end
-    
     # GET /admin/products/:id/delete
     def admin_delete_form
       return if !user_is_allowed('products', 'edit')    
@@ -596,7 +554,7 @@ module Caboose
           when 'seo_description'    then product.seo_description    = value
           when 'status'             then product.status             = value
           when 'category_id'        then product.toggle_category(value[0], value[1])
-          when 'stackable_group_id' then product.stackable_group_id = value
+          when 'stackable_group_id' then product.stackable_group_id = value          
           when 'option1'            then product.option1            = value
           when 'option2'            then product.option2            = value
           when 'option3'            then product.option3            = value
@@ -754,39 +712,7 @@ module Caboose
       end      
       render :json => { :success => true }
     end
-    
-    # PUT /admin/products/:id/variants/option1-sort-order
-    def admin_update_variant_option1_sort_order
-      product_id = params[:id]
-      params[:values].each_with_index do |value, i|
-        Variant.where(:product_id => product_id, :option1 => value).all.each do |v|
-          v.update_attribute(:option1_sort_order, i)
-        end
-      end            
-      render :json => { :success => true }
-    end
-    
-    # PUT /admin/products/:id/variants/option1-sort-order
-    def admin_update_variant_option2_sort_order            
-      product_id = params[:id]
-      params[:values].each_with_index do |value, i|
-        Variant.where(:product_id => product_id, :option2 => value).all.each do |v|
-          v.update_attribute(:option2_sort_order, i)
-        end
-      end            
-      render :json => { :success => true }
-    end
-    
-    # PUT /admin/products/:id/variants/option1-sort-order
-    def admin_update_variant_option3_sort_order      
-      product_id = params[:id]
-      params[:values].each_with_index do |value, i|
-        Variant.where(:product_id => product_id, :option3 => value).all.each do |v|
-          v.update_attribute(:option3_sort_order, i)
-        end
-      end            
-      render :json => { :success => true }
-    end
+        
   end
 end
 

@@ -75,12 +75,14 @@ module Caboose
       block.children.each{ |b2| self.cache_helper(site, p, b2) }
     end
     
-    def self.cache_helper2(site, p, bt)      
+    def self.cache_helper2(site, p, bt)
+      return if bt.nil?      
       self.add_block_type(site, p, bt)
       bt.children.each{ |bt2| self.cache_helper2(site, p, bt2) }
     end
             
     def self.add_block_type(site, p, bt)
+      return if bt.nil?
       if !@render_functions.has_key?(bt.id)
         f = ''        
         if bt.use_render_function && bt.render_function

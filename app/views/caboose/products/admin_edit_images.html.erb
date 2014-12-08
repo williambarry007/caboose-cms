@@ -15,10 +15,7 @@ p = @product
 <div id='images'>
   <% if p.product_images.count > 0 %>
     <% p.product_images.each do |img| %>
-      <% 
-      #url = "https://s3.amazonaws.com/tuskwear/products/#{img.product_id}_#{img.id}_tiny.jpg" 
-      url = img.image.url(:tiny)
-      %>
+      <% url = img.image.url(:tiny) %>
       <div id='img_<%= img.id %>_container'><a href="javascript:select_image(<%= img.id %>);"><img src='<%= url %>' width='75' /></a></div> 
     <% end %>
   <% else %>
@@ -42,13 +39,7 @@ p = @product
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
-var modal = false;
-$(window).load(function() {
-  modal.autosize();
-});
-
-$(document).ready(function() {
-  modal = new CabooseModal(900);
+$(document).ready(function() {  
   <% if p.product_images.count > 0 %>
   select_image(<%= p.product_images[0].id %>);
   <% end %>
@@ -76,7 +67,7 @@ function select_image(image_id, confirm)
 {
   if (!variants)
   {
-    modal.autosize("<p class='loading'>Getting attached product variants...</p>", 'variants');
+    $('#variants').html("<p class='loading'>Getting attached product variants...</p>");
     $.ajax({
       url: '/admin/products/<%= p.id %>/variants/json',
       success: function(resp) { variants = resp; select_image(image_id); }
@@ -109,8 +100,7 @@ function select_image(image_id, confirm)
   $('#variants').empty().append('<br/>');
   $('#variants').append($('<div/>').attr('id','delete_message'));
   $('#variants').append($('<input/>').attr('type','button').val('Delete Image').click(function() { delete_image(image_id); }));  
-  $('#variants').append(tbl);
-  modal.autosize();
+  $('#variants').append(tbl);  
 }
 
 function variants_subtable(image_id, x, y)
@@ -121,20 +111,6 @@ function variants_subtable(image_id, x, y)
     var v = variants[i];
     if (!v) break;
     checked = image_is_attached_to_variant(v.id);
-    
-    //var a = $('<a/>')
-    //  .attr('href', '#')
-    //  .attr('id', 'v_' + v.id)
-    //  .html(variant_title(v))
-    //  .click(function(e) {
-    //    e.preventDefault();
-    //    variant_id = $(this).attr('id').split('_')[1];
-    //    var attach = false;
-    //    if ($(this).hasClass('selected')) { attach = false; $(this).removeClass('selected'); }
-    //    else                              { attch = true;   $(this).addClass('selected');    }          
-    //    attach_image_to_variant(image_id, variant_id, attach); 
-    //  });
-    //tbody.append($('<tr/>').append($('<td/>').append(a)));
         
     tbody.append($('<tr/>')
       .append($('<td/>')
@@ -145,8 +121,8 @@ function variants_subtable(image_id, x, y)
           .css('position','relative')     
           .val('1')
           .click(function() {
-            variant_id = $(this).attr('id').split('_')[1];
-            attach_image_to_variant(image_id, variant_id, $(this).is(':checked')); 
+            variant_id = $(this).attr('id').split('_')[1];            
+            attach_image_to_variant(image_id, variant_id, $(this).prop('checked')); 
           })
         )        
       )
@@ -173,9 +149,7 @@ function variant_title(v)
 }
 
 function attach_image_to_variant(image_id, variant_id, attach)
-{
-	attach = attach || true;
-	
+{  	
   if (attach)
     image_variant_ids[image_variant_ids.length] = variant_id;
   else
@@ -193,8 +167,7 @@ function attach_image_to_variant(image_id, variant_id, attach)
 
 function add_image()
 {
-  $('#new_image_message').html("<p class='loading'>Adding image...</p>");
-  modal.autosize();
+  $('#new_image_message').html("<p class='loading'>Adding image...</p>");  
 }
 
 function delete_image(image_id, confirm)
@@ -204,17 +177,17 @@ function delete_image(image_id, confirm)
     var p = $('<p/>').addClass('note error').css('margin-bottom', '10px')
       .append("Are you sure you want to delete the image?<br />This can't be undone.<br /><br />")
       .append($('<input/>').attr('type', 'button').val('Yes').click(function() { delete_image(image_id, true); })).append(' ')
-      .append($('<input/>').attr('type', 'button').val('No').click(function() { $('#delete_message').empty(); modal.autosize(); }));      
-    modal.autosize(p, 'delete_message');
+      .append($('<input/>').attr('type', 'button').val('No').click(function() { $('#delete_message').empty(); }));      
+    $('#delete_message').empty().append(p);
     return;
   }
-  modal.autosize("<p class='loading'>Deleting the image...</p>", 'delete_message');
+  $('#delete_message').empty().append("<p class='loading'>Deleting the image...</p>");
   $.ajax({
     url: '/admin/product-images/' + image_id,
     type: 'delete',
     success: function(resp) {
       if (resp.error)
-        modal.autosize("<p class='note error'>" + resp.error + "</p>", 'delete_message');
+        $('#delete_message').html("<p class='note error'>" + resp.error + "</p>");
       else
         window.location.reload(true);
     }

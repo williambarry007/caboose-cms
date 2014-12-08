@@ -15,7 +15,7 @@ v = @variant
 
 <%= render :partial => 'caboose/products/admin_header' %>
 
-<p style='font-size: 75%;'><a href='/admin/products/<%= p.id %>/variant-cols'>Edit visible columns</a></p>
+<div id='variants'></div>
 
 <div id='message'><%
 # Make sure we're not trying to highlight a deleted variant
@@ -28,57 +28,6 @@ if @highlight_variant_id
   end
 end 
 %></div>
-
-<div id='variants_wrapper'>
-  <table id='variants'>
-    <tr>
-      <th>&nbsp;</th>
-      <% if @cols['option1'           ] && p.option1 %><th valign='bottom'><%= p.option1    %></th><% end %>
-      <% if @cols['option2'           ] && p.option2 %><th valign='bottom'><%= p.option2    %></th><% end %>
-      <% if @cols['option3'           ] && p.option3 %><th valign='bottom'><%= p.option3    %></th><% end %>
-      <% if @cols['status'            ] == true      %><th valign='bottom'>Status             </th><% end %>
-      <% if @cols['alternate_id'      ] == true      %><th valign='bottom'>Alternate ID       </th><% end %>
-      <% if @cols['barcode'           ] == true      %><th valign='bottom'>Barcode            </th><% end %>
-      <% if @cols['price'             ] == true      %><th valign='bottom'>Price              </th><% end %>
-      <% if @cols['quantity_in_stock' ] == true      %><th valign='bottom'>Quantity           </th><% end %>
-      <% if @cols['weight'            ] == true      %><th valign='bottom'>Weight             </th><% end %>
-      <% if @cols['length'            ] == true      %><th valign='bottom'>Length             </th><% end %>
-      <% if @cols['width'             ] == true      %><th valign='bottom'>Width              </th><% end %>
-      <% if @cols['height'            ] == true      %><th valign='bottom'>Height             </th><% end %>
-      <% if @cols['cylinder'          ] == true      %><th valign='bottom'>Cylinder           </th><% end %>
-      <% if @cols['requires_shipping' ] == true      %><th valign='bottom'>Requires Shipping  </th><% end %>
-      <% if @cols['allow_backorder'   ] == true      %><th valign='bottom'>Allow Backorder    </th><% end %>
-      <% if @cols['taxable'           ] == true      %><th valign='bottom'>Taxable            </th><% end %>
-      <th>&nbsp;</th>
-      <th>&nbsp;</th>
-    </tr>
-    <tbody id='variants_tbody'>
-      <% p.variants.where(:status => ['Active', 'Inactive']).each do |v| %>      
-        <tr id='variant_<%= v.id %>' <% if @highlight_variant_id && v.id == @highlight_variant_id %>class='highlight'<% end %>>
-          <td class='sort_handle'>&nbsp;</td>
-          <% if @cols['option1'           ] && p.option1 %><td><div id='variant_<%= v.id %>_option1'           ></div></td><% end %>
-          <% if @cols['option2'           ] && p.option2 %><td><div id='variant_<%= v.id %>_option2'           ></div></td><% end %>
-          <% if @cols['option3'           ] && p.option3 %><td><div id='variant_<%= v.id %>_option3'           ></div></td><% end %>
-          <% if @cols['status'            ] == true      %><td><div id='variant_<%= v.id %>_status'            ></div></td><% end %>
-          <% if @cols['alternate_id'      ] == true      %><td><div id='variant_<%= v.id %>_alternate_id'      ></div></td><% end %>
-          <% if @cols['barcode'           ] == true      %><td><div id='variant_<%= v.id %>_barcode'           ></div></td><% end %> 
-          <% if @cols['price'             ] == true      %><td><div id='variant_<%= v.id %>_price'             ></div></td><% end %> 
-          <% if @cols['quantity_in_stock' ] == true      %><td><div id='variant_<%= v.id %>_quantity_in_stock' ></div></td><% end %> 
-          <% if @cols['weight'            ] == true      %><td><div id='variant_<%= v.id %>_weight'            ></div></td><% end %> 
-          <% if @cols['length'            ] == true      %><td><div id='variant_<%= v.id %>_length'            ></div></td><% end %> 
-          <% if @cols['width'             ] == true      %><td><div id='variant_<%= v.id %>_width'             ></div></td><% end %> 
-          <% if @cols['height'            ] == true      %><td><div id='variant_<%= v.id %>_height'            ></div></td><% end %> 
-          <% if @cols['cylinder'          ] == true      %><td><div id='variant_<%= v.id %>_cylinder'          ></div></td><% end %> 
-          <% if @cols['requires_shipping' ] == true      %><td><div id='variant_<%= v.id %>_requires_shipping' ></div></td><% end %>
-          <% if @cols['allow_backorder'   ] == true      %><td><div id='variant_<%= v.id %>_allow_backorder'   ></div></td><% end %>
-          <% if @cols['taxable'           ] == true      %><td><div id='variant_<%= v.id %>_taxable'           ></div></td><% end %>
-          <td class='edit'><a href='/admin/products/<%= p.id %>/variants/<%= v.id %>/edit'>Edit</a></td>
-          <td class='delete'><a href='#' onclick='delete_variant(<%= v.id %>);'>Delete</a></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
 
 <p><input type='button' value='New Variant' onclick="add_variant(<%= p.id %>);" /></p>
 
@@ -102,69 +51,41 @@ td.sort_handle { background: #ccc; width: 20px; }
 <script type='text/javascript'>
 
 $(document).ready(function() {
-  $('form#add-multiple').on('submit', function(event) {
-    event.preventDefault();
-    var $form = $(event.target);
-    
-    $.ajax({
-      type: $form.attr('method'),
-      url: $form.attr('action'),
-      data: $form.serialize(),
-      success: function(response) {
-        console.log(response);
-        if (response.success) {
-          location.reload();
-        } else {
-          $form.find('.message').empty().text(response.error);
-        }
-      }
-    });
-  });
-  
-  <% p.variants.each do |v| %>
-  new ModelBinder({
-    name: 'Variant',
-    id: <%= v.id %>,
-    update_url: '/admin/variants/<%= v.id %>',
-    authenticity_token: '<%= form_authenticity_token %>',
-    attributes: [
-      <% if @cols['option1'           ] && p.option1 %>{ name: 'option1'            , nice_name: <%= raw Caboose.json(p.option1) %> , type: 'text'     , align: 'left'  , value: <%= raw Caboose.json(v.option1             ) %>, width: 75, fixed_placeholder: false },<% end %>
-      <% if @cols['option2'           ] && p.option2 %>{ name: 'option2'            , nice_name: <%= raw Caboose.json(p.option2) %> , type: 'text'     , align: 'left'  , value: <%= raw Caboose.json(v.option2             ) %>, width: 75, fixed_placeholder: false },<% end %>
-      <% if @cols['option3'           ] && p.option3 %>{ name: 'option3'            , nice_name: <%= raw Caboose.json(p.option3) %> , type: 'text'     , align: 'left'  , value: <%= raw Caboose.json(v.option3             ) %>, width: 75, fixed_placeholder: false },<% end %>
-      <% if @cols['status'            ] == true      %>{ name: 'status'             , nice_name: 'Status'                           , type: 'text'     , align: 'left'  , value: <%= raw Caboose.json(v.status              ) %>, width: 75, fixed_placeholder: false },<% end %>
-      <% if @cols['alternate_id'      ] == true      %>{ name: 'alternate_id'       , nice_name: 'Alternate ID'                     , type: 'text'     , align: 'left'  , value: <%= raw Caboose.json(v.alternate_id        ) %>, width: 75, fixed_placeholder: false },<% end %>
-      <% if @cols['sku'               ] == true      %>{ name: 'sku'                , nice_name: 'SKU'                              , type: 'text'     , align: 'left'  , value: <%= raw Caboose.json(v.sku                 ) %>, width: 75, fixed_placeholder: false },<% end %>                         
-      <% if @cols['barcode'           ] == true      %>{ name: 'barcode'            , nice_name: 'Barcode'                          , type: 'text'     , align: 'left'  , value: <%= raw Caboose.json(v.barcode             ) %>, width: 75, fixed_placeholder: false },<% end %> 
-      <% if @cols['price'             ] == true      %>{ name: 'price'              , nice_name: 'Price'                            , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.price               ) %>, width: 75, fixed_placeholder: false },<% end %> 
-      <% if @cols['quantity_in_stock' ] == true      %>{ name: 'quantity_in_stock'  , nice_name: 'Quantity'                         , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.quantity_in_stock   ) %>, width: 50, fixed_placeholder: false },<% end %> 
-      <% if @cols['weight'            ] == true      %>{ name: 'weight'             , nice_name: 'Weight (grams)'                   , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.weight              ) %>, width: 50, fixed_placeholder: false },<% end %> 
-      <% if @cols['length'            ] == true      %>{ name: 'length'             , nice_name: 'Length (in)'                      , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.length              ) %>, width: 50, fixed_placeholder: false },<% end %> 
-      <% if @cols['width'             ] == true      %>{ name: 'width'              , nice_name: 'Width (in)'                       , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.width               ) %>, width: 50, fixed_placeholder: false },<% end %> 
-      <% if @cols['height'            ] == true      %>{ name: 'height'             , nice_name: 'Height (in)'                      , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.height              ) %>, width: 50, fixed_placeholder: false },<% end %> 
-      <% if @cols['cylinder'          ] == true      %>{ name: 'cylinder'           , nice_name: 'Cylinder'                         , type: 'checkbox' , align: 'center', value: <%= raw Caboose.json(v.cylinder            ) %>, width: 50, fixed_placeholder: false },<% end %> 
-      <% if @cols['requires_shipping' ] == true      %>{ name: 'requires_shipping'  , nice_name: 'Requires shipping'                , type: 'checkbox' , align: 'center', value: <%= raw Caboose.json(v.requires_shipping   ) %>, width: 50, fixed_placeholder: false },<% end %> 
-      <% if @cols['taxable'           ] == true      %>{ name: 'taxable'            , nice_name: 'Taxable'                          , type: 'checkbox' , align: 'center', value: <%= raw Caboose.json(v.taxable             ) %>, width: 50, fixed_placeholder: false },<% end %>
-      <% if @cols['allow_backorder'   ] == true      %>{ name: 'allow_backorder'    , nice_name: 'Allow backorder'                  , type: 'checkbox' , align: 'center', value: <%= raw Caboose.json(v.allow_backorder     ) %>, width: 50, fixed_placeholder: false } <% end %>     
-    ]
-  });
-  <% end %>
-  
-  $('#variants_tbody').sortable({
-    handle: '.sort_handle',
-    update: function(event, ui) {
-      $.ajax({
-        url: '/admin/products/<%= p.id %>/variants/sort-order',
-        type: 'put',
-        data: $('#variants_tbody').sortable('serialize', { key: 'variant_ids[]' }),
-        success: function(resp) {}
-      });        
-    }    
-  });
-});
-
-var modal = false;
-$(window).load(function() {
-  modal = new CabooseModal('100%');
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'variants',
+    base_url: '/admin/products/<%= p.id %>/variants',
+    allow_bulk_edit: false,
+    allow_bulk_delete: true,
+    allow_duplicate: false,
+    allow_advanced_edit: true,
+    fields: [
+      <% if p.option1 %>{ show: true , name: 'option1' , nice_name: <%= raw Caboose.json(p.option1) %> , sort: 'option1'           , type: 'text'     , value: function(v) { return v.option1             }, width: 75, align: 'left'   },<% end %>
+      <% if p.option2 %>{ show: true , name: 'option2' , nice_name: <%= raw Caboose.json(p.option2) %> , sort: 'option2'           , type: 'text'     , value: function(v) { return v.option2             }, width: 75, align: 'left'   },<% end %>
+      <% if p.option3 %>{ show: true , name: 'option3' , nice_name: <%= raw Caboose.json(p.option3) %> , sort: 'option3'           , type: 'text'     , value: function(v) { return v.option3             }, width: 75, align: 'left'   },<% end %>
+      { show: true , name: 'status'                    , nice_name: 'Status'                           , sort: 'status'            , type: 'text'     , value: function(v) { return v.status              }, width: 75, align: 'left'   },
+      { show: true , name: 'alternate_id'              , nice_name: 'Alternate ID'                     , sort: 'alternate_id'      , type: 'text'     , value: function(v) { return v.alternate_id        }, width: 75, align: 'left'   },
+      { show: true , name: 'sku'                       , nice_name: 'SKU'                              , sort: 'sku'               , type: 'text'     , value: function(v) { return v.sku                 }, width: 75, align: 'left'   },                         
+      { show: true , name: 'barcode'                   , nice_name: 'Barcode'                          , sort: 'barcode'           , type: 'text'     , value: function(v) { return v.barcode             }, width: 75, align: 'left'   }, 
+      { show: true , name: 'price'                     , nice_name: 'Price'                            , sort: 'price'             , type: 'text'     , value: function(v) { return v.price               }, width: 75, align: 'right'  }, 
+      { show: true , name: 'quantity_in_stock'         , nice_name: 'Quantity'                         , sort: 'quantity_in_stock' , type: 'text'     , value: function(v) { return v.quantity_in_stock   }, width: 50, align: 'right'  }, 
+      { show: true , name: 'weight'                    , nice_name: 'Weight (grams)'                   , sort: 'weight'            , type: 'text'     , value: function(v) { return v.weight              }, width: 50, align: 'right'  }, 
+      { show: true , name: 'length'                    , nice_name: 'Length (in)'                      , sort: 'length'            , type: 'text'     , value: function(v) { return v.length              }, width: 50, align: 'right'  }, 
+      { show: true , name: 'width'                     , nice_name: 'Width (in)'                       , sort: 'width'             , type: 'text'     , value: function(v) { return v.width               }, width: 50, align: 'right'  }, 
+      { show: true , name: 'height'                    , nice_name: 'Height (in)'                      , sort: 'height'            , type: 'text'     , value: function(v) { return v.height              }, width: 50, align: 'right'  }, 
+      { show: true , name: 'cylinder'                  , nice_name: 'Cylinder'                         , sort: 'cylinder'          , type: 'checkbox' , value: function(v) { return v.cylinder            }, width: 50, align: 'center' }, 
+      { show: true , name: 'requires_shipping'         , nice_name: 'Requires shipping'                , sort: 'requires_shipping' , type: 'checkbox' , value: function(v) { return v.requires_shipping   }, width: 50, align: 'center' }, 
+      { show: true , name: 'taxable'                   , nice_name: 'Taxable'                          , sort: 'taxable'           , type: 'checkbox' , value: function(v) { return v.taxable             }, width: 50, align: 'center' },
+      { show: true , name: 'allow_backorder'           , nice_name: 'Allow backorder'                  , sort: 'allow_backorder'   , type: 'checkbox' , value: function(v) { return v.allow_backorder     }, width: 50, align: 'center' }             
+    ],
+    new_model_text: 'New Variant',
+    new_model_fields: [
+      <% if p.option1 %>{ name: 'name', nice_name: 'Name', type: 'text', width: 400 },<% end %>
+      <% if p.option1 %>{ name: 'name', nice_name: 'Name', type: 'text', width: 400 },<% end %>
+      <% if p.option1 %>{ name: 'name', nice_name: 'Name', type: 'text', width: 400 },<% end %>
+    ],    
+  });        
 });
 
 </script>

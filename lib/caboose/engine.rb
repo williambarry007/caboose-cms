@@ -199,6 +199,7 @@ module Caboose
         'caboose/fonts.css',
         'caboose/icomoon_fonts.css',
         'caboose/login.css',
+        'caboose/message_boxes.css',
         'caboose/modal.css',
         'caboose/model_binder.css',        
         'caboose/page_bar_generator.css',

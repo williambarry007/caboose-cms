@@ -180,9 +180,8 @@ module Caboose
         '*/js/application.js',
 
         # CSS        
-        'colorbox-rails.css',
-        'caboose/model_binder.css',
-        'colorbox-rails/colorbox-rails.css',        
+        'colorbox-rails.css',        
+        'colorbox-rails/colorbox-rails.css',                
         'caboose/admin_page_edit_content.css',
         'caboose/admin_crumbtrail.css',
         'caboose/admin_images_index.css',
@@ -192,6 +191,9 @@ module Caboose
         'caboose/application.css',
         'caboose/bound_input.css',
         'caboose/caboose.css',
+        'caboose/cart.css',
+        'caboose/checkout.css',
+        'caboose/model_binder.css',        
         'caboose/fonts/big_noodle_titling_oblique.ttf',
         'caboose/fonts/big_noodle_titling.ttf',
         'caboose/fonts.css',

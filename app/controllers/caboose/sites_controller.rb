@@ -30,33 +30,33 @@ module Caboose
       @site = Site.new
     end
     
-    # GET /admin/sites/1/edit
+    # GET /admin/sites/:id
     def admin_edit
       return if !user_is_allowed('sites', 'edit')
       @site = Site.find(params[:id])      
     end
     
-    # GET /admin/sites/1/edit/store
+    # GET /admin/sites/:id/store
     def admin_edit_store_config
       return if !user_is_allowed('sites', 'edit')
       @site = Site.find(params[:id])
       StoreConfig.create(:site_id => @site.id) if @site.store_config.nil?      
     end
     
-    # GET /admin/sites/1/edit/smtp
+    # GET /admin/sites/:id/smtp
     def admin_edit_smtp_config
       return if !user_is_allowed('sites', 'edit')
       @site = Site.find(params[:id])      
       SmtpConfig.create(:site_id => @site.id)  if @site.smtp_config.nil?
     end
     
-    # GET /admin/sites/1/edit/block-types
+    # GET /admin/sites/:id/block-types
     def admin_edit_block_types
       return if !user_is_allowed('sites', 'edit')
       @site = Site.find(params[:id])      
     end
     
-    # GET /admin/sites/1/edit/delete
+    # GET /admin/sites/:id/delete
     def admin_delete_form
       return if !user_is_allowed('sites', 'edit')
       @site = Site.find(params[:id])      
@@ -184,8 +184,9 @@ module Caboose
     # GET /admin/sites/payment-processor-options
     def payment_processor_options
       return if !user_is_allowed('sites', 'view')
-      options = [ 
-        { 'value' => 'stripe', 'text' => 'Stripe' }
+      options = [
+        { 'value' => 'authorize.net'  , 'text' => 'Authorize.net' },
+        { 'value' => 'stripe'         , 'text' => 'Stripe' }        
       ]
       render :json => options
     end

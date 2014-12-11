@@ -17,6 +17,9 @@ module Caboose
     # Calculates the shipping packages required for all the items in the order
     def self.create_for_order(order)
 
+      store_config = order.site.store_config
+      return if !store_config.calculate_packages
+      
       # Make sure all the line items in the order have a quantity of 1
       extra_line_items = []
       order.line_items.each do |li|        

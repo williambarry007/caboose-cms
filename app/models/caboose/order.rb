@@ -21,8 +21,8 @@ module Caboose
       :order_number,
       :subtotal,
       :tax,      
-      :shipping_method,
-      :shipping_method_code,
+      :shipping_carrier,
+      :shipping_service_code,
       :shipping,
       :handling,
       :discount,
@@ -56,19 +56,25 @@ module Caboose
       :transaction_service,
       :transaction_id
     
+    STATUS_CART      = 'cart'
+    STATUS_PENDING   = 'pending'    
+    STATUS_CANCELED  = 'canceled'
+    STATUS_SHIPPED   = 'shipped'
+    STATUS_TESTING   = 'testing'
+    
     #
     # Scopes
     #
     
-    scope :test, where('status = ?', 'testing')
-    scope :cancelled, where('status = ?', 'cancelled')
-    scope :pending, where('status = ?', 'pending')
+    scope :test       , where('status = ?', 'testing')
+    scope :cancelled  , where('status = ?', 'cancelled')
+    scope :pending    , where('status = ?', 'pending')
     #TODO scope :fulfilled
     #TODO scope :unfulfilled
-    scope :authorized, where('financial_status = ?', 'authorized')
-    scope :captured, where('financial_status = ?', 'captured')
-    scope :refunded, where('financial_status = ?', 'refunded')
-    scope :voided, where('financial_status = ?', 'voided')
+    scope :authorized , where('financial_status = ?', 'authorized')
+    scope :captured   , where('financial_status = ?', 'captured')
+    scope :refunded   , where('financial_status = ?', 'refunded')
+    scope :voided     , where('financial_status = ?', 'voided')        
     
     #
     # Validations
@@ -157,7 +163,7 @@ module Caboose
     def calculate
       self.update_column(:subtotal, (self.calculate_subtotal * 100).ceil / 100.00)
       self.update_column(:tax, (self.calculate_tax * 100).ceil / 100.00)
-      self.update_column(:shipping, (self.calculate_shipping * 100).ceil / 100.00)
+      #self.update_column(:shipping, (self.calculate_shipping * 100).ceil / 100.00)
       self.update_column(:handling, (self.calculate_handling * 100).ceil / 100.00)
       self.update_column(:total, (self.calculate_total * 100).ceil / 100.00)
     end
@@ -173,13 +179,14 @@ module Caboose
     end
     
     def calculate_shipping
-      return 0 if !self.shipping_address || !self.shipping_method_code
-      ShippingCalculator.rate(self)[:total_price]
+      return 0 if !self.shipping_address || !self.shipping_service_code      
+      return 0.0
+      #ShippingCalculator.rates(self)
     end
     
     def calculate_handling
       return 0 if !Caboose::store_handling_percentage
-      self.shipping * Caboose::store_handling_percentage
+      self.shipping * Caboose::store_handling_percentage.to_f
     end
     
     def calculate_total

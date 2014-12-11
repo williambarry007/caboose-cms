@@ -54,7 +54,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :repeat_start  , 
         :repeat_end        
       ],
+      Caboose::Order => [:shipping_method, :shipping_method_code],      
       #Caboose::PageCache => [:block],
+      Caboose::Site => [:shipping_cost_function],
       Caboose::Variant => [:quantity],
       Caboose::Vendor => [:vendor, :vendor_id]
     }
@@ -63,6 +65,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
   # Any column indexes that need to exist in the database
   def self.indexes
     {
+      Caboose::Block                  => [:parent_id],
+      Caboose::BlockType              => [:parent_id],
       Caboose::RoleMembership         => [ :role_id    , :user_id          ],
       Caboose::RolePermission         => [ :role_id    , :permission_id    ],
       Caboose::PostCategoryMembership => [ :post_id    , :post_category_id ]
@@ -300,9 +304,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_cancelled        , :datetime ],
         [ :referring_site        , :text     ],
         [ :landing_page          , :string   ],
-        [ :landing_page_ref      , :string   ],
-        [ :shipping_method       , :string   ],
-        [ :shipping_method_code  , :string   ],
+        [ :landing_page_ref      , :string   ],        
+        [ :shipping_carrier      , :string   ],
+        [ :shipping_service_code , :string   ],
+        [ :shipping_service_name , :string   ],        
         [ :transaction_id        , :string   ],
         [ :auth_code             , :string   ],
         [ :alternate_id          , :integer  ],
@@ -472,6 +477,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :value    , :text    ]
       ],
       Caboose::ShippingPackage => [
+        [ :site_id      , :integer ],
         [ :carrier      , :string  ],
         [ :service_code , :string  ],
         [ :service_name , :string  ],
@@ -482,9 +488,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :price        , :decimal ]        
       ],
       Caboose::Site => [
-        [ :name                     , :string ],
-        [ :description              , :text   ],
-        [ :under_construction_html  , :text   ]
+        [ :name                    , :string ],
+        [ :description             , :text   ],
+        [ :under_construction_html , :text   ]        
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
@@ -511,22 +517,24 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :max_height     , :decimal ]
       ],
       Caboose::StoreConfig => [
-        [ :site_id                , :integer ],     
-        [ :pp_name                , :string  ],
-        [ :pp_username            , :string  ],
-        [ :pp_password            , :string  ],
-        [ :use_usps               , :boolean , { :default => false } ],
-        [ :usps_secret_key        , :string  ],
-        [ :usps_publishable_key   , :string  ],
-        [ :allowed_shipping_codes , :string  ],
-        [ :default_shipping_code  , :string  ],    
-        [ :origin_country         , :string  ],
-        [ :origin_state           , :string  ],
-        [ :origin_city            , :string  ],
-        [ :origin_zip             , :string  ],
-        [ :fulfillment_email      , :string  ],
-        [ :shipping_email         , :string  ],
-        [ :handling_percentage    , :string  ]
+        [ :site_id                 , :integer ],     
+        [ :pp_name                 , :string  ],
+        [ :pp_username             , :string  ],
+        [ :pp_password             , :string  ],
+        [ :use_usps                , :boolean , { :default => false } ],
+        [ :usps_secret_key         , :string  ],
+        [ :usps_publishable_key    , :string  ],
+        [ :allowed_shipping_codes  , :string  ],
+        [ :default_shipping_code   , :string  ],    
+        [ :origin_country          , :string  ],
+        [ :origin_state            , :string  ],
+        [ :origin_city             , :string  ],
+        [ :origin_zip              , :string  ],
+        [ :fulfillment_email       , :string  ],
+        [ :shipping_email          , :string  ],
+        [ :handling_percentage     , :string  ],
+        [ :calculate_packages      , :boolean , { :default => true }],
+        [ :shipping_rates_function , :text    ]
       ],
       Caboose::User => [
         [ :site_id              , :integer    ],

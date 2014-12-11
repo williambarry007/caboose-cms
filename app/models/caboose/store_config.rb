@@ -1,5 +1,6 @@
 module Caboose
   class StoreConfig < ActiveRecord::Base
+    self.table_name = 'store_configs'
     belongs_to :site    
     attr_accessible :id,
       :site_id,            

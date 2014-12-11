@@ -4,9 +4,19 @@ include ActiveMerchant::Shipping
 module Caboose
   class ShippingCalculator
     
+    def self.custom_rates(store_config, order)          
+      return eval(store_config.shipping_rates_function)    
+    end
+    
     def self.rates(order)
       return [] if Caboose::store_shipping.nil?
-      
+            
+      store_config = order.site.store_config
+      if store_config        
+        rates = self.custom_rates(store_config, order)
+        return rates        
+      end
+            
       ss = Caboose::store_shipping
       origin = Location.new(
         :country => ss[:origin][:country],
@@ -42,14 +52,14 @@ module Caboose
             rates << { :carrier => 'USPS', :service_code => rate.service_code, :service_name => rate.service_name, :total_price  => rate.total_price.to_d / 100 }
           end
         end
-        all_rates << [op, rates]
+        all_rates << { :order_package => op, :rates => rates }
       end            
       return all_rates
     end
     
     def self.rate(order)
-      return nil if !order.shipping_method_code
-      self.rates(order).each { |rate| return rate if rate[:service_code] == order.shipping_method_code }
+      return nil if !order.shipping_service_code
+      self.rates(order).each { |rate| return rate if rate[:service_code] == order.shipping_service_code }
       return nil
     end
                 

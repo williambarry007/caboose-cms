@@ -2,7 +2,8 @@
 sa = @order.shipping_address
 ba = @order.billing_address
 %>
-<div id="checkout" class='constrain'>  
+
+<div id="checkout">  
   <% if @logged_in_user.id == 1 %>    
     <p class='note error'>You are logged in as the admin user. Please <a href='/logout'>logout</a> and complete your order as a different user.</p>
   <% else %>

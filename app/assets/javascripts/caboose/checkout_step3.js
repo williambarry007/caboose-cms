@@ -8,17 +8,19 @@ Caboose.Store.Modules.CheckoutStep3 = (function() {
   };
   
   self.bind_event_handlers = function() {
-    $('#checkout button').click(self.shipping_click_handler);    
+    $('a.shipping_rate').click(self.shipping_click_handler);    
   };
 
   self.shipping_click_handler = function(event) {
+    event.preventDefault();
     $('#message').html("<p class='loading'>Saving information...</p>");            
     $.ajax({
       url: '/checkout/shipping',
       type: 'put',      
       data: { 
-        shipping_method:      $(event.target).data('shipping-method'),
-        shipping_method_code: $(event.target).data('shipping-code') 
+        carrier:      $(event.target).data('carrier'),
+        service_code: $(event.target).data('service-code'),
+        service_name: $(event.target).data('service-name')         
       },
       success: function(resp) {
         if (resp.errors && resp.errors.length > 0)

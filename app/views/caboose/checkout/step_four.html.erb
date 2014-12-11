@@ -1,11 +1,13 @@
+<%
+store_config = @site.store_config
+%>
 <div id="checkout">
-  <h2>Checkout</h2>
-  <%= raw checkout_nav(4) %>
+  <h2>Payment</h2>  
   <%= render :partial => 'caboose/checkout/confirm' %>  
   <section id="checkout-payment">  
     <div class="wrapper">      
-      <% if Caboose::payment_processor == 'authorize.net' %>
-        <form id="payment" target="relay" action="<%= Caboose::PaymentProcessor.form_url(@order) %>" method="post">
+      <% if store_config.pp_name == 'authorize.net' %>
+        <form id="payment" target="relay" action="https://test.authorize.net/gateway/transact.dll" method="post">
           <%= sim_fields(@sim_transaction) %>
           
           <label>Card Number</label>
@@ -40,42 +42,7 @@
           <br />
           <input type="submit" value="Submit" />
         </form>
-      <% end %>
-                              
-      <% if Caboose::payment_processor == 'payscape' %>
-        <form id="payment" action="<%= @form_url %>" method="post" target="relay">
-          <input id="billing-amount" type="hidden" value="<%= @order.total %>" />
-          <input id="expiration" name="billing-cc-exp" type="hidden" />          
-          <div>
-            <label for="billing-cc-number">Card number:</label>
-            <input id="billing-cc-number" name="billing-cc-number" type="text" maxlength="16" />
-          </div>          
-          <div>
-            <label for="billing-expiration-month">Expiration:</label>
-            <select name="month">
-              <option value="01">01 - Jan</option>
-              <option value="02">02 - Feb</option>
-              <option value="03">03 - Mar</option>
-              <option value="04">04 - Apr</option>
-              <option value="05">05 - May</option>
-              <option value="06">06 - Jun</option>
-              <option value="07">07 - Jul</option>
-              <option value="08">08 - Aug</option>
-              <option value="09">09 - Sep</option>
-              <option value="10">10 - Oct</option>
-              <option value="11">11 - Nov</option>
-              <option value="12">12 - Dec</option>
-            </select>
-            /
-            <select name="year">
-              <% (DateTime.now.year...DateTime.now.year + 20).each do |i| %>
-                <option value="<%= i-2000 %>"><%= i %></option>
-              <% end %>
-            </select>
-          </div>
-          
-          <!--<input type="submit" value="Submit" />-->
-        </form>
+        <iframe id="relay" name="relay" style='display: block; width: 800px; height: 400px; border: #000 1px solid;'></iframe>
       <% end %>
     </div>    
   </section>
@@ -85,7 +52,7 @@
     <em>or</em>
     <a href="/">return to the store</a>
   </section>
-  <iframe id="relay" name="relay"></iframe>
+  
 </div>
 
 <%= content_for :caboose_js do %>

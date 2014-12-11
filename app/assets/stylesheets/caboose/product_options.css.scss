@@ -1,0 +1,34 @@
+//
+// Product Options
+//
+
+#product-options { margin: 0 0 24px }
+
+#product-options h1, 
+#product-options h2, 
+#product-options h3, 
+#product-options h4, 
+#product-options h5, 
+#product-options h6 { line-height: 60px }
+
+#product-options ul { overflow: hidden }
+
+#product-options ul li {
+  background: #d0d0d0;
+  cursor: pointer;
+  display: block;
+  float: left;
+  font-family: 'Avenir';
+  padding: 6px 12px;
+  margin: 0 6px 6px 0;
+  &.selected {
+    background: #981919;
+    color: #fff;
+  }
+  &.unavailable {
+    background: lighten(#d0d0d0, 6%);
+    color: darken(#d0d0d0, 12%);
+    text-decoration: line-through;
+  }
+}
+

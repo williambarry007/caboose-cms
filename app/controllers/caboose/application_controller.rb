@@ -47,7 +47,7 @@ module Caboose
       @logged_in_user = logged_in_user  
       
       # Initialize the card
-      init_cart if Caboose::use_store
+      init_cart #if Caboose::use_store
       
       before_action
     end
@@ -55,25 +55,25 @@ module Caboose
     # Initialize the cart in the session
     def init_cart            
       # Check if the cart ID is defined and that it exists in the database
-      if !session[:cart_id] || !Order.exists?(session[:cart_id])
+      if !session[:cart_id] || !Caboose::Order.exists?(session[:cart_id])
         
         # Create an order to associate with the session
-        order = Order.create(
-          :status => 'cart',
-          :financial_status => 'pending',
-          :date_created => DateTime.now,
-          :referring_site => request.env['HTTP_REFERER'],
-          :landing_page => request.fullpath,
+        order = Caboose::Order.create(
+          :site_id          => @site.id,
+          :status           => Caboose::Order::STATUS_CART,
+          :financial_status => Caboose::Order::STATUS_PENDING,
+          :date_created     => DateTime.now,
+          :referring_site   => request.env['HTTP_REFERER'],
+          :landing_page     => request.fullpath,
           :landing_page_ref => params[:ref] || nil
-        )        
-        order.update_attribute(:shipping_method_code, Caboose::store_shipping[:default_shipping_method_code]) if Caboose::store_shipping[:default_shipping_method_code]
-        
+        )
+
         # Define the cart ID
         session[:cart_id] = order.id
       end
       
       # Log the order and set an instance variable up
-      @order = Order.find(session[:cart_id])      
+      @order = Caboose::Order.find(session[:cart_id])
     end
     
     # Parses any parameters in the URL and adds them to the params

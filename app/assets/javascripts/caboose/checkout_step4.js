@@ -7,7 +7,7 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
   
   self.initialize = function() {
     $('#checkout-confirm').hide();
-    $('#relay').hide();
+    //$('#relay').hide();
     self.bind_event_handlers();    
     self.expiration_change_handler();
   };
@@ -30,6 +30,7 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
   };
   
   self.continue_handler = function(event) {
+    alert('Testing');
     if (!self.is_confirm)
     {
       var cc = $('#billing-cc-number').val();

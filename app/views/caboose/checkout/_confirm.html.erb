@@ -50,7 +50,7 @@
         <p><a href="/checkout/step-two">Edit billing address</a></p>
       </section>
       <section id='shipping_method'>
-        <p><%= @order.shipping_method %> - <%= number_to_currency(@order.shipping) %></p>
+        <p><%= @order.shipping_service_name %> - <%= number_to_currency(@order.shipping) %></p>
         <p><a href="/checkout/step-three">Edit shipping method</a></p>
       </section>
       <section id='payment_method'>

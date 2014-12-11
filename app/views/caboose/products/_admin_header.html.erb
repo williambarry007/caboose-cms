@@ -15,7 +15,7 @@ tabs = {
   "/admin/products/#{@product.id}/categories"   => 'Categories'
 }
 
-tabs["/admin/products/#{@product.id}/options"             ] = 'Options <span style="font-size: 65%">(size, color, style, etc.)</span>' if @product.options && @product.options.count > 0
+tabs["/admin/products/#{@product.id}/options"             ] = 'Options <span style="font-size: 65%">(size, color, style, etc.)</span>'
 tabs["/admin/products/#{@product.id}/variants/sort-order" ] = 'Sort Option Values' if @product.options && @product.options.count > 0
 tabs["/admin/products/#{@product.id}/variants"            ] = 'Inventory & Variants'
 tabs["/admin/products/#{@product.id}/images"              ] = 'Images'

@@ -1,0 +1,31 @@
+//
+// Product Images
+//
+
+#product-images {
+  width: 40%;
+  float: left;
+}
+
+#product-images figure {
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+}
+
+#product-images > figure { height: 350px }
+
+#product-images ul {
+  overflow: hidden;
+  padding: 6px 0 24px;
+}
+#product-images ul li {
+  float: left;
+  height: 115px;
+  margin: 0 6px 6px 0;
+  width: 115px;
+}
+

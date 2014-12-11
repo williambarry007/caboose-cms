@@ -70,7 +70,7 @@ function select_image(image_id, confirm)
     $('#variants').html("<p class='loading'>Getting attached product variants...</p>");
     $.ajax({
       url: '/admin/products/<%= p.id %>/variants/json',
-      success: function(resp) { variants = resp; select_image(image_id); }
+      success: function(resp) { variants = resp.models; select_image(image_id); }
     });
     return;
   }
@@ -158,7 +158,7 @@ function attach_image_to_variant(image_id, variant_id, attach)
     image_variant_ids.splice(i, 1);
   }  
   $.ajax({
-    url: '/admin/variants/' + variant_id + '/' + (attach ? 'attach-to-image' : 'unattach-from-image'),
+    url: '/admin/products/<%= p.id %>/variants/' + variant_id + '/' + (attach ? 'attach-to-image' : 'unattach-from-image'),
     type: 'put',
     data: { product_image_id: image_id },
     success: function(resp) {}

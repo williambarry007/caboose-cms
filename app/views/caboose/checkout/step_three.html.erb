@@ -1,39 +1,47 @@
-<div id="checkout" class='constrain'> 
-  <section id="checkout-shipping">  
-    <div class="wrapper">
-      <% if @rates.count > 1 %>
-        <p>Your package must be shipped in multiple packages.  Please select 
-        how you would like each package to be delivered.</p>
-      <% end %>
-      <table>
-        <tr>
-          <th>Package</th>
-          <th>Shipping Options</th>
+
+<h1>Shipping Rates</h1>
+<div id="checkout">
+  <%
+  Caboose.log(@rates.count)
+  %>
+  <% if @rates.count == 1 %>
+    <p>Please select which shipping method you'd like to use.</p>
+    <p>
+    <% @rates[0][:rates].each do |rate| %>          
+      <a href='#' class='shipping_rate btn' data-carrier="<%= rate[:carrier] %>" data-service-code="<%= rate[:service_code] %>" data-service-name="<%= rate[:service_name] %>">
+        <%= number_to_currency(rate[:total_price], :precision => 2) %><br /><%= rate[:service_name] %>
+      </a>
+    <% end %>
+    </p>
+  <% else %>
+    <p>Your order must be shipped in multiple packages.  Please select how you would like each package to be delivered.</p>
+    <table>
+      <tr>
+        <th>Package</th>
+        <th>Shipping Options</th>
+      </tr>
+      <% @rates.each_with_index do |package_rates, i| %>
+        <% op = package_rates[:order_package] %>
+        <% sp = op.shipping_package %>          
+        <tr>                    
+          <td valign='top'>
+            <ul><% op.line_items.each do |li| %><li><%= li.variant.product.title %> (<%= li.variant.title %>)<% end %></ul>
+          </td>
+          <td valign='top'>
+            <% package_rates[:rates].each do |rate| %>
+              <a href='#' class='shipping_rate btn' data-carrier="<%= rate[:carrier] %>" data-service-code="<%= rate[:service_code] %>" data-service-name="<%= rate[:service_name] %>">
+                <%= number_to_currency(rate[:total_price], :precision => 2) %><br /><%= rate[:service_name] %>
+              </a>              
+            <% end %>
+          </td>
         </tr>        
-        <% @rates.each_with_index do |arr, i| %>
-          <% op = arr[0] %>
-          <% sp = op.shipping_package %>          
-          <tr>                    
-            <td valign='top'>
-              <ul><% op.line_items.each do |li| %><li><%= li.variant.product.title %> (<%= li.variant.title %>)<% end %></ul>
-            </td>
-            <td valign='top'>
-              <% arr[1].each do |rate| %>          
-                <button class="blue" data-shipping-code="<%= rate[:service_code] %>" data-shipping-method="<%= rate[:service_name] %>">
-                  <%= number_to_currency(rate[:total_price], :precision => 2) %><br /><%= rate[:service_name] %>
-                </button>
-              <% end %>
-            </td>
-          </tr>        
-        <% end %>
-      </table>
-    </div>    
-  </section>  
-  <section id="checkout-continue">
-    <div id='message'></div>        
-    <a href="/">return to the store</a>
-  </section>
+      <% end %>
+    </table>
+  <% end %>
 </div>
+    
+<div id='message'></div>
+<p><a href="/">return to the store</a></p>
                                     
 <%= content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/checkout_step3' %>
@@ -41,4 +49,7 @@
 <%= content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/message_boxes' %>
 <%= stylesheet_link_tag 'caboose/checkout' %>
+<style type='text/css'>
+a.shipping_rate { margin-bottom: 10px; margin-right: 10px; }
+</style>
 <% end %>

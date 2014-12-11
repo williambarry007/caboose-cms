@@ -1,7 +1,33 @@
+#def calc_shipping_rates(order)
+#  weight = 0.0
+#  order.line_items.each do |li|
+#    w = li.variant.weight ? li.variant.weight : 0.0    
+#    weight = weight + (w * li.quantity)
+#  end
+#           
+#  shipping = 0.0
+#  shipping = 8.00  if weight >= 0.010  && weight <= 3.000      
+#  shipping = 10.00 if weight >= 3.001  && weight <= 6.000      
+#  shipping = 12.00 if weight >= 6.001  && weight <= 8.000      
+#  shipping = 15.00 if weight >= 8.001  && weight <= 12.000     
+#  shipping = order.total * 0.05 if weight > 12.000
+#             
+#  rates = [
+#    { :carrier => 'UPS'  , :service_code => 'GND'                  , :service_name => 'Ground'             , :total_price => shipping + (order.total > 49 ? 0.00 : 7.95) },           
+#    { :carrier => 'UPS'  , :service_code => '3DS'                  , :service_name => 'UPS 3 Day Air'      , :total_price => shipping + 12.95 },  
+#    { :carrier => 'UPS'  , :service_code => '2DA'                  , :service_name => 'UPS 2 Day Air'      , :total_price => shipping + 19.95 },  
+#    { :carrier => 'UPS'  , :service_code => '1DA'                  , :service_name => 'UPS Next Day Air'   , :total_price => shipping + 32.95 },
+#    { :carrier => 'USPS' , :service_code => 'Priority Mail 3-Day'  , :service_name => 'USPS Priority Mail' , :total_price => shipping + 12.95 },  
+#    { :carrier => 'USPS' , :service_code => 'Priority Mail 2-Day'  , :service_name => 'USPS Express Mail'  , :total_price => shipping + 24.95 }
+#  ]
+#      
+#  return [rates]
+#end
+
 module Caboose
   class CheckoutController < Caboose::ApplicationController
     
-    #helper :authorize_net
+    helper :authorize_net
     before_filter :ensure_line_items, :only => [:step_one, :step_two]
     protect_from_forgery :except => :relay
     
@@ -36,17 +62,17 @@ module Caboose
     def step_three
       redirect_to '/checkout/step-one' and return if !logged_in?
       redirect_to '/checkout/step-two' and return if @order.shipping_address.nil? || @order.billing_address.nil?
-            
+
       # Remove any order packages      
       LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
       OrderPackage.where(:order_id => @order.id).destroy_all      
       
-      # Calculate what shipping packages we'll need      
+      # Calculate what shipping packages we'll need            
       OrderPackage.create_for_order(@order)
       
       # Now get the rates for those packages
       Caboose.log("Getting rates...")      
-      @rates = ShippingCalculator.rates(@order)
+      @rates = ShippingCalculator.rates(@order)      
       Caboose.log(@rates.inspect)      
     end
     
@@ -54,7 +80,7 @@ module Caboose
     def step_four
       redirect_to '/checkout/step-one'   and return if !logged_in?
       redirect_to '/checkout/step-two'   and return if @order.shipping_address.nil? || @order.billing_address.nil?
-      redirect_to '/checkout/step-three' and return if @order.shipping_method_code.nil?
+      redirect_to '/checkout/step-three' and return if @order.shipping_service_code.nil?
       
       # Make sure all the variants still exist      
       @order.line_items.each do |li|
@@ -65,11 +91,12 @@ module Caboose
         end
       end
       
-      case Caboose::payment_processor
+      store_config = @site.store_config
+      case store_config.pp_name
         when 'authorize.net'
           @sim_transaction = AuthorizeNet::SIM::Transaction.new(
-            Caboose::authorize_net_login_id,
-            Caboose::authorize_net_transaction_key,
+            store_config.pp_username,
+            store_config.pp_password,
             @order.total,
             :relay_url => "#{Caboose::store_url}/checkout/relay/#{@order.id}",
             :transaction_type => 'AUTH_ONLY',
@@ -180,9 +207,24 @@ module Caboose
     #end
     
     # PUT /checkout/shipping
-    def update_shipping      
-      @order.shipping_method      = params[:shipping_method]
-      @order.shipping_method_code = params[:shipping_method_code]                 
+    def update_shipping
+
+      rates = ShippingCalculator.rates(@order)
+        
+      if @site.store_config.calculate_packages
+        # TODO: Add the separate shipping costs for each package
+      else
+        @order.shipping_carrier      = params[:carrier]
+        @order.shipping_service_code = params[:service_code]
+        @order.shipping_service_name = params[:service_name]
+        
+        rates[0][:rates].each do |rate|
+          if rate[:carrier] == params[:carrier] && rate[:service_code] == params[:service_code]
+            @order.shipping = rate[:total_price]
+            break
+          end
+        end                 
+      end                       
       render :json => { 
         :success => @order.save, 
         :errors => @order.errors.full_messages 

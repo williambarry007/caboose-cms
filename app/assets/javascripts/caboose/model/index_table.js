@@ -545,11 +545,11 @@ IndexTable.prototype = {
     {
       var div = $('<div/>').addClass('note')
         .append($('<h2/>').html('Bulk Import'))
-        .append($('<p/>').html("Enter either the URL where CSV data can be downloaded or the CSV data.</p>"))
-        .append($('<p/>')
-          .append('CSV Data URL').append('<br />')
-          .append($('<input/>').attr('id', that.container + '_bulk_import_data_url').attr('placeholder', 'CSV Data URL').css('width', '100%'))
-        )
+        //.append($('<p/>').html("Enter either the URL where CSV data can be downloaded or the CSV data.</p>"))
+        //.append($('<p/>')
+        //  .append('CSV Data URL').append('<br />')
+        //  .append($('<input/>').attr('id', that.container + '_bulk_import_data_url').attr('placeholder', 'CSV Data URL').css('width', '100%'))
+        //)
         .append($('<p/>')
           .append('CSV Data').append('<br />')
           .append($('<textarea/>').attr('id', that.container + '_bulk_import_data').attr('placeholder', 'CSV Data').css('width', '100%').css('height', '150px'))
@@ -780,7 +780,7 @@ IndexTable.prototype = {
       data: $('#new_form').serialize(),
       success: function(resp) {
         if (resp.error) $('#' + that.container + '_new_message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.redirect || resp.refresh) that.refresh();
+        if (resp.redirect || resp.refresh || resp.success) that.refresh();
       }
     });
   },

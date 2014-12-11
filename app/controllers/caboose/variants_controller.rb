@@ -28,7 +28,27 @@ module Caboose
     #=============================================================================
     # Admin actions
     #=============================================================================
-     
+    
+    # GET /admin/products/:id/variants
+    # GET /admin/products/:id/variants/:variant_id
+    def admin_index   
+      return if !user_is_allowed('products', 'edit')    
+      @product = Product.find(params[:product_id])
+      
+      if @product.variants.nil? || @product.variants.count == 0
+        v = Variant.new
+        v.option1 = @product.default1 if @product.option1
+        v.option2 = @product.default2 if @product.option2
+        v.option3 = @product.default3 if @product.option3
+        v.status  = 'Active'
+        @product.variants = [v]
+        @product.save
+      end
+      @variant = params[:variant_id] ? Variant.find(params[:variant_id]) : @product.variants[0]
+      @highlight_variant_id = params[:highlight] ? params[:highlight].to_i : nil
+      render :layout => 'caboose/admin'                
+    end
+    
     # GET /admin/products/:product_id/variants/json
     def admin_json
       return if !user_is_allowed('products', 'view')
@@ -48,42 +68,13 @@ module Caboose
         :models => pager.items
       }      
     end
-    
-    # GET /admin/variants/:variant_id/edit
-    # GET /admin/products/:product_id/variants/:variant_id/edit
+        
+    # GET /admin/products/:product_id/variants/:variant_id
     def admin_edit
       return if !user_is_allowed('variants', 'edit')    
-      @variant = Variant.find(params[:variant_id])
+      @variant = Variant.find(params[:id])
       @product = @variant.product
       render :layout => 'caboose/admin'            
-    end
-    
-    # GET /admin/products/:id/variants
-    # GET /admin/products/:id/variants/:variant_id
-    def admin_edit_variants   
-      return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:id])
-      
-      if @product.variants.nil? || @product.variants.count == 0
-        v = Variant.new
-        v.option1 = @product.default1 if @product.option1
-        v.option2 = @product.default2 if @product.option2
-        v.option3 = @product.default3 if @product.option3
-        v.status  = 'Active'
-        @product.variants = [v]
-        @product.save
-      end
-      @variant = params[:variant_id] ? Variant.find(params[:variant_id]) : @product.variants[0]
-      session['variant_cols'] = self.default_variant_cols if session['variant_cols'].nil?
-      @cols = session['variant_cols']
-      
-      @highlight_variant_id = params[:highlight] ? params[:highlight].to_i : nil        
-      
-      if @product.options.nil? || @product.options.count == 0
-        render 'caboose/products/admin_edit_variants_single', :layout => 'caboose/admin'  
-      else
-        render 'caboose/products/admin_edit_variants', :layout => 'caboose/admin'
-      end          
     end
     
     # PUT /admin/variants/:id
@@ -182,7 +173,7 @@ module Caboose
       render :json => true
     end
   
-    # DELETE /admin/variants/:id
+    # DELETE /admin/products/:product_id/variants/:id
     def admin_delete
       return if !user_is_allowed('variants', 'delete')
       v = Variant.find(params[:id])
@@ -191,6 +182,20 @@ module Caboose
       render :json => Caboose::StdClass.new({
         :redirect => "/admin/products/#{v.product_id}/variants"
       })
+    end
+    
+    # DELETE /admin/products/:product_id/variants/bulk
+    def admin_bulk_delete
+      return if !user_is_allowed('variants', 'delete')
+      
+      resp = Caboose::StdClass.new
+      params[:model_ids].each do |variant_id|
+        v = Variant.find(variant_id)
+        v.status = 'Deleted'
+        v.save
+      end
+      resp.success = true
+      render :json => resp
     end
     
     # GET /admin/products/:product_id/variants/sort-order  
@@ -238,7 +243,7 @@ module Caboose
       return if !user_is_allowed('variants', 'edit')
       
       joins  = []
-      where  = ''
+      where  = []
       values = []
       
       if params[:category_ids]
@@ -258,20 +263,97 @@ module Caboose
         values << "%#{params[:title].downcase}%"
       end
       
-      # Query for all relevant products
-      products = values.any? ? Caboose::Product.joins(joins).where([where].concat(values)) : []
+      # Query for all relevant products      
+      products = values.any? ? Caboose::Product.joins(joins).where([where.join(' AND ')].concat(values)) : []
       
       # Grab variants for each product
       @variants = products.collect { |product| product.variants }.flatten
       
-      # Grab all categories; except for all and uncategorized
-      @categories = Caboose::Category.where('parent_id IS NOT NULL')
+      # Grab all categories; except for all and uncategorized      
+      @categories = Category.where('site_id = ? and parent_id IS NOT NULL AND name IS NOT NULL', @site.id).order(:url)
       
-      # Grab all vendors
-      @vendors = Caboose::Vendor.all
+      # Grab all vendors      
+      @vendors = Vendor.where('site_id = ? and name IS NOT NULL', @site.id).order(:name)
       
       render :layout => 'caboose/admin'
     end
+    
+    # POST /admin/products/:product_id/variants/add
+    def admin_add
+      
+      resp = Caboose::StdClass.new
+      p = Caboose::Product.find(params[:product_id])
+      
+      v = Caboose::Variant.where(:alternate_id => params[:alternate_id]).first
+      v = Caboose::Variant.new(:product_id => p.id) if v.nil?
+      
+      v.product_id        = p.id
+      v.alternate_id      = params[:alternate_id].strip
+      v.quantity_in_stock = params[:quantity_in_stock].strip.to_i
+      v.price             = '%.2f' % params[:price].strip.to_f
+      v.option1 = params[:option1] if p.option1
+      v.option2 = params[:option2] if p.option2
+      v.option3 = params[:option3] if p.option3      
+      v.save
+      
+      resp.success = true      
+      render :json => resp
+    end
+    
+    # POST /admin/products/:product_id/variants/bulk
+    def admin_bulk_add
+      product = Product.find(params[:product_id])
+      
+      resp = Caboose::StdClass.new
+      p = Caboose::Product.find(params[:product_id])
+      
+      # Check for data integrity first
+      CSV.parse(params[:csv_data]).each do |row|
+        if    row[1].nil? then resp.error = "Quantity is not defined for variant: #{row[0].strip}" and break          
+        elsif row[2].nil? then resp.error = "Price is not defined for variant: #{row[0].strip}" and break
+        elsif p.option1 && row[3].nil? then resp.error = "#{p.option1} is not defined for variant: #{row[0].strip}" and break
+        elsif p.option2 && row[4].nil? then resp.error = "#{p.option2} is not defined for variant: #{row[0].strip}" and break
+        elsif p.option3 && row[5].nil? then resp.error = "#{p.option3} is not defined for variant: #{row[0].strip}" and break
+        end
+      end
+      
+      if resp.error.nil?
+        CSV.parse(params[:csv_data]).each do |row|                    
+          v = Caboose::Variant.where(:alternate_id => row[0]).first
+          v = Caboose::Variant.new(:product_id => p.id) if v.nil?
+      
+          v.product_id        = p.id
+          v.alternate_id      = row[0].strip
+          v.quantity_in_stock = row[1].strip.to_i
+          v.price             = '%.2f' % row[2].strip.to_f
+          v.option1 = row[3] if p.option1
+          v.option2 = row[4] if p.option2
+          v.option3 = row[5] if p.option3      
+          v.save
+        end
+        resp.success = true
+      end
+      
+      render :json => resp
+    end
+    
+    # POST /admin/products/:product_id/variants/remove
+    def admin_remove_variants
+      params[:variant_ids].each do |variant_id|
+        variant = Variant.find(variant_id)
+        # variant.update_attribute(:status, 'deleted')
+        # variant.product.update_attribute(:status, 'deleted') if variant.product.variants.where('status != ?', 'deleted').count == 0
+      end
+      
+      # Remove passed variants
+      # redirect_to "/admin/products/#{params[:id]}/variants/group"
+            
+      render :json => true
+    end
+    
+    #===========================================================================
+    # Option methods
+    #===========================================================================
     
     # GET /admin/variants/status-options
     def admin_status_options

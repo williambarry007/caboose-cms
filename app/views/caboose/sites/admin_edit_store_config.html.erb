@@ -1,6 +1,8 @@
 <%
 s = @site
 store_config = s.store_config
+StoreConfig.create(:site_id => @site.id) if @site.store_config.nil?
+store_config = s.store_config
 %>
 <%= render :partial => 'caboose/sites/admin_header' %>
 

@@ -112,148 +112,8 @@ module Caboose
     end
     
     #=============================================================================
-    # API actions
-    #=============================================================================
-    
-    # GET /api/products
-    def api_index
-      render :json => Product.where(:status => 'Active')
-    end
-    
-    # GET /api/products/:id
-    def api_details
-      p = Product.where(:id => params[:id]).first
-      render :json => p ? p : { :error => 'Invalid product ID' }
-    end
-    
-    # GET /api/products/:id/variants
-    def api_variants
-      p = Product.where(:id => params[:id]).first
-      render :json => p ? p.variants : { :error => 'Invalid product ID' }
-    end
-    
-    #=============================================================================
     # Admin actions
     #=============================================================================
-    
-    # GET /admin/products/:id/variants/group
-    def admin_group_variants
-      @product = Product.find(params[:id])
-      
-      return if !user_is_allowed('variants', 'edit')
-      
-      joins  = []
-      where  = []
-      values = []
-      
-      if params[:category_ids]
-        joins  << [:category_memberships]
-        where  << 'store_category_memberships.category_id IN (?)'
-        values << params[:category_ids]
-      end
-      
-      if params[:vendor_ids]
-        joins  << [:vendor]
-        where  << 'store_vendors.id IN (?)'
-        values << params[:vendor_ids]
-      end
-      
-      if params[:title]
-        where  << 'LOWER(store_products.title) LIKE ?'
-        values << "%#{params[:title].downcase}%"
-      end
-      
-      # Query for all relevant products
-      products = values.any? ? Product.joins(joins).where([where.join(' AND ')].concat(values)) : []
-      
-      # Grab variants for each product
-      @variants = products.collect { |product| product.variants }.flatten
-      
-      # Grab all categories; except for "all" and "uncategorized"
-      @categories = Category.where('site_id = ? and parent_id IS NOT NULL AND name IS NOT NULL', @site.id).order(:url)
-      
-      # Grab all vendors
-      @vendors = Vendor.where('site_id = ? and name IS NOT NULL', @site.id).order(:name)
-      
-      render :layout => 'caboose/admin'
-    end
-    
-    # POST /admin/products/:id/variants/add
-    def admin_add_variants
-      params[:variant_ids].each do |variant_id|
-        variant = Variant.find(variant_id)
-        
-        # Delete current variant product if this is the last variant
-        # variant.product.update_attribute(:status, 'deleted') if variant.product.variants.where('status != ?', 'deleted').count == 0
-        
-        # Add reference to new product
-        # varant.product_id = params[:id]
-      end
-      
-      # Iterate over variants and add them to the product
-        # Remove product that the variants are associated with; UNLESS it's the current product
-      
-      redirect_to "/admin/products/#{params[:id]}/variants"
-    end
-    
-    # POST /admin/products/:id/varaints/add-multiple
-    def admin_add_multiple_variants
-      product = Product.find(params[:id])
-      
-      params[:variants_csv].split("\r\n").each do |variant|
-        row = variant.split(',')
-        
-        render :json => { :success => false, :error => "Quantity is not defined for variant: #{row[0].strip}" } and return if row[1].nil?
-        render :json => { :success => false, :error => "Price is not defined for variant: #{row[0].strip}" } and return if row[2].nil?
-        
-        attributes = {
-          :alternate_id => row[0].strip,
-          :quantity_in_stock => row[1].strip.to_i,
-          :price => '%.2f' % row[2].strip.to_f,
-          :status => 'Active'
-        }
-        
-        if product.option1 && row[3].nil?
-          render :json => { :success => false, :error => "#{product.option1} not defined for variant: #{attributes[:alternate_id]}" } and return
-        elsif product.option1
-          attributes[:option1] = row[3].strip
-        end
-        
-        if product.option2 && row[4].nil?
-          render :json => { :success => false, :error => "#{product.option2} not defined for variant: #{attributes[:alternate_id]}" } and return
-        elsif product.option2
-          attributes[:option2] = row[4].strip
-        end
-        
-        if product.option3 && row[5].nil?
-          render :json => { :success => false, :error => "#{product.option3} not defined for variant: #{attributes[:alternate_id]}" } and return
-        elsif product.option3
-          attributes[:option3] = row[5].strip
-        end
-        
-        if product.variants.find_by_alternate_id(attributes[:alternate_id])
-          product.variants.find_by_alternate_id(attributes[:alternate_id]).update_attributes(attributes)
-        else
-          Variant.create(attributes.merge(:product_id => product.id))
-        end
-      end
-      
-      render :json => { :success => true }
-    end
-    
-    # POST /admin//products/:id/variants/remove
-    def admin_remove_variants
-      params[:variant_ids].each do |variant_id|
-        variant = Variant.find(variant_id)
-        # variant.update_attribute(:status, 'deleted')
-        # variant.product.update_attribute(:status, 'deleted') if variant.product.variants.where('status != ?', 'deleted').count == 0
-      end
-      
-      # Remove passed variants
-      # redirect_to "/admin/products/#{params[:id]}/variants/group"
-            
-      render :json => true
-    end
     
     # GET /admin/products/update-vendor-status/:id
     def admin_update_vendor_status
@@ -340,24 +200,6 @@ module Caboose
       }      
     end
     
-    # GET /admin/products/add-upcs - TODO remove this; it's a temporary thing for woods-n-water
-    def admin_add_upcs
-      params[:vendor_id] if params[:vendor_id] and params[:vendor_id].empty?
-      
-      conditions = if params[:vendor_id]
-        "store_variants.alternate_id IS NULL and store_vendors.id = #{params[:vendor_id]}"
-      else
-        "store_variants.alternate_id IS NULL"
-      end
-      
-      @products = Product.all(
-        :include => [:variants, :vendor],
-        :conditions => conditions
-      )
-      
-      render :layout => 'caboose/admin'
-    end
-    
     # GET /admin/products/:id/json
     def admin_json_single
       p = Product.find(params[:id])
@@ -378,73 +220,6 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/:id/variant-cols  
-    def admin_edit_variant_columns
-      return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:id])
-      session['variant_cols'] = self.default_variant_cols if session['variant_cols'].nil?
-      @cols = session['variant_cols']
-      render :layout => 'caboose/admin'
-    end
-    
-    # PUT /admin/products/:id/variant-cols
-    def admin_update_variant_columns    
-      return if !user_is_allowed('products', 'edit')
-      session['variant_cols'] = self.default_variant_cols if session['variant_cols'].nil?
-      
-      resp = Caboose::StdClass.new({'attributes' => {}})
-      product = Product.find(params[:id])    
-      
-      save = true    
-      params.each do |name,value|
-        value = ActiveRecord::ConnectionAdapters::Column.value_to_boolean(value)
-        case name
-          when 'option1'        ,
-            'option2'           ,
-            'option3'           ,
-            'status'            ,
-            'alternate_id'      ,
-            'sku'               ,                        
-            'barcode'           , 
-            'price'             ,
-            'quantity_in_stock' ,
-            'weight'            , 
-            'length'            , 
-            'width'             , 
-            'height'            , 
-            'cylinder'          , 
-            'requires_shipping' ,
-            'allow_backorder'   ,
-            'taxable'      
-            session['variant_cols'][name] = value
-        end
-      end
-      resp.success = save && product.save
-      render :json => resp
-    end
-    
-    def default_variant_cols
-      return {    
-        'option1'           => true,
-        'option2'           => true,
-        'option3'           => true,
-        'status'            => true,
-        'alternate_id'      => true,
-        'sku'               => true,                         
-        'barcode'           => false, 
-        'price'             => true, 
-        'quantity' => true, 
-        'weight'            => false, 
-        'length'            => false, 
-        'width'             => false, 
-        'height'            => false, 
-        'cylinder'          => false, 
-        'requires_shipping' => false,
-        'allow_backorder'   => false,
-        'taxable'           => false
-      }
-    end
-    
     # GET /admin/products/:id/options
     def admin_edit_options
       return if !user_is_allowed('products', 'edit')    
@@ -459,30 +234,6 @@ module Caboose
       @top_categories = Category.where(:parent_id => 1).reorder('name').all
       @selected_ids = @product.categories.collect{ |cat| cat.id }
       render :layout => 'caboose/admin'
-    end
-    
-    # POST /admin/products/:id/categories
-    def admin_add_to_category
-      return if !user_is_allowed('products', 'edit')
-      cat_id = params[:category_id]
-      product_id = params[:id]
-      
-      if !CategoryMembership.exists?(:category_id => cat_id, :product_id => product_id)
-        CategoryMembership.create(:category_id => cat_id, :product_id => product_id)
-      end    
-      render :json => true
-    end
-    
-    # DELETE /admin/products/:id/categories/:category_id
-    def admin_remove_from_category
-      return if !user_is_allowed('products', 'edit')
-      cat_id = params[:category_id]
-      product_id = params[:id]
-      
-      if CategoryMembership.exists?(:category_id => cat_id, :product_id => product_id)
-        CategoryMembership.where(:category_id => cat_id, :product_id => product_id).destroy_all
-      end        
-      render :json => true
     end
     
     # GET /admin/products/:id/images
@@ -603,20 +354,13 @@ module Caboose
     def admin_add
       return if !user_is_allowed('products', 'add')
       
-      resp = Caboose::StdClass.new(
-        :error => nil,
-        :redirect => nil
-      )
-      
+      resp = Caboose::StdClass.new
       name = params[:name]
       
       if name.length == 0
         resp.error = "The title cannot be empty."
       else
-        p = Product.new(
-          :site_id => @site.id,
-          :title => name
-        )
+        p = Product.new(:site_id => @site.id, :title => name)
         p.save
         resp.redirect = "/admin/products/#{p.id}/general"
       end
@@ -626,7 +370,7 @@ module Caboose
     # DELETE /admin/products/:id
     def admin_delete
       return if !user_is_allowed('products', 'delete')
-      p = Product.find(params[:id]).destroy
+      p = Product.find(params[:id])
       p.status = 'Deleted'
       p.save
       render :json => Caboose::StdClass.new({
@@ -636,28 +380,14 @@ module Caboose
     
     # GET /products/status-options
     def admin_status_options
-      arr = ['Active', 'Inactive', 'Deleted']
-      options = []
-      arr.each do |status|
-        options << {
-          :value => status,
-          :text => status
-        }
-      end
-      render :json => options
+      arr = ['Active', 'Inactive', 'Deleted']      
+      render :json => arr.collect{ |status| { :value => status, :text => status }}
     end
     
     # GET /products/stackable-group-options
     def admin_stackable_group_options
       arr = ['Active', 'Inactive', 'Deleted']
-      options = []
-      arr.each do |status|
-        options << {
-          :value => status,
-          :text => status
-        }
-      end
-      render :json => options
+      render :json => arr.collect{ |status| { :value => status, :text => status }}      
     end
     
     # GET /admin/products/combine
@@ -691,11 +421,6 @@ module Caboose
       end
     end
     
-    # PUT /admin/products/:id/update-vendor
-    def admin_update_vendor
-      render :json => { :success => Product.find(params[:id]).update_attribute(:vendor_id, params[:vendor_id]) }
-    end
-    
     # GET /admin/products/sort
     def admin_sort
       @products   = Product.active
@@ -711,6 +436,27 @@ module Caboose
         Product.find(product_id.to_i).update_attribute(:sort_order, index)
       end      
       render :json => { :success => true }
+    end
+    
+    #=============================================================================
+    # API actions
+    #=============================================================================
+    
+    # GET /api/products
+    def api_index
+      render :json => Product.where(:status => 'Active')
+    end
+    
+    # GET /api/products/:id
+    def api_details
+      p = Product.where(:id => params[:id]).first
+      render :json => p ? p : { :error => 'Invalid product ID' }
+    end
+    
+    # GET /api/products/:id/variants
+    def api_variants
+      p = Product.where(:id => params[:id]).first
+      render :json => p ? p.variants : { :error => 'Invalid product ID' }
     end
         
   end

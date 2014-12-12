@@ -58,6 +58,9 @@ store_config = @site.store_config
 
 <%= content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/checkout_step4' %>
+<script type='text/javascript'>
+var SHOW_RELAY = <%= @show_relay ? 'true' : 'false' %>;
+</script>
 <% end %>
 <%= content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/checkout' %>

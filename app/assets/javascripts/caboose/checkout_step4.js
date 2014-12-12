@@ -7,7 +7,8 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
   
   self.initialize = function() {
     $('#checkout-confirm').hide();
-    $('#relay').hide();
+    if (!SHOW_RELAY || SHOW_RELAY == false)
+      $('#relay').hide();
     self.bind_event_handlers();    
     self.expiration_change_handler();
   };

@@ -82,6 +82,7 @@ module Caboose
             :test => true
           )
           @request = request
+          @show_relay = params[:show_relay] && params[:show_relay].to_i == 1
           
         when 'payscape'
           @form_url = Caboose::PaymentProcessor.form_url(@order)

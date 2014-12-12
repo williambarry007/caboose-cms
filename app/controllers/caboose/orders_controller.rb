@@ -6,6 +6,7 @@ module Caboose
       return if !user_is_allowed('orders', 'view')
       
       @pager = Caboose::PageBarGenerator.new(params, {
+        'site_id'              => @site.id,
         'customer_id'          => '', 
         'status'               => 'pending',
         'shipping_method_code' => '',

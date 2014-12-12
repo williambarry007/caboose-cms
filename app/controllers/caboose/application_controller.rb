@@ -55,10 +55,16 @@ module Caboose
     # Initialize the cart in the session
     def init_cart            
       # Check if the cart ID is defined and that it exists in the database
-      if !session[:cart_id] || !Caboose::Order.exists?(session[:cart_id])
+      create_new_order = false
+      if session[:cart_id]
+        @order = Caboose::Order.where(:id => session[:cart_id]).first
+        create_new_order = true if @order.nil? || @order.status != 'cart'                    
+      else                        
+        create_new_order = true                         
+      end
         
-        # Create an order to associate with the session
-        order = Caboose::Order.create(
+      if create_new_order # Create an order to associate with the session        
+        @order = Caboose::Order.create(
           :site_id          => @site.id,
           :status           => Caboose::Order::STATUS_CART,
           :financial_status => Caboose::Order::STATUS_PENDING,
@@ -67,13 +73,9 @@ module Caboose
           :landing_page     => request.fullpath,
           :landing_page_ref => params[:ref] || nil
         )
-
-        # Define the cart ID
-        session[:cart_id] = order.id
-      end
-      
-      # Log the order and set an instance variable up
-      @order = Caboose::Order.find(session[:cart_id])
+        # Save the cart ID in the session
+        session[:cart_id] = @order.id
+      end                  
     end
     
     # Parses any parameters in the URL and adds them to the params

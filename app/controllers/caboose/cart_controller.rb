@@ -12,7 +12,7 @@ module Caboose
     
     # GET /cart/item-count
     def item_count
-      render :json => { :item_count => @order.line_items.count }
+      render :json => { :item_count => @order.item_count }
     end
     
     # POST /cart
@@ -30,11 +30,11 @@ module Caboose
           :quantity   => qty,
           :status     => 'pending'
         )
-      end            
+      end       
       render :json => { 
         :success => li.save, 
         :errors => li.errors.full_messages,
-        :item_count => @order.line_items.count 
+        :item_count => @order.item_count 
       }
     end
     

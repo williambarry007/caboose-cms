@@ -1,6 +1,14 @@
 <%
 sa = @order.shipping_address
 ba = @order.billing_address
+if sa.nil?
+  q = ["status <> ? and id < ?", 'cart', @order.id]
+  if Caboose::Order.where(q).exists?    
+    last_order = Caboose::Order.where(q).first
+    sa = last_order.shipping_address
+    ba = last_order.billing_address
+  end
+end
 %>
 
 <div id="checkout">  

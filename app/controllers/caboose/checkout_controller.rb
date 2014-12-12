@@ -1,35 +1,10 @@
-#def calc_shipping_rates(order)
-#  weight = 0.0
-#  order.line_items.each do |li|
-#    w = li.variant.weight ? li.variant.weight : 0.0    
-#    weight = weight + (w * li.quantity)
-#  end
-#           
-#  shipping = 0.0
-#  shipping = 8.00  if weight >= 0.010  && weight <= 3.000      
-#  shipping = 10.00 if weight >= 3.001  && weight <= 6.000      
-#  shipping = 12.00 if weight >= 6.001  && weight <= 8.000      
-#  shipping = 15.00 if weight >= 8.001  && weight <= 12.000     
-#  shipping = order.total * 0.05 if weight > 12.000
-#             
-#  rates = [
-#    { :carrier => 'UPS'  , :service_code => 'GND'                  , :service_name => 'Ground'             , :total_price => shipping + (order.total > 49 ? 0.00 : 7.95) },           
-#    { :carrier => 'UPS'  , :service_code => '3DS'                  , :service_name => 'UPS 3 Day Air'      , :total_price => shipping + 12.95 },  
-#    { :carrier => 'UPS'  , :service_code => '2DA'                  , :service_name => 'UPS 2 Day Air'      , :total_price => shipping + 19.95 },  
-#    { :carrier => 'UPS'  , :service_code => '1DA'                  , :service_name => 'UPS Next Day Air'   , :total_price => shipping + 32.95 },
-#    { :carrier => 'USPS' , :service_code => 'Priority Mail 3-Day'  , :service_name => 'USPS Priority Mail' , :total_price => shipping + 12.95 },  
-#    { :carrier => 'USPS' , :service_code => 'Priority Mail 2-Day'  , :service_name => 'USPS Express Mail'  , :total_price => shipping + 24.95 }
-#  ]
-#      
-#  return [rates]
-#end
 
 module Caboose
   class CheckoutController < Caboose::ApplicationController
     
     helper :authorize_net
     before_filter :ensure_line_items, :only => [:step_one, :step_two]
-    protect_from_forgery :except => :relay
+    protect_from_forgery :except => :authnet_relay
     
     def ensure_line_items
       redirect_to '/checkout/empty' if @order.line_items.empty?
@@ -94,14 +69,20 @@ module Caboose
       store_config = @site.store_config
       case store_config.pp_name
         when 'authorize.net'
+          
+          sc = @site.store_config
           @sim_transaction = AuthorizeNet::SIM::Transaction.new(
-            store_config.pp_username,
-            store_config.pp_password,
-            @order.total,
-            :relay_url => "#{Caboose::store_url}/checkout/relay/#{@order.id}",
-            :transaction_type => 'AUTH_ONLY',
+            sc.pp_username, 
+            sc.pp_password, 
+            @order.total,            
+            #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
+            :relay_response => 'TRUE',
+            :relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay",
+            :transaction_type => 'AUTH_ONLY',            
             :test => true
           )
+          @request = request
+          
         when 'payscape'
           @form_url = Caboose::PaymentProcessor.form_url(@order)
       end
@@ -250,45 +231,54 @@ module Caboose
     #  end      
     #  render :layout => false
     #end
-    
-    # POST /checkout/relay/:order_id
-    def relay
-      ap '--HOOK RELAY'
-      @order = Caboose::Order.find(params[:order_id])
-      @success = Caboose::PaymentProcessor.authorize(@order, params)
-      @message = @success ? 'Payment processed successfully' : 'There was a problem processing your payment'
-      
-      #case Caboose::payment_processor
-      #  when 'authorize.net'
-      #    @success = params[:x_response_code] == '1'
-      #    @message = jarams[:x_response_reason_text]
-      #    @order.transaction_id = params[:x_trans_id] if params[:x_trans_id]
-      #  when 'payscape'
-      #    @success = Caboose::PaymentProcessor.authorize(@order, params)
-      #    @message = @success ? 'Payment processed successfully' : 'There was a problem processing your payment'
-      #    @order.transaction_id = params['transaction-id'] if params['transaction-id']
-      #end
-      
-      if @success
-        @order.financial_status = 'authorized'
-        @order.status = 'pending'
-        @order.date_authorized = DateTime.now
-        @order.auth_amount = @order.total
         
-        # Clear cart
-        session[:cart_id] = nil
+    # POST /checkout/authnet-relay
+    def authnet_relay
+      Caboose.log("Authorize.net relay, order #{params[:x_invoice_id]}")
+      
+      order = Caboose::Order.find(params[:x_invoice_num])        
+      order.transaction_id = params[:x_trans_id] if params[:x_trans_id]        
+      success = params[:x_response_code] && params[:x_response_code] == '1' 
+      
+      if success
+        order.financial_status = 'authorized'
+        order.status = 'pending'
+        order.date_authorized = DateTime.now
+        order.auth_amount = order.total
         
         # Send out emails        
-        OrdersMailer.customer_new_order(@order).deliver
-        OrdersMailer.fulfillment_new_order(@order).deliver        
+        OrdersMailer.customer_new_order(order).deliver
+        OrdersMailer.fulfillment_new_order(order).deliver        
         
         # Emit order event
-        Caboose.plugin_hook('order_authorized', @order)
+        Caboose.plugin_hook('order_authorized', order)
       else
-        @order.financial_status = 'unauthorized'
+        order.financial_status = 'unauthorized'
+        error = "There was a problem processing your payment."
       end
       
-      @order.save
+      order.save
+      
+      @url = params[:x_after_relay]
+      @url << (success ? "?success=1" : "?error=#{error}")             
+                  
+      render :layout => false
+    end
+    
+    # GET  /checkout/authnet-response/:order_id
+    # POST /checkout/authnet-response/:order_id    
+    def authnet_response
+      Caboose.log("Authorize.net response, order #{params[:order_id]}")
+      
+      @resp = Caboose::StdClass.new
+      @resp.success = true if params[:success]
+      @resp.error = params[:error] if params[:error]
+      
+      if @resp.success        
+        session[:cart_id] = nil
+        init_cart
+      end
+      
       render :layout => false
     end
     

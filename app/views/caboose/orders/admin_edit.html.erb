@@ -13,6 +13,7 @@ captured = @order.financial_status == 'captured'
 <tr>
   <th><%= if @order.customer.nil? then 'Guest' else 'Customer' end %></th>
   <th>Shipping Address</th>
+  <th>Shipping Method</th>
   <th>Order Status</th>
   <th>Payment Status</th>
   <th>Transaction ID</th>
@@ -25,22 +26,29 @@ captured = @order.financial_status == 'captured'
     <% elsif @order.email %>
       <a href="mailto:<%= @order.email %>"><%= @order.email %></a>
     <% end %>
-    <%= @order.customer ? @order.customer.phone : @order.shipping_address.phone %>
+    <%= @order.customer ? @order.customer.phone : @order.shipping_address.phone %>    
   </td>
   <td valign='top'>
-    <%= "#{@order.shipping_address.name}" %><br />
+    <%= "#{@order.shipping_address.first_name} #{@order.shipping_address.last_name}" %><br />
     <%= raw shipping_address %>
+  </td>
+  <td valign='top' align='center'>
+    <% if @order.shipping_service_code %>
+      <%= @order.shipping_carrier %> <%= @order.shipping_service_name %>
+    <% else %>
+      Multiple packages
+    <% end %>
   </td>
   <td valign='top'>
     <div id='order_<%= @order.id %>_status'></div>
   </td>
-  <td valign='top'>
+  <td valign='top' align='center'>
     <%= @order.financial_status %>
     <% if @order.financial_status == 'authorized' %>
-    for <%= number_to_currency(@order.auth_amount) %>
+    for<br /><%= number_to_currency(@order.auth_amount) %>
     <% end %>
   </td>
-  <td valign="top"><%= @order.transaction_id %></td>
+  <td valign="top" align='center'><%= @order.transaction_id %></td>
 </tr>
 </table><br />
 
@@ -77,7 +85,7 @@ captured = @order.financial_status == 'captured'
 <% end %>
 <tr><td colspan='5' align='right'>Subtotal                </td><td align='right' id='subtotal'   ><%= number_to_currency(@order.subtotal ) %></td></tr>
 <tr><td colspan='5' align='right'>Tax                     </td><td align='right' id='tax'        ><%= number_to_currency(@order.tax      ) %></td></tr>
-<tr><td colspan='5' align='right'><%= @order.shipping_method ? @order.shipping_method : '' %> Shipping &amp; Handling </td><td align='right' id='shipping'><%= number_to_currency(@order.shipping + @order.handling) %></td></tr>
+<tr><td colspan='5' align='right'><%= @order.shipping_service_code ? @order.shipping_service_code : '' %> Shipping &amp; Handling </td><td align='right' id='shipping'><%= number_to_currency(@order.shipping + @order.handling) %></td></tr>
 <tr>
   <td colspan='5' align='right'>Discount</td>
   <td align='right'>

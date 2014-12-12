@@ -30,8 +30,8 @@
   <p><select name='shipping_method_code'>
       <optgroup label='Shipping Method'>
         <option value=''>-- All shipping methods --</option>
-        <option value='03'<%= @pager.params['shipping_method_code'] == '02' ? " selected='true'" : '' %>>UPS Ground</option>
-        <option value='02'<%= @pager.params['shipping_method_code'] == '02' ? " selected='true'" : '' %>>UPS 2nd Day</option>                
+        <option value='03'<%= @pager.params['shipping_service_code'] == '02' ? " selected='true'" : '' %>>UPS Ground</option>
+        <option value='02'<%= @pager.params['shipping_service_code'] == '02' ? " selected='true'" : '' %>>UPS 2nd Day</option>                
       </optgroup>
     </select></p>
   <p>
@@ -70,7 +70,7 @@
       <td><%= raw order.date_created %></td>
       <td align='right'><%= number_to_currency(order.total) %></td>
       <td><%= raw order.status %></td>
-      <td><%= raw order.shipping_method %></td>
+      <td><%= raw order.shipping_carrier %> <%= raw order.shipping_service_name %></td>
     </tr>
   <% end %>
   </table>

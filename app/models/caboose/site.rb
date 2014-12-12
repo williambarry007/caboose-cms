@@ -24,4 +24,8 @@ class Caboose::Site < ActiveRecord::Base
     self.name = self.name.downcase.gsub(' ', '_')
   end
   
+  def primary_domain
+    Caboose::Domain.where(:site_id => self.id, :primary => true).first
+  end
+  
 end

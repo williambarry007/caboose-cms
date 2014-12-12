@@ -196,6 +196,12 @@ module Caboose
     def shipping_and_handling
       (self.shipping ? self.shipping : 0.0) + (self.handling ? self.handling : 0.0)      
     end
+    
+    def item_count
+      count = 0
+      self.line_items.each{ |li| count = count + li.quantity } if self.line_items
+      return count
+    end
   end
 end
 

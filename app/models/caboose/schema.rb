@@ -556,7 +556,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :token                , :string     ],
         [ :date_created         , :datetime   ],
         [ :image                , :attachment ],
-        [ :is_guest             , :boolean    , { :default => false }]
+        [ :is_guest             , :boolean    , { :default => false }],
+        [ :customer_profile_id  , :string     ],
+        [ :payment_profile_id   , :string     ]
       ],
       Caboose::Variant => [
         [ :product_id            , :integer  ],

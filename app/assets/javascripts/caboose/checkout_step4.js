@@ -7,13 +7,13 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
   
   self.initialize = function() {
     $('#checkout-confirm').hide();
-    //$('#relay').hide();
+    $('#relay').hide();
     self.bind_event_handlers();    
     self.expiration_change_handler();
   };
     
   self.bind_event_handlers = function() {
-    $('#checkout-payment form#payment select').change(self.expiration_change_handler);
+    $('#payment select').change(self.expiration_change_handler);
     $('#checkout-continue button').click(self.continue_handler);
     $('#checkout-confirm #edit_payment').click(self.edit_payment_handler);                
     
@@ -29,8 +29,7 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
     $('#expiration').val(month + year);
   };
   
-  self.continue_handler = function(event) {
-    alert('Testing');
+  self.continue_handler = function(event) {    
     if (!self.is_confirm)
     {
       var cc = $('#billing-cc-number').val();
@@ -40,9 +39,7 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
       {          
         $('#message').empty();
         $('#checkout-payment').hide();
-        $('#checkout-confirm').show();
-        $('#checkout_nav4 a').removeClass('current').addClass('done');
-        $('#checkout_nav5 a').removeClass('not_done').addClass('current');
+        $('#checkout-confirm').show();        
         $('#confirm_card_number').html("Card ending in " + cc.substr(-4));
         $('#checkout-continue button').html("Confirm order");
         self.is_confirm = true;
@@ -89,10 +86,11 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
 function relay_handler(resp)
 {
   console.log('RELAY');
+  console.log(resp);
   if (resp.success == true)
     window.location = '/checkout/thanks';
-  else if (resp.message)  
-    $('#message').html("<p class='note error'>" + resp.message + "</p>");
+  else if (resp.error)  
+    $('#message').html("<p class='note error'>" + resp.error + "</p>");
   else
     $('#message').html("<p class='note error'>There was an error processing your payment.</p>");
 }

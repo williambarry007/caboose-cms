@@ -56,13 +56,18 @@ Caboose.Store.Modules.Cart = (function() {
   };
   
   self.render_item_count = function(item_count) {
-    var $link = $('#cart-link, .cart-link');
-    if (!$link.length) return false;
-    
-    function set_count(count) {
-      if      ($link.children('i') && count < 1) { $link.children('i').remove(); }
-      else if ($link.children('i').length)       { $link.children('i').empty().text(count); } 
-      else                                       { $link.append($('<i/>').text(count)); }
+    var $link = $('#cart-link, .cart-link');    
+    //if (!$link.length) return false;
+        
+    function set_count(count) {            
+      if ($('#cart_item_count').length > 0)
+        $('#cart_item_count').html(count);              
+      else if ($link.length > 0)
+      {
+        if ($link.children('i') && count < 1) { $link.children('i').remove(); }
+        else if ($link.children('i').length)  { $link.children('i').empty().text(count); } 
+        else                                  { $link.append($('<i/>').text(count)); }
+      }
     };
     
     if (item_count) {
@@ -94,7 +99,7 @@ Caboose.Store.Modules.Cart = (function() {
         type: $form.attr('method'),
         url: $form.attr('action'),
         data: $form.serialize(),
-        success: function(response) {
+        success: function(response) {          
           if (response.success) {
             self.render_item_count(response.item_count);
             if (self.$add_to_cart.length) self.$add_to_cart.trigger('added');

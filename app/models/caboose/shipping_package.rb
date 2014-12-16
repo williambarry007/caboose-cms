@@ -3,7 +3,18 @@ require 'box_packer'
 module Caboose
   class ShippingPackage < ActiveRecord::Base
     self.table_name = 'store_shipping_packages'
-    attr_accessible :id, :carrier, :service_code, :service_name, :length, :width, :height, :volume, :price
+    
+    has_many :shipping_package_methods
+    has_many :shipping_methods, :through => :shipping_package_methods
+    attr_accessible :id,
+      :site_id,
+      :name,
+      :length, 
+      :width, 
+      :height, 
+      :volume,
+      :priority,
+      :flat_rate_price
           
     def fits(variants)  
       

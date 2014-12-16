@@ -31,7 +31,7 @@ module Caboose
         else          
           bouncer_class = Caboose::authenticator_class.constantize
           bouncer = bouncer_class.new
-          login_resp = bouncer.authenticate(username, password)
+          login_resp = bouncer.authenticate(username, password, @site)
           
           if login_resp.error
             resp.error = login_resp.error

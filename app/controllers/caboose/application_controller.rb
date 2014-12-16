@@ -65,7 +65,7 @@ module Caboose
         
       if create_new_order # Create an order to associate with the session        
         @order = Caboose::Order.create(
-          :site_id          => @site.id,
+          :site_id          => @site ? @site.id : nil,
           :status           => Caboose::Order::STATUS_CART,
           :financial_status => Caboose::Order::STATUS_PENDING,
           :date_created     => DateTime.now,

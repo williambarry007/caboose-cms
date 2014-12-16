@@ -1,0 +1,42 @@
+<%= render :partial => 'caboose/sites/admin_header' %>
+
+<h2>Shipping Packages</h2>
+<div id='shipping_packages'></div>
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'shipping_packages',
+    base_url: '/admin/sites/<%= @site.id %>/shipping-packages',
+    allow_bulk_edit: false,
+    allow_bulk_delete: true,
+    allow_duplicate: false,
+    allow_advanced_edit: false,
+    fields: [      
+      { show: true , name: 'name'               , nice_name: 'Shipping Method'         , sort: 'shipping_method_id' , type: 'select' , value: function(sp) { return sp.shipping_method_id }, width: 75, align: 'left'   },                                           
+      { show: true , name: 'length'             , nice_name: 'Length (in)'             , sort: 'length'             , type: 'text'   , value: function(sp) { return sp.length             }, width: 50, align: 'right'  }, 
+      { show: true , name: 'width'              , nice_name: 'Width (in)'              , sort: 'width'              , type: 'text'   , value: function(sp) { return sp.width              }, width: 50, align: 'right'  }, 
+      { show: true , name: 'height'             , nice_name: 'Height (in)'             , sort: 'height'             , type: 'text'   , value: function(sp) { return sp.height             }, width: 50, align: 'right'  }, 
+      { show: true , name: 'volume'             , nice_name: 'Volume (in<sup>3</sup>)' , sort: 'volume'             , type: 'text'   , value: function(sp) { return sp.volume             }, width: 50, align: 'right'  },
+      { show: true , name: 'flat_rate_price'    , nice_name: 'Flat Rate Price'         , sort: 'flat_rate_price'    , type: 'text'   , value: function(sp) { return sp.flat_rate_price    }, width: 50, align: 'right'  },
+      { show: true , name: 'priority'           , nice_name: 'Priority'                , sort: 'priority'           , type: 'text'   , value: function(sp) { return sp.priority           }, width: 50, align: 'right'  }
+    ],
+    new_model_text: 'New Shipping Package',
+    new_model_fields: [                                                 
+      { name: 'length'             , nice_name: 'Length (in)'     , type: 'text'   , width: 50  }, 
+      { name: 'width'              , nice_name: 'Width (in)'      , type: 'text'   , width: 50  }, 
+      { name: 'height'             , nice_name: 'Height (in)'     , type: 'text'   , width: 50  }                        
+    ],
+    bulk_import_fields: ['shipping_method_id', 'length', 'width', 'height'],
+    bulk_import_url: '/admin/sites/<%= @site.id %>/shipping-packages/bulk'
+  });        
+});
+
+</script>
+<% end %>

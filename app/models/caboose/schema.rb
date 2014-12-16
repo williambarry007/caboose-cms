@@ -56,6 +56,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Order => [:shipping_method, :shipping_method_code],      
       #Caboose::PageCache => [:block],
+      Caboose::ShippingPackage => [:price, :carrier, :service_code, :service_name, :shipping_method_id],
       Caboose::Site => [:shipping_cost_function],
       Caboose::Variant => [:quantity],
       Caboose::Vendor => [:vendor, :vendor_id]
@@ -476,16 +477,24 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name     , :string  ],
         [ :value    , :text    ]
       ],
+      Caboose::ShippingMethod => [        
+        [ :carrier          , :string  ],
+        [ :service_code     , :string  ],
+        [ :service_name     , :string  ]        
+      ],      
       Caboose::ShippingPackage => [
-        [ :site_id      , :integer ],
-        [ :carrier      , :string  ],
-        [ :service_code , :string  ],
-        [ :service_name , :string  ],
-        [ :length       , :decimal ],
-        [ :width        , :decimal ],
-        [ :height       , :decimal ],
-        [ :volume       , :decimal ],
-        [ :price        , :decimal ]        
+        [ :site_id            , :integer ],
+        [ :name               , :string  ],
+        [ :length             , :decimal ],
+        [ :width              , :decimal ],
+        [ :height             , :decimal ],
+        [ :volume             , :decimal ],
+        [ :priority           , :integer  , { :default => 1 }],
+        [ :flat_rate_price    , :decimal ]
+      ],
+      Caboose::ShippingPackageMethod => [
+        [ :shipping_package_id  , :integer ],
+        [ :shipping_method_id   , :integer ]
       ],
       Caboose::Site => [
         [ :name                    , :string ],
@@ -761,20 +770,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :slug => 'products'
       })
     end
-        
-    if !Caboose::ShippingPackage.where(:carrier => 'USPS', :service_code => "29").exists?
-      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "29", :service_name => "USPS Priority Mail 1-Day Padded Flat Rate Envelope", :price=>610  , :volume => 180)
-    end
-    if !Caboose::ShippingPackage.where(:carrier => 'USPS', :service_code => "28").exists?
-      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "28", :service_name => "USPS Priority Mail 1-Day Small Flat Rate Box"      , :price=>595  , :length => 8.625   , :width => 5.375  , :height => 1.625 , :volume => 75.334)
-    end
-    if !Caboose::ShippingPackage.where(:carrier => 'USPS', :service_code => "17").exists?
-      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "17", :service_name => "USPS Priority Mail 1-Day Medium Flat Rate Box"     , :price=>1265 , :length => 11      , :width => 8.5    , :height => 5.5   , :volume => 514.25)
-      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "17", :service_name => "USPS Priority Mail 1-Day Medium Flat Rate Box"     , :price=>1265 , :length => 13.625  , :width => 11.875 , :height => 3.375 , :volume => 546.06)
-    end
-    if !Caboose::ShippingPackage.where(:carrier => 'USPS', :service_code => "22").exists?
-      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "22", :service_name => "USPS Priority Mail 1-Day Large Flat Rate Box"      , :price=>1790 , :length => 12      , :width => 12     , :height => 5.5   , :volume => 792   )
-      Caboose::ShippingPackage.create(:carrier => 'USPS', :service_code => "22", :service_name => "USPS Priority Mail 1-Day Large Flat Rate Box"      , :price=>1790 , :length => 23.6875 , :width => 11.75  , :height => 3     , :volume => 834.98)
+    
+    if Caboose::ShippingMethod.all.count == 0
+      Caboose::ShippingMethodLoader.load_shipping_methods
     end
 
   end

@@ -405,6 +405,20 @@ Caboose::Engine.routes.draw do
   post    "/admin/stackable-groups"           => "stackable_groups#admin_add"
   delete  "/admin/stackable-groups/bulk"      => "stackable_groups#admin_bulk_delete"
   delete  "/admin/stackable-groups/:id"       => "stackable_groups#admin_delete"
+  
+  #=============================================================================
+  # Shipping Packages
+  #=============================================================================
+  
+  get     "/admin/sites/:site_id/shipping-packages/options"                   => "shipping_packages#admin_options"
+  get     "/admin/sites/:site_id/shipping-packages/shipping-method-options"   => "shipping_packages#admin_shipping_method_options"  
+  get     "/admin/sites/:site_id/shipping-packages/json"                      => "shipping_packages#admin_json"
+  get     "/admin/sites/:site_id/shipping-packages/:id/json"                  => "shipping_packages#admin_json_single"
+  get     "/admin/sites/:site_id/shipping-packages"                           => "shipping_packages#admin_index"
+  put     "/admin/sites/:site_id/shipping-packages/:id"                       => "shipping_packages#admin_update"
+  post    "/admin/sites/:site_id/shipping-packages"                           => "shipping_packages#admin_add"
+  delete  "/admin/sites/:site_id/shipping-packages/bulk"                      => "shipping_packages#admin_bulk_delete"
+  delete  "/admin/sites/:site_id/shipping-packages/:id"                       => "shipping_packages#admin_delete"
 
   #=============================================================================
   # Categories

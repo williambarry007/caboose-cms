@@ -1,0 +1,164 @@
+<%
+s = @site
+admin_ids = Caboose::SiteMembership.where(:site_id => s.id, :role => Caboose::SiteMembership::ROLE_ADMIN).pluck(:user_id)
+user_ids  = Caboose::SiteMembership.where(:site_id => s.id, :role => Caboose::SiteMembership::ROLE_USER ).pluck(:user_id)
+admin_ids = [] if admin_ids.nil?
+user_ids = [] if user_ids.nil?
+%>
+<%= render :partial => 'caboose/sites/admin_header' %>
+
+<p><div id='site_<%= @site.id %>_name'        ></div></p>
+<p><div id='site_<%= @site.id %>_description' ></div></p>
+<p><div id='site_<%= @site.id %>_under_construction_html' ></div></p>
+
+<h2>Domains</h2>
+<p><a href='#' onclick="add_domain(<%= @site.id %>);">New Domain</a></p>
+<div id='new_domain_container'></div>
+<% if @site.domains && @site.domains.count > 0 %>
+  <table class='data'>
+  <tr>
+    <th>Domain</th>
+    <th>Primary</th>
+    <th>Under Construction</th>
+    <th>Delete</th>
+  </tr>
+  <% @site.domains.all.each do |d| %>
+  <tr>
+    <td><%= d.domain %></td>
+    <td align='center'><input type='radio'    name='primary_domain' <%= d.primary? ? "checked='true'" : '' %> onclick="set_primary_domain(<%= s.id %>, <%= d.id %>);" /></td>
+    <td align='center'><input type='checkbox' name='under_construction_<%= d.id %>' <%= d.under_construction ? "checked='true'" : '' %> onclick="set_under_construction(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
+    <td align='center'><input type='button'   value='Delete' onclick="delete_domain(<%= @site.id %>, <%= d.id %>);" /></td>    
+  </tr>
+  <% end %>
+  </table>
+<% else %>
+  <p>This site doesn't have any domains yet.</p>
+<% end %>
+<div id='domain_message'></div>
+
+<h2>Members</h2>
+<div id='members'>
+<table class='data'>
+<tr><th>User</th><th>None</th><th>User</th><th>Admin</th></tr>
+<% Caboose::User.reorder('last_name, first_name').all.each do |u| %>
+  <tr>
+    <td><%= u.first_name %> <%= u.last_name %> (<%= u.email %>)</td>
+    <td align='center'><input type='radio' name='user<%= u.id %>' <%= !admin_ids.include?(u.id) && !user_ids.include?(u.id) ? "checked='true'" : '' %> onclick="remove_site_membership(<%= s.id %>, <%= u.id %>);" /></td>
+    <td align='center'><input type='radio' name='user<%= u.id %>' <%= user_ids.include?(u.id)  ? "checked='true'" : ''                             %> onclick="add_site_membership(<%= s.id %>, <%= u.id %>, 'User');" /></td>
+    <td align='center'><input type='radio' name='user<%= u.id %>' <%= admin_ids.include?(u.id) ? "checked='true'" : ''                             %> onclick="add_site_membership(<%= s.id %>, <%= u.id %>, 'Admin');" /></td>    
+  </tr>
+<% end %>
+</table>
+</div>
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'Site',
+    id: <%= @site.id %>,
+    update_url: '/admin/sites/<%= @site.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'name'                    , nice_name: 'Name'                     , type: 'text'     , value: <%= raw Caboose.json(@site.name)                    %>, width: 400 },
+      { name: 'description'             , nice_name: 'Description'              , type: 'textarea' , value: <%= raw Caboose.json(@site.description)             %>, width: 600, height: 75 },
+      { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html) %>, width: 600, height: 75 }      
+    ]    
+  });       
+});
+
+function set_under_construction(site_id, domain_id, checked)
+{
+  $.ajax({
+    url: '/admin/sites/' + site_id + '/domains/' + domain_id,
+    type: 'put',
+    data: { under_construction: checked ? 1 : 0 }
+  });
+}
+
+function add_site_membership(site_id, user_id, role)
+{
+  $.ajax({
+    url: '/admin/sites/' + site_id +'/members',
+    type: 'post',
+    data: {
+      user_id: user_id,
+      role: role 
+    },
+    succes: function(resp) {}
+  });
+}
+
+function remove_site_membership(site_id, user_id)
+{
+  $.ajax({
+    url: '/admin/sites/' + site_id +'/members/' + user_id,
+    type: 'delete',    
+    succes: function(resp) {}
+  });
+}
+
+function add_domain(site_id, domain)
+{
+  if (!domain)
+  {    
+    var div = $('<div/>')
+      .append($('<p/>')
+        .addClass('note warning')
+        .append("What domain would you like to add?<br />")
+        .append($('<input/>').attr('type','text').attr('id','new_domain').css('width', '200px')).append(' ')
+        .append($('<input/>').attr('type','button').val('Add').click(function() { add_domain(site_id, $('#new_domain').val()); })).append(' ')
+        .append($('<input/>').attr('type','button').val('Cancel').click(function() { $('#new_domain_container').empty(); }))
+      )
+      .append($('<div/>').attr('id', 'new_domain_message'));      
+    $('#new_domain_container').empty().append(div);
+    return;      
+  }
+  $('#new_domain_message').empty().html("<p class='loading'>Adding domain...</p>");
+  $.ajax({
+    url: '/admin/sites/' + site_id + '/domains',
+    type: 'post',
+    data: { domain: domain },
+    success: function(resp) {
+      if (resp.error) $('#new_domain_message').html("<p class='note error'>" + resp.error + "<br /></p>");
+      if (resp.refresh) window.location.reload(true);
+    }
+  });
+}
+
+function delete_domain(site_id, domain_id, confirm)
+{        
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note confirm')
+      .append('Are you sure you want to delete the domain? ')
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_domain(site_id, domain_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#domain_message').empty(); }));
+    $('#domain_message').empty().append(p);
+    return;
+  }
+  $('#domain_message').html("<p class='loading'>Deleting domain...</p>");
+  $.ajax({
+    url: '/admin/sites/' + site_id + '/domains/' + domain_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.refresh) window.location.reload(true);
+    }
+  });
+}
+
+function set_primary_domain(site_id, domain_id)
+{    
+  $.ajax({
+    url: '/admin/sites/' + site_id + '/domains/' + domain_id + '/set-primary',
+    type: 'put',    
+    success: function(resp) {}
+  });
+}
+
+</script>
+<% end %>

@@ -44,7 +44,7 @@ end
   <p><div id='block_<%= @block.id %>_value'></div></p>
 <% else %>  
   <% if @block.children.count > 0 %>  
-    <% @block.children.each do |b| %>
+    <% @block.children.order(:id).each do |b| %>
       <% if b.block_type.field_type != 'block' && b.block_type.field_type != 'richtext' %>
         <div style='margin-bottom: 10px;'><div id='block_<%= b.id %>_value'></div></div>
       <% else %>

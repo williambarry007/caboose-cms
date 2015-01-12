@@ -14,16 +14,6 @@ module Caboose
     def index
       redirect_to '/checkout/step-one'
     end
-    
-    # Test Email 
-    def test_email
-            
-      m = OrdersMailer.configure_for_site(@site.id).test_email
-      Caboose.log(m.delivery_method.settings)
-      m.deliver
-      
-      render :json => DateTime.now
-    end
             
     # GET /checkout/step-one
     def step_one
@@ -266,8 +256,8 @@ module Caboose
         order.status = 'pending'
         
         # Send out emails        
-        OrdersMailer.customer_new_order(order).deliver
-        OrdersMailer.fulfillment_new_order(order).deliver        
+        OrdersMailer.configure_for_site(@site.id).customer_new_order(order).deliver
+        OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(order).deliver        
         
         # Emit order event
         Caboose.plugin_hook('order_authorized', order)

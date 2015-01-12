@@ -134,7 +134,7 @@ module Caboose
     end
     
     def resend_confirmation
-      OrdersMailer.customer_new_order(self).deliver
+      OrdersMailer.configure_for_site(self.site_id).customer_new_order(self).deliver
     end
     
     def test?

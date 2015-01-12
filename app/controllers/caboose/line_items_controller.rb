@@ -74,7 +74,7 @@ module Caboose
         end
       end
       if send_status_email       
-        OrdersMailer.customer_status_updated(li.order).deliver
+        OrdersMailer.configure_for_site(@site.id).customer_status_updated(li.order).deliver
       end    
       resp.success = save && li.save
       render :json => resp

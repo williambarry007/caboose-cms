@@ -1,6 +1,6 @@
 module Caboose
   class OrdersMailer < ActionMailer::Base
-    default :from => 'lockerroombiz@gmail.com'
+    #default :from => 'lockerroombiz@gmail.com'
     
     #before_action :configure            
     #def configure(site_id)      
@@ -16,11 +16,7 @@ module Caboose
     #  }
     #  default_options[:from] = delivery_options[:user_name]
     #  delivery_method.settings.merge!(delivery_options)
-    #end
-    
-    def test_email            
-      mail(:to => 'william@nine.is', :subject => "Test #{DateTime.now.strftime('%H:%M:%S')}")
-    end
+    #end        
     
     # Sends a confirmation email to the customer about a new order 
     def customer_new_order(order)      

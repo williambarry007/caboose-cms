@@ -18,7 +18,7 @@
 <% end %>
 <input type='button' value='Resend Confirmation' onclick="resend_confirmation(<%= @order.id %>)" />
 <input type='button' value='Add Item' onclick="controller.add_variant();" />
-<input type='button' value='Print Order' onclick="print_order(<%= @order.id %>);" />
+<input type='button' value='Print Order' onclick="controller.print_order(<%= @order.id %>);" />
 
 <% str = Caboose.plugin_hook('admin_edit_order_buttons', "", @order) %>
 <% if str %><%= raw str %><% end %>

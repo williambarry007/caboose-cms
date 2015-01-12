@@ -8,9 +8,9 @@
 
 <form action="/admin/products" method="get" id="search_form" style="margin: 0 0 12px">
 	<p><input type="text" name="search_like" placeholder="Title or Vendor Name" value="<%= params[:search_like] %>" style="width: 350px" /></p>
-	<p><select type="text" name="category_id" placeholder="Category" value="<%= params[:search_like] %>" style="width: 350px">
+	<p><select type="text" name="category_id" placeholder="Category" style="width: 350px">
 	  <option value=''>-- Category --</option>
-	  <% @category_options.each do |cat| %><option value="<%= cat[:value] %>"<% if cat[:value] == params[:category_id] %> selected='true'<% end %>><%= cat[:text] %></option><% end %>
+	  <% @category_options.each do |cat| %><option value="<%= cat[:value] %>"<% if cat[:value].to_i == params[:category_id].to_i %> selected='true'<% end %>><%= cat[:text] %></option><% end %>
 	</select></p>
 	<p>
 	  <input type="submit" value="Search" />
@@ -24,6 +24,12 @@
 <%= javascript_include_tag 'caboose/model/all' %>
 <script type='text/javascript'>
 
+function tiny_product_image(p) {
+  if (p.images.length == 0) return '';
+  if (p.images[0].urls.length == 0) return '';
+  return "<img src='" + p.images[0].urls['tiny'] + "' />";     
+}
+
 $(document).ready(function() {
   var that = this;
   var table = new IndexTable({    
@@ -34,8 +40,10 @@ $(document).ready(function() {
     allow_bulk_delete: true,
     allow_duplicate: false,
     allow_advanced_edit: true,
-    fields: [
+    after_add: 'redirect',
+    fields: [    
       { show: true , name: 'id'                 , nice_name: 'ID'                   , sort: 'id'                  , type: 'text'               , value: function(p) { return p.id                 }, width: 500, editable: false },
+      { show: true , name: 'image'              , nice_name: 'Image'                , sort: 'id'                  , type: 'image'              , value: tiny_product_image, width: 500, editable: false },
       { show: true , name: 'title'              , nice_name: 'Title'                , sort: 'title'               , type: 'text'               , value: function(p) { return p.title              }, width: 200 },
       { show: true , name: 'caption'            , nice_name: 'Caption'              , sort: 'caption'             , type: 'text'               , value: function(p) { return p.caption            }, width: 200 },   
       { show: true , name: 'status'             , nice_name: 'Status'               , sort: 'status'              , type: 'select'             , value: function(p) { return p.status             }, width: 200, options_url: '/admin/products/status-options' },

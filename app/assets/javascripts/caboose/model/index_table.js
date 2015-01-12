@@ -25,6 +25,7 @@ IndexTable.prototype = {
   
   // Where to post new models
   add_url: false,
+  after_add: 'refresh', // or 'redirect'
   
   // Array of fields you want to show in the table (given as model binder attributes with additional text and value functions)
   // [{ 
@@ -818,10 +819,12 @@ IndexTable.prototype = {
       data: $('#new_form').serialize(),
       success: function(resp) {
         if (resp.error) $('#' + that.container + '_new_message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.redirect || resp.refresh || resp.success) 
-        {
+        if (resp.redirect && that.after_add == 'redirect')          
+          window.location = resp.redirect;
+        else if (resp.redirect || resp.refresh || resp.success)           
+        {                      
           that.hide_message();
-          that.refresh();
+          that.refresh();          
         }
       }
     });

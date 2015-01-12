@@ -8,20 +8,24 @@
 </form>
 
 <% if @vendors.count > 0 %>
-  <table class="data" style="width: 350px">
+  <table class="data">
     <tr>
       <%= raw @pager.sortable_table_headings({
-        'id'     => 'ID',
-        'name'   => 'Name',
-        'status' => 'Status'
+        'id'       => 'ID',
+        'id,name'  => 'Image',
+        'name'     => 'Name',
+        'status'   => 'Status',
+        'featured' => 'Featured',
       }) %>
     </tr>
     
     <% @vendors.each do |vendor| %>
       <tr onclick="window.location='/admin/vendors/<%= vendor.id %>';">
         <td style="text-align: center"><%= raw vendor.id %></td>
+        <td><% if vendor.image %><img src='<%= raw vendor.image.url(:tiny) %>' /><% else %>&nbsp;<% end %></td>
         <td><%= raw vendor.name %></td>
         <td><%= raw vendor.status %></td>
+        <td><%= vendor.featured ? 'Yes' : 'No' %></td>
       </tr>
     <% end %>
   </table>

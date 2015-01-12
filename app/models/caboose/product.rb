@@ -87,6 +87,11 @@ module Caboose
       self.variants.where('price > ? AND status != ?', 0, 'Deleted').order('price ASC').first
     end
     
+    def first_tiny_image_url
+    	return '' if self.product_images.count == 0
+    	return self.product_images.first.image.url(:tiny)
+    end
+    
     def featured_image
     	self.product_images.reject{|p| p.nil?}.first
     end

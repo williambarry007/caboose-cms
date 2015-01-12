@@ -403,10 +403,11 @@ Caboose::Engine.routes.draw do
   put     "/admin/products/:product_id/variants/:id/attach-to-image"     => "variants#admin_attach_to_image"
   put     "/admin/products/:product_id/variants/:id/unattach-from-image" => "variants#admin_unattach_from_image"
   get     "/admin/products/:product_id/variants/:id"                     => "variants#admin_edit"
+  put     '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_update'
   put     "/admin/products/:product_id/variants/:id"                     => "variants#admin_update"  
   get     "/admin/products/:product_id/variants/new"                     => "variants#admin_new"
   post    '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_add'  
-  post    "/admin/products/:product_id/variants"                         => "variants#admin_add"  
+  post    "/admin/products/:product_id/variants"                         => "variants#admin_add"    
   delete  '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_delete'
   delete  "/admin/products/:product_id/variants/:id"                     => "variants#admin_delete"  
   get     "/admin/variants/status-options"                               => "variants#admin_status_options"
@@ -467,6 +468,7 @@ Caboose::Engine.routes.draw do
   get     "/admin/orders/test-gmail"                  => "orders#admin_mail_test_gmail"  
   get     "/admin/orders/status-options"              => "orders#admin_status_options"
   get     "/admin/orders/new"                         => "orders#admin_new"
+  get     "/admin/orders/print-pending"               => "orders#admin_print_pending"
   get     "/admin/orders/:id/capture"                 => "orders#capture_funds"  
   get     "/admin/orders/:id/json"                    => "orders#admin_json"
   get     "/admin/orders/:id/print"                   => "orders#admin_print"

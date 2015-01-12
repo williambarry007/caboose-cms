@@ -293,7 +293,8 @@ module Caboose
       v.price             = '%.2f' % params[:price].strip.to_f
       v.option1 = params[:option1] if p.option1
       v.option2 = params[:option2] if p.option2
-      v.option3 = params[:option3] if p.option3      
+      v.option3 = params[:option3] if p.option3
+      v.status = 'Active'      
       v.save
       
       resp.success = true      
@@ -328,12 +329,48 @@ module Caboose
           v.price             = '%.2f' % row[2].strip.to_f
           v.option1 = row[3] if p.option1
           v.option2 = row[4] if p.option2
-          v.option3 = row[5] if p.option3      
+          v.option3 = row[5] if p.option3
+          v.status = 'Active'
           v.save
         end
         resp.success = true
       end
       
+      render :json => resp
+    end
+    
+    # PUT /admin/products/:product_id/variants/bulk
+    def admin_bulk_update
+      return unless user_is_allowed_to 'edit', 'sites'
+    
+      resp = Caboose::StdClass.new    
+      variants = params[:model_ids].collect{ |variant_id| Variant.find(variant_id) }
+    
+      save = true
+      params.each do |k,value|
+        case k
+          when 'alternate_id'       then variants.each { |v| v.alternate_id       = value }
+          when 'sku'                then variants.each { |v| v.sku                = value }
+          when 'barcode'            then variants.each { |v| v.barcode            = value }
+          when 'price'              then variants.each { |v| v.price              = value }
+          when 'quantity_in_stock'  then variants.each { |v| v.quantity_in_stock  = value }
+          when 'ignore_quantity'    then variants.each { |v| v.ignore_quantity    = value }
+          when 'allow_backorder'    then variants.each { |v| v.allow_backorder    = value }
+          when 'status'             then variants.each { |v| v.status             = value }
+          when 'weight'             then variants.each { |v| v.weight             = value }
+          when 'length'             then variants.each { |v| v.length             = value }
+          when 'width'              then variants.each { |v| v.width              = value }
+          when 'height'             then variants.each { |v| v.height             = value }
+          when 'option1'            then variants.each { |v| v.option1            = value }
+          when 'option2'            then variants.each { |v| v.option2            = value }
+          when 'option3'            then variants.each { |v| v.option3            = value }
+          when 'requires_shipping'  then variants.each { |v| v.requires_shipping  = value }
+          when 'taxable'            then variants.each { |v| v.taxable            = value }                      
+        end        
+      end
+      variants.each{ |v| v.save }
+    
+      resp.success = true
       render :json => resp
     end
     

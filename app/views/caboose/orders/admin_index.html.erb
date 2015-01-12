@@ -6,7 +6,8 @@
 
 <p>
   <a href='#' onclick="$('#search_form').toggle(400, function() { modal.autosize(); });">Show/hide search form</a> | 
-  <a href='/admin/orders/new'>New Manual Order</a>
+  <a href='/admin/orders/new'>New Manual Order</a> |
+  <a href='/admin/orders/print-pending' target='_blank'>Print Pending Orders</a>
 </p>
 <form action='/admin/orders' method='get' id='search_form' style='display: none;'>
   <p><input type='text' name='id' placeholder='Order ID' value="<%= @pager.params['id'] %>" style='width: 100px;' /></p>

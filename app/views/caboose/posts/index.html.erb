@@ -3,12 +3,14 @@
   <% if @posts && @posts.count > 0 %>
     <ul>
       <% @posts.each do |p| %>
-  	    <li>
-  	      <figure><a href="/posts/<%= p.id %>"><img src="<%= p.image.url(:thumb) %>" /></a></figure>
-  	      <h5><strong><%= raw a[:title] %></strong></h5>
-  	  		<p class="h-space-mvt"><%= a[:created_at].strftime("%m/%d/%Y")  %></p>
-  	  		<p class="h-space-mbt"><%= truncate(strip_tags(a[:body]), :length => 175) %></p>
-  	  		<a class="m-btn-red h-space-mts" href="/news/<%= a.id %>">Read More</a>  	  		
+  	    <li class='clearfix'>  	        	      
+  	      <% if p.image && !p.image.url.include?('placehold.it') %>
+  	        <figure><a href="/posts/<%= p.id %>"><img src="<%= p.image.url(:thumb) %>" /></a></figure>
+  	      <% end %>
+  	      <h5><strong><%= raw p[:title] %></strong></h5>
+  	  		<p class="h-space-mvt"><%= p[:created_at].strftime("%m/%d/%Y")  %></p>
+  	  		<p class="h-space-mbt"><%= raw Caboose.teaser_text(p[:body], 200) %></p>
+  	  		<a class="m-btn-red h-space-mts" href="/posts/<%= p.id %>">Read More</a>  	  		
   	  	</li>
   	  <% end %>
   	</ul>
@@ -16,3 +18,12 @@
     <p>There are no posts right now.</p>
   <% end %>
 </div>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+.posts li { min-height: 200px; }
+.posts li figure { float: right; margin: 0 0 20px 10px; }
+
+</style>
+<% end %>

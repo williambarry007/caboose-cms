@@ -1,34 +1,39 @@
 require 'prawn'
 
 module Caboose
-  class OrderPdf < Prawn::Document
+  class PendingOrdersPdf < Prawn::Document
     
+    attr_accessor :orders
     attr_accessor :order
     
     def to_pdf
       #image open("https://dmwwflw4i3miv.cloudfront.net/logo.png"), :position => :center
       text " "
-      customer_info
-      text " "
-      order_table
+      self.orders.each_with_index do |o, i|
+        start_new_page if i > 0
+        self.order = o        
+        customer_info
+        text " "
+        order_table
+      end      
       render
     end
     
     def customer_info
       
-      order_info = "Order ##{order.id}\n"
-      order_info << "Status: #{order.status.capitalize}\n"
-      order_info << "Received: #{order.date_created.strftime("%m/%d/%Y")}\n"
-      if order.status == 'shipped' && order.date_shipped
-        order_info << "Shipped: #{order.date_shipped.strftime("%m/%d/%Y")}"
+      order_info = "Order ##{self.order.id}\n"
+      order_info << "Status: #{self.order.status.capitalize}\n"
+      order_info << "Received: #{self.order.date_created ? self.order.date_created.strftime("%m/%d/%Y") : ''}\n"
+      if order.status == 'shipped' && self.order.date_shipped
+        order_info << "Shipped: #{self.order.date_shipped.strftime("%m/%d/%Y")}"
       end
       
-      c = order.customer
-      billed_to = "#{c.first_name} #{c.last_name}\n#{c.email}\n#{c.phone}"
+      c = self.order.customer
+      billed_to = c ? "#{c.first_name} #{c.last_name}\n#{c.email}\n#{c.phone}" : ''
       
-      sa = order.shipping_address
+      sa = self.order.shipping_address
       shipped_to = "#{sa.name}\n#{sa.address1}\n"
-      shipped_to << "#{sa.address2}\n" if sa.address2.strip.length > 0
+      shipped_to << "#{sa.address2}\n" if sa.address2 && sa.address2.strip.length > 0
       shipped_to << "#{sa.city}, #{sa.state} #{sa.zip}"
   
       tbl = []

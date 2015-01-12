@@ -169,13 +169,14 @@ module Caboose
       })
       
       # Make a copy of all the items; so it can be filtered more
-      @all_products = @gen.all_records
+      @all_products = @gen.all_records      
       
       # Apply any extra filters
       if params[:filters]
         @all_products = @all_products.includes(:product_images).where('store_product_images.id IS NULL') if params[:filters][:missing_images]
         @all_products = @all_products.where('vendor_id IS NULL') if params[:filters][:no_vendor]
       end
+      
       
       # Get the correct page of the results
       @products = @all_products.limit(@gen.limit).offset(@gen.offset)
@@ -194,7 +195,8 @@ module Caboose
       pager = Caboose::PageBarGenerator.new(params, {
         'site_id'      => @site.id,
         'vendor_name'  => '',
-        'search_like'  => '', 
+        'search_like'  => '',
+        'category_id'  => '',
         'price'        => params[:filters] && params[:filters][:missing_prices] ? 0 : ''
       }, {
         'model'          => 'Caboose::Product',
@@ -207,8 +209,9 @@ module Caboose
           'search_like' => 'store_products.title_concat_vendor_name_like'
         },        
         'includes' => {
-          'vendor_name'  => [ 'vendor'   , 'name'  ],
-          'price'        => [ 'variants' , 'price' ]
+          'category_id'  => [ 'categories' , 'id'    ],
+          'vendor_name'  => [ 'vendor'     , 'name'  ],
+          'price'        => [ 'variants'   , 'price' ]
         }
       })
       render :json => {

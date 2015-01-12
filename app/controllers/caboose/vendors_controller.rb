@@ -3,6 +3,8 @@ module Caboose
         
     # GET /admin/vendors
     def admin_index
+      return if !user_is_allowed('vendors', 'view')
+      
       @pager = Caboose::Pager.new(params, {
         'site_id'   => @site.id,
         'name_like' => ''
@@ -22,32 +24,51 @@ module Caboose
     
     # GET /admin/vendors/:id
     def admin_edit
+      return if !user_is_allowed('vendors', 'edit')
       @vendor = Vendor.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
     # PUT /admin/vendors/:id/update
     def admin_update
+      return if !user_is_allowed('vendors', 'edit')
       vendor = Vendor.find(params[:id])
       
       params.each do |name, value|
         case name
-          when 'site_id' then vendor.site_id = value
-          when 'name'    then vendor.name    = value
-          when 'status'  then vendor.status  = value
+          when 'site_id'  then vendor.site_id  = value
+          when 'name'     then vendor.name     = value
+          when 'status'   then vendor.status   = value
+          when 'featured' then vendor.featured = value
         end
       end
       
       render :json => { :success => vendor.save }
     end
     
+    # POST /admin/vendors/:id/update/image
+    def admin_update_image
+      return if !user_is_allowed('vendors', 'edit')
+      
+      vendor = Vendor.find(params[:id])       
+      vendor.image = params[:image]
+      vendor.save
+      
+      resp = StdClass.new
+      resp.attributes = { :image => { :value => vendor.image.url(:thumb) }}
+      resp.success = vendor.save            
+    end
+    
     # GET /admin/vendors/new
     def admin_new
+      return if !user_is_allowed('vendors', 'add')
       render :layout => 'caboose/admin'
     end
     
     # POST /admin/vendors
     def admin_add
+      return if !user_is_allowed('vendors', 'add')
+      
       render :json => { :success => false, :message => 'Must define a name' } and return if params[:name].nil? || params[:name].empty?
       
       vendor = Vendor.new(
@@ -59,7 +80,7 @@ module Caboose
     end
     
     # DELETE /admin/vendors/:id
-    def admin_delete
+    def admin_delete      
       return if !user_is_allowed('vendors', 'delete')
       v = Vendor.find(params[:id])
       v.destroy

@@ -4,12 +4,15 @@ module Caboose
 
     belongs_to :order
     belongs_to :shipping_package
+    belongs_to :shipping_method
     has_many :line_items    
     attr_accessible :id, 
       :order_id,
+      :shipping_method_id,
       :shipping_package_id,
       :status,
-      :tracking_number
+      :tracking_number,
+      :total
       
     STATUS_PENDING = 'Pending'
     STATUS_SHIPPED = 'Shipped'
@@ -99,7 +102,7 @@ module Caboose
       self.line_items.each{ |li| weight = weight + li.variant.weight }
       weight = weight * 0.035274 # Convert from grams to ounces
       sp = self.shipping_package
-      return Package.new(weight, [sp.length, sp.width, sp.height], :units => :imperial)
+      return Package.new(weight, [sp.outside_length, sp.outside_width, sp.outside_height], :units => :imperial)
     end
 
   end

@@ -56,8 +56,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Order => [:shipping_method, :shipping_method_code],      
       #Caboose::PageCache => [:block],
-      Caboose::ShippingPackage => [:price, :carrier, :service_code, :service_name, :shipping_method_id],
+      Caboose::ShippingPackage => [:price, :carrier, :service_code, :service_name, :shipping_method_id, :length, :width, :height],
       Caboose::Site => [:shipping_cost_function],
+      Caboose::StoreConfig => [:use_usps, :allowed_shipping_codes, :default_shipping_code],
       Caboose::Variant => [:quantity],
       Caboose::Vendor => [:vendor, :vendor_id]
     }
@@ -281,6 +282,28 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :description       , :text       ],
         [ :file              , :attachment ]
       ],
+      Caboose::OrderTransaction => [
+        [ :order_id              , :integer  ],
+        [ :date_processed        , :datetime ],
+        [ :transaction_type      , :string   ],
+        [ :amount                , :numeric   , :default => 0 ],        
+        [ :transaction_id        , :string   ],
+        [ :auth_code             , :string   ],
+        [ :response_code         , :string   ],
+        [ :success               , :boolean  ]        
+      ],
+      Caboose::OrderDiscount => [
+        [ :order_id              , :integer ],
+        [ :discount_id           , :integer ]
+      ],
+      Caboose::OrderPackage => [
+        [ :order_id             , :integer ],
+        [ :shipping_method_id   , :integer ],
+        [ :shipping_package_id  , :integer ],
+        [ :status               , :string  ],
+        [ :tracking_number      , :string  ],
+        [ :total                , :decimal , { :default => 0.0 }]
+      ],
       Caboose::Order => [
         [ :site_id               , :integer  ],
         [ :email                 , :string   ],
@@ -318,16 +341,6 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :transaction_service   , :string   ],
         [ :amount_discounted     , :numeric  ],
         [ :decremented           , :boolean  ]
-      ],
-      Caboose::OrderDiscount => [
-        [ :order_id              , :integer ],
-        [ :discount_id           , :integer ]
-      ],
-      Caboose::OrderPackage => [
-        [ :order_id             , :integer ],
-        [ :shipping_package_id  , :integer ],
-        [ :status               , :string  ],
-        [ :tracking_number      , :string  ]      
       ],      
       Caboose::Page => [
         [ :site_id               , :integer ],
@@ -485,11 +498,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::ShippingPackage => [
         [ :site_id            , :integer ],
         [ :name               , :string  ],
-        [ :length             , :decimal ],
-        [ :width              , :decimal ],
-        [ :height             , :decimal ],
+        [ :inside_length      , :decimal ],
+        [ :inside_width       , :decimal ],
+        [ :inside_height      , :decimal ],
+        [ :outside_length     , :decimal ],
+        [ :outside_width      , :decimal ],
+        [ :outside_height     , :decimal ],        
         [ :volume             , :decimal ],
-        [ :priority           , :integer  , { :default => 1 }],
+        [ :empty_weight       , :decimal ],
+        [ :cylinder           , :boolean , { :default => false }],
+        [ :priority           , :integer , { :default => 1 }],
         [ :flat_rate_price    , :decimal ]
       ],
       Caboose::ShippingPackageMethod => [
@@ -499,7 +517,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Site => [
         [ :name                    , :string ],
         [ :description             , :text   ],
-        [ :under_construction_html , :text   ]        
+        [ :under_construction_html , :text   ],
+        [ :use_store               , :boolean , { :default => false }]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
@@ -529,12 +548,18 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :site_id                 , :integer ],     
         [ :pp_name                 , :string  ],
         [ :pp_username             , :string  ],
-        [ :pp_password             , :string  ],
-        [ :use_usps                , :boolean , { :default => false } ],
+        [ :pp_password             , :string  ],        
+        [ :ups_username            , :string  ],
+        [ :ups_password            , :string  ],
+        [ :ups_key                 , :string  ],
+        [ :ups_origin_account      , :string  ],
+        [ :usps_username           , :string  ],
         [ :usps_secret_key         , :string  ],
         [ :usps_publishable_key    , :string  ],
-        [ :allowed_shipping_codes  , :string  ],
-        [ :default_shipping_code   , :string  ],    
+        [ :fedex_username          , :string  ],
+        [ :fedex_password          , :string  ],
+        [ :fedex_key               , :string  ],
+        [ :fedex_account           , :string  ],
         [ :origin_country          , :string  ],
         [ :origin_state            , :string  ],
         [ :origin_city             , :string  ],
@@ -543,7 +568,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :shipping_email          , :string  ],
         [ :handling_percentage     , :string  ],
         [ :calculate_packages      , :boolean , { :default => true }],
-        [ :shipping_rates_function , :text    ]
+        [ :shipping_rates_function , :text    ],
+        [ :length_unit             , :string  , { :default => 'in' }],
+        [ :weight_unit             , :string  , { :default => 'oz' }]
       ],
       Caboose::User => [
         [ :site_id              , :integer    ],
@@ -601,7 +628,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :site_id      , :integer    ],
         [ :alternate_id , :string     ],
         [ :name         , :string     ],
-        [ :status       , :string     , { :default => 'Active' } ],
+        [ :status       , :string     , { :default => 'Active' }],
+        [ :featured     , :boolean    , { :default => false    }],
         [ :image        , :attachment ]
       ]
     }

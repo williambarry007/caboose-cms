@@ -36,20 +36,6 @@ module Caboose
       @site = Site.find(params[:id])      
     end
     
-    # GET /admin/sites/:id/store
-    def admin_edit_store_config
-      return if !user_is_allowed('sites', 'edit')
-      @site = Site.find(params[:id])
-      StoreConfig.create(:site_id => @site.id) if @site.store_config.nil?      
-    end
-    
-    # GET /admin/sites/:id/smtp
-    def admin_edit_smtp_config
-      return if !user_is_allowed('sites', 'edit')
-      @site = Site.find(params[:id])      
-      SmtpConfig.create(:site_id => @site.id)  if @site.smtp_config.nil?
-    end
-    
     # GET /admin/sites/:id/block-types
     def admin_edit_block_types
       return if !user_is_allowed('sites', 'edit')
@@ -95,6 +81,7 @@ module Caboose
           when 'name'                     then site.name                    = value
           when 'description'              then site.description             = value
           when 'under_construction_html'  then site.under_construction_html = value
+          when 'use_store'                then site.use_store               = value
     	  end
     	end
     	
@@ -102,7 +89,7 @@ module Caboose
     	render :json => resp
     end        
       
-    # DELETE /admin/sites/1
+    # DELETE /admin/sites/:id
     def admin_delete
       return if !user_is_allowed('sites', 'delete')
       site = Site.find(params[:id])
@@ -131,74 +118,10 @@ module Caboose
       render :json => true
     end
     
-    # POST /admin/sites/:id/domains
-    #def admin_add_domain
-    #  return if !user_is_allowed('sites', 'edit')
-    #  
-    #  resp = Caboose::StdClass.new      
-    #  d = Domain.where(:domain => params[:domain]).first
-    #        
-    #  if d && d.site_id != params[:id]
-    #    resp.error = "That domain is already associated with another site."
-    #  elsif d && d.site_id == params[:id]
-    #    resp.refresh = true
-    #  elsif d.nil?
-    #    primary = Domain.where(:site_id => params[:id]).count == 0        
-    #    d = Domain.create(:site_id => params[:id], :domain => params[:domain], :primary => primary)
-    #    resp.refresh = true
-    #  end
-    #  render :json => resp
-    #end
-    
-    # PUT /admin/sites/:id/domains/:domain_id/set-primary
-    #def admin_set_primary_domain
-    #  return if !user_is_allowed('sites', 'edit')
-    #  
-    #  domain_id = params[:domain_id].to_i
-    #  Domain.where(:site_id => params[:id]).all.each do |d|
-    #    d.primary = d.id == domain_id ? true : false
-    #    d.save
-    #  end       
-    #  render :json => true
-    #end
-    
-    # DELETE /admin/sites/:id/domains/:domain_id
-    #def admin_remove_domain
-    #  return if !user_is_allowed('sites', 'edit')
-    #  Domain.find(params[:domain_id]).destroy
-    #  if Domain.where(:site_id => params[:id]).count == 1
-    #    d = Domain.where(:site_id => params[:id]).first
-    #    d.primary = true
-    #    d.save
-    #  end
-    #  render :json => { 'refresh' => true }
-    #end        
-    
     # GET /admin/sites/options
     def options
       return if !user_is_allowed('sites', 'view')
       options = Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }}
-      render :json => options
-    end
-    
-    # GET /admin/sites/payment-processor-options
-    def payment_processor_options
-      return if !user_is_allowed('sites', 'view')
-      options = [
-        { 'value' => 'authorize.net'  , 'text' => 'Authorize.net' },
-        { 'value' => 'stripe'         , 'text' => 'Stripe' }        
-      ]
-      render :json => options
-    end
-    
-    # GET /admin/sites/smtp-auth-options
-    def smtp_auth_options
-      return if !user_is_allowed('sites', 'view')
-      options = [
-        { 'value' => SmtpConfig::AUTH_PLAIN , 'text' => SmtpConfig::AUTH_PLAIN },
-        { 'value' => SmtpConfig::AUTH_LOGIN , 'text' => SmtpConfig::AUTH_LOGIN },
-        { 'value' => SmtpConfig::AUTH_MD5   , 'text' => SmtpConfig::AUTH_MD5   }                  
-      ]
       render :json => options
     end
     

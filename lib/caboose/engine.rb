@@ -66,7 +66,7 @@ module Caboose
     end
     return str2
   end
-  
+
   class Engine < ::Rails::Engine
     isolate_namespace Caboose
     require 'jquery-rails'    

@@ -1,0 +1,155 @@
+<%
+sa = @order.shipping_address
+shipping_address = sa.address1
+shipping_address << "<br />#{sa.address2}" if sa.address2 && sa.address2.length > 0
+shipping_address << "<br />#{sa.city}, #{sa.state} #{sa.zip}"
+captured = @order.financial_status == 'captured'
+%>
+<input type='hidden' name='order_id'    id='order_id'     value='<%= @order.id %>' />
+
+<h1>Edit Order #<%= @order.id %></h1>
+         
+<table class='data'>
+<tr>
+  <th><%= if @order.customer.nil? then 'Guest' else 'Customer' end %></th>
+  <th>Shipping Address</th>
+  <th>Shipping Method</th>
+  <th>Order Status</th>
+  <th>Payment Status</th>
+  <th>Transaction ID</th>
+</tr>
+<tr>
+  <td valign='top'>
+    <%= "#{@order.shipping_address.first_name} #{@order.shipping_address.last_name}" %><br />
+    <% if @order.customer %>
+      <a href="mailto:<%= "#{@order.customer.email}" %>"><%= "#{@order.customer.email}" %></a><br />
+    <% elsif @order.email %>
+      <a href="mailto:<%= @order.email %>"><%= @order.email %></a>
+    <% end %>
+    <%= @order.customer ? @order.customer.phone : @order.shipping_address.phone %>    
+  </td>
+  <td valign='top'>
+    <%= "#{@order.shipping_address.first_name} #{@order.shipping_address.last_name}" %><br />
+    <%= raw shipping_address %>
+  </td>
+  <td valign='top' align='center'>
+    <% if @order.shipping_service_code %>
+      <%= @order.shipping_carrier %> <%= @order.shipping_service_name %>
+    <% else %>
+      Multiple packages
+    <% end %>
+  </td>
+  <td valign='top'>
+    <div id='order_<%= @order.id %>_status'></div>
+  </td>
+  <td valign='top' align='center'>
+    <%= @order.financial_status %>
+    <% if @order.financial_status == 'authorized' %>
+    for<br /><%= number_to_currency(@order.auth_amount) %>
+    <% end %>
+  </td>
+  <td valign="top" align='center'><%= @order.transaction_id %></td>
+</tr>
+</table><br />
+
+<table class='data' width='100%'>
+<tr>
+  <th>Package</th>
+  <th>Item</th>
+  <th>Status</th>    
+  <th>Unit Price</th>
+  <th>Quantity</th>
+  <th>Subtotal</th>
+</tr>
+<% @order.packages.each do |op| %>  
+  <% op.line_items.each_with_index do |li, i| %>
+    <tr>
+      <% if i == 0 %>
+        <td rowspan="<%= op.line_items.count %>">
+          <div id='orderpackage_<%= op.id %>_shipping_method_id'></div>
+          <div id='orderpackage_<%= op.id %>_status'></div>    
+        </td>
+      <% end %>  
+      <td>
+        <% if li.variant.nil? || li.variant.product.nil? %>
+          <% if li.variant.nil? %>
+            Unknown variant
+          <% else %>
+            <%= li.variant.sku %>
+          <% end %>
+        <% else %>
+          <a href='/admin/products/<%= li.variant.product.id %>/variants?highlight=<%= li.variant.id %>'><%= li.variant.product.title  %></a><br />
+          <%= li.variant.sku            %><br />
+          <%= li.variant.title          %>
+        <% end %>
+      </td>
+      <td              ><div id='lineitem_<%= li.id %>_status'          ></div></td>      
+      <td align='right'><%= number_to_currency(li.variant.price) %></td>    
+      <td align='right'><% if captured %><%= li.quantity %><% else %><div id='lineitem_<%= li.id %>_quantity'></div><% end %></td>
+      <td align='right' id='li_<%= li.id %>_subtotal'><%= number_to_currency(li.price) %></td>
+    </tr>
+  <% end %>
+<% end %>
+<% @order.line_items.each do |li| %>   
+  <% next if li.order_package_id %>  
+  <tr>    
+    <td><div id='assign_to_package'>Unpackaged! <a href='#' onclick="assign_to_package_form(<%= li.id %>);">Assign to package</a></div></td>    
+    <td>
+      <% if li.variant.nil? || li.variant.product.nil? %>
+        <% if li.variant.nil? %>Unknown variant<% else %><%= li.variant.sku %><% end %>
+      <% else %>
+        <a href='/admin/products/<%= li.variant.product.id %>/variants?highlight=<%= li.variant.id %>'><%= li.variant.product.title  %></a><br />
+        <%= li.variant.sku            %><br />
+        <%= li.variant.title          %>
+      <% end %>
+    </td>
+    <td              ><div id='lineitem_<%= li.id %>_status'          ></div></td>    
+    <td align='right'><%= number_to_currency(li.variant.price) %></td>    
+    <td align='right'><% if captured %><%= li.quantity %><% else %><div id='lineitem_<%= li.id %>_quantity'></div><% end %></td>
+    <td align='right' id='li_<%= li.id %>_subtotal'><%= number_to_currency(li.price) %></td>
+  </tr>
+<% end %>
+<tr><td colspan='5' align='right'>Subtotal                </td><td align='right' id='subtotal'   ><%= number_to_currency(@order.subtotal ) %></td></tr>
+<tr><td colspan='5' align='right'>Tax                     </td><td align='right' id='tax'        ><%= number_to_currency(@order.tax      ) %></td></tr>
+<tr><td colspan='5' align='right'><%= @order.shipping_service_code ? @order.shipping_service_code : '' %> Shipping &amp; Handling </td><td align='right' id='shipping'><%= number_to_currency(@order.shipping + @order.handling) %></td></tr>
+<tr>
+  <td colspan='5' align='right'>Discount</td>
+  <td align='right'>
+    <% if captured && @order.discounts.any? %>
+      <%= number_to_currency(@order.amount_discounted || 0) %>
+    <% elsif @order.discounts.any? %>
+      <%= number_to_currency(@order.discounts.first.amount_current) %>
+    <% else %>
+      $0.00
+    <% end %>
+  </td>
+</tr>
+<tr><td colspan='5' align='right'>Total                   </td><td align='right' id='total'      ><%= number_to_currency(@order.total    ) %></td></tr>
+</table>
+<div id='message'></div>
+
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/orders';" />
+<% if @order.financial_status == 'authorized' %>
+  <input type='button' value='Capture Funds' onclick="capture_funds(<%= @order.id %>);" />
+  <input type='button' value='Void' onclick="void_order(<%= @order.id %>);" />
+<% end %>
+<% if @order.financial_status == 'captured' %>
+  <input type='button' value='Refund' onclick="refund_order(<%= @order.id %>);" />
+<% end %>
+<input type='button' value='Resend Confirmation' onclick="resend_confirmation(<%= @order.id %>)" />
+<input type='button' value='Print Order' onclick="print_order(<%= @order.id %>);" />
+
+<% str = Caboose.plugin_hook('admin_edit_order_buttons', "", @order) %>
+<% if str %><%= raw str %><% end %>
+</p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/admin_edit_order' %>
+<script type='text/javascript'>
+
+var controller = new OrderController({ order_id: <%= raw Caboose.json(@order.id) %> });
+
+</script>
+<% end %>

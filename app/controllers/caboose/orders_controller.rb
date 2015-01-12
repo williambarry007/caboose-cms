@@ -27,9 +27,18 @@ module Caboose
     
     # GET /admin/orders/new
     def admin_new
-      return if !user_is_allowed('orders', 'add')
-      @products = Product.by_title
+      return if !user_is_allowed('orders', 'add')      
       render :layout => 'caboose/admin'
+    end
+    
+    # POST /admin/orders
+    def admin_add
+      return if !user_is_allowed('orders', 'add')
+      order = Order.create(
+        :status => 'pending',                          
+        :financial_status => 'pending'
+      )    
+      render :json => { :sucess => true, :redirect => "/admin/orders/#{order.id}" }
     end
       
     # GET /admin/orders/:id
@@ -160,7 +169,19 @@ module Caboose
     def admin_json
       return if !user_is_allowed('orders', 'edit')    
       order = Order.find(params[:id])
-      render :json => order, :include => { :order_line_items => { :include => :variant }}
+      if order.shipping_address_id.nil?
+        sa = Address.create
+        order.shipping_address_id = sa.id
+        order.save
+      end
+      render :json => order.as_json(:include => [        
+        { :line_items => { :include => { :variant => { :include => :product }}}},
+        { :order_packages => { :include => [:shipping_package, :shipping_method] }},
+        :customer,
+        :shipping_address,
+        :billing_address,
+        :order_transactions
+      ])
     end
   
     # GET /admin/orders/:id/print
@@ -185,63 +206,18 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
-          when 'tax'
-            order.tax = value          
-          when 'shipping'
-            order.shipping = value
-          when 'handling'
-            order.handling = value
-          when 'discount'
-            order.discount = value        
-          when 'status'
-            order.status = value
-            resp.attributes['status'] = {'text' => value}
+          when 'tax'         then order.tax         = value          
+          when 'shipping'    then order.shipping    = value
+          when 'handling'    then order.handling    = value
+          when 'discount'    then order.discount    = value        
+          when 'status'      then order.status      = value
+          when 'customer_id' then order.customer_id = value            
         end
       end
       order.calculate_total    
       resp.success = save && order.save
       render :json => resp
     end
-    
-    # PUT /admin/orders/:order_id/line-items/:id
-    def admin_update_line_item
-      return if !user_is_allowed('orders', 'edit')
-      
-      resp = Caboose::StdClass.new({'attributes' => {}})
-      li = OrderLineItem.find(params[:id])    
-      
-      save = true
-      send_status_email = false    
-      params.each do |name,value|
-        case name
-          when 'quantity'
-            li.quantity = value
-            li.save
-                      	  
-            # Recalculate everything
-            r = ShippingCalculator.rate(li.order, li.order.shipping_method_code)
-            li.order.shipping = r['negotiated_rate'] / 100
-            li.order.handling = (r['negotiated_rate'] / 100) * 0.05
-            tax_rate = TaxCalculator.tax_rate(li.order.shipping_address)
-            li.order.tax = li.order.subtotal * tax_rate
-            li.order.calculate_total
-            li.order.save
-            
-          when 'tracking_number'
-            li.tracking_number = value
-            send_status_email = true
-          when 'status'
-            li.status = value
-            resp.attributes['status'] = {'text' => value}
-            send_status_email = true
-        end
-      end
-      if send_status_email       
-        OrdersMailer.customer_status_updated(li.order).deliver
-      end
-      resp.success = save && li.save
-      render :json => resp
-    end 
     
     # DELETE /admin/orders/:id
     def admin_delete
@@ -250,19 +226,6 @@ module Caboose
       render :json => Caboose::StdClass.new({
         :redirect => '/admin/orders'
       })
-    end
-    
-    # GET /admin/orders/line-item-status-options
-    def admin_line_item_status_options
-      arr = ['pending', 'ready to ship', 'shipped', 'backordered', 'canceled']
-      options = []
-      arr.each do |status|
-        options << {
-          :value => status,
-          :text  => status
-        }
-      end
-      render :json => options
     end
     
     # GET /admin/orders/:id/capture
@@ -378,13 +341,7 @@ module Caboose
     def admin_status_options
       return if !user_is_allowed('categories', 'view')
       statuses = ['cart', 'pending', 'ready to ship', 'shipped', 'canceled']
-      options = []
-      statuses.each do |s|
-        options << {
-          'text' => s,
-          'value' => s
-        }
-      end       
+      options = statuses.collect{ |s| { 'text' => s, 'value' => s }}       
       render :json => options    
     end
     

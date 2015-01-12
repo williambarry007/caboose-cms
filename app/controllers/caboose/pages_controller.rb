@@ -147,7 +147,8 @@ module Caboose
     
     # GET /admin/pages/:id/edit
     def admin_edit_general
-      return unless user_is_allowed('pages', 'edit')
+      return if !user_is_allowed('pages', 'edit')
+      #return if !Page.is_allowed(logged_in_user, params[:id], 'edit')            
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end

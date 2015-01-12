@@ -26,12 +26,8 @@ Caboose::Engine.routes.draw do
   # Sites
   #=============================================================================  
                                                                                                                                        
-  get     "admin/sites/options"                    => "sites#options"
-  get     "admin/sites/payment-processor-options"  => "sites#payment_processor_options"      
-  get     "admin/sites/smtp-auth-options"          => "sites#smtp_auth_options"            
-  get     "admin/sites/new"                        => "sites#admin_new"  
-  get     "admin/sites/:id/store"                  => "sites#admin_edit_store_config"
-  get     "admin/sites/:id/smtp"                   => "sites#admin_edit_smtp_config"
+  get     "admin/sites/options"                    => "sites#options"            
+  get     "admin/sites/new"                        => "sites#admin_new"      
   get     "admin/sites/:id/block-types"            => "sites#admin_edit_block_types"
   get     "admin/sites/:id/delete"                 => "sites#admin_delete_form"
   get     "admin/sites/:id"                        => "sites#admin_edit"
@@ -46,6 +42,46 @@ Caboose::Engine.routes.draw do
   post    "admin/sites/:site_id/domains"           => "domains#admin_add"
   put     "admin/sites/:site_id/domains/:id"       => "domains#admin_update"
   delete  "admin/sites/:site_id/domains/:id"       => "domains#admin_delete"
+  
+  #=============================================================================
+  # Store
+  #=============================================================================  
+  
+  get     "admin/store/shipping-method-options"    => "store#shipping_method_options"
+  get     "admin/store/payment-processor-options"  => "store#payment_processor_options"        
+  get     "admin/store/length-unit-options"        => "store#length_unit_options"
+  get     "admin/store/weight-unit-options"        => "store#weight_unit_options"
+  get     "admin/store/payment-processor"          => "store#admin_edit_payment_processor"
+  get     "admin/store/shipping"                   => "store#admin_edit_shipping"
+  get     "admin/store"                            => "store#admin_edit"  
+  put     "admin/store"                            => "store#admin_update"
+  
+  #=============================================================================
+  # SMTP
+  #=============================================================================  
+  
+  get     "admin/smtp/auth-options"  => "smtp#auth_options"   
+  get     "admin/smtp"               => "smtp#admin_edit"  
+  put     "admin/smtp"               => "smtp#admin_update"
+    
+  #=============================================================================
+  # Shipping Packages
+  #=============================================================================
+  
+  get     "admin/shipping-packages/options"                     => "shipping_packages#admin_options"    
+  get     "admin/shipping-packages/json"                        => "shipping_packages#admin_json"
+  get     "admin/shipping-packages/:id/json"                    => "shipping_packages#admin_json_single"
+  get     "admin/shipping-packages/:id/shipping-method-options" => "shipping_packages#admin_shipping_method_options"
+  get     "admin/shipping-packages/package-method-options"      => "shipping_packages#admin_package_method_options"
+  get     "admin/shipping-packages/:id"                         => "shipping_packages#admin_edit"
+  get     "admin/shipping-packages"                             => "shipping_packages#admin_index"  
+  put     "admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_update"
+  put     "admin/shipping-packages/:id"                         => "shipping_packages#admin_update"
+  post    "admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_add"
+  post    "admin/shipping-packages"                             => "shipping_packages#admin_add"
+  delete  "admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_delete"
+  delete  "admin/shipping-packages/:id"                         => "shipping_packages#admin_delete"
+  get     "admin/shipping-methods/options"                      => "shipping_packages#admin_shipping_method_options"
   
   #=============================================================================
   # 301 Redirects
@@ -388,6 +424,7 @@ Caboose::Engine.routes.draw do
   delete  "/admin/products/:id"                             => "products#admin_delete"
   put     "/admin/products/:id/update-vendor"               => "products#admin_update_vendor"
   
+  put     "/admin/product-images/sort-order"          => "product_images#admin_update_sort_order"      
   get     "/admin/product-images/:id/variant-ids"     => "product_images#admin_variant_ids"
   get     "/admin/product-images/:id/variants"        => "product_images#admin_variants"
   delete  "/admin/product-images/:id"                 => "product_images#admin_delete"
@@ -404,21 +441,7 @@ Caboose::Engine.routes.draw do
   put     "/admin/stackable-groups/:id"       => "stackable_groups#admin_update"
   post    "/admin/stackable-groups"           => "stackable_groups#admin_add"
   delete  "/admin/stackable-groups/bulk"      => "stackable_groups#admin_bulk_delete"
-  delete  "/admin/stackable-groups/:id"       => "stackable_groups#admin_delete"
-  
-  #=============================================================================
-  # Shipping Packages
-  #=============================================================================
-  
-  get     "/admin/sites/:site_id/shipping-packages/options"                   => "shipping_packages#admin_options"
-  get     "/admin/sites/:site_id/shipping-packages/shipping-method-options"   => "shipping_packages#admin_shipping_method_options"  
-  get     "/admin/sites/:site_id/shipping-packages/json"                      => "shipping_packages#admin_json"
-  get     "/admin/sites/:site_id/shipping-packages/:id/json"                  => "shipping_packages#admin_json_single"
-  get     "/admin/sites/:site_id/shipping-packages"                           => "shipping_packages#admin_index"
-  put     "/admin/sites/:site_id/shipping-packages/:id"                       => "shipping_packages#admin_update"
-  post    "/admin/sites/:site_id/shipping-packages"                           => "shipping_packages#admin_add"
-  delete  "/admin/sites/:site_id/shipping-packages/bulk"                      => "shipping_packages#admin_bulk_delete"
-  delete  "/admin/sites/:site_id/shipping-packages/:id"                       => "shipping_packages#admin_delete"
+  delete  "/admin/stackable-groups/:id"       => "stackable_groups#admin_delete"    
 
   #=============================================================================
   # Categories
@@ -440,8 +463,7 @@ Caboose::Engine.routes.draw do
   
   get     "/admin/orders"                             => "orders#admin_index"
   get     "/admin/orders/test-info"                   => "orders#admin_mail_test_info"
-  get     "/admin/orders/test-gmail"                  => "orders#admin_mail_test_gmail"
-  get     "/admin/orders/line-item-status-options"    => "orders#admin_line_item_status_options"
+  get     "/admin/orders/test-gmail"                  => "orders#admin_mail_test_gmail"  
   get     "/admin/orders/status-options"              => "orders#admin_status_options"
   get     "/admin/orders/new"                         => "orders#admin_new"
   get     "/admin/orders/:id/capture"                 => "orders#capture_funds"  
@@ -450,12 +472,32 @@ Caboose::Engine.routes.draw do
   get     "/admin/orders/:id/send-to-quickbooks"      => "orders#admin_send_to_quickbooks"
   get     "/admin/orders/:id"                         => "orders#admin_edit"        
   put     "/admin/orders/:id"                         => "orders#admin_update"
-  put     "/admin/orders/:order_id/line-items/:id"    => "orders#admin_update_line_item"
   delete  "/admin/orders/:id"                         => "orders#admin_delete"
-      
   get     '/admin/orders/:id/void'                    => 'orders#admin_void'
   get     '/admin/orders/:id/refund'                  => 'orders#admin_refund'
   post    '/admin/orders/:id/resend-confirmation'     => 'orders#admin_resend_confirmation'
+  post    '/admin/orders'                             => 'orders#admin_add'
+  
+  get     "/admin/orders/line-items/status-options"           => "line_items#admin_status_options"
+  get     "/admin/orders/line-items/product-stubs"            => "line_items#admin_product_stubs"
+  get     "/admin/orders/:order_id/line-items/new"            => "line_items#admin_new"
+  get     "/admin/orders/:order_id/line-items/json"           => "line_items#admin_json"  
+  post    "/admin/orders/:order_id/line-items"                => "line_items#admin_add"
+  get     "/admin/orders/:order_id/line-items/:id/highlight"  => "line_items#admin_highlight"  
+  put     "/admin/orders/:order_id/line-items/:id"            => "line_items#admin_update"  
+  delete  "/admin/orders/:order_id/line-items/:id"            => "line_items#admin_delete"
+  
+  get     "admin/orders/:order_id/packages/json"      => "order_packages#admin_json"      
+  put     "admin/orders/:order_id/packages/:id"       => "order_packages#admin_update"
+  post    "admin/orders/:order_id/packages"           => "order_packages#admin_add"
+  delete  "admin/orders/:order_id/packages/:id"       => "order_packages#admin_delete"    
+    
+  get     "/admin/orders/:order_id/packages/json"     => "line_items#admin_json"  
+  put     "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_update"
+  delete  "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_delete"
+  
+  get     "admin/orders/:order_id/shipping-address/json"  => "shipping_addresses#admin_json"      
+  put     "admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"    
   
   #=============================================================================
   # Vendors

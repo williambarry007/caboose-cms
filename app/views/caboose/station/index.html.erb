@@ -1,5 +1,5 @@
 <%
-@nav = Caboose.plugin_hook('admin_nav', [], @user, @page)
+@nav = Caboose.plugin_hook('admin_nav', [], @user, @page, @site)
 return_url = session[:caboose_station_return_url].nil? ? '/' : session[:caboose_station_return_url]
 return_url = '/' if return_url.starts_with?('/admin/') || return_url == '/admin'
 

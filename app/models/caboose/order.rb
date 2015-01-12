@@ -14,7 +14,8 @@ module Caboose
     has_many :discounts, :through => :order_discounts
     has_many :order_discounts
     has_many :line_items, :after_add => :line_item_added, :after_remove => :line_item_removed, :order => :id
-    has_many :packages, :class_name => 'Caboose::OrderPackage'
+    has_many :order_packages, :class_name => 'Caboose::OrderPackage'
+    has_many :order_transactions
     
     attr_accessible :id,
       :site_id,
@@ -100,13 +101,17 @@ module Caboose
     # Methods
     #
     
-    def as_json(options={})
-      self.attributes.merge({
-        :line_items => self.line_items,
-        :shipping_address => self.shipping_address,
-        :billing_address => self.billing_address
-      })
+    def packages
+      self.order_packages
     end
+    
+    #def as_json(options={})
+    #  self.attributes.merge({
+    #    :line_items => self.line_items,
+    #    :shipping_address => self.shipping_address,
+    #    :billing_address => self.billing_address
+    #  })
+    #end
     
     def decrement_quantities
       return false if self.decremented

@@ -19,7 +19,7 @@ Cart.prototype = {
     $.ajax({
       url: '/cart/items',
       success: function(resp) {
-        that.order = resp.order;
+        that.order = resp;
         that.print();
       }        
     });    
@@ -44,9 +44,9 @@ Cart.prototype = {
       );
                 
     $.each(this.order.line_items, function(i, li) {      
-      var v = li.variant;      
-      var img = v.images ? v.images[0] : (p.featured_image ? p.featured_image : false);
-      console.log(img);
+      var v = li.variant;
+      var p = v.product;      
+      var img = v.images ? v.images[0] : (p.featured_image ? p.featured_image : false);      
       img = img ? $('<img/>').attr('src', img.urls.tiny) : '&nbsp;';
             
       tbody.append($('<tr/>')

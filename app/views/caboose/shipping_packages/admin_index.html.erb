@@ -1,40 +1,77 @@
-<%= render :partial => 'caboose/sites/admin_header' %>
+<%
+sc = @site.store_config
+%>
 
-<h2>Shipping Packages</h2>
+<h1>Shipping Packages</h1>
 <div id='shipping_packages'></div>
 
-<%= render :partial => 'caboose/sites/admin_footer' %>
+<p><a href='#' onclick='toggle_standard_dimensions();'>Standard package dimensions</a></p>
+<div id='standard_dimensions'>
+  <table class='data'>
+  <tr><th>Carrier</th><th>Box</th><th>IL</th><th>IW</th><th>IH</th><th>OL</th><th>OW</th><th>OH</th></tr>
+  <tr><td>USPS</td><td>Small Flat Rate Box    </td><td align='right'>   5.375</td><td align='right'>  8.625</td><td align='right'>  1.625</td><td align='right'>  5.500</td><td align='right'>  9.000</td><td align='right'>  2.000</td></tr>
+  <tr><td>USPS</td><td>Medium Flat Rate Box 1 </td><td align='right'>  11.000</td><td align='right'>  8.500</td><td align='right'>  5.500</td><td align='right'> 11.250</td><td align='right'>  8.750</td><td align='right'>  6.000</td></tr>
+  <tr><td>USPS</td><td>Medium Flat Rate Box 2 </td><td align='right'>  11.875</td><td align='right'>  3.375</td><td align='right'> 13.625</td><td align='right'> 12.000</td><td align='right'>  3.500</td><td align='right'> 14.000</td></tr>
+  <tr><td>USPS</td><td>Large Flat Rate Box    </td><td align='right'>  12.000</td><td align='right'> 12.000</td><td align='right'>  5.500</td><td align='right'> 12.250</td><td align='right'> 12.250</td><td align='right'>  6.000</td></tr>
+  </table>
+</div>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
 <script type='text/javascript'>
 
+function toggle_standard_dimensions()
+{
+  var el = $('#standard_dimensions');
+  if (el.is(':visible')) el.slideUp();
+  else el.slideDown();
+}
+
 $(document).ready(function() {
+  $('#standard_dimensions').hide();
   var that = this;
   var table = new IndexTable({    
     form_authenticity_token: '<%= form_authenticity_token %>',
     container: 'shipping_packages',
-    base_url: '/admin/sites/<%= @site.id %>/shipping-packages',
-    allow_bulk_edit: false,
+    base_url: '/admin/shipping-packages',
+    allow_bulk_edit: true,
     allow_bulk_delete: true,
     allow_duplicate: false,
-    allow_advanced_edit: false,
+    allow_advanced_edit: true,
     fields: [      
-      { show: true , name: 'name'               , nice_name: 'Shipping Method'         , sort: 'shipping_method_id' , type: 'select' , value: function(sp) { return sp.shipping_method_id }, width: 75, align: 'left'   },                                           
-      { show: true , name: 'length'             , nice_name: 'Length (in)'             , sort: 'length'             , type: 'text'   , value: function(sp) { return sp.length             }, width: 50, align: 'right'  }, 
-      { show: true , name: 'width'              , nice_name: 'Width (in)'              , sort: 'width'              , type: 'text'   , value: function(sp) { return sp.width              }, width: 50, align: 'right'  }, 
-      { show: true , name: 'height'             , nice_name: 'Height (in)'             , sort: 'height'             , type: 'text'   , value: function(sp) { return sp.height             }, width: 50, align: 'right'  }, 
-      { show: true , name: 'volume'             , nice_name: 'Volume (in<sup>3</sup>)' , sort: 'volume'             , type: 'text'   , value: function(sp) { return sp.volume             }, width: 50, align: 'right'  },
-      { show: true , name: 'flat_rate_price'    , nice_name: 'Flat Rate Price'         , sort: 'flat_rate_price'    , type: 'text'   , value: function(sp) { return sp.flat_rate_price    }, width: 50, align: 'right'  },
-      { show: true , name: 'priority'           , nice_name: 'Priority'                , sort: 'priority'           , type: 'text'   , value: function(sp) { return sp.priority           }, width: 50, align: 'right'  }
+      { show: true  , bulk_edit: false , name: 'name'               , nice_name: 'name'                                       , sort: 'name'               , type: 'text'              , value: function(sp) { return sp.name               }, width: 75, align: 'left'   },                                           
+      { show: true  , bulk_edit: true  , name: 'inside_length'      , nice_name: 'Inside Length (<%= sc.length_unit %>)'      , sort: 'inside_length'      , type: 'text'              , value: function(sp) { return sp.inside_length      }, width: 50, align: 'right'  }, 
+      { show: true  , bulk_edit: true  , name: 'inside_width'       , nice_name: 'Inside Width (<%=  sc.length_unit %>)'      , sort: 'inside_width'       , type: 'text'              , value: function(sp) { return sp.inside_width       }, width: 50, align: 'right'  }, 
+      { show: true  , bulk_edit: true  , name: 'inside_height'      , nice_name: 'Inside Height (<%= sc.length_unit %>)'      , sort: 'inside_height'      , type: 'text'              , value: function(sp) { return sp.inside_height      }, width: 50, align: 'right'  },
+      { show: true  , bulk_edit: true  , name: 'outside_length'     , nice_name: 'Outside Length (<%= sc.length_unit %>)'     , sort: 'outside_length'     , type: 'text'              , value: function(sp) { return sp.outside_length     }, width: 50, align: 'right'  }, 
+      { show: true  , bulk_edit: true  , name: 'outside_width'      , nice_name: 'Outside Width (<%=  sc.length_unit %>)'     , sort: 'outside_width'      , type: 'text'              , value: function(sp) { return sp.outside_width      }, width: 50, align: 'right'  }, 
+      { show: true  , bulk_edit: true  , name: 'outside_height'     , nice_name: 'Outside Height (<%= sc.length_unit %>)'     , sort: 'outside_height'     , type: 'text'              , value: function(sp) { return sp.outside_height     }, width: 50, align: 'right'  },
+      { show: true  , bulk_edit: true  , name: 'volume'             , nice_name: 'Volume (<%= sc.length_unit %><sup>3</sup>)' , sort: 'volume'             , type: 'text'              , value: function(sp) { return sp.volume             }, width: 50, align: 'right'  },
+      { show: true  , bulk_edit: true  , name: 'empty_weight'       , nice_name: 'Empty Weight (<%= sc.weight_unit %>)'       , sort: 'empty_weight'       , type: 'text'              , value: function(sp) { return sp.empty_weight       }, width: 50, align: 'right'  },
+      { show: true  , bulk_edit: true  , name: 'cylinder'           , nice_name: 'Cylinder'                                   , sort: 'cylinder'           , type: 'text'              , value: function(sp) { return sp.cylinder           }, width: 50, align: 'right'  },
+      { show: false , bulk_edit: true  , name: 'flat_rate_price'    , nice_name: 'Flat Rate Price'                            , sort: 'flat_rate_price'    , type: 'text'              , value: function(sp) { return sp.flat_rate_price    }, width: 50, align: 'right'  },
+      { show: false , bulk_edit: true  , name: 'priority'           , nice_name: 'Priority'                                   , sort: 'priority'           , type: 'text'              , value: function(sp) { return sp.priority           }, width: 50, align: 'right'  },            
+      { show: true  , bulk_edit: true  , name: 'shipping_method_id' , nice_name: 'Shipping Methods'                           , sort: 'name'               , type: 'checkbox-multiple' ,         
+          options_url: '/admin/shipping-methods/options',
+          value: function(sp) { return sp.shipping_methods.map(function(sm) { return sm.id }); },
+          text:  function(sp) { return sp.shipping_methods.map(function(sm) { return sm.service_name }).join(', '); },
+          width: 400,
+          height: 200        
+      }
     ],
     new_model_text: 'New Shipping Package',
-    new_model_fields: [                                                 
-      { name: 'length'             , nice_name: 'Length (in)'     , type: 'text'   , width: 50  }, 
-      { name: 'width'              , nice_name: 'Width (in)'      , type: 'text'   , width: 50  }, 
-      { name: 'height'             , nice_name: 'Height (in)'     , type: 'text'   , width: 50  }                        
+    no_models_text: 'There are no shipping packages right now.',
+    new_model_fields: [
+      { name: 'name'           , nice_name: 'Name'                                   , type: 'text'   , width: 400 },
+      { name: 'inside_length'  , nice_name: 'Inside Length  (<%= sc.length_unit %>)' , type: 'text'   , width: 400 }, 
+      { name: 'inside_width'   , nice_name: 'Inside Width   (<%= sc.length_unit %>)' , type: 'text'   , width: 400 }, 
+      { name: 'inside_height'  , nice_name: 'Inside Height  (<%= sc.length_unit %>)' , type: 'text'   , width: 400 },
+      { name: 'outside_length' , nice_name: 'Outside Length (<%= sc.length_unit %>)' , type: 'text'   , width: 400 }, 
+      { name: 'outside_width'  , nice_name: 'Outside Width  (<%= sc.length_unit %>)' , type: 'text'   , width: 400 }, 
+      { name: 'outside_height' , nice_name: 'Outside Height (<%= sc.length_unit %>)' , type: 'text'   , width: 400 }      
     ],
-    bulk_import_fields: ['shipping_method_id', 'length', 'width', 'height'],
-    bulk_import_url: '/admin/sites/<%= @site.id %>/shipping-packages/bulk'
+    bulk_import_fields: ['name', 'inside_length', 'inside_width', 'inside_height', 'outside_length', 'outside_width', 'outside_height'],
+    bulk_import_url: '/admin/shipping-packages/bulk'
   });        
 });
 

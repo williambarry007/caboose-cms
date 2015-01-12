@@ -14,10 +14,12 @@ p = @product
 
 <div id='images'>
   <% if p.product_images.count > 0 %>
-    <% p.product_images.each do |img| %>
-      <% url = img.image.url(:tiny) %>
-      <div id='img_<%= img.id %>_container'><a href="javascript:select_image(<%= img.id %>);"><img src='<%= url %>' width='75' /></a></div> 
-    <% end %>
+    <ul id='images_list' class='clearfix'>
+      <% p.product_images.reorder(:position).each do |img| %>
+        <% url = img.image.url(:tiny) %>
+        <li id='img_<%= img.id %>'><div id='img_<%= img.id %>_container'><a href="javascript:select_image(<%= img.id %>);"><img src='<%= url %>' width='75' /></a></div></li> 
+      <% end %>
+    </ul>
   <% else %>
     <p>This product doesn't have any images yet.</p>
   <% end %>
@@ -34,6 +36,8 @@ p = @product
 #images div { display: inline-block; }
 #images div img { border: #000 4px solid; }
 #images div.selected img { border: #ff3333 4px solid; }
+#images_list { list-style: none; margin: 0; padding: 0; }
+#images_list li { list-style: none; margin: 0 10px 10px 0; padding: 0; float: left; }
 </style>
 <% end %>
 <% content_for :caboose_js do %>
@@ -43,6 +47,18 @@ $(document).ready(function() {
   <% if p.product_images.count > 0 %>
   select_image(<%= p.product_images[0].id %>);
   <% end %>
+  $('#images_list').sortable({
+    stop: function(e, ui) {
+      var arr = $('#images_list').sortable('toArray')
+      ids = $.map(arr, function(id, i) { return parseInt(id.replace('img_', '')); }); 
+      $.ajax({
+        url: '/admin/product-images/sort-order',
+        type: 'put',
+        data: { product_image_ids: ids },
+        success: function(resp) {}        
+      });
+    }
+  });
 });
 
 variants = false;

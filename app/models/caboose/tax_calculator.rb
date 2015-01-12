@@ -1,9 +1,10 @@
 module Caboose
   class TaxCalculator
     def self.tax_rate(address)      
-      return 0 if address.state.downcase != 'al'
-      city = address.city.downcase
-      rate = 0.00
+      return 0.00 if address.nil? || address.city.nil? || address.state.nil?       
+      return 0 if address.state.downcase != 'al'      
+      rate = 0.00      
+      city = address.city.downcase            
       rate = rate + 0.05 if city == 'brookwood'  
       rate = rate + 0.05 if city == 'coaling'    
       rate = rate + 0.05 if city == 'coker'      
@@ -14,8 +15,8 @@ module Caboose
       rate = rate + 0.05 if city == 'northport'  
       rate = rate + 0.05 if city == 'tuscaloosa' 
       rate = rate + 0.05 if city == 'vance'      
-      rate = rate + 0.05 if city == 'woodstock'  
-      rate = rate + 0.04 if address.state.downcase == 'al' || address.state.downcase == 'alabama'        
+      rate = rate + 0.05 if city == 'woodstock'      
+      rate = rate + 0.04 if address.state.downcase == 'al' || address.state.downcase == 'alabama'              
       return rate.round(2)
     end
   end

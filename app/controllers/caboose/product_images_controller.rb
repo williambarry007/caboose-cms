@@ -33,6 +33,17 @@ module Caboose
       img = var.product_images.first
       render :json => img
     end
+    
+    # PUT /admin/products/:product_id/images/sort-order
+    def admin_update_sort_order
+      return if !user_is_allowed('products', 'edit')
+            
+      ids = params[:product_image_ids]            
+      ids.each_with_index do |id, i|
+        ProductImage.find(id).update_attribute(:position, i)
+      end
+      render :json => { :success => true }
+    end
   
   end
 end

@@ -9,12 +9,17 @@ module Caboose
     attr_accessible :id,
       :site_id,
       :name,
-      :length, 
-      :width, 
-      :height, 
+      :inside_length, 
+      :inside_width, 
+      :inside_height,
+      :outside_length, 
+      :outside_width, 
+      :outside_height,
       :volume,
+      :empty_weight,
+      :cylinder,
       :priority,
-      :flat_rate_price
+      :flat_rate_price            
           
     def fits(variants)  
       
@@ -36,7 +41,7 @@ module Caboose
       rigid_boxes = self.boxes(rigid)
       
       it_fits = false       
-      BoxPacker.container [self.length, self.width, self.height] do        
+      BoxPacker.container [self.inside_length, self.inside_width, self.inside_height] do        
         rigid_boxes.each{ |arr| add_item arr }    
         count = pack!
         it_fits = true if count == rigid_boxes.count                                      
@@ -85,6 +90,41 @@ module Caboose
       end
       
       return nonstackable
+    end
+    
+    def toggle_shipping_method(shipping_method_id, value)      
+      if value.to_i > 0 # Add        
+        if shipping_method_id == 'all'
+          ShippingPackageMethod.where(:shipping_package_id => self.id).destroy_all      
+          ShippingMethod.reorder(:service_name).all.each do |sm|
+            ShippingPackageMethod.create(:shipping_package_id => self.id, :shipping_method_id => sm.id)
+          end                          
+        else
+          if !ShippingPackageMethod.where(:shipping_package_id => self.id, :shipping_method_id => shipping_method_id.to_i).exists?
+            ShippingPackageMethod.create(:shipping_package_id => self.id, :shipping_method_id => shipping_method_id.to_i)
+          end      
+        end              
+      else # Remove
+        if shipping_method_id == 'all'
+          ShippingPackageMethod.where(:shipping_package_id => self.id).destroy_all                          
+        else
+          ShippingPackageMethod.where(:shipping_package_id => self.id, :shipping_method_id => shipping_method_id.to_i).destroy_all      
+        end
+      end
+    end
+    
+    def uses_carrier(carrier)
+      self.shipping_methods.each do |sm|
+        return true if sm.carrier == carrier
+      end
+      return false
+    end
+    
+    def uses_service_code(carrier, service_code)
+      self.shipping_methods.each do |sm|
+        return true if sm.carrier == carrier && sm.service_code == service_code
+      end
+      return false
     end
         
   end

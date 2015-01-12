@@ -6,7 +6,7 @@
     <th>Name</th>
   </tr>
 <% @roles.each do |r| %> 
-  <tr onclick="window.location='/admin/roles/<%= r['value'] %>/edit';">
+  <tr onclick="window.location='/admin/roles/<%= r['value'] %>';">
     <td><%= r['text'] %></td>
   </tr>
 <% end %>

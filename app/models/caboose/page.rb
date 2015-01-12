@@ -144,7 +144,7 @@ class Caboose::Page < ActiveRecord::Base
   
   def self.update_authorized_for_action(page_id, action, roles)
     Caboose::PagePermission.where(:page_id => page_id, :action => action).destroy_all
-    if (!roles.nil?)
+    if roles
       roles.each do |role|
         role_id = role.is_a?(Integer) ? role : role.id
         Caboose::PagePermission.create({

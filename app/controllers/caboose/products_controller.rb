@@ -130,10 +130,19 @@ module Caboose
       params[:sort] = 'store_vendors.name' if params[:sort] == 'vendor'
       
       @gen = Caboose::PageBarGenerator.new(params, {
-        'site_id'      => @site.id,
-        'vendor_name'  => '',
-        'search_like'  => '', 
-        'price'        => params[:filters] && params[:filters][:missing_prices] ? 0 : ''
+        'site_id'        => @site.id,
+        'vendor_name'    => '',
+        'search_like'    => '', 
+        'category_id'    => '',
+        'category_name'  => '',
+        'vendor_id'      => '',
+        'vendor_name'    => '',
+        'vendor_status'  => '',
+        'price_gte'      => '',
+        'price_lte'      => '',
+        'price'          => '',
+        'variant_status' => '',          
+        'price'          => params[:filters] && params[:filters][:missing_prices] ? 0 : ''
       }, {
         'model'          => 'Caboose::Product',
         'sort'           => 'title',
@@ -146,9 +155,16 @@ module Caboose
           'search_like' => 'store_products.title_concat_vendor_name_like'
         },
         
-        'includes' => {
-          'vendor_name'  => [ 'vendor'         , 'name'  ],
-          'price'        => [ 'variants'       , 'price' ]
+        'includes' => {                           
+          'category_id'    => [ 'categories' , 'id'     ],
+          'category_name'  => [ 'categories' , 'name'   ],
+          'vendor_id'      => [ 'vendor'     , 'id'     ],
+          'vendor_name'    => [ 'vendor'     , 'name'   ],
+          'vendor_status'  => [ 'vendor'     , 'status' ],
+          'price_gte'      => [ 'variants'   , 'price'  ],
+          'price_lte'      => [ 'variants'   , 'price'  ],
+          'price'          => [ 'variants'   , 'price'  ],
+          'variant_status' => [ 'variants'   , 'status' ]
         }
       })
       
@@ -163,6 +179,7 @@ module Caboose
       
       # Get the correct page of the results
       @products = @all_products.limit(@gen.limit).offset(@gen.offset)
+      @category_options = Category.options(@site.id)
       
       render :layout => 'caboose/admin'
     end
@@ -337,7 +354,7 @@ module Caboose
                 resp.error = "Invalid date"
                 save = false
               end
-            end
+            end          
         end
       end
       resp.success = save && product.save

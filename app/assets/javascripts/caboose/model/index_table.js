@@ -170,7 +170,7 @@ IndexTable.prototype = {
     this.parse_querystring();
         
     var that = this;
-    var $el = $('#' + this.container + '_columns').length > 0 ? $('#' + this.container + '_table_container') : $('#' + this.container);
+    var $el = $('#' + this.container + '_table_container').length > 0 ? $('#' + this.container + '_table_container') : $('#' + this.container);
     $el.html("<p class='loading'>Refreshing...</p>");        
     $.ajax({
       url: that.refresh_url,
@@ -214,52 +214,66 @@ IndexTable.prototype = {
   {
     var that = this;
     
-    if (that.models == null || that.models.length == 0)
-    {
-      $('#' + that.container).empty()
-        .append($('<p/>').append(that.new_model_link()))
-        .append($('<div/>').attr('id', that.container + '_new_form_container'))        
-        .append($('<p/>').append(that.no_models_text));            
-      return;
-    }
+    //if (that.models == null || that.models.length == 0)
+    //{
+    //  $('#' + that.container).empty()
+    //    .append($('<p/>').append(that.new_model_link()))
+    //    .append($('<div/>').attr('id', that.container + '_new_form_container'))        
+    //    .append($('<p/>').append(that.no_models_text));              
+    //  return;
+    //}
 
-    var tbody = $('<tbody/>').append(this.table_headers());            
-    $.each(that.models, function(i, m) {
-      tbody.append(that.table_row(m));
-    });                                
-    var table = $('<table/>').addClass('data').css('margin-bottom', '10px').append(tbody);
-    var pager_div = this.pager_div();    
-        
-    if ($('#' + this.container + '_columns').length > 0)
+    var model_count = that.models ? that.models.length  : 0;      
+    var table = that.no_models_text;
+    var pager_div = '';
+
+    if (model_count > 0)
     {
-      $('#' + this.container + '_table_container').empty().append(table);
-      $('#' + this.container + '_pager').empty().append(pager_div);
-      $('#' + this.container + '_new_form_container').empty();
+      var tbody = $('<tbody/>').append(this.table_headers());            
+      $.each(that.models, function(i, m) {
+        tbody.append(that.table_row(m));
+      });                                
+      table = $('<table/>').addClass('data').css('margin-bottom', '10px').append(tbody);
+      pager_div = this.pager_div();
+    }
+        
+    if ($('#' + this.container + '_table_container').length > 0)
+    {
+      $('#' + this.container + '_table_container' ).empty().append(table);
+      $('#' + this.container + '_pager'           ).empty().append(pager_div);            
+      $('#' + this.container + '_toggle_columns'  ).show();              
+      $('#' + this.container + '_bulk_delete'     ).show();
+      $('#' + this.container + '_bulk_edit'       ).show();
+      $('#' + this.container + '_duplicate'       ).show();      
     }
     else
     {
-      var columns = this.column_checkboxes();            
       var controls = $('<p/>');
-      if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'  ).val('Bulk Edit'  ).click(function(e) { that.bulk_edit();   })).append(' ');
-      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete').val('Delete'     ).click(function(e) { that.bulk_delete(); })).append(' ');
-      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'  ).val('Duplicate'  ).click(function(e) { that.duplicate();   })).append(' ');
-      if (this.allow_bulk_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import').val('Bulk Import').click(function(e) { that.bulk_import(); })).append(' ');
-      
-      $('#' + that.container).empty()
-        .append($('<p/>')
-          .append(that.new_model_link()).append(' | ')          
-          .append($('<a/>').attr('href', '#').html('Show/Hide Columns').click(function(e) { e.preventDefault(); $('#' + that.container + '_columns').slideToggle(); }))
-        )
-        .append($('<div/>').attr('id', that.container + '_new_form_container'))        
-        .append($('<div/>').attr('id', that.container + '_columns').append(columns))
-        .append($('<div/>').attr('id', that.container + '_table_container').append(table))        
-        .append($('<div/>').attr('id', that.container + '_pager').append(pager_div))        
+                                   controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_new'            ).val(that.new_model_text ).click(function(e) { that.new_form();       })).append(' ');                                   
+                                   controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_columns' ).val('Show/Hide Columns' ).click(function(e) { that.toggle_columns(); })).append(' ');
+      if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'      ).val('Bulk Edit'         ).click(function(e) { that.bulk_edit();      })).append(' ');
+      if (this.allow_bulk_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import'    ).val('Import'            ).click(function(e) { that.bulk_import();    })).append(' ');
+      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'      ).val('Duplicate'         ).click(function(e) { that.duplicate();      })).append(' ');
+      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete'    ).val('Delete'            ).click(function(e) { that.bulk_delete();    })).append(' ');
+                          
+      var c = $('#' + that.container);
+      c.empty()        
+        .append($('<div/>').attr('id', that.container + '_controls').append(controls))
         .append($('<div/>').attr('id', that.container + '_message'))
-        .append(controls);        
-      $('#' + that.container + '_columns').hide();
+        .append($('<div/>').attr('id', that.container + '_table_container').append(table))        
+        .append($('<div/>').attr('id', that.container + '_pager').append(pager_div));      
+      
+      if (model_count == 0)
+      {
+        $('#' + that.container + '_toggle_columns').hide();
+        $('#' + that.container + '_bulk_edit'     ).hide();        
+        $('#' + that.container + '_duplicate'     ).hide();
+        $('#' + that.container + '_bulk_delete'   ).hide();                
+        $('#' + that.container + '_pager'         ).hide();
+      }
     }    
 
-    if (that.quick_edit_model_id)
+    if (model_count > 0 && that.quick_edit_model_id)
     {      
       var m = that.model_for_id(that.quick_edit_model_id);
       $.each(that.fields, function(j, field) {
@@ -408,7 +422,7 @@ IndexTable.prototype = {
   column_checkboxes: function()
   {
     var that = this;
-    var div = $('<div/>').attr('id', that.container + '_columns');
+    var div = $('<div/>').attr('id', that.container + '_columns').addClass('note');
     $.each(this.fields, function(i, field) {
       var input = $('<input/>')
         .attr('type', 'checkbox')
@@ -465,24 +479,31 @@ IndexTable.prototype = {
     cols[col] = checked;
     localStorage.setItem(this.container + '_cols', JSON.stringify(cols));            
   },
+  
+  toggle_columns: function()
+  {
+    var that = this;
+    var columns = that.column_checkboxes();
+    that.show_message(columns, 'toggle_columns');    
+  },
 
   bulk_edit: function()
   {
     var that = this;
     if (this.model_ids.length == 0)
-    {
-      $('#' + that.container + '_message').html("<p class='note error'>Please select at least one row.</p>");
+    {      
+      that.show_message("<p class='note error'>Please select at least one row.</p>", 'bulk_edit_select_row');
       return;
     }   
-    var div = $('<div/>')
+    var div = $('<div/>').addClass('note')
       .append($('<h2/>').html('Bulk Edit Jobs'))
       .append($('<p/>').html('Any change you make the fields below will apply to all the selected rows.'));
     $.each(this.fields, function(i, field) {
       if (field.bulk_edit == true)
         div.append($('<p/>').append($('<div/>').attr('id', 'bulkmodel_1_' + field.name)));
     });      
-    div.append($('<input/>').attr('type','button').val('Finished').click(function() { $('#' + that.container + '_message').empty(); }));    
-    $('#' + that.container + '_message').empty().append(div);
+    div.append($('<p/>').append($('<input/>').attr('type','button').val('Finished').click(function() { that.hide_message(); })));    
+    that.show_message(div, 'bulk_edit_form');
         
     var params = this.model_ids.map(function(model_id) { return 'model_ids[]=' + model_id; }).join('&');
     var attribs = [];
@@ -511,7 +532,7 @@ IndexTable.prototype = {
     var that = this;
     if (this.model_ids.length == 0)
     {
-      $('#' + that.container + '_message').html("<p class='note error'>Please select at least one row.</p>");
+      that.show_message("<p class='note error'>Please select at least one row.</p>", 'bulk_delete_select_row');
       return;
     } 
     if (!confirm)
@@ -519,8 +540,8 @@ IndexTable.prototype = {
       var p = $('<p/>').addClass('note').addClass('warning')
         .append('Are you sure you want to delete the selected rows? ')      
         .append($('<input/>').attr('type','button').val('Yes').click(function() { that.bulk_delete(true); })).append(' ')
-        .append($('<input/>').attr('type','button').val('No').click(function() { $('#' + that.container + '_message').empty(); }));
-      $('#' + that.container + '_message').empty().append(p);
+        .append($('<input/>').attr('type','button').val('No').click(function() { that.hide_message(); }));
+      that.show_message(p, 'bulk_delete_confirm');
       return;
     }        
     var params = this.model_ids.map(function(model_id) { return 'model_ids[]=' + model_id; }).join('&');
@@ -532,7 +553,7 @@ IndexTable.prototype = {
         model_ids: that.model_ids
       },
       success: function(resp) {
-        $('#' + that.container + '_message').empty();
+        that.hide_message();
         that.refresh();        
       }      
     });        
@@ -555,16 +576,16 @@ IndexTable.prototype = {
           .append($('<textarea/>').attr('id', that.container + '_bulk_import_data').attr('placeholder', 'CSV Data').css('width', '100%').css('height', '150px'))
         )
         .append($('<p/>')
-          .append($('<input/>').attr('type','button').val('Cancel').click(function() { $('#' + that.container + '_message').empty(); })).append(' ')
+          .append($('<input/>').attr('type','button').val('Cancel').click(function() { that.hide_message(); })).append(' ')
           .append($('<input/>').attr('type','button').val('Add').click(function() { that.bulk_import($('#' + that.container + '_bulk_import_data').val(), $('#' + that.container + '_bulk_import_data_url').val()); }))
         );        
       if (that.bulk_import_fields)
         div.append($('<p/>').css('font-size', '75%').html("Format: " + that.bulk_import_fields.join(', ')));
       
-      $('#' + that.container + '_message').empty().append(div);
+      that.show_message(div, 'bulk_import_form');
       return;
     }
-    $('#' + that.container + '_message').empty().append("<p class='loading'>Adding...</p>");
+    that.show_message("<p class='loading'>Adding...</p>", 'bulk_import_loading');
     $.ajax({
       url: this.bulk_import_url,
       type: 'post',
@@ -574,11 +595,11 @@ IndexTable.prototype = {
       },
       success: function(resp) {
         if (resp.error)
-          $('#' + that.container + '_message').html("<p class='note error'>" + resp.error + "</p>");        
+          that.show_message("<p class='note error'>" + resp.error + "</p>", 'bulk_import_error');        
         else
         {
-          $('#' + that.container + '_message').html("<p class='note success'>Added successfully.</p>");
-          setTimeout(function() { $('#' + that.container + '_message').empty(); }, 3000);
+          that.show_message("<p class='note success'>Added successfully.</p>", 'bulk_import_success');
+          setTimeout(function() { that.hide_message(); }, 3000);
           that.refresh();
         }
       }        
@@ -599,13 +620,13 @@ IndexTable.prototype = {
     if (this.model_ids.length == 0)
     {
       var p = $('<p/>').addClass('note error').html("Please select a row.");
-      $('#' + that.container + '_message').empty().append(p);
+      that.show_message(p, 'duplicate_select_row');
       return;
     }
     if (this.model_ids.length > 1)
     {
       var p = $('<p/>').addClass('note error').html("Please select a single row.");
-      $('#' + that.container + '_message').empty().append(p);
+      that.show_message(p, 'duplicate_select_single_row');
       return;
     }
     if (!count)
@@ -614,19 +635,19 @@ IndexTable.prototype = {
         .append('How many times do you want this duplicated?')          
         .append($('<input/>').attr('type', 'text').attr('id', 'count').css('width', '50'))
         .append('<br />')
-        .append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { $('#' + that.container + '_message').empty(); })).append(' ')
+        .append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { that.hide_message(); })).append(' ')
         .append($('<input/>').attr('type', 'button').val('Duplicate').click(function(e) { that.duplicate($('#count').val()); return false; }));
-      $('#' + that.container + '_message').empty().append(p);
+      that.show_message(p, 'duplicate_form');
       return;      
     }    
-    $('#' + that.container + '_message').html("<p class='loading'>Duplicating...</p>");
+    that.show_message("<p class='loading'>Duplicating...</p>", 'duplicate_loading');
     $.ajax({
       url: that.duplicate_url(that.model_ids[0], that),
       type: 'post',
       data: { count: count },
       success: function(resp) {
-        if (resp.error) $('#' + that.container + '_message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) { $('#' + that.container + '_message').empty(); that.refresh(); }
+        if (resp.error) that.show_message("<p class='note error'>" + resp.error + "</p>", 'duplicate_error');
+        if (resp.success) { that.hide_message(); that.refresh(); }
       }
     });    
   },
@@ -740,34 +761,51 @@ IndexTable.prototype = {
     return $('<a/>').attr('href', '#').html(that.new_model_text).click(function(e) { e.preventDefault(); that.new_form(); });
   },
   
+  hide_message: function() {
+    var that = this;
+    $('#' + that.container + '_message').slideUp(function() { $('#' + that.container + '_message').empty().css('margin-bottom', 0); });
+    that.current_message = false
+  },
+  
+  current_message: false,
+  show_message: function(el, name) {
+    var that = this;
+    if (that.current_message == name)
+    {
+      $('#' + that.container + '_message').slideUp(function() { $('#' + that.container + '_message').empty().css('margin-bottom', 0); });
+      that.current_message = false;
+      return;
+    }
+    if (!$('#' + that.container + '_message').is(':empty'))
+    {
+      $('#' + that.container + '_message').slideUp(function() { $('#' + that.container + '_message').empty().append(el).css('margin-bottom', '10px').slideDown(); });
+      that.current_message = name;
+      return;
+    }
+    else     
+    {
+      $('#' + that.container + '_message').hide().empty().append(el).css('margin-bottom', '10px').slideDown();
+      that.current_message = name;
+    }
+  },
+  
   new_form: function()
   {
-    var that = this;
-    if (!$('#' + that.container + '_new_form_container').is(':empty'))
-    {
-      $('#' + that.container + '_new_form_container').slideUp(function() {          
-        $('#' + that.container + '_new_form_container').empty();
-      });
-      return;
-    }      
-        
+    var that = this;          
     var form = $('<form/>').attr('id', 'new_form')
       .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(that.form_authenticity_token));
     $.each(this.new_model_fields, function(i, f) {
       form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
     });
-    form
-      .append($('<div/>').attr('id', that.container + '_new_message'))
-      .append($('<p>')        
-        .append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { $('#' + that.container + '_new_form_container').empty(); }))
-        .append(' ')
-        .append($('<input/>').attr('type', 'submit').val('Add').click(function(e) { that.add_model(); return false; }))
-      );                
-    $('#' + that.container + '_new_form_container').hide().empty().append(
-      $('<div/>').addClass('note').css('margin-bottom', '10px')
-        .append($('<h2/>').css('margin-top', 0).css('padding-top', 0).html(that.new_model_text))
-        .append(form)
-      ).slideDown();
+    form.append($('<div/>').attr('id', that.container + '_new_message'));
+    form.append($('<p>')        
+      .append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { that.hide_message(); })).append(' ')
+      .append($('<input/>').attr('type', 'submit').val('Add').click(function(e) { that.add_model(); return false; }))
+    );        
+    var div = $('<div/>').addClass('note')
+      .append($('<h2/>').css('margin-top', 0).css('padding-top', 0).html(that.new_model_text))
+      .append(form);
+    that.show_message(div);
   },
     
   add_model: function() 
@@ -780,7 +818,11 @@ IndexTable.prototype = {
       data: $('#new_form').serialize(),
       success: function(resp) {
         if (resp.error) $('#' + that.container + '_new_message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.redirect || resp.refresh || resp.success) that.refresh();
+        if (resp.redirect || resp.refresh || resp.success) 
+        {
+          that.hide_message();
+          that.refresh();
+        }
       }
     });
   },

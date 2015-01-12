@@ -1,6 +1,6 @@
 <%
 
-@nav = Caboose.plugin_hook('admin_nav', [], @user, @page)
+@nav = Caboose.plugin_hook('admin_nav', [], @user, @page, @site)
 
 initial_state = session[:caboose_station_state].nil?      ? 'min' : session[:caboose_station_state] 
 open_tabs     = session[:caboose_station_open_tabs].nil?  ? []    : session[:caboose_station_open_tabs] 

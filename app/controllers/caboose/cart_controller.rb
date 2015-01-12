@@ -7,7 +7,14 @@ module Caboose
     
     # GET /cart/items
     def list
-      render :json => { :order => @order }
+      render :json => @order.as_json(:include => [        
+        { :line_items => { :include => { :variant => { :include => :product }}}},
+        { :order_packages => { :include => [:shipping_package, :shipping_method] }},
+        :customer,
+        :shipping_address,
+        :billing_address,
+        :order_transactions
+      ])
     end
     
     # GET /cart/item-count

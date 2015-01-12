@@ -433,3 +433,11 @@ Page Bar Generator
 #crumbtrail a {
   color: #fff; 
 }
+
+.clearfix:after { 
+   content: "."; 
+   visibility: hidden; 
+   display: block; 
+   height: 0; 
+   clear: both;
+}

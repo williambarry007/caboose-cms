@@ -4,7 +4,7 @@ class Caboose::CaboosePlugin
     return str    
   end
   
-  def self.admin_nav(nav, user, page)
+  def self.admin_nav(nav, user, page, site)
     return nav
   end
   

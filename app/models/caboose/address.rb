@@ -18,9 +18,7 @@ module Caboose
       :country,
       :country_code,
       :phone
-    
-    validates :first_name, :last_name, :address1, :city, :state, :zip, :presence => true
-    validates :zip, :format => { :with => /^\d{5}(-\d{4})?$/, :message => 'Invalid zip code' }
+                
   end
 end
 

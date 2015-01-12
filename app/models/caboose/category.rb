@@ -90,5 +90,23 @@ module Caboose
       ancestors << self
       return ancestors 
     end
+        
+    def self.options(site_id)            
+      cat = Category.where("site_id = ? and parent_id is null", site_id).first      
+      if cat.nil?
+        cat = Category.create(:site_id => site_id, :name => 'All Products', :url => '/')
+      end
+      arr = self.options_helper(cat, '')
+      return arr
+    end
+        
+    def self.options_helper(cat, prefix)
+      return [] if cat.nil?
+      arr = [{ :value => cat.id, :text => "#{prefix}#{cat.name}" }]      
+      cat.children.each do |c|
+        arr = arr + self.options_helper(c, "#{prefix} - ")        
+      end
+      return arr
+    end
   end
 end

@@ -7,9 +7,15 @@
 </p>
 
 <form action="/admin/products" method="get" id="search_form" style="margin: 0 0 12px">
-	<input type="text" name="search_like" placeholder="Title or Vendor Name" value="<%= params[:search_like] %>" style="width: 350px" />
-	<input type="submit" value="Search" />
-	<input type="button" value="Clear" onclick="window.location='/admin/products'" />
+	<p><input type="text" name="search_like" placeholder="Title or Vendor Name" value="<%= params[:search_like] %>" style="width: 350px" /></p>
+	<p><select type="text" name="category_id" placeholder="Category" value="<%= params[:search_like] %>" style="width: 350px">
+	  <option value=''>-- Category --</option>
+	  <% @category_options.each do |cat| %><option value="<%= cat[:value] %>"<% if cat[:value] == params[:category_id] %> selected='true'<% end %>><%= cat[:text] %></option><% end %>
+	</select></p>
+	<p>
+	  <input type="submit" value="Search" />
+	  <input type="button" value="Clear" onclick="window.location='/admin/products'" />
+	</p>
 </form>
 	
 <div id='products'></div>

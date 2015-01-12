@@ -237,15 +237,23 @@ module Caboose
     def authnet_relay
       Caboose.log("Authorize.net relay, order #{params[:x_invoice_id]}")
       
-      order = Caboose::Order.find(params[:x_invoice_num])        
-      order.transaction_id = params[:x_trans_id] if params[:x_trans_id]        
-      success = params[:x_response_code] && params[:x_response_code] == '1' 
+      order = Caboose::Order.find(params[:x_invoice_num])
+      ot = Caboose::OrderTransaction.new(
+        :order_id => order.id,
+        :date_processed => DateTime.now.utc,
+        :transaction_type => Caboose::OrderTransaction::TYPE_AUTHORIZE
+      )
+      ot.success        = params[:x_response_code] && params[:x_response_code] == '1'
+      ot.transaction_id = params[:x_trans_id] if params[:x_trans_id]              
+      ot.auth_code      = params[:x_auth_code] if params[:x_auth_code]
+      ot.response_code  = params[:x_response_code] if params[:x_response_code]
+      ot.amount         = order.total
+      ot.save
       
-      if success
+      error = nil
+      if ot.success
         order.financial_status = 'authorized'
         order.status = 'pending'
-        order.date_authorized = DateTime.now
-        order.auth_amount = order.total
         
         # Send out emails        
         OrdersMailer.customer_new_order(order).deliver
@@ -254,14 +262,14 @@ module Caboose
         # Emit order event
         Caboose.plugin_hook('order_authorized', order)
       else
-        order.financial_status = 'unauthorized'
+        order.financial_status = 'unauthorized'        
         error = "There was a problem processing your payment."
       end
-      
+            
       order.save
       
       @url = params[:x_after_relay]
-      @url << (success ? "?success=1" : "?error=#{error}")             
+      @url << (ot.success ? "?success=1" : "?error=#{error}")             
                   
       render :layout => false
     end

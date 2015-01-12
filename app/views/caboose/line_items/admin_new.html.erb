@@ -1,0 +1,100 @@
+
+<h1>Add Item</h1>
+         
+<p><input type='text' name='product_title' id='product_title' value='' style='width: 400px;' /></p>
+<div id='products'></div>
+<div id='variants'></div>
+<div id='message'></div>
+
+<p><input type='button' value='Cancel' onclick="modal.close();" /></p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(600);
+});
+
+$(document).ready(function() {
+  $('#product_title').on('keyup', function() { show_products(); });
+});
+
+function show_products()
+{
+  var title = $('#product_title').val();
+  $.ajax({
+    url: '/admin/orders/line-items/product-stubs',
+    type: 'get',
+    data: { title: title },
+    success: function(products) {
+      if (products && products.length > 0)
+      {
+        var ul = $('<ul/>');
+        $.each(products, function(i, p) {
+          ul.append($('<li/>')
+            .attr('id', 'product_id_' + p.id)
+            .data('product_id', p.id)            
+            .append($('<a/>').html(p.title).click(function(e) {
+              e.preventDefault();
+              show_variants($(e.target).parent(), $(e.target).parent().data('product_id'));        
+            }))
+          );
+        });
+        $('#products').empty().append(ul);
+      }
+      else
+      {
+        $('#products').empty().append($('<p/>').html('No products met your search.'));
+      }
+      modal.autosize();
+    } 
+  });
+}
+
+var open_product_id = false;
+
+function show_variants(li, product_id)
+{
+  if (open_product_id && open_product_id == product_id)
+  {
+    $('#product_id_' + open_product_id).find('ul').remove();
+    open_product_id = false;
+    return;
+  }
+  if (open_product_id)  
+  {
+    $('#product_id_' + open_product_id).find('ul').remove();
+    open_product_id = false;
+  }  
+  open_product_id = product_id;
+  $.ajax({
+    url: '/admin/products/' + product_id + '/variants/json',
+    type: 'get',        
+    success: function(resp) {
+      var ul = $('<ul/>');
+      $.each(resp.models, function(i, v) {
+        var name = [];
+        if (v.option1) name.push(v.option1);
+        if (v.option2) name.push(v.option2);
+        if (v.option3) name.push(v.option3);
+        name = name.join(' / ');
+        ul.append($('<li/>')
+          .data('variant_id', v.id)          
+          .append($('<a/>').html(name).click(function(e) {
+            e.preventDefault();
+            variant_id = $(e.target).parent().data('variant_id');
+            parent.controller.add_variant(variant_id);
+            modal.close();
+          }))
+        );
+      });
+      li.append(ul);
+      modal.autosize();
+    }
+  });  
+}
+
+</script>
+<% end %>

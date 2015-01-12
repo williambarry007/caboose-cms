@@ -11,48 +11,44 @@ module Caboose
     def self.rates(order)
       return [] if Caboose::store_shipping.nil?
             
-      store_config = order.site.store_config
-      if store_config        
-        rates = self.custom_rates(store_config, order)
+      sc = order.site.store_config
+      if sc.shipping_rates_function        
+        rates = self.custom_rates(sc, order)
         return rates        
       end
-            
-      ss = Caboose::store_shipping
+
       origin = Location.new(
-        :country => ss[:origin][:country],
-        :state   => ss[:origin][:state],
-        :city    => ss[:origin][:city],
-        :zip     => ss[:origin][:zip]
+        :country => sc.origin_country,
+        :state   => sc.origin_state,
+        :city    => sc.origin_city,
+        :zip     => sc.origin_zip
       )      
       destination = Location.new(
-        :country     => ss[:origin][:country],
+        :country     => sc.origin_country,
         :state       => order.shipping_address.state,
         :city        => order.shipping_address.city,
         :postal_code => order.shipping_address.zip
-      )      
-      ups = ss[:ups] ? UPS.new(:key => ss[:ups][:key], :login => ss[:ups][:username], :password => ss[:ups][:password], :origin_account => ss[:ups][:origin_account]) : nil        
-      usps = ss[:usps] ? USPS.new(:login => ss[:usps][:username]) : nil                        
-                  
+      )
+      carriers = {}      
+      carriers['UPS']   = UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account)  if sc.ups_username.strip.length   > 0 
+      carriers['USPS']  = USPS.new( :login => sc.usps_username)                                                                                             if sc.usps_username.strip.length  > 0
+      carriers['FedEx'] = FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)        if sc.fedex_username.strip.length > 0
+
       all_rates = []
-      order.packages.each do |op|              
-        sp = op.shipping_package
+      order.packages.each do |op|
+        sp = op.shipping_package                            
         package = op.activemerchant_package
         rates = []
-        if ups                  
-          resp = ups.find_rates(origin, destination, package)      
-          resp.rates.sort_by(&:price).each do |rate|
-            next if rate.service_code != sp.service_code            
-            rates << { :carrier => 'UPS', :service_code => rate.service_code, :service_name => rate.service_name, :price => rate.total_price.to_d / 100 }
+        carriers.each do |name, carrier|          
+          if sp.uses_carrier(name)
+            resp = carrier.find_rates(origin, destination, package)      
+            resp.rates.sort_by(&:price).each do |rate|
+              next if !sp.uses_service_code(name, rate.service_code)            
+              rates << { :carrier => name, :service_code => rate.service_code, :service_name => rate.service_name, :price => rate.total_price.to_d / 100 }
+            end
           end
-        end
-        if usps
-          resp = usps.find_rates(origin, destination, package)
-          resp.rates.sort_by(&:price).each do |rate|
-            next if rate.service_code != sp.service_code            
-            rates << { :carrier => 'USPS', :service_code => rate.service_code, :service_name => rate.service_name, :total_price  => rate.total_price.to_d / 100 }
-          end
-        end
-        all_rates << { :order_package => op, :rates => rates }
+        end        
+        all_rates << { :order_package => op, :rates => rates }        
       end            
       return all_rates
     end

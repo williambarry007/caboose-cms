@@ -1,6 +1,8 @@
 <h1>Edit Vendor</h1>
 <p><div id="vendor_<%= @vendor.id %>_name"></div></p>
 <p><div id="vendor_<%= @vendor.id %>_status"></div></p>
+<p><div id="vendor_<%= @vendor.id %>_featured"></div></p>
+<p><div id="vendor_<%= @vendor.id %>_image"></div></p>
 <div id='message'></div>
 <input type="button" value="< Back" onclick="window.location='/admin/vendors';" />
 <input type="button" value="Delete" onclick="delete_vendor(<%= @vendor.id %>);" />
@@ -12,11 +14,13 @@ $(document).ready(function() {
   m = new ModelBinder({
     id: <%= @vendor.id %>,
     name: 'Vendor',
-    update_url: '/admin/vendors/<%= @vendor.id %>/update',
+    update_url: '/admin/vendors/<%= @vendor.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'name'   , nice_name: 'Name'   , type: 'text'   , value: <%= Caboose.json(@vendor.name).html_safe %>, width: 500 },
-      { name: 'status' , nice_name: 'Status' , type: 'select' , text: <%= raw Caboose.json(@vendor.status).html_safe %>, value: <%= Caboose.json(@vendor.status).html_safe %>, width: 500, options_url: '/admin/vendors/status-options' }
+      { name: 'name'     , nice_name: 'Name'     , type: 'text'     , value: <%= raw Caboose.json(@vendor.name)              %>, width: 500 },
+      { name: 'status'   , nice_name: 'Status'   , type: 'select'   , value: <%= raw Caboose.json(@vendor.status)            %>, width: 500, options_url: '/admin/vendors/status-options' },
+      { name: 'featured' , nice_name: 'Featured' , type: 'checkbox' , value: <%= @vendor.featured ? 1 : 0                    %>, width: 500 },
+      { name: 'image'    , nice_name: 'Image'    , type: 'image'    , value: <%= raw Caboose.json(@vendor.image.url(:thumb)) %>, width: 500 , update_url: '/admin/vendors/<%= @vendor.id %>/image' }
     ]
   })
 });

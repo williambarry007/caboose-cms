@@ -1,13 +1,6 @@
 <h1>New Manual Order</h1>
 
-<p><select name='product_id' id='product_id' onchange='populate_variants();'>
-<option value=''>-- Select a product --</option>
-<% @products.each do |p| %>
-  <option value='<%= p.id %>'><%= p.title %></option>
-<% end %>
-</select>
-<span id='variant_id_container'></span>
-</p>
+<p>This will create a new order that you can populate and then send to the customer for payment.</p>
 
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/orders';" />
@@ -17,23 +10,15 @@
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
-var modal = false;
-$(window).load(function() { 
-  modal = new CabooseModal('95%');
-});
-
-function populate_variants()
+function create_order()
 {
-  $('#variant_id_container').empty().append("<p class='loading'>Getting variants...</p>");
-  var product_id = $('#product_id').val();
+  $('#message').empty().append("<p class='loading'>Creating order...</p>");  
   $.ajax({
-    url: '/admin/products/' + product_id + '/variants/json',    
-    success: function(variants) {
-      var select = $('<select/>').attr('id', 'variant_id');
-      $.each(variants, function(i, v) {
-        select.append($('<option/>').val(v.id).html(v.title));
-      });
-      $('#variant_id_container').empty().append(select);
+    url: '/admin/orders',
+    type: 'post',    
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;      
     }
   });
 }

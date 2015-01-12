@@ -15,6 +15,16 @@ module Caboose
       redirect_to '/checkout/step-one'
     end
     
+    # Test Email 
+    def test_email
+            
+      m = OrdersMailer.configure_for_site(@site.id).test_email
+      Caboose.log(m.delivery_method.settings)
+      m.deliver
+      
+      render :json => DateTime.now
+    end
+            
     # GET /checkout/step-one
     def step_one
       if logged_in?

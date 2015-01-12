@@ -355,6 +355,7 @@ Caboose::Engine.routes.draw do
   get  '/checkout/step-three'      => 'checkout#step_three'
   get  '/checkout/step-four'       => 'checkout#step_four'  
   get  '/checkout/thanks'          => 'checkout#thanks'
+  get  '/checkout/test-email'      => 'checkout#test_email'
     
   get  '/checkout/authnet-profile-form'       => 'checkout#authnet_profile_form'
   put  '/checkout/address'                    => 'checkout#update_address'

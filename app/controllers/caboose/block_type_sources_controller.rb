@@ -40,7 +40,7 @@ module Caboose
       bts.save      
       
       # Send back the response
-      resp.redirect = "/admin/block-types/store/sources/#{bts.id}"
+      resp.redirect = "/admin/block-types/store/sources/#{bts.id}/edit"
       render :json => resp
     end
     

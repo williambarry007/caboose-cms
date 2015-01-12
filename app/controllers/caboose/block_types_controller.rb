@@ -27,7 +27,7 @@ module Caboose
       end
       pager = Caboose::Pager.new(params, h, {      
         'model' => 'Caboose::BlockType',
-        'sort'  => 'description',
+        'sort'  => 'name',
         'desc'  => 'false',
         'base_url' => "/admin/block-types",
         'items_per_page' => 10,

@@ -22,6 +22,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item = { 'id' => 'content', 'text' => 'Content', 'children' => [] }    
     item['children'] << { 'id' => 'pages'        , 'text' => 'Pages'       , 'href' => '/admin/pages'        , 'modal' => false } if user.is_allowed('pages'       , 'view')
     item['children'] << { 'id' => 'posts'        , 'text' => 'Posts'       , 'href' => '/admin/posts'        , 'modal' => false } if user.is_allowed('posts'       , 'view')
+    item['children'] << { 'id' => 'calendars'    , 'text' => 'Calendars'   , 'href' => '/admin/calendars'    , 'modal' => false } if user.is_allowed('calendars'   , 'view')  
     nav << item if item['children'].count > 0
     
     if site.use_store      

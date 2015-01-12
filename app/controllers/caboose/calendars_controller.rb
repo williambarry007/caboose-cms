@@ -13,7 +13,7 @@ module Caboose
       return if !user_is_allowed('calendars', 'view')
       render :file => 'caboose/extras/error_invalid_site' and return if @site.nil?
                   
-      @calendars = Calendar.reorder(:name).all
+      @calendars = Calendar.where(:site_id => @site.id).reorder(:name).all
       render :layout => 'caboose/admin'      
     end
 

@@ -116,6 +116,7 @@ module Caboose
         'caboose/model/bound_text.js',
         'caboose/model/bound_textarea.js',
         'caboose/model/class.js',
+        'caboose/model/imageZoom.js',
         'caboose/model/index_table.js',
         'caboose/model/model_binder.js',
         'caboose/model/model.js',

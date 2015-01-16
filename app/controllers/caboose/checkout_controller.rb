@@ -52,7 +52,7 @@ module Caboose
     def gift_cards
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
-      redirect_to '/checkout/shipping'  and return if @order.shipping_service_code.nil?
+      redirect_to '/checkout/shipping'  and return if @order.has_empty_shipping_methods?
     end
     
     # Step 5 - Payment
@@ -60,7 +60,7 @@ module Caboose
     def payment
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
-      redirect_to '/checkout/shipping'  and return if @order.shipping_service_code.nil?      
+      redirect_to '/checkout/shipping'  and return if @order.has_empty_shipping_methods?      
       
       # Make sure all the variants still exist      
       @order.line_items.each do |li|
@@ -187,11 +187,6 @@ module Caboose
       end
       render :json => resp            
     end
-    
-    ## GET /checkout/shipping
-    #def shipping
-    #  render :json => { :rates => ShippingCalculator.rates(@order), :selected_rate => ShippingCalculator.rate(@order) }
-    #end
     
     # PUT /checkout/shipping
     def update_shipping

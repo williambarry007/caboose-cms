@@ -227,6 +227,15 @@ module Caboose
         gc.save
       end
     end
+    
+    def has_empty_shipping_methods?
+      return true if self.order_packages.nil?
+      return true if self.order_packages.count == 0
+      self.order_packages.each do |op|
+        return true if op.shipping_method_id.nil?
+      end
+      return false
+    end
   end
 end
 

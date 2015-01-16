@@ -47,7 +47,7 @@ module Caboose
       @logged_in_user = logged_in_user  
       
       # Initialize the card
-      init_cart if @site.use_store
+      init_cart if @site && @site.use_store
       
       before_action
     end

@@ -18,7 +18,7 @@ Caboose.Store.Modules.Product = (function() {
     self.$product = $('#product');
     self.$price = self.$product.find('#product-price');
     if (!self.$product.length) return false;
-    
+
     $.get('/products/' + self.$product.data('id') + '/info', function(response) {
       self.product = response.product;
       self.option1_values = response.option1_values;
@@ -29,6 +29,7 @@ Caboose.Store.Modules.Product = (function() {
       self.set_variant(self.get_initial_variant());
       self.set_options_from_variant(self.variant);
     });
+    
   };
   
   //
@@ -47,6 +48,12 @@ Caboose.Store.Modules.Product = (function() {
       });
     });
   };
+
+  self.initalize_zoom = function(image_url) {
+    var big_image = $("#product-images").children("figure").first();
+    big_image.data("zoom-image",image_url);
+    big_image.elevateZoom();
+  }
   
   self.render_images = function(callback) {
     self.$images = $('#product-images', self.$product);        
@@ -81,8 +88,8 @@ Caboose.Store.Modules.Product = (function() {
   };
   
   self.thumb_click_handler = function(event) {
-    //self.$images.children('figure').css('background-image', 'url(' + $(event.target).data('url-large') + ')');
     self.$images.children('figure').css('background-image', 'url(' + $(event.target).data('url-large') + ')');
+    self.initalize_zoom($(event.target).data('url-large').replace('large','huge'));
   };
   
   self.image_click_handler = function(event) {
@@ -274,9 +281,12 @@ Caboose.Store.Modules.Product = (function() {
     var $figure = self.$images.children('figure');   
     if (variant.images && variant.images.length > 0 && variant.images[0]) {
       $figure.css('background-image', 'url(' + variant.images[0].urls.large + ')');
+      self.initalize_zoom(variant.images[0].urls.huge);
     } else if ($figure.css('background-image').toLowerCase() == 'none') {
       $figure.css('background-image', 'url(' + _.first(self.product.images).urls.large + ')');
+      self.initalize_zoom(_.first(self.product.images).urls.huge);
     }
+    
   };
   
   return self;

@@ -197,7 +197,7 @@ module Caboose
         'caboose/application.css',
         'caboose/bound_input.css',
         'caboose/caboose.css',
-        'caboose/cart.scss',
+        'caboose/cart.css',
         'caboose/checkout.css',        
         'caboose/fonts/avenir-medium.eot',
         'caboose/fonts/avenir-medium.ttf',

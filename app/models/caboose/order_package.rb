@@ -17,12 +17,19 @@ module Caboose
     STATUS_PENDING = 'Pending'
     STATUS_SHIPPED = 'Shipped'
     
+    def self.custom_order_packages(store_config, order)          
+      eval(store_config.order_packages_function)    
+    end
+    
     # Calculates the shipping packages required for all the items in the order
     def self.create_for_order(order)
-
-      store_config = order.site.store_config
-      return if !store_config.calculate_packages
       
+      store_config = order.site.store_config            
+      if !store_config.calculate_packages                        
+        self.custom_order_packages(store_config, order)
+        return
+      end
+                  
       # Make sure all the line items in the order have a quantity of 1
       extra_line_items = []
       order.line_items.each do |li|        
@@ -87,7 +94,7 @@ module Caboose
           end
         end
                
-      end                      
+      end            
     end
     
     def fits(line_item = nil)

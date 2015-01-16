@@ -1,0 +1,52 @@
+<%
+sc = @site.store_config
+%>
+
+<h1>Gift Cards</h1>
+<div id='gift_cards'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {  
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'gift_cards',
+    base_url: '/admin/gift-cards',
+    allow_bulk_edit: true,
+    allow_bulk_delete: true,
+    allow_duplicate: false,
+    allow_advanced_edit: true,
+    fields: [
+      { show: true  , bulk_edit: true  , name: 'name'               , nice_name: 'Name'           , sort: 'name'            , type: 'text'    , value: function(gc) { return gc.name;                        }, width: 75, align: 'left'  },                                                         
+      { show: true  , bulk_edit: true  , name: 'code'               , nice_name: 'Code'           , sort: 'code'            , type: 'text'    , value: function(gc) { return gc.code;                        }, width: 75, align: 'left'  },
+      { show: true  , bulk_edit: true  , name: 'card_type'          , nice_name: 'Type'           , sort: 'card_type'       , type: 'select'  , value: function(gc) { return gc.card_type;                   }, width: 75, align: 'left'  , options_url: '/admin/gift-cards/card-type-options' },
+      { show: true  , bulk_edit: true  , name: 'total'              , nice_name: 'Total'          , sort: 'total'           , type: 'text'    , value: function(gc) { return curr(gc.total);                 }, width: 75, align: 'right' },
+      { show: true  , bulk_edit: true  , name: 'balance'            , nice_name: 'Balance'        , sort: 'balance'         , type: 'text'    , value: function(gc) { return curr(gc.balance);               }, width: 75, align: 'right' },
+      { show: true  , bulk_edit: true  , name: 'min_order_total'    , nice_name: 'Minimum Order'  , sort: 'min_order_total' , type: 'text'    , value: function(gc) { return curr(gc.min_order_total);       }, width: 75, align: 'right' },
+      { show: true  , bulk_edit: true  , name: 'date_available'     , nice_name: 'Date Available' , sort: 'date_available'  , type: 'date'    , value: function(gc) { return format_date(gc.date_available); }, width: 75, align: 'left'  },
+      { show: true  , bulk_edit: true  , name: 'date_expires'       , nice_name: 'Date Expires'   , sort: 'date_expires'    , type: 'date'    , value: function(gc) { return format_date(gc.date_expires);   }, width: 75, align: 'left'  },
+      { show: true  , bulk_edit: true  , name: 'status'             , nice_name: 'Status'         , sort: 'status'          , type: 'select'  , value: function(gc) { return gc.status;                      }, width: 75, align: 'left'  , options_url: '/admin/gift-cards/status-options' }            
+    ],
+    new_model_text: 'New Gift Card',
+    no_models_text: 'There are no gift cards right now.',
+    new_model_fields: [
+      { name: 'code', nice_name: 'Code', type: 'text', width: 400 }      
+    ],
+    bulk_import_fields: ['code'],
+    bulk_import_url: '/admin/gift-cards/bulk'
+  });        
+});
+
+function format_date(str)
+{
+  if (!str)
+    return '';
+  var d = new Date(str);
+  return d.getMonth() + '/' + d.getDate() + '/' + d.getFullYear();  
+}
+
+</script>
+<% end %>

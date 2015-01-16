@@ -1,43 +1,54 @@
-<h3>Checkout2</h3>
-<%= render :partial => '/caboose/checkout/cart' %>
-<%= render :partial => '/caboose/checkout/address_form' %>
+<h1>Checkout</h1>
 
-<% content_for :caboose_css do %>
-<style>
+<div id="checkout">
 
-/* Table */
-
-table#cart { border-collapse: collapse; }
-table#cart td { border: #666 1px dotted; padding: 4px 8px; }
-table#cart th { font-weight: bold; text-align: center; }
-
-/* Form */
-
-form#address {
-  overflow: hidden;
-  width: 100%;
-}
-
-form#address label {
-  display: inline-block;
-  margin-right: 12px;
-  min-width: 100px;
-  text-align: right;
-}
-form#address input { width: 200px; }
-
-form#address fieldset {
-  width: 100%;
-  min-width: 320px;
-}
-form#address fieldset#billing { display: none; }
-
-@media all and (min-width: 768px) {
-  form#address fieldset {
-    float: left;
-    width: 50%;
-  }
-}
-
-</style>
+  <% if @logged_in_user.id == 1 %>
+    <p class='note error'>You are logged in as the admin user. Please <a href='/logout'>logout</a> and complete your order as a different user.</p>
+  <% else %>
+    <section id="checkout-login">
+      <div class="wrapper" class='login-choices'>
+        <ul>
+          <li><p>Already a member?          </p><button data-login-action="signin"   id='signin_button'   >Sign in</button></li>    
+          <li><p>Continue as a new customer </p><button data-login-action="register" id='register_button' >New Customer</button></li>        
+        </ul>
+      </div>
+      
+      <section id='checkout-login-form'>    
+        <div class="constrain" id='signin_form_container'>  
+          <form action="/login" method="post" id='signin_form'>
+            <p><input name="username" type="text"     placeholder="Email"    /></p>
+            <p><input name="password" type="password" placeholder="Password" /></p>
+            <p><input type="submit" value="Continue" /></p>
+          </form>
+        </div>      
+        <div class="constrain" id='register_form_container'>  
+          <form action="/register" method="post" id='register_form'></p>
+            <p><input name="first_name" type="text"     placeholder="First Name" /></p>
+            <p><input name="last_name"  type="text"     placeholder="Last Name"  /></p>
+            <p><input name="email"      type="text"     placeholder="Email"      /></p>
+            <p><input name="phone"      type="text"     placeholder="Phone"      /></p>
+            <p><input name="pass1"      type="password" placeholder="Password"   /></p>
+            <p><input name="pass2"      type="password" placeholder="Confirm Password" /></p>
+            <p><input name='newsletter' id='newsletter' type='checkbox' value='1' /> <label for='newsletter'>Send me updates on new products and special deals</label></p> 
+            <p><input type="submit" value="Continue" /></p>
+          </form>
+        </div>      
+        <div class="wrapper">
+          <div id='message'></div>
+        </div>
+      </section>
+    </section>
+  <% end %>
+  
+  <section id="checkout-continue">        
+    <a href="/">return to the store</a>
+  </section>
+</div>
+                                    
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/checkout_login_register' %>
+<% end %>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/message_boxes' %>
+<%= stylesheet_link_tag 'caboose/checkout' %>
 <% end %>

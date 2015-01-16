@@ -1,0 +1,35 @@
+
+<div id="checkout">
+  <h2>Gift Cards</h2>    
+  
+  <p align='center'>
+    <input type='text' name='code' id='code' placeholder='Gift card code' style='width: 300px;' />
+    <button class="blue" id='redeem_code_btn'>Redeem Code</button>
+    <div id='message'></div>
+  </p>
+  <div id='cart'></div>
+      
+  <section id="checkout-continue">    
+    <button class="blue">Continue to Payment</button>
+    <em>or</em>
+    <a href="/">return to the store</a>
+  </section>  
+</div>
+
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/cart' %>
+<%= javascript_include_tag 'caboose/checkout_gift_cards' %>
+<script type='text/javascript'>
+
+var cart = false;
+$(document).ready(function() {
+  cart = new Cart({ allow_edit_line_items: false });
+});
+
+</script>
+<% end %>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/cart' %>
+<%= stylesheet_link_tag 'caboose/checkout' %>
+<% end %>

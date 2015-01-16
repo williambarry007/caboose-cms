@@ -2,56 +2,28 @@ require 'active_shipping'
 include ActiveMerchant::Shipping
 
 module Caboose
-  class ShippingCalculator
+  class OrderPackageCalculator
     
-    def self.custom_rates(store_config, order)          
-      return eval(store_config.shipping_rates_function)    
+    def self.custom_order_packages(store_config, order)          
+      return eval(store_config.order_packages_function)    
     end
     
-    def self.rates(order)
+    def self.order_packages(order)
       return [] if Caboose::store_shipping.nil?
             
       sc = order.site.store_config
-      if sc.shipping_rates_function        
-        rates = self.custom_rates(sc, order)
-        return rates        
+      if sc.order_packages_function        
+        order_packages = self.custom_order_packages(sc, order)
+        return order_packages        
       end
-
-      origin = Location.new(
-        :country => sc.origin_country,
-        :state   => sc.origin_state,
-        :city    => sc.origin_city,
-        :zip     => sc.origin_zip
-      )      
-      destination = Location.new(
-        :country     => sc.origin_country,
-        :state       => order.shipping_address.state,
-        :city        => order.shipping_address.city,
-        :postal_code => order.shipping_address.zip
-      )
-      carriers = {}      
-      carriers['UPS']   = UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account)  if sc.ups_username.strip.length   > 0 
-      carriers['USPS']  = USPS.new( :login => sc.usps_username)                                                                                             if sc.usps_username.strip.length  > 0
-      carriers['FedEx'] = FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)        if sc.fedex_username.strip.length > 0
-
-      all_rates = []
-      order.packages.each do |op|
-        sp = op.shipping_package                            
-        package = op.activemerchant_package
-        rates = []
-        carriers.each do |name, carrier|          
-          if sp.uses_carrier(name)
-            resp = carrier.find_rates(origin, destination, package)      
-            resp.rates.sort_by(&:price).each do |rate|
-              sm = ShippingMethod.where(:carrier => name, :service_code => rate.service_code).first
-              sm = ShippingMethod.create(:carrier => name, :service_code => rate.service_code, :service_name => rate.service_name) if sm.nil?
-              next if !sp.uses_shipping_method(sm)
-              rates << { :shipping_method => sm, :price => rate.total_price.to_d / 100 }
-            end
-          end
-        end        
-        all_rates << { :order_package => op, :rates => rates }        
-      end            
+      
+      # Remove any order packages      
+      LineItem.where(:order_id => order.id).update_all(:order_package_id => nil)
+      OrderPackage.where(:order_id => order.id).destroy_all      
+        
+      # Calculate what shipping packages we'll need            
+      OrderPackage.create_for_order(order)
+              
       return all_rates
     end
     

@@ -27,7 +27,8 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     
     if site.use_store      
       item = { 'id' => 'store', 'text' => 'Store', 'children' => [] }
-      item['children'] << { 'id' => 'categories'       , 'href' => '/admin/categories'        , 'text' => 'Categories'        , 'modal' => false } if user.is_allowed('categories'       , 'view')        
+      item['children'] << { 'id' => 'categories'       , 'href' => '/admin/categories'        , 'text' => 'Categories'        , 'modal' => false } if user.is_allowed('categories'       , 'view')
+      item['children'] << { 'id' => 'giftcards'        , 'href' => '/admin/gift-cards'        , 'text' => 'Gift Cards'        , 'modal' => false } if user.is_allowed('giftcards'        , 'view')
       item['children'] << { 'id' => 'orders'           , 'href' => '/admin/orders'            , 'text' => 'Orders'            , 'modal' => false } if user.is_allowed('orders'           , 'view')
       item['children'] << { 'id' => 'products'         , 'href' => '/admin/products'          , 'text' => 'Products'          , 'modal' => false } if user.is_allowed('products'         , 'view')
       item['children'] << { 'id' => 'shippingpackages' , 'href' => '/admin/shipping-packages' , 'text' => 'Shipping Packages' , 'modal' => false } if user.is_allowed('shippingpackages' , 'view')

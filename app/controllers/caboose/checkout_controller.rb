@@ -10,52 +10,57 @@ module Caboose
       redirect_to '/checkout/empty' if @order.line_items.empty?
     end
     
+    # Step 1 - Login or register
     # GET /checkout
-    def index
-      redirect_to '/checkout/step-one'
-    end
-            
-    # GET /checkout/step-one
-    def step_one
+    def index        
       if logged_in?
         if @order.customer_id.nil?
           @order.customer_id = logged_in_user.id
           @order.save
         end
-        redirect_to '/checkout/step-two'
+        redirect_to '/checkout/addresses'
         return        
       end
     end
     
-    # GET /checkout/step-two
-    def step_two
-      #redirect_to '/checkout/step-one' if !@order.shipping_address || !@order.billing_address
-      redirect_to '/checkout/step-one' if !logged_in?      
+    # Step 2 - Shipping and billing addresses
+    # GET /checkout/addresses
+    def addresses      
+      redirect_to '/checkout' if !logged_in?      
     end
     
-    # GET /checkout/step-three
-    def step_three
-      redirect_to '/checkout/step-one' and return if !logged_in?
-      redirect_to '/checkout/step-two' and return if @order.shipping_address.nil? || @order.billing_address.nil?
-
+    # Step 3 - Shipping method
+    # GET /checkout/shipping
+    def shipping
+      redirect_to '/checkout'           and return if !logged_in?
+      redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
+                  
       # Remove any order packages      
       LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
       OrderPackage.where(:order_id => @order.id).destroy_all      
-      
+        
       # Calculate what shipping packages we'll need            
       OrderPackage.create_for_order(@order)
       
-      # Now get the rates for those packages
-      Caboose.log("Getting rates...")      
+      # Now get the rates for those packages            
       @rates = ShippingCalculator.rates(@order)      
       Caboose.log(@rates.inspect)      
     end
     
-    # GET /checkout/step-four
-    def step_four
-      redirect_to '/checkout/step-one'   and return if !logged_in?
-      redirect_to '/checkout/step-two'   and return if @order.shipping_address.nil? || @order.billing_address.nil?
-      redirect_to '/checkout/step-three' and return if @order.shipping_service_code.nil?
+    # Step 4 - Gift cards
+    # GET /checkout/gift-cards
+    def gift_cards
+      redirect_to '/checkout'           and return if !logged_in?
+      redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
+      redirect_to '/checkout/shipping'  and return if @order.shipping_service_code.nil?
+    end
+    
+    # Step 5 - Payment
+    # GET /checkout/payment
+    def payment
+      redirect_to '/checkout'           and return if !logged_in?
+      redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
+      redirect_to '/checkout/shipping'  and return if @order.shipping_service_code.nil?      
       
       # Make sure all the variants still exist      
       @order.line_items.each do |li|
@@ -103,8 +108,8 @@ module Caboose
       }
     end
     
-    # PUT /checkout/address
-    def update_address
+    # PUT /checkout/addresses
+    def update_addresses
       
       # Grab or create addresses
       shipping_address = if @order.shipping_address then @order.shipping_address else Address.new end
@@ -177,7 +182,7 @@ module Caboose
           resp.errors = @order.errors.full_messages
         else
           @order.save
-          resp.redirect = '/checkout/step-two'
+          resp.redirect = '/checkout/addresses'
         end
       end
       render :json => resp            
@@ -190,29 +195,13 @@ module Caboose
     
     # PUT /checkout/shipping
     def update_shipping
-
-      rates = ShippingCalculator.rates(@order)
-        
-      if @site.store_config.calculate_packages
-        # TODO: Add the separate shipping costs for each package
-      else
-        @order.shipping_carrier      = params[:carrier]
-        @order.shipping_service_code = params[:service_code]
-        @order.shipping_service_name = params[:service_name]
-        
-        rates[0][:rates].each do |rate|
-          if rate[:carrier] == params[:carrier] && rate[:service_code] == params[:service_code]
-            @order.shipping = rate[:total_price]
-            break
-          end
-        end                 
-      end                       
-      render :json => { 
-        :success => @order.save, 
-        :errors => @order.errors.full_messages 
-        #:order => @order, 
-        #:selected_rate => ShippingCalculator.rate(@order) 
-      }
+      op = OrderPackage.find(params[:order_package_id])
+      op.shipping_method_id = params[:shipping_method_id]
+      op.total = params[:total]
+      op.save
+      op.order.calculate
+                                   
+      render :json => { :success => true }               
     end
     
     # GET /checkout/payment
@@ -254,6 +243,9 @@ module Caboose
       if ot.success
         order.financial_status = 'authorized'
         order.status = 'pending'
+         
+        # Take funds from any gift cards that were used on the order
+        order.take_gift_card_funds
         
         # Send out emails        
         OrdersMailer.configure_for_site(@site.id).customer_new_order(order).deliver
@@ -290,27 +282,6 @@ module Caboose
       
       render :layout => false
     end
-    
-    # GET /checkout/discount
-    #def discount
-    #  # TODO make it possible to use multiple discounts
-    #  
-    #  @gift_card = @order.discounts.first
-    #end
-    
-    # POST /checkout/update-discount
-    #def add_discount
-    #  gift_card = Discount.find_by_code(params[:gift_card_number])
-    #  
-    #  render :json => { :error => true, :message => 'Gift card not found.' } and return if gift_card.nil?
-    #  render :json => { :error => true, :message => 'Gift card has no remaining funds.' } and return if gift_card.amount_current <= 0
-    #  
-    #  @order.discounts.delete_all if @order.discounts.any?
-    #  @order.discounts << gift_card
-    #  @order.calculate_total
-    #  
-    #  render :json => { :success => true, :message => 'Gift card added successfully.' }
-    #end
     
     #def relay
     #  

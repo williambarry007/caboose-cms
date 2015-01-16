@@ -32,9 +32,8 @@ Caboose.Store.Modules.Checkout = (function() {
   
   self.initialize = function() {    
     switch (window.location.pathname.replace(/\/$/, "")) {
-      case '/checkout':
-      case '/checkout/step-one': self.step = 1; break;
-      case '/checkout/step-two': self.step = 2; break;
+      case '/checkout':           self.step = 1; break;
+      case '/checkout/addresses': self.step = 2; break;
     }
     
     self.$checkout = $('#checkout')
@@ -150,7 +149,7 @@ Caboose.Store.Modules.Checkout = (function() {
       data: $form.serialize(),
       success: function(response) {
         if (response.success) {
-          window.location = '/checkout/step-two';
+          window.location = '/checkout/addresses';
         } else {
           $form.find('.message').remove();
           $form.find('#' + response.address + ' h3').append($('<span/>').addClass('message error').text(response.errors[0]));

@@ -11,51 +11,50 @@ module Caboose
     belongs_to :customer, :class_name => 'Caboose::User'
     belongs_to :shipping_address, :class_name => 'Address'
     belongs_to :billing_address, :class_name => 'Address'
-    has_many :discounts, :through => :order_discounts
-    has_many :order_discounts
+    has_many :discounts    
     has_many :line_items, :after_add => :line_item_added, :after_remove => :line_item_removed, :order => :id
     has_many :order_packages, :class_name => 'Caboose::OrderPackage'
     has_many :order_transactions
     
     attr_accessible :id,
       :site_id,
-      :order_number,
+      :alternate_id,      
       :subtotal,
-      :tax,      
-      :shipping_carrier,
-      :shipping_service_code,
+      :tax,            
       :shipping,
       :handling,
-      :discount,
-      :amount_discounted,
+      :custom_discount,
+      :discount,      
       :total,
-      :status,
-      :payment_status,
-      :notes,
-      :referring_site,
-      :landing_site,
-      :landing_site_ref,
-      :cancel_reason,
-      :date_created,
-      :date_authorized,
-      :date_captured,
-      :date_cancelled,
-      :email,
-      :customer_id,
-      :payment_id,
-      :gateway_id,
-      :financial_status,
+      :customer_id,      
       :shipping_address_id,
       :billing_address_id,
+      :status,      
+      :financial_status,
+      :referring_site,
       :landing_page,
-      :landing_page_ref,
-      :transaction_d,
-      :auth_code,
-      :alternate_id,
+      :landing_page_ref,                        
       :auth_amount,
-      :date_shipped,
-      :transaction_service,
-      :transaction_id
+      :date_created,
+      :notes
+      
+      # :payment_status,
+      # :cancel_reason,      
+      # :date_authorized,
+      # :date_captured,
+      # :date_cancelled,
+      # :email,      
+      # :payment_id,
+      # :gateway_id,      
+      # :transaction_d,
+      # :auth_code,      
+      # :amount_discounted,
+      # :shipping_carrier,
+      # :shipping_service_code,
+      # :order_number,            
+      # :date_shipped,
+      # :transaction_service,
+      # :transaction_id
     
     STATUS_CART      = 'cart'
     STATUS_PENDING   = 'pending'    
@@ -166,36 +165,48 @@ module Caboose
     end
     
     def calculate
-      self.update_column(:subtotal, (self.calculate_subtotal * 100).ceil / 100.00)
-      self.update_column(:tax, (self.calculate_tax * 100).ceil / 100.00)
-      #self.update_column(:shipping, (self.calculate_shipping * 100).ceil / 100.00)
-      self.update_column(:handling, (self.calculate_handling * 100).ceil / 100.00)
-      self.update_column(:total, (self.calculate_total * 100).ceil / 100.00)
+      self.update_column(:subtotal , self.calculate_subtotal )
+      self.update_column(:tax      , self.calculate_tax      )
+      self.update_column(:shipping , self.calculate_shipping )
+      self.update_column(:handling , self.calculate_handling )
+      self.update_column(:discount , self.calculate_discount )
+      self.update_column(:total    , self.calculate_total    )
     end
     
     def calculate_subtotal
-      return 0 if self.line_items.empty?
-      self.line_items.collect { |line_item| line_item.price }.inject { |sum, price| sum + price }
+      return 0.0 if self.line_items.empty?
+      x = 0.0      
+      self.line_items.each{ |li| x = x + li.variant.price }
+      return x
     end
     
     def calculate_tax
-      return 0 if !self.shipping_address
+      return 0.0 if !self.shipping_address
       self.subtotal * TaxCalculator.tax_rate(self.shipping_address)
     end
     
-    def calculate_shipping
-      return 0 if !self.shipping_address || !self.shipping_service_code      
-      return 0.0
-      #ShippingCalculator.rates(self)
+    def calculate_shipping      
+      return 0.0 if self.order_packages.nil? || self.order_packages.count == 0
+      x = 0.0
+      self.order_packages.each{ |op| x = x + op.total }
+      return x
     end
     
     def calculate_handling
-      return 0 if !Caboose::store_handling_percentage
-      self.shipping * Caboose::store_handling_percentage.to_f
+      return 0.0 if self.site.nil? || self.site.store_config.nil?      
+      self.subtotal * self.site.store_config.handling_percentage.to_f
+    end
+    
+    def calculate_discount      
+      return 0.0 if self.discounts.nil? || self.discounts.count == 0
+      x = 0.0
+      self.discounts.each{ |d| x = x + d.amount }
+      x = x + self.custom_discount if self.custom_discount
+      return x
     end
     
     def calculate_total
-      [self.subtotal, self.tax, self.shipping, self.handling].compact.inject { |sum, price| sum + price }
+      return (self.subtotal + self.tax + self.shipping + self.handling) - self.discount
     end
     
     def shipping_and_handling
@@ -206,6 +217,15 @@ module Caboose
       count = 0
       self.line_items.each{ |li| count = count + li.quantity } if self.line_items
       return count
+    end
+    
+    def take_gift_card_funds
+      return if self.discounts.nil? || self.discounts.count == 0
+      self.discounts.each do |d|        
+        gc = d.gift_card
+        gc.balance = gc.balance - d.amount
+        gc.save
+      end
     end
   end
 end

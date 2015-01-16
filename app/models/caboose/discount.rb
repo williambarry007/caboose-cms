@@ -1,19 +1,14 @@
 module Caboose
   class Discount < ActiveRecord::Base
-    self.table_name  = 'store_discounts'
+    self.table_name  = 'store_order_discounts'
     self.primary_key = 'id'
-    
-    belongs_to :site
-    
+            
+    belongs_to :gift_card
+    belongs_to :order
     attr_accessible :id,
-      :site_id,
-      :name,              # The name of this discount
-      :code,              # The code the customer has to input to apply for this discount
-      :amount_current,
-      :amount_total,
-      :amount_flat,       # Amount of the savings flat off the total
-      :amount_percentage, # Amount of savings as a percentage off the total
-      :no_shipping,       # Whether or not it's a free shipping discount
-      :no_tax             # Whether or not it's a free shipping discount
+      :gift_card_id,
+      :order_id,
+      :amount      
+      
   end
 end

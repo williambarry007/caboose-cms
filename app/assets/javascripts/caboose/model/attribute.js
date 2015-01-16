@@ -27,7 +27,8 @@ Attribute.prototype = {
   image_refresh_delay: false,
   minute_increment: 15,
   hour_increment: 1,
-  show_check_all: true,  
+  show_check_all: true,
+  show_empty_option: false,  
   
   update_url: false,
   options_url: false,

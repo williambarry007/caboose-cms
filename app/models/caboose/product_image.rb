@@ -47,6 +47,16 @@ module Caboose
       self.image.url(size)
     end
     
+    def urls
+      {
+        :tiny   => self.url(:tiny),
+        :thumb  => self.url(:thumb),
+        :medium => self.url(:medium),
+        :large  => self.url(:large),
+        :huge   => self.url(:huge)
+      }      
+    end
+    
     def as_json(options={})
       self.attributes.merge({
         :urls => {

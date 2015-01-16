@@ -16,3 +16,4 @@
 //= require colorbox-rails
 //= require caboose/jquery.placeholder
 //= require caboose/modal_integration
+//= require caboose/admin_main

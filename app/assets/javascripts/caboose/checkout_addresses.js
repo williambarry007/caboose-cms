@@ -1,5 +1,5 @@
 
-Caboose.Store.Modules.CheckoutStep2 = (function() {
+Caboose.Store.Modules.CheckoutAddresses = (function() {
     
   self = {};
   
@@ -22,14 +22,14 @@ Caboose.Store.Modules.CheckoutStep2 = (function() {
   self.continue_handler = function(event) {    
     $('#message').html("<p class='loading'>Saving information...</p>");
     $.ajax({
-      url: '/checkout/address',
+      url: '/checkout/addresses',
       type: 'put',      
       data: $('#address_form').serialize(),
       success: function(resp) {
         if (resp.errors && resp.errors.length > 0)
           $('#message').html("<p class='note error'>" + resp.errors[0] + "</p>");
         else if (resp.success)
-          window.location = '/checkout/step-three';
+          window.location = '/checkout/shipping';
       }
     });
     return false;

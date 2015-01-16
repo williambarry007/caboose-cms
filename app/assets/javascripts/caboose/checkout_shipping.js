@@ -1,5 +1,5 @@
 
-Caboose.Store.Modules.CheckoutStep3 = (function() {
+Caboose.Store.Modules.CheckoutShipping = (function() {
     
   self = {};
    
@@ -18,15 +18,15 @@ Caboose.Store.Modules.CheckoutStep3 = (function() {
       url: '/checkout/shipping',
       type: 'put',      
       data: { 
-        carrier:      $(event.target).data('carrier'),
-        service_code: $(event.target).data('service-code'),
-        service_name: $(event.target).data('service-name')         
+        order_package_id:   $(event.target).data('order_package_id'),
+        shipping_method_id: $(event.target).data('shipping_method_id'),
+        total:              $(event.target).data('total')
       },
       success: function(resp) {
         if (resp.errors && resp.errors.length > 0)
           $('#message').html("<p class='note error'>" + resp.errors[0] + "</p>");
         else if (resp.success)
-          window.location = '/checkout/step-four';        
+          window.location = '/checkout/gift-cards';        
       }
     });
     return false;

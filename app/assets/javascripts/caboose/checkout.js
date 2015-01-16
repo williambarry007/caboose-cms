@@ -50,7 +50,7 @@ var CabooseCheckout = function() {
       event.preventDefault();
       
       $.ajax({
-        url: '/checkout/address',
+        url: '/checkout/addresses',
         type: 'put',
         data: $(event.delegateTarget).serialize(),
         success: function(response) {

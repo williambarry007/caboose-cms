@@ -1,49 +1,46 @@
 
-<div class='constrain'>
-  <table id="cart">
-  	<tr>
-  		<th>Item</th>
-  		<th>Quantity</th>
-  		<th>Subtotal</th>
-  	</tr>	
-  	<% @order.line_items.each do |line_item| %>
-  		<tr>
-  			<td>
-  				<%= line_item.variant.product.title %> - <%= line_item.variant.title %>
-  				
-  				<% line_item.customizations.each do |customization| %>
-  					<p><%= "- #{customization.variant.product.custom_input}: #{customization.custom_input}"%></p>
-  				<% end %>
-  			</td>
-  			<td align="right"><%= line_item.quantity %></td>
-  			<td align="right"><%= number_to_currency(line_item.subtotal) %></td>
-  		</tr>
-  	<% end %>	
-  	<tr>
-  		<td colspan="2" align="right">Subtotal</td>
-  		<td align="right"><%= number_to_currency(@order.subtotal) %></td>
-  	</tr>
-  	<% if @order.tax and @order.tax > 0 %>
-  		<tr>
-  			<td colspan="2" align="right">Tax <span class="float: right">+</span></td>
-  			<td align="right"><%= number_to_currency(@order.tax) %></td>
-  		</tr>
-  	<% end %>	
-  	<% if @order.shipping and @order.handling %>
-  		<tr>
-  		  <td colspan="2" align="right">Shipping &amp; Handling <span class="float: right">+</span></td>
-  		  <td align="right"><%= number_to_currency(@order.shipping + @order.handling) %></td>
-  		</tr>
-  	<% end %>	
-  	<% if @order.discounts.any? %>
-  		<tr>
-  		  <td colspan="2" align="right">Gift Card <span class="float: right">-</span></td>
-  		  <td align="right"><%= number_to_currency(@order.discounts.first.amount_current) %></td>
-  		</tr>
-  	<% end %>	
-  	<tr>
-  	  <td colspan="2" align="right">Total <span class="float: right">=</span></td>
-  	  <td align="right"><%= number_to_currency(@order.total) %></td>
-  	</tr>
-  </table>
-</div>
+<table class='cart'>
+  <tr>   
+    <th colspan='2'>Product</th>
+    <th>Quantity</th>
+    <th>Unit Price</th>
+    <th>Subtotal</th>
+  </tr>
+  <% @order.line_items.each do |li| %>
+    <tr data-id="<%= li.id %>">
+      <td valign='top'>
+        <% if li.variant.product_images.count > 0 %>              
+          <img src="<%= li.variant.product_images[0].image.url(:thumb) %>" width="150" />        
+        <% elsif li.variant.product.product_images.count > 0 %>              
+          <img src="<%= li.variant.product.product_images[0].image.url(:thumb) %>" width="150" />
+        <% end %>
+      </td>
+      <td valign='top'><%= li.title %></td>
+      <td valign='top' align='right' class='qty'      style='text-align: right;'><%= li.quantity %></td>
+      <td valign='top' align='right' class='price'    style='text-align: right;'><%= number_to_currency(li.price, :precision => 2) %></td>
+      <td valign='top' align='right' class='subtotal' style='text-align: right;'><%= number_to_currency(li.price, :precision => 2) %></td>
+    </tr>        
+  <% end %>                  
+  <tr><td colspan='4' align='right' style='text-align: right;'>Subtotal:            </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.subtotal                   , :precision => 2) %></td></tr>            
+  <tr><td colspan='4' align='right' style='text-align: right;'>Shipping & Handling: </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.shipping + @order.handling , :precision => 2) %></td></tr>  
+  <tr><td colspan='4' align='right' style='text-align: right;'>Tax:                 </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.tax                        , :precision => 2) %></td></tr>
+  <% if @order.discounts && @order.discounts.count > 0 %>
+    <% @order.discounts.each do |d| %>
+      <tr>
+        <td colspan='4' align='right' style='text-align: right;'>Gift card (<%= d.gift_card.code %>):</td>
+        <td align='right' style='text-align: right;'><%= number_to_currency(d.amount, :precision => 2) %></td>
+      </tr>    
+    <% end %>
+  <% end %>
+  <tr><td colspan='4' align='right' style='text-align: right;'>Total:               </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.total                      , :precision => 2) %></td></tr>
+</table>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+table.cart { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
+table.cart th { border: #ccc 1px solid; margin: 0; padding: 10px; text-align: center; font-weight: bold; color: #fff; background-image: url("//d9hjv462jiw15.cloudfront.net/assets/lockerroom/images/body_bg.jpg"); }
+table.cart td { border: #ccc 1px solid; margin: 0; padding: 10px; }
+
+</style>
+<% end %>

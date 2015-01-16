@@ -2,7 +2,7 @@
 // Checkout
 //
 
-Caboose.Store.Modules.CheckoutStep1 = (function() {
+Caboose.Store.Modules.CheckoutLoginRegister = (function() {
 
   // Steps
   // Step 1: Present non-editable cart and login/register/guest buttons.
@@ -19,8 +19,7 @@ Caboose.Store.Modules.CheckoutStep1 = (function() {
   
   self.initialize = function() {
     switch (window.location.pathname.replace(/\/$/, "")) {
-      case '/checkout':
-      case '/checkout/step-one': self.step = 1; break;      
+      case '/checkout': self.step = 1; break;      
     }
     
     $('#signin_form_container'   ).slideUp();
@@ -69,53 +68,6 @@ Caboose.Store.Modules.CheckoutStep1 = (function() {
     self.current_form = form;         
   };
   
-  //self.login_submit_handler = function(event) {
-  //  event.preventDefault();
-  //  var $form = $(event.target);
-  //  
-  //  $.ajax({
-  //    type: $form.attr('method'),
-  //    url: $form.attr('action'),
-  //    data: $form.serialize(),
-  //    success: function(response) {
-  //      if (response.error || (response.errors && response.errors.length > 0)) {
-  //        if ($form.find('.message').length) {
-  //          $form.find('.message').empty().addClass('error').text(response.error || response.errors[0]);
-  //        } else {
-  //          $form.append($('<span/>').addClass('message error').text(response.error || response.errors[0]));
-  //        }
-  //      } else {
-  //        if (response.logged_in) {
-  //          self.$login.after($('<p/>').addClass('alert').text('You are now signed in').css('text-align', 'center')).remove();
-  //          $.post('/checkout/attach-user');
-  //        } else {
-  //          self.$login.after($('<p/>').addClass('alert').text('Email successfully saved').css('text-align', 'center')).remove();
-  //        }
-  //      }
-  //      
-  //      self.fetch(self.render);
-  //    }
-  //  });
-  //};
-  
-  //self.continueHandler = function(event) {
-  //  $form = self.$address.find('form');
-  //  
-  //  $.ajax({
-  //    type: $form.attr('method'),
-  //    url: $form.attr('action'),
-  //    data: $form.serialize(),
-  //    success: function(response) {
-  //      if (response.success) {
-  //        window.location = '/checkout/step-two';
-  //      } else {
-  //        $form.find('.message').remove();
-  //        $form.find('#' + response.address + ' h3').append($('<span/>').addClass('message error').text(response.errors[0]));
-  //      }
-  //    }
-  //  });
-  //};
-  
   self.login_form_submit_handler = function(event) {    
     $('#message').html("<p class='loading'>Logging in...</p>");
     $.ajax({
@@ -131,7 +83,7 @@ Caboose.Store.Modules.CheckoutStep1 = (function() {
             type: 'post',            
             success: function(resp2) {
               if (resp2.error) $('#message').html("<p class='note error'>" + resp2.error + "</p>");
-              else window.location = '/checkout/step-two';
+              else window.location = '/checkout/addresses';
             }
           });          
         }
@@ -153,7 +105,7 @@ Caboose.Store.Modules.CheckoutStep1 = (function() {
           type: 'post',            
           success: function(resp2) {
             if (resp2.error) $('#message').html("<p class='note error'>" + resp2.error + "</p>");
-            else window.location = '/checkout/step-two';
+            else window.location = '/checkout/addresses';
           }
         });        
       }
@@ -169,7 +121,7 @@ Caboose.Store.Modules.CheckoutStep1 = (function() {
       data: $('#guest_form').serialize(),
       success: function(resp) {
         if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        else window.location = '/checkout/step-two';
+        else window.location = '/checkout/addresses';
       }
     });
     return false;

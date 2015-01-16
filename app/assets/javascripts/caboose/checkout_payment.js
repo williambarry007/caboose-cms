@@ -1,23 +1,25 @@
 
-Caboose.Store.Modules.CheckoutStep4 = (function() {
+Caboose.Store.Modules.CheckoutPayment = (function() {
 
   self = {
     is_confirm: false
   };    
   
   self.initialize = function() {
-    $('#checkout-confirm').hide();
+    //$('#checkout-confirm').hide();
     if (!SHOW_RELAY || SHOW_RELAY == false)
       $('#relay').hide();
+    $('#checkout-confirm').hide();
     self.bind_event_handlers();    
     self.expiration_change_handler();
   };
     
   self.bind_event_handlers = function() {
+    
     $('#payment select').change(self.expiration_change_handler);
     $('#checkout-continue button').click(self.continue_handler);
     $('#checkout-confirm #edit_payment').click(self.edit_payment_handler);                
-    
+          
     $(window).on('message', function(event) {
       relay_handler(event.originalEvent.data);
     });
@@ -40,8 +42,8 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
       {          
         $('#message').empty();
         $('#checkout-payment').hide();
-        $('#checkout-confirm').show();        
-        $('#confirm_card_number').html("Card ending in " + cc.substr(-4));
+        $('#checkout-confirm').show();
+        $('#confirm_card_number').html("Card ending in " + cc.substr(-4));                        
         $('#checkout-continue button').html("Confirm order");
         self.is_confirm = true;
       }
@@ -55,9 +57,7 @@ Caboose.Store.Modules.CheckoutStep4 = (function() {
   
   self.edit_payment_handler = function(event) {
     $('#checkout-confirm').hide();
-    $('#checkout-payment').show();
-    $('#checkout_nav4 a').removeClass('done').addClass('current');
-    $('#checkout_nav5 a').removeClass('current').addClass('not_done');
+    $('#checkout-payment').show();    
     $('#checkout-continue button').html("Continue");    
     self.is_confirm = false;    
   };

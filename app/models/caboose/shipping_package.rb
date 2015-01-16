@@ -126,6 +126,13 @@ module Caboose
       end
       return false
     end
+    
+    def uses_shipping_method(sm)
+      self.shipping_methods.each do |sm2|
+        return true if sm.id == sm2.id
+      end
+      return false
+    end
         
   end
 end

@@ -15,7 +15,7 @@ end
   <% if @logged_in_user.id == 1 %>    
     <p class='note error'>You are logged in as the admin user. Please <a href='/logout'>logout</a> and complete your order as a different user.</p>
   <% else %>
-    <form  action="/checkout/address" method="put" id='address_form'>
+    <form action="/checkout/addresses" method="put" id='address_form'>
       <section id="checkout-address">  
         <div class="wrapper">      
           <section>
@@ -58,7 +58,7 @@ end
 </div>
 
 <%= content_for :caboose_js do %>
-<%= javascript_include_tag 'caboose/checkout_step2' %>
+<%= javascript_include_tag 'caboose/checkout_addresses' %>
 <% end %>
 <%= content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/message_boxes' %>

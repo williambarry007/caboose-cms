@@ -1,6 +1,6 @@
   <section id='checkout-confirm'>
     <div class='wrapper'>  
-      <section id="line-items">          
+      <section id="line-items">         
         <table>
           <tr>
             <th>Product</th>
@@ -28,6 +28,8 @@
           <% end %>      
           <tr><td colspan='3' align='right' style='text-align: right;'>Total:               </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.total, :precision => 2) %></td></tr>
         </table>
+        <p><a href='#' id='redeem_gift_card'>Redeem gift card</a></p>
+        <div id='gift_card_redemption_form'></div>
       </section><br />
       <section id='shipping_address'>
         <% sa = @order.shipping_address %>        
@@ -37,7 +39,7 @@
           <%= "#{sa.address2}<br />" if sa.address2 and not sa.address2.empty? %>
           <%= "#{sa.city}, #{sa.state} #{sa.zip}" %>
         </address>        
-        <p><a href="/checkout/step-two">Edit shipping address</a></p>
+        <p><a href="/checkout/addresses">Edit shipping address</a></p>
       </section>
       <section id='billing_address'>        
         <% ba = @order.billing_address %>        
@@ -47,11 +49,11 @@
           <%= "#{ba.address2}<br />" if ba.address2 and not ba.address2.empty? %>
           <%= "#{ba.city}, #{ba.state} #{ba.zip}" %>
         </address>
-        <p><a href="/checkout/step-two">Edit billing address</a></p>
+        <p><a href="/checkout/addresses">Edit billing address</a></p>
       </section>
       <section id='shipping_method'>
         <p><%= @order.shipping_carrier %> <%= @order.shipping_service_name %> - <%= number_to_currency(@order.shipping) %></p>
-        <p><a href="/checkout/step-three">Edit shipping method</a></p>
+        <p><a href="/checkout/shipping">Edit shipping method</a></p>
       </section>
       <section id='payment_method'>
         <p id='confirm_card_number'></p>

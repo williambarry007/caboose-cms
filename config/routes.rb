@@ -329,39 +329,41 @@ Caboose::Engine.routes.draw do
   delete  "admin/ab-options/:id"                  => "ab_options#admin_delete"
   
   #=============================================================================
-  # Cart  
-  #=============================================================================
-  
-  get     '/cart'               => 'cart#index'
-  get     '/cart/items'         => 'cart#list'
-  get     '/cart/item-count'    => 'cart#item_count'
-  post    '/cart'               => 'cart#add'
-  put     '/cart/:line_item_id' => 'cart#update'
-  delete  '/cart/:line_item_id' => 'cart#remove'
-  
-  #=============================================================================
   # Reviews  
   #=============================================================================
   
   post    "/reviews/add"        => "reviews#add"
   
   #=============================================================================
+  # Cart  
+  #=============================================================================
+  
+  get     '/cart'                         => 'cart#index'
+  get     '/cart/items'                   => 'cart#list'
+  get     '/cart/item-count'              => 'cart#item_count'
+  post    '/cart'                         => 'cart#add'
+  post    '/cart/gift-cards'              => 'cart#add_gift_card'
+  delete  '/cart/discounts/:discount_id'  => 'cart#remove_discount'
+  put     '/cart/:line_item_id'           => 'cart#update'
+  delete  '/cart/:line_item_id'           => 'cart#remove'
+  
+  #=============================================================================
   # Checkout  
   #=============================================================================
   
   get  '/checkout'                 => 'checkout#index'
-  get  '/checkout/step-one'        => 'checkout#step_one'
-  get  '/checkout/step-two'        => 'checkout#step_two'
-  get  '/checkout/step-three'      => 'checkout#step_three'
-  get  '/checkout/step-four'       => 'checkout#step_four'  
+  post '/checkout/attach-user'     => 'checkout#attach_user'
+  post '/checkout/attach-guest'    => 'checkout#attach_guest'
+  get  '/checkout/addresses'       => 'checkout#addresses'
+  put  '/checkout/addresses'       => 'checkout#update_addresses'
+  get  '/checkout/shipping'        => 'checkout#shipping'
+  put  '/checkout/shipping'        => 'checkout#update_shipping'
+  get  '/checkout/gift-cards'      => 'checkout#gift_cards'  
+  get  '/checkout/payment'         => 'checkout#payment'  
   get  '/checkout/thanks'          => 'checkout#thanks'
   get  '/checkout/test-email'      => 'checkout#test_email'
-    
-  get  '/checkout/authnet-profile-form'       => 'checkout#authnet_profile_form'
-  put  '/checkout/address'                    => 'checkout#update_address'
-  post '/checkout/attach-user'                => 'checkout#attach_user'
-  post '/checkout/attach-guest'               => 'checkout#attach_guest'  
-  put  '/checkout/shipping'                   => 'checkout#update_shipping'  
+
+  get  '/checkout/authnet-profile-form'       => 'checkout#authnet_profile_form'          
   get  '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
   post '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
   get  '/checkout/authnet-relay'              => 'checkout#authnet_relay'
@@ -502,6 +504,24 @@ Caboose::Engine.routes.draw do
   get     "admin/orders/:order_id/shipping-address/json"  => "shipping_addresses#admin_json"      
   put     "admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"    
   
+  #=============================================================================
+  # Gift cards
+  #=============================================================================
+  
+  get    "/admin/gift-cards"                   => "gift_cards#admin_index"  
+  get    "/admin/gift-cards/json"              => "gift_cards#admin_json"
+  get    "/admin/gift-cards/new"               => "gift_cards#admin_new"        
+  get    "/admin/gift-cards/status-options"    => "gift_cards#admin_status_options"
+  get    "/admin/gift-cards/card-type-options" => "gift_cards#admin_card_type_options"
+  get    "/admin/gift-cards/:id/json"          => "gift_cards#admin_json_single"
+  get    "/admin/gift-cards/:id"               => "gift_cards#admin_edit"
+  put    "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_update"  
+  put    "/admin/gift-cards/:id"               => "gift_cards#admin_update"
+  post   "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_add"  
+  post   "/admin/gift-cards"                   => "gift_cards#admin_add"
+  delete "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_delete"
+  delete "/admin/gift-cards/:id"               => "gift_cards#admin_delete"
+      
   #=============================================================================
   # Vendors
   #=============================================================================

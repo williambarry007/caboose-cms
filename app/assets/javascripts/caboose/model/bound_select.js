@@ -66,7 +66,8 @@ BoundSelect = BoundControl.extend({
         .addClass('mb_fake')
         .css('width', $('#'+this2.el).outerWidth())        
         .on('change', function() {
-          $('#'+this2.el).val($('#'+this2.el+'_select').val());
+          var v = $('#'+this2.el+'_select').val();
+          $('#'+this2.el).val(v);                    
           this2.save();                     
         });        
       // Make sure the existing value is in the list of options
@@ -78,12 +79,15 @@ BoundSelect = BoundControl.extend({
           return false;
         }
       });
-      if (!exists)
+      if (!exists && !(this2.attribute.show_empty_option && (this2.attribute.value == '' || this2.attribute.value == null)))
+      {
         this2.attribute.options.unshift({ 
           value: this2.attribute.value,
           text: this2.attribute.text
         });
-
+      }      
+      if (this2.attribute.show_empty_option)      
+        select.append($('<option/>').val('').html('-- Empty --'));        
       $.each(this2.attribute.options, function(i, option) {
         var opt = $('<option/>')
           .val(option.value)
@@ -139,14 +143,19 @@ BoundSelect = BoundControl.extend({
   
   save: function() {
     this.attribute.value = $('#'+this.el).val();
-    var this2 = this;
+    var i = $('#' + this.el + "_container option[value='" + this.attribute.value + "']").index();
+    this.attribute.text = $('#' + this.el + " option").eq(i).text();
+    if (this.attribute.text == '' && this.attribute.show_empty_option)
+      this.attribute.text = '-- Empty --';
+        
+    var this2 = this;    
     this.model.save(this.attribute, function(resp) {      
       $(this2.attribute.options).each(function(i,opt) {
         if (opt.value == this2.attribute.value)
           this2.attribute.text = opt.text;        
-      });
+      });      
       if (this2.attribute.text)
-        $('#'+this2.el).val(this2.attribute.text);        
+        $('#'+this2.el).val(this2.attribute.text);
       $('#'+this2.el+'_check a').removeClass('loading');
       if (resp.error) this2.error(resp.error);
       else

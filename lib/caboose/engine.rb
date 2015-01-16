@@ -97,6 +97,7 @@ module Caboose
         'caboose/application.js',
         'caboose/authorize.net.js',        
         'caboose/cart.js',
+        'caboose/cart_old.js',
         'caboose/checkout_addresses.js',
         'caboose/checkout_gift_cards.js',
         'caboose/checkout_login_register.js',

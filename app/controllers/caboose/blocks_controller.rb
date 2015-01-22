@@ -140,7 +140,8 @@ module Caboose
             :csrf_meta_tags => '|CABOOSE_CSRF|',
             :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
             :logged_in_user => @logged_in_user,
-            :site => @site
+            :site => @site,
+            :page => p
           })
         }
       end

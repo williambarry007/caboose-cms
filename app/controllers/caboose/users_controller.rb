@@ -202,7 +202,7 @@ module Caboose
         resp.error = "That email is already in the system."
       else
         user.save
-        resp.redirect = "/admin/users/#{user.id}/edit"
+        resp.redirect = "/admin/users/#{user.id}"
       end
       
       render :json => resp

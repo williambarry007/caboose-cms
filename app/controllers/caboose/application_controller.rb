@@ -243,5 +243,17 @@ module Caboose
       return false
     end
     
+    # Standard methods used by model binder
+    def admin_index()       raise 'This method should be overridden.' end
+    def admin_json()        raise 'This method should be overridden.' end
+    def admin_json_single() raise 'This method should be overridden.' end
+    def admin_edit()        raise 'This method should be overridden.' end
+    def admin_update()      raise 'This method should be overridden.' end
+    def admin_bulk_update() raise 'This method should be overridden.' end        
+    def admin_add()         raise 'This method should be overridden.' end    
+    def admin_bulk_add()    raise 'This method should be overridden.' end
+    def admin_delete()      raise 'This method should be overridden.' end
+    def admin_bulk_delete() raise 'This method should be overridden.' end
+            
   end
 end

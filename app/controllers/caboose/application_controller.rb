@@ -234,7 +234,7 @@ module Caboose
       return s.value
     end
     
-    # RedirectsConverts querystrings into hashes    
+    # Redirects/Converts querystrings into hashes    
     def hashify_query_string
       if request.query_string && request.query_string.length > 0
         redirect_to request.url.gsub('?', '#')

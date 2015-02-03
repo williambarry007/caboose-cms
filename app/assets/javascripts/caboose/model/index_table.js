@@ -74,7 +74,8 @@ IndexTable.prototype = {
       it.quick_edit_model_id = model_id;
     it.print();       
   },    
-    
+
+  allow_add: true,
   allow_bulk_edit: true,
   allow_bulk_delete: true,
   allow_bulk_import: true,
@@ -186,7 +187,8 @@ IndexTable.prototype = {
           var m = that.models[i];                              
           m.id = parseInt(m.id);          
         }        
-        that.print();                        
+        that.print();
+        that.populate_search_form();
       },
       error: function() { $('#' + this.container).html("<p class='note error'>Error retrieving data.</p>"); }
     });
@@ -250,7 +252,7 @@ IndexTable.prototype = {
     else
     {
       var controls = $('<p/>');
-                                   controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_new'            ).val(that.new_model_text ).click(function(e) { that.new_form();       })).append(' ');                                   
+      if (this.allow_add         ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_new'            ).val(that.new_model_text ).click(function(e) { that.new_form();       })).append(' ');                                   
                                    controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_columns' ).val('Show/Hide Columns' ).click(function(e) { that.toggle_columns(); })).append(' ');
       if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'      ).val('Bulk Edit'         ).click(function(e) { that.bulk_edit();      })).append(' ');
       if (this.allow_bulk_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import'    ).val('Import'            ).click(function(e) { that.bulk_import();    })).append(' ');
@@ -294,6 +296,14 @@ IndexTable.prototype = {
         }
       });      
     }
+  },
+  
+  populate_search_form: function()
+  {    
+    var pp = this.pager_params();    
+    $.each(this.search_form_fields, function(i, f) {      
+      $('#' + f).val(pp[f]);
+    });      
   },
   
   all_models_selected: function()

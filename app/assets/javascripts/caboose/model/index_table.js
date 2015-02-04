@@ -278,18 +278,18 @@ IndexTable.prototype = {
 
     if (model_count > 0 && that.quick_edit_model_id)
     {      
-      var m = that.model_for_id(that.quick_edit_model_id);
+      var m = that.model_for_id(that.quick_edit_model_id);            
       $.each(that.fields, function(j, field) {
         if (field.show && field.editable)
         {            
           var attrib = $.extend({}, field);
           attrib['value'] = field.value(m);
           attrib['fixed_placeholder'] = false;
-          attrib['after_update'] = function() { that.refresh_single(m.id); };          
+          attrib['after_update'] = function() { that.refresh_single(m.id); };
           new ModelBinder({
             name: 'Model',
             id: m.id,
-            update_url: that.update_url(m.id, that),
+            update_url: that.update_url(that.quick_edit_model_id, that),
             authenticity_token: that.form_authenticity_token,
             attributes: [attrib]            
           });

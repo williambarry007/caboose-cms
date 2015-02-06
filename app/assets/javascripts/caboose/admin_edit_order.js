@@ -636,7 +636,7 @@ OrderController.prototype = {
     }
     $('#message').html("<p class='loading'>Voiding...</p>");
     $.ajax({
-      url: '/admin/orders/' + order_id + '/void',
+      url: '/admin/orders/' + that.order.id + '/void',
       success: function(resp) {
         if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
         if (resp.success) $('#message').html("<p class='note success'>" + resp.success + "</p>");
@@ -660,7 +660,7 @@ OrderController.prototype = {
     }
     $('#message').html("<p class='loading'>Capturing funds...</p>");
     $.ajax({
-      url: '/admin/orders/' + order_id + '/capture',
+      url: '/admin/orders/' + that.order.id + '/capture',
       success: function(resp) {
         if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
         if (resp.success) $('#message').html("<p class='note success'>" + resp.success + "</p>");

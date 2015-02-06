@@ -26,6 +26,7 @@ module Caboose
           when 'pp_name'                  then sc.pp_name                 = value
           when 'pp_username'              then sc.pp_username             = value
           when 'pp_password'              then sc.pp_password             = value
+          when 'pp_testing'               then sc.pp_testing              = value
           when 'ups_username'             then sc.ups_username            = value
           when 'ups_password'             then sc.ups_password            = value
           when 'ups_key'                  then sc.ups_key                 = value

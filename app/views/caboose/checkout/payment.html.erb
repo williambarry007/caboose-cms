@@ -7,8 +7,15 @@ store_config = @site.store_config
     <% if store_config.pp_name == 'authorize.net' %>        
       <form id="payment" target="relay" action="https://secure.authorize.net/gateway/transact.dll" method="post">
         <%= sim_fields(@sim_transaction) %>
-        <input id="x_invoice_num" name="x_invoice_num" type="hidden" value="<%= @order.id %>" />
-        <input id="x_description" name="x_after_relay" type="hidden" value="<%= raw "#{@request.protocol}#{@request.host_with_port}/checkout/authnet-response/#{@order.id}" %>" />
+        <input type="hidden" id="x_invoice_num" name="x_invoice_num" value="<%= @order.id %>" />
+        <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw "#{@request.protocol}#{@request.host_with_port}/checkout/authnet-response/#{@order.id}" %>" />                
+        <input type="hidden" id="x_first_name"  name="x_first_name"  value="<%= raw @order.billing_address.first_name %>" />
+        <input type="hidden" id="x_last_name"   name="x_last_name"   value="<%= raw @order.billing_address.last_name  %>" />       
+        <input type="hidden" id="x_address"     name="x_address"     value="<%= raw @order.billing_address.address1   %>" />      
+        <input type="hidden" id="x_city"        name="x_city"        value="<%= raw @order.billing_address.city       %>" />
+        <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @order.billing_address.state      %>" />
+        <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @order.billing_address.zip        %>" />
+        
         <p><input name="x_card_num" id='billing-cc-number' type="text" maxlength="16" placeholder="Card Number" /></p>                    
         <p>            
           <input id="expiration" name="x_exp_date" type="hidden" />

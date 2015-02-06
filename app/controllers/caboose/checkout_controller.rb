@@ -83,7 +83,11 @@ module Caboose
             #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
             :relay_response => 'TRUE',
             :relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay",
-            :transaction_type => 'AUTH_ONLY',            
+            :transaction_type => 'AUTH_ONLY',
+            :billing_address => AuthorizeNet::Address.new(
+              :first_name => 'John', 
+              :last_name => 'Doe'
+            )            
             :test => sc.pp_testing
           )
           @request = request

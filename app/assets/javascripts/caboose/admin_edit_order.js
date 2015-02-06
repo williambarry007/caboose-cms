@@ -643,6 +643,30 @@ OrderController.prototype = {
         if (resp.refresh) window.location.reload(true);
       }
     });
+  },
+  
+  capture_funds: function(confirm)
+  {
+    var that = this;    
+    if (!confirm)
+    {    
+      var p = $('<p/>').addClass('note confirm')
+        .append("Are you sure you want to charge " + that.order.total + " to the customer? ")
+        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.capture_funds(true); }))
+        .append(' ')
+        .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+      $('#message').empty().append(p);
+      return;
+    }
+    $('#message').html("<p class='loading'>Capturing funds...</p>");
+    $.ajax({
+      url: '/admin/orders/' + order_id + '/capture',
+      success: function(resp) {
+        if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) $('#message').html("<p class='note success'>" + resp.success + "</p>");
+        if (resp.refresh) window.location.reload(true);
+      }
+    });
   }
                               
   //resend_confirmation: function(order_id)
@@ -657,30 +681,7 @@ OrderController.prototype = {
   //    }
   //  });
   //},
-  //
-  //capture_funds: function(order_id, confirm)
-  //{
-  //  total = $('#total').html();
-  //  if (!confirm)
-  //  {    
-  //    var p = $('<p/>').addClass('note confirm')
-  //      .append("Are you sure you want to charge " + total + " to the customer? ")
-  //      .append($('<input/>').attr('type','button').val('Yes').click(function() { capture_funds(order_id, true); }))
-  //      .append(' ')
-  //      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); modal.autosize(); }));
-  //    modal.autosize(p);
-  //    return;
-  //  }
-  //  modal.autosize("<p class='loading'>Capturing funds...</p>");
-  //  $.ajax({
-  //    url: '/admin/orders/' + order_id + '/capture',
-  //    success: function(resp) {
-  //      if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
-  //      if (resp.success) modal.autosize("<p class='note success'>" + resp.success + "</p>");
-  //      if (resp.refresh) window.location.reload(true);
-  //    }
-  //  });
-  //},    
+  //      
   //
   //refund_order: function(order_id, confirm)
   //{

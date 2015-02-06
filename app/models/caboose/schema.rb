@@ -58,7 +58,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       #Caboose::PageCache => [:block],
       Caboose::ShippingPackage => [:price, :carrier, :service_code, :service_name, :shipping_method_id, :length, :width, :height],
       Caboose::Site => [:shipping_cost_function],
-      Caboose::StoreConfig => [:use_usps, :allowed_shipping_codes, :default_shipping_code],
+      Caboose::StoreConfig => [:use_usps, :allowed_shipping_codes, :default_shipping_code, :pp_relay_url, :pp_response_url],
       Caboose::Variant => [:quantity],
       Caboose::Vendor => [:vendor, :vendor_id]
     }
@@ -557,9 +557,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :pp_name                 , :string  ],
         [ :pp_username             , :string  ],
         [ :pp_password             , :string  ],
-        [ :pp_testing              , :boolean , { :default => true }],
-        [ :pp_relay_url            , :string  ],        
-        [ :pp_response_url         , :string  ],
+        [ :pp_testing              , :boolean , { :default => true }],        
+        [ :pp_relay_domain         , :string  ],                
         [ :ups_username            , :string  ],
         [ :ups_password            , :string  ],
         [ :ups_key                 , :string  ],

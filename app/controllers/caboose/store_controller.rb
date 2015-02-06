@@ -27,7 +27,7 @@ module Caboose
           when 'pp_username'              then sc.pp_username             = value
           when 'pp_password'              then sc.pp_password             = value
           when 'pp_testing'               then sc.pp_testing              = value
-          when 'pp_relay_url'             then sc.pp_relay_url            = value
+          when 'pp_relay_domain'          then sc.pp_relay_domain         = value
           when 'ups_username'             then sc.ups_username            = value
           when 'ups_password'             then sc.ups_password            = value
           when 'ups_key'                  then sc.ups_key                 = value

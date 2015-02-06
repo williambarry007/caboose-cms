@@ -83,7 +83,7 @@ module Caboose
             #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
             :relay_response => 'TRUE',
             #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay",
-            :relay_url => sc.pp_relay_url,
+            :relay_url => "#{sc.pp_relay_domain}/checkout/authnet-relay",
             :transaction_type => 'AUTH_ONLY',                        
             :test => sc.pp_testing
           )

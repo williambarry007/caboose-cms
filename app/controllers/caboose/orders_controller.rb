@@ -54,30 +54,36 @@ module Caboose
       
       resp = Caboose::StdClass.new      
       order = Order.find(params[:id])
+      t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
       
       if order.financial_status == 'captured'
         resp.error = "This order has already been captured, you will need to refund instead"
+      elsif t.nil?
+        resp.error = "This order doesn't seem to be authorized."
       else
-        
-        t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true)
+                
         sc = @site.store_config
-        response = AuthorizeNet::SIM::Transaction.new(
-          sc.pp_username, 
-          sc.pp_password,                      
-          order.total,
-          :transaction_type => 'VOID',
-          :transaction_id => t.transaction_id
-        )                    
-        order.update_attributes(
-          :financial_status => 'voided',
-          :status => 'cancelled'
-        )
-        order.save
-          
-        # Add the variant quantities ordered back
-        #order.cancel
-          
-        resp.success = "Order voided successfully"                     
+        case sc.pp_name
+          when 'authorize.net'        
+                    
+            response = AuthorizeNet::SIM::Transaction.new(
+              sc.pp_username, 
+              sc.pp_password,                      
+              order.total,
+              :transaction_type => 'VOID',
+              :transaction_id => t.transaction_id
+            )                    
+            order.update_attributes(
+              :financial_status => 'voided',
+              :status => 'cancelled'
+            )
+            order.save          
+            # TODO: Add the variant quantities ordered back        
+            resp.success = "Order voided successfully"
+          when 'payscape'
+            # TODO: Implement payscape void order
+        end
+        
       end
     
       render :json => resp
@@ -240,24 +246,34 @@ module Caboose
     def capture_funds
       return if !user_is_allowed('orders', 'edit')
       
-      response = Caboose::StdClass.new({
-        'refresh' => nil,
-        'error'   => nil,
-        'success' => nil
-      })
-      
+      response = Caboose::StdClass.new
       order = Order.find(params[:id])
+      t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
       
       if order.financial_status == 'captured'
         resp.error = "Funds for this order have already been captured."    
       elsif order.total > order.auth_amount
         resp.error = "The order total exceeds the authorized amount."
+      elsif t.nil?
+        resp.error = "This order doesn't seem to be authorized."
       else
-        if PaymentProcessor.capture(order)
-          order.update_attribute(:financial_status, 'captured')
-          response.success = 'Captured funds successfully'
-        else
-          response.error = 'Error capturing funds'
+                        
+        sc = @site.store_config
+        case sc.pp_name
+          when 'authorize.net'
+            
+            response = AuthorizeNet::SIM::Transaction.new(
+              sc.pp_username, 
+              sc.pp_password,
+              order.total,
+              :transaction_type => 'CAPTURE_ONLY',
+              :transaction_id => t.transaction_id
+            )                
+            order.update_attribute(:financial_status, 'captured')
+            resp.success = 'Captured funds successfully'
+          when 'payscape'
+            # TODO: Implement capture funds for payscape
+
         end
           
         #if (order.discounts.any? && order.total < order.discounts.first.amount_current) || PaymentProcessor.capture(order)
@@ -273,6 +289,7 @@ module Caboose
         #else
         #  response.error = "Error capturing funds."
         #end
+        
       end
       
       render :json => response

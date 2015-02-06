@@ -8,7 +8,7 @@ store_config = @site.store_config
       <form id="payment" target="relay" action="https://secure.authorize.net/gateway/transact.dll" method="post">
         <%= sim_fields(@sim_transaction) %>
         <input type="hidden" id="x_invoice_num" name="x_invoice_num" value="<%= @order.id %>" />
-        <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw store_config.pp_response_url      %>/<%= @order.id %>" />        
+        <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw store_config.pp_relay_domain      %>/checkout/authnet-response/<%= @order.id %>" />        
         <input type="hidden" id="x_first_name"  name="x_first_name"  value="<%= raw @order.billing_address.first_name %>" />
         <input type="hidden" id="x_last_name"   name="x_last_name"   value="<%= raw @order.billing_address.last_name  %>" />       
         <input type="hidden" id="x_address"     name="x_address"     value="<%= raw @order.billing_address.address1   %>" />      

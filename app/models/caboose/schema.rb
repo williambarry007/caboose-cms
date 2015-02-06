@@ -559,6 +559,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :pp_password             , :string  ],
         [ :pp_testing              , :boolean , { :default => true }],
         [ :pp_relay_url            , :string  ],        
+        [ :pp_response_url         , :string  ],
         [ :ups_username            , :string  ],
         [ :ups_password            , :string  ],
         [ :ups_key                 , :string  ],

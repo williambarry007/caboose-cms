@@ -52,33 +52,35 @@ module Caboose
     def admin_void
       return if !user_is_allowed('orders', 'edit')
       
-      response = Caboose::StdClass.new({
-        'refresh' => nil,
-        'error' => nil,
-        'success' => nil
-      })
-      
+      resp = Caboose::StdClass.new      
       order = Order.find(params[:id])
       
       if order.financial_status == 'captured'
-        response.error = "This order has already been captured, you will need to refund instead"
+        resp.error = "This order has already been captured, you will need to refund instead"
       else
-        if PaymentProcessor.void(order)
-          order.update_attributes(
-            :financial_status => 'voided',
-            :status => 'cancelled'
-          )
+        
+        t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true)
+        sc = @site.store_config
+        response = AuthorizeNet::SIM::Transaction.new(
+          sc.pp_username, 
+          sc.pp_password,                      
+          order.total,
+          :transaction_type => 'VOID',
+          :transaction_id => t.transaction_id
+        )                    
+        order.update_attributes(
+          :financial_status => 'voided',
+          :status => 'cancelled'
+        )
+        order.save
           
-          # Add the variant quantities ordered back
-          #order.cancel
+        # Add the variant quantities ordered back
+        #order.cancel
           
-          response.success = "Order voided successfully"
-        else
-          response.error = "Error voiding order."
-        end
+        resp.success = "Order voided successfully"                     
       end
     
-      render :json => response
+      render :json => resp
     end
   
     # GET /admin/orders/:id/refund

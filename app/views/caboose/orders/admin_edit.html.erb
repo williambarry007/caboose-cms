@@ -11,7 +11,7 @@
 <input type='button' value='< Back' onclick="window.location='/admin/orders';" />
 <% if @order.financial_status == 'authorized' %>
   <input type='button' value='Capture Funds' onclick="capture_funds(<%= @order.id %>);" />
-  <input type='button' value='Void' onclick="void_order(<%= @order.id %>);" />
+  <input type='button' value='Void' onclick="controller.void_order();" />
 <% end %>
 <% if @order.financial_status == 'captured' %>
   <input type='button' value='Refund' onclick="refund_order(<%= @order.id %>);" />

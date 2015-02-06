@@ -9,6 +9,7 @@ sc = @store_config
 <p><div id='storeconfig_<%= sc.id %>_pp_name'                 ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_pp_username'             ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_pp_password'             ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_pp_relay_url'            ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_pp_testing'              ></div></p>
 
 <h2>Fulfillment Contacts</h2>
@@ -69,6 +70,7 @@ $(document).ready(function() {
       { name: 'pp_username'          , nice_name: 'Username'             , type: 'text'     , value: <%= raw Caboose.json(sc.pp_username            ) %>, width: 400 },
       { name: 'pp_password'          , nice_name: 'Password'             , type: 'text'     , value: <%= raw Caboose.json(sc.pp_password            ) %>, width: 400 },
       { name: 'pp_testing'           , nice_name: 'Test Mode'            , type: 'checkbox' , value: <%= raw Caboose.json(sc.pp_testing ? 1 : 0     ) %>, width: 400 },
+      { name: 'pp_relay_url'         , nice_name: 'Relay URL'            , type: 'text'     , value: <%= raw Caboose.json(sc.pp_relay_url           ) %>, width: 400 },
       { name: 'fulfillment_email'    , nice_name: 'Fulfillment Email'    , type: 'text'     , value: <%= raw Caboose.json(sc.fulfillment_email      ) %>, width: 400 },
       { name: 'shipping_email'       , nice_name: 'Shipping Email'       , type: 'text'     , value: <%= raw Caboose.json(sc.shipping_email         ) %>, width: 400 },
       { name: 'handling_percentage'  , nice_name: 'Handling Percentage'  , type: 'text'     , value: <%= raw Caboose.json(sc.handling_percentage    ) %>, width: 400 },

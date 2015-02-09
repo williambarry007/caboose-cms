@@ -2,11 +2,11 @@
 sa = @order.shipping_address
 ba = @order.billing_address
 if sa.nil?
-  q = ["status <> ? and id < ?", 'cart', @order.id]
+  q = ["status <> ? and id < ? and customer_id = ?", 'cart', @order.id, @order.customer_id]
   if Caboose::Order.where(q).exists?    
     last_order = Caboose::Order.where(q).first
     sa = last_order.shipping_address
-    ba = last_order.billing_address
+    ba = last_order.billing_address      
   end
 end
 %>
@@ -14,10 +14,10 @@ end
 <div id="checkout">  
   <% if @logged_in_user.id == 1 %>    
     <p class='note error'>You are logged in as the admin user. Please <a href='/logout'>logout</a> and complete your order as a different user.</p>
-  <% else %>
+  <% else %>    
     <form action="/checkout/addresses" method="put" id='address_form'>
       <section id="checkout-address">  
-        <div class="wrapper">      
+        <div class="wrapper">          
           <section>
             <fieldset id="shipping">
               <h3>Shipping Address</h3>

@@ -27,6 +27,7 @@ module Caboose
     # GET /checkout/addresses
     def addresses      
       redirect_to '/checkout' if !logged_in?      
+      @logged_in_user = logged_in_user      
     end
     
     # Step 3 - Shipping method
@@ -44,7 +45,8 @@ module Caboose
       
       # Now get the rates for those packages            
       @rates = ShippingCalculator.rates(@order)      
-      Caboose.log(@rates.inspect)      
+      #Caboose.log(@rates.inspect)
+      @logged_in_user = logged_in_user      
     end
     
     # Step 4 - Gift cards
@@ -53,6 +55,7 @@ module Caboose
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
       redirect_to '/checkout/shipping'  and return if @order.has_empty_shipping_methods?
+      @logged_in_user = logged_in_user
     end
     
     # Step 5 - Payment
@@ -93,10 +96,12 @@ module Caboose
         when 'payscape'
           @form_url = Caboose::PaymentProcessor.form_url(@order)
       end
+      @logged_in_user = logged_in_user
     end
     
     # GET /checkout/thanks
     def thanks
+      @logged_in_user = logged_in_user
     end
     
     #===========================================================================
@@ -153,9 +158,10 @@ module Caboose
     end
     
     # POST /checkout/attach-user
-    def attach_user            
+    def attach_user              
       render :json => { :success => false, :errors => ['User is not logged in'] } and return if !logged_in?
       @order.customer_id = logged_in_user.id
+      #Caboose.log("Attaching user to order: customer_id = #{@order.customer_id}")
       render :json => { :success => @order.save, :errors => @order.errors.full_messages, :logged_in => logged_in? }
     end
     

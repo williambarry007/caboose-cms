@@ -62,8 +62,8 @@ module Caboose
       else                        
         create_new_order = true                         
       end
-        
-      if create_new_order # Create an order to associate with the session        
+              
+      if create_new_order # Create an order to associate with the session                
         @order = Caboose::Order.new
         @order.site_id          = @site ? @site.id : nil
         @order.status           = Caboose::Order::STATUS_CART

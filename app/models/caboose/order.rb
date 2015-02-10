@@ -94,7 +94,7 @@ module Caboose
     # Callbacks
     #
     
-    after_update :calculate
+    #after_update :calculate
     
     #
     # Methods

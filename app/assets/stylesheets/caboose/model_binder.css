@@ -69,7 +69,7 @@
   margin: 3px 0 0 1px;
   padding: 8px 0 6px 0;
   background: #ccc;
-  color: #000;
+  color: #000 !important;
   text-align: center;
   border: #666 1px solid;
 }

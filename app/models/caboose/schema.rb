@@ -543,6 +543,18 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :authentication       , :string ], # :plain, :login, :cram_md5.
         [ :enable_starttls_auto , :boolean , { :default => true }]
       ],
+      Caboose::SocialConfig => [
+        [ :site_id              , :integer ],
+        [ :facebook_page_id     , :string ],
+        [ :twitter_username     , :string ],
+        [ :instagram_username   , :string ],
+        [ :youtube_url          , :string ],
+        [ :pinterest_url        , :string ],
+        [ :vimeo_url            , :string ],
+        [ :rss_url              , :string ],
+        [ :google_plus_url      , :string ],
+        [ :linkedin_url         , :string ]
+      ],
       Caboose::StackableGroup => [       
         [ :name           , :string  ],
         [ :extra_length   , :decimal ],

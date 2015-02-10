@@ -42,6 +42,7 @@ Caboose::Engine.routes.draw do
   post    "admin/sites/:site_id/domains"           => "domains#admin_add"
   put     "admin/sites/:site_id/domains/:id"       => "domains#admin_update"
   delete  "admin/sites/:site_id/domains/:id"       => "domains#admin_delete"
+  put     "admin/sites/:site_id/domains/:id/set-primary" => "domains#admin_set_primary"
   
   #=============================================================================
   # Store
@@ -64,6 +65,14 @@ Caboose::Engine.routes.draw do
   get     "admin/smtp"               => "smtp#admin_edit"  
   put     "admin/smtp"               => "smtp#admin_update"
     
+  #=============================================================================
+  # Social
+  #=============================================================================  
+  
+  get     "admin/social"               => "social#admin_edit"  
+  put     "admin/social"               => "social#admin_update"
+
+
   #=============================================================================
   # Shipping Packages
   #=============================================================================

@@ -57,8 +57,23 @@ module Caboose
     def admin_delete
       return if !user_is_allowed('sites', 'delete')
       Domain.find(params[:id]).destroy
-      render :json => { 'redirect' => "/admin/sites/#{params[:site_id]}" }
+      render :json => { 'refresh' => "/admin/sites/#{params[:site_id]}" }
     end
+
+    # PUT /admin/sites/:site_id/domains/:id/set-primary
+    def admin_set_primary
+      return if !user_is_allowed('domains', 'edit')
+      resp = StdClass.new     
+      d = Domain.find(params[:id])
+      save = true
+    #  d.primary = value
+      Domain.where(:site_id => params[:site_id]).all.each do |d2|
+        d2.primary = d2.id == d.id ? true : false
+        d2.save
+      end      
+      resp.success = save && d.save
+      render :json => resp
+    end 
             
   end
 end

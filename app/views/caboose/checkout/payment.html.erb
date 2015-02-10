@@ -16,8 +16,25 @@ store_config = @site.store_config
         <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @order.billing_address.state      %>" />
         <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @order.billing_address.zip        %>" />
         
-        <p><input name="x_card_num" id='billing-cc-number' type="text" maxlength="16" placeholder="Card Number" /></p>                    
-        <p>            
+
+        
+        <div class="field" id="credit-card">
+          <span class="field-text">Credit Card</span>
+          <div class="icons">
+            <img src="/assets/caboose/credit_cards.png" alt="Credit Cards Accepted" />
+          </div>
+        </div>
+
+        <div class="field" id="card-number">
+          <span class="field-text">Card</span>
+          <input name="x_card_num" id='billing-cc-number' type="text" maxlength="16" placeholder="Card number" />
+          <div class="icons">
+            <img src="/assets/caboose/lock.png" alt="Secure Connection" />
+          </div>
+        </div>
+
+        <div class="field" id="expiry">
+          <span class="field-text">Expiry</span>
           <input id="expiration" name="x_exp_date" type="hidden" />
           <select id="month" name="month">                                      
             <option value="01">01 - Jan</option>
@@ -39,7 +56,11 @@ store_config = @site.store_config
               <option value="<%= i-2000 %>"><%= i %></option>
             <% end %>
           </select>
-        </p>                                                                  
+        </div>
+
+
+
+
       </form>        
     <% end %>
   </section>

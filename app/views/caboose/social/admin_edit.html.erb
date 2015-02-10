@@ -1,0 +1,46 @@
+<%
+sc = @social_config
+%>
+<h1>Social Media Config</h1>
+
+<p>Find your Facebook page ID <a href="http://findmyfacebookid.com/" target="_blank">here</a>.</p>
+<p><div id="socialconfig_<%= sc.id %>_facebook_page_id"     ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_twitter_username"     ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_instagram_username"   ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_youtube_url"          ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_pinterest_url"        ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_vimeo_url"            ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_rss_url"              ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_google_plus_url"      ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_linkedin_url"         ></div></p>
+      
+<div id='message'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+    
+  new ModelBinder({
+    name: 'SocialConfig',
+    id: <%= sc.id %>,
+    update_url: '/admin/social',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [      
+      { name: 'facebook_page_id' , nice_name: 'Facebook Page ID' , type: 'text', value: <%= raw Caboose.json(sc.facebook_page_id) %>, width: 400 },
+      { name: 'twitter_username' , nice_name: 'Twitter Username' , type: 'text', value: <%= raw Caboose.json(sc.twitter_username) %>, width: 400 },
+      { name: 'instagram_username' , nice_name: 'Instagram Username' , type: 'text', value: <%= raw Caboose.json(sc.instagram_username) %>, width: 400 },
+      { name: 'youtube_url' , nice_name: 'YouTube URL' , type: 'text', value: <%= raw Caboose.json(sc.youtube_url) %>, width: 400 },
+      { name: 'pinterest_url' , nice_name: 'Pinterest URL' , type: 'text', value: <%= raw Caboose.json(sc.pinterest_url) %>, width: 400 },
+      { name: 'vimeo_url' , nice_name: 'Vimeo URL' , type: 'text', value: <%= raw Caboose.json(sc.vimeo_url) %>, width: 400 },
+      { name: 'rss_url' , nice_name: 'RSS Feed URL' , type: 'text', value: <%= raw Caboose.json(sc.rss_url) %>, width: 400 },
+      { name: 'google_plus_url' , nice_name: 'Google Plus URL' , type: 'text', value: <%= raw Caboose.json(sc.google_plus_url) %>, width: 400 },
+      { name: 'linkedin_url' , nice_name: 'LinkedIn URL' , type: 'text', value: <%= raw Caboose.json(sc.linkedin_url) %>, width: 400 }
+    ]    
+  });
+      
+});
+
+</script>
+<% end %>

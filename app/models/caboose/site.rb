@@ -13,6 +13,10 @@ class Caboose::Site < ActiveRecord::Base
   def smtp_config
     c = Caboose::SmtpConfig.where(:site_id => self.id).first
   end
+
+  def social_config
+    s = Caboose::SocialConfig.where(:site_id => self.id).first
+  end
   
   def self.id_for_domain(domain)
     d = Caboose::Domain.where(:domain => domain).first

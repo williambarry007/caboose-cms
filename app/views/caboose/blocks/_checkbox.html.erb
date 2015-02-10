@@ -1,0 +1,9 @@
+<%
+checked = block.value.to_i
+checked = checked == 1 ? true : false
+%>
+<% if editing %>
+  <div id='block_<%= block.id %>'><%= raw block.block_type.description %> = <%= (checked ? "Yes" : "No") %></div>
+<% else %>
+  <%= raw block.block_type.description %>
+<% end %>

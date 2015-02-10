@@ -171,5 +171,18 @@ module Caboose
       end
     end
     
+    # TODO: Implement product sales
+    #def self.products_on_sale
+    #        
+    #  query[0] = "select distinct product_id from store_variants 
+    #    where sale_price is not null 
+    #    and date_sale_starts < now() 
+    #    and date_sale_ends > now()
+    #    order by title limit 20"          
+    #  rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))
+    #  arr = rows.collect{ |row| { :id => row[0], :title => row[1] }}
+    #  
+    #end
+    
   end
 end

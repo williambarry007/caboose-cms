@@ -16,8 +16,10 @@ module Caboose
     # GET /admin/block-types/json
     def admin_json
       h = {        
-        'name'           => '',
-        'description'    => '',                
+        'name'              => '',
+        'description'       => '',
+        'name_like'         => '',
+        'description_like'  => '',
       }
       if params[:parent_id]
         h['parent_id'] = ''

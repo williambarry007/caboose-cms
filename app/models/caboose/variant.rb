@@ -17,6 +17,9 @@ module Caboose
       :product_id,
       :barcode,            # Returns the barcode value of the variant.
       :price,              # Variant’s price.
+      :sale_price,
+      :date_sale_starts,
+      :date_sale_end,
       :ignore_quantity,
       :quantity,
       :quantity_in_stock,
@@ -92,5 +95,6 @@ module Caboose
       arr << self.option3 if self.option3 && self.option3.strip.length > 0
       return arr
     end
+     
   end
 end

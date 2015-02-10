@@ -64,15 +64,15 @@ module Caboose
       end
         
       if create_new_order # Create an order to associate with the session        
-        @order = Caboose::Order.create(
-          :site_id          => @site ? @site.id : nil,
-          :status           => Caboose::Order::STATUS_CART,
-          :financial_status => Caboose::Order::STATUS_PENDING,
-          :date_created     => DateTime.now,
-          :referring_site   => request.env['HTTP_REFERER'],
-          :landing_page     => request.fullpath,
-          :landing_page_ref => params[:ref] || nil
-        )
+        @order = Caboose::Order.new
+        @order.site_id          = @site ? @site.id : nil
+        @order.status           = Caboose::Order::STATUS_CART
+        @order.financial_status = Caboose::Order::STATUS_PENDING
+        @order.date_created     = DateTime.now
+        @order.referring_site   = request.env['HTTP_REFERER']
+        @order.landing_page     = request.fullpath
+        @order.landing_page_ref = params[:ref] || nil
+        @order.save
         # Save the cart ID in the session
         session[:cart_id] = @order.id
       end                  

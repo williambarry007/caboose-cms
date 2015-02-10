@@ -625,7 +625,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :sku                   , :string   ],
         [ :barcode               , :string   ],
         [ :price                 , :numeric   , :default => 0 ],
-        [ :sale_price            , :numberic  , :default => 0 ],
+        [ :sale_price            , :numeric   , :default => 0 ],
         [ :date_sale_starts      , :datetime ],
         [ :date_sale_end         , :datetime ],
         [ :available             , :boolean  ],

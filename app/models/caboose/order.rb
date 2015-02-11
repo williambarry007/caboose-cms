@@ -71,6 +71,18 @@ module Caboose
       :in      => ['pending', 'authorized', 'captured', 'refunded', 'voided'],
       :message => "%{value} is not a valid financial status. Must be 'authorized', 'captured', 'refunded' or 'voided'"
     }
+    
+    after_initialize :check_nil_fields
+    
+    def check_nil_fields
+      self.subtotal        = 0.00 if self.subtotal.nil?       
+      self.tax             = 0.00 if self.tax.nil?
+      self.shipping        = 0.00 if self.shipping.nil?
+      self.handling        = 0.00 if self.handling.nil?
+      self.custom_discount = 0.00 if self.custom_discount.nil?
+      self.discount        = 0.00 if self.discount.nil?
+      self.total           = 0.00 if self.total.nil?
+    end
         
     def packages
       self.order_packages

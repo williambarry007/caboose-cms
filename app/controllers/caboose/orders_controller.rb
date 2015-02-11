@@ -4,7 +4,7 @@ module Caboose
     # GET /admin/orders/weird-test
     def admin_weird_test
       Caboose.log("Before the admin_weird_test")
-      @order = Order.new
+      x = Order.new
       Caboose.log("After the admin_weird_test")      
     end
     

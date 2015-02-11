@@ -47,7 +47,7 @@ module Caboose
       @logged_in_user = logged_in_user  
       
       # Initialize the card
-      init_cart if @site && @site.use_store
+      init_cart if @site && @site.use_store && !domain.under_construction
       
       before_action
     end
@@ -62,7 +62,7 @@ module Caboose
       else                        
         create_new_order = true                         
       end
-              
+
       if create_new_order # Create an order to associate with the session
         Caboose.log(@order)
         @order = Caboose::Order.new

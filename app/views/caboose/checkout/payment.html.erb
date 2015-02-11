@@ -89,7 +89,9 @@ store_config = @site.store_config
     </section>
     <section id='shipping_method'>
       <h3>Shipping</h3>
-      <p><%= @order.shipping_carrier %> <%= @order.shipping_service_name %> - <%= number_to_currency(@order.shipping) %></p>
+      <% @order.order_packages.each do |op| %>        
+        <p><%= op.shipping_method.service_name %> - <%= number_to_currency(op.total) %></p>
+      <% end %>
       <p><a href="/checkout/shipping">Edit</a></p>
     </section>
     <section id='payment_method'>

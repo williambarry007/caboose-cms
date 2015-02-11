@@ -1,6 +1,13 @@
 module Caboose
   class OrdersController < Caboose::ApplicationController
     
+    # GET /admin/orders/weird-test
+    def admin_weird_test
+      Caboose.log("Before the admin_weird_test")
+      @order = Order.new
+      Caboose.log("After the admin_weird_test")      
+    end
+    
     # GET /admin/orders
     def admin_index
       return if !user_is_allowed('orders', 'view')

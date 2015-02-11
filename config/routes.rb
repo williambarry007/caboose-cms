@@ -474,6 +474,7 @@ Caboose::Engine.routes.draw do
   # Orders
   #=============================================================================
   
+  get     "/admin/orders/weird-test"                  => "orders#admin_weird_test"
   get     "/admin/orders"                             => "orders#admin_index"
   get     "/admin/orders/test-info"                   => "orders#admin_mail_test_info"
   get     "/admin/orders/test-gmail"                  => "orders#admin_mail_test_gmail"  

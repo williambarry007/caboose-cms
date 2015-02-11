@@ -17,6 +17,12 @@ module Caboose
     STATUS_PENDING = 'Pending'
     STATUS_SHIPPED = 'Shipped'
     
+    after_initialize :check_nil_fields
+    
+    def check_nil_fields      
+      self.total = 0.00 if self.total.nil?
+    end
+    
     def self.custom_order_packages(store_config, order)          
       eval(store_config.order_packages_function)    
     end

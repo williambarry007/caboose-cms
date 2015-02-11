@@ -26,6 +26,14 @@ module Caboose
     CARD_TYPE_PERCENTAGE  = 'Percentage'
     CARD_TYPE_NO_SHIPPING = 'No Shipping'
     CARD_TYPE_NO_TAX      = 'No Tax'
+    
+    after_initialize :check_nil_fields
+    
+    def check_nil_fields
+      self.total           = 0.00 if self.total.nil?
+      self.balance         = 0.00 if self.balance.nil?          
+      self.min_order_total = 0.00 if self.min_order_total.nil?  
+    end
 
     def valid_for_order?(order)
       return false if self.status != GiftCard::STATUS_ACTIVE

@@ -19,6 +19,12 @@ module Caboose
     TYPE_VOID      = 'void'
     TYPE_REFUND    = 'refund'
     
+    after_initialize :check_nil_fields
+    
+    def check_nil_fields
+      self.amount = 0.00 if self.amount.nil?        
+    end
+    
   end
 end
    

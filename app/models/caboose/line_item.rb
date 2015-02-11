@@ -48,7 +48,12 @@ module Caboose
     #
     
     before_save :update_price
-    after_save { self.order.calculate }
+    after_save { self.order.calculate }    
+    after_initialize :check_nil_fields
+    
+    def check_nil_fields
+      self.price = 0.00 if self.price.nil?        
+    end
     
     #
     # Methods

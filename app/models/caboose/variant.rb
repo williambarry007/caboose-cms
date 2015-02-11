@@ -39,6 +39,13 @@ module Caboose
       :cylinder,
       :shipping_unit_value
     
+    after_initialize :check_nil_fields
+    
+    def check_nil_fields
+      self.price       = 0.00 if self.price.nil?
+      self.sale_price  = 0.00 if self.sale_price.nil?                  
+    end
+    
     #
     # Class Methods
     #

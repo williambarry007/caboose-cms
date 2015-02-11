@@ -54,7 +54,27 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :repeat_start  , 
         :repeat_end        
       ],
-      Caboose::Order => [:shipping_method, :shipping_method_code],      
+      Caboose::Order => [
+        :shipping_method       , 
+        :shipping_method_code  ,
+        :email                 ,
+        :order_number          ,
+        :payment_id            ,
+        :gateway_id            ,
+        :date_authorized       ,
+        :date_captured         ,
+        :date_cancelled        ,                
+        :shipping_carrier      ,
+        :shipping_service_code ,
+        :shipping_service_name ,        
+        :transaction_id        ,
+        :transaction_id        ,
+        :transaction_service   ,
+        :amount_discounted     ,
+        :auth_code             ,                
+        :date_shipped          ,                        
+        :decremented           
+      ],        
       #Caboose::PageCache => [:block],
       Caboose::ShippingPackage => [:price, :carrier, :service_code, :service_name, :shipping_method_id, :length, :width, :height],
       Caboose::Site => [:shipping_cost_function],
@@ -237,7 +257,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Discount => [
         [ :gift_card_id , :integer  ],
         [ :order_id     , :integer  ],                
-        [ :amount       , :numeric  , { :default => 0.0 }]        
+        [ :amount       , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }]        
       ],
       Caboose::Domain => [
         [ :site_id            , :integer ],
@@ -250,9 +270,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name            , :string   ],
         [ :code            , :string   ],
         [ :card_type       , :string   ],
-        [ :total           , :numeric  , { :default => 0.0 }],
-        [ :balance         , :numeric  , { :default => 0.0 }],
-        [ :min_order_total , :numeric , { :default => 0.0 }],        
+        [ :total           , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :balance         , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :min_order_total , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],        
         [ :date_available  , :datetime ],
         [ :date_expires    , :datetime ],
         [ :status          , :string   ]                                
@@ -265,7 +285,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :quantity              , :integer   , :default => 0 ],
         [ :status                , :string   ],
         [ :tracking_number       , :string   ],        
-        [ :price                 , :numeric   , :default => 0 ],
+        [ :price                 , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
         [ :notes                 , :text     ],
         [ :custom1               , :string   ],
         [ :custom2               , :string   ],
@@ -292,7 +312,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :order_id              , :integer  ],
         [ :date_processed        , :datetime ],
         [ :transaction_type      , :string   ],
-        [ :amount                , :numeric   , :default => 0 ],        
+        [ :amount                , :decimal   , { :precision => 8, :scale => 2, :default => 0 }],        
         [ :transaction_id        , :string   ],
         [ :auth_code             , :string   ],
         [ :response_code         , :string   ],
@@ -308,18 +328,18 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :shipping_package_id  , :integer ],
         [ :status               , :string  ],
         [ :tracking_number      , :string  ],
-        [ :total                , :decimal , { :default => 0.0 }]
+        [ :total                , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }]
       ],
       Caboose::Order => [
         [ :site_id               , :integer  ],
         [ :alternate_id          , :integer  ],        
-        [ :subtotal              , :numeric   , :default => 0.00 ],
-        [ :tax                   , :numeric   , :default => 0.00 ],
-        [ :shipping              , :numeric   , :default => 0.00 ],
-        [ :handling              , :numeric   , :default => 0.00 ],
-        [ :custom_discount       , :numeric   , :default => 0.00 ],
-        [ :discount              , :numeric   , :default => 0.00 ],
-        [ :total                 , :numeric   , :default => 0.00 ],
+        [ :subtotal              , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :tax                   , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :shipping              , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :handling              , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :custom_discount       , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :discount              , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :total                 , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
         [ :customer_id           , :integer  ],
         [ :financial_status      , :string   ],
         [ :shipping_address_id   , :integer  ],
@@ -330,7 +350,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :referring_site        , :text     ],
         [ :landing_page          , :string   ],
         [ :landing_page_ref      , :string   ],
-        [ :auth_amount           , :numeric  ]
+        [ :auth_amount           , :decimal  , { :precision => 8, :scale => 2 }]
         
         #[ :email                 , :string   ],
         #[ :order_number          , :string   ],
@@ -624,8 +644,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :alternate_id          , :string   ],
         [ :sku                   , :string   ],
         [ :barcode               , :string   ],
-        [ :price                 , :numeric   , :default => 0.00 ],
-        [ :sale_price            , :numeric   , :default => 0.00 ],
+        [ :price                 , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :sale_price            , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
         [ :date_sale_starts      , :datetime ],
         [ :date_sale_end         , :datetime ],
         [ :available             , :boolean  ],
@@ -645,10 +665,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :taxable               , :boolean  ],        
         [ :shipping_unit_value   , :numeric  ],        
         [ :status                , :string   ],
-        [ :option1_sort_order    , :integer  , { :defult => 0 }],
-        [ :option2_sort_order    , :integer  , { :defult => 0 }],
-        [ :option3_sort_order    , :integer  , { :defult => 0 }],
-        [ :sort_order            , :integer  , { :defult => 0 }]
+        [ :option1_sort_order    , :integer  , { :default => 0 }],
+        [ :option2_sort_order    , :integer  , { :default => 0 }],
+        [ :option3_sort_order    , :integer  , { :default => 0 }],
+        [ :sort_order            , :integer  , { :default => 0 }]
       ],
       Caboose::Vendor => [
         [ :site_id      , :integer    ],

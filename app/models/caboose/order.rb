@@ -9,10 +9,10 @@ module Caboose
 
     belongs_to :site    
     belongs_to :customer, :class_name => 'Caboose::User'
-    belongs_to :shipping_address, :class_name => 'Address'
-    belongs_to :billing_address, :class_name => 'Address'
+    belongs_to :shipping_address, :class_name => 'Caboose::Address'
+    belongs_to :billing_address, :class_name => 'Caboose::Address'
     has_many :discounts    
-    has_many :line_items, :after_add => :line_item_added, :after_remove => :line_item_removed, :order => :id
+    has_many :line_items, :order => :id
     has_many :order_packages, :class_name => 'Caboose::OrderPackage'
     has_many :order_transactions
     
@@ -156,13 +156,13 @@ module Caboose
       PaymentProcessor.void(self)
     end
     
-    def line_item_added(line_item)
-      self.calculate
-    end
-    
-    def line_item_removed(line_item)
-      self.calculate
-    end
+    #def line_item_added(line_item)
+    #  self.calculate
+    #end
+    #
+    #def line_item_removed(line_item)
+    #  self.calculate
+    #end
     
     def calculate
       self.update_column(:subtotal , self.calculate_subtotal )

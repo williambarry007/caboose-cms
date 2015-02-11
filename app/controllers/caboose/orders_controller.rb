@@ -5,7 +5,8 @@ module Caboose
     def admin_weird_test
       Caboose.log("Before the admin_weird_test")
       x = Order.new
-      Caboose.log("After the admin_weird_test")      
+      Caboose.log("After the admin_weird_test")
+      render :json => x      
     end
     
     # GET /admin/orders

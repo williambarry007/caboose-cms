@@ -16,28 +16,28 @@ module Caboose
     #has_many :order_packages, :class_name => 'Caboose::OrderPackage'
     #has_many :order_transactions
     
-    attr_accessible :id,
-      :site_id,
-      :alternate_id,      
-      :subtotal,
-      :tax,            
-      :shipping,
-      :handling,
-      :custom_discount,
-      :discount,      
-      :total,
-      :customer_id,      
-      :shipping_address_id,
-      :billing_address_id,
-      :status,      
-      :financial_status,
-      :referring_site,
-      :landing_page,
-      :landing_page_ref,                        
-      :auth_amount,
-      :date_created,
-      :notes
-      
+    #attr_accessible :id,
+    #  :site_id,
+    #  :alternate_id,      
+    #  :subtotal,
+    #  :tax,            
+    #  :shipping,
+    #  :handling,
+    #  :custom_discount,
+    #  :discount,      
+    #  :total,
+    #  :customer_id,      
+    #  :shipping_address_id,
+    #  :billing_address_id,
+    #  :status,      
+    #  :financial_status,
+    #  :referring_site,
+    #  :landing_page,
+    #  :landing_page_ref,                        
+    #  :auth_amount,
+    #  :date_created,
+    #  :notes
+    #  
       # :payment_status,
       # :cancel_reason,      
       # :date_authorized,
@@ -56,11 +56,11 @@ module Caboose
       # :transaction_service,
       # :transaction_id
     
-    STATUS_CART      = 'cart'
-    STATUS_PENDING   = 'pending'    
-    STATUS_CANCELED  = 'canceled'
-    STATUS_SHIPPED   = 'shipped'
-    STATUS_TESTING   = 'testing'
+    #STATUS_CART      = 'cart'
+    #STATUS_PENDING   = 'pending'    
+    #STATUS_CANCELED  = 'canceled'
+    #STATUS_SHIPPED   = 'shipped'
+    #STATUS_TESTING   = 'testing'
     
     #
     # Scopes

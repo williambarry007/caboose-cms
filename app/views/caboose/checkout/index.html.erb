@@ -17,7 +17,8 @@
         <div class="constrain" id='signin_form_container'>  
           <form action="/login" method="post" id='signin_form'>
             <p><input name="username" type="text"     placeholder="Email"    /></p>
-            <p><input name="password" type="password" placeholder="Password" /></p>
+            <label class="small">Password:</label>
+            <p><input name="password" type="password" /></p>
             <p><input type="submit" value="Continue" /></p>
           </form>
         </div>      
@@ -27,8 +28,10 @@
             <p><input name="last_name"  type="text"     placeholder="Last Name"  /></p>
             <p><input name="email"      type="text"     placeholder="Email"      /></p>
             <p><input name="phone"      type="text"     placeholder="Phone"      /></p>
-            <p><input name="pass1"      type="password" placeholder="Password"   /></p>
-            <p><input name="pass2"      type="password" placeholder="Confirm Password" /></p>
+            <label class="small">Password:</label>
+            <p><input name="pass1"      type="password"    /></p>
+            <label class="small">Confirm Password:</label>
+            <p><input name="pass2"      type="password"  /></p>
             <p><input name='newsletter' id='newsletter' type='checkbox' value='1' /> <label for='newsletter'>Send me updates on new products and special deals</label></p> 
             <p><input type="submit" value="Continue" /></p>
           </form>
@@ -51,4 +54,12 @@
 <%= content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/message_boxes' %>
 <%= stylesheet_link_tag 'caboose/checkout' %>
+<style>
+label.small {
+  font-size: 14px;
+  margin: 0 0 3px 0;
+  padding-left: 5px;
+  color: rgb(79, 79, 79);
+}
+</style>
 <% end %>

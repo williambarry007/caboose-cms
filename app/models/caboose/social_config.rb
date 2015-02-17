@@ -12,6 +12,7 @@ class Caboose::SocialConfig < ActiveRecord::Base
     :vimeo_url            ,
     :rss_url              ,
     :google_plus_url      ,
-    :linkedin_url         
+    :linkedin_url         , 
+    :google_analytics_id  
     
 end

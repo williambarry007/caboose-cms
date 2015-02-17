@@ -573,7 +573,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :vimeo_url            , :string ],
         [ :rss_url              , :string ],
         [ :google_plus_url      , :string ],
-        [ :linkedin_url         , :string ]
+        [ :linkedin_url         , :string ],
+        [ :google_analytics_id  , :string ]
       ],
       Caboose::StackableGroup => [       
         [ :name           , :string  ],

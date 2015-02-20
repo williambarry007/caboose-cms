@@ -27,7 +27,7 @@ b = @block
     <%
     #kids = cat.block_types.where("parent_id is null and (site_id is null or site_id = ?)", @site.id).reorder(:name).all
     arr = ["parent_id is null and block_type_category_id = ? and block_type_site_memberships.site_id = ?", cat.id, @site.id]     
-    kids = Caboose::BlockType.includes(:block_type_site_memberships).where(arr).reorder(:name).all
+    kids = Caboose::BlockType.includes(:block_type_site_memberships).where(arr).reorder(:description).all
     %>
     <% if kids && kids.count > 0 %>
       <h2 onclick="$('#cat<%= cat.id %>_container').slideToggle();"><%= cat.name %></h3>

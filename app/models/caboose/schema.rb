@@ -145,6 +145,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :block_type_id         , :integer ],
         [ :sort_order            , :integer , { :default => 0 }],
         [ :constrain             , :boolean , { :default => false }],
+        [ :full_width            , :boolean , { :default => false }],
         [ :name                  , :string  ],
         [ :value                 , :text    ],
         [ :file                  , :attachment ],
@@ -171,6 +172,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :options_function                , :text    ],
         [ :options_url                     , :string  ],
         [ :default_constrain               , :boolean , { :default => false }],
+        [ :default_full_width              , :boolean , { :default => false }],
         [ :share                           , :boolean , { :default => true  }],
         [ :downloaded                      , :boolean , { :default => false }]
       ],

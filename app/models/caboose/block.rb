@@ -27,6 +27,7 @@ class Caboose::Block < ActiveRecord::Base
     :block_type_id,
     :sort_order,
     :constrain,
+    :full_width,
     :name,
     :value        
     
@@ -402,6 +403,13 @@ class Caboose::Block < ActiveRecord::Base
       end      
     end
     return changed            
+  end
+  
+  def constrain_all         
+    self.children.each do |b|
+      return false if b.full_width == true
+    end
+    return true
   end
 
 end

@@ -21,6 +21,7 @@ end
   <p><div id='block_<%= @block.id %>_block_type_id' ></div></p>
   <p><div id='block_<%= @block.id %>_parent_id'     ></div></p>
   <p><div id='block_<%= @block.id %>_constrain'     ></div></p>
+  <p><div id='block_<%= @block.id %>_full_width'    ></div></p>
 </div>
 <div id='message'></div>
 <p>
@@ -76,6 +77,16 @@ $(document).ready(function() {
       nice_name: 'Constrain', 
       type: 'checkbox', 
       value: <%= raw Caboose.json(b.constrain ? 1 : 0) %>, 
+      width: 400, 
+      fixed_placeholder: true, 
+      after_update: function() { parent.controller.render_blocks(); },
+      after_cancel: function() { parent.controller.render_blocks(); },
+      on_load: function() { that.modal.autosize(); }
+    },{ 
+      name: 'full_width', 
+      nice_name: 'Full Width', 
+      type: 'checkbox', 
+      value: <%= raw Caboose.json(b.full_width ? 1 : 0) %>, 
       width: 400, 
       fixed_placeholder: true, 
       after_update: function() { parent.controller.render_blocks(); },

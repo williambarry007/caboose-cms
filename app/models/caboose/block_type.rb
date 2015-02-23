@@ -18,7 +18,7 @@ class Caboose::BlockType < ActiveRecord::Base
     :use_render_function_for_layout,
     :allow_child_blocks,
     :default_child_block_type_id,
-    :render_function,
+    :render_function,    
     :field_type, 
     :default, 
     :width,
@@ -28,6 +28,7 @@ class Caboose::BlockType < ActiveRecord::Base
     :options_function,
     :options_url,
     :icon,
+    :default_constrain,
     :share,      # Whether or not to share the block type in the existing block store.
     :downloaded  # Whether the full block type has been download or just the name and description.
     

@@ -20,6 +20,7 @@ end
 <div id='advanced'>
   <p><div id='block_<%= @block.id %>_block_type_id' ></div></p>
   <p><div id='block_<%= @block.id %>_parent_id'     ></div></p>
+  <p><div id='block_<%= @block.id %>_constrain'     ></div></p>
 </div>
 <div id='message'></div>
 <p>
@@ -67,6 +68,16 @@ $(document).ready(function() {
       width: 400,
       fixed_placeholder: true,        
       options_url: '/admin/pages/<%= b.page_id %>/block-options',        
+      after_update: function() { parent.controller.render_blocks(); },
+      after_cancel: function() { parent.controller.render_blocks(); },
+      on_load: function() { that.modal.autosize(); }
+    },{ 
+      name: 'constrain', 
+      nice_name: 'Constrain', 
+      type: 'checkbox', 
+      value: <%= raw Caboose.json(b.constrain ? 1 : 0) %>, 
+      width: 400, 
+      fixed_placeholder: true, 
       after_update: function() { parent.controller.render_blocks(); },
       after_cancel: function() { parent.controller.render_blocks(); },
       on_load: function() { that.modal.autosize(); }

@@ -26,6 +26,7 @@ class Caboose::Block < ActiveRecord::Base
     :parent_id,
     :block_type_id,
     :sort_order,
+    :constrain,
     :name,
     :value        
     

@@ -144,7 +144,7 @@ module Caboose
     def calculate_subtotal
       return 0.0 if self.line_items.empty?
       x = 0.0      
-      self.line_items.each{ |li| x = x + li.variant.price }
+      self.line_items.each{ |li| x = x + (li.variant.price * li.quantity) } # Fixed issue with quantity
       return x
     end
     

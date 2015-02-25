@@ -156,7 +156,7 @@ module Caboose
       if value.to_i > 0 # Add to category                   
         if cat_id == 'all'
           CategoryMembership.where(:product_id => self.id).destroy_all      
-          Category.reorder(:name).all.each{ |cat| CategoryMembership.create(:product_id => self.id, :category_id => cat.id) }                          
+          Category.where(:site_id => self.site_id).reorder(:name).all.each{ |cat| CategoryMembership.create(:product_id => self.id, :category_id => cat.id) }                          
         else
           if !CategoryMembership.where(:product_id => self.id, :category_id => cat_id.to_i).exists?
             CategoryMembership.create(:product_id => self.id, :category_id => cat_id.to_i)

@@ -91,6 +91,11 @@ module Caboose
       render :json => resp
     end
     
+    # GET /admin/vendors/options
+    def options      
+      render :json => Vendor.where(:site_id => @site.id).reorder(:name).all.collect{ |v| { :value => v.id, :text => v.name }}      
+    end
+    
     # GET /admin/vendors/status-options
     def status_options      
       render :json => [

@@ -536,6 +536,7 @@ Caboose::Engine.routes.draw do
   # Vendors
   #=============================================================================
   
+  get     '/admin/vendors/options'        => 'vendors#options'
   get     '/admin/vendors/status-options' => 'vendors#status_options'    
   get     '/admin/vendors/new'            => 'vendors#admin_new'
   get     '/admin/vendors/:id'            => 'vendors#admin_edit'

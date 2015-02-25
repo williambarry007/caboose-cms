@@ -48,7 +48,7 @@ $(document).ready(function() {
   m = new ModelBinder({
     name: 'Variant',
     id: <%= v.id %>,
-    update_url: '/admin/variants/<%= v.id %>',
+    update_url: '/admin/products/<%= v.product_id %>/variants/<%= v.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       <% if p.option1 %>{ name: 'option1' , nice_name: <%= raw Caboose.json(p.option1) %> , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.option1                ) %>, width: 250 },<% end %>

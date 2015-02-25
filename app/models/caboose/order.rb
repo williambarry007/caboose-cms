@@ -205,6 +205,20 @@ module Caboose
       return false
     end
     
+    def has_downloadable_items?
+      self.line_items.each do |li|
+        return true if li.variant.downloadable
+      end
+      return false
+    end
+    
+    def has_shippable_items?
+      self.line_items.each do |li|
+        return true if !li.variant.downloadable
+      end
+      return false
+    end
+    
   end
 end
 

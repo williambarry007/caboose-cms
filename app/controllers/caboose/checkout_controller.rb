@@ -36,6 +36,11 @@ module Caboose
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
                   
+      if !@order.has_shippable_items?
+        redirect_to '/checkout/gift-cards'
+        return
+      end
+      
       # Remove any order packages      
       LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
       OrderPackage.where(:order_id => @order.id).destroy_all      
@@ -44,7 +49,8 @@ module Caboose
       OrderPackage.create_for_order(@order)
       
       # Now get the rates for those packages            
-      @rates = ShippingCalculator.rates(@order)      
+      @rates = ShippingCalculator.rates(@order)
+      
       #Caboose.log(@rates.inspect)
       @logged_in_user = logged_in_user      
     end
@@ -54,7 +60,7 @@ module Caboose
     def gift_cards
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
-      redirect_to '/checkout/shipping'  and return if @order.has_empty_shipping_methods?
+      redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
       @logged_in_user = logged_in_user
     end
     
@@ -63,7 +69,7 @@ module Caboose
     def payment
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
-      redirect_to '/checkout/shipping'  and return if @order.has_empty_shipping_methods?      
+      redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?      
       
       # Make sure all the variants still exist      
       @order.line_items.each do |li|
@@ -102,6 +108,10 @@ module Caboose
     # GET /checkout/thanks
     def thanks
       @logged_in_user = logged_in_user
+      
+      # Find the last order for the user
+      @last_order = Order.where(:customer_id => @logged_in_user.id).order("id desc").limit(1).first
+            
     end
     
     #===========================================================================
@@ -120,19 +130,23 @@ module Caboose
       # Grab or create addresses
       shipping_address = if @order.shipping_address then @order.shipping_address else Address.new end
       billing_address  = if @order.billing_address  then @order.billing_address  else Address.new end
-      
+            
+      has_shippable_items = @order.has_shippable_items?
+        
       # Shipping address
-      shipping_address.first_name = params[:shipping][:first_name]
-      shipping_address.last_name  = params[:shipping][:last_name]
-      shipping_address.company    = params[:shipping][:company]
-      shipping_address.address1   = params[:shipping][:address1]
-      shipping_address.address2   = params[:shipping][:address2]
-      shipping_address.city       = params[:shipping][:city]
-      shipping_address.state      = params[:shipping][:state]
-      shipping_address.zip        = params[:shipping][:zip]
+      if has_shippable_items
+        shipping_address.first_name = params[:shipping][:first_name]
+        shipping_address.last_name  = params[:shipping][:last_name]
+        shipping_address.company    = params[:shipping][:company]
+        shipping_address.address1   = params[:shipping][:address1]
+        shipping_address.address2   = params[:shipping][:address2]
+        shipping_address.city       = params[:shipping][:city]
+        shipping_address.state      = params[:shipping][:state]
+        shipping_address.zip        = params[:shipping][:zip]
+      end
       
       # Billing address
-      if params[:use_as_billing]
+      if has_shippable_items && params[:use_as_billing]
         billing_address.update_attributes(shipping_address.attributes)
       else
         billing_address.first_name = params[:billing][:first_name]
@@ -146,7 +160,7 @@ module Caboose
       end
       
       # Save address info; generate ids
-      render :json => { :success => false, :errors => shipping_address.errors.full_messages, :address => 'shipping' } and return if !shipping_address.save
+      render :json => { :success => false, :errors => shipping_address.errors.full_messages, :address => 'shipping' } and return if has_shippable_items && !shipping_address.save
       render :json => { :success => false, :errors => billing_address.errors.full_messages, :address => 'billing' } and return if !billing_address.save
       
       # Associate address info with order

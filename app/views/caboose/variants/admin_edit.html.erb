@@ -3,7 +3,7 @@ p = @product
 v = @variant
 %>
 <h1>Edit Variant</h1>
-
+<p><strong>Product:</strong> <%= p.title %></p>
 <table>
   <tr>
     <td valign='top'>
@@ -15,6 +15,7 @@ v = @variant
 <div id='variant_<%= v.id %>_requires_shipping'  ></div>
 <div id='variant_<%= v.id %>_allow_backorder'    ></div>
 <div id='variant_<%= v.id %>_taxable'            ></div>
+<div id='variant_<%= v.id %>_downloadable'       ></div>
     </td><td valign='top'>
 <h2>Inventory</h2>
 <div id='variant_<%= v.id %>_alternate_id'       ></div>
@@ -33,9 +34,11 @@ v = @variant
     </td>
   </tr>
 </table>
+<div id='variant_<%= v.id %>_download_path'      ></div>
 <div id='message'></div>
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/products/<%= p.id %>/variants';" />
+<input type='button' value='Generate Download URL' onclick="download_url();" />
 <input type='button' value='Delete Variant' onclick="delete_variant(<%= v.id %>);" />
 </p>
 
@@ -68,15 +71,38 @@ $(document).ready(function() {
       { name: 'requires_shipping'         , nice_name: 'Requires shipping'                , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.requires_shipping      ) %>, width: 250 }, 
       { name: 'taxable'                   , nice_name: 'Taxable'                          , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.taxable                ) %>, width: 250 },
       { name: 'allow_backorder'           , nice_name: 'Allow backorder'                  , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.allow_backorder        ) %>, width: 250 }, 
-      { name: 'status'                    , nice_name: 'Status'                           , type: 'select'   , align: 'right' , value: <%= raw Caboose.json(v.status) %>, text: <%= raw Caboose.json(v.status) %>, width: 250, options_url: '/admin/variants/status-options' }      
+      { name: 'status'                    , nice_name: 'Status'                           , type: 'select'   , align: 'right' , value: <%= raw Caboose.json(v.status                 ) %>, width: 250, options_url: '/admin/variants/status-options' },
+      { name: 'downloadable'              , nice_name: 'Downloadable'                     , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.downloadable           ) %>, width: 250 },
+      { name: 'download_path'             , nice_name: 'Download path'                    , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.download_path          ) %>, width: 800 }      
     ]
   });
 });
 
-var modal = false;
-$(window).load(function() {
-  modal = new CabooseModal(800);
-});
+function download_url(expires_in)
+{
+  if (!expires_in)
+  {
+    var p = $('<p/>').addClass('note')
+      .append("For how many minutes do you want the download link to be valid?<br />")
+      .append($('<input/>').attr('type', 'text').attr('id', 'expires_in').css('width', '50px').val('5'))
+      .append(' minutes<br/>')
+      .append($('<input/>').attr('type', 'button').val('Generate Download URL').click(function() {
+        download_url($('#expires_in').val());
+      }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').html("<p class='loading'>Generating download URL...</p>");
+  $.ajax({
+    url: '/admin/products/<%= v.product_id %>/variants/<%= v.id %>/download-url',
+    type: 'get',
+    data: { expires_in: expires_in },
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.success) $('#message').html("<p class='note success'>The URL has been generated successfully:<br/><br/>" + resp.url + "</p>");
+    }
+  });
+}
 
 </script>
 <% end %>

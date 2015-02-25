@@ -19,9 +19,21 @@ Caboose::Engine.routes.draw do
   get  "logout"                          => "logout#index"
   get  "register"                        => "register#index"
   post "register"                        => "register#register"
-  get  "my-account"                      => "users#my_account"
-  put  "my-account"                      => "users#update_my_account"
   
+  #=============================================================================
+  # My Account
+  #=============================================================================
+  
+  get "my-account" => "users#my_account"
+  put "my-account" => "users#update_my_account"
+    
+  get "my-account/orders/:order_id/line-items/:id/download"  => "my_account_line_items#download"
+  get "my-account/orders/:order_id/line-items/:id"           => "my_account_line_items#edit"
+  get "my-account/orders/:order_id/line-items"               => "my_account_line_items#index"
+    
+  get "my-account/orders/:id"  => "my_account_orders#edit"
+  get "my-account/orders"      => "my_account_orders#index"
+    
   #=============================================================================
   # Sites
   #=============================================================================  
@@ -413,7 +425,9 @@ Caboose::Engine.routes.draw do
   put     '/admin/products/:product_id/variants/option3-sort-order'      => 'variants#admin_update_option3_sort_order'      
   put     "/admin/products/:product_id/variants/:id/attach-to-image"     => "variants#admin_attach_to_image"
   put     "/admin/products/:product_id/variants/:id/unattach-from-image" => "variants#admin_unattach_from_image"
-  get     "/admin/products/:product_id/variants/:id"                     => "variants#admin_edit"
+  get     "/admin/products/:product_id/variants/:id/download-url"        => "variants#admin_download_url"
+  get     "/admin/products/:product_id/variants/:id/json"                => "variants#admin_json_single"
+  get     "/admin/products/:product_id/variants/:id"                     => "variants#admin_edit"  
   put     '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_update'
   put     "/admin/products/:product_id/variants/:id"                     => "variants#admin_update"  
   get     "/admin/products/:product_id/variants/new"                     => "variants#admin_new"

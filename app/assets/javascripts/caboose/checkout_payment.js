@@ -89,7 +89,12 @@ function relay_handler(resp)
   console.log('RELAY');
   console.log(resp);
   if (resp.success == true)
-    window.location = '/checkout/thanks';
+  {
+    if (resp.redirect)
+      window.location = resp.redirect;
+    else
+      window.location = '/checkout/thanks';          
+  }
   else if (resp.error)  
     $('#message').html("<p class='note error'>" + resp.error + "</p>");
   else

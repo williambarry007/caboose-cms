@@ -72,10 +72,11 @@ body {
 #content h1 {
   margin: 0 0 20px -30px;
   padding: 40px 0 0 30px;
-  height: 80px;
+  height: 80px;  
   background: #e1e1e1;
   border-bottom: #aaa 1px solid;
   font-size: 36pt;
+  overflow: hidden;
 }
 
 #content h1.model_attribute_h1 {

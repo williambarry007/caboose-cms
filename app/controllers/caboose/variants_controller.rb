@@ -68,6 +68,14 @@ module Caboose
         :models => pager.items
       }      
     end
+    
+    # GET /admin/products/:product_id/variants/:id/json
+    def admin_json_single
+      return if !user_is_allowed('products', 'view')
+      
+      v = Variant.find(params[:id])      
+      render :json => v      
+    end
         
     # GET /admin/products/:product_id/variants/:variant_id
     def admin_edit
@@ -75,6 +83,27 @@ module Caboose
       @variant = Variant.find(params[:id])
       @product = @variant.product
       render :layout => 'caboose/admin'            
+    end
+    
+    # GET /admin/producst/:product_id/variants/:id/download-url
+    def admin_download_url
+      return if !user_is_allowed('variants', 'edit')
+      
+      resp = StdClass.new
+      v = Variant.find(params[:id])
+      expires_in = params[:expires_in].to_i
+      
+      if !v.downloadable
+        resp.error = "This variant is not downloadable."
+      else
+        config = YAML.load_file("#{::Rails.root}/config/aws.yml")        
+        bucket = AWS::S3::Bucket.new(config[Rails.env]['bucket'])
+        s3object = AWS::S3::S3Object.new(bucket, v.download_path)
+        resp.url = s3object.url_for(:read, :expires => expires_in.minutes).to_s
+        resp.success = true
+      end
+
+      render :json => resp
     end
     
     # PUT /admin/variants/:id
@@ -104,6 +133,8 @@ module Caboose
           when 'option3'            then v.option3            = value
           when 'requires_shipping'  then v.requires_shipping  = value
           when 'taxable'            then v.taxable            = value
+          when 'downloadable'       then v.downloadable       = value
+          when 'download_path'      then v.download_path      = value
         end
       end
       resp.success = save && v.save
@@ -319,10 +350,15 @@ module Caboose
       end
       
       if resp.error.nil?
-        CSV.parse(params[:csv_data]).each do |row|                    
-          v = Caboose::Variant.where(:alternate_id => row[0]).first
-          v = Caboose::Variant.new(:product_id => p.id) if v.nil?
-      
+        CSV.parse(params[:csv_data]).each do |row|
+          v = nil
+          if row[0].strip.length == 0
+            v = Caboose::Variant.new(:product_id => p.id)
+          else
+            v = Caboose::Variant.where(:alternate_id => row[0]).first
+            v = Caboose::Variant.new(:product_id => p.id) if v.nil?
+          end
+
           v.product_id        = p.id
           v.alternate_id      = row[0].strip
           v.quantity_in_stock = row[1].strip.to_i
@@ -365,7 +401,9 @@ module Caboose
           when 'option2'            then variants.each { |v| v.option2            = value }
           when 'option3'            then variants.each { |v| v.option3            = value }
           when 'requires_shipping'  then variants.each { |v| v.requires_shipping  = value }
-          when 'taxable'            then variants.each { |v| v.taxable            = value }                      
+          when 'taxable'            then variants.each { |v| v.taxable            = value }
+          when 'downloadable'       then variants.each { |v| v.downloadable       = value }
+          when 'download_path'      then variants.each { |v| v.download_path      = value }
         end        
       end
       variants.each{ |v| v.save }

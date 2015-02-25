@@ -617,7 +617,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :order_packages_function , :text    ],
         [ :shipping_rates_function , :text    ],
         [ :length_unit             , :string  , { :default => 'in' }],
-        [ :weight_unit             , :string  , { :default => 'oz' }]
+        [ :weight_unit             , :string  , { :default => 'oz' }],
+        [ :download_url_expires_in , :string  , { :default => 5 }]
       ],
       Caboose::User => [
         [ :site_id              , :integer    ],
@@ -672,7 +673,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :option1_sort_order    , :integer  , { :default => 0 }],
         [ :option2_sort_order    , :integer  , { :default => 0 }],
         [ :option3_sort_order    , :integer  , { :default => 0 }],
-        [ :sort_order            , :integer  , { :default => 0 }]
+        [ :sort_order            , :integer  , { :default => 0 }],
+        [ :downloadable          , :boolean  , { :default => false }],
+        [ :download_path         , :string   ]
       ],
       Caboose::Vendor => [
         [ :site_id      , :integer    ],

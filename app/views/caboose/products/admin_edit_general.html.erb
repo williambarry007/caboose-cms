@@ -31,7 +31,7 @@ $(document).ready(function() {
     update_url: '/admin/products/<%= p.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'vendor_id'       , nice_name: 'Vendor'               , type: 'text'      , value: <%= raw Caboose.json(p.vendor_id       ) %>, width: 500, options_url: '/admin/vendors/options' },
+      { name: 'vendor_id'       , nice_name: 'Vendor'               , type: 'select'    , value: <%= raw Caboose.json(p.vendor_id       ) %>, width: 500, options_url: '/admin/vendors/options' },
       { name: 'title'           , nice_name: 'Title'                , type: 'text'      , value: <%= raw Caboose.json(p.title           ) %>, width: 500 },
       { name: 'caption'         , nice_name: 'Caption'              , type: 'text'      , value: <%= raw Caboose.json(p.caption         ) %>, width: 500 },
       { name: 'status'          , nice_name: 'Status'               , type: 'select'    , value: <%= raw Caboose.json(p.status          ) %>, width: 500, options_url: '/admin/products/status-options' },

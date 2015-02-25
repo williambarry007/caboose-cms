@@ -9,8 +9,8 @@ p = @product
   <select id="vendor" data-product-id="<%= @product.id %>">
     <option>-- Select a Vendor --</option>
     
-    <% Caboose::Vendor.all.each do |vendor| %>
-      <option value="<%= vendor.id %>" <%= 'selected' if p.vendor_id && p.vendor_id == vendor.id %>><%= vendor.name%></option>
+    <% Caboose::Vendor.where(:site_id => @site.id).reorder(:name).all.each do |vendor| %>
+      <option value="<%= vendor.id %>" <%= 'selected' if p.vendor_id && p.vendor_id == vendor.id %>><%= vendor.name %></option>
     <% end %>
   </select>
 </p>

@@ -34,7 +34,7 @@ module Caboose
     # GET /checkout/shipping
     def shipping
       redirect_to '/checkout'           and return if !logged_in?
-      redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
+      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?) 
                   
       if !@order.has_shippable_items?
         redirect_to '/checkout/gift-cards'
@@ -59,7 +59,7 @@ module Caboose
     # GET /checkout/gift-cards
     def gift_cards
       redirect_to '/checkout'           and return if !logged_in?
-      redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
+      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
       redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
       @logged_in_user = logged_in_user
     end
@@ -68,7 +68,7 @@ module Caboose
     # GET /checkout/payment
     def payment
       redirect_to '/checkout'           and return if !logged_in?
-      redirect_to '/checkout/addresses' and return if @order.shipping_address.nil? || @order.billing_address.nil?
+      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
       redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?      
       
       # Make sure all the variants still exist      
@@ -159,7 +159,7 @@ module Caboose
         billing_address.zip        = params[:billing][:zip]
       end
       
-      # Save address info; generate ids
+      # Save address info; generate ids      
       render :json => { :success => false, :errors => shipping_address.errors.full_messages, :address => 'shipping' } and return if has_shippable_items && !shipping_address.save
       render :json => { :success => false, :errors => billing_address.errors.full_messages, :address => 'billing' } and return if !billing_address.save
       

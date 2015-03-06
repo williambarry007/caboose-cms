@@ -104,14 +104,14 @@ module Caboose
         'colorbox-rails.css',        
         'colorbox-rails/colorbox-rails.css',
         'jquery-ui.css',                
-        '*/css/application.css' # Site CSS
+        '*/css/application.css', # Site CSS
 
         # Fonts
         'caboose/fonts/avenir-medium.eot',
         'caboose/fonts/avenir-medium.ttf',
         'caboose/fonts/big_noodle_titling_oblique.ttf',
         'caboose/fonts/big_noodle_titling.ttf',               
-        'caboose/icons.txt',
+        'caboose/icons.txt'
         
       ]      
     end

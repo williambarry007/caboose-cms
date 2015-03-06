@@ -46,7 +46,7 @@ module Caboose
       render :json => { :success => vendor.save }
     end
     
-    # POST /admin/vendors/:id/update/image
+    # POST /admin/vendors/:id/image
     def admin_update_image
       return if !user_is_allowed('vendors', 'edit')
       
@@ -55,8 +55,9 @@ module Caboose
       vendor.save
       
       resp = StdClass.new
+      resp.success = true
       resp.attributes = { :image => { :value => vendor.image.url(:thumb) }}
-      resp.success = vendor.save            
+      render :json => resp            
     end
     
     # GET /admin/vendors/new

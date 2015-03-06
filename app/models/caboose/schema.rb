@@ -57,13 +57,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Order => [
         :shipping_method       , 
         :shipping_method_code  ,
-        :email                 ,
-        :order_number          ,
+        :email                 ,        
         :payment_id            ,
         :gateway_id            ,
         :date_authorized       ,
         :date_captured         ,
-        :date_cancelled        ,                
+        :date_canceled         ,                
         :shipping_carrier      ,
         :shipping_service_code ,
         :shipping_service_name ,        
@@ -79,7 +78,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::ShippingPackage => [:price, :carrier, :service_code, :service_name, :shipping_method_id, :length, :width, :height],
       Caboose::Site => [:shipping_cost_function],
       Caboose::StoreConfig => [:use_usps, :allowed_shipping_codes, :default_shipping_code, :pp_relay_url, :pp_response_url],
-      Caboose::Variant => [:quantity],
+      Caboose::Variant => [:quantity, :on_sale],
       Caboose::Vendor => [:vendor, :vendor_id]
     }
   end
@@ -285,11 +284,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :order_id              , :integer  ],
         [ :order_package_id      , :integer  ],
         [ :variant_id            , :integer  ],
-        [ :parent_id             , :integer  ],
-        [ :quantity              , :integer   , :default => 0 ],
+        [ :parent_id             , :integer  ],                
         [ :status                , :string   ],
-        [ :tracking_number       , :string   ],        
-        [ :price                 , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :tracking_number       , :string   ],
+        [ :quantity              , :integer   , :default => 0 ],
+        [ :unit_price            , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :subtotal              , :decimal   , { :precision => 8, :scale => 2 }],
         [ :notes                 , :text     ],
         [ :custom1               , :string   ],
         [ :custom2               , :string   ],
@@ -336,6 +336,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Order => [
         [ :site_id               , :integer  ],
+        [ :order_number          , :integer  ],
         [ :alternate_id          , :integer  ],        
         [ :subtotal              , :decimal  , { :precision => 8, :scale => 2 }],
         [ :tax                   , :decimal  , { :precision => 8, :scale => 2 }],
@@ -354,7 +355,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :referring_site        , :text     ],
         [ :landing_page          , :string   ],
         [ :landing_page_ref      , :string   ],
-        [ :auth_amount           , :decimal  , { :precision => 8, :scale => 2 }]
+        [ :auth_amount           , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :gift_message          , :text     ],
+        [ :include_receipt       , :boolean  , { :default => true }]
         
         #[ :email                 , :string   ],
         #[ :order_number          , :string   ],
@@ -467,7 +470,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :custom_input          , :text      ],
         [ :sort_order            , :integer   ],
         [ :featured              , :boolean   , :default => false ],
-        [ :stackable_group_id    , :integer   ]
+        [ :stackable_group_id    , :integer   ],
+        [ :on_sale               , :boolean   , { :default => false }]
       ],
       Caboose::ProductImage => [
         [ :product_id            , :integer  ],
@@ -550,7 +554,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name                    , :string ],
         [ :description             , :text   ],
         [ :under_construction_html , :text   ],
-        [ :use_store               , :boolean , { :default => false }]
+        [ :use_store               , :boolean , { :default => false }],
+        [ :logo                    , :attachment ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
@@ -618,7 +623,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :shipping_rates_function , :text    ],
         [ :length_unit             , :string  , { :default => 'in' }],
         [ :weight_unit             , :string  , { :default => 'oz' }],
-        [ :download_url_expires_in , :string  , { :default => 5 }]
+        [ :download_url_expires_in , :string  , { :default => 5 }],
+        [ :starting_order_number   , :integer , { :default => 1000 }]
       ],
       Caboose::User => [
         [ :site_id              , :integer    ],
@@ -652,7 +658,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :price                 , :decimal   , { :precision => 8, :scale => 2 }],
         [ :sale_price            , :decimal   , { :precision => 8, :scale => 2 }],
         [ :date_sale_starts      , :datetime ],
-        [ :date_sale_end         , :datetime ],
+        [ :date_sale_ends        , :datetime ],
+        [ :date_sale_end         , :datetime ],        
         [ :available             , :boolean  ],
         [ :quantity_in_stock     , :integer   , :default => 0 ],        
         [ :ignore_quantity       , :boolean  ],

@@ -24,8 +24,8 @@ Caboose::Engine.routes.draw do
   # My Account
   #=============================================================================
   
-  get "my-account" => "users#my_account"
-  put "my-account" => "users#update_my_account"
+  #get "my-account" => "users#my_account"
+  #put "my-account" => "users#update_my_account"
     
   get "my-account/orders/:order_id/line-items/:id/download"  => "my_account_line_items#download"
   get "my-account/orders/:order_id/line-items/:id"           => "my_account_line_items#edit"
@@ -33,6 +33,9 @@ Caboose::Engine.routes.draw do
     
   get "my-account/orders/:id"  => "my_account_orders#edit"
   get "my-account/orders"      => "my_account_orders#index"
+  
+  get "my-account" => "my_account#index"
+  put "my-account" => "my_account#update"
     
   #=============================================================================
   # Sites
@@ -46,6 +49,7 @@ Caboose::Engine.routes.draw do
   get     "admin/sites"                            => "sites#admin_index"
   
   post    "admin/sites"                            => "sites#admin_add"
+  post    "admin/sites/:id/logo"                   => "sites#admin_update_logo"
   put     "admin/sites/:id"                        => "sites#admin_update"      
   delete  "admin/sites/:id"                        => "sites#admin_delete"
   post    "admin/sites/:id/members"                => "sites#admin_add_member"
@@ -555,6 +559,7 @@ Caboose::Engine.routes.draw do
   get     '/admin/vendors/new'            => 'vendors#admin_new'
   get     '/admin/vendors/:id'            => 'vendors#admin_edit'
   get     '/admin/vendors'                => 'vendors#admin_index'
+  post    '/admin/vendors/:id/image'      => 'vendors#admin_update_image'
   put     '/admin/vendors/:id'            => 'vendors#admin_update'
   post    '/admin/vendors'                => 'vendors#admin_add'
   delete  '/admin/vendors/:id'            => 'vendors#admin_delete'

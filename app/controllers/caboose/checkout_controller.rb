@@ -257,8 +257,9 @@ module Caboose
       
       error = nil
       if ot.success
-        order.financial_status = 'authorized'
-        order.status = 'pending'
+        order.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED
+        order.status = Order::STATUS_PENDING
+        order.order_number = @site.store_config.next_order_number
          
         # Take funds from any gift cards that were used on the order
         order.take_gift_card_funds

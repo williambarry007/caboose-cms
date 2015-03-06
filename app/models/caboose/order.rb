@@ -38,21 +38,27 @@ module Caboose
       :date_created,
       :notes
           
-    STATUS_CART      = 'cart'
-    STATUS_PENDING   = 'pending'    
-    STATUS_CANCELED  = 'canceled'
-    STATUS_SHIPPED   = 'shipped'
-    STATUS_TESTING   = 'testing'
+    STATUS_CART          = 'cart'
+    STATUS_PENDING       = 'pending'    
+    STATUS_CANCELED      = 'canceled'
+    STATUS_READY_TO_SHIP = 'ready to ship'
+    STATUS_SHIPPED       = 'shipped'    
+    STATUS_TESTING       = 'testing'
+
+    FINANCIAL_STATUS_AUTHORIZED = 'authorized'
+    FINANCIAL_STATUS_CAPTURED   = 'captured'
+    FINANCIAL_STATUS_REFUNDED   = 'refunded'
+    FINANCIAL_STATUS_VOIDED     = 'voided'
     
     #
     # Scopes
-    #
-    
+    #    
+    scope :cart       , where('status = ?', 'cart')
+    scope :pending    , where('status = ?', 'pending')    
+    scope :canceled   , where('status = ?', 'canceled')
+    scope :shipped    , where('status = ?', 'shipped')
     scope :test       , where('status = ?', 'testing')
-    scope :cancelled  , where('status = ?', 'cancelled')
-    scope :pending    , where('status = ?', 'pending')
-    #TODO scope :fulfilled
-    #TODO scope :unfulfilled
+    
     scope :authorized , where('financial_status = ?', 'authorized')
     scope :captured   , where('financial_status = ?', 'captured')
     scope :refunded   , where('financial_status = ?', 'refunded')
@@ -63,7 +69,7 @@ module Caboose
     #
     
     validates :status, :inclusion => {
-      :in      => ['cart', 'pending', 'cancelled', 'shipped', 'testing'],
+      :in      => ['cart', 'pending', 'canceled', 'ready to ship', 'shipped', 'testing'],
       :message => "%{value} is not a valid status. Must be either 'pending' or 'shipped'"
     }
     
@@ -124,7 +130,7 @@ module Caboose
       PaymentProcessor.capture(self)
     end
     
-    def refuned
+    def refund
       PaymentProcessor.refund(self)
     end
     
@@ -143,8 +149,9 @@ module Caboose
     
     def calculate_subtotal
       return 0.0 if self.line_items.empty?
+      self.line_items.each{ |li| li.verify_unit_price } # Make sure the unit prices are populated        
       x = 0.0      
-      self.line_items.each{ |li| x = x + (li.variant.price * li.quantity) } # Fixed issue with quantity
+      self.line_items.each{ |li| x = x + (li.unit_price * li.quantity) } # Fixed issue with quantity 
       return x
     end
     

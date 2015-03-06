@@ -10,6 +10,7 @@
  *
  *= require colorbox-rails
  *= require jquery-ui
+ *= require caboose/jquery.datetimepicker
  *= require caboose/fonts
  *= require caboose/caboose
  *= require caboose/message_boxes

@@ -67,9 +67,9 @@ Cart.prototype = {
       tbody.append($('<tr/>').data('id', li.id)            
         .append($('<td/>').attr('valign', 'top').append(img))
         .append(item)                                                                        
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(v.price).toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(li.unit_price).toFixed(2)))
         .append(qty)
-        .append($('<td/>').css('text-align', 'right').html('$' + (v.price * li.quantity).toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').html('$' + (li.unit_price * li.quantity).toFixed(2)))
       );      
     });
     tbody.append($('<tr/>')        

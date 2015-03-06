@@ -47,6 +47,7 @@ module Caboose
       # Otherwise looking at a category or search parameters
       @pager = Caboose::Pager.new(params, {
         'site_id'        => @site.id,
+        'on_sale'        => '',
         'category_id'    => '',
         'vendor_id'      => '',
         'vendor_name'    => '',

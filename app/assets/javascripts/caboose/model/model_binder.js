@@ -103,6 +103,9 @@ ModelBinder.prototype = {
       
       if (attrib.type == 'text')                   control = new BoundText(opts);
       else if (attrib.type == 'color')             control = new BoundColor(opts);
+      else if (attrib.type == 'datetime')          control = new BoundDateTime(opts);
+      else if (attrib.type == 'date-time')         control = new BoundDateTime(opts);
+      else if (attrib.type == 'date_time')         control = new BoundDateTime(opts);
       else if (attrib.type == 'select')            control = new BoundSelect(opts);
       else if (attrib.type == 'checkbox')          control = new BoundCheckbox(opts);
       else if (attrib.type == 'checkbox-multiple') control = new BoundCheckboxMultiple(opts);

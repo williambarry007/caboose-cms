@@ -92,9 +92,9 @@ module Caboose
         tbl << [        
           "#{li.variant.product.title}\n#{li.variant.sku}\n#{li.variant.title}",
           { :content => li.tracking_number },
-          { :content => sprintf("%.2f", li.variant.price) , :align => :right },
-          { :content => "#{li.quantity}"                  , :align => :right },          
-          { :content => sprintf("%.2f", li.subtotal)      , :align => :right }
+          { :content => sprintf("%.2f", li.unit_price) , :align => :right },
+          { :content => "#{li.quantity}"               , :align => :right },          
+          { :content => sprintf("%.2f", li.subtotal)   , :align => :right }
         ]
       end            
       tbl << [{ :content => "Subtotal"                                      , :colspan => 4, :align => :right }, { :content => sprintf("%.2f", order.subtotal                        ) , :align => :right }]

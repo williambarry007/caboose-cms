@@ -31,6 +31,13 @@ v = @variant
 <div id='variant_<%= v.id %>_length'             ></div>
 <div id='variant_<%= v.id %>_width'              ></div>
 <div id='variant_<%= v.id %>_height'             ></div>
+    </td><td valign='top'>
+<h2>Sale</h2>
+<div id='variant_<%= v.id %>_sale_price'         ></div>
+<div id='variant_<%= v.id %>_date_sale_starts'   ></div>
+<div id='variant_<%= v.id %>_time_sale_starts'   ></div>
+<div id='variant_<%= v.id %>_date_sale_ends'     ></div>
+<div id='variant_<%= v.id %>_time_sale_ends'     ></div>      
     </td>
   </tr>
 </table>
@@ -60,7 +67,10 @@ $(document).ready(function() {
       { name: 'alternate_id'              , nice_name: 'Alternate ID'                     , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.alternate_id           ) %>, width: 250 },      
       { name: 'sku'                       , nice_name: 'SKU'                              , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.sku                    ) %>, width: 250 },                         
       { name: 'barcode'                   , nice_name: 'Barcode'                          , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.barcode                ) %>, width: 250 }, 
-      { name: 'price'                     , nice_name: 'Price'                            , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(sprintf("%.2f", v.price) ) %>, width: 250 }, 
+      { name: 'price'                     , nice_name: 'Price'                            , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(sprintf("%.2f", v.price) ) %>, width: 250 },
+      { name: 'sale_price'                , nice_name: 'Sale price'                       , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.sale_price             ) %>, width: 275 },
+      { name: 'date_sale_starts'          , nice_name: 'Sale starts'                      , type: 'datetime' , align: 'right' , value: <%= raw Caboose.json(v.date_sale_starts ? v.date_sale_starts.in_time_zone(@logged_in_user.timezone).strftime('%m/%d/%Y %I:%M %P') : '') %>, width: 275 },      
+      { name: 'date_sale_ends'            , nice_name: 'Sale ends'                        , type: 'datetime' , align: 'right' , value: <%= raw Caboose.json(v.date_sale_ends   ? v.date_sale_ends.in_time_zone(@logged_in_user.timezone).strftime('%m/%d/%Y %I:%M %P')   : '') %>, width: 275 },      
       { name: 'quantity_in_stock'         , nice_name: 'Quantity'                         , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.quantity_in_stock      ) %>, width: 250 }, 
       { name: 'ignore_quantity'           , nice_name: 'Ignore Quantity'                  , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.ignore_quantity        ) %>, width: 250 },
       { name: 'weight'                    , nice_name: 'Weight (grams)'                   , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.weight                 ) %>, width: 250 }, 

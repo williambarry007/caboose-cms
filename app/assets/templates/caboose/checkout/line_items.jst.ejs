@@ -6,10 +6,10 @@
       <div class="wrapper">
         <aside>
           <figure style="background-image: url(<%= lineItem.variant.images[0].urls.thumb %>)"></figure>
-          <p><%= lineItem.title %><br />Qty: <%= lineItem.quantity %><br /><span class="price">$<%= ((parseFloat(lineItem.price) * 100) / 100).toFixed(2) %></span></p>
+          <p><%= lineItem.title %><br />Qty: <%= lineItem.quantity %><br /><span class="price">$<%= ((parseFloat(lineItem.unit_price) * 100) / 100).toFixed(2) %></span></p>
         </aside>        
         <section>
-          <p>$<%= ((parseFloat(lineItem.price) * 100) / 100).toFixed(2) %></p>
+          <p>$<%= ((parseFloat(lineItem.subtotal) * 100) / 100).toFixed(2) %></p>
         </section>
       </div>
     </li>

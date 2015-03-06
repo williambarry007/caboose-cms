@@ -16,7 +16,7 @@ module Caboose
       @pager = Caboose::PageBarGenerator.new(params, {
         'site_id'              => @site.id,
         'customer_id'          => '', 
-        'status'               => 'pending',
+        'status'               => Order::STATUS_PENDING,
         'shipping_method_code' => '',
         'id'                   => ''
       }, {
@@ -43,8 +43,8 @@ module Caboose
     def admin_add
       return if !user_is_allowed('orders', 'add')
       order = Order.create(
-        :status => 'pending',                          
-        :financial_status => 'pending'
+        :status => Order::STATUS_PENDING,                          
+        :financial_status => Order::FINANCIAL_STATUS_PENDING
       )    
       render :json => { :sucess => true, :redirect => "/admin/orders/#{order.id}" }
     end
@@ -64,7 +64,7 @@ module Caboose
       order = Order.find(params[:id])
       t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
       
-      if order.financial_status == 'captured'
+      if order.financial_status == Order::FINANCIAL_STATUS_CAPTURED
         resp.error = "This order has already been captured, you will need to refund instead"
       elsif t.nil?
         resp.error = "This order doesn't seem to be authorized."
@@ -78,12 +78,12 @@ module Caboose
               sc.pp_username, 
               sc.pp_password,                      
               order.total,
-              :transaction_type => 'VOID',
+              :transaction_type => OrderTransaction::TYPE_VOID,
               :transaction_id => t.transaction_id
             )                    
             order.update_attributes(
-              :financial_status => 'voided',
-              :status => 'cancelled'
+              :financial_status => Order::FINANCIAL_STATUS_VOIDED,
+              :status => Order::STATUS_CANCELED
             )
             order.save          
             # TODO: Add the variant quantities ordered back        
@@ -109,13 +109,13 @@ module Caboose
     
       order = Order.find(params[:id])
     
-      if order.financial_status != 'captured'
+      if order.financial_status != Order::FINANCIAL_STATUS_CAPTURED
         response.error = "This order hasn't been captured yet, you will need to void instead"
       else
         if PaymentProcessor.refund(order)
           order.update_attributes(
-            :financial_status => 'refunded',
-            :status => 'cancelled'
+            :financial_status => Order::FINANCIAL_STATUS_REFUNDED,
+            :status => Order::STATUS_CANCELED
           )
           
           response.success = 'Order refunded successfully'
@@ -214,7 +214,7 @@ module Caboose
       return if !user_is_allowed('orders', 'edit')    
       
       pdf = PendingOrdersPdf.new
-      pdf.orders = Order.where(:status => 'pending').all      
+      pdf.orders = Order.where(:status => Order::STATUS_PENDING).all      
       send_data pdf.to_pdf, :filename => "pending_orders.pdf", :type => "application/pdf", :disposition => "inline"            
     end
       
@@ -258,7 +258,7 @@ module Caboose
       order = Order.find(params[:id])
       t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
       
-      if order.financial_status == 'captured'
+      if order.financial_status == Order::FINANCIAL_STATUS_CAPTURED
         resp.error = "Funds for this order have already been captured."    
       elsif order.total > order.auth_amount
         resp.error = "The order total exceeds the authorized amount."
@@ -277,7 +277,7 @@ module Caboose
               :transaction_type => 'CAPTURE_ONLY',
               :transaction_id => t.transaction_id
             )                
-            order.update_attribute(:financial_status, 'captured')
+            order.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
             resp.success = 'Captured funds successfully'
           when 'payscape'
             # TODO: Implement capture funds for payscape
@@ -372,9 +372,15 @@ module Caboose
 
     # GET /admin/orders/status-options
     def admin_status_options
-      return if !user_is_allowed('categories', 'view')
-      statuses = ['cart', 'pending', 'ready to ship', 'shipped', 'canceled']
-      options = statuses.collect{ |s| { 'text' => s, 'value' => s }}       
+      return if !user_is_allowed('orders', 'view')
+      statuses = [
+        Order::STATUS_CART, 
+        Order::STATUS_PENDING, 
+        Order::STATUS_READY_TO_SHIP, 
+        Order::STATUS_SHIPPED, 
+        Order::STATUS_CANCELED
+      ]
+      options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}       
       render :json => options    
     end
     
@@ -397,16 +403,16 @@ module Caboose
       if Caboose::Setting.exists?(:name => 'google_feed_date_last_submitted')                  
         d1 = Caboose::Setting.where(:name => 'google_feed_date_last_submitted').first.value      
         d1 = DateTime.parse(d1)
-      elsif Order.exists?("status = 'shipped' and date_authorized is not null")
-        d1 = Order.where("status = ? and date_authorized is not null", 'shipped').reorder("date_authorized DESC").limit(1).pluck('date_authorized')
+      elsif Order.exists?("status = ? and date_authorized is not null", Order::STATUS_SHIPPED)
+        d1 = Order.where("status = ? and date_authorized is not null", Order::STATUS_SHIPPED).reorder("date_authorized DESC").limit(1).pluck('date_authorized')
         d1 = DateTime.parse(d1)
       end
       
       # Google Feed Docs
       # https://support.google.com/trustedstoresmerchant/answer/3272612?hl=en&ref_topic=3272286?hl=en
       tsv = ["merchant order id\ttracking number\tcarrier code\tother carrier name\tship date"]            
-      if Order.exists?("status = 'shipped' and date_authorized > '#{d1.strftime("%F %T")}'")
-        Order.where("status = ? and date_authorized > ?", 'shipped', d1).reorder(:id).all.each do |order|
+      if Order.exists?("status = ? and date_authorized > '#{d1.strftime("%F %T")}'", Order::STATUS_SHIPPED)
+        Order.where("status = ? and date_authorized > ?", Order::STATUS_SHIPPED, d1).reorder(:id).all.each do |order|
           tracking_numbers = order.line_items.collect{ |li| li.tracking_number }.compact.uniq
           tn = tracking_numbers && tracking_numbers.count >= 1 ? tracking_numbers[0] : ""
           tsv << "#{order.id}\t#{tn}\tUPS\t\t#{order.date_shipped.strftime("%F")}"                              

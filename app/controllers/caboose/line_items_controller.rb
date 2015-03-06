@@ -24,7 +24,8 @@ module Caboose
         :order_id   => params[:order_id],
         :variant_id => params[:variant_id],
         :quantity   => 1,
-        :price      => v.price,
+        :unit_price => v.price,
+        :subtotal   => v.price,
         :status     => 'pending'                
       )         
       resp.success = li.save
@@ -46,7 +47,8 @@ module Caboose
           when 'order_package_id' then li.order_package_id  = value
           when 'variant_id'       then li.variant_id        = value
           when 'parent_id'        then li.parent_id         = value          
-          when 'price'            then li.price             = value
+          when 'unit_price'       then li.unit_price        = value
+          when 'subtotal'         then li.subtotal          = value
           when 'notes'            then li.notes             = value
           when 'custom1'          then li.custom1           = value
           when 'custom2'          then li.custom2           = value

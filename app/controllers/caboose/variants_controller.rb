@@ -119,7 +119,7 @@ module Caboose
           when 'alternate_id'       then v.alternate_id       = value
           when 'sku'                then v.sku                = value
           when 'barcode'            then v.barcode            = value
-          when 'price'              then v.price              = value
+          when 'price'              then v.price              = value                      
           when 'quantity_in_stock'  then v.quantity_in_stock  = value
           when 'ignore_quantity'    then v.ignore_quantity    = value
           when 'allow_backorder'    then v.allow_backorder    = value
@@ -135,6 +135,16 @@ module Caboose
           when 'taxable'            then v.taxable            = value
           when 'downloadable'       then v.downloadable       = value
           when 'download_path'      then v.download_path      = value
+            
+          when 'sale_price'
+            v.sale_price = value            
+            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale            
+          when 'date_sale_starts'
+            v.date_sale_starts = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
+            v.product.delay(:run_at => v.date_sale_starts).update_on_sale                                  
+          when 'date_sale_ends'
+            v.date_sale_ends = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
+            v.product.delay(:run_at => v.date_sale_ends).update_on_sale                                  
         end
       end
       resp.success = save && v.save
@@ -380,7 +390,7 @@ module Caboose
       return unless user_is_allowed_to 'edit', 'sites'
     
       resp = Caboose::StdClass.new    
-      variants = params[:model_ids].collect{ |variant_id| Variant.find(variant_id) }
+      variants = params[:model_ids].collect{ |variant_id| Variant.find(variant_id) }      
     
       save = true
       params.each do |k,value|
@@ -404,6 +414,45 @@ module Caboose
           when 'taxable'            then variants.each { |v| v.taxable            = value }
           when 'downloadable'       then variants.each { |v| v.downloadable       = value }
           when 'download_path'      then variants.each { |v| v.download_path      = value }
+
+          when 'sale_price'
+            variants.each_with_index do |v, i|              
+              v.sale_price = value            
+              v.product.delay(:run_at => 3.seconds.from_now).update_on_sale if i == 0
+            end
+          when 'date_sale_starts'
+            variants.each_with_index do |v, i|
+              v.date_sale_starts = ModelBinder.update_date(v.date_sale_starts, value, @logged_in_user.timezone)
+              if i == 0
+                v.product.delay(:run_at => v.date_sale_starts).update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now).update_on_sale                
+              end                                
+            end
+          when 'time_sale_starts'
+            variants.each_with_index do |v, i|
+              v.date_sale_starts = ModelBinder.update_time(v.date_sale_starts, value, @logged_in_user.timezone)                                    
+              if i == 0
+                v.product.delay(:run_at => v.date_sale_starts).update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now).update_on_sale                
+              end
+            end            
+          when 'date_sale_ends'
+            variants.each_with_index do |v, i|
+              v.date_sale_ends = ModelBinder.update_date(v.date_sale_ends, value, @logged_in_user.timezone)            
+              if i == 0
+                v.product.delay(:run_at => v.date_sale_ends).update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now).update_on_sale                
+              end
+            end            
+          when 'time_sale_ends'
+            variants.each_with_index do |v, i|
+              v.date_sale_ends = ModelBinder.update_time(v.date_sale_ends, value, @logged_in_user.timezone)                                    
+              if i == 0
+                v.product.delay(:run_at => v.date_sale_ends).update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now).update_on_sale                
+              end
+            end
+            
         end        
       end
       variants.each{ |v| v.save }

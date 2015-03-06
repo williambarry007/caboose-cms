@@ -50,7 +50,7 @@ module Caboose
         unit_price = v.on_sale? ? v.sale_price : v.price
         li = LineItem.new(
           :order_id   => @order.id,
-          :variant_id => variant_id,
+          :variant_id => v.id,
           :quantity   => qty,
           :unit_price => unit_price,
           :subtotal   => unit_price * qty,

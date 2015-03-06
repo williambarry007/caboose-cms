@@ -264,7 +264,22 @@ Caboose.Store.Modules.Product = (function() {
     Caboose.Store.Modules.Cart.set_variant(variant);
     if (variant) self.set_image_from_variant(variant);
     if (variant && self.$price.length) self.$price.empty().text('$' + parseFloat((variant.price * 100) / 100).toFixed(2));
+
   };
+
+  self.variant_on_sale = function(variant) {
+    if (variant.sale_price == "") {
+      return false;
+    }
+    else {
+      
+    }
+    d = DateTime.now.utc
+    return false if self.date_sale_starts && d < self.date_sale_starts
+    return false if self.date_sale_ends   && d > self.date_sale_ends
+    return true
+  
+  }
   
   self.get_variant = function(id) {
     return _.find(self.product.variants, function(variant) { return variant.id == (id || self.variant.id) });

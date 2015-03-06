@@ -38,18 +38,22 @@ module Caboose
     end
     
     # POST /cart
-    def add
-      variant_id = params[:variant_id]
+    def add      
+      v = Variant.find(params[:variant_id])
       qty = params[:quantity] ? params[:quantity].to_i : 1
       
-      if @order.line_items.exists?(:variant_id => variant_id)
-        li = @order.line_items.find_by_variant_id(variant_id)
+      if @order.line_items.exists?(:variant_id => v.id)
+        li = @order.line_items.find_by_variant_id(v.id)
         li.quantity += qty
+        li.subtotal = li.unit_price * li.quantity
       else
+        unit_price = v.on_sale? ? v.sale_price : v.price
         li = LineItem.new(
           :order_id   => @order.id,
-          :variant_id => variant_id,
+          :variant_id => v.id,
           :quantity   => qty,
+          :unit_price => unit_price,
+          :subtotal   => unit_price * qty,
           :status     => 'pending'
         )
       end       
@@ -64,6 +68,7 @@ module Caboose
     def update
       li = LineItem.find(params[:line_item_id])
       li.quantity = params[:quantity].to_i
+      li.subtotal = li.unit_price * li.quantity
       li.save
       li.destroy if li.quantity == 0
       @order.calculate_subtotal

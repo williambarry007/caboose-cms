@@ -119,4 +119,3 @@ module Caboose
     end
   end
 end
-

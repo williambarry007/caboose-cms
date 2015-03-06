@@ -110,7 +110,7 @@ module Caboose
     end
     
     def on_sale?
-      return false if self.sale_price.nil?
+      return false if self.sale_price.nil? || self.sale_price == 0.0
       d = DateTime.now.utc
       return false if self.date_sale_starts && d < self.date_sale_starts
       return false if self.date_sale_ends   && d > self.date_sale_ends

@@ -8,6 +8,15 @@ class Caboose::Site < ActiveRecord::Base
   has_many :domains, :class_name => 'Caboose::Domain', :dependent => :delete_all
   has_many :post_categories, :class_name => 'Caboose::PostCategory'
   has_one :store_config
+  has_attached_file :logo, 
+    :path => ':path_prefixsite_logos/:id_:style.:extension',    
+    :default_url => 'http://placehold.it/300x300',    
+    :styles => {
+      :tiny  => '150x200>',
+      :thumb => '300x400>',
+      :large => '600x800>'
+    }
+  do_not_validate_attachment_file_type :logo
   attr_accessible :id, :name, :description, :under_construction_html
   
   def smtp_config

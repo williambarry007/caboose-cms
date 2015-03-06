@@ -1,20 +1,21 @@
 
 <h1>My Account</h1>
+
 <p><div id='user_<%= @user.id %>_first_name' ></div></p>
 <p><div id='user_<%= @user.id %>_last_name'  ></div></p>
 <p><div id='user_<%= @user.id %>_email'      ></div></p>
 <p><div id='user_<%= @user.id %>_phone'      ></div></p>
 <div id='message'></div>
-<p><input type='button' id='btn_cancel'   value='Close' onclick="parent.$.fn.colorbox.close();" /></p>
+
+<p>
+<% if @site.use_store %>
+  <input type='button' value='Order History' class='btn' onclick="window.location='/my-account/orders';" />
+<% end %>
+</p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type='text/javascript'>
-
-var modal = false;
-$(window).load(function() {  
-  modal = new CabooseModal(450);
-});
 
 $(document).ready(function() {
   new ModelBinder({

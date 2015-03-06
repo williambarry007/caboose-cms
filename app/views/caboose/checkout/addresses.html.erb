@@ -17,21 +17,23 @@ end
   <% else %>    
     <form action="/checkout/addresses" method="put" id='address_form'>
       <section id="checkout-address">  
-        <div class="wrapper">          
-          <section>
-            <fieldset id="shipping">
-              <h3>Shipping Address</h3>
-              <label><span>First Name </span> <input name="shipping[first_name]" type="text" value="<%= sa ? sa.first_name : "" %>" /></label>
-              <label><span>Last Name  </span> <input name="shipping[last_name]"  type="text" value="<%= sa ? sa.last_name  : "" %>" /></label>
-              <label><span>Company    </span> <input name="shipping[company]"    type="text" value="<%= sa ? sa.company    : "" %>" /></label>
-              <label><span>Address 1  </span> <input name="shipping[address1]"   type="text" value="<%= sa ? sa.address1   : "" %>" /></label>
-              <label><span>Address 2  </span> <input name="shipping[address2]"   type="text" value="<%= sa ? sa.address2   : "" %>" /></label>
-              <label><span>City       </span> <input name="shipping[city]"       type="text" value="<%= sa ? sa.city       : "" %>" /></label>        
-              <label><span>State      </span> <select name="shipping[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= sa && sa.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>        
-              <label><span>Zip        </span> <input name="shipping[zip]"       type="text"  value="<%= sa ? sa.zip        : "" %>" /></label>
-              <label><input name="use_as_billing" type="checkbox" value="false" /> Use as billing address</label>
-            </fieldset>
-          </section>    
+        <div class="wrapper">
+          <% if @order.has_shippable_items? %>
+            <section>
+              <fieldset id="shipping">
+                <h3>Shipping Address</h3>
+                <label><span>First Name </span> <input name="shipping[first_name]" type="text" value="<%= sa ? sa.first_name : "" %>" /></label>
+                <label><span>Last Name  </span> <input name="shipping[last_name]"  type="text" value="<%= sa ? sa.last_name  : "" %>" /></label>
+                <label><span>Company    </span> <input name="shipping[company]"    type="text" value="<%= sa ? sa.company    : "" %>" /></label>
+                <label><span>Address 1  </span> <input name="shipping[address1]"   type="text" value="<%= sa ? sa.address1   : "" %>" /></label>
+                <label><span>Address 2  </span> <input name="shipping[address2]"   type="text" value="<%= sa ? sa.address2   : "" %>" /></label>
+                <label><span>City       </span> <input name="shipping[city]"       type="text" value="<%= sa ? sa.city       : "" %>" /></label>        
+                <label><span>State      </span> <select name="shipping[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= sa && sa.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>        
+                <label><span>Zip        </span> <input name="shipping[zip]"       type="text"  value="<%= sa ? sa.zip        : "" %>" /></label>
+                <label><input name="use_as_billing" type="checkbox" value="false" /> Use as billing address</label>
+              </fieldset>
+            </section>
+          <% end %>
           <section>
             <fieldset id="billing">
               <h3>Billing Address</h3>

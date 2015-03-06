@@ -7,6 +7,7 @@ user_ids = [] if user_ids.nil?
 %>
 <%= render :partial => 'caboose/sites/admin_header' %>
 
+<p><div id='site_<%= @site.id %>_logo'        ></div></p>
 <p><div id='site_<%= @site.id %>_name'        ></div></p>
 <p><div id='site_<%= @site.id %>_description' ></div></p>
 <p><div id='site_<%= @site.id %>_under_construction_html' ></div></p>
@@ -64,6 +65,7 @@ $(document).ready(function() {
     update_url: '/admin/sites/<%= @site.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
+      { name: 'logo'                    , nice_name: 'Logo'                     , type: 'image'    , value: <%= raw Caboose.json(@site.logo ? @site.logo.url(:thumb) : '') %>, width: 400, update_url: '/admin/sites/<%= @site.id %>/logo' },
       { name: 'name'                    , nice_name: 'Name'                     , type: 'text'     , value: <%= raw Caboose.json(@site.name)                     %>, width: 400 },
       { name: 'description'             , nice_name: 'Description'              , type: 'textarea' , value: <%= raw Caboose.json(@site.description)              %>, width: 600, height: 75 },
       { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html)  %>, width: 600, height: 75 },

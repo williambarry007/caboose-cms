@@ -3,30 +3,7 @@ p = @product
 %>
 <%= render :partial => 'caboose/products/admin_header' %>
 
-<p>
-  <strong>Vendor:</strong>
-  
-  <select id="vendor" data-product-id="<%= @product.id %>">
-    <option>-- Select a Vendor --</option>
-    
-    <% Caboose::Vendor.all.each do |vendor| %>
-      <option value="<%= vendor.id %>" <%= 'selected' if p.vendor_id && p.vendor_id == vendor.id %>><%= vendor.name%></option>
-    <% end %>
-  </select>
-</p>
-
-
-<% if p.vendor %>
-	<p>
-		<strong>Vendor Status (<%= p.vendor.name %>):</strong>
-		<select id="vendor-status" data-vendor-id="<%= p.vendor.id %>">
-			<% ['Active', 'Inactive'].each do |status| %>
-				<option value="<%= status %>" <%= 'selected' if p.vendor.status == status %>><%= status %></option>
-			<% end %>
-		</select>
-	</p>
-<% end %>
-
+<p><div id='product_<%= p.id %>_vendor_id'></div></p>
 <p><div id='product_<%= p.id %>_title'></div></p>
 <p><div id='product_<%= p.id %>_caption'></div></p>
 <p><div id='product_<%= p.id %>_handle'></div></p>
@@ -47,34 +24,6 @@ p = @product
 date_available = p.date_available ? p.date_available.strftime('%F') : ''
 %>
 $(document).ready(function() {
-  $('#vendor').on('change', function(event) {
-    event.preventDefault();
-    
-    var $target    = $(event.target)
-      , vendor_id  = $target.val()
-      , product_id = $target.data('product-id');
-    
-    console.log(vendor_id, product_id);
-    
-    $.ajax({
-      type: 'put',
-      url: '/admin/products/' + product_id + '/update-vendor',
-      data: { vendor_id: vendor_id },
-      success: function(response) {
-        console.log(response);
-      }
-    })
-  });
-  
-	$('#vendor-status').on('change', function(e) {
-		$select = $(e.target)
-		
-		$.ajax({
-			type: 'put',
-			url: '/admin/products/update-vendor-status/' + $select.data('vendor-id'),
-			data: { status: $select.val() }
-		});
-	});
 	
   m = new ModelBinder({
     name: 'Product',
@@ -82,9 +31,10 @@ $(document).ready(function() {
     update_url: '/admin/products/<%= p.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
+      { name: 'vendor_id'       , nice_name: 'Vendor'               , type: 'select'    , value: <%= raw Caboose.json(p.vendor_id       ) %>, width: 500, options_url: '/admin/vendors/options' },
       { name: 'title'           , nice_name: 'Title'                , type: 'text'      , value: <%= raw Caboose.json(p.title           ) %>, width: 500 },
       { name: 'caption'         , nice_name: 'Caption'              , type: 'text'      , value: <%= raw Caboose.json(p.caption         ) %>, width: 500 },
-      { name: 'status'          , nice_name: 'Status'               , type: 'select'    , value: <%= raw Caboose.json(p.status          ) %>, width: 500, text: <%= raw Caboose.json(p.status) %>, options_url: '/admin/products/status-options' },
+      { name: 'status'          , nice_name: 'Status'               , type: 'select'    , value: <%= raw Caboose.json(p.status          ) %>, width: 500, options_url: '/admin/products/status-options' },
       { name: 'handle'          , nice_name: 'URL Handle'           , type: 'text'      , value: <%= raw Caboose.json(p.handle          ) %>, width: 500 },
       { name: 'seo_title'       , nice_name: 'SEO Page Title'       , type: 'text'      , value: <%= raw Caboose.json(p.seo_title       ) %>, width: 500 },
       { name: 'seo_description' , nice_name: 'SEO Meta Description' , type: 'textarea'  , value: <%= raw Caboose.json(p.seo_description ) %>, width: 500, height: 150 },

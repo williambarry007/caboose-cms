@@ -16,9 +16,9 @@
         <% end %>
       </td>
       <td valign='top'><%= li.title %></td>
-      <td valign='top' align='right' class='qty'      style='text-align: right;'><%= li.quantity %></td>
-      <td valign='top' align='right' class='price'    style='text-align: right;'><%= number_to_currency(li.price, :precision => 2) %></td>
-      <td valign='top' align='right' class='subtotal' style='text-align: right;'><%= number_to_currency(li.price, :precision => 2) %></td>
+      <td valign='top' align='right' class='qty'        style='text-align: right;'><%= li.quantity %></td>
+      <td valign='top' align='right' class='unit_price' style='text-align: right;'><%= number_to_currency(li.unit_price , :precision => 2) %></td>
+      <td valign='top' align='right' class='subtotal'   style='text-align: right;'><%= number_to_currency(li.subtotal   , :precision => 2) %></td>
     </tr>        
   <% end %>                  
   <tr><td colspan='4' align='right' style='text-align: right;'>Subtotal:            </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.subtotal                   , :precision => 2) %></td></tr>            

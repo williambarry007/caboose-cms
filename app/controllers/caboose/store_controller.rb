@@ -49,7 +49,8 @@ module Caboose
           when 'calculate_packages'       then sc.calculate_packages      = value
           when 'shipping_rates_function'  then sc.shipping_rates_function = value
           when 'length_unit'              then sc.length_unit             = value
-          when 'weight_unit'              then sc.weight_unit             = value                      
+          when 'weight_unit'              then sc.weight_unit             = value
+          when 'download_url_expires_in'  then sc.download_url_expires_in = value
     	  end
     	end
     	

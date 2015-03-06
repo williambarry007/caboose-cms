@@ -47,6 +47,7 @@ module Caboose
       # Otherwise looking at a category or search parameters
       @pager = Caboose::Pager.new(params, {
         'site_id'        => @site.id,
+        'on_sale'        => '',
         'category_id'    => '',
         'vendor_id'      => '',
         'vendor_name'    => '',
@@ -314,6 +315,7 @@ module Caboose
       params.each do |name,value|
         case name
           when 'site_id'            then product.site_id            = value
+          when 'vendor_id'          then product.vendor_id          = value
           when 'alternate_id'       then product.alternate_id       = value          
           when 'title'              then product.title              = value
           when 'caption'            then product.caption            = value

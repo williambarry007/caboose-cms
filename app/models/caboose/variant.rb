@@ -102,6 +102,20 @@ module Caboose
       arr << self.option3 if self.option3 && self.option3.strip.length > 0
       return arr
     end
-     
+    
+    def product_image
+      return self.product_images.first if self.product_images
+      return self.product.product_images.first if self.product.product_images
+      return nil
+    end
+    
+    def on_sale?
+      return false if self.sale_price.nil?
+      d = DateTime.now.utc
+      return false if self.date_sale_starts && d < self.date_sale_starts
+      return false if self.date_sale_ends   && d > self.date_sale_ends
+      return true
+    end
+
   end
 end

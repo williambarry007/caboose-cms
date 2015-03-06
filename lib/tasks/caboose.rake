@@ -66,6 +66,20 @@ namespace :caboose do
       ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
     end
   end
+  
+  desc "Set order numbers"
+  task :set_order_numbers => :environment do
+    
+    Caboose::Site.all.each do |site|
+      next if !site.use_store
+      i = site.store_config.starting_order_number
+      Caboose::Order.where("order_number is null and status <> 'cart'").reorder(:id).all.each do |o|
+        o.order_number = i
+        o.save
+        i = i + 1
+      end
+    end
+  end
 
   #=============================================================================
   
@@ -173,5 +187,5 @@ namespace :assets do
       end
     end
   end
-  
+    
 end

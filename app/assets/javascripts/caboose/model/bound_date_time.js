@@ -1,5 +1,5 @@
 
-BoundDate = BoundControl.extend({
+BoundDateTime = BoundControl.extend({
 
   //el: false,
   //model: false,
@@ -56,16 +56,11 @@ BoundDate = BoundControl.extend({
     });
     $('#'+this.el).css('z-index', 21);
     $('#'+this.el).css('position', 'relative');
-    $('#'+this.el).css('background', 'transparent');
-    //$('#'+this.el).datepicker({
-    //  onSelect: function() { this2.save(); }      
-    //});
+    $('#'+this.el).css('background', 'transparent');    
     $('#'+this.el).datetimepicker({
-      format: 'm/d/Y',
-      //formatDate: 'm/d/Y',
-      timepicker: false,      
-      //formatTime: 'g:i a', // 12-hour format without leading zeros + lowercase am/pm 
-      onSelectDate: function() { this2.save(); }      
+      format: 'm/d/Y g:i a',                  
+      formatTime: 'h:i a', // 12-hour format without leading zeros + lowercase am/pm
+      step: 15
     });
   },
   

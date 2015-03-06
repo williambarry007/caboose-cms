@@ -265,6 +265,8 @@ module Caboose
             b.sort_order = Block.where(:parent_id => v).count
           when 'block_type_id' then b.block_type_id = v
           when 'sort_order'    then b.sort_order    = v
+          when 'constrain'     then b.constrain     = v
+          when 'full_width'    then b.full_width    = v
           when 'name'          then b.name          = v
           when 'value'         then
             

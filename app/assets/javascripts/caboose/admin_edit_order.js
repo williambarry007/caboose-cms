@@ -396,13 +396,12 @@ OrderController.prototype = {
               .append($('<div/>').attr('id', 'orderpackage_' + op.id + '_tracking_number'))
               .append($('<div/>').attr('id', 'orderpackage_' + op.id + '_total'))
             );
-          }
-          var v = li.variant;
+          }          
           tr.append($('<td/>').append(that.line_item_link(li)).append($('<div/>').attr('id', 'line_item_' + li.id + '_message')));
           tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
-          tr.append($('<td/>').attr('align', 'right').html(curr(v.price)));    
+          tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
           tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
-          tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.price)));        
+          tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));        
           table.append(tr);
         });
       }
@@ -511,8 +510,7 @@ OrderController.prototype = {
     
     $.each(that.order.line_items, function(i, li) {
       if (li.order_package_id && li.order_package_id != -1) return true;
-      var v = li.variant;
-      
+            
       var div = $('<div/>').attr('id', 'assign_to_package_' + li.id)
         .append('Unpackaged! ')
         .append($('<a/>').data('line_item_id', li.id).attr('href', '#').html('Assign to package').click(function(e) {
@@ -525,9 +523,9 @@ OrderController.prototype = {
       tr.append($('<td/>').append(div));
       tr.append($('<td/>').append(that.line_item_link(li)).append($('<div/>').attr('id', 'line_item_' + li.id + '_message')));            
       tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
-      tr.append($('<td/>').attr('align', 'right').html(curr(v.price)));    
+      tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
       tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
-      tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.price)));
+      tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));
       table.append(tr);
     });
   },

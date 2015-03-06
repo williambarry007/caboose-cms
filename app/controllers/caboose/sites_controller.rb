@@ -87,7 +87,21 @@ module Caboose
     	
     	resp.success = save && site.save
     	render :json => resp
-    end        
+    end
+    
+    # POST /admin/sites/:id/logo
+    def admin_update_logo
+      return if !user_is_allowed('sites', 'edit')
+      
+      site = Site.find(params[:id])       
+      site.logo = params[:logo]
+      site.save
+      
+      resp = StdClass.new
+      resp.success = true
+      resp.attributes = { :image => { :value => site.logo.url(:thumb) }}
+      render :json => resp
+    end
       
     # DELETE /admin/sites/:id
     def admin_delete

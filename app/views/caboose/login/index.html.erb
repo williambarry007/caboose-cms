@@ -1,8 +1,12 @@
 <form action="/login" method="post" id="login-form">
 	<div class="header">
-		<img src="/assets/caboose/caboose_logo.png" alt="Caboose">
-		<h1>caboose</h1>
-		<p>Coo Coo Ca Choo</p>
+	  <% if @site.logo %>
+	    <img src='<%= @site.logo.url(:thumb) %>' alt="<%= @site.description %>" />
+	  <% else %>
+		  <img src="/assets/caboose/caboose_logo.png" alt="Caboose">
+		  <h1>caboose</h1>
+		  <p>Coo Coo Ca Choo</p>
+		<% end %>		
 	</div>
 	
 	<input type="hidden"   name="return_url" value="<%= @return_url %>" />

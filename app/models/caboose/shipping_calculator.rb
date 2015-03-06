@@ -30,9 +30,9 @@ module Caboose
         :postal_code => order.shipping_address.zip
       )
       carriers = {}      
-      carriers['UPS']   = UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account)  if sc.ups_username.strip.length   > 0 
-      carriers['USPS']  = USPS.new( :login => sc.usps_username)                                                                                             if sc.usps_username.strip.length  > 0
-      carriers['FedEx'] = FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)        if sc.fedex_username.strip.length > 0
+      carriers['UPS']   = UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account)  if sc.ups_username   && sc.ups_username.strip.length   > 0 
+      carriers['USPS']  = USPS.new( :login => sc.usps_username)                                                                                             if sc.usps_username  && sc.usps_username.strip.length  > 0
+      carriers['FedEx'] = FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)        if sc.fedex_username && sc.fedex_username.strip.length > 0
 
       all_rates = []
       order.packages.each do |op|

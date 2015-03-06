@@ -124,6 +124,8 @@ module Caboose
           when 'options'                         then bt.options                        = v
           when 'options_function'                then bt.options_function               = v
           when 'options_url'                     then bt.options_url                    = v
+          when 'default_constrain'               then bt.default_constrain              = v
+          when 'default_full_width'              then bt.default_full_width             = v
           when 'site_id'                         then bt.toggle_site(v[0], v[1])
         end
       end

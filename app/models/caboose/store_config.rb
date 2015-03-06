@@ -32,6 +32,12 @@ module Caboose
       :shipping_rates_function,
       :length_unit,
       :weight_unit
+      
+    def next_order_number
+      x = Order.where("order_number is not null").reorder("order_number desc").limit(1).first
+      return x.order_number + 1 if x
+      return self.starting_order_number      
+    end
         
   end
 end

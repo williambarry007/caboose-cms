@@ -11,8 +11,9 @@ module Caboose
     attr_accessible :id,
       :order_package_id,
       :variant_id,
+      :unit_price,
       :quantity,
-      :price,
+      :subtotal,
       :notes,
       :order_id,
       :status,      
@@ -47,20 +48,23 @@ module Caboose
     # Callbacks
     #
     
-    before_save :update_price
+    before_save :update_subtotal
     after_save { self.order.calculate }    
     after_initialize :check_nil_fields
     
-    def check_nil_fields
-      self.price = 0.00 if self.price.nil?        
+    def check_nil_fields      
+      self.subtotal = 0.00 if self.subtotal.nil?        
     end
     
     #
     # Methods
     #
     
-    def update_price
-      self.price = self.variant.price * self.quantity
+    def update_subtotal
+      if self.unit_price.nil?
+        self.unit_price = self.variant.on_sale? ? self.variant.sale_price : self.variant.price        
+      end      
+      self.subtotal = self.unit_price * self.quantity
     end
     
     def title
@@ -78,15 +82,19 @@ module Caboose
       })
     end
     
-    def subtotal
-      return self.quantity * self.price
+    def verify_unit_price      
+      if self.unit_price.nil?
+        self.unit_price = self.variant.on_sale? ? self.variant.sale_price : self.variant.price
+        self.save
+      end      
     end
     
     def copy
       LineItem.new(      
         :variant_id      => self.variant_id      ,
         :quantity        => self.quantity        ,
-        :price           => self.price           ,
+        :unit_price      => self.unit_price      ,
+        :subtotal        => self.subtotal        ,
         :notes           => self.notes           ,
         :order_id        => self.order_id        ,
         :status          => self.status          ,        

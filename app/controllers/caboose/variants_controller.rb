@@ -141,10 +141,12 @@ module Caboose
             v.product.delay(:run_at => 3.seconds.from_now).update_on_sale            
           when 'date_sale_starts'
             v.date_sale_starts = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
-            v.product.delay(:run_at => v.date_sale_starts).update_on_sale                                  
+            v.product.delay(:run_at => v.date_sale_starts).update_on_sale
+            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale
           when 'date_sale_ends'
             v.date_sale_ends = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
-            v.product.delay(:run_at => v.date_sale_ends).update_on_sale                                  
+            v.product.delay(:run_at => v.date_sale_ends).update_on_sale  
+            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale
         end
       end
       resp.success = save && v.save

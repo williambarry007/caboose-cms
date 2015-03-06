@@ -107,7 +107,7 @@ module Caboose
       
       self.variants.each do |variant|        
         next if variant.nil? || variant.price.nil? || variant.price <= 0
-        price = variant.on_sale? ? v.sale_price : v.price
+        price = variant.on_sale? ? variant.sale_price : variant.price
         min = price if price < min
         max = price if price > max
       end

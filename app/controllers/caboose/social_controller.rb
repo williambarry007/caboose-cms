@@ -1,6 +1,10 @@
 module Caboose
   class SocialController < ApplicationController
     layout 'caboose/admin'
+
+    def analytics
+
+    end
     
     # GET /admin/social
     def admin_edit
@@ -30,6 +34,7 @@ module Caboose
           when 'rss_url'              then sc.rss_url              = value
           when 'google_plus_url'      then sc.google_plus_url      = value
           when 'linkedin_url'         then sc.linkedin_url         = value
+          when 'google_analytics_id'  then sc.google_analytics_id  = value
     	  end
     	end
     	

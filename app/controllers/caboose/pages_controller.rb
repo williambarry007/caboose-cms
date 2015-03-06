@@ -78,7 +78,7 @@ module Caboose
         end
         
         respond_to do |format|          
-          format.all { render :file => "caboose/extras/error404", :layout => "caboose/error404", :formats => [:html] }
+          format.all { render :file => "caboose/extras/error404", :layout => "caboose/application", :formats => [:html] }
         end         
         return
       end
@@ -86,7 +86,7 @@ module Caboose
       asset = Asset.where(:page_id => page.id, :filename => File.basename(uri)).first
       if (asset.nil?)
         respond_to do |format|          
-          format.all { render :file => "caboose/extras/error404", :layout => "caboose/error404", :formats => [:html] }
+          format.all { render :file => "caboose/extras/error404", :layout => "caboose/application", :formats => [:html] }
         end
         return
       end

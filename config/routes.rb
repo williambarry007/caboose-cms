@@ -87,6 +87,7 @@ Caboose::Engine.routes.draw do
   
   get     "admin/social"               => "social#admin_edit"  
   put     "admin/social"               => "social#admin_update"
+  get     "admin/analytics"            => "social#analytics"
 
 
   #=============================================================================

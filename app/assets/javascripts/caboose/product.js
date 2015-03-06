@@ -17,6 +17,8 @@ Caboose.Store.Modules.Product = (function() {
   self.initialize = function() {
     self.$product = $('#product');
     self.$price = self.$product.find('#product-price');
+    $("<span id='percent-off'></span").insertAfter(self.$price);
+    $("<span id='sale-price'></span").insertBefore(self.$price);
     if (!self.$product.length) return false;
 
     $.get('/products/' + self.$product.data('id') + '/info', function(response) {
@@ -264,21 +266,34 @@ Caboose.Store.Modules.Product = (function() {
     Caboose.Store.Modules.Cart.set_variant(variant);
     if (variant) self.set_image_from_variant(variant);
     if (variant && self.$price.length) self.$price.empty().text('$' + parseFloat((variant.price * 100) / 100).toFixed(2));
-
+    if (self.variant_on_sale(variant)) {
+      self.$price.addClass("on-sale");
+      var percent = 100 - ((variant.sale_price / variant.price) * 100).toFixed(0);
+      $("#percent-off").text("SALE! Save " + percent + "%");
+      $("#sale-price").text('$' + parseFloat((variant.sale_price * 100) / 100).toFixed(2));
+    }
+    else {
+      self.$price.removeClass("on-sale");
+      $("#percent-off").text('');
+      $("#sale-price").text('');
+    }
   };
 
   self.variant_on_sale = function(variant) {
-    if (variant.sale_price == "") {
-      return false;
+    var is_on_sale = false;
+    if (variant.sale_price != "" && variant.sale_price != 0) {
+      var d = new Date();
+      if (variant.date_sale_starts && d < variant.date_sale_starts) {
+        is_on_sale = false;
+      }
+      else if (variant.date_sale_ends && d > variant.date_sale_ends) {
+        is_on_sale = false;
+      }
+      else {
+        is_on_sale = true;
+      }
     }
-    else {
-      
-    }
-    d = DateTime.now.utc
-    return false if self.date_sale_starts && d < self.date_sale_starts
-    return false if self.date_sale_ends   && d > self.date_sale_ends
-    return true
-  
+    return is_on_sale;
   }
   
   self.get_variant = function(id) {

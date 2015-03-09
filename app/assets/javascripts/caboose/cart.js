@@ -101,12 +101,12 @@ Cart.prototype = {
             
         tbody.append($('<tr/>')        
           .append(gctd)
-          .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(d.amount).toFixed(2)))
+          .append($('<td/>').css('text-align', 'right').html('-$' + parseFloat(d.amount).toFixed(2)))
         );          
       });
       if (that.order.custom_discount && that.order.custom_discount > 0)
       {
-        tbody.append($('<tr/>')        
+        tbody.append($('<tr/>')
           .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Discount'))
           .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.custom_discount).toFixed(2)))
         );

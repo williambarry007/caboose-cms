@@ -8,7 +8,11 @@ module Caboose
     attr_accessible :id,
       :gift_card_id,
       :order_id,
-      :amount      
+      :amount
+
+    after_find do |d|
+      d.amount = 0.00 if d.amount.nil?                        
+    end
       
   end
 end

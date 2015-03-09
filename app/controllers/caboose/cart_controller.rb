@@ -89,8 +89,8 @@ module Caboose
                   
       if gc.nil? then resp.error = "Invalid gift card code."                    
       elsif gc.status != GiftCard::STATUS_ACTIVE                                then resp.error = "That gift card is not active."
-      elsif gc.date_available && DateTime.now.utc < self.date_available         then resp.error = "That gift card is not active yet."         
-      elsif gc.date_expires && DateTime.now.utc > self.date_expires             then resp.error = "That gift card is expired."
+      elsif gc.date_available && DateTime.now.utc < gc.date_available           then resp.error = "That gift card is not active yet."         
+      elsif gc.date_expires && DateTime.now.utc > gc.date_expires               then resp.error = "That gift card is expired."
       elsif gc.card_type == GiftCard::CARD_TYPE_AMOUNT && gc.balance <= 0       then resp.error = "That gift card has a zero balance." 
       elsif gc.min_order_total && @order.total < gc.min_order_total             then resp.error = "Your order must be at least $#{sprintf('%.2f',gc.min_order_total)} to use this gift card." 
       elsif Discount.where(:order_id => @order.id, :gift_card_id => gc.id).exists? then resp.error = "That gift card has already been applied to this order."

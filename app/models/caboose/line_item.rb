@@ -8,18 +8,23 @@ module Caboose
     belongs_to :parent, :class_name => 'LineItem', :foreign_key => 'parent_id'
     has_many :children, :class_name => 'LineItem', :foreign_key => 'parent_id'
     
-    attr_accessible :id,
-      :order_package_id,
-      :variant_id,
-      :unit_price,
-      :quantity,
-      :subtotal,
-      :notes,
-      :order_id,
-      :status,      
-      :custom1,
-      :custom2,
-      :custom3
+    attr_accessible :id      ,
+      :order_id              ,
+      :order_package_id      ,
+      :variant_id            ,
+      :unit_price            ,
+      :quantity              ,
+      :subtotal              ,
+      :notes                 ,            
+      :status                ,      
+      :custom1               ,
+      :custom2               ,
+      :custom3               ,
+      :is_gift               ,
+      :include_gift_message  ,
+      :gift_message          ,
+      :gift_wrap             ,
+      :hide_prices
     
     #
     # Scopes

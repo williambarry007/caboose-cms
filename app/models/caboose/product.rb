@@ -17,26 +17,36 @@ module Caboose
     
     #default_scope order('store_products.sort_order')
     
-    attr_accessible :id,
-      :site_id,
-      :alternate_id,
-      :title,
-      :description,
-      :vendor_id,
-      :handle,
-      :date_available,
-      :seo_title,
-      :seo_description,
-      :option1,
-      :option2,
-      :option3,
-      :default1,
-      :default2,
-      :default3,
-      :status,
-      :custom_input,
-      :featured
-    
+    attr_accessible :id      ,
+      :site_id               ,
+      :alternate_id          ,
+      :title                 ,
+      :caption               ,
+      :description           ,
+      :handle                ,
+      :status                ,
+      :vendor_id             ,
+      :category_id           ,      
+      :option1               ,
+      :option2               ,
+      :option3               ,      
+      :default1              ,
+      :default2              ,
+      :default3              ,
+      :seo_title             ,
+      :seo_description       ,
+      :alternate_id          ,
+      :date_available        ,
+      :custom_input          ,
+      :sort_order            ,
+      :featured              ,
+      :stackable_group_id    ,
+      :on_sale               ,
+      :allow_gift_wrap       ,
+      :gift_wrap_price
+
+    STATUS_ACTIVE = 'Active'
+    STATUS_INACTIVE = 'Inactive'
     
     #
     # Scopes

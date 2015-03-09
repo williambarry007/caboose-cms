@@ -13,16 +13,33 @@ module Caboose
     def index
       
       # If id exists, is an integer and a product exists with the specified id then get the product
-      if params[:id] && params[:id].to_i > 0 && Product.exists?(params[:id])
-        @product = Product.find(params[:id])
-        render 'product/not_available' and return if @product.status == 'Inactive'
-        
-        @category       = @product.categories.first
-        @review         = Review.new
-        @reviews        = Review.where(:product_id => @product.id).limit(10).order("id DESC") || nil
-        @logged_in_user = logged_in_user
-        
-        render 'caboose/products/details' and return        
+      if params[:id]        
+        if params[:id] == 'sales'
+          products = Caboose::Product.where(:site_id => @site.id, :status => Caboose::Product::STATUS_ACTIVE, :on_sale => true).all      
+          @sale_categories = {}        
+          products.each do |p|
+            cat = 'Uncategorized'
+            if p.categories.count > 0
+              cats = p.categories.last.ancestry.collect{ |a| a.name }
+              cats.shift
+              cat = cats.join(' > ')
+            end
+            @sale_categories[cat] = [] if @sale_categories[cat].nil?
+            @sale_categories[cat] << p
+          end
+          render 'caboose/products/sales' and return
+          
+        elsif params[:id].to_i > 0 && Product.exists?(params[:id])
+          @product = Product.find(params[:id])
+          render 'product/not_available' and return if @product.status == 'Inactive'
+          
+          @category       = @product.categories.first
+          @review         = Review.new
+          @reviews        = Review.where(:product_id => @product.id).limit(10).order("id DESC") || nil
+          @logged_in_user = logged_in_user
+          
+          render 'caboose/products/details' and return
+        end
       end
       
       # Filter params from url
@@ -327,7 +344,9 @@ module Caboose
           when 'seo_description'    then product.seo_description    = value
           when 'status'             then product.status             = value
           when 'category_id'        then product.toggle_category(value[0], value[1])
-          when 'stackable_group_id' then product.stackable_group_id = value          
+          when 'stackable_group_id' then product.stackable_group_id = value
+          when 'allow_gift_wrap'    then product.allow_gift_wrap    = value
+          when 'gift_wrap_price'    then product.gift_wrap_price    = value
           when 'option1'            then product.option1            = value
           when 'option2'            then product.option2            = value
           when 'option3'            then product.option3            = value

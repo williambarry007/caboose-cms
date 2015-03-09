@@ -285,15 +285,19 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :order_package_id      , :integer  ],
         [ :variant_id            , :integer  ],
         [ :parent_id             , :integer  ],                
-        [ :status                , :string   ],
-        [ :tracking_number       , :string   ],
+        [ :status                , :string   ],        
         [ :quantity              , :integer   , :default => 0 ],
         [ :unit_price            , :decimal   , { :precision => 8, :scale => 2 }],
         [ :subtotal              , :decimal   , { :precision => 8, :scale => 2 }],
         [ :notes                 , :text     ],
         [ :custom1               , :string   ],
         [ :custom2               , :string   ],
-        [ :custom3               , :string   ]
+        [ :custom3               , :string   ],
+        [ :is_gift               , :boolean   , { :default => false }],
+        [ :include_gift_message  , :boolean   , { :default => false }],
+        [ :gift_message          , :text     ],
+        [ :gift_wrap             , :boolean   , { :default => false }],
+        [ :hide_prices           , :boolean   , { :default => false }]
       ],
       Caboose::MediaCategory => [
         [ :parent_id         , :integer ],
@@ -342,6 +346,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :tax                   , :decimal  , { :precision => 8, :scale => 2 }],
         [ :shipping              , :decimal  , { :precision => 8, :scale => 2 }],
         [ :handling              , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :gift_wrap             , :decimal  , { :precision => 8, :scale => 2 }],
         [ :custom_discount       , :decimal  , { :precision => 8, :scale => 2 }],
         [ :discount              , :decimal  , { :precision => 8, :scale => 2 }],
         [ :total                 , :decimal  , { :precision => 8, :scale => 2 }],
@@ -471,7 +476,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :sort_order            , :integer   ],
         [ :featured              , :boolean   , :default => false ],
         [ :stackable_group_id    , :integer   ],
-        [ :on_sale               , :boolean   , { :default => false }]
+        [ :on_sale               , :boolean   , { :default => false }],
+        [ :allow_gift_wrap       , :boolean   , { :default => false }],
+        [ :gift_wrap_price       , :decimal   , { :precision => 8, :scale => 2 }]
       ],
       Caboose::ProductImage => [
         [ :product_id            , :integer  ],

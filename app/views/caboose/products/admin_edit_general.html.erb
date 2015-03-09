@@ -3,16 +3,18 @@ p = @product
 %>
 <%= render :partial => 'caboose/products/admin_header' %>
 
-<p><div id='product_<%= p.id %>_vendor_id'></div></p>
-<p><div id='product_<%= p.id %>_title'></div></p>
-<p><div id='product_<%= p.id %>_caption'></div></p>
-<p><div id='product_<%= p.id %>_handle'></div></p>
-<p><div id='product_<%= p.id %>_featured'></div></p>
-<p><div id='product_<%= p.id %>_seo_title'></div></p>
-<p><div id='product_<%= p.id %>_seo_description'></div></p>
-<p><div id='product_<%= p.id %>_status'></div></p>
-<p><div id='product_<%= p.id %>_alternate_id'></div></p>
-<p><div id='product_<%= p.id %>_date_available'></div></p>
+<p><div id='product_<%= p.id %>_vendor_id'       ></div></p>
+<p><div id='product_<%= p.id %>_title'           ></div></p>
+<p><div id='product_<%= p.id %>_caption'         ></div></p>
+<p><div id='product_<%= p.id %>_handle'          ></div></p>
+<p><div id='product_<%= p.id %>_featured'        ></div></p>
+<p><div id='product_<%= p.id %>_seo_title'       ></div></p>
+<p><div id='product_<%= p.id %>_seo_description' ></div></p>
+<p><div id='product_<%= p.id %>_status'          ></div></p>
+<p><div id='product_<%= p.id %>_alternate_id'    ></div></p>
+<p><div id='product_<%= p.id %>_date_available'  ></div></p>
+<p><div id='product_<%= p.id %>_allow_gift_wrap' ></div></p>
+<p><div id='product_<%= p.id %>_gift_wrap_price' ></div></p>
 
 <div id='message'><%= raw flash[:message] ? flash[:message] : "" %></div>
 
@@ -40,7 +42,9 @@ $(document).ready(function() {
       { name: 'seo_description' , nice_name: 'SEO Meta Description' , type: 'textarea'  , value: <%= raw Caboose.json(p.seo_description ) %>, width: 500, height: 150 },
       { name: 'alternate_id'    , nice_name: 'Alternate ID'         , type: 'text'      , value: <%= raw Caboose.json(p.alternate_id    ) %>, width: 500 },
       { name: 'date_available'  , nice_name: 'Date Available'       , type: 'text'      , value: <%= raw Caboose.json(date_available    ) %>, width: 500 },
-      { name: 'featured'        , nice_name: 'Featured'             , type: 'checkbox'  , value: <%= raw Caboose.json(p.featured        ) %>, width: 500 }
+      { name: 'featured'        , nice_name: 'Featured'             , type: 'checkbox'  , value: <%= raw Caboose.json(p.featured        ) %>, width: 500 },
+      { name: 'allow_gift_wrap' , nice_name: 'Allow Gift Wrap'      , type: 'checkbox'  , value: <%= raw Caboose.json(p.allow_gift_wrap ? 1 : 0) %>, width: 500 },
+      { name: 'gift_wrap_price' , nice_name: 'Gift Wrap Price'      , type: 'text'      , value: <%= raw Caboose.json(p.gift_wrap_price ? number_with_delimiter(p.gift_wrap_price, :precision => 2) : '') %>, width: 500 }
     ]
   });
 });

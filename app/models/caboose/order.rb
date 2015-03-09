@@ -23,6 +23,7 @@ module Caboose
       :tax,            
       :shipping,
       :handling,
+      :gift_wrap,
       :custom_discount,
       :discount,      
       :total,
@@ -139,12 +140,13 @@ module Caboose
     end
     
     def calculate
-      self.update_column(:subtotal , self.calculate_subtotal )
-      self.update_column(:tax      , self.calculate_tax      )
-      self.update_column(:shipping , self.calculate_shipping )
-      self.update_column(:handling , self.calculate_handling )
-      self.update_column(:discount , self.calculate_discount )
-      self.update_column(:total    , self.calculate_total    )
+      self.update_column(:subtotal  , self.calculate_subtotal  )
+      self.update_column(:tax       , self.calculate_tax       )
+      self.update_column(:shipping  , self.calculate_shipping  )
+      self.update_column(:handling  , self.calculate_handling  )
+      self.update_column(:gift_wrap , self.calculate_gift_wrap )
+      self.update_column(:discount  , self.calculate_discount  )
+      self.update_column(:total     , self.calculate_total     )
     end
     
     def calculate_subtotal
@@ -172,6 +174,16 @@ module Caboose
       self.subtotal * self.site.store_config.handling_percentage.to_f
     end
     
+    def calculate_gift_wrap      
+      x = 0.0
+      self.line_items.each do |li|
+        next if !li.gift_wrap
+        next if !li.product.allow_gift_wrap
+        x = x + li.product.gift_wrap_price * li.quantity
+      end
+      return x
+    end
+    
     def calculate_discount      
       return 0.0 if self.discounts.nil? || self.discounts.count == 0
       x = 0.0
@@ -181,7 +193,7 @@ module Caboose
     end
     
     def calculate_total
-      return (self.subtotal + self.tax + self.shipping + self.handling) - self.discount
+      return (self.subtotal + self.tax + self.shipping + self.handling + self.gift_wrap) - self.discount
     end
     
     def shipping_and_handling

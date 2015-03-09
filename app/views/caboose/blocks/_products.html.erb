@@ -1,6 +1,12 @@
+<%
+# Note: This block is in the content area for the /products pages.
+# It's set up like this so that each site can have custom views.
+%>
 <div id='block_<%= block.id %>'>
 
-  <%= block.partial('product_crumbtrail', local_assigns) %>	
+  <%= block.partial('product_crumbtrail', local_assigns) %>
+  <% if @sale_categories %>	
+    <%= block.partial('product_sales', local_assigns) %>
   <% if @product %>    
     <%= block.partial('product_details', local_assigns) %>  
   <% else %>  

@@ -401,7 +401,7 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   # Products  
   #=============================================================================
-  
+    
   get     '/products/:id/info' => 'products#info'
   get     '/products/:id'      => 'products#index', :constraints => { :id => /.*/ }
   get     '/products'          => 'products#index'

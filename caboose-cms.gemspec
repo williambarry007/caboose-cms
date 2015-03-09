@@ -52,7 +52,7 @@ Gem::Specification.new do |s|
   s.add_dependency "ejs"
   s.add_dependency "httparty"
   s.add_dependency "authorize-net"
-  s.add_dependency "prawn"      
+  s.add_dependency "prawn"
   s.add_dependency "active_shipping"  
   s.add_dependency "nokogiri"
   s.add_dependency 'box_packer'

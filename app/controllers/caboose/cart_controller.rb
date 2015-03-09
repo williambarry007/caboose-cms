@@ -86,7 +86,7 @@ module Caboose
       resp = StdClass.new
       code = params[:code].strip
       gc = GiftCard.where("lower(code) = ?", code.downcase).first
-      
+                  
       if gc.nil? then resp.error = "Invalid gift card code."                    
       elsif gc.status != GiftCard::STATUS_ACTIVE                                then resp.error = "That gift card is not active."
       elsif gc.date_available && DateTime.now.utc < self.date_available         then resp.error = "That gift card is not active yet."         
@@ -96,9 +96,9 @@ module Caboose
       elsif Discount.where(:order_id => @order.id, :gift_card_id => gc.id).exists? then resp.error = "That gift card has already been applied to this order."
       else
         # Determine how much the discount will be
-        d = Discount.new(:order_id => @order.id, :gift_card_id => gc.id, :amount => 0.0)
+        d = Discount.new(:order_id => @order.id, :gift_card_id => gc.id, :amount => 0.0)        
         case gc.card_type
-          when GiftCard::CARD_TYPE_AMOUNT      then d.amount = (@order.total > gc.balance ? gc.balance : @order.total)
+          when GiftCard::CARD_TYPE_AMOUNT      then d.amount = (@order.total >= gc.balance ? gc.balance : @order.total)
           when GiftCard::CARD_TYPE_PERCENTAGE  then d.amount = @order.subtotal * gc.total
           when GiftCard::CARD_TYPE_NO_SHIPPING then d.amount = @order.shipping
           when GiftCard::CARD_TYPE_NO_TAX      then d.amount = @order.tax

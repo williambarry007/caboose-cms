@@ -54,6 +54,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :repeat_start  , 
         :repeat_end        
       ],
+      #Caboose::Discount => [
+      #  :amount
+      #],
       Caboose::Order => [
         :shipping_method       , 
         :shipping_method_code  ,

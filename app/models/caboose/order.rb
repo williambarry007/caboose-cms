@@ -46,6 +46,7 @@ module Caboose
     STATUS_SHIPPED       = 'shipped'    
     STATUS_TESTING       = 'testing'
 
+    FINANCIAL_STATUS_PENDING    = 'pending'
     FINANCIAL_STATUS_AUTHORIZED = 'authorized'
     FINANCIAL_STATUS_CAPTURED   = 'captured'
     FINANCIAL_STATUS_REFUNDED   = 'refunded'

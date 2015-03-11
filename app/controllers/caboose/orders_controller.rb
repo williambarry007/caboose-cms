@@ -201,13 +201,13 @@ module Caboose
       ])
     end
   
-    # GET /admin/orders/:id/print
+    # GET /admin/orders/:id/print.pdf
     def admin_print
       return if !user_is_allowed('orders', 'edit')           
       
       pdf = OrderPdf.new
       pdf.order = Order.find(params[:id])             
-      send_data pdf.to_pdf, :filename => "order_#{pdf.order.id}.pdf", :type => "application/pdf", :disposition => "inline"                        
+      send_data pdf.to_pdf, :filename => "order_#{pdf.order.id}.pdf", :type => "application/pdf", :disposition => "inline"   
     end
     
     # GET /admin/orders/print-pending

@@ -15,9 +15,7 @@ store_config = @site.store_config
         <input type="hidden" id="x_city"        name="x_city"        value="<%= raw @order.billing_address.city       %>" />
         <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @order.billing_address.state      %>" />
         <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @order.billing_address.zip        %>" />
-        
-
-        
+                
         <div class="field" id="credit-card">
           <span class="field-text">Credit Card</span>
           <div class="icons">

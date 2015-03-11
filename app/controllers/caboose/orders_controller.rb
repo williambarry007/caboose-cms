@@ -53,6 +53,7 @@ module Caboose
     def admin_edit
       return if !user_is_allowed('orders', 'edit')
       @order = Order.find(params[:id])
+      @order.calculate
       render :layout => 'caboose/admin'
     end
     

@@ -9,7 +9,9 @@ Cart.prototype = {
   show_total: true,
   show_shipping: true,
   show_tax: true,
+  show_gift_wrap: true,
   show_discounts: true,
+  show_gift_options: true,
     
   init: function(params) 
   {
@@ -58,6 +60,44 @@ Cart.prototype = {
       var item = $('<td/>').attr('valign', 'top').append(p.title + '<br/>' + v.title);
       if (that.allow_edit_line_items == true)
         item.append('<br/>').append($('<a/>').attr('href','#').html('Remove').click(function(e) { e.preventDefault(); that.remove_item(li.id); }));
+      if (that.show_gift_options)
+      {
+        if (this.allow_edit_line_items)
+        {
+          item
+            .append($('<div/>').addClass('gift_options_checkbox')
+              .append($('<table/>')
+                .append($('<tbody/>')
+                  .append($('<tr/>').append($('<td/>').addClass('checkbox').append($('<div/>').attr('id', 'lineitem_' + li.id + '_is_gift'  ))).append($('<td/>').append("This item is a gift")))              
+                )
+              )
+            )
+            .append($('<div/>').attr('id', 'gift_options_' + li.id).addClass('gift_options').css('display', li.is_gift ? 'block' : 'none')   
+              .append($('<table/>')
+                .append($('<tbody/>')
+                  .append($('<tr/>').append($('<td/>').addClass('checkbox').append($('<div/>').attr('id', 'lineitem_' + li.id + '_gift_wrap'  ))).append($('<td/>').append("Gift wrap ($" + parseFloat(li.variant.product.gift_wrap_price).toFixed(2) + ')')))
+                  .append($('<tr/>').append($('<td/>').addClass('checkbox').append($('<div/>').attr('id', 'lineitem_' + li.id + '_hide_prices'))).append($('<td/>').append("Hide prices in receipt")))
+                  .append($('<tr/>').append($('<td/>').attr('colspan', '2').append('Gift message<br/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_gift_message'))))
+                )
+              )
+            );
+        }
+        else
+        {
+          if (li.is_gift)
+          {
+            item.append($('<ul/>').addClass('gift_options')
+              .append($('<li/>').html("This item is a gift."))
+              .append($('<li/>').html("Gift wrap? " + (li.gift_wrap ? 'Yes' : 'No')))
+              .append($('<li/>').html("Hide prices? " + (li.hide_prices ? 'Yes' : 'No')))
+              .append($('<li/>').html("Gift message: " + (li.gift_message.length > 0 ? li.gift_message : '[Empty]')))
+            );
+          }
+          else 
+            item.append("This item is not a gift.")                              
+        }
+      }
+      
       var qty = $('<td/>').css('text-align', 'right');
       if (that.allow_edit_line_items == true)
         qty.append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity'));
@@ -81,6 +121,13 @@ Cart.prototype = {
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Shipping &amp; Handling'))
         .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.shipping + that.order.handling).toFixed(2)))
+      );
+    }
+    if (that.show_gift_wrap)
+    {
+      tbody.append($('<tr/>')        
+        .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Gift Wrapping'))
+        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.gift_wrap).toFixed(2)))
       );
     }
     if (that.show_tax)
@@ -120,21 +167,40 @@ Cart.prototype = {
       );            
     }            
     $('#cart').empty().append($('<table/>').append(tbody));
-          
-    if (that.allow_edit_line_items)
+     
+    // Make anything editable that needs to be
+    if (this.allow_edit_line_items)
     {
-      $.each(this.order.line_items, function(i, li) {      
+      $.each(this.order.line_items, function(i, li) {
+        var p = li.variant.product;
+        var attribs = [];
+        if (that.allow_edit_line_items)
+          attribs.push({ name: 'quantity', nice_name: 'Qty', type: 'text', value: li.quantity, width: 50, fixed_placeholder: false, after_update: function() { that.refresh(); } });
+        if (that.show_gift_options)
+        {
+          attribs.push({ name: 'is_gift'      , nice_name: 'This item is a gift'  , type: 'checkbox' , value: li.is_gift      , width: 40 ,               fixed_placeholder: false, after_update: function() { that.toggle_gift_options(this.li_id); }, li_id: li.id });
+          attribs.push({ name: 'hide_prices'  , nice_name: 'Hide prices'          , type: 'checkbox' , value: li.hide_prices  , width: 40 ,               fixed_placeholder: false, after_update: function() { } });        
+          attribs.push({ name: 'gift_wrap'    , nice_name: 'Gift wrap'            , type: 'checkbox' , value: li.gift_wrap    , width: 40 ,               fixed_placeholder: false, after_update: function() { that.refresh(); } });        
+          attribs.push({ name: 'gift_message' , nice_name: 'Gift message'         , type: 'textarea' , value: li.gift_message , width: 400 , height: 75 , fixed_placeholder: false, after_update: function() { } });                        
+        }                  
         m = new ModelBinder({
           name: 'LineItem',
           id: li.id,
           update_url: '/cart/' + li.id,
           authenticity_token: that.form_authenticity_token,    
-          attributes: [
-            { name: 'quantity', nice_name: 'Qty', type: 'text', value: li.quantity, width: 50, fixed_placeholder: false, after_update: function() { that.refresh(); } }                
-          ]
-        }); 
+          attributes: attribs
+        });
       });
-    }        
+    }
+  },
+  
+  toggle_gift_options: function(li_id)
+  {
+    var el = $('#gift_options_' + li_id);
+    if (el.is(':visible'))
+      el.slideUp();
+    else
+      el.slideDown();    
   },
   
   remove_item: function(li_id)

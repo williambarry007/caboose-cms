@@ -73,7 +73,7 @@ module Caboose
         end
       end      
       line_items = h.sort_by{ |k,v| k }.collect{ |x| x[1] }      
-      all_packages = ShippingPackage.reorder(:price).all      
+      all_packages = ShippingPackage.reorder(:flat_rate_price).all      
       
       # Now go through each variant and fit it in a new or existing package
       line_items.each do |li|

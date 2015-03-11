@@ -5,6 +5,18 @@
   table { border-collapse: collapse; width: 100%; }
   table th { font-weight: bold; text-align: center; }
   table td { border: #ccc 1px solid; padding: 10px; }
+  .gift_options {
+    table td { border: 0; }
+    table td.checkbox { margin: 0; padding: 0; width: 20px; }
+    .mb_checkbox_background { display: none; }      
+    .mb_container input[type="checkbox"] { position: relative; margin-left: -10px; width: auto; top: 0; }
+  }
+  .gift_options_checkbox {    
+    table td { border: 0; }
+    table td.checkbox { margin: 0; padding: 0; width: 20px; }
+    .mb_checkbox_background { display: none; }      
+    .mb_container input[type="checkbox"] { position: relative; margin-left: -10px; width: auto; top: 0; }
+  }
   
   input[type="text"] {    
     border-color: #b9b9b9;

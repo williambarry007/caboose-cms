@@ -65,14 +65,33 @@ module Caboose
     end
     
     # PUT /cart/:line_item_id
-    def update
+    def update            
+      resp = Caboose::StdClass.new
       li = LineItem.find(params[:line_item_id])
-      li.quantity = params[:quantity].to_i
-      li.subtotal = li.unit_price * li.quantity
+
+      save = true    
+      params.each do |name,value|
+        case name
+          when 'quantity'    then 
+            li.quantity = value.to_i
+            if li.quantity == 0
+              li.destroy
+            else            
+              li.subtotal = li.unit_price * li.quantity
+              li.save
+              li.order.calculate
+            end
+          when 'is_gift'               then li.is_gift              = value
+          when 'include_gift_message'  then li.include_gift_message = value
+          when 'gift_message'          then li.gift_message         = value
+          when 'gift_wrap'             then li.gift_wrap            = value
+          when 'hide_prices'           then li.hide_prices          = value                                  
+        end
+      end
       li.save
-      li.destroy if li.quantity == 0
-      @order.calculate_subtotal
-      render :json => { :success => true }
+      li.order.calculate
+      resp.success = true
+      render :json => resp                                    
     end
     
     # DELETE /cart/:line_item_id

@@ -80,6 +80,20 @@ namespace :caboose do
       end
     end
   end
+  
+  desc "Remove invalid variant images"
+  task :remove_invalid_variant_images => :environment do
+    
+    Caboose::Product.reorder(:id).all.each do |p|
+      ids = p.product_images.collect{ |img| img.id }
+      p.variants.each do |v|
+        v.product_image_variants.all.each do |piv|
+          piv.destroy if !ids.include?(piv.product_image_id)
+        end
+      end
+    end
+    
+  end
 
   #=============================================================================
   

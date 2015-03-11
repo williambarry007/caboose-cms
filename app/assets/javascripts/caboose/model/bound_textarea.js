@@ -21,7 +21,8 @@ BoundTextarea = BoundControl.extend({
     );
     $('#'+this.el+'_container').empty();
     $('#'+this.el+'_container').append($('<textarea/>').attr('id', this.el).attr('placeholder', 'empty').val(this.attribute.value));
-    $('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('mb_placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));
+    if (this.attribute.fixed_placeholder)
+      $('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('mb_placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));
     if (this.attribute.width)  $('#'+this.el).css('width'  , this.attribute.width);
     if (this.attribute.height) $('#'+this.el).css('height' , this.attribute.height);
     var h = $('#'+this.el+'_placeholder').outerHeight();

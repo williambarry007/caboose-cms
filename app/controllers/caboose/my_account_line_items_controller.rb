@@ -47,7 +47,7 @@ module Caboose
       config = YAML.load_file("#{::Rails.root}/config/aws.yml")        
       bucket = AWS::S3::Bucket.new(config[Rails.env]['bucket'])
       s3object = AWS::S3::S3Object.new(bucket, li.variant.download_path)
-      url = s3object.url_for(:read, :expires => sc.download_url_expires_in.minutes).to_s
+      url = s3object.url_for(:read, :expires => sc.download_url_expires_in.to_i.minutes).to_s
 
       redirect_to url
     end

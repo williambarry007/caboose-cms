@@ -179,8 +179,8 @@ module Caboose
       x = 0.0
       self.line_items.each do |li|
         next if !li.gift_wrap
-        next if !li.product.allow_gift_wrap
-        x = x + li.product.gift_wrap_price * li.quantity
+        next if !li.variant.product.allow_gift_wrap
+        x = x + li.variant.product.gift_wrap_price * li.quantity
       end
       return x
     end

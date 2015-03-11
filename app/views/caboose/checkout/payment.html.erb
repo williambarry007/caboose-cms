@@ -90,7 +90,7 @@ store_config = @site.store_config
     <% if @order.has_shippable_items? %>
       <section id='shipping_method'>
         <h3>Shipping</h3>
-        <% @order.order_packages.each do |op| %>        
+        <% @order.order_packages.all.each do |op| %>        
           <p><%= op.shipping_method.service_name %> - <%= number_to_currency(op.total) %></p>
         <% end %>
         <p><a href="/checkout/shipping">Edit</a></p>

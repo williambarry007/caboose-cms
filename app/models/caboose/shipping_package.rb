@@ -40,7 +40,7 @@ module Caboose
       return false if (rigid_volume + floppy_volume) > self.volume
       rigid_boxes = self.boxes(rigid)
       
-      it_fits = false       
+      it_fits = false      
       BoxPacker.container [self.inside_length, self.inside_width, self.inside_height] do        
         rigid_boxes.each{ |arr| add_item arr }    
         count = pack!

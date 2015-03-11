@@ -73,16 +73,17 @@ module Caboose
         end
       end      
       line_items = h.sort_by{ |k,v| k }.collect{ |x| x[1] }      
-      all_packages = ShippingPackage.reorder(:flat_rate_price).all      
+      all_packages = ShippingPackage.where(:site_id => order.site_id).reorder(:flat_rate_price).all      
       
       # Now go through each variant and fit it in a new or existing package
       line_items.each do |li|
+        next if li.variant.downloadable
         
         # See if the item will fit in any of the existing packages
         it_fits = false
-        order.packages.each do |op|
+        order.order_packages.all.each do |op|
           it_fits = op.fits(li)
-          if it_fits
+          if it_fits            
             li.order_package_id = op.id
             li.save            
             break
@@ -91,16 +92,20 @@ module Caboose
         next if it_fits
         
         # Otherwise find the cheapest package the item will fit into
-        all_packages.each do |sp|          
-          if sp.fits(li.variant)
+        it_fits = false
+        all_packages.each do |sp|
+          it_fits = sp.fits(li.variant)          
+          if it_fits            
             op = OrderPackage.create(:order_id => order.id, :shipping_package_id => sp.id)
             li.order_package_id = op.id
             li.save                          
             break
           end
         end
-               
-      end            
+        next if it_fits
+        
+        Caboose.log("Error: line item #{li.id} (#{li.variant.product.title}) does not fit into any package.")               
+      end      
     end
     
     def fits(line_item = nil)

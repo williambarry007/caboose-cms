@@ -5,7 +5,7 @@ module Caboose
     def admin_json      
       return if !user_is_allowed('orders', 'view')
       order = Order.find(params[:order_id])
-      render :json => order.packages.as_json(
+      render :json => order.order_packages.as_json(
         :include => { :shipping_package => { :include => :shipping_methods} }
       )
     end     

@@ -21,7 +21,7 @@ captured = @order.financial_status == 'captured'
 </table><br />
 
 <table class='order' width='100%'>
-<% @order.packages.each_with_index do |op, i| %>
+<% @order.order_packages.all.each_with_index do |op, i| %>
   <tr><td colspan='5' class='package_header'>Package <%= (i+1) %>: <%= op.shipping_method.service_name %><br /><%= op.status %></td></tr>
   <tr>  
     <th>Item</th>

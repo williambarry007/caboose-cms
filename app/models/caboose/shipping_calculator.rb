@@ -9,8 +9,8 @@ module Caboose
     end
     
     def self.rates(order)
-      return [] if Caboose::store_shipping.nil?
-            
+      
+      return [] if order.site.nil? || order.site.store_config.nil?
       sc = order.site.store_config
       if sc.shipping_rates_function        
         rates = self.custom_rates(sc, order)
@@ -33,23 +33,28 @@ module Caboose
       carriers['UPS']   = UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account)  if sc.ups_username   && sc.ups_username.strip.length   > 0 
       carriers['USPS']  = USPS.new( :login => sc.usps_username)                                                                                             if sc.usps_username  && sc.usps_username.strip.length  > 0
       carriers['FedEx'] = FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)        if sc.fedex_username && sc.fedex_username.strip.length > 0
-
-      all_rates = []
-      order.packages.each do |op|
+      
+      all_rates = []            
+      order.order_packages.all.each do |op|                
         sp = op.shipping_package                            
         package = op.activemerchant_package
         rates = []
-        carriers.each do |name, carrier|          
+        carriers.each do |name, carrier|
+          Caboose.log("Looking at carrier #{name}")
           if sp.uses_carrier(name)
-            resp = carrier.find_rates(origin, destination, package)      
-            resp.rates.sort_by(&:price).each do |rate|
-              sm = ShippingMethod.where(:carrier => name, :service_code => rate.service_code).first
+            Caboose.log("Shipping package does use carrier #{name}.")            
+            resp = carrier.find_rates(origin, destination, package)                        
+            resp.rates.sort_by(&:price).each do |rate|              
+              sm = ShippingMethod.where( :carrier => name, :service_code => rate.service_code, :service_name => rate.service_name).first
               sm = ShippingMethod.create(:carrier => name, :service_code => rate.service_code, :service_name => rate.service_name) if sm.nil?
               next if !sp.uses_shipping_method(sm)
               rates << { :shipping_method => sm, :price => rate.total_price.to_d / 100 }
             end
           end
         end        
+        if rates.count == 0
+          Caboose.log("Error: no shipping rates found for order package #{op.id}.")
+        end
         all_rates << { :order_package => op, :rates => rates }        
       end            
       return all_rates

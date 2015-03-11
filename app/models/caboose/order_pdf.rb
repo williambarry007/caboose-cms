@@ -139,7 +139,7 @@ module Caboose
 
       order.calculate
       
-      order.order_packages.each do |pk|
+      order.order_packages.all.each do |pk|
 
         carrier = pk.shipping_method.carrier
         service = pk.shipping_method.service_name

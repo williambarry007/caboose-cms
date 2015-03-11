@@ -1,10 +1,9 @@
 
 <h1>Shipping Rates</h1>
-<div id="checkout">
-  <%
-  Caboose.log(@rates.count)
-  %>
-  <% if @rates.count == 1 %>
+<div id="checkout">  
+  <% if @rates.count == 0 %>
+    <p>It looks like no rates were returned. Please contact the site adminstrator.</p>    
+  <% elsif @rates.count == 1 %>
     <p>Please select which shipping method you'd like to use.</p>
     <p>
     <% op = @rates[0][:order_package] %>

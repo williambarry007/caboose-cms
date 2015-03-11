@@ -18,7 +18,7 @@
 <% end %>
   <%  
   b = @page.block
-  Caboose.log(@page.block.inspect)
+  #Caboose.log(@page.block.inspect)
   if b.nil?
     bt = Caboose::BlockType.where(:name => 'layout_basic').first
     Caboose::Block.create(:page_id => @page.id, :block_type_id => bt.id)    

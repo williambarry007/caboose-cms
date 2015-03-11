@@ -47,7 +47,7 @@ module Caboose
         
       # Calculate what shipping packages we'll need            
       OrderPackage.create_for_order(@order)
-      
+
       # Now get the rates for those packages            
       @rates = ShippingCalculator.rates(@order)
       

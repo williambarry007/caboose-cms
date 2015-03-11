@@ -91,10 +91,6 @@ module Caboose
       self.discount        = 0.00 if self.discount.nil?
       self.total           = 0.00 if self.total.nil?
     end
-        
-    def packages
-      self.order_packages
-    end
            
     def decrement_quantities
       return false if self.decremented
@@ -166,7 +162,7 @@ module Caboose
     def calculate_shipping      
       return 0.0 if self.order_packages.nil? || self.order_packages.count == 0
       x = 0.0
-      self.order_packages.each{ |op| x = x + op.total }
+      self.order_packages.all.each{ |op| x = x + op.total }
       return x
     end
     
@@ -219,7 +215,7 @@ module Caboose
     def has_empty_shipping_methods?
       return true if self.order_packages.nil?
       return true if self.order_packages.count == 0
-      self.order_packages.each do |op|
+      self.order_packages.all.each do |op|
         return true if op.shipping_method_id.nil?
       end
       return false

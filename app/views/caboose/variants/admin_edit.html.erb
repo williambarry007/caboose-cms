@@ -26,8 +26,8 @@ v = @variant
 <div id='variant_<%= v.id %>_ignore_quantity'  ></div>
     </td><td valign='top'>
 <h2>Dimensions</h2>
-<div id='variant_<%= v.id %>_weight'             ></div>
 <div id='variant_<%= v.id %>_cylinder'           ></div>
+<div id='variant_<%= v.id %>_weight'             ></div>
 <div id='variant_<%= v.id %>_length'             ></div>
 <div id='variant_<%= v.id %>_width'              ></div>
 <div id='variant_<%= v.id %>_height'             ></div>
@@ -53,7 +53,9 @@ v = @variant
 <%= javascript_include_tag "caboose/model/all" %>
 <%= javascript_include_tag "caboose/admin_products" %>
 <script type='text/javascript'>
-
+<%
+sc = @site.store_config
+%>
 $(document).ready(function() {
   m = new ModelBinder({
     name: 'Variant',
@@ -73,10 +75,10 @@ $(document).ready(function() {
       { name: 'date_sale_ends'            , nice_name: 'Sale ends'                        , type: 'datetime' , align: 'right' , value: <%= raw Caboose.json(v.date_sale_ends   ? v.date_sale_ends.in_time_zone(@logged_in_user.timezone).strftime('%m/%d/%Y %I:%M %P')   : '') %>, width: 275 },      
       { name: 'quantity_in_stock'         , nice_name: 'Quantity'                         , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.quantity_in_stock      ) %>, width: 250 }, 
       { name: 'ignore_quantity'           , nice_name: 'Ignore Quantity'                  , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.ignore_quantity        ) %>, width: 250 },
-      { name: 'weight'                    , nice_name: 'Weight (grams)'                   , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.weight                 ) %>, width: 250 }, 
-      { name: 'length'                    , nice_name: 'Length (in)'                      , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.length                 ) %>, width: 250 }, 
-      { name: 'width'                     , nice_name: 'Width (in)'                       , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.width                  ) %>, width: 250 }, 
-      { name: 'height'                    , nice_name: 'Height (in)'                      , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.height                 ) %>, width: 250 }, 
+      { name: 'weight'                    , nice_name: 'Weight (<%= sc.weight_unit %>)'   , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.weight                 ) %>, width: 250 }, 
+      { name: 'length'                    , nice_name: 'Length (<%= sc.length_unit %>)'   , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.length                 ) %>, width: 250 }, 
+      { name: 'width'                     , nice_name: 'Width (<%= sc.length_unit %>)'    , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.width                  ) %>, width: 250 }, 
+      { name: 'height'                    , nice_name: 'Height (<%= sc.length_unit %>)'   , type: 'text'     , align: 'right' , value: <%= raw Caboose.json(v.height                 ) %>, width: 250 }, 
       { name: 'cylinder'                  , nice_name: 'Cylinder'                         , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.cylinder               ) %>, width: 250 }, 
       { name: 'requires_shipping'         , nice_name: 'Requires shipping'                , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.requires_shipping      ) %>, width: 250 }, 
       { name: 'taxable'                   , nice_name: 'Taxable'                          , type: 'checkbox' , align: 'right' , value: <%= raw Caboose.json(v.taxable                ) %>, width: 250 },

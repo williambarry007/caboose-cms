@@ -215,7 +215,7 @@ module Caboose
       return if !user_is_allowed('orders', 'edit')    
       
       pdf = PendingOrdersPdf.new
-      pdf.orders = Order.where(:status => Order::STATUS_PENDING).all      
+      pdf.orders = Order.where(:site_id => @site.id, :status => Order::STATUS_PENDING).all      
       send_data pdf.to_pdf, :filename => "pending_orders.pdf", :type => "application/pdf", :disposition => "inline"            
     end
       

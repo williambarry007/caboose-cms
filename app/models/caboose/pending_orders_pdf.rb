@@ -9,7 +9,7 @@ module Caboose
     def to_pdf
       #image open("https://dmwwflw4i3miv.cloudfront.net/logo.png"), :position => :center
       text " "
-      self.orders.each_with_index do |o, i|
+      self.orders.each_with_index do |o, i|        
         start_new_page if i > 0
         self.order = o        
         customer_info
@@ -66,7 +66,7 @@ module Caboose
         tbl << [        
           "#{li.variant.product.title}\n#{li.variant.sku}\n#{li.variant.title}",
           { :content => li.tracking_number },
-          { :content => sprintf("%.2f", li.unit_price) , :align => :right },
+          { :content => sprintf("%.2f", li.unit_price)    , :align => :right },
           { :content => "#{li.quantity}"                  , :align => :right },          
           { :content => sprintf("%.2f", li.subtotal)      , :align => :right }
         ]

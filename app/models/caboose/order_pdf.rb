@@ -196,11 +196,11 @@ module Caboose
         tbl << arr
       end
 
-      tbl << [{ :content => "Subtotal"                                      , :colspan => 6, :align => :right }, { :content => "$" + sprintf("%.2f", order.subtotal                        ) , :align => :right }]
-      tbl << [{ :content => "Discount"                                      , :colspan => 6, :align => :right }, { :content => "(-) $" + sprintf("%.2f", order.discount ? order.discount : 0.0 ) , :align => :right }]
-      tbl << [{ :content => "Shipping and Handling Charges"  , :colspan => 6, :align => :right }, { :content => "(+) $" + sprintf("%.2f", order.shipping_and_handling           ) , :align => :right }]    
-      tbl << [{ :content => "Sales Tax"                                           , :colspan => 6, :align => :right }, { :content => "(+) $" + sprintf("%.2f", order.tax ? order.tax : 0.0           ) , :align => :right }]
-      tbl << [{ :content => "Grand Total"                                         , :colspan => 6, :font_style => :bold, :align => :right }, { :content => "$" + sprintf("%.2f", order.total                           ) , :align => :right, :font_style => :bold }]
+      tbl << [{ :content => "Subtotal"                       , :colspan => 6, :align => :right                       }, { :content => "$"     + sprintf("%.2f", order.subtotal                        ) , :align => :right }]
+      tbl << [{ :content => "Discount"                       , :colspan => 6, :align => :right                       }, { :content => "(-) $" + sprintf("%.2f", order.discount ? order.discount : 0.0 ) , :align => :right }]
+      tbl << [{ :content => "Shipping and Handling Charges"  , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.shipping_and_handling           ) , :align => :right }]    
+      tbl << [{ :content => "Sales Tax"                      , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.tax ? order.tax : 0.0           ) , :align => :right }]
+      tbl << [{ :content => "Grand Total"                    , :colspan => 6, :align => :right, :font_style => :bold }, { :content => "$"     + sprintf("%.2f", order.total                           ) , :align => :right, :font_style => :bold }]
       
       table tbl , :position => 7, :width => 530
     end

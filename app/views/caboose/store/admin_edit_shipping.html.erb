@@ -1,0 +1,90 @@
+<%
+sc = @store_config
+%>
+<%= render :partial => 'caboose/store/admin_header' %>
+
+<p>If calculating shipping rates automatically, all shippable variants must have dimensions and weights populated. Otherwise, a custom shipping rates function is required.</p>
+<p><div id='storeconfig_<%= sc.id %>_auto_calculate_shipping'  ></div></p>
+<div id='custom_shipping_container' <% if sc.auto_calculate_shipping %>style='display: none;'<% end %>>
+  <h3>Custom Shipping Rates Function</h3>
+  <p><code>def custom_shipping_rates_function(order) {</code></p>
+  <p><div id='storeconfig_<%= sc.id %>_custom_shipping_function' ></div></p>
+  <p><code>
+  # Returns an empty array by default.<br />
+  # Return an array of order packages and their rates<br />
+  # return [{<br />
+  # &nbsp;&nbsp;:order_package => Caboose::OrderPackage.new,<br /> 
+  # &nbsp;&nbsp;:rates => [{ <br />
+  # &nbsp;&nbsp;&nbsp;&nbsp;:shipping_method => Caboose::ShippingMethod.new,<br />
+  # &nbsp;&nbsp;&nbsp;&nbsp;:total_price => 3.50 <br />
+  # &nbsp;&nbsp;}]<br />
+  # }]<br />            
+  }</code></p>
+</div>
+<h3>Shipping Origin</h3>
+<p><div id='storeconfig_<%= sc.id %>_origin_address1'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_address2'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_city'              ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_state'             ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_zip'               ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_country'           ></div></p>
+<h3>Shipping Carriers</h3>
+<p><div id='storeconfig_<%= sc.id %>_ups_username'             ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_ups_password'             ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_ups_key'                  ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_ups_origin_account'       ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_usps_username'            ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_usps_secret_key'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_usps_publishable_key'     ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_username'           ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_password'           ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_key'                ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_account'            ></div></p>
+
+<%= render :partial => 'caboose/store/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  new ModelBinder({
+    name: 'StoreConfig',
+    id: <%= sc.id %>,
+    update_url: '/admin/store',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'ups_username'             , nice_name: 'UPS Username'                      , type: 'text'     , value: <%= raw Caboose.json(sc.ups_username               ) %>, width: 400 },
+      { name: 'ups_password'             , nice_name: 'UPS Password'                      , type: 'text'     , value: <%= raw Caboose.json(sc.ups_password               ) %>, width: 400 },
+      { name: 'ups_key'                  , nice_name: 'UPS Key'                           , type: 'text'     , value: <%= raw Caboose.json(sc.ups_key                    ) %>, width: 400 },
+      { name: 'ups_origin_account'       , nice_name: 'UPS Origin Account'                , type: 'text'     , value: <%= raw Caboose.json(sc.ups_origin_account         ) %>, width: 400 },
+      { name: 'usps_username'            , nice_name: 'USPS Username'                     , type: 'text'     , value: <%= raw Caboose.json(sc.usps_username              ) %>, width: 400 },
+      { name: 'usps_secret_key'          , nice_name: 'USPS Secret Key'                   , type: 'text'     , value: <%= raw Caboose.json(sc.usps_secret_key            ) %>, width: 400 },
+      { name: 'usps_publishable_key'     , nice_name: 'USPS Publishable Key'              , type: 'text'     , value: <%= raw Caboose.json(sc.usps_publishable_key       ) %>, width: 400 },
+      { name: 'fedex_username'           , nice_name: 'FedEx Username'                    , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_username             ) %>, width: 400 },
+      { name: 'fedex_password'           , nice_name: 'FedEx Password'                    , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_password             ) %>, width: 400 },
+      { name: 'fedex_key'                , nice_name: 'FedEx Key'                         , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_key                  ) %>, width: 400 },
+      { name: 'fedex_account'            , nice_name: 'FedEx Account'                     , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_account              ) %>, width: 400 },
+      { name: 'origin_address1'          , nice_name: 'Address 1'                         , type: 'text'     , value: <%= raw Caboose.json(sc.origin_address1            ) %>, width: 400 },
+      { name: 'origin_address2'          , nice_name: 'Address 2'                         , type: 'text'     , value: <%= raw Caboose.json(sc.origin_address2            ) %>, width: 400 },      
+      { name: 'origin_city'              , nice_name: 'City'                              , type: 'text'     , value: <%= raw Caboose.json(sc.origin_city                ) %>, width: 400 },
+      { name: 'origin_state'             , nice_name: 'State'                             , type: 'text'     , value: <%= raw Caboose.json(sc.origin_state               ) %>, width: 400 },
+      { name: 'origin_zip'               , nice_name: 'Zip'                               , type: 'text'     , value: <%= raw Caboose.json(sc.origin_zip                 ) %>, width: 400 },
+      { name: 'origin_country'           , nice_name: 'Country'                           , type: 'text'     , value: <%= raw Caboose.json(sc.origin_country             ) %>, width: 400 },
+      { name: 'auto_calculate_shipping'  , nice_name: 'Calculate Shipping Automatically'  , type: 'checkbox' , value: <%= raw Caboose.json(sc.auto_calculate_shipping ? 1 : 0 ) %>, width: 400, after_update: function() { toggleCustomShipping(this.value); }},
+      { name: 'custom_shipping_function' , nice_name: 'Custom Shipping Function'          , type: 'textarea' , value: <%= raw Caboose.json(sc.custom_shipping_function   ) %>, width: 800, height: 200, fixed_placeholder: false }                                      
+    ]    
+  });
+                                                                                                                                                                                    
+});
+
+function toggleCustomShipping(checked) {
+  var el = $('#custom_shipping_container');
+  if (checked)
+    el.slideUp()
+  else
+    el.slideDown(); 
+}
+
+</script>
+<% end %>

@@ -1,0 +1,28 @@
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#content input[type=checkbox] { position: relative; }
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<% end %>
+
+<h1 id='page_title'>Edit Store</h1>
+<ul id='tabs'>
+<%
+tabs = {
+  'General'           => "/admin/store",
+  'Payment Processor' => "/admin/store/payment",        
+  'Tax'               => "/admin/store/tax",
+  'Order Packages'    => "/admin/store/packages",
+  'Shipping'          => "/admin/store/shipping"
+}
+
+%>
+<% tabs.each do |text, href| %>
+<li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
+<% end %>
+</ul>
+<div id='content2'>

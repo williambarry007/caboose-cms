@@ -5,7 +5,35 @@ module Caboose
     layout 'caboose/admin'
     
     # GET /admin/store
-    def admin_edit
+    def admin_edit_general
+      return if !user_is_allowed('sites', 'edit')
+      @store_config = @site.store_config
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+    end
+    
+    # GET /admin/store/payment
+    def admin_edit_payment
+      return if !user_is_allowed('sites', 'edit')
+      @store_config = @site.store_config
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+    end
+    
+    # GET /admin/store/shipping
+    def admin_edit_shipping
+      return if !user_is_allowed('sites', 'edit')
+      @store_config = @site.store_config
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+    end
+    
+    # GET /admin/store/tax
+    def admin_edit_tax
+      return if !user_is_allowed('sites', 'edit')
+      @store_config = @site.store_config
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+    end
+    
+    # GET /admin/store/packages
+    def admin_edit_packages
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
       @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      

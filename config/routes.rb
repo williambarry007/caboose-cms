@@ -68,9 +68,11 @@ Caboose::Engine.routes.draw do
   get     "admin/store/payment-processor-options"  => "store#payment_processor_options"        
   get     "admin/store/length-unit-options"        => "store#length_unit_options"
   get     "admin/store/weight-unit-options"        => "store#weight_unit_options"
-  get     "admin/store/payment-processor"          => "store#admin_edit_payment_processor"
+  get     "admin/store/payment"                    => "store#admin_edit_payment"
   get     "admin/store/shipping"                   => "store#admin_edit_shipping"
-  get     "admin/store"                            => "store#admin_edit"  
+  get     "admin/store/tax"                        => "store#admin_edit_tax"
+  get     "admin/store/packages"                   => "store#admin_edit_packages"
+  get     "admin/store"                            => "store#admin_edit_general"  
   put     "admin/store"                            => "store#admin_update"
   
   #=============================================================================

@@ -1,0 +1,48 @@
+<%
+sc = @store_config
+%>
+<%= render :partial => 'caboose/store/admin_header' %>
+
+<p>If calculating tax automatically, a TaxCloud (<a href='http://taxcloud.net'>taxcloud.net</a>) account is required. Otherwise, a custom tax function is required.</p>
+<p><div id='storeconfig_<%= sc.id %>_auto_calculate_tax'       ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_taxcloud_api_id'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_taxcloud_api_key'         ></div></p>
+<div id='custom_tax_container' <% if sc.auto_calculate_tax %>style='display: none;'<% end %>>
+  <h3>Custom Tax Function</h3>
+  <p><code>def custom_tax_function(order) {</code></p>
+  <p><div id='storeconfig_<%= sc.id %>_custom_tax_function'      ></div></p>
+  <p><code># return 0.00<br />}</code></p>
+</div>
+
+<%= render :partial => 'caboose/store/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  new ModelBinder({
+    name: 'StoreConfig',
+    id: <%= sc.id %>,
+    update_url: '/admin/store',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'auto_calculate_tax'       , nice_name: 'Automatically Calculate Tax'       , type: 'checkbox' , value: <%= raw Caboose.json(sc.auto_calculate_tax ? 1 : 0 ) %>, width: 400 , after_update: function() { toggleCustomTax(this.value); }},
+      { name: 'taxcloud_api_id'          , nice_name: 'TaxCloud API ID'                   , type: 'text'     , value: <%= raw Caboose.json(sc.taxcloud_api_id            ) %>, width: 400 },
+      { name: 'taxcloud_api_key'         , nice_name: 'TaxCloud API Key'                  , type: 'text'     , value: <%= raw Caboose.json(sc.taxcloud_api_key           ) %>, width: 600 },            
+      { name: 'custom_tax_function'      , nice_name: 'Custom Tax Function'               , type: 'textarea' , value: <%= raw Caboose.json(sc.custom_tax_function        ) %>, width: 800, height: 200, fixed_placeholder: false }                                      
+    ]    
+  });
+                                                                                                                                                                                    
+});
+
+function toggleCustomTax(checked) {
+  var el = $('#custom_tax_container');
+  if (checked)
+    el.slideUp()
+  else
+    el.slideDown(); 
+}
+
+</script>
+<% end %>

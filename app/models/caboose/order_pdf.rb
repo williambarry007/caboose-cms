@@ -163,8 +163,8 @@ module Caboose
           arr << { :image => image, :fit => [40, 40], :borders => [:top, :bottom, :left], :width => 50 }
           arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}", :borders => [:top, :right, :bottom], :width => 100 }
           arr << { :content => options }
-          arr << { :content => "#{li.quantity}"               , :align => :right }
-          arr << { :content => "$" + sprintf("%.2f", li.price) , :align => :right }
+          arr << { :content => "#{li.quantity}"                     , :align => :right }
+          arr << { :content => "$" + sprintf("%.2f", li.unit_price) , :align => :right }
           arr << { :content => "$" + sprintf("%.2f", li.subtotal)   , :align => :right }
 
           tbl << arr

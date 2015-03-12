@@ -5,14 +5,14 @@ module Caboose
   class ShippingCalculator
     
     def self.custom_rates(store_config, order)          
-      return eval(store_config.shipping_rates_function)    
+      return eval(store_config.custom_shipping_function)    
     end
     
     def self.rates(order)
       
       return [] if order.site.nil? || order.site.store_config.nil?
       sc = order.site.store_config
-      if sc.shipping_rates_function        
+      if !sc.auto_calculate_shipping        
         rates = self.custom_rates(sc, order)
         return rates        
       end
@@ -39,16 +39,16 @@ module Caboose
         sp = op.shipping_package                            
         package = op.activemerchant_package
         rates = []
-        carriers.each do |name, carrier|
-          Caboose.log("Looking at carrier #{name}")
-          if sp.uses_carrier(name)
-            Caboose.log("Shipping package does use carrier #{name}.")            
+        carriers.each do |name, carrier|          
+          if sp.uses_carrier(name)                        
             resp = carrier.find_rates(origin, destination, package)                        
-            resp.rates.sort_by(&:price).each do |rate|              
+            resp.rates.sort_by(&:price).each do |rate|                            
               sm = ShippingMethod.where( :carrier => name, :service_code => rate.service_code, :service_name => rate.service_name).first
               sm = ShippingMethod.create(:carrier => name, :service_code => rate.service_code, :service_name => rate.service_name) if sm.nil?
               next if !sp.uses_shipping_method(sm)
-              rates << { :shipping_method => sm, :price => rate.total_price.to_d / 100 }
+              price = rate.total_price
+              price = rate.package_rates[0].rate if price.nil? && rate.package_rates && rate.package_rates.count > 0              
+              rates << { :shipping_method => sm, :total_price => (price.to_d/100) }
             end
           end
         end        

@@ -59,11 +59,17 @@ Cart.prototype = {
          
       var item = $('<td/>').attr('valign', 'top').append(p.title + '<br/>' + v.title);
       if (that.allow_edit_line_items == true)
-        item.append('<br/>').append($('<a/>').attr('href','#').html('Remove').click(function(e) { e.preventDefault(); that.remove_item(li.id); }));
+        item.append($('<div/>').append($('<a/>').attr('href','#').html('Remove').click(function(e) { e.preventDefault(); that.remove_item(li.id); })));
       if (that.show_gift_options)
       {
-        if (this.allow_edit_line_items)
+        if (that.allow_edit_line_items == true)
         {
+          var gift_options_tbody = $('<tbody/>');
+          if (li.variant.product.allow_gift_wrap == true)
+            gift_options_tbody.append($('<tr/>').append($('<td/>').addClass('checkbox').append($('<div/>').attr('id', 'lineitem_' + li.id + '_gift_wrap'  ))).append($('<td/>').append("Gift wrap ($" + parseFloat(li.variant.product.gift_wrap_price).toFixed(2) + ')')));
+          gift_options_tbody.append($('<tr/>').append($('<td/>').addClass('checkbox').append($('<div/>').attr('id', 'lineitem_' + li.id + '_hide_prices'))).append($('<td/>').append("Hide prices in receipt")));
+          gift_options_tbody.append($('<tr/>').append($('<td/>').attr('colspan', '2').append('Gift message<br/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_gift_message'))));
+                          
           item
             .append($('<div/>').addClass('gift_options_checkbox')
               .append($('<table/>')
@@ -72,14 +78,8 @@ Cart.prototype = {
                 )
               )
             )
-            .append($('<div/>').attr('id', 'gift_options_' + li.id).addClass('gift_options').css('display', li.is_gift ? 'block' : 'none')   
-              .append($('<table/>')
-                .append($('<tbody/>')
-                  .append($('<tr/>').append($('<td/>').addClass('checkbox').append($('<div/>').attr('id', 'lineitem_' + li.id + '_gift_wrap'  ))).append($('<td/>').append("Gift wrap ($" + parseFloat(li.variant.product.gift_wrap_price).toFixed(2) + ')')))
-                  .append($('<tr/>').append($('<td/>').addClass('checkbox').append($('<div/>').attr('id', 'lineitem_' + li.id + '_hide_prices'))).append($('<td/>').append("Hide prices in receipt")))
-                  .append($('<tr/>').append($('<td/>').attr('colspan', '2').append('Gift message<br/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_gift_message'))))
-                )
-              )
+            .append($('<div/>').attr('id', 'gift_options_' + li.id).addClass('gift_options').css('display', li.is_gift ? 'block' : 'none')
+              .append($('<table/>').append(gift_options_tbody))
             );
         }
         else
@@ -116,20 +116,6 @@ Cart.prototype = {
       .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Subtotal'))
       .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.subtotal).toFixed(2)))
     );
-    if (that.show_shipping)
-    {
-      tbody.append($('<tr/>')        
-        .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Shipping &amp; Handling'))
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.shipping + that.order.handling).toFixed(2)))
-      );
-    }
-    if (that.show_gift_wrap)
-    {
-      tbody.append($('<tr/>')        
-        .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Gift Wrapping'))
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.gift_wrap).toFixed(2)))
-      );
-    }
     if (that.show_tax)
     {
       tbody.append($('<tr/>')        
@@ -137,6 +123,21 @@ Cart.prototype = {
         .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.tax).toFixed(2)))
       );
     }
+    if (that.show_shipping)
+    {
+      var x = parseFloat(that.order.shipping) + parseFloat(that.order.handling);
+      tbody.append($('<tr/>')        
+        .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Shipping &amp; Handling'))
+        .append($('<td/>').css('text-align', 'right').html('$' + x.toFixed(2)))
+      );
+    }
+    if (that.show_gift_wrap && that.order.gift_wrap > 0)
+    {
+      tbody.append($('<tr/>')        
+        .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Gift Wrapping'))
+        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.gift_wrap).toFixed(2)))
+      );
+    }    
     if (that.show_discounts && that.order.discounts.length > 0)
     {
       $.each(that.order.discounts, function(i, d) {
@@ -169,20 +170,20 @@ Cart.prototype = {
     $('#cart').empty().append($('<table/>').append(tbody));
      
     // Make anything editable that needs to be
-    if (this.allow_edit_line_items)
+    if (that.allow_edit_line_items)
     {
       $.each(this.order.line_items, function(i, li) {
         var p = li.variant.product;
-        var attribs = [];
-        if (that.allow_edit_line_items)
-          attribs.push({ name: 'quantity', nice_name: 'Qty', type: 'text', value: li.quantity, width: 50, fixed_placeholder: false, after_update: function() { that.refresh(); } });
+        var attribs = [];        
+        attribs.push({ name: 'quantity', nice_name: 'Qty', type: 'text', value: li.quantity, width: 50, fixed_placeholder: false, after_update: function() { that.refresh(); } });
         if (that.show_gift_options)
         {
           attribs.push({ name: 'is_gift'      , nice_name: 'This item is a gift'  , type: 'checkbox' , value: li.is_gift      , width: 40 ,               fixed_placeholder: false, after_update: function() { that.toggle_gift_options(this.li_id); }, li_id: li.id });
-          attribs.push({ name: 'hide_prices'  , nice_name: 'Hide prices'          , type: 'checkbox' , value: li.hide_prices  , width: 40 ,               fixed_placeholder: false, after_update: function() { } });        
-          attribs.push({ name: 'gift_wrap'    , nice_name: 'Gift wrap'            , type: 'checkbox' , value: li.gift_wrap    , width: 40 ,               fixed_placeholder: false, after_update: function() { that.refresh(); } });        
+          attribs.push({ name: 'hide_prices'  , nice_name: 'Hide prices'          , type: 'checkbox' , value: li.hide_prices  , width: 40 ,               fixed_placeholder: false, after_update: function() { } });
+          if (p.allow_gift_wrap == true)
+            attribs.push({ name: 'gift_wrap'  , nice_name: 'Gift wrap'            , type: 'checkbox' , value: li.gift_wrap    , width: 40 ,               fixed_placeholder: false, after_update: function() { that.refresh(); } });        
           attribs.push({ name: 'gift_message' , nice_name: 'Gift message'         , type: 'textarea' , value: li.gift_message , width: 400 , height: 75 , fixed_placeholder: false, after_update: function() { } });                        
-        }                  
+        }        
         m = new ModelBinder({
           name: 'LineItem',
           id: li.id,

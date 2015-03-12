@@ -81,8 +81,7 @@ module Caboose
             r = ShippingCalculator.rate(li.order, li.order.shipping_method_code)
             li.order.shipping = r['negotiated_rate'] / 100
             li.order.handling = (r['negotiated_rate'] / 100) * 0.05
-            tax_rate = TaxCalculator.tax_rate(li.order.shipping_address)
-            li.order.tax = li.order.subtotal * tax_rate
+            li.order.tax = TaxCalculator.tax(li.order)            
             li.order.calculate_total
             li.order.save
             

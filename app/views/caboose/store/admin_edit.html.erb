@@ -3,45 +3,88 @@ sc = @store_config
 %>
 <h1>Edit Store</h1>
 
-<p><div id='site_<%= @site.id %>_use_store'                 ></div></p>
+<p><div id='site_<%= @site.id %>_use_store'                    ></div></p>
 
 <h2>Payment Processor</h2>
-<p><div id='storeconfig_<%= sc.id %>_pp_name'                 ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_pp_username'             ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_pp_password'             ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_pp_relay_domain'         ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_pp_testing'              ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_pp_name'                  ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_pp_username'              ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_pp_password'              ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_pp_relay_domain'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_pp_testing'               ></div></p>
+<hr />
 
 <h2>Fulfillment Contacts</h2>
-<p><div id='storeconfig_<%= sc.id %>_fulfillment_email'       ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_shipping_email'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fulfillment_email'        ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_shipping_email'           ></div></p>
+<hr />
 
 <h2>Dimension Units</h2>
-<p><div id='storeconfig_<%= sc.id %>_length_unit'          ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_weight_unit'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_length_unit'              ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_weight_unit'              ></div></p>
+<hr />
 
-<h2>Shipping Carriers</h3>
-<p><div id='storeconfig_<%= sc.id %>_ups_username'            ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_ups_password'            ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_ups_key'                 ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_ups_origin_account'      ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_usps_username'           ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_usps_secret_key'         ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_usps_publishable_key'    ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_fedex_username'          ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_fedex_password'          ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_fedex_key'               ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_fedex_account'           ></div></p>
+<h2>Tax</h2>
+<p>If calculating tax automatically, a TaxCloud (<a href='http://taxcloud.net'>taxcloud.net</a>) account is required. Otherwise, a custom tax function is required.</p>
+<p><div id='storeconfig_<%= sc.id %>_auto_calculate_tax'       ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_taxcloud_api_id'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_taxcloud_api_key'         ></div></p>
+<h3>Custom Tax Function</h3>
+<p><code>def custom_tax_function(order) {</code></p>
+<p><div id='storeconfig_<%= sc.id %>_custom_tax_function'      ></div></p>
+<p><code># return 0.00<br />}</code></p>
+<hr />
 
-<h2>Shipping Origin</h2>
-<p><div id='storeconfig_<%= sc.id %>_origin_country'          ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_origin_state'            ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_origin_city'             ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_origin_zip'              ></div></p>
+<h2>Order Packages</h2>
+<p>If calculating order packages automatically, all shippable variants must have dimensions and weights populated. Otherwise, a custom order packages function is required.</p>
+<p><div id='storeconfig_<%= sc.id %>_auto_calculate_packages'  ></div></p>
+<h3>Custom Order Packages Function</h3>
+<p><code>def custom_order_packages_function(order) {</code></p>
+<p><div id='storeconfig_<%= sc.id %>_custom_packages_function' ></div></p>
+<p><code># This function does not return anything, but creates the Caboose::OrderPackage objects for the given order<br />}</code></p>
+<hr />
+
+<h2>Shipping</h2>
+<p>If calculating shipping rates automatically, all shippable variants must have dimensions and weights populated. Otherwise, a custom shipping rates function is required.</p>
+<p><div id='storeconfig_<%= sc.id %>_auto_calculate_shipping'  ></div></p>
+<h3>Custom Shipping Rates Function</h3>
+<p><code>def custom_shipping_rates_function(order) {</code></p>
+<p><div id='storeconfig_<%= sc.id %>_custom_shipping_function' ></div></p>
+<p><code>
+# Returns an empty array by default.<br />
+# Return an array of order packages and their rates<br />
+# return [{<br />
+# &nbsp;&nbsp;:order_package => Caboose::OrderPackage.new,<br /> 
+# &nbsp;&nbsp;:rates => [{ <br />
+# &nbsp;&nbsp;&nbsp;&nbsp;:shipping_method => Caboose::ShippingMethod.new,<br />
+# &nbsp;&nbsp;&nbsp;&nbsp;:total_price => 3.50 <br />
+# &nbsp;&nbsp;}]<br />
+# }]<br />            
+}</code></p>
+<h3>Shipping Origin</h3>
+<p><div id='storeconfig_<%= sc.id %>_origin_address1'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_address2'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_city'              ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_state'             ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_zip'               ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_origin_country'           ></div></p>
+<h3>Shipping Carriers</h3>
+<p><div id='storeconfig_<%= sc.id %>_ups_username'             ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_ups_password'             ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_ups_key'                  ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_ups_origin_account'       ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_usps_username'            ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_usps_secret_key'          ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_usps_publishable_key'     ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_username'           ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_password'           ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_key'                ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_account'            ></div></p>
+<hr />
 
 <h2>Other</h2>
-<p><div id='storeconfig_<%= sc.id %>_handling_percentage'     ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_download_url_expires_in' ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_handling_percentage'      ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_download_url_expires_in'  ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_starting_order_number'    ></div></p>
 
 <div id='message'></div>
 
@@ -67,35 +110,46 @@ $(document).ready(function() {
     update_url: '/admin/store',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'pp_name'                 , nice_name: 'Type'                              , type: 'select'   , value: <%= raw Caboose.json(sc.pp_name                 ) %>, width: 400 , options_url: '/admin/store/payment-processor-options' },
-      { name: 'pp_username'             , nice_name: 'Username'                          , type: 'text'     , value: <%= raw Caboose.json(sc.pp_username             ) %>, width: 400 },
-      { name: 'pp_password'             , nice_name: 'Password'                          , type: 'text'     , value: <%= raw Caboose.json(sc.pp_password             ) %>, width: 400 },
-      { name: 'pp_relay_domain'         , nice_name: 'Relay Domain'                      , type: 'text'     , value: <%= raw Caboose.json(sc.pp_relay_domain         ) %>, width: 400 },
-      { name: 'pp_testing'              , nice_name: 'Test Mode'                         , type: 'checkbox' , value: <%= raw Caboose.json(sc.pp_testing ? 1 : 0      ) %>, width: 400 },      
-      { name: 'fulfillment_email'       , nice_name: 'Fulfillment Email'                 , type: 'text'     , value: <%= raw Caboose.json(sc.fulfillment_email       ) %>, width: 400 },
-      { name: 'shipping_email'          , nice_name: 'Shipping Email'                    , type: 'text'     , value: <%= raw Caboose.json(sc.shipping_email          ) %>, width: 400 },
-      { name: 'handling_percentage'     , nice_name: 'Handling Percentage'               , type: 'text'     , value: <%= raw Caboose.json(sc.handling_percentage     ) %>, width: 400 },
-      { name: 'length_unit'             , nice_name: 'Length'                            , type: 'select'   , value: <%= raw Caboose.json(sc.length_unit             ) %>, width: 400 , options_url: '/admin/store/length-unit-options' },
-      { name: 'weight_unit'             , nice_name: 'Weight'                            , type: 'select'   , value: <%= raw Caboose.json(sc.weight_unit             ) %>, width: 400 , options_url: '/admin/store/weight-unit-options' },
-      { name: 'ups_username'            , nice_name: 'UPS Username'                      , type: 'text'     , value: <%= raw Caboose.json(sc.ups_username            ) %>, width: 400 },
-      { name: 'ups_password'            , nice_name: 'UPS Password'                      , type: 'text'     , value: <%= raw Caboose.json(sc.ups_password            ) %>, width: 400 },
-      { name: 'ups_key'                 , nice_name: 'UPS Key'                           , type: 'text'     , value: <%= raw Caboose.json(sc.ups_key                 ) %>, width: 400 },
-      { name: 'ups_origin_account'      , nice_name: 'UPS Origin Account'                , type: 'text'     , value: <%= raw Caboose.json(sc.ups_origin_account      ) %>, width: 400 },
-      { name: 'usps_username'           , nice_name: 'USPS Username'                     , type: 'text'     , value: <%= raw Caboose.json(sc.usps_username           ) %>, width: 400 },
-      { name: 'usps_secret_key'         , nice_name: 'USPS Secret Key'                   , type: 'text'     , value: <%= raw Caboose.json(sc.usps_secret_key         ) %>, width: 400 },
-      { name: 'usps_publishable_key'    , nice_name: 'USPS Publishable Key'              , type: 'text'     , value: <%= raw Caboose.json(sc.usps_publishable_key    ) %>, width: 400 },
-      { name: 'fedex_username'          , nice_name: 'FedEx Username'                    , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_username          ) %>, width: 400 },
-      { name: 'fedex_password'          , nice_name: 'FedEx Password'                    , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_password          ) %>, width: 400 },
-      { name: 'fedex_key'               , nice_name: 'FedEx Key'                         , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_key               ) %>, width: 400 },
-      { name: 'fedex_account'           , nice_name: 'FedEx Account'                     , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_account           ) %>, width: 400 },
-      { name: 'origin_country'          , nice_name: 'Country'                           , type: 'text'     , value: <%= raw Caboose.json(sc.origin_country          ) %>, width: 400 },
-      { name: 'origin_state'            , nice_name: 'State'                             , type: 'text'     , value: <%= raw Caboose.json(sc.origin_state            ) %>, width: 400 },
-      { name: 'origin_city'             , nice_name: 'City'                              , type: 'text'     , value: <%= raw Caboose.json(sc.origin_city             ) %>, width: 400 },
-      { name: 'origin_zip'              , nice_name: 'Zip'                               , type: 'text'     , value: <%= raw Caboose.json(sc.origin_zip              ) %>, width: 400 },
-      { name: 'download_url_expires_in' , nice_name: 'Download URL Expires In (minutes)' , type: 'text'     , value: <%= raw Caboose.json(sc.download_url_expires_in ) %>, width: 400 }
+      { name: 'pp_name'                  , nice_name: 'Type'                              , type: 'select'   , value: <%= raw Caboose.json(sc.pp_name                    ) %>, width: 400 , options_url: '/admin/store/payment-processor-options' },
+      { name: 'pp_username'              , nice_name: 'Username'                          , type: 'text'     , value: <%= raw Caboose.json(sc.pp_username                ) %>, width: 400 },
+      { name: 'pp_password'              , nice_name: 'Password'                          , type: 'text'     , value: <%= raw Caboose.json(sc.pp_password                ) %>, width: 400 },
+      { name: 'pp_relay_domain'          , nice_name: 'Relay Domain'                      , type: 'text'     , value: <%= raw Caboose.json(sc.pp_relay_domain            ) %>, width: 400 },
+      { name: 'pp_testing'               , nice_name: 'Test Mode'                         , type: 'checkbox' , value: <%= raw Caboose.json(sc.pp_testing ? 1 : 0         ) %>, width: 400 },      
+      { name: 'fulfillment_email'        , nice_name: 'Fulfillment Email'                 , type: 'text'     , value: <%= raw Caboose.json(sc.fulfillment_email          ) %>, width: 400 },
+      { name: 'shipping_email'           , nice_name: 'Shipping Email'                    , type: 'text'     , value: <%= raw Caboose.json(sc.shipping_email             ) %>, width: 400 },
+      { name: 'handling_percentage'      , nice_name: 'Handling Percentage'               , type: 'text'     , value: <%= raw Caboose.json(sc.handling_percentage        ) %>, width: 400 },
+      { name: 'length_unit'              , nice_name: 'Length'                            , type: 'select'   , value: <%= raw Caboose.json(sc.length_unit                ) %>, width: 400 , options_url: '/admin/store/length-unit-options' },
+      { name: 'weight_unit'              , nice_name: 'Weight'                            , type: 'select'   , value: <%= raw Caboose.json(sc.weight_unit                ) %>, width: 400 , options_url: '/admin/store/weight-unit-options' },
+      { name: 'ups_username'             , nice_name: 'UPS Username'                      , type: 'text'     , value: <%= raw Caboose.json(sc.ups_username               ) %>, width: 400 },
+      { name: 'ups_password'             , nice_name: 'UPS Password'                      , type: 'text'     , value: <%= raw Caboose.json(sc.ups_password               ) %>, width: 400 },
+      { name: 'ups_key'                  , nice_name: 'UPS Key'                           , type: 'text'     , value: <%= raw Caboose.json(sc.ups_key                    ) %>, width: 400 },
+      { name: 'ups_origin_account'       , nice_name: 'UPS Origin Account'                , type: 'text'     , value: <%= raw Caboose.json(sc.ups_origin_account         ) %>, width: 400 },
+      { name: 'usps_username'            , nice_name: 'USPS Username'                     , type: 'text'     , value: <%= raw Caboose.json(sc.usps_username              ) %>, width: 400 },
+      { name: 'usps_secret_key'          , nice_name: 'USPS Secret Key'                   , type: 'text'     , value: <%= raw Caboose.json(sc.usps_secret_key            ) %>, width: 400 },
+      { name: 'usps_publishable_key'     , nice_name: 'USPS Publishable Key'              , type: 'text'     , value: <%= raw Caboose.json(sc.usps_publishable_key       ) %>, width: 400 },
+      { name: 'fedex_username'           , nice_name: 'FedEx Username'                    , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_username             ) %>, width: 400 },
+      { name: 'fedex_password'           , nice_name: 'FedEx Password'                    , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_password             ) %>, width: 400 },
+      { name: 'fedex_key'                , nice_name: 'FedEx Key'                         , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_key                  ) %>, width: 400 },
+      { name: 'fedex_account'            , nice_name: 'FedEx Account'                     , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_account              ) %>, width: 400 },
+      { name: 'taxcloud_api_id'          , nice_name: 'TaxCloud API ID'                   , type: 'text'     , value: <%= raw Caboose.json(sc.taxcloud_api_id            ) %>, width: 400 },
+      { name: 'taxcloud_api_key'         , nice_name: 'TaxCloud API Key'                  , type: 'text'     , value: <%= raw Caboose.json(sc.taxcloud_api_key           ) %>, width: 400 },
+      { name: 'origin_address1'          , nice_name: 'Address 1'                         , type: 'text'     , value: <%= raw Caboose.json(sc.origin_address1            ) %>, width: 400 },
+      { name: 'origin_address2'          , nice_name: 'Address 2'                         , type: 'text'     , value: <%= raw Caboose.json(sc.origin_address2            ) %>, width: 400 },      
+      { name: 'origin_city'              , nice_name: 'City'                              , type: 'text'     , value: <%= raw Caboose.json(sc.origin_city                ) %>, width: 400 },
+      { name: 'origin_state'             , nice_name: 'State'                             , type: 'text'     , value: <%= raw Caboose.json(sc.origin_state               ) %>, width: 400 },
+      { name: 'origin_zip'               , nice_name: 'Zip'                               , type: 'text'     , value: <%= raw Caboose.json(sc.origin_zip                 ) %>, width: 400 },
+      { name: 'origin_country'           , nice_name: 'Country'                           , type: 'text'     , value: <%= raw Caboose.json(sc.origin_country             ) %>, width: 400 },
+      { name: 'download_url_expires_in'  , nice_name: 'Download URL Expires In (minutes)' , type: 'text'     , value: <%= raw Caboose.json(sc.download_url_expires_in    ) %>, width: 400 },
+      { name: 'starting_order_number'    , nice_name: 'Starting Order Number'             , type: 'text'     , value: <%= raw Caboose.json(sc.starting_order_number      ) %>, width: 400 },
+      { name: 'auto_calculate_packages'  , nice_name: 'Automatically Calculate Packages'  , type: 'checkbox' , value: <%= raw Caboose.json(sc.auto_calculate_packages ? 1 : 0 ) %>, width: 400 },
+      { name: 'auto_calculate_shipping'  , nice_name: 'Calculate Shipping Automatically'  , type: 'checkbox' , value: <%= raw Caboose.json(sc.auto_calculate_shipping ? 1 : 0 ) %>, width: 400 },
+      { name: 'auto_calculate_tax'       , nice_name: 'Automatically Calculate Tax'       , type: 'checkbox' , value: <%= raw Caboose.json(sc.auto_calculate_tax      ? 1 : 0 ) %>, width: 400 },
+      { name: 'custom_packages_function' , nice_name: 'Custom Packages Function'          , type: 'textarea' , value: <%= raw Caboose.json(sc.custom_packages_function   ) %>, width: 800, height: 200, fixed_placeholder: false },      
+      { name: 'custom_shipping_function' , nice_name: 'Custom Shipping Function'          , type: 'textarea' , value: <%= raw Caboose.json(sc.custom_shipping_function   ) %>, width: 800, height: 200, fixed_placeholder: false },      
+      { name: 'custom_tax_function'      , nice_name: 'Custom Tax Function'               , type: 'textarea' , value: <%= raw Caboose.json(sc.custom_tax_function        ) %>, width: 800, height: 200, fixed_placeholder: false },                                      
     ]    
   });
-        
+                                                                                                                                                                                    
 });
 
 </script>

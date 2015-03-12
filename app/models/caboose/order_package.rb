@@ -24,14 +24,14 @@ module Caboose
     end
     
     def self.custom_order_packages(store_config, order)          
-      eval(store_config.order_packages_function)    
+      eval(store_config.custom_packages_function)    
     end
     
     # Calculates the shipping packages required for all the items in the order
     def self.create_for_order(order)
       
       store_config = order.site.store_config            
-      if !store_config.calculate_packages                        
+      if !store_config.auto_calculate_packages                        
         self.custom_order_packages(store_config, order)
         return
       end

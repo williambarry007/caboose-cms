@@ -5,14 +5,14 @@ module Caboose
   class OrderPackageCalculator
     
     def self.custom_order_packages(store_config, order)          
-      return eval(store_config.order_packages_function)    
+      return eval(store_config.custom_packages_function)    
     end
     
     def self.order_packages(order)
       return [] if Caboose::store_shipping.nil?
             
       sc = order.site.store_config
-      if sc.order_packages_function        
+      if !sc.auto_calculate_packages        
         order_packages = self.custom_order_packages(sc, order)
         return order_packages        
       end

@@ -34,7 +34,9 @@ module Caboose
     # GET /checkout/shipping
     def shipping
       redirect_to '/checkout'           and return if !logged_in?
-      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?) 
+      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
+      
+      @order.calculate
                   
       if !@order.has_shippable_items?
         redirect_to '/checkout/gift-cards'

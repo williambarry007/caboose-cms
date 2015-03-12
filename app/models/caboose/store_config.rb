@@ -21,6 +21,8 @@ module Caboose
       :fedex_password,
       :fedex_key,
       :fedex_account,
+      :taxcloud_api_id,
+      :taxcloud_api_key,
       :origin_country, 
       :origin_state, 
       :origin_city, 
@@ -28,8 +30,12 @@ module Caboose
       :fulfillment_email,
       :shipping_email,
       :handling_percentage,
-      :calculate_packages,
-      :shipping_rates_function,
+      :auto_calculate_packages,
+      :auto_calculate_shipping,
+      :auto_calculate_tax,
+      :custom_packages_function,   
+      :custom_shipping_function,   
+      :custom_tax_function,                  
       :length_unit,
       :weight_unit
       

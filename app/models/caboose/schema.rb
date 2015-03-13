@@ -69,8 +69,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :shipping_carrier      ,
         :shipping_service_code ,
         :shipping_service_name ,        
-        :transaction_id        ,
-        :transaction_id        ,
+        :transaction_id        ,        
         :transaction_service   ,
         :amount_discounted     ,
         :auth_code             ,                
@@ -248,7 +247,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::CategoryMembership => [        
         [ :category_id           , :integer ],
-        [ :product_id            , :integer ]      
+        [ :product_id            , :integer ],
+        [ :sort_order            , :integer  , { :default => 0 }]
       ],
       Caboose::CustomizationMembership => [
         [ :product_id       , :integer ],
@@ -483,12 +483,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :on_sale               , :boolean   , { :default => false }],
         [ :allow_gift_wrap       , :boolean   , { :default => false }],
         [ :gift_wrap_price       , :decimal   , { :precision => 8, :scale => 2 }]
-      ],
-      Caboose::ProductCategorySort => [
-        [ :product_id  , :integer ],
-        [ :category_id , :integer ],
-        [ :sort_order  , :integer ]
-      ],                              
+      ],         
       Caboose::ProductImage => [
         [ :product_id            , :integer  ],
         [ :alternate_id          , :string   ],

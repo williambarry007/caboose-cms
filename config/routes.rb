@@ -413,14 +413,14 @@ Caboose::Engine.routes.draw do
                                                                                
   get     "/admin/products"                                 => "products#admin_index"
   get     "/admin/products/json"                            => "products#admin_json"
-  get     '/admin/products/sort'                            => 'products#admin_sort'
-  put     '/admin/products/update-sort-order'               => 'products#admin_update_sort_order'  
+  get     '/admin/products/sort'                            => 'products#admin_sort'  
+  put     "/admin/categories/:category_id/products/sort-order" => "products#admin_update_sort_order"  
   put     "/admin/products/update-vendor-status/:id"        => "products#admin_update_vendor_status"
   get     "/admin/products/new"                             => "products#admin_new"
   get     "/admin/products/status-options"                  => "products#admin_status_options"    
   get     "/admin/products/:id/general"                     => "products#admin_edit_general"    
   get     "/admin/products/:id/description"                 => "products#admin_edit_description"
-  get     "/admin/products/:id/categories"                  => "products#admin_edit_categories"
+  get     "/admin/products/:id/categories"                  => "products#admin_edit_categories"  
   post    "/admin/products/:id/categories"                  => "products#admin_add_to_category"
   delete  "/admin/products/:id/categories/:category_id"     => "products#admin_remove_from_category"
 
@@ -480,16 +480,17 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   # Categories
   #=============================================================================
-  
-  get     "/admin/categories"                 => "categories#admin_index"
-  get     "/admin/categories/new"             => "categories#admin_new"
-  get     "/admin/categories/options"         => "categories#admin_options"
-  get     '/admin/categories/status-options'  => 'categories#admin_status_options'  
-  get     "/admin/categories/:id"             => "categories#admin_edit"  
-  put     "/admin/categories/:id"             => "categories#admin_update"    
-  post    "/admin/categories/:id"             => "categories#admin_update"  
-  post    "/admin/categories"                 => "categories#admin_add"
-  delete  "/admin/categories/:id"             => "categories#admin_delete"
+          
+  get     "/admin/categories"                   => "categories#admin_index"
+  get     "/admin/categories/new"               => "categories#admin_new"
+  get     "/admin/categories/options"           => "categories#admin_options"
+  get     '/admin/categories/status-options'    => 'categories#admin_status_options'
+  get     "/admin/categories/:id/products/json" => "categories#admin_category_products"  
+  get     "/admin/categories/:id"               => "categories#admin_edit"  
+  put     "/admin/categories/:id"               => "categories#admin_update"    
+  post    "/admin/categories/:id"               => "categories#admin_update"  
+  post    "/admin/categories"                   => "categories#admin_add"
+  delete  "/admin/categories/:id"               => "categories#admin_delete"
   
   #=============================================================================  
   # Orders

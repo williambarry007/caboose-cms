@@ -74,12 +74,13 @@ module Caboose
         'price_gte'       => '',
         'price_lte'       => '',
         'alternate_id'    => '',
-        'search_like'     => ''
-        #'pcs_category_id' => cat.id
+        'search_like'     => '',
+        'cm_category_id'  => cat.id # This filters the CategoryMembership object that we'll be sorting on
       }, {
         'model'           => 'Caboose::Product',
-        'sort'            => if params[:sort] then params[:sort] else 'store_products.sort_order' end,
-        #'sort'            => if params[:sort] then params[:sort] else 'store_product_category_sorts.sort_order' end,
+        #'sort'            => if params[:sort] then params[:sort] else 'store_products.sort_order' end,
+        #'sort'            => if params[:sort] then params[:sort] else 'store_category_memberships.sort_order' end,
+        'sort'            => 'store_category_memberships.sort_order',
         'base_url'        => url_without_params,
         'items_per_page'  => 15,
         'use_url_params'  => false,
@@ -89,15 +90,15 @@ module Caboose
         },
         
         'includes' => {
-          #'pcs_category_id' => [ 'product_category_sorts', 'category_id' ],          
-          'category_id'     => [ 'categories' , 'id'     ],
-          'category_name'   => [ 'categories' , 'name'   ],
-          'vendor_id'       => [ 'vendor'     , 'id'     ],
-          'vendor_name'     => [ 'vendor'     , 'name'   ],
-          'vendor_status'   => [ 'vendor'     , 'status' ],
-          'price_gte'       => [ 'variants'   , 'price'  ],
-          'price_lte'       => [ 'variants'   , 'price'  ],
-          'variant_status'  => [ 'variants'   , 'status' ]
+          'cm_category_id'  => [ 'category_memberships' , 'category_id' ],          
+          'category_id'     => [ 'categories'           , 'id'          ],
+          'category_name'   => [ 'categories'           , 'name'        ],
+          'vendor_id'       => [ 'vendor'               , 'id'          ],
+          'vendor_name'     => [ 'vendor'               , 'name'        ],
+          'vendor_status'   => [ 'vendor'               , 'status'      ],
+          'price_gte'       => [ 'variants'             , 'price'       ],
+          'price_lte'       => [ 'variants'             , 'price'       ],
+          'variant_status'  => [ 'variants'             , 'status'      ]
         }
       })
       
@@ -467,17 +468,19 @@ module Caboose
     
     # GET /admin/products/sort
     def admin_sort
-      @products   = Product.active
-      @vendors    = Vendor.active
-      @categories = Category.all
-      
+      #@products   = Product.active
+      #@vendors    = Vendor.active
+      #@categories = Category.all      
       render :layout => 'caboose/admin'
     end
     
-    # PUT /admin/products/update-sort-order
+    # PUT /admin/categories/:category_id/products/sort-order
     def admin_update_sort_order
-      params[:product_ids].each_with_index do |product_id, index|
-        Product.find(product_id.to_i).update_attribute(:sort_order, index)
+      cat_id = params[:category_id]      
+      params[:product_ids].each_with_index do |product_id, i|
+        cm = CategoryMembership.where(:category_id => cat_id, :product_id => product_id).first
+        cm.sort_order = i
+        cm.save
       end      
       render :json => { :success => true }
     end

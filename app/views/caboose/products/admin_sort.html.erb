@@ -1,250 +1,88 @@
 <h1>Sort Products</h1>
 
-<section>
-  <aside>
-    <ul id="source" class="sortable">
-      <% @products.each do |product| %>
-        <li data-id="<%= product.id %>"><%= product.title %></li>
-      <% end %>
-    </ul>
-    
-    <input name="search" type="search" placeholder="Search for Products" />
-    
-    <select class="filter" name="vendor">
-      <option value="">-- Filter by Vendor --</option>      
-      <% @vendors.each do |vendor| %>
-        <option value="<%= vendor.id %>"><%= vendor.name %></option>
-      <% end %>
-    </select>
-  </aside>
-  
-  <article>
-    <ul id="target" class="sortable">
-      <% @products.each do |product| %>
-        <li data-id="<%= product.id %>"><%= product.title %></li>
-      <% end %>
-    </ul>
-    
-    <input id="submit" type="button" value="Apply" /><br />
-  </article>
-</section>
+<p><select id="category_id">
+  <option value="">-- Select a category --</option>
+  <% Caboose::Category.options(@site.id).each do |cat| %>
+    <option value='<%= cat[:value] %>'><%= cat[:text] %></option>
+  <% end %>
+</select></p>
+<div id='products'></div>
+<div id='message'></div>
 
 <% content_for :caboose_js do %>
-<%= javascript_include_tag('underscore') %>
 <script type='text/javascript'>    
-window.products = <%= @products.to_json.html_safe %>;
-window.results  = window.products; // Used to store filtered results
-    
-// Delay method
-var delay = (function(){
-  var timer = 0;
-  return function(callback, ms){
-    clearTimeout (timer);
-    timer = setTimeout(callback, ms);
-  };
-})();
-    
-// Filter
-function filter(event) {
-  var $source       = $('ul#source')
-    , $search       = $('input[name=search]')
-    , search_string = $search.val() === $search.attr('placeholder') ? undefined : $search.val().trim().toUpperCase()
-    , vendor_id     = $('select[name=vendor]').val();
-  
-  $source.empty();
-  
-  _.each(window.products, function(product) {
-    if (!search_string && !vendor_id
-    || search_string && product.title.toUpperCase().indexOf(search_string) > -1
-    || vendor_id && product.vendor_id == vendor_id) {
-      $source.append( $('<li/>').attr('data-id', product.id).text(product.title) );
-    }
-  });
-}
-
-function update(event) {
-  
-  // Send the ordered array to the server to make it official
-  $.ajax({
-    type: 'put',
-    url: '/admin/products/update-sort-order',
-    data: { product_ids: $('ul#target').sortable('toArray', { attribute: 'data-id' }) }
-  });
-}
 
 $(document).ready(function() {
-  var selected_class = 'selected';
-  
-  // Selection rules
-  $('ul.sortable').on('click', 'li', function(event) {
-    $element = $(this);
-    
-    if (event.shiftKey && $last_element) {
-      if ($element.index() < $last_element.index()) {
-        $element.nextUntil($last_element).addClass(selected_class);
-      } else {
-        $element.prevUntil($last_element).addClass(selected_class);
-      }
-      
-      $element.toggleClass(selected_class);
-    } else if (event.ctrlKey || event.metaKey) {
-      if ($element.hasClass(selected_class)) {
-        $element.removeClass(selected_class);
-      } else {
-        $element.addClass(selected_class);
-      }
-    } else {
-      $element.addClass(selected_class).siblings().removeClass(selected_class);
-    }
-    
-    $last_element = $element;
+  $('#category_id').change(function() {
+    update_products();  
   });
-  
-  // Setup sortable lists
-  $('ul#source').sortable({
-    delay: 150,
-    revert: 0,
-    connectWith: 'ul#target',
-    
-    helper: function(event, item) {
-      
-      // If the user just clicked and immediately drug an element
-      if ( !item.hasClass(selected_class) ) item.addClass(selected_class).siblings().removeClass(selected_class);
-      
-      // Grab the selected elements and create the helper
-      var elements = item.parent().children('.' + selected_class).clone()
-        , helper   = $('<li/>');
-        
-      // Add the elements to the item multidrag data attribute
-      item.data('multidrag', elements).siblings('.' + selected_class);
-      
-      // Pass back the helper
-      return helper.append(elements);
-    },
-    
-    start: function(event, ui) {
-      
-      // Make sure the item stays visible on #source
-      $(ui.item).show();
-      
-      // Clone the original item and note the previous one, to reappend after jquery ui takes it away
-      item_clone = $(ui.item).clone();
-      previous_item = $(ui.item).prev();
-      
-      // Remove selected status from ul#target
-      $('ul#target li.selected').removeClass('selected');
-    },
-    
-    beforeStop: function(event, ui) {
-      
-      if ($(ui.item).parent().attr('id') != 'source') {
-      
-        // Remove duplicate items from old positions
-        ui.item.data('multidrag').each(function(index, element) {
-          var $element = $(element);
-          $('ul#target li[data-id=' + $element.attr('data-id') + ']').not('.selected').remove()
-        });
-      }
-    },
-    
-    stop: function(event, ui) {
-      
-      if ($(ui.item).parent().attr('id') == 'source') return false;
-      
-      // Clear multidrag data
-      ui.item.after( ui.item.data('multidrag') ).remove();
-      
-      // If the previous item is defined append the clone just after, otherwise prepend to #source
-      if (previous_item.length) {
-        previous_item.after(item_clone);
-      } else {
-        $('ul#source').prepend(item_clone);
-      }
-      
-      // Update sort order
-      update(event, ui);
-    }
-  });
-  
-  // Update sort order when done sorting
-  $('ul#target').sortable({ stop: update });
-  
-  // Filter when the vendor select box change
-  $('select').on('change', filter);
-  
-  // Filter, after a delay, when there is a keyup event in the search
-  $('input[type=search]').on('keyup', function(event) {
-    delay(function() { filter(event) }, 600);
-  });
+  update_products();
 });
+
+function update_products()
+{
+  var cat_id = $('#category_id').val();
+  if (cat_id == '')
+  {
+    $('#message').empty().html("<p class'note error'>Please select a category.</p>");
+    return;
+  }
+  
+  $('#message').empty().html("<p class'loading'>Getting products...</p>");
+  $.ajax({
+    url: '/admin/categories/' + cat_id + '/products/json',
+    type: 'get',
+    success: function(products) {
+      var ul = $('<ul/>').attr('id', 'product_list');
+      $.each(products, function(i, p) {        
+        ul.append($('<li/>').attr('id', 'product_' + p.id).data('id', p.id).html(p.title));      
+      });
+      $('#message').empty();
+      $('#products').empty().append(ul);
+      $('#product_list').sortable({
+        stop: function(event, ui) 
+        {           
+          $.ajax({
+            url: '/admin/categories/' + $('#category_id').val() + '/products/sort-order',
+            type: 'put',            
+            data: { 
+              product_ids: $.map($('#product_list').sortable('toArray'), function(str, j) { return parseInt(str.replace('product_', '')); })
+            }          
+          });                        
+        }
+      });
+    }
+  });      
+}
+
 </script>
 <% end %>
 
 <% content_for :caboose_css do %>
-  <style>
-  
-    /* Layout */
+<style>
+
+#product_list {      
+  list-style: none;
+  margin: 0;      
+  padding: 0;
+  width: 350px;      
+}
+#product_list li {
+  box-sizing: border-box;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  cursor: grab;
+  display: block;
+  padding: 6px;
+  width: 100%;
+}
+
+#product_list li.selected {
+  background: #3e9aff;
+  border-color: #fff;
+  color: #fff;
+}
     
-    section,
-    section article { overflow: hidden; }
-    
-    section aside {
-      float: left;
-      margin-right: 12px;
-    }
-    
-    /* Filters */
-    
-    input[type=search], select {
-      box-sizing: border-box;
-      margin: 6px 0;
-      width: 350px;
-      outline: none !important;
-    }
-    input[type=search] { height: 42px; }
-    select { display: block; }
-    
-    input[type=button] {
-      background: #ccc;
-      cursor: pointer;
-      margin: 12px 0;
-      padding: 6px;
-      outline: none !important;
-    }
-    
-    /* Lists */
-    
-    ul.sortable {
-      border: 1px solid #ccc;
-      height: 250px;
-      list-style: none;
-      margin: 0;
-      overflow-x: hidden;
-      overflow-y: scroll;
-      padding: 0;
-      width: 350px;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-    ul.sortable li {
-      box-sizing: border-box;
-      border-bottom: 1px solid #ccc;
-      cursor: pointer;
-      cursor: grab;
-      display: block;
-      padding: 6px;
-      width: 100%;
-    }
-    ul.sortable li.selected {
-      background: #3e9aff;
-      border-color: #fff;
-      color: #fff;
-    }
-    
-    ul#source .ui-sortable-placeholder { display: none; }
-  </style>
+</style>
 <% end %>

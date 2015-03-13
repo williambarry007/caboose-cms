@@ -43,6 +43,7 @@ module Caboose
     def admin_add
       return if !user_is_allowed('orders', 'add')
       order = Order.create(
+        :site_id => @site.id,
         :status => Order::STATUS_PENDING,                          
         :financial_status => Order::FINANCIAL_STATUS_PENDING
       )    

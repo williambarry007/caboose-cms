@@ -119,8 +119,8 @@ module Caboose
     def admin_product_stubs      
       title = params[:title].strip.downcase.split(' ')
       render :json => [] and return if title.length == 0      
-      where = []
-      query = [""]
+      where = ["site_id = ?"]
+      query = [@site.id]
       title.each do |str|
         where << 'lower(title) like ?'
         query << "%#{str}%"

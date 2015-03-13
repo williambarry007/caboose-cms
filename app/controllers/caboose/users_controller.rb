@@ -254,7 +254,7 @@ module Caboose
     # GET /admin/users/options
     def options
       return if !user_is_allowed('users', 'view')
-      @users = User.where('id <> 2').reorder('last_name, first_name').all
+      @users = User.where(:site_id => @site.id).reorder('last_name, first_name').all
       options = @users.collect { |u| { 'value' => u.id, 'text' => "#{u.first_name} #{u.last_name} (#{u.email})"}}
       render json: options
     end

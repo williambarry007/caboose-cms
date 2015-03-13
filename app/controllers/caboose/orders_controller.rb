@@ -283,15 +283,15 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
-          when 'tax'         then order.tax         = value          
-          when 'shipping'    then order.shipping    = value
-          when 'handling'    then order.handling    = value
-          when 'discount'    then order.discount    = value        
-          when 'status'      then order.status      = value
-          when 'customer_id' then order.customer_id = value            
+          when 'tax'             then order.tax             = value          
+          when 'shipping'        then order.shipping        = value
+          when 'handling'        then order.handling        = value
+          when 'custom_discount' then order.custom_discount = value        
+          when 'status'          then order.status          = value
+          when 'customer_id'     then order.customer_id     = value            
         end
       end
-      order.calculate_total    
+      order.calculate
       resp.success = save && order.save
       render :json => resp
     end

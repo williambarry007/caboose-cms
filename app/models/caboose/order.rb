@@ -180,10 +180,11 @@ module Caboose
       return x
     end
     
-    def calculate_discount      
-      return 0.0 if self.discounts.nil? || self.discounts.count == 0
+    def calculate_discount             
       x = 0.0
-      self.discounts.each{ |d| x = x + d.amount }
+      if self.discounts && self.discounts.count > 0
+        self.discounts.each{ |d| x = x + d.amount }
+      end
       x = x + self.custom_discount if self.custom_discount
       return x
     end

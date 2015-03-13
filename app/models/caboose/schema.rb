@@ -484,6 +484,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :allow_gift_wrap       , :boolean   , { :default => false }],
         [ :gift_wrap_price       , :decimal   , { :precision => 8, :scale => 2 }]
       ],
+      Caboose::ProductCategorySort => [
+        [ :product_id  , :integer ],
+        [ :category_id , :integer ],
+        [ :sort_order  , :integer ]
+      ],                              
       Caboose::ProductImage => [
         [ :product_id            , :integer  ],
         [ :alternate_id          , :string   ],

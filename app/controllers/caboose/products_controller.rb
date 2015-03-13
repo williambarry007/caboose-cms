@@ -63,38 +63,42 @@ module Caboose
       
       # Otherwise looking at a category or search parameters
       @pager = Caboose::Pager.new(params, {
-        'site_id'        => @site.id,
-        'on_sale'        => '',
-        'category_id'    => '',
-        'vendor_id'      => '',
-        'vendor_name'    => '',
-        'vendor_status'  => 'Active',
-        'status'         => 'Active',
-        'variant_status' => 'Active',
-        'price_gte'      => '',
-        'price_lte'      => '',
-        'alternate_id'   => '',
-        'search_like'    => ''
+        'site_id'         => @site.id,
+        'on_sale'         => '',
+        'category_id'     => '',
+        'vendor_id'       => '',
+        'vendor_name'     => '',
+        'vendor_status'   => 'Active',
+        'status'          => 'Active',
+        'variant_status'  => 'Active',
+        'price_gte'       => '',
+        'price_lte'       => '',
+        'alternate_id'    => '',
+        'search_like'     => '',
+        'pcs_category_id' => cat.id
       }, {
-        'model'          => 'Caboose::Product',
-        'sort'           => if params[:sort] then params[:sort] else 'store_products.sort_order' end,
-        'base_url'       => url_without_params,
-        'items_per_page' => 15,
-        'use_url_params' => false,
+        'model'           => 'Caboose::Product',
+        #'sort'            => if params[:sort] then params[:sort] else 'store_products.sort_order' end,
+        'sort'            => if params[:sort] then params[:sort] else 'store_product_category_sorts.sort_order' end,
+        'base_url'        => url_without_params,
+        'items_per_page'  => 15,
+        'use_url_params'  => false,
         
-        'abbreviations' => {
-          'search_like' => 'title_concat_store_products.alternate_id_concat_vendor_name_concat_category_name_like',
+        'abbreviations'   => {
+          'search_like'   => 'title_concat_store_products.alternate_id_concat_vendor_name_concat_category_name_like',
         },
         
         'includes' => {
-          'category_id'    => [ 'categories' , 'id'     ],
-          'category_name'  => [ 'categories' , 'name'   ],
-          'vendor_id'      => [ 'vendor'     , 'id'     ],
-          'vendor_name'    => [ 'vendor'     , 'name'   ],
-          'vendor_status'  => [ 'vendor'     , 'status' ],
-          'price_gte'      => [ 'variants'   , 'price'  ],
-          'price_lte'      => [ 'variants'   , 'price'  ],
-          'variant_status' => [ 'variants'   , 'status' ]
+          'pcs_category_id' => [ 'product_category_sorts', 'category_id' ]
+          'cat_sort'        => [ 'product_category_sorts', 'sort_value'  ]
+          'category_id'     => [ 'categories' , 'id'     ],
+          'category_name'   => [ 'categories' , 'name'   ],
+          'vendor_id'       => [ 'vendor'     , 'id'     ],
+          'vendor_name'     => [ 'vendor'     , 'name'   ],
+          'vendor_status'   => [ 'vendor'     , 'status' ],
+          'price_gte'       => [ 'variants'   , 'price'  ],
+          'price_lte'       => [ 'variants'   , 'price'  ],
+          'variant_status'  => [ 'variants'   , 'status' ]
         }
       })
       

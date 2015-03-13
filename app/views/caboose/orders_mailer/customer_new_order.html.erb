@@ -67,7 +67,7 @@
     <% end %>
   <% end %>
   <% if @order.custom_discount %>
-    <tr><td colspan="4">Discount: </td><td><%= number_to_currency(d.custom_discount) %></td></tr>
+    <tr><td colspan="4">Discount: </td><td><%= number_to_currency(@order.custom_discount) %></td></tr>
   <% end %>      
   <tr><td colspan="4">Total:     </td><td><%= number_to_currency(@order.total) %></td></tr>
 </table>

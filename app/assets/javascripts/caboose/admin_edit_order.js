@@ -704,8 +704,8 @@ OrderController.prototype = {
       url: '/admin/orders/' + that.order.id + '/void',
       success: function(resp) {
         if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) that.refresh();
-        if (resp.refresh) that.refresh();
+        if (resp.success) { $('#message').empty(); that.refresh(); }
+        if (resp.refresh) { $('#message').empty(); that.refresh(); }
       }
     });
   },
@@ -716,7 +716,7 @@ OrderController.prototype = {
     if (!confirm)
     {    
       var p = $('<p/>').addClass('note confirm')
-        .append("Are you sure you want to charge " + that.order.total + " to the customer? ")
+        .append("Are you sure you want to charge $" + parseFloat(that.order.total).toFixed(2) + " to the customer? ")
         .append($('<input/>').attr('type','button').val('Yes').click(function() { that.capture_funds(true); }))
         .append(' ')
         .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
@@ -728,8 +728,8 @@ OrderController.prototype = {
       url: '/admin/orders/' + that.order.id + '/capture',
       success: function(resp) {
         if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) that.refresh();
-        if (resp.refresh) that.refresh();
+        if (resp.success) { $('#message').empty(); that.refresh(); }
+        if (resp.refresh) { $('#message').empty(); that.refresh(); }
       }
     });
   }

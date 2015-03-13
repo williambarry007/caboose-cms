@@ -79,11 +79,10 @@ module Caboose
           when 'authorize.net'
             transaction = AuthorizeNet::AIM::Transaction.new(sc.pp_username, sc.pp_password)
             response = transaction.prior_auth_capture(t.transaction_id, order.total)
-            Caboose.log(response.inspect)
-            
+                        
             order.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
             resp.success = 'Captured funds successfully'
-                                    
+
             ot = Caboose::OrderTransaction.new(
               :order_id => order.id,
               :date_processed => DateTime.now.utc,

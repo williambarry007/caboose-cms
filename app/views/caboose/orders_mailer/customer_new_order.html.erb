@@ -43,7 +43,7 @@
       </tr>
     <% end %>
   <% end %>  
-  <% op.line_items.each do |li| %>
+  <% @order.line_items.each do |li| %>
     <% next if li.order_package_id %>
     <% v = li.variant %>
     <% p = v.product %>

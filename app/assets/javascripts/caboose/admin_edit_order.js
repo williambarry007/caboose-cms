@@ -463,8 +463,12 @@ OrderController.prototype = {
               .append($('<div/>').attr('id', 'orderpackage_' + op.id + '_tracking_number'))
               .append($('<div/>').attr('id', 'orderpackage_' + op.id + '_total'))
             );
-          }          
-          tr.append($('<td/>').append(that.line_item_link(li)).append($('<div/>').attr('id', 'line_item_' + li.id + '_message')));
+          }                       
+          tr.append($('<td/>')
+            .append(that.line_item_link(li))
+            .append(that.gift_options(li))
+            .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
+          );
           tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
           tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
           tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
@@ -495,6 +499,25 @@ OrderController.prototype = {
           );
       }
     });
+  },
+  
+  gift_options: function(li)
+  {
+    var div = $('<div/>');
+    if (li.is_gift)
+    {
+      div.append($('<ul/>').addClass('gift_options')
+        .append($('<li/>').html("This item is a gift."))
+        .append($('<li/>').html("Gift wrap? " + (li.gift_wrap ? 'Yes' : 'No')))
+        .append($('<li/>').html("Hide prices? " + (li.hide_prices ? 'Yes' : 'No')))
+        .append($('<li/>').html("Gift message: " + (li.gift_message.length > 0 ? li.gift_message : '[Empty]')))
+      );            
+    }
+    else
+    {
+      div.append($('<p/>').html("This item is not a gift."));
+    } 
+    return div;
   },
   
   line_item_link: function(li)
@@ -588,7 +611,11 @@ OrderController.prototype = {
                                      
       var tr = $('<tr/>');
       tr.append($('<td/>').append(div));
-      tr.append($('<td/>').append(that.line_item_link(li)).append($('<div/>').attr('id', 'line_item_' + li.id + '_message')));            
+      tr.append($('<td/>')
+        .append(that.line_item_link(li))        
+        .append(that.gift_options(li))            
+        .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
+      );            
       tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
       tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
       tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));

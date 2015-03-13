@@ -532,6 +532,8 @@ Caboose::Engine.routes.draw do
   put     "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_update"
   delete  "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_delete"
   
+  get     "admin/orders/:order_id/billing-address/json"   => "billing_addresses#admin_json"      
+  put     "admin/orders/:order_id/billing-address"        => "billing_addresses#admin_update"
   get     "admin/orders/:order_id/shipping-address/json"  => "shipping_addresses#admin_json"      
   put     "admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"    
   

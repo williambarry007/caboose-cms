@@ -118,15 +118,18 @@ module Caboose
     # GET /admin/line-items/product-stubs
     def admin_product_stubs      
       title = params[:title].strip.downcase.split(' ')
-      render :json => [] and return if title.length == 0      
-      where = ["site_id = ?"]
-      query = [@site.id]
+      render :json => [] and return if title.length == 0
+      
+      where = ["site_id = ?"]      
+      vars = [@site.id]
       title.each do |str|
         where << 'lower(title) like ?'
-        query << "%#{str}%"
-      end
+        vars << "%#{str}%"
+      end      
       where = where.join(' and ')
-      query[0] = "select id, title from store_products where #{where} order by title limit 20"          
+      query = ["select id, title from store_products where #{where} order by title limit 20"]
+      vars.each{ |v| query << v }
+      
       rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))
       arr = rows.collect{ |row| { :id => row[0], :title => row[1] }}
       render :json => arr

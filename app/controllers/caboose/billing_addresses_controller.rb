@@ -1,20 +1,26 @@
 module Caboose
-  class ShippingAddressesController < Caboose::ApplicationController
+  class BillingAddressesController < Caboose::ApplicationController
             
-    # GET /admin/orders/:order_id/shipping-address/json
+    # GET /admin/orders/:order_id/billing-address/json
     def admin_json
       return if !user_is_allowed('orders', 'edit')    
       order = Order.find(params[:order_id])      
-      render :json => order.shipping_address      
+      render :json => order.billing_address      
     end
       
-    # PUT /admin/orders/:order_id/shipping-address
+    # PUT /admin/orders/:order_id/billing-address
     def admin_update
       return if !user_is_allowed('orders', 'edit')
       
       resp = Caboose::StdClass.new({'attributes' => {}})
       order = Order.find(params[:order_id])    
-      sa = order.shipping_address
+      sa = order.billing_address
+      
+      if sa.nil?
+        sa = Address.create
+        order.billing_address_id = sa.id
+        order.save
+      end
       
       save = true    
       params.each do |name, value|
@@ -35,7 +41,7 @@ module Caboose
           when 'country_code'   then sa.country_code  = value
           when 'phone'          then sa.phone         = value
         end
-      end                
+      end
       resp.success = save && sa.save      
       render :json => resp
     end

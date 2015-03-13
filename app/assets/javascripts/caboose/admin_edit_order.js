@@ -250,7 +250,8 @@ OrderController.prototype = {
     var table = $('<table/>').addClass('data');
     table.append($('<tr/>')  
       .append($('<th/>').html('Customer'))
-      .append($('<th/>').html('Shipping Address'))  
+      .append($('<th/>').html('Shipping Address'))
+      .append($('<th/>').html('Billing Address'))
       .append($('<th/>').html('Order Status'))
       .append($('<th/>').html('Payment Status'))      
     );    
@@ -272,6 +273,16 @@ OrderController.prototype = {
           that.refresh_order(function() {
             if (a.html() == 'Edit') { that.edit_shipping_address();        a.html('Finished'); }
             else                    { that.noneditable_shipping_address(); a.html('Edit');     }
+          });
+        }))
+      )
+      .append($('<td/>').attr('valign', 'top')
+        .append($('<div/>').attr('id', 'billing_address').append(that.noneditable_billing_address(true)))
+        .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
+          var a = $(this);
+          that.refresh_order(function() {
+            if (a.html() == 'Edit') { that.edit_billing_address();        a.html('Finished'); }
+            else                    { that.noneditable_billing_address(); a.html('Edit');     }
           });
         }))
       )
@@ -357,6 +368,62 @@ OrderController.prototype = {
       name: 'ShippingAddress',
       id: sa.id,
       update_url: '/admin/orders/' + that.order.id + '/shipping-address',
+      authenticity_token: that.authenticity_token,
+      attributes: [        
+        { name: 'first_name'  , nice_name: 'First Name' , type: 'text'  , value: sa.first_name , width: 150, fixed_placeholder: false },
+        { name: 'last_name'   , nice_name: 'Last Name'  , type: 'text'  , value: sa.last_name  , width: 150, fixed_placeholder: false },
+        { name: 'address1'    , nice_name: 'Address 1'  , type: 'text'  , value: sa.address1   , width: 320, fixed_placeholder: false },
+        { name: 'address2'    , nice_name: 'Address 2'  , type: 'text'  , value: sa.address2   , width: 320, fixed_placeholder: false },
+        { name: 'city'        , nice_name: 'City'       , type: 'text'  , value: sa.city       , width: 180, fixed_placeholder: false },
+        { name: 'state'       , nice_name: 'State'      , type: 'text'  , value: sa.state      , width: 40, fixed_placeholder: false },
+        { name: 'zip'         , nice_name: 'Zip'        , type: 'text'  , value: sa.zip        , width: 60, fixed_placeholder: false }
+      ]
+    });
+  },
+  
+  noneditable_billing_address: function(return_element)
+  {
+    var that = this;
+    var sa = that.order.billing_address;
+    if (!sa) sa = {};
+    var str = '';
+    str += (sa.first_name ? sa.first_name : '[Empty first name]') + ' ';
+    str += (sa.last_name  ? sa.last_name  : '[Empty last name]');        
+    str += '<br />' + (sa.address1 ? sa.address1 : '[Empty address]');
+    if (sa.address2) str += "<br />" + sa.address2;             
+    str += '<br/>' + (sa.city ? sa.city : '[Empty city]') + ", " + (sa.state ? sa.state : '[Empty state]') + " " + (sa.zip ? sa.zip : '[Empty zip]');
+    if (return_element)
+      return str;
+    $('#billing_address').empty().append(str);
+  },
+  
+  edit_billing_address: function()
+  {
+    var that = this;
+    var sa = that.order.billing_address;
+    if (!sa) sa = { id: 1 };
+    var table = $('<table/>').addClass('billing_address')
+      .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
+        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_first_name')))
+        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_last_name')))
+      ))))
+      .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
+        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_address1')))                                
+      ))))
+      .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')        
+        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_address2')))                        
+      ))))
+      .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
+        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_city')))
+        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_state')))        
+        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_zip')))        
+      ))));
+    $('#billing_address').empty().append(table);
+            
+    new ModelBinder({
+      name: 'BillingAddress',
+      id: sa.id,
+      update_url: '/admin/orders/' + that.order.id + '/billing-address',
       authenticity_token: that.authenticity_token,
       attributes: [        
         { name: 'first_name'  , nice_name: 'First Name' , type: 'text'  , value: sa.first_name , width: 150, fixed_placeholder: false },
@@ -637,8 +704,8 @@ OrderController.prototype = {
       url: '/admin/orders/' + that.order.id + '/void',
       success: function(resp) {
         if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) $('#message').html("<p class='note success'>" + resp.success + "</p>");
-        if (resp.refresh) window.location.reload(true);
+        if (resp.success) that.refresh();
+        if (resp.refresh) that.refresh();
       }
     });
   },
@@ -661,8 +728,8 @@ OrderController.prototype = {
       url: '/admin/orders/' + that.order.id + '/capture',
       success: function(resp) {
         if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) $('#message').html("<p class='note success'>" + resp.success + "</p>");
-        if (resp.refresh) window.location.reload(true);
+        if (resp.success) that.refresh();
+        if (resp.refresh) that.refresh();
       }
     });
   }

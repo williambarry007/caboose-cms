@@ -77,26 +77,21 @@ module Caboose
         sc = @site.store_config
         case sc.pp_name
           when 'authorize.net'
-            
-            response = AuthorizeNet::SIM::Transaction.new(
-              sc.pp_username, 
-              sc.pp_password,
-              order.total,
-              :transaction_type => 'CAPTURE_ONLY',
-              :transaction_id => t.transaction_id
-            )                
-            order.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
-            resp.success = 'Captured funds successfully'
-            
+            transaction = AuthorizeNet::AIM::Transaction.new(sc.pp_username, sc.pp_password)
+            response = transaction.prior_auth_capture(t.transaction_id, order.total)
             Caboose.log(response.inspect)
             
+            order.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
+            resp.success = 'Captured funds successfully'
+                                    
             ot = Caboose::OrderTransaction.new(
               :order_id => order.id,
               :date_processed => DateTime.now.utc,
               :transaction_type => Caboose::OrderTransaction::TYPE_CAPTURE
             )
-            ot.success        = response.success?
-            ot.transaction_id = response.transaction_id                          
+            ot.success        = response.response_code && response.response_code == '1'            
+            ot.transaction_id = response.transaction_id
+            ot.auth_code      = response.authorization_code
             ot.response_code  = response.response_code
             ot.amount         = order.total
             ot.save

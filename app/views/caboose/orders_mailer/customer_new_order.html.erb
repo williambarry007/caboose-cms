@@ -2,11 +2,11 @@
 
 <h1>Thank you for your order!</h1>
 
-<p>Order #<%= @order.order_number %></p>
-
 <h2>Order Details</h2>
 
-<table>
+<p>Order #<%= @order.order_number %></p>
+
+<table border='1' style='border-collapse: collapse;'>
   <tr>
     <th>Package</th>
     <th>Line Item</th>
@@ -55,21 +55,21 @@
       <td align='right'><%= number_to_currency(li.subtotal) %></td>
     </tr>  
   <% end %>
-  <tr><td colspan="4">Subtotal:               </td><td><%= number_to_currency(@order.subtotal) %></td></tr>
-  <tr><td colspan="4">Tax:                    </td><td><%= number_to_currency(@order.tax)      %></td></tr>
-  <tr><td colspan="4">Shipping and Handling:  </td><td><%= number_to_currency(@order.shipping + @order.handling) %></td></tr>
+  <tr><td colspan="4" align='right'>Subtotal:               </td><td align='right'><%= number_to_currency(@order.subtotal) %></td></tr>
+  <tr><td colspan="4" align='right'>Tax:                    </td><td align='right'><%= number_to_currency(@order.tax)      %></td></tr>
+  <tr><td colspan="4" align='right'>Shipping and Handling:  </td><td align='right'><%= number_to_currency(@order.shipping + @order.handling) %></td></tr>
   <% if @order.gift_wrap && @order.gift_wrap > 0 %>  
-    <tr><td colspan="4">Gift wrap:            </td><td><%= number_to_currency(@order.gift_wrap) %></td></tr>
+    <tr><td colspan="4" align='right'>Gift wrap:            </td><td align='right'><%= number_to_currency(@order.gift_wrap) %></td></tr>
   <% end %>
   <% if @order.discounts %>
     <% @order.discounts.each do |d| %>
-      <tr><td colspan="4">"<%= d.gift_card.code %>" gift card: </td><td><%= number_to_currency(d.amount) %></td></tr>
+      <tr><td colspan="4" align='right'>"<%= d.gift_card.code %>" gift card: </td><td align='right'><%= number_to_currency(d.amount) %></td></tr>
     <% end %>
   <% end %>
   <% if @order.custom_discount %>
-    <tr><td colspan="4">Discount: </td><td><%= number_to_currency(@order.custom_discount) %></td></tr>
+    <tr><td colspan="4" align='right'>Discount: </td><td align='right'><%= number_to_currency(@order.custom_discount) %></td></tr>
   <% end %>      
-  <tr><td colspan="4">Total:     </td><td><%= number_to_currency(@order.total) %></td></tr>
+  <tr><td colspan="4" align='right'>Total:     </td><td align='right'><%= number_to_currency(@order.total) %></td></tr>
 </table>
 
 <% if @order.shipping_address %>
@@ -78,7 +78,7 @@
   <p>
     <%= sa.first_name %> <%= sa.last_name %><br />
     <%= sa.address1 %><br />
-    <% if sa.address2 %><%= sa.address2 %><br /><% end %>
+    <% if sa.address2 && sa.address2.strip.length > 0 %><%= sa.address2 %><br /><% end %>
     <%= sa.city %>, <%= sa.state %> <%= sa.zip %>
   </p>
 <% end %>
@@ -89,7 +89,7 @@
   <p>
     <%= ba.first_name %> <%= ba.last_name %><br />
     <%= ba.address1 %><br />
-    <% if ba.address2 %><%= ba.address2 %><br /><% end %>
+    <% if ba.address2 && ba.address2.strip.length > 0 %><%= ba.address2 %><br /><% end %>
     <%= ba.city %>, <%= ba.state %> <%= ba.zip %>
   </p>
 <% end %>

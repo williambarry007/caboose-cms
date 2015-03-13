@@ -62,10 +62,10 @@ module Caboose
     def capture_funds
       return if !user_is_allowed('orders', 'edit')
       
-      response = Caboose::StdClass.new
+      resp = Caboose::StdClass.new
       order = Order.find(params[:id])
       t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
-      
+            
       if order.financial_status == Order::FINANCIAL_STATUS_CAPTURED
         resp.error = "Funds for this order have already been captured."    
       elsif order.total > t.amount
@@ -87,6 +87,20 @@ module Caboose
             )                
             order.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
             resp.success = 'Captured funds successfully'
+            
+            Caboose.log(response.inspect)
+            
+            ot = Caboose::OrderTransaction.new(
+              :order_id => order.id,
+              :date_processed => DateTime.now.utc,
+              :transaction_type => Caboose::OrderTransaction::TYPE_CAPTURE
+            )
+            ot.success        = response.success?
+            ot.transaction_id = response.transaction_id                          
+            ot.response_code  = response.response_code
+            ot.amount         = order.total
+            ot.save
+      
           when 'payscape'
             # TODO: Implement capture funds for payscape
 

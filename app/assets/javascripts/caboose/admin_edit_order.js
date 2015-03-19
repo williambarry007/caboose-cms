@@ -505,12 +505,12 @@ OrderController.prototype = {
   {
     var div = $('<div/>');
     if (li.is_gift)
-    {
+    {      
       div.append($('<ul/>').addClass('gift_options')
         .append($('<li/>').html("This item is a gift."))
         .append($('<li/>').html("Gift wrap? " + (li.gift_wrap ? 'Yes' : 'No')))
         .append($('<li/>').html("Hide prices? " + (li.hide_prices ? 'Yes' : 'No')))
-        .append($('<li/>').html("Gift message: " + (li.gift_message.length > 0 ? li.gift_message : '[Empty]')))
+        .append($('<li/>').html("Gift message: " + (li.gift_message && li.gift_message.length > 0 ? li.gift_message : '[Empty]')))
       );            
     }
     else

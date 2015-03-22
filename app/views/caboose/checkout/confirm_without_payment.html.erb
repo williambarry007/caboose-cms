@@ -38,11 +38,8 @@ store_config = @site.store_config
       </section>
     <% end %>
     <section id='payment_method'>
-      <h3>Payment Method</h3>      
-      <div id='confirm_card'>
-        <p id='confirm_card_number'></p>
-        <p><a href="#" id='edit_payment'>Edit</a></p>
-      </div>
+      <h3>Payment Method</h3>
+      <p>Your order does not require payment.</p>
     </section>
     <div style='clear: left;'>&nbsp;</div>
   </section>
@@ -59,7 +56,7 @@ store_config = @site.store_config
 
 <%= content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/cart' %>
-<%= javascript_include_tag 'caboose/checkout_payment' %>
+<%= javascript_include_tag 'caboose/checkout_confirm_without_payment' %>
 <script type='text/javascript'>
 
 var cart = false;

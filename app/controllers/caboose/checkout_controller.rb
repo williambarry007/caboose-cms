@@ -72,7 +72,7 @@ module Caboose
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
       redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
-      #redirect_to '/checkout/confirm'   and return if @order.total == 0.00      
+      redirect_to '/checkout/confirm'   and return if @order.total == 0.00      
       
       # Make sure all the variants still exist      
       @order.line_items.each do |li|
@@ -109,22 +109,57 @@ module Caboose
     end
         
     # GET /checkout/confirm
-    #def confirm_without_payment
-    #  redirect_to '/checkout'           and return if !logged_in?
-    #  redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
-    #  redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
-    #  redirect_to '/checkout/payment'   and return if @order.total > 0.00      
-    #  
-    #  # Make sure all the variants still exist      
-    #  @order.line_items.each do |li|
-    #    v = Variant.where(:id => li.variant_id).first
-    #    if v.nil? || v.status == 'Deleted'
-    #      render :file => 'caboose/checkout/deleted_variant'
-    #      return
-    #    end
-    #  end
-    #  @logged_in_user = logged_in_user
-    #end
+    def confirm_without_payment
+      redirect_to '/checkout'           and return if !logged_in?
+      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
+      redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
+      redirect_to '/checkout/payment'   and return if @order.total > 0.00      
+      
+      # Make sure all the variants still exist      
+      @order.line_items.each do |li|
+        v = Variant.where(:id => li.variant_id).first
+        if v.nil? || v.status == 'Deleted'
+          render :file => 'caboose/checkout/deleted_variant'
+          return
+        end
+      end
+      @logged_in_user = logged_in_user
+    end
+    
+    # POST /checkout/confirm
+    def confirm
+      render :json => { :error => 'Not logged in.'            } and return if !logged_in?
+      render :json => { :error => 'Invalid addresses.'        } and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
+      render :json => { :error => 'Invalid shipping methods.' } and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
+      render :json => { :error => 'Order requires payment.'   } and return if @order.total > 0.00
+      
+      resp = Caboose::StdClass.new
+                  
+      @order.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED
+      @order.status = Order::STATUS_PENDING
+      @order.order_number = @site.store_config.next_order_number
+         
+      # Take funds from any gift cards that were used on the order
+      @order.take_gift_card_funds
+        
+      # Send out emails        
+      OrdersMailer.configure_for_site(@site.id).customer_new_order(@order).deliver
+      OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(@order).deliver        
+        
+      # Emit order event
+      Caboose.plugin_hook('order_authorized', @order)
+      
+      # Save the order
+      @order.save
+      
+      # Clear the cart and re-initialize                    
+      session[:cart_id] = nil
+      init_cart
+      
+      resp.success = true
+      resp.redirect = '/checkout/thanks'      
+      render :json => resp
+    end
     
     # GET /checkout/thanks
     def thanks

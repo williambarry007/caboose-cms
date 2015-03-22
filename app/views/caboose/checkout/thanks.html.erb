@@ -4,13 +4,24 @@
 
 <% if @last_order.has_downloadable_items? %>
   <p>Your order contained downloadable items. Download your items with the links below:</p>
-  <ul>
+  <ul id='downloads'>
     <% @last_order.line_items.each do |li| %>
       <% if li.variant.downloadable %>
         <li><a href='/my-account/orders/<%= @last_order.id %>/line-items/<%= li.id %>/download' target="_blank"><%= li.variant.product.title %></a></li>
       <% end %>
     <% end %>
-  </ul>
+  </ul>   
 <% end %>
 
 <p><a href="/">Continue Shopping</a></p>
+
+<%= content_for :caboose_css do %>
+<style type='text/css'>
+
+p { margin-bottom: 10px; }
+
+#downloads { margin: 0 0 10px 0; padding: 0; list-style: none; }
+#downloads li { margin: 0; padding: 0; }
+
+</style>
+<% end %>

@@ -1,0 +1,83 @@
+<%
+store_config = @site.store_config
+%>
+<div id="checkout">
+  <h2>Confirm Order</h2>  
+  <section id='checkout-confirm'>
+    <% if @order.has_shippable_items? %>
+      <section id='shipping_address'>
+        <h3>Shipping Address</h3>
+        <% sa = @order.shipping_address %>        
+        <address>
+          <%= "#{sa.first_name} #{sa.last_name}" %><br />
+          <%= sa.address1 %><br />
+          <%= "#{sa.address2}<br />" if sa.address2 and not sa.address2.empty? %>
+          <%= "#{sa.city}, #{sa.state} #{sa.zip}" %>
+        </address>        
+        <p><a href="/checkout/addresses">Edit</a></p>
+      </section>
+    <% end %>
+    <section id='billing_address'>        
+      <h3>Billing Address</h3>
+      <% ba = @order.billing_address %>        
+      <address>
+        <%= "#{ba.first_name} #{ba.last_name}" %><br />
+        <%= ba.address1 %><br />
+        <%= "#{ba.address2}<br />" if ba.address2 and not ba.address2.empty? %>
+        <%= "#{ba.city}, #{ba.state} #{ba.zip}" %>
+      </address>
+      <p><a href="/checkout/addresses">Edit</a></p>
+    </section>
+    <% if @order.has_shippable_items? %>
+      <section id='shipping_method'>
+        <h3>Shipping</h3>
+        <% @order.order_packages.all.each do |op| %>        
+          <p><%= op.shipping_method.service_name %> - <%= number_to_currency(op.total) %></p>
+        <% end %>
+        <p><a href="/checkout/shipping">Edit</a></p>
+      </section>
+    <% end %>
+    <section id='payment_method'>
+      <h3>Payment Method</h3>      
+      <div id='confirm_card'>
+        <p id='confirm_card_number'></p>
+        <p><a href="#" id='edit_payment'>Edit</a></p>
+      </div>
+    </section>
+    <div style='clear: left;'>&nbsp;</div>
+  </section>
+  <section>
+  <div id='cart'></div>
+  </section>  
+  <section id="checkout-continue">
+    <div id='message'></div>    
+    <button class="blue">Confirm Order</button>
+    <em>or</em>
+    <a href="/">return to the store</a>
+  </section>  
+</div>
+
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/cart' %>
+<%= javascript_include_tag 'caboose/checkout_payment' %>
+<script type='text/javascript'>
+
+var cart = false;
+$(document).ready(function() {
+  cart = new Cart({
+    allow_edit_line_items: false,
+    allow_edit_gift_cards: false
+  });
+});
+
+</script>
+<% end %>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/cart' %>
+<%= stylesheet_link_tag 'caboose/checkout' %>
+<style type='text/css'>
+
+#checkout h3 { font-size: 14pt; font-weight: bold; }
+
+</style>
+<% end %>

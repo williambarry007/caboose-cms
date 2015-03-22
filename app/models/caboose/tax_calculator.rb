@@ -23,6 +23,10 @@ module Caboose
       end
       
       sa = order.shipping_address
+      if sa.nil? || sa.address1.nil? || sa.city.nil? || sa.state.nil? || sa.zip.nil?        
+        sa = order.billing_address
+      end      
+      return 0.00 if sa.nil? || sa.address1.nil? || sa.city.nil? || sa.state.nil? || sa.zip.nil?
       
       TaxCloud.configure do |config|
         config.api_login_id  = sc.taxcloud_api_id

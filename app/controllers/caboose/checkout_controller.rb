@@ -71,7 +71,8 @@ module Caboose
     def payment
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
-      redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?      
+      redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
+      #redirect_to '/checkout/confirm'   and return if @order.total == 0.00      
       
       # Make sure all the variants still exist      
       @order.line_items.each do |li|
@@ -106,6 +107,24 @@ module Caboose
       end
       @logged_in_user = logged_in_user
     end
+        
+    # GET /checkout/confirm
+    #def confirm_without_payment
+    #  redirect_to '/checkout'           and return if !logged_in?
+    #  redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
+    #  redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
+    #  redirect_to '/checkout/payment'   and return if @order.total > 0.00      
+    #  
+    #  # Make sure all the variants still exist      
+    #  @order.line_items.each do |li|
+    #    v = Variant.where(:id => li.variant_id).first
+    #    if v.nil? || v.status == 'Deleted'
+    #      render :file => 'caboose/checkout/deleted_variant'
+    #      return
+    #    end
+    #  end
+    #  @logged_in_user = logged_in_user
+    #end
     
     # GET /checkout/thanks
     def thanks

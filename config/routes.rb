@@ -387,7 +387,8 @@ Caboose::Engine.routes.draw do
   get  '/checkout/shipping'        => 'checkout#shipping'
   put  '/checkout/shipping'        => 'checkout#update_shipping'
   get  '/checkout/gift-cards'      => 'checkout#gift_cards'  
-  get  '/checkout/payment'         => 'checkout#payment'  
+  get  '/checkout/payment'         => 'checkout#payment'
+  get  '/checkout/confirm'         => 'checkout#confirm_without_payment'  
   get  '/checkout/thanks'          => 'checkout#thanks'
   get  '/checkout/test-email'      => 'checkout#test_email'
 

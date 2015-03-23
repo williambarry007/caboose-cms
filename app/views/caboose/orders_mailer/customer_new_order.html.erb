@@ -35,9 +35,6 @@
               <li><% if li.include_gift_message %>Gift message: <%= li.gift_message %><% else %>No gift message<% end %></li>
               <li><% if li.hide_prices %>Hide all prices<% else %>Show all prices<% end %></li>
             </ul>
-          <% end %>          
-          <% if li.variant.downloadable %>
-            <p><a href='<%= @order.site.store_config.pp_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>
           <% end %>
         </td>
         <td align='right'><%= number_to_currency(li.unit_price) %></td>
@@ -51,8 +48,25 @@
     <% v = li.variant %>
     <% p = v.product %>
     <tr>
-      <td>Not assigned to a package</td>                
-      <td><%= p.title %></td></td>
+      <td>
+        <% if v.downloadable %>
+          <p>This item is downloadable.</p>          
+          <p><a href='<%= @order.site.store_config.pp_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>        
+        <% else %>
+          Not assigned to a package
+        <% end %>
+      </td>      
+      <td>
+        <p><%= p.title %></td></p>
+        <% if li.is_gift %>
+          <p>This item is a gift.</p>
+          <ul>
+            <li><% if li.gift_wrap %>Gift wrap (<%= number_to_currency(p.gift_wrap_price) %>)<% else %>Do not gift wrap<% end %></li>
+            <li><% if li.include_gift_message %>Gift message: <%= li.gift_message %><% else %>No gift message<% end %></li>
+            <li><% if li.hide_prices %>Hide all prices<% else %>Show all prices<% end %></li>
+          </ul>
+        <% end %>
+      </td>
       <td align='right'><%= number_to_currency(li.unit_price) %></td>
       <td align='right'><%= li.quantity %></td>
       <td align='right'><%= number_to_currency(li.subtotal) %></td>

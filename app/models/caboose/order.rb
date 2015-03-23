@@ -242,7 +242,7 @@ module Caboose
             
       if self.financial_status == Order::FINANCIAL_STATUS_CAPTURED
         resp.error = "Funds for this order have already been captured."    
-      elsif order.total > t.amount
+      elsif self.total > t.amount
         resp.error = "The order total exceeds the authorized amount."
       elsif t.nil?
         resp.error = "This order doesn't seem to be authorized."

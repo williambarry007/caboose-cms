@@ -11,7 +11,7 @@
     </tr>
     <% @orders.each do |order| %>
       <tr onclick="window.location='/my-account/orders/<%= order.id %>';">
-        <td><%= order.date_created.strftime('%m/%d/%Y') %></td>
+        <td><%= order.date_created ? order.date_created.strftime('%m/%d/%Y') : '' %></td>
         <td><%= order.order_number %></td>
         <td><%= number_to_currency(order.total) %></td>
         <td><%= order.status.capitalize %></td>

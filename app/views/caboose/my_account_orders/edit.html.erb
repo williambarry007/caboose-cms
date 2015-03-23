@@ -1,5 +1,9 @@
 <%
 captured = @order.financial_status == 'captured'
+ba = @order.billing_address  
+sa = @order.shipping_address
+ba = nil if ba.first_name.nil? || ba.last_name.nil?
+sa = nil if sa.first_name.nil? || sa.last_name.nil?
 %>
 <input type='hidden' name='order_id'    id='order_id'     value='<%= @order.id %>' />
 
@@ -7,14 +11,14 @@ captured = @order.financial_status == 'captured'
 
 <table class='order'>
 <tr>
-  <th>Billing Address</th>
-  <th>Shipping Address</th>  
+  <% if ba %><th>Billing Address</th><% end %>
+  <% if sa %><th>Shipping Address</th><% end %>  
   <th>Order Status</th>
   <th>Payment Status</th>  
 </tr>
 <tr>
-  <td valign='top'><%= raw @order.billing_address.name_and_address %></td>
-  <td valign='top'><%= raw @order.shipping_address.name_and_address %></td>    
+  <% if ba %><td valign='top'><%= raw ba.name_and_address %></td><% end %>
+  <% if sa %><td valign='top'><%= raw sa.name_and_address %></td><% end %>    
   <td valign='top'><%= @order.status.capitalize %></td>    
   <td valign='top'><%= @order.financial_status.capitalize %></td>
 </tr>
@@ -50,19 +54,33 @@ captured = @order.financial_status == 'captured'
     </tr>
   <% end %>
 <% end %>
+<% if @order.has_downloadable_items? %>
+  <tr>  
+    <th>Item</th>
+    <th>Status</th>    
+    <th>Unit Price</th>
+    <th>Quantity</th>
+    <th>Subtotal</th>
+  </tr>
+<% end %>
 <% @order.line_items.each do |li| %>   
-  <% next if li.order_package_id %>  
-  <tr><td colspan='5'>Unpackaged Items</td></tr>
-  <% img = li.variant.product_image %>
+  <% next if li.order_package_id %>
+  <% v = li.variant %>  
+  <% if !v.downloadable %><tr><td colspan='5'>Unpackaged Items</td></tr><% end %>
+  <% img = v.product_image %>  
   <tr>            
     <td>
       <% if img %><img src='<%= img.url(:tiny) %>' /><% end %>
-      <% if li.variant.nil? || li.variant.product.nil? %>
-        <% if li.variant.nil? %>Unknown variant<% else %><%= li.variant.sku %><% end %>
+      <% if v.nil? || v.product.nil? %>
+        <% if v.nil? %>Unknown variant<% else %><%= v.sku %><% end %>
       <% else %>
-        <a href='/admin/products/<%= li.variant.product.id %>'><%= li.variant.product.title  %></a><br />
-        <% if li.variant.sku && li.variant.sku.strip.length > 0 %><%= li.variant.sku %><br /><% end %>
-        <%= li.variant.title %>
+        <p><a href='/admin/products/<%= v.product.id %>'><%= v.product.title  %></a><br />
+        <% if v.sku && v.sku.strip.length > 0 %><%= v.sku %><br /><% end %>
+        <%= v.title %></p>
+      <% end %>
+      <% if v.downloadable %>
+        <% sc = @order.site.store_config %>        
+        <p><a href='<%= raw sc.pp_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></p>
       <% end %>
     </td>    
     <td><%= li.status.capitalize %></td>    
@@ -93,6 +111,8 @@ table.order td { margin: 0; padding: 10px; border: #000 1px solid; }
 table.order td img { float: left; margin-right: 10px; }
 table.order td.package_header { font-weight: bold; text-align: center; border: 0; }
 table.order td.totals_header { font-weight: bold; text-align: center; border: 0; }
+
+p { margin-bottom: 10px; }
 
 </style>
 <% end %>

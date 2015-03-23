@@ -235,6 +235,64 @@ module Caboose
       return false
     end
     
+    def capture_funds
+      
+      resp = StdClass.new      
+      t = OrderTransaction.where(:order_id => self.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
+            
+      if self.financial_status == Order::FINANCIAL_STATUS_CAPTURED
+        resp.error = "Funds for this order have already been captured."    
+      elsif order.total > t.amount
+        resp.error = "The order total exceeds the authorized amount."
+      elsif t.nil?
+        resp.error = "This order doesn't seem to be authorized."
+      else
+                        
+        sc = self.site.store_config
+        case sc.pp_name
+          when 'authorize.net'
+            transaction = AuthorizeNet::AIM::Transaction.new(sc.pp_username, sc.pp_password)
+            response = transaction.prior_auth_capture(t.transaction_id, self.total)
+                        
+            self.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
+            resp.success = 'Captured funds successfully'
+
+            ot = Caboose::OrderTransaction.new(
+              :order_id => self.id,
+              :date_processed => DateTime.now.utc,
+              :transaction_type => OrderTransaction::TYPE_CAPTURE
+            )
+            ot.success        = response.response_code && response.response_code == '1'            
+            ot.transaction_id = response.transaction_id
+            ot.auth_code      = response.authorization_code
+            ot.response_code  = response.response_code
+            ot.amount         = self.total
+            ot.save
+      
+          when 'payscape'
+            # TODO: Implement capture funds for payscape
+
+        end
+          
+        #if (order.discounts.any? && order.total < order.discounts.first.amount_current) || PaymentProcessor.capture(order)
+        #  order.financial_status = 'captured'
+        #  order.save
+        #  
+        #  if order.discounts.any?
+        #    order.update_attribute(:amount_discounted, order.discounts.first.amount_current)
+        #    order.update_gift_cards
+        #  end
+        #  
+        #  response.success = "Captured funds successfully"
+        #else
+        #  response.error = "Error capturing funds."
+        #end
+        
+      end
+      
+      return resp
+    end
+    
   end
 end
 

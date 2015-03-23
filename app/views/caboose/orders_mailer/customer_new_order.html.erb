@@ -27,7 +27,7 @@
           </td>
         <% end %>
         <td>
-          <%= p.title %>
+          <p><%= p.title %></p>
           <% if li.is_gift %>
             <p>This item is a gift.</p>
             <ul>
@@ -35,6 +35,9 @@
               <li><% if li.include_gift_message %>Gift message: <%= li.gift_message %><% else %>No gift message<% end %></li>
               <li><% if li.hide_prices %>Hide all prices<% else %>Show all prices<% end %></li>
             </ul>
+          <% end %>          
+          <% if li.variant.downloadable %>
+            <p><a href='<%= @order.site.store_config.pp_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>
           <% end %>
         </td>
         <td align='right'><%= number_to_currency(li.unit_price) %></td>

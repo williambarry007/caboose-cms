@@ -1,17 +1,17 @@
 
-<h1>My Account</h1>
-
-<p><div id='user_<%= @user.id %>_first_name' ></div></p>
-<p><div id='user_<%= @user.id %>_last_name'  ></div></p>
-<p><div id='user_<%= @user.id %>_email'      ></div></p>
-<p><div id='user_<%= @user.id %>_phone'      ></div></p>
-<div id='message'></div>
-
-<p>
-<% if @site.use_store %>
-  <input type='button' value='Order History' class='btn' onclick="window.location='/my-account/orders';" />
-<% end %>
-</p>
+<div id='my_account'>
+  <h1>My Account</h1>
+  <p><div id='user_<%= @user.id %>_first_name' ></div></p>
+  <p><div id='user_<%= @user.id %>_last_name'  ></div></p>
+  <p><div id='user_<%= @user.id %>_email'      ></div></p>
+  <p><div id='user_<%= @user.id %>_phone'      ></div></p>
+  <div id='message'></div>
+  <p>
+  <% if @site.use_store %>
+    <input type='button' value='Order History' class='btn' onclick="window.location='/my-account/orders';" />
+  <% end %>
+  </p>
+</div>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
@@ -29,12 +29,17 @@ $(document).ready(function() {
       { name: 'email'      , nice_name: 'Email'        , type: 'text', value: <%= raw Caboose.json(@user.email)      %>, width: 400 },
       { name: 'phone'      , nice_name: 'Phone Number' , type: 'text', value: <%= raw Caboose.json(@user.phone)      %>, width: 400 }
     ],
-    on_load: function() { modal.autosize(); }
+    on_load: function() {
+      $('#user_<%= @user.id %>_first_name').css('width', '400px');
+      $('#user_<%= @user.id %>_last_name' ).css('width', '400px');
+      $('#user_<%= @user.id %>_email'     ).css('width', '400px');
+      $('#user_<%= @user.id %>_phone'     ).css('width', '400px');    
+    }
   });  
 });
 
 </script>
 <% end %>
 <%= content_for :caboose_css do %>
-<%= stylesheet_link_tag "caboose/my-account", :media => "all" %>
+<%= stylesheet_link_tag "caboose/my_account", :media => "all" %>
 <% end %>

@@ -325,7 +325,7 @@ module Caboose
         OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(order).deliver        
         
         # Emit order event
-        Caboose.plugin_hook('order_authorized', order)
+        Caboose.plugin_hook('order_authorized', order)        
       else
         order.financial_status = 'unauthorized'        
         error = "There was a problem processing your payment."
@@ -347,6 +347,16 @@ module Caboose
       @resp = Caboose::StdClass.new
       @resp.success = true if params[:success]
       @resp.error = params[:error] if params[:error]
+      
+      # Go ahead and capture funds if the order only contained downloadable items
+      @order = Order.find(params[:order_id])
+      if !@order.has_shippable_items?
+        capture_resp = @order.capture_funds
+        if capture_resp.error
+          @resp.success = false
+          @resp.error = capture_resp.error
+        end        
+      end
       
       if @resp.success        
         session[:cart_id] = nil

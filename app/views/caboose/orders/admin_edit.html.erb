@@ -9,11 +9,11 @@
 
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/orders';" />
-<% if @order.financial_status == Caboose::Order::FINANCIAL_STATUS_AUTHORIZED %>
+<% if @order.financial_status == Caboose::Order::FINANCIAL_STATUS_AUTHORIZED && @order.total > 0.00 %>
   <input type='button' value='Capture Funds' onclick="controller.capture_funds();" />
   <input type='button' value='Void'          onclick="controller.void_order();" />
 <% end %>
-<% if @order.financial_status == Caboose::Order::FINANCIAL_STATUS_CAPTURED %>
+<% if @order.financial_status == Caboose::Order::FINANCIAL_STATUS_CAPTURED && @order.total > 0.00 %>
   <input type='button' value='Refund' onclick="refund_order(<%= @order.id %>);" />
 <% end %>
 <input type='button' value='Resend Confirmation' onclick="resend_confirmation(<%= @order.id %>)" />

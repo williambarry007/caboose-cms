@@ -315,7 +315,7 @@ module Caboose
               :transaction_type => OrderTransaction::TYPE_VOID,
               :transaction_id => t.transaction_id
             )                    
-            order.update_attributes(
+            self.update_attributes(
               :financial_status => Order::FINANCIAL_STATUS_VOIDED,
               :status => Order::STATUS_CANCELED
             )

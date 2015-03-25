@@ -174,7 +174,7 @@ module Caboose
     def admin_send_for_authorization
       return if !user_is_allowed('orders', 'edit')              
       OrdersMailer.configure_for_site(@site.id).delay.customer_payment_authorization(order)
-      render :json =>       
+      render :json => { :success => true }
     end
 
     # GET /admin/orders/status-options

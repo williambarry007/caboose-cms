@@ -2,6 +2,7 @@ module Caboose
   class MyAccountOrdersController < Caboose::ApplicationController
             
     helper :authorize_net
+    protect_from_forgery :except => :authnet_relay
     
     # GET /my-account/orders
     def index

@@ -30,31 +30,46 @@ module Caboose
         render :file => 'caboose/extras/error'
         return
       end
-
-      if @order.financial_status == Order::FINANCIAL_STATUS_PENDING
-        
-        sc = @site.store_config
-        case sc.pp_name
-          when 'authorize.net'
-                        
-            @sim_transaction = AuthorizeNet::SIM::Transaction.new(
-              sc.pp_username, 
-              sc.pp_password, 
-              @order.total,                          
-              :relay_response => 'TRUE',              
-              :relay_url => "#{sc.pp_relay_domain}/my-account/orders/authnet-relay",
-              :transaction_type => 'AUTH_ONLY',                        
-              :test => sc.pp_testing
-            )
-            @request = request
-            @show_relay = params[:show_relay] && params[:show_relay].to_i == 1
-            
-          when 'stripe'
-            # TODO: Implement manual order payment for stripe
-            
-        end
-      end
+    end
+    
+    # GET /my-account/orders/:id/payment-form
+    def payment_form
+      return if !logged_in?
       
+      @order = Order.find(params[:id])
+      if @order.customer_id != logged_in_user.id
+        @error = "The given order does not belong to you."
+        render :file => 'caboose/extras/error'
+        return
+      end
+  
+      if @order.financial_status != Order::FINANCIAL_STATUS_PENDING        
+        @error = "This order does not require payment at this time."
+        render :file => 'caboose/extras/error'
+        return
+      end
+        
+      sc = @site.store_config
+      case sc.pp_name
+        when 'authorize.net'
+                      
+          @sim_transaction = AuthorizeNet::SIM::Transaction.new(
+            sc.pp_username, 
+            sc.pp_password, 
+            @order.total,                          
+            :relay_response => 'TRUE',              
+            :relay_url => "#{sc.pp_relay_domain}/my-account/orders/authnet-relay",
+            :transaction_type => 'AUTH_ONLY',                        
+            :test => sc.pp_testing
+          )
+          @request = request
+          @show_relay = params[:show_relay] && params[:show_relay].to_i == 1
+          
+        when 'stripe'
+          # TODO: Implement manual order payment for stripe
+          
+      end      
+      render :layout => false      
     end
     
     # GET /my-account/orders/:id/json

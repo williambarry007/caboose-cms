@@ -419,56 +419,44 @@ MyAccountOrderController.prototype = {
   payment_form: function()
   {
     var that = this;
-    var ba = that.order.billing_address;
-    if (ba == null || ba == false || 
-      ba.first_name.length == 0 || 
-      ba.last_name.length == 0 ||
-      ba.address1.length == 0 || 
-      ba.city.length == 0 || 
-      ba.state.length == 0 || 
-      ba.zip.length == 0
-    ) {                                                           
-      $('#payment_message').empty().html("<p class='note error'>Your billing address must be valid before making payment. Please review and try again.</p>");
-      return;    
-    }
     var form = $('#payment_form');
-    if (!form.is(':visible'))
-    {
+    if (form.is(':visible'))
+    {      
+      form.slideUp(function() { form.empty(); });
       $('#payment_message').empty();
-      form.slideDown();
+      return; 
     }
-    else
-      form.slideUp();          
+    
+    $('#payment_message').empty().html("<p class='loading'>Getting payment form...</p>");
+    $.ajax({
+      url: '/my-account/orders/' + that.order.id + '/payment-form',
+      type: 'get',
+      success: function(html) {        
+        form.empty().append(html);
+        form.slideDown();
+        $('#payment_message').empty();        
+      }
+    });                  
   },
   
   submit_payment: function() 
   {
+    $('input[name=billing-cc-exp]').val($('#billing-expiration-month').val() + $('#billing-expiration-year').val());      
     $('#payment_message').empty().html("<p class='loading'>Processing payment...</p>");
     $('#payment_form').slideUp();
+    $('#payment').submit();    
   },
-    
-  send_for_authorization: function(confirm)
+  
+  payment_relay_handler: function(resp)
   {
-    var that = this;    
-    if (!confirm)
-    {    
-      var p = $('<p/>').addClass('note confirm')
-        .append("Are you sure you want to send this order to the customer for authorization? ")
-        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.send_for_authorization(true); }))
-        .append(' ')                
-        .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
-      $('#message').empty().append(p);
-      return;
-    }
-    $('#message').html("<p class='loading'>Sending for authorization...</p>");
-    $.ajax({
-      url: '/my-account/orders/' + that.order.id + '/send-for-authorization',
-      success: function(resp) {
-        if (resp.error)     $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) { $('#message').empty(); that.refresh(); }
-        if (resp.refresh) { $('#message').empty(); that.refresh(); }
-      }
-    });
+    console.log('RELAY');
+    console.log(resp);
+    if (resp.success == true)
+      controller.refresh();
+    else if (resp.error)  
+      $('#payment_message').html("<p class='note error'>" + resp.error + "</p>");
+    else
+      $('#payment_message').html("<p class='note error'>There was an error processing your payment.</p>");    
   },
 
   has_shippable_items: function()
@@ -486,5 +474,5 @@ MyAccountOrderController.prototype = {
   
 function relay_handler(resp)
 {
-  
+  controller.payment_relay_handler(resp);  
 }

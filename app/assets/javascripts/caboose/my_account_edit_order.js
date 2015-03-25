@@ -435,8 +435,8 @@ MyAccountOrderController.prototype = {
         form.empty().append(html);
         form.slideDown();
         $('#payment_message').empty();
-        $('#payment_confirm').click(function(e) {
-          $('input[name=billing-cc-exp]').val($('#billing-expiration-month').val() + $('#billing-expiration-year').val());      
+        $('#payment_confirm').click(function(e) {                                                                   
+          $('#expiration').val($('#month').val() + $('#year').val());    
           $('#payment_message').empty().html("<p class='loading'>Processing payment...</p>");
           $('#payment_form').slideUp();
           $('#payment').submit();            

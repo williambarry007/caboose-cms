@@ -36,8 +36,8 @@ valid_address = ba &&
       <div class="field" id="expiry">
         <span class="field-text">Expiration</span>
         <input id="expiration" name="x_exp_date" type="hidden" />
-        <select id="month" name="month"><% (1..12).each do |i| %><option value="<%= (i<10 ? "0#{i}" : i) %>"><%= (i<10 ? "0#{i}" : i) %> - <%= DateTime.new(2000, i, 1).strftime("%b") %></option><% end %></select> /                                
-        <select id="year" name="year"><% (DateTime.now.year...DateTime.now.year + 20).each do |i| %><option value="<%= i-2000 %>"><%= i %></option><% end %></select>
+        <select id="month" name="month" ><% (1..12).each do |i| %><option value="<%= (i<10 ? "0#{i}" : i) %>"><%= (i<10 ? "0#{i}" : i) %> - <%= DateTime.new(2000, i, 1).strftime("%b") %></option><% end %></select> /                                
+        <select id="year"  name="year"  ><% (DateTime.now.year...DateTime.now.year + 20).each do |i| %><option value="<%= i-2000 %>"><%= i %></option><% end %></select>
       </div>
       <input type='button' value='Confirm Payment' id='payment_confirm' class='btn' />
     </form>    

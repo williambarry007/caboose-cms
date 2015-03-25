@@ -414,6 +414,10 @@ module Caboose
     #  # render :json => response
     #end
     
+    def send_payment_authorization_email
+      OrdersMailer.configure_for_site(self.site_id).customer_payment_authorization(self).deliver
+    end
+    
   end
 end
 

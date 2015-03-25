@@ -35,10 +35,22 @@ function show_products()
         $.each(products, function(i, p) {
           ul.append($('<li/>')
             .attr('id', 'product_id_' + p.id)
-            .data('product_id', p.id)            
+            .data('product_id', p.id)
+            .data('variant_id', p.variant_id)            
             .append($('<a/>').html(p.title).click(function(e) {
               e.preventDefault();
-              show_variants($(e.target).parent(), $(e.target).parent().data('product_id'));        
+              
+              var li = $(e.target).parent();
+              var product_id = li.data('product_id');
+              var variant_id = li.data('variant_id');              
+              
+              if (variant_id && variant_id != null)
+              {
+                parent.controller.add_variant(variant_id);
+                modal.close();
+              }
+              else              
+                show_variants(li, product_id);                                        
             }))
           );
         });
@@ -80,6 +92,7 @@ function show_variants(li, product_id)
         if (v.option2) name.push(v.option2);
         if (v.option3) name.push(v.option3);
         name = name.join(' / ');
+        if (!name || name.length == 0) name = 'Default';
         ul.append($('<li/>')
           .data('variant_id', v.id)          
           .append($('<a/>').html(name).click(function(e) {

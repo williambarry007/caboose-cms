@@ -1,0 +1,16 @@
+<%
+# This relay page is rendered from the authorize.net server in a hidden iframe 
+# on the host application's checkout page.
+#
+# Since security rules in browsers disallow javascript access to and from 
+# iframes with pages in different domains, we need to send things back to 
+# a page on our own domain so we can bubble up the response.
+#
+%><!DOCTYPE>
+<html>
+<body>    
+<script type='text/javascript'>
+window.location = <%= raw Caboose.json(@url) %>;
+</script>
+</body>
+</html>

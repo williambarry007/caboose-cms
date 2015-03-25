@@ -1,0 +1,138 @@
+<%
+store_config = @site.store_config
+%>
+<div id="checkout">
+  <h2>Payment</h2>
+  <section id='checkout-payment'>
+    <% if store_config.pp_name == 'authorize.net' %>        
+      <form id="payment" target="relay" action="https://secure.authorize.net/gateway/transact.dll" method="post">
+        <%= sim_fields(@sim_transaction) %>
+        <input type="hidden" id="x_invoice_num" name="x_invoice_num" value="<%= @order.id %>" />
+        <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw store_config.pp_relay_domain      %>/checkout/authnet-response/<%= @order.id %>" />        
+        <input type="hidden" id="x_first_name"  name="x_first_name"  value="<%= raw @order.billing_address.first_name %>" />
+        <input type="hidden" id="x_last_name"   name="x_last_name"   value="<%= raw @order.billing_address.last_name  %>" />       
+        <input type="hidden" id="x_address"     name="x_address"     value="<%= raw @order.billing_address.address1   %>" />      
+        <input type="hidden" id="x_city"        name="x_city"        value="<%= raw @order.billing_address.city       %>" />
+        <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @order.billing_address.state      %>" />
+        <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @order.billing_address.zip        %>" />
+                
+        <div class="field" id="credit-card">
+          <span class="field-text">Credit Card</span>
+          <div class="icons">
+            <img src="/assets/caboose/credit_cards.png" alt="Credit Cards Accepted" />
+          </div>
+        </div>
+
+        <div class="field" id="card-number">
+          <span class="field-text">Card</span>
+          <input name="x_card_num" id='billing-cc-number' type="text" maxlength="16" placeholder="Card number" />
+          <div class="icons">
+            <img src="/assets/caboose/lock.png" alt="Secure Connection" />
+          </div>
+        </div>
+
+        <div class="field" id="expiry">
+          <span class="field-text">Expiry</span>
+          <input id="expiration" name="x_exp_date" type="hidden" />
+          <select id="month" name="month">                                      
+            <option value="01">01 - Jan</option>
+            <option value="02">02 - Feb</option>
+            <option value="03">03 - Mar</option>
+            <option value="04">04 - Apr</option>
+            <option value="05">05 - May</option>
+            <option value="06">06 - Jun</option>
+            <option value="07">07 - Jul</option>
+            <option value="08">08 - Aug</option>
+            <option value="09">09 - Sep</option>
+            <option value="10">10 - Oct</option>
+            <option value="11">11 - Nov</option>
+            <option value="12">12 - Dec</option>
+          </select>
+          /
+          <select id="year" name="year">
+            <% (DateTime.now.year...DateTime.now.year + 20).each do |i| %>
+              <option value="<%= i-2000 %>"><%= i %></option>
+            <% end %>
+          </select>
+        </div>
+
+      </form>        
+    <% end %>
+  </section>
+  <section id='checkout-confirm'>
+    <% if @order.has_shippable_items? %>
+      <section id='shipping_address'>
+        <h3>Shipping Address</h3>
+        <% sa = @order.shipping_address %>        
+        <address>
+          <%= "#{sa.first_name} #{sa.last_name}" %><br />
+          <%= sa.address1 %><br />
+          <%= "#{sa.address2}<br />" if sa.address2 and not sa.address2.empty? %>
+          <%= "#{sa.city}, #{sa.state} #{sa.zip}" %>
+        </address>
+      </section>
+    <% end %>
+    <section id='billing_address'>        
+      <h3>Billing Address</h3>
+      <% ba = @order.billing_address %>        
+      <address>
+        <%= "#{ba.first_name} #{ba.last_name}" %><br />
+        <%= ba.address1 %><br />
+        <%= "#{ba.address2}<br />" if ba.address2 and not ba.address2.empty? %>
+        <%= "#{ba.city}, #{ba.state} #{ba.zip}" %>
+      </address>      
+    </section>
+    <% if @order.has_shippable_items? %>
+      <section id='shipping_method'>
+        <h3>Shipping</h3>
+        <% @order.order_packages.all.each do |op| %>        
+          <p><%= op.shipping_method.service_name %> - <%= number_to_currency(op.total) %></p>
+        <% end %>        
+      </section>
+    <% end %>
+    <section id='payment_method'>
+      <h3>Payment Method</h3>      
+      <div id='confirm_card'>
+        <p id='confirm_card_number'></p>
+        <p><a href="#" id='edit_payment'>Edit</a></p>
+      </div>
+    </section>
+    <div style='clear: left;'>&nbsp;</div>
+  </section>
+  <section>
+  <div id='cart'></div>
+  </section>  
+  <section id="checkout-continue">
+    <div id='message'><p align='center'>Your credit card will not be charged until you confirm your order.</p></div>    
+    <button class="blue">Continue to Order Confirmation</button>
+    <em>or</em>
+    <a href="/">return to the store</a>
+  </section>
+  <iframe id="relay" name="relay" style='display: block; width: 800px; height: 400px; border: #000 1px solid;'></iframe>
+</div>
+
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/cart' %>
+<%= javascript_include_tag 'caboose/checkout_payment' %>
+<script type='text/javascript'>
+var SHOW_RELAY = <%= @show_relay ? 'true' : 'false' %>;
+
+var cart = false;
+$(document).ready(function() {
+  cart = new Cart({
+    allow_edit_line_items: false,
+    allow_edit_gift_cards: false
+  });
+});
+
+</script>
+<% end %>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/cart' %>
+<%= stylesheet_link_tag 'caboose/checkout' %>
+<style type='text/css'>
+
+#checkout h3 { font-size: 14pt; font-weight: bold; }
+
+</style>
+<% end %>

@@ -18,7 +18,8 @@ module Caboose
     
     attr_accessible :id,
       :site_id,
-      :alternate_id,      
+      :alternate_id,
+      :order_number,      
       :subtotal,
       :tax,            
       :shipping,
@@ -235,6 +236,7 @@ module Caboose
       return false
     end
     
+    # Capture funds from a previously authorized transaction
     def capture_funds
       
       resp = StdClass.new      
@@ -249,49 +251,168 @@ module Caboose
       else
                         
         sc = self.site.store_config
+        ot = Caboose::OrderTransaction.new(
+          :order_id => self.id,
+          :date_processed => DateTime.now.utc,
+          :transaction_type => OrderTransaction::TYPE_CAPTURE,
+          :amount => self.total
+        )
+        
         case sc.pp_name
           when 'authorize.net'
             transaction = AuthorizeNet::AIM::Transaction.new(sc.pp_username, sc.pp_password)
             response = transaction.prior_auth_capture(t.transaction_id, self.total)
-                        
-            self.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
-            resp.success = 'Captured funds successfully'
-
-            ot = Caboose::OrderTransaction.new(
-              :order_id => self.id,
-              :date_processed => DateTime.now.utc,
-              :transaction_type => OrderTransaction::TYPE_CAPTURE
-            )
+            
             ot.success        = response.response_code && response.response_code == '1'            
             ot.transaction_id = response.transaction_id
             ot.auth_code      = response.authorization_code
-            ot.response_code  = response.response_code
-            ot.amount         = self.total
+            ot.response_code  = response.response_code            
             ot.save
-      
+                                    
+            self.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
+            resp.success = 'Captured funds successfully'
+                                    
+          when 'stripe'
+            # TODO: Implement capture funds for stripe
+            
           when 'payscape'
             # TODO: Implement capture funds for payscape
 
         end
-          
-        #if (order.discounts.any? && order.total < order.discounts.first.amount_current) || PaymentProcessor.capture(order)
-        #  order.financial_status = 'captured'
-        #  order.save
-        #  
-        #  if order.discounts.any?
-        #    order.update_attribute(:amount_discounted, order.discounts.first.amount_current)
-        #    order.update_gift_cards
-        #  end
-        #  
-        #  response.success = "Captured funds successfully"
-        #else
-        #  response.error = "Error capturing funds."
-        #end
         
       end
       
       return resp
     end
+        
+    # Void an authorized order
+    def void
+            
+      resp = StdClass.new
+      t = OrderTransaction.where(:order_id => self.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
+      
+      if self.financial_status == Order::FINANCIAL_STATUS_CAPTURED
+        resp.error = "This order has already been captured, you will need to refund instead"
+      elsif t.nil?
+        resp.error = "This order doesn't seem to be authorized."
+      else
+                
+        sc = self.site.store_config
+        ot = Caboose::OrderTransaction.new(
+          :order_id => self.id,
+          :date_processed => DateTime.now.utc,
+          :transaction_type => OrderTransaction::TYPE_VOID,
+          :amount => self.total
+        )
+        
+        case sc.pp_name
+          when 'authorize.net'        
+                    
+            response = AuthorizeNet::SIM::Transaction.new(
+              sc.pp_username, 
+              sc.pp_password,                      
+              self.total,
+              :transaction_type => OrderTransaction::TYPE_VOID,
+              :transaction_id => t.transaction_id
+            )                    
+            order.update_attributes(
+              :financial_status => Order::FINANCIAL_STATUS_VOIDED,
+              :status => Order::STATUS_CANCELED
+            )
+            self.save          
+            # TODO: Add the variant quantities ordered back        
+            resp.success = "Order voided successfully"
+                        
+            ot.success        = response.response_code && response.response_code == '1'            
+            ot.transaction_id = response.transaction_id
+            #ot.auth_code      = response.authorization_code
+            ot.response_code  = response.response_code            
+            ot.save
+          
+          when 'stripe'
+            # TODO: Implement void order for strip
+            
+          when 'payscape'
+            # TODO: Implement void order for payscape
+            
+        end
+        
+      end
+      return resp      
+    end
+      
+    #def refund
+    #      
+    #  resp = StdClass.new
+    #  t = OrderTransaction.where(:order_id => self.id, :transaction_type => OrderTransaction::TYPE_CAPTURE, :success => true).first
+    #      
+    #  if self.financial_status != Order::FINANCIAL_STATUS_CAPTURED
+    #    resp.error = "This order hasn't been captured yet, you will need to void instead"
+    #  else
+    #    
+    #    sc = self.site.store_config
+    #    case sc.pp_name
+    #      when 'authorize.net'
+    #      
+    #    if PaymentProcessor.refund(order)
+    #      order.update_attributes(
+    #        :financial_status => Order::FINANCIAL_STATUS_REFUNDED,
+    #        :status => Order::STATUS_CANCELED
+    #      )
+    #      
+    #      response.success = 'Order refunded successfully'
+    #    else
+    #      response.error = 'Error refunding order'
+    #    end
+    #    
+    #    #if order.calculate_net < (order.amount_discounted || 0) || PaymentProcessor.refund(order)
+    #    #  order.financial_status = 'refunded'
+    #    #  order.status = 'refunded'
+    #    #  order.save
+    #    #  
+    #    #  if order.discounts.any?
+    #    #    discount = order.discounts.first
+    #    #    amount_to_refund = order.calculate_net < order.amount_discounted ? order.calculate_net : order.amount_discounted
+    #    #    discount.update_attribute(:amount_current, amount_to_refund + discount.amount_current)
+    #    #  end
+    #    #  
+    #    #  response.success = "Order refunded successfully"
+    #    #else
+    #    #  response.error = "Error refunding order."
+    #    #end
+    #  end
+    #
+    #  render json: response
+    #  
+    #  # return if !user_is_allowed('orders', 'edit')
+    #  #     
+    #  # response = Caboose::StdClass.new({
+    #  #   'refresh' => nil,
+    #  #   'error' => nil,
+    #  #   'success' => nil
+    #  # })
+    #  #     
+    #  # order = Order.find(params[:id])
+    #  #     
+    #  # if order.financial_status != 'captured'
+    #  #   response.error = "This order hasn't been captured yet, you will need to void instead"
+    #  # else
+    #  #   if PaymentProcessor.refund(order)
+    #  #     order.financial_status = 'refunded'
+    #  #     order.status = 'refunded'
+    #  #     order.save
+    #  #     
+    #  #     # Add the variant quantities ordered back
+    #  #     order.cancel
+    #  #     
+    #  #     response.success = "Order refunded successfully"
+    #  #   else
+    #  #     response.error = "Error refunding order."
+    #  #   end
+    #  # end
+    #  #     
+    #  # render :json => response
+    #end
     
   end
 end

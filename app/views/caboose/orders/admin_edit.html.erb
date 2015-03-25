@@ -6,7 +6,9 @@
 <div id='overview_table'></div>
 <div id='order_table'></div>
 <div id='message'></div>
+<div id='controls'></div>
 
+<!--
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/orders';" />
 <% if @order.financial_status == Caboose::Order::FINANCIAL_STATUS_AUTHORIZED && @order.total > 0.00 %>
@@ -23,6 +25,7 @@
 <% str = Caboose.plugin_hook('admin_edit_order_buttons', "", @order) %>
 <% if str %><%= raw str %><% end %>
 </p>
+-->
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/model/all' %>

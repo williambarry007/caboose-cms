@@ -99,6 +99,7 @@ module Caboose
         'caboose/cart.css',
         'caboose/checkout.css',        
         'caboose/message_boxes.css',
+        'caboose/my_account_edit_order.css',
         'caboose/product_images.css',
         'caboose/product_options.css',                        
         'colorbox-rails.css',        

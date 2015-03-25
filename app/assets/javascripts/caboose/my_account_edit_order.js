@@ -454,7 +454,7 @@ MyAccountOrderController.prototype = {
     if (resp.success == true)
     {
       $('#payment_form').empty();
-      $('#payment_message').empty().html("<p class='success'>Your payment has been processed successfully.</p>");
+      $('#payment_message').empty().html("<p class='note success'>Your payment has been processed successfully.</p>");
       setTimeout(function() { $('#payment_message').empty() }, 5000);
       that.refresh();
     }

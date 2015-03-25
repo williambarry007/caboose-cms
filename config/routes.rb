@@ -517,6 +517,7 @@ Caboose::Engine.routes.draw do
   get     "/admin/orders/status-options"              => "orders#admin_status_options"
   get     "/admin/orders/new"                         => "orders#admin_new"
   get     "/admin/orders/print-pending"               => "orders#admin_print_pending"
+  get     "/admin/orders/:id/send-for-authorization"  => "orders#admin_send_for_authorization"
   get     "/admin/orders/:id/capture"                 => "orders#capture_funds"  
   get     "/admin/orders/:id/json"                    => "orders#admin_json"
   get     "/admin/orders/:id/print"                   => "orders#admin_print"

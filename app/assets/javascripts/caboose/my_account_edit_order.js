@@ -17,12 +17,13 @@ MyAccountOrderController.prototype = {
     $(document).ready(function() { that.refresh(); });
   },
   
-  refresh: function()
+  refresh: function(after)
   {
     var that = this;
     that.refresh_order(function() {
       $('#order_table').html("<p class='loading'>Getting order...</p>");
-      that.print();       
+      that.print();
+      if (after) after();
     });    
   },
   
@@ -110,7 +111,7 @@ MyAccountOrderController.prototype = {
       .append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(that.noneditable_shipping_address()))      
       .append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
       .append($('<td/>').attr('valign', 'top').attr('align', 'center').append($('<p/>').html(capitalize_first_letter(that.order.status))))
-      .append($('<td/>').attr('valign', 'top').attr('align', 'center').append(fstatus))      
+      .append($('<td/>').attr('valign', 'top').attr('id', 'financial_status' ).attr('align', 'center').append(fstatus))      
     );
     return table;  
   },
@@ -447,10 +448,16 @@ MyAccountOrderController.prototype = {
   
   payment_relay_handler: function(resp)
   {
+    var that = this;
     console.log('RELAY');
     console.log(resp);
     if (resp.success == true)
-      controller.refresh();
+    {
+      $('#payment_form').empty();
+      $('#payment_message').empty().html("<p class='success'>Your payment has been processed successfully.</p>");
+      setTimeout(function() { $('#payment_message').empty() }, 5000);
+      that.refresh();
+    }
     else if (resp.error)  
       $('#payment_message').html("<p class='note error'>" + resp.error + "</p>");
     else

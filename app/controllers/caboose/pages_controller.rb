@@ -25,6 +25,7 @@ module Caboose
           render :file => 'caboose/application/under_construction', :layout => false
         end
         return
+      # See if we're on a forwarding domain
       elsif !d.primary && d.forward_to_primary
         pd = d.site.primary_domain
         if pd

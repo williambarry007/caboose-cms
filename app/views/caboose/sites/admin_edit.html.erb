@@ -22,6 +22,7 @@ user_ids = [] if user_ids.nil?
     <th>Domain</th>
     <th>Primary</th>
     <th>Under Construction</th>
+    <th>Forward to Primary</th>
     <th>Delete</th>
   </tr>
   <% @site.domains.order(:id).all.each do |d| %>
@@ -29,6 +30,7 @@ user_ids = [] if user_ids.nil?
     <td><%= d.domain %></td>
     <td align='center'><input type='radio'    name='primary_domain' <%= d.primary? ? "checked='true'" : '' %> onclick="set_primary_domain(<%= s.id %>, <%= d.id %>);" /></td>
     <td align='center'><input type='checkbox' name='under_construction_<%= d.id %>' <%= d.under_construction ? "checked='true'" : '' %> onclick="set_under_construction(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
+    <td align='center'><input type='checkbox' name='forward_to_primary_<%= d.id %>' <%= d.forward_to_primary ? "checked='true'" : '' %> onclick="set_forward_to_primary(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
     <td align='center'><input type='button'   value='Delete' onclick="delete_domain(<%= @site.id %>, <%= d.id %>);" /></td>    
   </tr>
   <% end %>
@@ -80,6 +82,15 @@ function set_under_construction(site_id, domain_id, checked)
     url: '/admin/sites/' + site_id + '/domains/' + domain_id,
     type: 'put',
     data: { under_construction: checked ? 1 : 0 }
+  });
+}
+
+function set_forward_to_primary(site_id, domain_id, checked)
+{
+  $.ajax({
+    url: '/admin/sites/' + site_id + '/domains/' + domain_id,
+    type: 'put',
+    data: { forward_to_primary: checked ? 1 : 0 }
   });
 }
 

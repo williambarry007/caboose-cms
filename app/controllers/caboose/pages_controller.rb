@@ -26,16 +26,16 @@ module Caboose
         end
         return
       # See if we're on a forwarding domain
-      elsif !d.primary && d.forward_to_primary
-        pd = d.site.primary_domain
-        if pd
-          url = "#{request.protocol}#{pd.domain}"
-          if request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
-            url << request.fullpath
-          end
-          redirect_to url
-          return
-        end
+      #elsif !d.primary && d.forward_to_primary
+      #  pd = d.site.primary_domain
+      #  if pd
+      #    url = "#{request.protocol}#{pd.domain}"
+      #    if request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
+      #      url << request.fullpath
+      #    end
+      #    redirect_to url
+      #    return
+      #  end
       else
         #Caboose.log(request.inspect)        
       end

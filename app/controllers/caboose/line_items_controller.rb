@@ -47,23 +47,29 @@ module Caboose
           when 'order_package_id' then li.order_package_id  = value
           when 'variant_id'       then li.variant_id        = value
           when 'parent_id'        then li.parent_id         = value          
-          when 'unit_price'       then li.unit_price        = value
-          when 'subtotal'         then li.subtotal          = value
+          #when 'unit_price'       then li.unit_price        = value
+          #when 'subtotal'         then li.subtotal          = value
           when 'notes'            then li.notes             = value
           when 'custom1'          then li.custom1           = value
           when 'custom2'          then li.custom2           = value
           when 'custom3'          then li.custom3           = value
           when 'quantity'
             li.quantity = value
+            li.subtotal = li.unit_price * li.quantity
+            
             li.save
-                      	  
+            
+            
+            li.order.subtotal = li.order.calculate_subtotal
+            li.order.total = li.order.calculate_total
+            
             # Recalculate everything
-            r = ShippingCalculator.rate(li.order, li.order.shipping_method_code)
-            li.order.shipping = r['negotiated_rate'] / 100
-            li.order.handling = (r['negotiated_rate'] / 100) * 0.05
-            li.order.tax = TaxCalculator.tax(li.order)            
-            li.order.calculate_total
-            li.order.save
+            #r = ShippingCalculator.rate(li.order, li.order.shipping_method_code)
+            #li.order.shipping = r['negotiated_rate'] / 100
+            #li.order.handling = (r['negotiated_rate'] / 100) * 0.05
+            #li.order.tax = TaxCalculator.tax(li.order)            
+            #li.order.calculate_total
+            #li.order.save
             
           when 'tracking_number'
             li.tracking_number = value

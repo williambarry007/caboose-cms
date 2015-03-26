@@ -55,8 +55,28 @@ module Caboose
     def admin_edit
       return if !user_is_allowed('orders', 'edit')
       @order = Order.find(params[:id])
-      @order.calculate
+      #@order.calculate
       render :layout => 'caboose/admin'
+    end
+    
+    # GET /admin/orders/:id/calculate-tax
+    def admin_calculate_tax
+      return if !user_is_allowed('orders', 'edit')
+      order = Order.find(params[:id])
+      order.tax = order.calculate_tax
+      order.total = order.calculate_total
+      order.save
+      render :json => { :success => true }      
+    end
+    
+    # GET /admin/orders/:id/calculate-handling
+    def admin_calculate_handling
+      return if !user_is_allowed('orders', 'edit')
+      order = Order.find(params[:id])
+      order.handling = order.calculate_handling
+      order.total = order.calculate_total
+      order.save
+      render :json => { :success => true }      
     end
 
     # GET /admin/orders/:id/capture
@@ -146,17 +166,25 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
-          when 'tax'             then order.tax             = value                                     
-          when 'shipping'        then order.shipping        = value              
-          when 'handling'        then order.handling        = value
+          when 'tax'             then 
+            order.tax = value
+            order.total = order.calculate_total          
+          when 'handling'        then
+            order.handling = value
+            order.total = order.calculate_total
           when 'custom_discount' then 
             order.custom_discount = value
             order.discount = order.calculate_discount
+            order.total = order.calculate_total
           when 'status'          then order.status          = value
           when 'customer_id'     then order.customer_id     = value            
         end
       end
-      order.calculate_total
+
+      #order.calculate
+      #order.calculate_total
+      #resp.attributes['total'] = { 'value' => order.total }
+      
       resp.success = save && order.save
       render :json => resp
     end

@@ -6,8 +6,8 @@ module Caboose
     
     # GET /my-account/orders
     def index
-      return if !logged_in?
-      
+      return if !verify_logged_in
+            
       @pager = Caboose::PageBarGenerator.new(params, {
         'customer_id'          => logged_in_user.id,         
         'status'               => [Order::STATUS_PENDING, Order::STATUS_CANCELED, Order::STATUS_READY_TO_SHIP, Order::STATUS_SHIPPED]        
@@ -23,7 +23,7 @@ module Caboose
       
     # GET /my-account/orders/:id
     def edit
-      return if !logged_in?
+      return if !verify_logged_in
       
       @order = Order.find(params[:id])
       if @order.customer_id != logged_in_user.id

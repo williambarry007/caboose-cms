@@ -269,7 +269,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :site_id            , :integer ],
         [ :domain             , :string  ],
         [ :primary            , :boolean, { :default => false }],
-        [ :under_construction , :boolean, { :default => false }]
+        [ :under_construction , :boolean, { :default => false }],
+        [ :forward_to_primary , :boolean, { :default => false }]
       ],
       Caboose::GiftCard => [
         [ :site_id         , :integer  ],        

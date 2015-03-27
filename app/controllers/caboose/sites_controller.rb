@@ -50,7 +50,7 @@ module Caboose
       @site = Site.find(params[:id])      
       
       # Create an admin user for the account
-      if User.where(:username => 'admin', :site_id => @site.id).exists?
+      if !User.where(:username => 'admin', :site_id => @site.id).exists?
         admin_user = User.create(:username => 'admin', :site_id => @site.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose'))
         admin_role = Role.where(:name => 'Admin').first
         if admin_role
@@ -101,7 +101,7 @@ module Caboose
       end
       
       # Create an admin user for the account
-      if User.where(:username => 'admin', :site_id => site.id).exists?
+      if !User.where(:username => 'admin', :site_id => site.id).exists?
         admin_user = User.create(:username => 'admin', :site_id => site.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose'))
         admin_role = Role.where(:name => 'Admin').first
         if admin_role

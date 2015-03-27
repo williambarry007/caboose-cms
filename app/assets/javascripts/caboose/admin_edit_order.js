@@ -204,9 +204,10 @@ OrderController.prototype = {
 
 /******************************************************************************/
 
-  print_order: function(order_id)
+  print_order: function()
   {
-    window.open('/admin/orders/' + order_id + '/print');
+    var that = this;
+    window.open('/admin/orders/' + that.order.id + '/print');
   },  
     
   line_items_for_order_package: function(order_package_id)

@@ -28,7 +28,7 @@ module Caboose
       # See if we're on a forwarding domain
       elsif d.primary == false && d.forward_to_primary == true
         pd = d.site.primary_domain
-        if pd
+        if pd && pd.domain != request.host
           url = "#{request.protocol}#{pd.domain}"
           if request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
             url << request.fullpath

@@ -51,14 +51,13 @@ module Caboose
       
       # Create an admin user for the account
       if !User.where(:username => 'admin', :site_id => @site.id).exists?
-        admin_user = User.create(:username => 'admin', :site_id => @site.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose'))
-        admin_role = Role.where(:name => 'Admin').first
-        if admin_role
-          RoleMembership.create(:user_id => admin_user.id, :role_id => admin_role.id)
-        else
-          Caboose.log("Error: no admin role exists.")
+        admin_user = User.create(:username => 'admin', :email => 'admin@nine.is', :site_id => @site.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose'))        
+        admin_role = Role.where(:name => 'Admin').first        
+        if admin_user && admin_role                      
+          RoleMembership.create(:user_id => admin_user.id, :role_id => admin_role.id)          
         end
       end
+      
     end
     
     # GET /admin/sites/:id/block-types
@@ -101,13 +100,11 @@ module Caboose
       end
       
       # Create an admin user for the account
-      if !User.where(:username => 'admin', :site_id => site.id).exists?
-        admin_user = User.create(:username => 'admin', :site_id => site.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose'))
+      if !User.where(:username => 'admin', :site_id => site.id).exists?        
+        admin_user = User.create(:username => 'admin', :email => 'admin@nine.is', :site_id => site.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose'))
         admin_role = Role.where(:name => 'Admin').first
         if admin_role
-          RoleMembership.create(:user_id => admin_user.id, :role_id => admin_role.id)
-        else
-          Caboose.log("Error: no admin role exists.")
+          RoleMembership.create(:user_id => admin_user.id, :role_id => admin_role.id)        
         end
       end
       

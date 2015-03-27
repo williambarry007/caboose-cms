@@ -567,7 +567,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :description             , :text   ],
         [ :under_construction_html , :text   ],
         [ :use_store               , :boolean , { :default => false }],
-        [ :logo                    , :attachment ]        
+        [ :logo                    , :attachment ],        
+        [ :is_master               , :boolean , { :default => false }]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],

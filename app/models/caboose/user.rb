@@ -12,7 +12,7 @@ class Caboose::User < ActiveRecord::Base
       :large => '600x800>'
     }
   do_not_validate_attachment_file_type :image
-  attr_accessible :id, :email, :first_name, :last_name, :username, :token, :password, :phone, :timezone
+  attr_accessible :id, :site_id, :email, :first_name, :last_name, :username, :token, :password, :phone, :timezone
   
   validates :email, :presence => true
   

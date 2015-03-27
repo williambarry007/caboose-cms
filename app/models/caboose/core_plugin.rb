@@ -12,7 +12,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'redirects'        , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'    , 'view')
     item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'         , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'  , 'view')
     item['children'] << { 'id' => 'roles'            , 'text' => 'Roles'               , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'        , 'view')
-    item['children'] << { 'id' => 'sites'            , 'text' => 'Sites'               , 'href' => '/admin/sites'              , 'modal' => false } if user.is_allowed('sites'        , 'view') if site.name == 'application'
+    item['children'] << { 'id' => 'sites'            , 'text' => 'Sites'               , 'href' => '/admin/sites'              , 'modal' => false } if user.is_allowed('sites'        , 'view') if site.name == 'application'        
     item['children'] << { 'id' => 'smtp'             , 'text' => 'SMTP (Mail)'         , 'href' => '/admin/smtp'               , 'modal' => false } if user.is_allowed('smtp'         , 'view')
     item['children'] << { 'id' => 'social'           , 'text' => 'Social Media'        , 'href' => '/admin/social'             , 'modal' => false } if user.is_allowed('social'       , 'view')
     item['children'] << { 'id' => 'store'            , 'text' => 'Store'               , 'href' => '/admin/store'              , 'modal' => false } if user.is_allowed('store'        , 'view')

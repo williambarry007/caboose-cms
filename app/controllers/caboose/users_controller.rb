@@ -23,25 +23,7 @@ module Caboose
       return if !user_is_allowed('users', 'view')
       
       @gen = PageBarGenerator.new(params, {
-    		  'first_name_like' => '',
-    		  'last_name_like'	=> '',
-    		  'username_like'	  => '',
-    		  'email_like' 		  => '',
-    		},{
-    		  'model'          => 'Caboose::User',
-    	    'sort'			     => 'last_name, first_name',
-    		  'desc'			     => false,
-    		  'base_url'		   => '/admin/users',
-    		  'use_url_params' => false
-    	})
-    	@users = @gen.items
-    end
-    
-    # GET /admin/users
-    def index
-      return if !user_is_allowed('users', 'view')
-      
-      @gen = PageBarGenerator.new(params, {
+          'site_id'         => @site.id,
     		  'first_name_like' => '',
     		  'last_name_like'	=> '',
     		  'username_like'	  => '',
@@ -183,6 +165,7 @@ module Caboose
       save = true
       params.each do |name,value|
         case name
+          when 'site_id'              then user.site_id             = value
           when 'first_name'           then user.first_name          = value     
           when 'last_name'            then user.last_name           = value 
           when 'username'             then user.username            = value 

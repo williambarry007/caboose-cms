@@ -3,7 +3,7 @@ module Caboose
             
     # GET /my-account/orders/:order_id/line-items
     def index
-      return if !logged_in?      
+      return if !verify_logged_in      
       @order = Order.find(params[:order_id])
       if @order.customer_id != logged_in_user.id
         @error = "The given order does not belong to you."
@@ -14,7 +14,7 @@ module Caboose
       
     # GET /my-account/orders/:order_id/line-items/:id
     def edit
-      return if !logged_in?
+      return if !verify_logged_in
       
       @order = Order.find(params[:order_id])
       @line_item = LineItem.find(params[:id])
@@ -27,7 +27,7 @@ module Caboose
     
     # GET /my-account/orders/:order_id/line-items/:id/download
     def download
-      return if !logged_in?
+      return if !verify_logged_in
       
       order = Order.find(params[:order_id])      
       if order.customer_id != logged_in_user.id
@@ -35,7 +35,7 @@ module Caboose
         render :file => 'caboose/extras/error'
         return
       end
-
+      
       li = LineItem.find(params[:id])
       if !li.variant.downloadable
         render :text => "Not a downloadable file."

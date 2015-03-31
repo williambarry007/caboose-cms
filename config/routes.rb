@@ -495,16 +495,20 @@ Caboose::Engine.routes.draw do
   # Categories
   #=============================================================================
           
-  get     "/admin/categories"                   => "categories#admin_index"
-  get     "/admin/categories/new"               => "categories#admin_new"
-  get     "/admin/categories/options"           => "categories#admin_options"
-  get     '/admin/categories/status-options'    => 'categories#admin_status_options'
-  get     "/admin/categories/:id/products/json" => "categories#admin_category_products"  
-  get     "/admin/categories/:id"               => "categories#admin_edit"  
-  put     "/admin/categories/:id"               => "categories#admin_update"    
-  post    "/admin/categories/:id"               => "categories#admin_update"  
-  post    "/admin/categories"                   => "categories#admin_add"
-  delete  "/admin/categories/:id"               => "categories#admin_delete"
+  
+
+  get     "/admin/categories"                         => "categories#admin_index"
+  get     "/admin/categories/new"                     => "categories#admin_new"
+  get     "/admin/categories/options"                 => "categories#admin_options"
+  get     '/admin/categories/status-options'          => 'categories#admin_status_options'
+  get     "/admin/categories/:id/sort-children"       => "categories#admin_sort_children"
+  put     "/admin/categories/:id/children/sort-order" => "categories#admin_update_sort_order"
+  get     "/admin/categories/:id/products/json"       => "categories#admin_category_products"  
+  get     "/admin/categories/:id"                     => "categories#admin_edit"  
+  put     "/admin/categories/:id"                     => "categories#admin_update"    
+  post    "/admin/categories/:id"                     => "categories#admin_update"  
+  post    "/admin/categories"                         => "categories#admin_add"
+  delete  "/admin/categories/:id"                     => "categories#admin_delete"
   
   #=============================================================================  
   # Orders

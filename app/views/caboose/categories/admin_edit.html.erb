@@ -19,8 +19,13 @@
 <% end %>
 
 <div id="message"></div>
+<p>
 <input type="button" value="< Back" onclick="window.location='/admin/categories';" />
+<% if @category.children && @category.children.count > 0 %>
+  <input type="button" value="Sort Child Categories" onclick="window.location='/admin/categories/<%= @category.id %>/sort-children';" />
+<% end %>
 <input type="button" value="Delete Category" onclick="delete_category(<%= @category.id %>)" />
+</p>
 
 <% content_for :caboose_css do %>
   <style>

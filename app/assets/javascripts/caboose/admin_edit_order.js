@@ -16,13 +16,14 @@ OrderController.prototype = {
     $(document).ready(function() { that.refresh(); });
   },
   
-  refresh: function()
+  refresh: function(after)
   {
     var that = this;
     that.refresh_order(function() {
       $('#order_table').html("<p class='loading'>Getting order...</p>");
       that.print();
-      that.make_editable(); 
+      that.make_editable();
+      if (after) after();
     });    
   },
   
@@ -33,10 +34,22 @@ OrderController.prototype = {
       url: '/admin/orders/' + that.order_id + '/json',
       success: function(order) {                 
         that.order = order;
-        if (after) after(); 
+        that.refresh_numbers();
+        if (after) after();                      
       }
     });
   },
+  
+  refresh_numbers: function()
+  {    
+    var that = this;        
+    $('#subtotal').html(curr(that.order.subtotal));        
+    $('#shipping').html(curr(that.order.shipping));                    
+    $('#total'   ).html(curr(that.order.total   ));        
+    $.each(that.order.line_items, function(i, li) {
+      $('#li_' + li.id + '_subtotal').html(curr(li.subtotal));
+    }); 
+  },  
   
   make_editable: function()
   {    
@@ -51,7 +64,7 @@ OrderController.prototype = {
           { name: 'status'          , nice_name: 'Status'          , type: 'select' , value: op.status                                            , width: 300, fixed_placeholder: true , options_url: '/admin/orders/line-items/status-options' },
           { name: 'package_method'  , nice_name: 'Package/Method'  , type: 'select' , value: op.shipping_package_id + '_' + op.shipping_method_id , width: 300, fixed_placeholder: false, options_url: '/admin/shipping-packages/package-method-options' },
           { name: 'tracking_number' , nice_name: 'Tracking Number' , type: 'text'   , value: op.tracking_number                                   , width: 300, fixed_placeholder: true, align: 'right' },
-          { name: 'total'           , nice_name: 'Shipping Total'  , type: 'text'   , value: curr(op.total)                                       , width: 300, fixed_placeholder: true, align: 'right' }
+          { name: 'total'           , nice_name: 'Shipping Total'  , type: 'text'   , value: curr(op.total)                                       , width: 300, fixed_placeholder: true, align: 'right' , after_update: function() { that.refresh_order(); }}
         ]
       });              
     });    
@@ -64,7 +77,7 @@ OrderController.prototype = {
         attributes: [
           { name: 'status'          , nice_name: 'Status'           , type: 'select'  , align: 'left' , value: li.status          , text: li.status, width: 150, fixed_placeholder: false, options_url: '/admin/orders/line-items/status-options' },
           { name: 'tracking_number' , nice_name: 'Tracking Number'  , type: 'text'    , align: 'left' , value: li.tracking_number , width: 200, fixed_placeholder: false },
-          { name: 'quantity'        , nice_name: 'Quantity'         , type: 'text'    , align: 'right', value: li.quantity        , width:  75, fixed_placeholder: false, after_update: function() { that.refresh(); } }
+          { name: 'quantity'        , nice_name: 'Quantity'         , type: 'text'    , align: 'right', value: li.quantity        , width:  75, fixed_placeholder: false, after_update: function() { that.refresh_order(); } }
         ]
       });
     });    
@@ -75,9 +88,9 @@ OrderController.prototype = {
       authenticity_token: that.authenticity_token,
       attributes: [
         { name: 'status'         , nice_name: 'Status'   , type: 'select', value: that.order.status                , width: 100, fixed_placeholder: false, options_url: '/admin/orders/status-options' },
-        { name: 'tax'            , nice_name: 'Tax'      , type: 'text'  , value: curr(that.order.tax)             , width: 100, fixed_placeholder: false, align: 'right' },
-        { name: 'handling'       , nice_name: 'Handling' , type: 'text'  , value: curr(that.order.handling)        , width: 100, fixed_placeholder: false, align: 'right' },
-        { name: 'custom_discount', nice_name: 'Discount' , type: 'text'  , value: curr(that.order.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' }
+        { name: 'tax'            , nice_name: 'Tax'      , type: 'text'  , value: curr(that.order.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_order(); }},
+        { name: 'handling'       , nice_name: 'Handling' , type: 'text'  , value: curr(that.order.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_order(); }},
+        { name: 'custom_discount', nice_name: 'Discount' , type: 'text'  , value: curr(that.order.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_order(); }}
       ]
     });        
   },
@@ -191,9 +204,10 @@ OrderController.prototype = {
 
 /******************************************************************************/
 
-  print_order: function(order_id)
+  print_order: function()
   {
-    window.open('/admin/orders/' + order_id + '/print');
+    var that = this;
+    window.open('/admin/orders/' + that.order.id + '/print');
   },  
     
   line_items_for_order_package: function(order_package_id)
@@ -217,8 +231,10 @@ OrderController.prototype = {
     table = $('<table/>').addClass('data').css('width', '100%');    
     that.order_packages_table(table);
     that.unassigned_line_items_table(table);
-    that.summary_table(table);
+    that.summary_table(table);    
     $('#order_table').empty().append(table);
+    
+    that.button_controls();
   },
   
   overview_table: function()
@@ -245,8 +261,8 @@ OrderController.prototype = {
         );                    
       });
       fstatus.append(transactions_table);
-    }
-    
+    }            
+
     var table = $('<table/>').addClass('data');
     table.append($('<tr/>')  
       .append($('<th/>').html('Customer'))
@@ -265,27 +281,9 @@ OrderController.prototype = {
             else                    { that.noneditable_customer(); a.html('Edit');     }
           });
         }))
-      )
-      .append($('<td/>').attr('valign', 'top')
-        .append($('<div/>').attr('id', 'shipping_address').append(that.noneditable_shipping_address(true)))
-        .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
-          var a = $(this);
-          that.refresh_order(function() {
-            if (a.html() == 'Edit') { that.edit_shipping_address();        a.html('Finished'); }
-            else                    { that.noneditable_shipping_address(); a.html('Edit');     }
-          });
-        }))
-      )
-      .append($('<td/>').attr('valign', 'top')
-        .append($('<div/>').attr('id', 'billing_address').append(that.noneditable_billing_address(true)))
-        .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
-          var a = $(this);
-          that.refresh_order(function() {
-            if (a.html() == 'Edit') { that.edit_billing_address();        a.html('Finished'); }
-            else                    { that.noneditable_billing_address(); a.html('Edit');     }
-          });
-        }))
-      )
+      )      
+      .append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(that.noneditable_shipping_address()))      
+      .append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
       .append($('<td/>').attr('valign', 'top').append($('<div/>').attr('id', 'order_' + that.order.id + '_status')))
       .append($('<td/>').attr('valign', 'top').attr('align', 'center').append(fstatus))      
     );
@@ -327,19 +325,31 @@ OrderController.prototype = {
     });
   },
   
-  noneditable_shipping_address: function(return_element)
+  noneditable_shipping_address: function()
   {
     var that = this;
-    var sa = that.order.shipping_address;
-    var str = '';
-    str += (sa.first_name ? sa.first_name : '[Empty first name]') + ' ';
-    str += (sa.last_name  ? sa.last_name  : '[Empty last name]');        
-    str += '<br />' + (sa.address1 ? sa.address1 : '[Empty address]');
-    if (sa.address2) str += "<br />" + sa.address2;             
-    str += '<br/>' + (sa.city ? sa.city : '[Empty city]') + ", " + (sa.state ? sa.state : '[Empty state]') + " " + (sa.zip ? sa.zip : '[Empty zip]');
-    if (return_element)
-      return str;
-    $('#shipping_address').empty().append(str);
+    var div = $('<div/>');
+    if (that.has_shippable_items())
+    {
+      var sa = that.order.shipping_address;
+      str = '';                  
+      str += (sa.first_name ? sa.first_name : '[Empty first name]') + ' ';
+      str += (sa.last_name  ? sa.last_name  : '[Empty last name]');
+      str += '<br />' + (sa.address1 ? sa.address1 : '[Empty address]');
+      if (sa.address2) str += "<br />" + sa.address2;
+      str += '<br/>' + (sa.city ? sa.city : '[Empty city]') + ", " + (sa.state ? sa.state : '[Empty state]') + " " + (sa.zip ? sa.zip : '[Empty zip]');
+      
+      div.append($('<div/>').attr('id', 'shipping_address').append(str));
+      div.append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
+        var a = $(this);
+        that.refresh_order(function() { that.edit_shipping_address(); });
+      }));      
+    }
+    else
+    {
+      div.append("This order does not require shipping.");
+    }    
+    return div;    
   },
   
   edit_shipping_address: function()
@@ -362,7 +372,12 @@ OrderController.prototype = {
         .append($('<td/>').append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_state')))        
         .append($('<td/>').append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_zip')))        
       ))));
-    $('#shipping_address').empty().append(table);
+    $('#shipping_address').empty()          
+      .append(table)
+      .append($('<a/>').attr('href', '#').html('Finished').click(function(e) {
+        var a = $(this);
+        that.refresh_order(function() { $('#shipping_address').empty().append(that.noneditable_shipping_address()); });
+      }));
             
     new ModelBinder({
       name: 'ShippingAddress',
@@ -381,9 +396,10 @@ OrderController.prototype = {
     });
   },
   
-  noneditable_billing_address: function(return_element)
+  noneditable_billing_address: function()
   {
     var that = this;
+    
     var sa = that.order.billing_address;
     if (!sa) sa = {};
     var str = '';
@@ -392,9 +408,15 @@ OrderController.prototype = {
     str += '<br />' + (sa.address1 ? sa.address1 : '[Empty address]');
     if (sa.address2) str += "<br />" + sa.address2;             
     str += '<br/>' + (sa.city ? sa.city : '[Empty city]') + ", " + (sa.state ? sa.state : '[Empty state]') + " " + (sa.zip ? sa.zip : '[Empty zip]');
-    if (return_element)
-      return str;
-    $('#billing_address').empty().append(str);
+    
+    var div = $('<div/>')
+      .append(str)      
+      .append("<br />")
+      .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
+        var a = $(this);
+        that.refresh_order(function() { that.edit_billing_address(); });
+      }));
+    return div;    
   },
   
   edit_billing_address: function()
@@ -418,7 +440,12 @@ OrderController.prototype = {
         .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_state')))        
         .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_zip')))        
       ))));
-    $('#billing_address').empty().append(table);
+    $('#billing_address').empty()
+      .append(table)
+      .append($('<a/>').attr('href', '#').html('Finished').click(function(e) {
+        var a = $(this);
+        that.refresh_order(function() { $('#billing_address').empty().append(that.noneditable_billing_address()); });
+      }));      
             
     new ModelBinder({
       name: 'BillingAddress',
@@ -593,7 +620,7 @@ OrderController.prototype = {
       .append($('<th/>').html('Package'    ))
       .append($('<th/>').html('Item'       ))
       .append($('<th/>').html('Status'     ))    
-      .append($('<th/>').html('Unit Price1' ))
+      .append($('<th/>').html('Unit Price' ))
       .append($('<th/>').html('Quantity'   ))
       .append($('<th/>').html('Subtotal'   ))
     );
@@ -601,13 +628,22 @@ OrderController.prototype = {
     $.each(that.order.line_items, function(i, li) {
       if (li.order_package_id && li.order_package_id != -1) return true;
             
-      var div = $('<div/>').attr('id', 'assign_to_package_' + li.id)
-        .append('Unpackaged! ')
-        .append($('<a/>').data('line_item_id', li.id).attr('href', '#').html('Assign to package').click(function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          that.assign_to_package_form($(this).data('line_item_id'));
-        }));
+      var div = false;
+      
+      if (li.variant.downloadable)
+      {
+        div = $('<div/>').append('This item is downloadable.');
+      }
+      else
+      {        
+        div = $('<div/>').attr('id', 'assign_to_package_' + li.id)
+          .append('Unpackaged! ')
+          .append($('<a/>').data('line_item_id', li.id).attr('href', '#').html('Assign to package').click(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            that.assign_to_package_form($(this).data('line_item_id'));
+          }));
+      }
                                      
       var tr = $('<tr/>');
       tr.append($('<td/>').append(div));
@@ -635,17 +671,17 @@ OrderController.prototype = {
     
     if (that.order.line_items.length > 0)
     {
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Subtotal' )).append($('<td/>').attr('align', 'right').attr('id', 'subtotal').html(curr(that.order.subtotal))));
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Tax'      )).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'order_' + that.order.id + '_tax'))));
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Shipping' )).append($('<td/>').attr('align', 'right').attr('id', 'shipping').html(curr(that.order.shipping))));    
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Handling' )).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'order_' + that.order.id + '_handling'))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Subtotal'    )).append($('<td/>').attr('align', 'right').attr('id', 'subtotal').html(curr(that.order.subtotal))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').append('Tax '      ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_tax();      }))).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'order_' + that.order.id + '_tax'))));                
+      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Shipping'    )).append($('<td/>').attr('align', 'right').attr('id', 'shipping').html(curr(that.order.shipping))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').append('Handling ' ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_handling(); }))).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'order_' + that.order.id + '_handling'))));
       if (that.order.discounts)
       {
         $.each(that.order.discounts, function(i, d) {
           table.append($('<tr/>')
             .append($('<td/>').attr('colspan', '5').attr('align', 'right')
               .append($('<a/>').attr('href', '#').html('Remove').click(function(e) { that.remove_discount(d.id); }))
-              .append(' ' + d.name + ' Discount')
+              .append(' "' + d.gift_card.code + '" Discount')
             )
             .append($('<td/>').attr('align', 'right').html(curr(d.amount)))
           );
@@ -667,6 +703,35 @@ OrderController.prototype = {
       ));            
     }
   },
+  
+  button_controls: function()
+  {
+    var that = this;
+    var p = $('<p/>');
+    p.append($('<input/>').attr('type', 'button').val('< Back').click(function() { window.location = '/admin/orders'; })).append(' ');
+    if (that.order.total > 0)
+    {
+      switch (that.order.financial_status)
+      {
+        case 'pending':
+          p.append($('<input/>').attr('type', 'button').val('Send for Authorization').click(function() { that.send_for_authorization(); })).append(' ');
+          break;
+        case 'authorized':    
+          p.append($('<input/>').attr('type', 'button').val('Capture Funds').click(function() { that.capture_funds(); })).append(' ');
+          p.append($('<input/>').attr('type', 'button').val('Void'         ).click(function() { that.void_order();    })).append(' ');
+          break;
+        case 'captured':           
+          p.append($('<input/>').attr('type', 'button').val('Refund'       ).click(function() { that.refund(); })).append(' ');
+          break;
+      }
+    }
+    //p.append($('<input/>').attr('type', 'button').val('Resend Confirmation' ).click(function() { that.resend_confirmation(); })).append(' ');
+    p.append($('<input/>').attr('type', 'button').val('Add Item'            ).click(function() { that.add_variant();         })).append(' ');
+    p.append($('<input/>').attr('type', 'button').val('Print Order'         ).click(function() { that.print_order();         })).append(' ');
+    $('#controls').empty().append(p);
+  },
+
+  /****************************************************************************/
   
   add_variant: function(variant_id)
   {
@@ -759,8 +824,69 @@ OrderController.prototype = {
         if (resp.refresh) { $('#message').empty(); that.refresh(); }
       }
     });
+  },
+  
+  send_for_authorization: function(confirm)
+  {
+    var that = this;    
+    if (!confirm)
+    {    
+      var p = $('<p/>').addClass('note confirm')
+        .append("Are you sure you want to send this order to the customer for authorization? ")
+        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.send_for_authorization(true); }))
+        .append(' ')                
+        .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+      $('#message').empty().append(p);
+      return;
+    }
+    $('#message').html("<p class='loading'>Sending for authorization...</p>");
+    $.ajax({
+      url: '/admin/orders/' + that.order.id + '/send-for-authorization',
+      success: function(resp) {
+        if (resp.error)   { that.flash_error(resp.error); }
+        if (resp.success) { that.refresh(function() { that.flash_success("An email has been sent successfully to the customer."); }); }        
+      }
+    });
+  },
+
+  calculate_tax: function()
+  {
+    var that = this;
+    $.ajax({
+      url: '/admin/orders/' + that.order_id + '/calculate-tax',
+      success: function(resp) { that.refresh_order(function() { $('#order_' + that.order.id + '_tax').val(that.order.tax); }); }
+    });
+  },
+  
+  calculate_handling: function()
+  {
+    var that = this;
+    $.ajax({
+      url: '/admin/orders/' + that.order_id + '/calculate-handling',
+      success: function(resp) { that.refresh_order(function() { $('#order_' + that.order.id + '_handling').val(that.order.handling); }); }
+    });
+  },
+  
+  has_shippable_items: function()
+  {
+    var that = this;
+    var needs_shipping = false;
+    $.each(that.order.line_items, function(i, li) {      
+      if (li.variant.downloadable == false)
+        needs_shipping = true;
+    });
+    return needs_shipping;    
+  },
+  
+  flash_success: function(str, length) { this.flash_message("<p class='note success'>" + str + "</p>", length); },
+  flash_error:   function(str, length) { this.flash_message("<p class='note error'>" + str + "</p>", length); },    
+  flash_message: function(str, length)
+  {
+    if (!length) length = 5000;
+    $('#message').empty().append(str);
+    setTimeout(function() { $('#message').slideUp(function() { $('#message').empty().show(); }); }, length);
   }
-                              
+  
   //resend_confirmation: function(order_id)
   //{
   //  modal.autosize("<p class='loading'>Resending confirmation..</p>");
@@ -799,7 +925,3 @@ OrderController.prototype = {
   //},
   
 };
-  
-  
-  
-  

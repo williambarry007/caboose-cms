@@ -1,9 +1,9 @@
 <h1>Users</h1>
 
 <form action='/admin/users' method='get' class='search_form'>
-<input type='text' name='first_name_like' placeholder='First name' />
-<input type='text' name='last_name_like'  placeholder='Last name' />
-<input type='text' name='email_like'      placeholder='Email' />
+<input type='text' name='first_name_like' value="<%= @gen.params['first_name_like'] %>" placeholder='First name' />
+<input type='text' name='last_name_like'  value="<%= @gen.params['last_name_like']  %>" placeholder='Last name' />
+<input type='text' name='email_like'      value="<%= @gen.params['email_like']      %>" placeholder='Email' />
 <input type='submit' value='Search' />
 </form>
 

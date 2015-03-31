@@ -57,8 +57,13 @@ module Caboose
             op.shipping_method_id = arr[1]                      
         end
       end
-      op.order.calculate_total    
-      resp.success = save && op.save
+      
+      op.save
+      op.order.shipping = op.order.calculate_shipping
+      op.order.total = op.order.calculate_total
+      op.order.save
+      
+      resp.success = true
       render :json => resp
     end
     

@@ -8,8 +8,8 @@ class Caboose::Authenticator
     )
     pass = Digest::SHA1.hexdigest(Caboose::salt + password)
     
-    user = Caboose::User.where(:username => username).first
-    user = Caboose::User.where(:email => username).first if user.nil?
+    user = Caboose::User.where(:username => username, :site_id => site.id).first
+    user = Caboose::User.where(:email    => username, :site_id => site.id).first if user.nil?
             
     valid_credentials = false
     if user && user.password == pass 

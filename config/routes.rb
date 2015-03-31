@@ -27,12 +27,24 @@ Caboose::Engine.routes.draw do
   #get "my-account" => "users#my_account"
   #put "my-account" => "users#update_my_account"
     
-  get "my-account/orders/:order_id/line-items/:id/download"  => "my_account_line_items#download"
-  get "my-account/orders/:order_id/line-items/:id"           => "my_account_line_items#edit"
-  get "my-account/orders/:order_id/line-items"               => "my_account_line_items#index"
-    
-  get "my-account/orders/:id"  => "my_account_orders#edit"
-  get "my-account/orders"      => "my_account_orders#index"
+  get  "my-account/orders/:order_id/line-items/:id/download"  => "my_account_line_items#download"
+  get  "my-account/orders/:order_id/line-items/:id"           => "my_account_line_items#edit"
+  get  "my-account/orders/:order_id/line-items"               => "my_account_line_items#index"
+
+  get  "my-account/orders/:order_id/billing-address/json"     => "billing_addresses#my_account_json"      
+  put  "my-account/orders/:order_id/billing-address"          => "billing_addresses#my_account_update"
+  get  "my-account/orders/:order_id/shipping-address/json"    => "shipping_addresses#my_account_json"      
+  put  "my-account/orders/:order_id/shipping-address"         => "shipping_addresses#my_account_update"
+        
+  get  "my-account/orders/authnet-relay"        => "my_account_orders#authnet_relay"
+  post "my-account/orders/authnet-relay"        => "my_account_orders#authnet_relay"
+  get  "my-account/orders/:id/authnet-response" => "my_account_orders#authnet_response"
+  post "my-account/orders/:id/authnet-response" => "my_account_orders#authnet_response"
+  get  "my-account/orders/:id/payment-form"     => "my_account_orders#payment_form"  
+  get  "my-account/orders/:id/json"             => "my_account_orders#order_json"
+  get  "my-account/orders/:id/json"             => "my_account_orders#order_json"
+  get  "my-account/orders/:id"                  => "my_account_orders#edit"
+  get  "my-account/orders"                      => "my_account_orders#index"
   
   get "my-account" => "my_account#index"
   put "my-account" => "my_account#update"
@@ -504,7 +516,10 @@ Caboose::Engine.routes.draw do
   get     "/admin/orders/test-gmail"                  => "orders#admin_mail_test_gmail"  
   get     "/admin/orders/status-options"              => "orders#admin_status_options"
   get     "/admin/orders/new"                         => "orders#admin_new"
-  get     "/admin/orders/print-pending"               => "orders#admin_print_pending"
+  get     "/admin/orders/print-pending"               => "orders#admin_print_pending"  
+  get     "/admin/orders/:id/calculate-tax"           => "orders#admin_calculate_tax"
+  get     "/admin/orders/:id/calculate-handling"      => "orders#admin_calculate_handling"      
+  get     "/admin/orders/:id/send-for-authorization"  => "orders#admin_send_for_authorization"
   get     "/admin/orders/:id/capture"                 => "orders#capture_funds"  
   get     "/admin/orders/:id/json"                    => "orders#admin_json"
   get     "/admin/orders/:id/print"                   => "orders#admin_print"
@@ -538,7 +553,7 @@ Caboose::Engine.routes.draw do
   get     "admin/orders/:order_id/billing-address/json"   => "billing_addresses#admin_json"      
   put     "admin/orders/:order_id/billing-address"        => "billing_addresses#admin_update"
   get     "admin/orders/:order_id/shipping-address/json"  => "shipping_addresses#admin_json"      
-  put     "admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"    
+  put     "admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"
   
   #=============================================================================
   # Gift cards

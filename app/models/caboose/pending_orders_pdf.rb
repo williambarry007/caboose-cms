@@ -69,22 +69,11 @@ module Caboose
       ba = order.billing_address
       billed_to = []
       if ba
-        billed_to << [
-          { :content => "Name", :border_width => 0 },
-          { :content => "#{ba.first_name} #{ba.last_name}", :border_width => 0}
-        ]
-        billed_to << [
-          { :content => "Address", :border_width => 0 },
-          { :content => "#{ba.address1}" + (ba.address2.blank? ? '' : "\n#{ba.address2}") + "\n#{ba.city}, #{ba.state} #{ba.zip}", :border_width => 0}
-        ]
-        billed_to << [
-          { :content => "Email", :border_width => 0 },
-          { :content => "#{c.email}", :border_width => 0}
-        ]
-        billed_to << [
-          { :content => "Phone", :border_width => 0 },
-          { :content => "#{self.formatted_phone(c.phone)}", :border_width => 0}
-        ]
+        ba_address = "#{ba.address1}" + (ba.address2.blank? ? '' : "\n#{ba.address2}") + "\n#{ba.city}, #{ba.state} #{ba.zip}"
+        billed_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => "#{ba.first_name} #{ba.last_name}" , :border_width => 0, :width => 200 }]
+        billed_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => ba_address                         , :border_width => 0, :width => 200 }]
+        billed_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }]
+        billed_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
       else
         billed_to << [{ :content => "Name"    , :border_width => 0 }]
         billed_to << [{ :content => "Address" , :border_width => 0 }]
@@ -95,22 +84,11 @@ module Caboose
       sa = order.shipping_address
       shipped_to = []
       if sa
-        shipped_to << [
-          { :content => "Name", :border_width => 0 },
-          { :content => "#{sa.first_name} #{sa.last_name}", :border_width => 0}
-        ]
-        shipped_to << [
-          { :content => "Address", :border_width => 0 },
-          { :content => "#{sa.address1}" + (sa.address2.blank? ? '' : "\n#{sa.address2}") + "\n#{sa.city}, #{sa.state} #{sa.zip}", :border_width => 0}
-        ]
-        shipped_to << [
-          { :content => "Email", :border_width => 0 },
-          { :content => "#{c.email}", :border_width => 0}
-        ]
-        shipped_to << [
-          { :content => "Phone", :border_width => 0 },
-          { :content => "#{self.formatted_phone(c.phone)}", :border_width => 0}
-        ]
+        sa_address = "#{sa.address1}" + (sa.address2.blank? ? '' : "\n#{sa.address2}") + "\n#{sa.city}, #{sa.state} #{sa.zip}"
+        shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => "#{sa.first_name} #{sa.last_name}" , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
       else
         shipped_to << [{ :content => "Name"    , :border_width => 0 }]
         shipped_to << [{ :content => "Address" , :border_width => 0 }]
@@ -136,15 +114,15 @@ module Caboose
       
       tbl = []
       tbl << [
-        { :content => "Package"            , :align => :left, :valign => :bottom },
-        { :content => "Product"            , :align => :left, :valign => :bottom, :colspan => 2 },
-        { :content => "Attributes"         , :align => :left, :valign => :bottom },
-        { :content => "Quantity"           , :align => :right, :valign => :bottom },        
-        { :content => "Price"              , :align => :right, :valign => :bottom },
-        { :content => "Amount"             , :align => :right, :valign => :bottom }
+        { :content => "Package"    , :align => :left  , :valign => :bottom },
+        { :content => "Product"    , :align => :left  , :valign => :bottom , :colspan => 2 },
+        { :content => "Attributes" , :align => :left  , :valign => :bottom },
+        { :content => "Quantity"   , :align => :right , :valign => :bottom },        
+        { :content => "Price"      , :align => :right , :valign => :bottom },
+        { :content => "Amount"     , :align => :right , :valign => :bottom }
       ]
 
-      order.calculate
+      #order.calculate
       
       order.order_packages.all.each do |pk|
 

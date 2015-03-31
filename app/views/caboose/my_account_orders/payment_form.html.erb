@@ -1,0 +1,47 @@
+<%
+store_config = @order.site.store_config
+
+ba = @order.billing_address
+valid_address = ba && 
+  ba.first_name.strip.length > 0 && 
+  ba.last_name.strip.length  > 0 &&
+  ba.address1.strip.length   > 0 && 
+  ba.city.strip.length       > 0 && 
+  ba.state.strip.length      > 0 && 
+  ba.zip.strip.length        > 0
+
+%>
+<% if valid_address %>          
+  <% if store_config.pp_name == 'authorize.net' %>      
+    <form id="payment" target="relay" action="https://secure.authorize.net/gateway/transact.dll" method="post">
+      <%= sim_fields(@sim_transaction) %>
+      <input type="hidden" id="x_invoice_num" name="x_invoice_num" value="<%= @order.id %>" />
+      <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw store_config.pp_relay_domain      %>/my-account/orders/<%= @order.id %>/authnet-response" />        
+      <input type="hidden" id="x_first_name"  name="x_first_name"  value="<%= raw @order.billing_address.first_name %>" />
+      <input type="hidden" id="x_last_name"   name="x_last_name"   value="<%= raw @order.billing_address.last_name  %>" />       
+      <input type="hidden" id="x_address"     name="x_address"     value="<%= raw @order.billing_address.address1   %>" />      
+      <input type="hidden" id="x_city"        name="x_city"        value="<%= raw @order.billing_address.city       %>" />
+      <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @order.billing_address.state      %>" />
+      <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @order.billing_address.zip        %>" />
+              
+      <div class="field" id="credit-card">
+        <span class="field-text">Credit Card Payment</span>
+        <div class="icons"><img src="/assets/caboose/credit_cards.png" alt="Credit Cards Accepted" /></div>
+      </div>
+      <div class="field" id="card-number">
+        <span class="field-text">Card</span>
+        <input name="x_card_num" id='billing-cc-number' type="text" maxlength="16" placeholder="Card number" />
+        <div class="icons"><img src="/assets/caboose/lock.png" alt="Secure Connection" /></div>
+      </div>
+      <div class="field" id="expiry">
+        <span class="field-text">Expiration</span>
+        <input id="expiration" name="x_exp_date" type="hidden" />
+        <select id="month" name="month" ><% (1..12).each do |i| %><option value="<%= (i<10 ? "0#{i}" : i) %>"><%= (i<10 ? "0#{i}" : i) %> - <%= DateTime.new(2000, i, 1).strftime("%b") %></option><% end %></select> /                                
+        <select id="year"  name="year"  ><% (DateTime.now.year...DateTime.now.year + 20).each do |i| %><option value="<%= i-2000 %>"><%= i %></option><% end %></select>
+      </div>
+      <input type='button' value='Confirm Payment' id='payment_confirm' class='btn' />
+    </form>    
+  <% end %>
+<% else %>                                                           
+  <p class='note error'>Your billing address must be valid before making payment. Please review and try again.</p>
+<% end %>

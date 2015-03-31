@@ -55,6 +55,7 @@ module Caboose
       # Make sure all the items in the order have attributes set
       order.line_items.each do |li|              
         v = li.variant
+        next if v.downloadable
         Caboose.log("Error: variant #{v.id} has a zero weight") and return false if v.weight.nil? || v.weight == 0
         next if v.volume && v.volume > 0
         Caboose.log("Error: variant #{v.id} has a zero length") and return false if v.length.nil? || v.length == 0
@@ -64,19 +65,14 @@ module Caboose
         v.save
       end
             
-      # Reorder the items in the order by volume            
-      h = {}
-      order.line_items.each do |li|
-        (1..li.quantity).each do |i|        
-          v = li.variant          
-          h[v.volume] = li          
-        end
-      end      
-      line_items = h.sort_by{ |k,v| k }.collect{ |x| x[1] }      
+      # Reorder the items in the order by volume
+      line_items = order.line_items.sort_by{ |li| li.quantity * (li.variant.volume ? li.variant.volume : 0.00) * -1 }
+                      
+      # Get all the packages we're going to use      
       all_packages = ShippingPackage.where(:site_id => order.site_id).reorder(:flat_rate_price).all      
       
-      # Now go through each variant and fit it in a new or existing package
-      line_items.each do |li|
+      # Now go through each variant and fit it in a new or existing package            
+      line_items.each do |li|        
         next if li.variant.downloadable
         
         # See if the item will fit in any of the existing packages

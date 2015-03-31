@@ -14,8 +14,8 @@ module Caboose
       # Find the page with an exact URI match 
       page = Page.page_with_uri(request.host_with_port, request.fullpath, false)            
       
-      # Make sure we're not under construction
-      d = Caboose::Domain.where(:domain => request.host_with_port).first        
+      # Make sure we're not under construction or on a forwarded domain
+      d = Caboose::Domain.where(:domain => request.host_with_port).first
       if d.nil?
         Caboose.log("Could not find domain for #{request.host_with_port}\nAdd this domain to the caboose site.")
       elsif d.under_construction == true
@@ -25,8 +25,17 @@ module Caboose
           render :file => 'caboose/application/under_construction', :layout => false
         end
         return
-      else
-        #Caboose.log(request.inspect)        
+      # See if we're on a forwarding domain
+      elsif d.primary == false && d.forward_to_primary == true
+        pd = d.site.primary_domain
+        if pd && pd.domain != request.host
+          url = "#{request.protocol}#{pd.domain}"
+          if request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
+            url << request.fullpath
+          end
+          redirect_to url
+          return
+        end        
       end
       
       if !page

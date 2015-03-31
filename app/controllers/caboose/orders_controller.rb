@@ -45,7 +45,8 @@ module Caboose
       order = Order.create(
         :site_id => @site.id,
         :status => Order::STATUS_PENDING,                          
-        :financial_status => Order::FINANCIAL_STATUS_PENDING
+        :financial_status => Order::FINANCIAL_STATUS_PENDING,
+        :order_number => @site.store_config.next_order_number
       )    
       render :json => { :sucess => true, :redirect => "/admin/orders/#{order.id}" }
     end
@@ -54,67 +55,36 @@ module Caboose
     def admin_edit
       return if !user_is_allowed('orders', 'edit')
       @order = Order.find(params[:id])
-      @order.calculate
+      #@order.calculate
       render :layout => 'caboose/admin'
+    end
+    
+    # GET /admin/orders/:id/calculate-tax
+    def admin_calculate_tax
+      return if !user_is_allowed('orders', 'edit')
+      order = Order.find(params[:id])
+      order.tax = order.calculate_tax
+      order.total = order.calculate_total
+      order.save
+      render :json => { :success => true }      
+    end
+    
+    # GET /admin/orders/:id/calculate-handling
+    def admin_calculate_handling
+      return if !user_is_allowed('orders', 'edit')
+      order = Order.find(params[:id])
+      order.handling = order.calculate_handling
+      order.total = order.calculate_total
+      order.save
+      render :json => { :success => true }      
     end
 
     # GET /admin/orders/:id/capture
     def capture_funds
       return if !user_is_allowed('orders', 'edit')
-      
-      resp = Caboose::StdClass.new
+           
       order = Order.find(params[:id])
-      t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
-            
-      if order.financial_status == Order::FINANCIAL_STATUS_CAPTURED
-        resp.error = "Funds for this order have already been captured."    
-      elsif order.total > t.amount
-        resp.error = "The order total exceeds the authorized amount."
-      elsif t.nil?
-        resp.error = "This order doesn't seem to be authorized."
-      else
-                        
-        sc = @site.store_config
-        case sc.pp_name
-          when 'authorize.net'
-            transaction = AuthorizeNet::AIM::Transaction.new(sc.pp_username, sc.pp_password)
-            response = transaction.prior_auth_capture(t.transaction_id, order.total)
-                        
-            order.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
-            resp.success = 'Captured funds successfully'
-
-            ot = Caboose::OrderTransaction.new(
-              :order_id => order.id,
-              :date_processed => DateTime.now.utc,
-              :transaction_type => Caboose::OrderTransaction::TYPE_CAPTURE
-            )
-            ot.success        = response.response_code && response.response_code == '1'            
-            ot.transaction_id = response.transaction_id
-            ot.auth_code      = response.authorization_code
-            ot.response_code  = response.response_code
-            ot.amount         = order.total
-            ot.save
-      
-          when 'payscape'
-            # TODO: Implement capture funds for payscape
-
-        end
-          
-        #if (order.discounts.any? && order.total < order.discounts.first.amount_current) || PaymentProcessor.capture(order)
-        #  order.financial_status = 'captured'
-        #  order.save
-        #  
-        #  if order.discounts.any?
-        #    order.update_attribute(:amount_discounted, order.discounts.first.amount_current)
-        #    order.update_gift_cards
-        #  end
-        #  
-        #  response.success = "Captured funds successfully"
-        #else
-        #  response.error = "Error capturing funds."
-        #end
-        
-      end
+      resp = order.capture_funds
       
       render :json => resp
     end
@@ -122,40 +92,9 @@ module Caboose
     # GET /admin/orders/:id/void
     def admin_void
       return if !user_is_allowed('orders', 'edit')
-      
-      resp = Caboose::StdClass.new      
+            
       order = Order.find(params[:id])
-      t = OrderTransaction.where(:order_id => order.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
-      
-      if order.financial_status == Order::FINANCIAL_STATUS_CAPTURED
-        resp.error = "This order has already been captured, you will need to refund instead"
-      elsif t.nil?
-        resp.error = "This order doesn't seem to be authorized."
-      else
-                
-        sc = @site.store_config
-        case sc.pp_name
-          when 'authorize.net'        
-                    
-            response = AuthorizeNet::SIM::Transaction.new(
-              sc.pp_username, 
-              sc.pp_password,                      
-              order.total,
-              :transaction_type => OrderTransaction::TYPE_VOID,
-              :transaction_id => t.transaction_id
-            )                    
-            order.update_attributes(
-              :financial_status => Order::FINANCIAL_STATUS_VOIDED,
-              :status => Order::STATUS_CANCELED
-            )
-            order.save          
-            # TODO: Add the variant quantities ordered back        
-            resp.success = "Order voided successfully"
-          when 'payscape'
-            # TODO: Implement payscape void order
-        end
-        
-      end
+      resp = order.void
     
       render :json => resp
     end
@@ -164,75 +103,10 @@ module Caboose
     def admin_refund
       return if !user_is_allowed('orders', 'edit')
     
-      response = Caboose::StdClass.new({
-        'refresh' => nil,
-        'error' => nil,
-        'success' => nil
-      })
-    
       order = Order.find(params[:id])
-    
-      if order.financial_status != Order::FINANCIAL_STATUS_CAPTURED
-        response.error = "This order hasn't been captured yet, you will need to void instead"
-      else
-        if PaymentProcessor.refund(order)
-          order.update_attributes(
-            :financial_status => Order::FINANCIAL_STATUS_REFUNDED,
-            :status => Order::STATUS_CANCELED
-          )
-          
-          response.success = 'Order refunded successfully'
-        else
-          response.error = 'Error refunding order'
-        end
-        
-        #if order.calculate_net < (order.amount_discounted || 0) || PaymentProcessor.refund(order)
-        #  order.financial_status = 'refunded'
-        #  order.status = 'refunded'
-        #  order.save
-        #  
-        #  if order.discounts.any?
-        #    discount = order.discounts.first
-        #    amount_to_refund = order.calculate_net < order.amount_discounted ? order.calculate_net : order.amount_discounted
-        #    discount.update_attribute(:amount_current, amount_to_refund + discount.amount_current)
-        #  end
-        #  
-        #  response.success = "Order refunded successfully"
-        #else
-        #  response.error = "Error refunding order."
-        #end
-      end
-    
-      render json: response
+      resp = order.refund 
       
-      # return if !user_is_allowed('orders', 'edit')
-      #     
-      # response = Caboose::StdClass.new({
-      #   'refresh' => nil,
-      #   'error' => nil,
-      #   'success' => nil
-      # })
-      #     
-      # order = Order.find(params[:id])
-      #     
-      # if order.financial_status != 'captured'
-      #   response.error = "This order hasn't been captured yet, you will need to void instead"
-      # else
-      #   if PaymentProcessor.refund(order)
-      #     order.financial_status = 'refunded'
-      #     order.status = 'refunded'
-      #     order.save
-      #     
-      #     # Add the variant quantities ordered back
-      #     order.cancel
-      #     
-      #     response.success = "Order refunded successfully"
-      #   else
-      #     response.error = "Error refunding order."
-      #   end
-      # end
-      #     
-      # render :json => response
+      render :json => resp            
     end
     
     # POST /admin/orders/:id/resend-confirmation
@@ -256,6 +130,7 @@ module Caboose
       render :json => order.as_json(:include => [        
         { :line_items => { :include => { :variant => { :include => :product }}}},
         { :order_packages => { :include => [:shipping_package, :shipping_method] }},
+        { :discounts => { :include => :gift_card }},
         :customer,
         :shipping_address,
         :billing_address,
@@ -291,17 +166,25 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
-          when 'tax'             then order.tax             = value                                     
-          when 'shipping'        then order.shipping        = value              
-          when 'handling'        then order.handling        = value
+          when 'tax'             then 
+            order.tax = value
+            order.total = order.calculate_total          
+          when 'handling'        then
+            order.handling = value
+            order.total = order.calculate_total
           when 'custom_discount' then 
             order.custom_discount = value
             order.discount = order.calculate_discount
+            order.total = order.calculate_total
           when 'status'          then order.status          = value
           when 'customer_id'     then order.customer_id     = value            
         end
       end
-      order.calculate_total
+
+      #order.calculate
+      #order.calculate_total
+      #resp.attributes['total'] = { 'value' => order.total }
+      
       resp.success = save && order.save
       render :json => resp
     end
@@ -315,43 +198,13 @@ module Caboose
       })
     end
 
-    # GET /admin/orders/:id/refund
-    # def refund
-    #   return if !user_is_allowed('orders', 'edit')
-    # 
-    #   response = Caboose::StdClass.new({
-    #     'refresh' => nil,
-    #     'error' => nil,
-    #     'success' => nil
-    #   })
-    # 
-    #   order = Order.find(params[:id])
-    # 
-    #   if order.financial_status != 'captured'
-    #     response.error = "This order hasn't been captured yet, you will need to void instead"
-    #   else
-    #     ap order.total
-    #     ap order.amount_discounted
-    #     
-    #     if order.total < order.amount_discounted || PaymentProcessor.refund(order)
-    #       order.financial_status = 'refunded'
-    #       order.status = 'refunded'
-    #       order.save
-    #       
-    #       discount = order.discounts.first
-    #       ap '==========================='
-    #       ap order.amount_discounted + discount.amount_current
-    #       ap '==========================='
-    #       discount.update_attribute(:amount_current, order.amount_discounted + discount.amount_current) if order.discounts.any?
-    #       
-    #       response.success = "Order refunded successfully"
-    #     else
-    #       response.error = "Error refunding order."
-    #     end
-    #   end
-    # 
-    #   render json: response
-    # end
+    # GET /admin/orders/:id/send-for-authorization
+    def admin_send_for_authorization
+      return if !user_is_allowed('orders', 'edit')
+      order = Order.find(params[:id])
+      order.delay.send_payment_authorization_email      
+      render :json => { :success => true }
+    end
 
     # GET /admin/orders/status-options
     def admin_status_options

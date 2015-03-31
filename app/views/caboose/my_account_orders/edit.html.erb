@@ -1,104 +1,35 @@
 <%
-captured = @order.financial_status == 'captured'
+store_config = @order.site.store_config
 %>
-<input type='hidden' name='order_id'    id='order_id'     value='<%= @order.id %>' />
-
 <h1>Order #<%= @order.order_number %></h1>
 
-<table class='order'>
-<tr>
-  <th>Billing Address</th>
-  <th>Shipping Address</th>  
-  <th>Order Status</th>
-  <th>Payment Status</th>  
-</tr>
-<tr>
-  <td valign='top'><%= raw @order.billing_address.name_and_address %></td>
-  <td valign='top'><%= raw @order.shipping_address.name_and_address %></td>    
-  <td valign='top'><%= @order.status.capitalize %></td>    
-  <td valign='top'><%= @order.financial_status.capitalize %></td>
-</tr>
-</table><br />
-
-<table class='order' width='100%'>
-<% @order.order_packages.all.each_with_index do |op, i| %>
-  <tr><td colspan='5' class='package_header'>Package <%= (i+1) %>: <%= op.shipping_method.service_name %><br /><%= op.status %></td></tr>
-  <tr>  
-    <th>Item</th>
-    <th>Status</th>    
-    <th>Unit Price</th>
-    <th>Quantity</th>
-    <th>Subtotal</th>
-  </tr>
-  <% op.line_items.each do |li| %>
-    <% img = li.variant.product_image %>
-    <tr>        
-      <td>
-        <% if img %><img src='<%= img.url(:tiny) %>' /><% end %>
-        <% if li.variant.nil? || li.variant.product.nil? %>
-          <% if li.variant.nil? %>Unknown variant<% else %><%= li.variant.sku %><% end %>
-        <% else %>
-          <a href='/products/<%= li.variant.product.id %>'><%= li.variant.product.title  %></a><br />
-          <% if li.variant.sku && li.variant.sku.strip.length > 0 %><%= li.variant.sku %><br /><% end %>
-          <%= li.variant.title %>
-        <% end %>
-      </td>      
-      <td><%= li.status.capitalize %></td>      
-      <td style='text-align: right;'><%= number_to_currency(li.unit_price) %></td>    
-      <td style='text-align: right;'><%= li.quantity %></td>
-      <td style='text-align: right;'><%= number_to_currency(li.subtotal) %></td>
-    </tr>
-  <% end %>
+<div id='overview_table'></div>
+<% if @order.financial_status == Caboose::Order::FINANCIAL_STATUS_PENDING %>  
+  <div id='payment_form'></div>
+  <div id='payment_message'></div>
+  <iframe id="relay" name="relay" style='<% if @show_relay %>display: block; width: 800px; height: 400px; border: #000 1px solid;<% else %>display: none;<% end %>'></iframe>  
 <% end %>
-<% @order.line_items.each do |li| %>   
-  <% next if li.order_package_id %>  
-  <tr><td colspan='5'>Unpackaged Items</td></tr>
-  <% img = li.variant.product_image %>
-  <tr>            
-    <td>
-      <% if img %><img src='<%= img.url(:tiny) %>' /><% end %>
-      <% if li.variant.nil? || li.variant.product.nil? %>
-        <% if li.variant.nil? %>Unknown variant<% else %><%= li.variant.sku %><% end %>
-      <% else %>
-        <a href='/admin/products/<%= li.variant.product.id %>'><%= li.variant.product.title  %></a><br />
-        <% if li.variant.sku && li.variant.sku.strip.length > 0 %><%= li.variant.sku %><br /><% end %>
-        <%= li.variant.title %>
-      <% end %>
-    </td>    
-    <td><%= li.status.capitalize %></td>    
-    <td style='text-align: right;'><%= number_to_currency(li.unit_price) %></td>    
-    <td style='text-align: right;'><%= li.quantity %></td>
-    <td style='text-align: right;'><%= number_to_currency(li.subtotal) %></td>
-  </tr>
-<% end %>
-<tr><td colspan='5' class='totals_header'>Totals</td></tr>
-<tr><td colspan='4' align='right'>Subtotal                </td><td style='text-align: right;'><%= number_to_currency(@order.subtotal ) %></td></tr>
-<tr><td colspan='4' align='right'>Tax                     </td><td style='text-align: right;'><%= number_to_currency(@order.tax      ) %></td></tr>
-<tr><td colspan='4' align='right'>Shipping &amp; Handling </td><td style='text-align: right;'><%= number_to_currency(@order.shipping + @order.handling) %></td></tr>
-<tr><td colspan='4' align='right'>Discount                </td><td style='text-align: right;'><%= number_to_currency(@order.discount ) %></td></tr>  
-<tr><td colspan='4' align='right'>Total                   </td><td style='text-align: right;'><%= number_to_currency(@order.total    ) %></td></tr>
-</table>
+<div id='order_table'></div>
 <div id='message'></div>
 
-<p>
-<input type='button' value='< Back' class='btn' onclick="window.location='/my-account/orders';" />
-</p>
-
-<% content_for :caboose_css do %>
-<style type='text/css'>
-
-table.order { border-collapse: collapse; margin-bottom: 20px; }
-table.order th { margin: 0; padding: 10px; border: #000 0px solid; font-weight: bold; text-align: center; }
-table.order td { margin: 0; padding: 10px; border: #000 1px solid; }
-table.order td img { float: left; margin-right: 10px; }
-table.order td.package_header { font-weight: bold; text-align: center; border: 0; }
-table.order td.totals_header { font-weight: bold; text-align: center; border: 0; }
-
-</style>
-<% end %>
+<p><input type='button' value='< Back' class='btn' onclick="window.location='/my-account/orders';" /></p>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/my_account_edit_order' %>
 <script type='text/javascript'>
 
+var controller = false;
+$(document).ready(function() {
+  controller = new MyAccountOrderController({ 
+    order_id: <%= raw Caboose.json(@order.id) %>,
+    authenticity_token: <%= raw Caboose.json(form_authenticity_token) %>
+  });
+});
+
 </script>
+<% end %>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/my_account_edit_order' %>
 <% end %>

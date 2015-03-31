@@ -43,6 +43,12 @@ module Caboose
       @order = order
       mail(:to => order.customer.email, :subject => 'Order status update')
     end
+    
+    # Sends an email to the customer telling them they need to authorize payment on an order 
+    def customer_payment_authorization(order)      
+      @order = order
+      mail(:to => order.customer.email, :subject => "Order #{@order.order_number} ready for payment")
+    end
   end
 end
 

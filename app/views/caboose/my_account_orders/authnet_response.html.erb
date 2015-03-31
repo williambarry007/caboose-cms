@@ -1,0 +1,12 @@
+<%
+# This page is rendered from the host application's domain, and thus is allowed
+# to access the parent's DOM via javascript.
+#
+%><!DOCTYPE>
+<html>
+<body>    
+<script type='text/javascript'>
+parent.relay_handler(<%= raw Caboose.json(@resp) %>);
+</script>
+</body>
+</html>

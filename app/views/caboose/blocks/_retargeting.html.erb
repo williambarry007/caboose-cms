@@ -1,9 +1,9 @@
 <% if site.use_retargeting %> 
   <% rc = site.retargeting_config %>
-  <% rc.labels(request, page).each do |label %>                                                  
+  <% rc.labels(request, page).each do |label| %>                                                  
     <script type='text/javascript'>
     /* <![CDATA[ */
-    var google_conversion_id = #{rc.conversion_id};
+    var google_conversion_id = <%= rc.conversion_id %>;
     var google_conversion_label = "<%= raw label %>";
     var google_custom_params = window.google_tag_params;
     var google_remarketing_only = true;

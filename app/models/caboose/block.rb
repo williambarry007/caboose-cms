@@ -240,10 +240,10 @@ class Caboose::Block < ActiveRecord::Base
       str = view.render(:partial => "../../sites/#{site.name}/blocks/#{name}", :locals => options2)
     rescue ActionView::MissingTemplate => ex      
       begin
-        str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)
-      rescue
+        str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)      
+      rescue Exception => ex
         Caboose.log("Partial caboose/blocks/#{name} doesn't exist.")
-        str = "<p class='note error'>#{self.partial_message(block, ex)}</p>"
+        str = "<p class='note error'>#{self.partial_message(name, ex)}</p>"
       end      
     end
       

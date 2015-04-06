@@ -74,9 +74,14 @@
   css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
   css.gsub!("<link href='//" , "<link href='#{protocol}")
   
+  js = yield(:js)
+  if @site.use_retargeting
+    js << b.partial('retargeting', options)
+  end
+  
   str.gsub!('|CABOOSE_CSS|'        , css)
   str.gsub!('|CABOOSE_PROTOCOL|'   , protocol)  
-  str.gsub!('|CABOOSE_JAVASCRIPT|' , yield(:js))  
+  str.gsub!('|CABOOSE_JAVASCRIPT|' , js)  
   str.gsub!('|CABOOSE_CSRF|'       , csrf_meta_tags)  
   
   %><%= raw str %><%

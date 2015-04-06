@@ -130,7 +130,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :country       , :string  ],
         [ :country_code  , :string  ],
         [ :phone         , :string  ]
-      ],
+      ],      
       Caboose::Asset => [
         [ :page_id        , :integer    ],
         [ :user_id        , :integer    ],
@@ -502,6 +502,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :product_image_id      , :integer ],
         [ :variant_id            , :integer ]
       ],
+      Caboose::RetargetingConfig => [
+        [ :site_id               , :integer ],
+        [ :conversion_id         , :string  ],                
+        [ :labels_function       , :text    ]                        
+      ],
       Caboose::Review => [
         [ :product_id            , :integer   ],
         [ :content               , :string    ],
@@ -568,13 +573,15 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :under_construction_html , :text   ],
         [ :use_store               , :boolean , { :default => false }],
         [ :logo                    , :attachment ],        
-        [ :is_master               , :boolean , { :default => false }]
+        [ :is_master               , :boolean , { :default => false }],
+        [ :analytics_id            , :string ],
+        [ :use_retargeting         , :boolean , { :default => false }]        
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
         [ :user_id     , :integer ],
         [ :role        , :string  ]
-      ],
+      ],            
       Caboose::SmtpConfig => [
         [ :site_id              , :integer ],
         [ :address              , :string  , { :default => 'localhost' }],
@@ -646,7 +653,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :weight_unit               , :string   , { :default => 'oz' }],
         [ :download_url_expires_in   , :string   , { :default => 5    }],
         [ :starting_order_number     , :integer  , { :default => 1000 }]
-      ],
+      ],      
       Caboose::User => [
         [ :site_id              , :integer    ],
         [ :first_name           , :string     ],

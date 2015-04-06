@@ -48,13 +48,20 @@ Caboose::Engine.routes.draw do
   
   get "my-account" => "my_account#index"
   put "my-account" => "my_account#update"
-    
+  
+  #=============================================================================
+  # Retargeting
+  #=============================================================================
+  
+  get     "admin/sites/:site_id/retargeting"       => "retargeting#admin_edit"
+  put     "admin/sites/:site_id/retargeting"       => "retargeting#admin_update"
+  
   #=============================================================================
   # Sites
   #=============================================================================  
                                                                                                                                        
   get     "admin/sites/options"                    => "sites#options"            
-  get     "admin/sites/new"                        => "sites#admin_new"      
+  get     "admin/sites/new"                        => "sites#admin_new"        
   get     "admin/sites/:id/block-types"            => "sites#admin_edit_block_types"
   get     "admin/sites/:id/delete"                 => "sites#admin_delete_form"
   get     "admin/sites/:id"                        => "sites#admin_edit"
@@ -71,7 +78,7 @@ Caboose::Engine.routes.draw do
   put     "admin/sites/:site_id/domains/:id"       => "domains#admin_update"
   delete  "admin/sites/:site_id/domains/:id"       => "domains#admin_delete"
   put     "admin/sites/:site_id/domains/:id/set-primary" => "domains#admin_set_primary"
-  
+        
   #=============================================================================
   # Store
   #=============================================================================  

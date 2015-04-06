@@ -26,7 +26,8 @@
     b.create_children
   end
   #b.log_helper
-  options = {    
+  options = {
+    :request => @request,    
     :page => @page,
     :view => self,
     :controller_view_content => yield,

@@ -444,8 +444,9 @@ module Caboose
           current_tags.each{ |t| PageTag.where(:page_id => page.id, :tag => t).destroy_all if !new_tags.include?(t) }
           
           # Add any new tags not in current_tags
-          new_tags.each{ |t| PageTag.create(:page_id => page.id, :tag => t) if !current_tags.include?(t) }
+          new_tags.each{ |t| PageTag.create(:page_id => page.id, :tag => t) if !current_tags.include?(t) }        
         end
+        
       end
     
       resp.success = save && page.save

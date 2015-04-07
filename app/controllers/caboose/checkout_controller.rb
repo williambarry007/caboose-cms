@@ -167,7 +167,7 @@ module Caboose
       
       # Find the last order for the user
       @last_order = Order.where(:customer_id => @logged_in_user.id).order("id desc").limit(1).first
-            
+
     end
     
     #===========================================================================

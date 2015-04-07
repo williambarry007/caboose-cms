@@ -26,5 +26,6 @@ tinyMCE.init({
     def parent_categories
       Caboose::Category.find(1).children.where(:status => 'Active')
     end
+    
   end
 end

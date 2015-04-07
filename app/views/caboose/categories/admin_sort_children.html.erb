@@ -1,0 +1,64 @@
+<h1>Sort Children</h1>
+
+<p>Drag the categories into the order you would like them displayed.</p>
+
+<div id='categories'>
+  <ul id='category_list'>
+    <% @category.children.reorder(:sort_order).all.each do |cat| %>
+      <li id='category_<%= cat.id %>'><%= cat.name %></li>
+    <% end %>
+  </ul>
+</div>
+<div id='message'></div>
+
+<p><input type='button' value='< Back' onclick="window.location='/admin/categories/<%= @category.id %>';" /></p>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>    
+
+$(document).ready(function() {  
+  $('#category_list').sortable({
+    stop: function(event, ui) 
+    {           
+      $.ajax({
+        url: '/admin/categories/<%= @category.id %>/children/sort-order',
+        type: 'put',            
+        data: { 
+          category_ids: $.map($('#category_list').sortable('toArray'), function(str, j) { return parseInt(str.replace('category_', '')); })
+        }          
+      });                        
+    }
+  });
+});
+
+</script>
+<% end %>
+
+<% content_for :caboose_css do %>
+<style>
+
+#category_list {      
+  list-style: none;
+  margin: 0;      
+  padding: 0;
+  width: 350px;      
+}
+#category_list li {
+  box-sizing: border-box;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  cursor: grab;
+  display: block;
+  padding: 6px;
+  width: 100%;
+}
+
+#category_list li.selected {
+  background: #3e9aff;
+  border-color: #fff;
+  color: #fff;
+}
+    
+</style>
+<% end %>

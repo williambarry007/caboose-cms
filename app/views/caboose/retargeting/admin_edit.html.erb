@@ -1,0 +1,42 @@
+<%
+s = @site
+rc = s.retargeting_config
+%>
+<%= render :partial => 'caboose/sites/admin_header' %>
+
+<p><div id='site_<%= s.id %>_use_retargeting'   ></div></p>
+<p><div id='retargetingconfig_<%= rc.id %>_conversion_id'   ></div></p>
+<h2>Conversion Labels</h2>
+<p><code>def conversion_labels_function(request, page) {</code></p>
+<p><div id='retargetingconfig_<%= rc.id %>_labels_function' ></div></p>
+<p><code># This function returns an array of conversion labels<br />}</code></p>
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'Site',
+    id: <%= @site.id %>,
+    update_url: "/admin/sites/<%= @site.id %>",
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [      
+      { name: 'use_retargeting' , nice_name: 'Use Retargeting'          , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_retargeting ? true : false) %>, width: 400 }            
+    ]    
+  });
+  new ModelBinder({
+    name: 'RetargetingConfig',
+    id: <%= rc.id %>,
+    update_url: "/admin/sites/<%= @site.id %>/retargeting",
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'conversion_id'   , nice_name: 'Conversion ID'              , type: 'text'     , value: <%= raw Caboose.json(rc.conversion_id  ) %>, width: 600 },
+      { name: 'labels_function' , nice_name: 'Conversion Labels Function' , type: 'textarea' , value: <%= raw Caboose.json(rc.labels_function) %>, width: 600, height: 75, fixed_placeholder: false }            
+    ]    
+  });
+});
+
+</script>
+<% end %>

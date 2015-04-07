@@ -48,13 +48,20 @@ Caboose::Engine.routes.draw do
   
   get "my-account" => "my_account#index"
   put "my-account" => "my_account#update"
-    
+  
+  #=============================================================================
+  # Retargeting
+  #=============================================================================
+  
+  get     "admin/sites/:site_id/retargeting"       => "retargeting#admin_edit"
+  put     "admin/sites/:site_id/retargeting"       => "retargeting#admin_update"
+  
   #=============================================================================
   # Sites
   #=============================================================================  
                                                                                                                                        
   get     "admin/sites/options"                    => "sites#options"            
-  get     "admin/sites/new"                        => "sites#admin_new"      
+  get     "admin/sites/new"                        => "sites#admin_new"        
   get     "admin/sites/:id/block-types"            => "sites#admin_edit_block_types"
   get     "admin/sites/:id/delete"                 => "sites#admin_delete_form"
   get     "admin/sites/:id"                        => "sites#admin_edit"
@@ -71,7 +78,7 @@ Caboose::Engine.routes.draw do
   put     "admin/sites/:site_id/domains/:id"       => "domains#admin_update"
   delete  "admin/sites/:site_id/domains/:id"       => "domains#admin_delete"
   put     "admin/sites/:site_id/domains/:id/set-primary" => "domains#admin_set_primary"
-  
+        
   #=============================================================================
   # Store
   #=============================================================================  
@@ -495,16 +502,20 @@ Caboose::Engine.routes.draw do
   # Categories
   #=============================================================================
           
-  get     "/admin/categories"                   => "categories#admin_index"
-  get     "/admin/categories/new"               => "categories#admin_new"
-  get     "/admin/categories/options"           => "categories#admin_options"
-  get     '/admin/categories/status-options'    => 'categories#admin_status_options'
-  get     "/admin/categories/:id/products/json" => "categories#admin_category_products"  
-  get     "/admin/categories/:id"               => "categories#admin_edit"  
-  put     "/admin/categories/:id"               => "categories#admin_update"    
-  post    "/admin/categories/:id"               => "categories#admin_update"  
-  post    "/admin/categories"                   => "categories#admin_add"
-  delete  "/admin/categories/:id"               => "categories#admin_delete"
+  
+
+  get     "/admin/categories"                         => "categories#admin_index"
+  get     "/admin/categories/new"                     => "categories#admin_new"
+  get     "/admin/categories/options"                 => "categories#admin_options"
+  get     '/admin/categories/status-options'          => 'categories#admin_status_options'
+  get     "/admin/categories/:id/sort-children"       => "categories#admin_sort_children"
+  put     "/admin/categories/:id/children/sort-order" => "categories#admin_update_sort_order"
+  get     "/admin/categories/:id/products/json"       => "categories#admin_category_products"  
+  get     "/admin/categories/:id"                     => "categories#admin_edit"  
+  put     "/admin/categories/:id"                     => "categories#admin_update"    
+  post    "/admin/categories/:id"                     => "categories#admin_update"  
+  post    "/admin/categories"                         => "categories#admin_add"
+  delete  "/admin/categories/:id"                     => "categories#admin_delete"
   
   #=============================================================================  
   # Orders

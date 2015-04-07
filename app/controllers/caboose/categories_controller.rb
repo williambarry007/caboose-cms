@@ -54,12 +54,30 @@ module Caboose
       render :json => resp
     end
       
-    # GET /admin/categories/:id/edit
+    # GET /admin/categories/:id
     def admin_edit
       return unless user_is_allowed('categories', 'edit')    
       @category = Category.find(params[:id])
       render :layout => 'caboose/admin'
-    end        
+    end
+    
+    # GET /admin/categories/:id/sort-children
+    def admin_sort_children
+      return unless user_is_allowed('categories', 'edit')    
+      @category = Category.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # PUT /admin/categories/:id/children/sort-order
+    def admin_update_sort_order
+      return unless user_is_allowed('categories', 'edit')            
+      params[:category_ids].each_with_index do |cat_id, i|
+        cat = Category.find(cat_id)
+        cat.sort_order = i
+        cat.save
+      end      
+      render :json => { :success => true }
+    end
     
     # PUT /admin/categories/:id
     def admin_update

@@ -39,6 +39,7 @@
     <tr>
       <%= raw @pager.sortable_table_headings({
   				'id'              => 'ID',
+  				'order_number'    => 'Order Number',
   				'customer_id'     => 'Customer',
   				'date_created'    => 'Date Created',  				
   				'total'           => 'Total',
@@ -49,6 +50,7 @@
   <% @orders.each do |order| %>
     <tr onclick="window.location='/admin/orders/<%= order.id %>';">
       <td><%= raw order.id %></td>
+      <td><%= raw order.order_number %></td>
       <td>
         <% if order.customer.nil? %>
           Unknown

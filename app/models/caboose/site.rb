@@ -21,10 +21,20 @@ class Caboose::Site < ActiveRecord::Base
   
   def smtp_config
     c = Caboose::SmtpConfig.where(:site_id => self.id).first
+    c = Caboose::SmtpConfig.create(:site_id => self.id) if c.nil?
+    return c
   end
 
   def social_config
     s = Caboose::SocialConfig.where(:site_id => self.id).first
+    s = Caboose::SocialConfig.create(:site_id => self.id) if s.nil?
+    return s
+  end
+  
+  def retargeting_config
+    c = Caboose::RetargetingConfig.where(:site_id => self.id).first
+    c = Caboose::RetargetingConfig.create(:site_id => self.id) if c.nil?      
+    return c      
   end
   
   def self.id_for_domain(domain)

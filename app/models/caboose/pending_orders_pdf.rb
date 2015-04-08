@@ -44,8 +44,10 @@ module Caboose
           t = AuthorizeNet::Reporting::Transaction.new(sc.pp_username, sc.pp_password)
           resp = t.get_transaction_details(ot.transaction_id)
           t2 = resp.transaction
-          self.card_type = t2.payment_method.card_type.upcase
-          self.card_number = t2.payment_method.card_number.gsub('X', '')
+          if t2
+            self.card_type = t2.payment_method.card_type.upcase
+            self.card_number = t2.payment_method.card_number.gsub('X', '')
+          end
       end
     end
 
@@ -133,7 +135,9 @@ module Caboose
           if li.variant.product.option1 && li.variant.option1 then options += li.variant.product.option1 + ": " + li.variant.option1 + "\n" end
           if li.variant.product.option2 && li.variant.option2 then options += li.variant.product.option2 + ": " + li.variant.option2 + "\n" end
           if li.variant.product.option3 && li.variant.option3 then options += li.variant.product.option3 + ": " + li.variant.option3 + "\n" end
-          if li.variant.product.product_images.count > 0 
+          if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)
+          #  Caboose.log("image path: #{li.variant.product.product_images.first.url(:tiny)}")
+          #  image = ""
             image = open("#{li.variant.product.product_images.first.url(:tiny)}")
           else
             image = ""
@@ -143,7 +147,11 @@ module Caboose
             arr << { :content => package + "\n" + carrier + "\n" + service, :width => 115, :rowspan => (index == 0 ? pk.line_items.count : 1) }
           end
          
-          arr << { :image => image, :fit => [40, 40], :borders => [:top, :bottom, :left], :width => 50 }
+          if !image.blank?
+            arr << { :image => image, :fit => [40, 40], :borders => [:top, :bottom, :left], :width => 50 }
+          else
+            arr << { :content => "No Image" }
+          end
           arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}", :borders => [:top, :right, :bottom], :width => 100 }
           arr << { :content => options }
           arr << { :content => "#{li.quantity}"                     , :align => :right }
@@ -161,7 +169,9 @@ module Caboose
         if li.variant.product.option1 && li.variant.option1 then options += li.variant.product.option1 + ": " + li.variant.option1 + "\n" end
         if li.variant.product.option2 && li.variant.option2 then options += li.variant.product.option2 + ": " + li.variant.option2 + "\n" end
         if li.variant.product.option3 && li.variant.option3 then options += li.variant.product.option3 + ": " + li.variant.option3 + "\n" end
-        if li.variant.product.product_images.count > 0 
+        if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)
+       #   Caboose.log("image path: #{li.variant.product.product_images.first.url(:tiny)}")
+       #   image = ""
           image = open("#{li.variant.product.product_images.first.url(:tiny)}")
         else
           image = ""
@@ -170,15 +180,23 @@ module Caboose
         if index == 0
           arr << { :content => "Unassigned", :width => 115, :rowspan => (index == 0 ? unassigned.count : 1) }
         end
-        arr << { :image => image, :fit => [40, 40], :borders => [:top, :bottom, :left], :width => 50 }
+        if !image.blank?
+          arr << { :image => image, :fit => [40, 40], :borders => [:top, :bottom, :left], :width => 50 }
+        else
+          arr << { :content => "No Image" }
+        end
         arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}", :borders => [:top, :right, :bottom], :width => 100 }
         arr << { :content => options }
         arr << { :content => "#{li.quantity}"               , :align => :right }
-        arr << { :content => "$" + sprintf("%.2f", li.price) , :align => :right }
+        if li.unit_price
+          arr << { :content => "$" + sprintf("%.2f", li.unit_price) , :align => :right }
+        else
+          arr << { :content => "" }
+        end
         arr << { :content => "$" + sprintf("%.2f", li.subtotal)   , :align => :right }
         tbl << arr
       end
-
+      order.calculate
       tbl << [{ :content => "Subtotal"                       , :colspan => 6, :align => :right                       }, { :content => "$"     + sprintf("%.2f", order.subtotal                        ) , :align => :right }]
       tbl << [{ :content => "Discount"                       , :colspan => 6, :align => :right                       }, { :content => "(-) $" + sprintf("%.2f", order.discount ? order.discount : 0.0 ) , :align => :right }]
       tbl << [{ :content => "Shipping and Handling Charges"  , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.shipping_and_handling           ) , :align => :right }]    
@@ -198,7 +216,7 @@ module Caboose
       if trans
         tbl2 << [
           { :content => "Card Type", :width => 127, :border_width => 0 },
-          { :content => self.card_type, :width => 128, :border_width => 0 }
+          { :content => self.card_type.blank? ? "N/A" : self.card_type, :width => 128, :border_width => 0 }
         ]
         tbl2 << [
           { :content => "Transaction ID", :width => 127, :border_width => 0 },
@@ -210,7 +228,7 @@ module Caboose
         ]
         tbl3 << [
           { :content => "Card Number", :width => 127, :border_width => 0},
-          { :content => "XXXX XXXX XXXX " + self.card_number, :width => 128, :border_width => 0 }
+          { :content => self.card_number ? ("XXXX XXXX XXXX " + self.card_number) : "N/A", :width => 128, :border_width => 0 }
         ]
         tbl3 << [
           { :content => "Transaction Time", :width => 127, :border_width => 0},

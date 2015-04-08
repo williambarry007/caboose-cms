@@ -54,7 +54,9 @@ Caboose.Store.Modules.Product = (function() {
   self.initalize_zoom = function(image_url) {
     var big_image = $("#product-images").children("figure").first();
     big_image.data("zoom-image",image_url);
-    big_image.elevateZoom();
+    if (typeof elevateZoom !== 'undefined') {
+      big_image.elevateZoom();
+    }
   }
   
   self.render_images = function(callback) {

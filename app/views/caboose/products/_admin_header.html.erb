@@ -1,12 +1,19 @@
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag "caboose/admin_products" %>
+<style>
+#product-title {
+	font-size: 24px !important;
+	height: auto !important;
+	padding: 10px 2% !important;
+}
+</style>
 <% end %>
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <%= javascript_include_tag "caboose/admin_products" %>
 <% end %>
 
-<h1>Edit Product - <%= @product.title %></h1>
+<h1 id="product-title">Edit Product - <%= @product.title %></h1>
 <ul id='tabs'>
 <%
 tabs = {
@@ -27,6 +34,6 @@ tabs["/admin/products/#{@product.id}/delete"              ] = 'Delete Product'
 <% tabs.each do |href,text| %>
 <li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
 <% end %>
-<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/products';" /></li>
+<li class='back'><input type='button' class="caboose-btn" value='< Back' onclick="window.location='/admin/products';" /></li>
 </ul>
 <div id='content2'>

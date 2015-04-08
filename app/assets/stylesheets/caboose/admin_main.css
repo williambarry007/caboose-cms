@@ -442,3 +442,59 @@ Page Bar Generator
    height: 0; 
    clear: both;
 }
+
+.caboose-btn {
+  background: #141516; 
+  color: #f7f7f7;
+  text-align: center; 
+  padding: 8px 15px 6px 15px;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 18px;
+  cursor: pointer;
+  border: 1px solid #fff;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-width: 0;
+  -webkit-appearance: none;
+  border-radius: 5px; 
+  text-decoration: none;
+}
+
+.caboose-btn-white, input[type="submit"], input[type="button"] {
+  background: #e3e3e3; 
+  border: 1px solid #fff;
+  color: #141516;
+  text-align: center; 
+  padding: 8px 15px 6px 15px;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+  font-size: 15px;
+  cursor: pointer;
+  -webkit-border-radius: 5px;
+  border-width: 0;
+  -webkit-appearance: none;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  line-height: 18px;
+  text-decoration: none;
+}
+
+.caboose-btn:focus {
+  outline-width: 0;
+}
+
+.caboose-btn-white:focus, input[type="submit"]:focus, input[type="button"]:focus {
+  outline-width: 0;
+}
+
+.caboose-btn:hover {
+  background: #4f4448;
+}
+
+.caboose-btn-white:hover, input[type="submit"]:hover, input[type="button"]:hover {
+  background: #ccc;
+}

@@ -1,0 +1,24 @@
+
+<%= render :partial => 'caboose/sites/admin_header' %>
+
+<p><div id='site_<%= @site.id %>_custom_css'        ></div></p>
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'Site',
+    id: <%= @site.id %>,
+    update_url: '/admin/sites/<%= @site.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'custom_css', nice_name: 'Custom CSS', type: 'textarea' , value: <%= raw Caboose.json(@site.custom_css) %>, width: 600, height: 200 }      
+    ]    
+  });       
+});
+
+</script>
+<% end %>

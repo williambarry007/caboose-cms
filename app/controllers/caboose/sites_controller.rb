@@ -71,6 +71,26 @@ module Caboose
       @site = Site.find(params[:id])      
     end
     
+    # GET /admin/sites/:id/css
+    def admin_edit_css
+      return if !user_is_allowed('sites', 'edit')
+      if !@site.is_master
+        @error = "You are not allowed to manage sites."
+        render :file => 'caboose/extras/error' and return
+      end      
+      @site = Site.find(params[:id])      
+    end
+    
+    # GET /admin/sites/:id/js
+    def admin_edit_js
+      return if !user_is_allowed('sites', 'edit')
+      if !@site.is_master
+        @error = "You are not allowed to manage sites."
+        render :file => 'caboose/extras/error' and return
+      end      
+      @site = Site.find(params[:id])      
+    end
+    
     # GET /admin/sites/:id/delete
     def admin_delete_form
       return if !user_is_allowed('sites', 'edit')
@@ -127,6 +147,8 @@ module Caboose
           when 'under_construction_html'  then site.under_construction_html = value
           when 'use_store'                then site.use_store               = value
           when 'use_retargeting'          then site.use_retargeting         = value
+          when 'custom_css'               then site.custom_css              = value            
+          when 'custom_js'                then site.custom_js               = value                        
     	  end
     	end
     	

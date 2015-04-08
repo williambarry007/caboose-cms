@@ -568,14 +568,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :shipping_method_id   , :integer ]
       ],
       Caboose::Site => [
-        [ :name                    , :string ],
-        [ :description             , :text   ],
-        [ :under_construction_html , :text   ],
-        [ :use_store               , :boolean , { :default => false }],
+        [ :name                    , :string     ],
+        [ :description             , :text       ],
+        [ :under_construction_html , :text       ],
+        [ :use_store               , :boolean     , { :default => false }],
         [ :logo                    , :attachment ],        
-        [ :is_master               , :boolean , { :default => false }],
-        [ :analytics_id            , :string ],
-        [ :use_retargeting         , :boolean , { :default => false }]        
+        [ :is_master               , :boolean     , { :default => false }],
+        [ :analytics_id            , :string     ],
+        [ :use_retargeting         , :boolean     , { :default => false }],
+        [ :date_js_updated         , :datetime   ],
+        [ :date_css_updated        , :datetime   ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],

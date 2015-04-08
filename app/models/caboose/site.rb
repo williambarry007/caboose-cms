@@ -1,3 +1,4 @@
+require 'httparty'
 
 class Caboose::Site < ActiveRecord::Base
   self.table_name = "sites"
@@ -49,6 +50,54 @@ class Caboose::Site < ActiveRecord::Base
   
   def primary_domain
     Caboose::Domain.where(:site_id => self.id, :primary => true).first
+  end
+  
+  def custom_js_url
+    url = "http://#{Caboose::cdn_domain}/assets/#{self.name}/js/custom.js"
+    url << "?#{self.date_js_updated.strftime('%Y%m%d%H%M%S')}" if self.date_js_updated
+    return url
+  end
+  
+  def custom_css_url
+    url = "http://#{Caboose::cdn_domain}/assets/#{self.name}/css/custom.css"
+    url << "?#{self.date_css_updated.strftime('%Y%m%d%H%M%S')}" if self.date_css_updated
+    return url
+  end
+    
+  def custom_js              
+    resp = HTTParty.get(self.custom_js_url)
+    if resp.nil? || resp.code.to_i == 403
+      self.custom_js = ""
+      return ""            
+    end
+    return resp.body    
+  end
+  
+  def custom_css    
+    resp = HTTParty.get(self.custom_css_url)
+    if resp.nil? || resp.code.to_i == 403
+      self.custom_css = ""
+      return ""            
+    end
+    return resp.body    
+  end
+  
+  def custom_js=(str)    
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
+    AWS.config(:access_key_id => config['access_key_id'], :secret_access_key => config['secret_access_key'])
+    bucket =  AWS::S3.new.buckets[config['bucket']]                         
+    bucket.objects["assets/#{self.name}/js/custom.js"].write(str, :acl => 'public-read')                        
+    self.date_js_updated = DateTime.now.utc
+    self.save
+  end
+  
+  def custom_css=(str)    
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
+    AWS.config(:access_key_id => config['access_key_id'], :secret_access_key => config['secret_access_key'])
+    bucket =  AWS::S3.new.buckets[config['bucket']]                         
+    bucket.objects["assets/#{self.name}/css/custom.css"].write(str, :acl => 'public-read')                        
+    self.date_css_updated = DateTime.now.utc
+    self.save
   end
   
 end

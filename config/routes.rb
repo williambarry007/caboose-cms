@@ -62,6 +62,8 @@ Caboose::Engine.routes.draw do
                                                                                                                                        
   get     "admin/sites/options"                    => "sites#options"            
   get     "admin/sites/new"                        => "sites#admin_new"        
+  get     "admin/sites/:id/css"                    => "sites#admin_edit_css"
+  get     "admin/sites/:id/js"                     => "sites#admin_edit_js"
   get     "admin/sites/:id/block-types"            => "sites#admin_edit_block_types"
   get     "admin/sites/:id/delete"                 => "sites#admin_delete_form"
   get     "admin/sites/:id"                        => "sites#admin_edit"

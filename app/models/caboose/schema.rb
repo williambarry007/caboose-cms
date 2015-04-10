@@ -77,6 +77,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :decremented           
       ],        
       #Caboose::PageCache => [:block],
+      #Caboose::RetargetingConfig => [:fb_pixels_function],
       Caboose::ShippingPackage => [:price, :carrier, :service_code, :service_name, :shipping_method_id, :length, :width, :height],
       Caboose::Site => [:shipping_cost_function],
       Caboose::StoreConfig => [:use_usps, :allowed_shipping_codes, :default_shipping_code, :pp_relay_url, :pp_response_url],
@@ -506,7 +507,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :site_id               , :integer ],
         [ :conversion_id         , :string  ],                
         [ :labels_function       , :text    ],
-        [ :fb_pixels_function    , :text    ]
+        [ :fb_pixel_id           , :string  ]        
       ],
       Caboose::Review => [
         [ :product_id            , :integer   ],

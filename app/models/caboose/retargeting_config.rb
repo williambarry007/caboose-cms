@@ -7,7 +7,7 @@ module Caboose
       :site_id,
       :conversion_id,      
       :labels_function,
-      :fb_pixels_function
+      :fb_pixel_id
     
     def labels(request, page)
       return [] if self.labels_function.nil? || self.labels_function.strip.length == 0      
@@ -16,15 +16,7 @@ module Caboose
       return [] if arr.nil?
       return [arr] if arr is_a? String
       return arr        
-    end
-    
-    def fb_pixels(request, page)
-      return [] if self.fb_pixels_function.nil? || self.fb_pixels_function.strip.length == 0
-      arr = eval(self.fb_pixels_function)
-      return [] if arr.nil?
-      return [arr] if arr.is_a?(String) || arr.is_a?(Integer)
-      return arr        
-    end
+    end        
     
   end  
 end

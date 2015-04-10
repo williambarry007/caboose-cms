@@ -19,8 +19,8 @@
     </noscript>
   <% end %>
   <%
-  # Facebook audiences  
-  %><% rc.fb_pixels(request, page).each do |pixel_id| %>  
+  # Facebook audiences
+  %><% if rc.fb_pixel_id && rc.fb_pixel_id.strip.length > 0 %>    
     <script>(function() {
       var _fbq = window._fbq || (window._fbq = []);
       if (!_fbq.loaded) {
@@ -31,11 +31,11 @@
         s.parentNode.insertBefore(fbds, s);
         _fbq.loaded = true;
       }
-      _fbq.push(['addPixelId', '<%= raw pixel_id %>']);
+      _fbq.push(['addPixelId', '<%= raw rc.fb_pixel_id %>']);
     })();
     window._fbq = window._fbq || [];
     window._fbq.push(['track', 'PixelInitialized', {}]);
     </script>
-    <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?id=<%= raw pixel_id %>&amp;ev=PixelInitialized" /></noscript>
+    <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?id=<%= raw rc.fb_pixel_id %>&amp;ev=PixelInitialized" /></noscript>
   <% end %>
 <% end %>

@@ -29,7 +29,7 @@ module Caboose
         case name          
           when 'conversion_id'      then rc.conversion_id      = value    
           when 'labels_function'    then rc.labels_function    = value
-          when 'fb_pixels_function' then rc.fb_pixels_function = value
+          when 'fb_pixel_id'        then rc.fb_pixel_id        = value
     	  end
     	end
     	

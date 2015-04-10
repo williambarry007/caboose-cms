@@ -505,7 +505,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::RetargetingConfig => [
         [ :site_id               , :integer ],
         [ :conversion_id         , :string  ],                
-        [ :labels_function       , :text    ]                        
+        [ :labels_function       , :text    ],
+        [ :fb_pixels_function    , :text    ]
       ],
       Caboose::Review => [
         [ :product_id            , :integer   ],

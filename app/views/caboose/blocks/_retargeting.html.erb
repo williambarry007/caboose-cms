@@ -1,6 +1,8 @@
-<% if site.use_retargeting %> 
-  <% rc = site.retargeting_config %>
-  <% rc.labels(request, page).each do |label| %>                                                  
+<% if site.use_retargeting %>
+  <% rc = site.retargeting_config %> 
+  <%
+  # Google audiences
+  %><% rc.labels(request, page).each do |label| %>                                                  
     <script type='text/javascript'>
     /* <![CDATA[ */
     var google_conversion_id = <%= rc.conversion_id %>;
@@ -15,5 +17,25 @@
     <img height='1' width='1' style='border-style:none;' alt='' src='//googleads.g.doubleclick.net/pagead/viewthroughconversion/<%= raw rc.conversion_id %>/?value=1.00&amp;currency_code=USD&amp;label=<%= raw label %>&amp;guid=ON&amp;script=0'/>
     </div>
     </noscript>
+  <% end %>
+  <%
+  # Facebook audiences  
+  %><% rc.fb_pixels(request, page).each do |pixel_id| %>  
+    <script>(function() {
+      var _fbq = window._fbq || (window._fbq = []);
+      if (!_fbq.loaded) {
+        var fbds = document.createElement('script');
+        fbds.async = true;
+        fbds.src = '//connect.facebook.net/en_US/fbds.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(fbds, s);
+        _fbq.loaded = true;
+      }
+      _fbq.push(['addPixelId', '<%= raw pixel_id %>']);
+    })();
+    window._fbq = window._fbq || [];
+    window._fbq.push(['track', 'PixelInitialized', {}]);
+    </script>
+    <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?id=<%= raw pixel_id %>&amp;ev=PixelInitialized" /></noscript>
   <% end %>
 <% end %>

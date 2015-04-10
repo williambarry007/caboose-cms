@@ -5,11 +5,31 @@ rc = s.retargeting_config
 <%= render :partial => 'caboose/sites/admin_header' %>
 
 <p><div id='site_<%= s.id %>_use_retargeting'   ></div></p>
+
+<h2>Google Audiences</h2>
 <p><div id='retargetingconfig_<%= rc.id %>_conversion_id'   ></div></p>
-<h2>Conversion Labels</h2>
+<h3>Conversion Labels</h3>
 <p><code>def conversion_labels_function(request, page) {</code></p>
 <p><div id='retargetingconfig_<%= rc.id %>_labels_function' ></div></p>
-<p><code># This function returns an array of conversion labels<br />}</code></p>
+<p><code>
+&nbsp;&nbsp;# This function returns a conversion label string or an array of conversion label strings.<br />
+&nbsp;&nbsp;# Example 1:<br />
+&nbsp;&nbsp;# return "abc123"<br />
+&nbsp;&nbsp;# Example 2: <br />
+&nbsp;&nbsp;# return ["abc123", "xyz456"]<br />
+}</code></p>
+
+<h2>Facebook Pixel IDs</h2>
+<p><code>def facebook_pixel_ids(request, page) {</code></p>
+<p><div id='retargetingconfig_<%= rc.id %>_fb_pixels_function' ></div></p>
+<p><code>
+&nbsp;&nbsp;# This function returns a pixel ID string or an array of pixel ID strings.<br />
+&nbsp;&nbsp;# Example 1:<br />
+&nbsp;&nbsp;# return "abc123"<br />
+&nbsp;&nbsp;# Example 2: <br />
+&nbsp;&nbsp;# return ["abc123", "xyz456"]<br />
+&nbsp;&nbsp;# This function returns an array of conversion labels<br />
+}</code></p>
 
 <%= render :partial => 'caboose/sites/admin_footer' %>
 
@@ -32,8 +52,9 @@ $(document).ready(function() {
     update_url: "/admin/sites/<%= @site.id %>/retargeting",
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'conversion_id'   , nice_name: 'Conversion ID'              , type: 'text'     , value: <%= raw Caboose.json(rc.conversion_id  ) %>, width: 600 },
-      { name: 'labels_function' , nice_name: 'Conversion Labels Function' , type: 'textarea' , value: <%= raw Caboose.json(rc.labels_function) %>, width: 600, height: 75, fixed_placeholder: false }            
+      { name: 'conversion_id'      , nice_name: 'Conversion ID'               , type: 'text'     , value: <%= raw Caboose.json(rc.conversion_id      ) %>, width: 600 },
+      { name: 'labels_function'    , nice_name: 'Conversion Labels Function'  , type: 'textarea' , value: <%= raw Caboose.json(rc.labels_function    ) %>, width: 600, height: 75, fixed_placeholder: false },
+      { name: 'fb_pixels_function' , nice_name: 'Facebook Pixel IDs Function' , type: 'textarea' , value: <%= raw Caboose.json(rc.fb_pixels_function ) %>, width: 600, height: 75, fixed_placeholder: false }
     ]    
   });
 });

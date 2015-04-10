@@ -27,8 +27,9 @@ module Caboose
     
       params.each do |name,value|
         case name          
-          when 'conversion_id'   then rc.conversion_id   = value    
-          when 'labels_function' then rc.labels_function = value                
+          when 'conversion_id'      then rc.conversion_id      = value    
+          when 'labels_function'    then rc.labels_function    = value
+          when 'fb_pixels_function' then rc.fb_pixels_function = value
     	  end
     	end
     	

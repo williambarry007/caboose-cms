@@ -5,16 +5,27 @@ rc = s.retargeting_config
 <%= render :partial => 'caboose/sites/admin_header' %>
 
 <p><div id='site_<%= s.id %>_use_retargeting'   ></div></p>
-<p><div id='retargetingconfig_<%= rc.id %>_fb_pixel_id' ></div></p>
-<p><div id='retargetingconfig_<%= rc.id %>_conversion_id'   ></div></p>
+
+<h2>Google</h2>
+<p><div id='retargetingconfig_<%= rc.id %>_google_conversion_id'   ></div></p>
 <p><code>def google_conversion_labels_function(request, page) {</code></p>
-<p><div id='retargetingconfig_<%= rc.id %>_labels_function' ></div></p>
+<p><div id='retargetingconfig_<%= rc.id %>_google_labels_function' ></div></p>
 <p><code>
 &nbsp;&nbsp;# This function returns a conversion label string or an array of conversion label strings.<br />
 &nbsp;&nbsp;# Example 1:<br />
 &nbsp;&nbsp;# return "abc123"<br />
 &nbsp;&nbsp;# Example 2: <br />
 &nbsp;&nbsp;# return ["abc123", "xyz456"]<br />
+}</code></p>
+
+<h2>Facebook</h2>
+<p><div id='retargetingconfig_<%= rc.id %>_fb_pixel_id' ></div></p>
+<p><code>def facebook_custom_data_function(request, page) {</code></p>
+<p><div id='retargetingconfig_<%= rc.id %>_fb_vars_function' ></div></p>
+<p><code>
+&nbsp;&nbsp;# This function returns an array of key/value strings.<br />
+&nbsp;&nbsp;# Example:<br />
+&nbsp;&nbsp;# return { 'segment' => 'General' }<br />
 }</code></p>
 
 <%= render :partial => 'caboose/sites/admin_footer' %>
@@ -38,9 +49,10 @@ $(document).ready(function() {
     update_url: "/admin/sites/<%= @site.id %>/retargeting",
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'conversion_id'      , nice_name: 'Google Conversion ID'        , type: 'text'     , value: <%= raw Caboose.json(rc.conversion_id   ) %>, width: 600 },
-      { name: 'labels_function'    , nice_name: 'Conversion Labels Function'  , type: 'textarea' , value: <%= raw Caboose.json(rc.labels_function ) %>, width: 600, height: 75, fixed_placeholder: false },
-      { name: 'fb_pixel_id'        , nice_name: 'Facebook Pixel ID'           , type: 'text'     , value: <%= raw Caboose.json(rc.fb_pixel_id     ) %>, width: 600 }
+      { name: 'google_conversion_id'   , nice_name: 'Google Conversion ID'          , type: 'text'     , value: <%= raw Caboose.json(rc.google_conversion_id   ) %>, width: 600 },
+      { name: 'google_labels_function' , nice_name: 'Conversion Labels Function'    , type: 'textarea' , value: <%= raw Caboose.json(rc.google_labels_function ) %>, width: 600, height: 75, fixed_placeholder: false },
+      { name: 'fb_pixel_id'            , nice_name: 'Facebook Pixel ID'             , type: 'text'     , value: <%= raw Caboose.json(rc.fb_pixel_id            ) %>, width: 600 },
+      { name: 'fb_vars_function'       , nice_name: 'Facebook Custom Data Function' , type: 'textarea' , value: <%= raw Caboose.json(rc.fb_vars_function       ) %>, width: 600, height: 75, fixed_placeholder: false }
     ]    
   });
 });

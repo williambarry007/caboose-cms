@@ -2,10 +2,10 @@
   <% rc = site.retargeting_config %> 
   <%
   # Google audiences
-  %><% rc.labels(request, page).each do |label| %>                                                  
+  %><% rc.google_labels(request, page).each do |label| %>                                                  
     <script type='text/javascript'>
     /* <![CDATA[ */
-    var google_conversion_id = <%= rc.conversion_id %>;
+    var google_conversion_id = <%= rc.google_conversion_id %>;
     var google_conversion_label = "<%= raw label %>";
     var google_custom_params = window.google_tag_params;
     var google_remarketing_only = true;
@@ -14,7 +14,7 @@
     <script type='text/javascript' src='//www.googleadservices.com/pagead/conversion.js'></script>
     <noscript>
     <div style='display:inline;'>
-    <img height='1' width='1' style='border-style:none;' alt='' src='//googleads.g.doubleclick.net/pagead/viewthroughconversion/<%= raw rc.conversion_id %>/?value=1.00&amp;currency_code=USD&amp;label=<%= raw label %>&amp;guid=ON&amp;script=0'/>
+    <img height='1' width='1' style='border-style:none;' alt='' src='//googleads.g.doubleclick.net/pagead/viewthroughconversion/<%= raw rc.google_conversion_id %>/?value=1.00&amp;currency_code=USD&amp;label=<%= raw label %>&amp;guid=ON&amp;script=0'/>
     </div>
     </noscript>
   <% end %>
@@ -34,8 +34,15 @@
       _fbq.push(['addPixelId', '<%= raw rc.fb_pixel_id %>']);
     })();
     window._fbq = window._fbq || [];
-    window._fbq.push(['track', 'PixelInitialized', {}]);
+    <% vars = rc.fb_vars(request, page) %>    
+    window._fbq.push(['track', 'PixelInitialized', <%= raw Caboose.json(vars) %>]);    
     </script>
-    <noscript><img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?id=<%= raw rc.fb_pixel_id %>&amp;ev=PixelInitialized" /></noscript>
+    <noscript>
+      <%
+      cd = vars.collect{ |k,v| "cd[#{k}]=#{v}" }.join('&amp;')
+      cd = "&amp;#{cd}" if vars.count > 0
+      %>                          
+      <img height="1" width="1" border="0" alt="" style="display:none" src="https://www.facebook.com/tr?id=<%= raw rc.fb_pixel_id %>&amp;ev=PixelInitialized<%= raw cd %>" />      
+    </noscript>
   <% end %>
 <% end %>

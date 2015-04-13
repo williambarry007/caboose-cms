@@ -5,18 +5,27 @@ module Caboose
     belongs_to :site
     attr_accessible :id,
       :site_id,
-      :conversion_id,      
-      :labels_function,
-      :fb_pixel_id
+      :google_conversion_id,      
+      :google_labels_function,
+      :fb_pixel_id,
+      :fb_vars_function
     
-    def labels(request, page)
-      return [] if self.labels_function.nil? || self.labels_function.strip.length == 0      
-      return [self.labels_function] if self.labels_function.starts_with?('_')        
-      arr = eval(self.labels_function)      
+    def google_labels(request, page)
+      return [] if self.google_labels_function.nil? || self.google_labels_function.strip.length == 0      
+      return [self.google_labels_function] if self.google_labels_function.starts_with?('_')        
+      arr = eval(self.google_labels_function)      
       return [] if arr.nil?
       return [arr] if arr is_a? String
       return arr        
-    end        
+    end
+    
+    def fb_vars(request, page)
+      return nil if self.fb_vars_function.nil? || self.fb_vars_function.strip.length == 0
+      arr = eval(self.fb_vars_function)      
+      return [] if arr.nil?
+      return [arr] if arr is_a? String
+      return arr        
+    end
     
   end  
 end

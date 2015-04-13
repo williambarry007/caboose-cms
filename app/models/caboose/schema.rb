@@ -18,7 +18,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
       #Caboose::Field     => { :page_block_id        => :block_id,
       #                        :page_block_field_id  => :field_type_id },
       #Caboose::FieldType => { :page_block_type_id   => :block_type_id },
-      Caboose::Block     => { :page_block_type_id   => :block_type_id }
+      Caboose::Block     => { :page_block_type_id   => :block_type_id },
+      Caboose::RetargetingConfig => { 
+        :conversion_id   => :google_conversion_id,
+        :labels_function => :google_labels_function
+      }
     }
   end
 
@@ -504,10 +508,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :variant_id            , :integer ]
       ],
       Caboose::RetargetingConfig => [
-        [ :site_id               , :integer ],
-        [ :conversion_id         , :string  ],                
-        [ :labels_function       , :text    ],
-        [ :fb_pixel_id           , :string  ]        
+        [ :site_id                , :integer ],
+        [ :google_conversion_id   , :string  ],                
+        [ :google_labels_function , :text    ],
+        [ :fb_pixel_id            , :string  ],
+        [ :fb_vars_function       , :text    ]        
       ],
       Caboose::Review => [
         [ :product_id            , :integer   ],

@@ -31,18 +31,20 @@
         s.parentNode.insertBefore(fbds, s);
         _fbq.loaded = true;
       }
-      _fbq.push(['addPixelId', '<%= raw rc.fb_pixel_id %>']);
+      _fbq.push(['addPixelId', '<%= raw rc.fb_pixel_id %>']);      
     })();
-    window._fbq = window._fbq || [];
-    <% vars = rc.fb_vars(request, page) %>    
-    window._fbq.push(['track', 'PixelInitialized', <%= raw Caboose.json(vars) %>]);    
+    window._fbq = window._fbq || [];        
+    window._fbq.push(['track', 'PixelInitialized', {}]);
+    <% vars = rc.fb_vars(request, page) %>
+    <% vars.each do |v| %>    
+    window._fbq.push(['track', <%= raw Caboose.json(v) %>]);
+    <% end %>
     </script>
-    <noscript>
-      <%
-      cd = vars.collect{ |k,v| "cd[#{k}]=#{v}" }.join('&amp;')
-      cd = "&amp;#{cd}" if vars.count > 0
-      %>                          
-      <img height="1" width="1" border="0" alt="" style="display:none" src="https://www.facebook.com/tr?id=<%= raw rc.fb_pixel_id %>&amp;ev=PixelInitialized<%= raw cd %>" />      
+    <noscript>                                
+      <img height="1" width="1" border="0" alt="" style="display:none" src="https://www.facebook.com/tr?id=<%= raw rc.fb_pixel_id %>&amp;ev=PixelInitialized" />
+      <% vars.each do |v| %>            
+      <img height="1" width="1" border="0" alt="" style="display:none" src="https://www.facebook.com/tr?id=<%= raw rc.fb_pixel_id %>&amp;ev=<%= raw v %>" />
+      <% end %>
     </noscript>
   <% end %>
 <% end %>

@@ -508,11 +508,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :variant_id            , :integer ]
       ],
       Caboose::RetargetingConfig => [
-        [ :site_id                , :integer ],
-        [ :google_conversion_id   , :string  ],                
-        [ :google_labels_function , :text    ],
-        [ :fb_pixel_id            , :string  ],
-        [ :fb_vars_function       , :text    ]        
+        [ :site_id                 , :integer  ],
+        [ :google_conversion_id    , :string   ],                
+        [ :google_labels_function  , :text     ],
+        [ :fb_pixel_id             , :string   ],
+        [ :fb_vars_function        , :text     ]
+        #[ :fb_access_token         , :string   ],
+        #[ :fb_access_token_expires , :datetime ]        
       ],
       Caboose::Review => [
         [ :product_id            , :integer   ],

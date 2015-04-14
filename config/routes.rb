@@ -52,7 +52,11 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   # Retargeting
   #=============================================================================
-  
+   
+  #get     "admin/sites/:site_id/retargeting/fb-auth"                          => "retargeting#admin_fb_auth"
+  #get     "admin/sites/:site_id/retargeting/fb-audiences"                     => "retargeting#admin_fb_audiences"
+  #get     "admin/sites/:site_id/retargeting/fb-audiences/:custom_audience_id" => "retargeting#admin_fb_audience_members"
+    
   get     "admin/sites/:site_id/retargeting"       => "retargeting#admin_edit"
   put     "admin/sites/:site_id/retargeting"       => "retargeting#admin_update"
   

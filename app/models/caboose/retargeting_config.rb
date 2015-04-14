@@ -9,6 +9,8 @@ module Caboose
       :google_labels_function,
       :fb_pixel_id,
       :fb_vars_function
+      #:fb_access_token,
+      #:fb_access_token_expires
     
     def google_labels(request, page)
       return [] if self.google_labels_function.nil? || self.google_labels_function.strip.length == 0      
@@ -20,7 +22,7 @@ module Caboose
     end
     
     def fb_vars(request, page)
-      return nil if self.fb_vars_function.nil? || self.fb_vars_function.strip.length == 0
+      return [] if self.fb_vars_function.nil? || self.fb_vars_function.strip.length == 0      
       arr = eval(self.fb_vars_function)      
       return [] if arr.nil?
       return [arr] if arr is_a? String

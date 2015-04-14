@@ -23,9 +23,11 @@ rc = s.retargeting_config
 <p><code>def facebook_custom_data_function(request, page) {</code></p>
 <p><div id='retargetingconfig_<%= rc.id %>_fb_vars_function' ></div></p>
 <p><code>
-&nbsp;&nbsp;# This function returns an array of key/value strings.<br />
-&nbsp;&nbsp;# Example:<br />
-&nbsp;&nbsp;# return { 'segment' => 'General' }<br />
+&nbsp;&nbsp;# This function returns an event name string or an array of event names.<br />
+&nbsp;&nbsp;# Example 1:<br />
+&nbsp;&nbsp;# return "abc123"<br />
+&nbsp;&nbsp;# Example 2: <br />
+&nbsp;&nbsp;# return ["abc123", "xyz456"]<br />
 }</code></p>
 
 <%= render :partial => 'caboose/sites/admin_footer' %>

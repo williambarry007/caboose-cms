@@ -147,7 +147,7 @@ module Caboose
           else
             arr << { :content => "No Image" }
           end
-          arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}", :borders => [:top, :right, :bottom], :width => 100 }
+          arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}\n#{self.gift_options(li)}", :borders => [:top, :right, :bottom], :width => 100 }
           arr << { :content => options }
           arr << { :content => "#{li.quantity}"                     , :align => :right }
           arr << { :content => "$" + sprintf("%.2f", li.unit_price) , :align => :right }
@@ -177,8 +177,8 @@ module Caboose
           arr << { :image => image, :fit => [40, 40], :borders => [:top, :bottom, :left], :width => 50 }
         else
           arr << { :content => "No Image" }
-        end
-        arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}", :borders => [:top, :right, :bottom], :width => 100 }
+        end        
+        arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}\n#{self.gift_options(li)}", :borders => [:top, :right, :bottom], :width => 100 }
         arr << { :content => options }
         arr << { :content => "#{li.quantity}"               , :align => :right }
         if li.unit_price
@@ -197,6 +197,15 @@ module Caboose
       tbl << [{ :content => "Grand Total"                    , :colspan => 6, :align => :right, :font_style => :bold }, { :content => "$"     + sprintf("%.2f", order.total                           ) , :align => :right, :font_style => :bold }]
       
       table tbl , :position => 7, :width => 530
+    end
+    
+    def gift_options(li)          
+      return "This item is not a gift." if !li.is_gift                  
+      str = "This item is a gift.\n"
+      str << "- Gift wrap: #{li.gift_wrap ? 'Yes' : 'No'}\n"
+      str << "- Hide prices: #{li.hide_prices ? 'Yes' : 'No'}\n"
+      str << "- Gift message:\n #{li.gift_message && li.gift_message.length > 0 ? li.gift_message : '[Empty]'}"
+      return str        
     end
 
     def payment_info

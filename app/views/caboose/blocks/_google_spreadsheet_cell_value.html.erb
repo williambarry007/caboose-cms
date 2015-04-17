@@ -1,0 +1,26 @@
+<%
+spreadsheet_id = block.child_value('spreadsheet_id')
+row = block.child_value('row')
+col = block.child_value('column')
+%>
+<div id='block_<%= block.id %>'>
+  <% if editing && (spreadsheet_id.nil? || spreadsheet_id.strip.length == 0) %>
+    [Empty spreadsheet ID]
+  <% elsif editing && (row.nil? || row.strip.length == 0) %>
+    [Empty spreadsheet row]
+  <% elsif editing && (col.nil? || col.strip.length == 0) %>
+    [Empty spreadsheet column]
+  <% elsif !editing && spreadsheet_id && row && col %><% end %>        
+</div>
+<% if spreadsheet_id && row && col %>
+  <%= content_for :js do %>
+    <%= javascript_include_tag('caboose/google_spreadsheets') %>
+    <script type='text/javascript'>
+    $(document).ready(function() {      
+      var str = google_csv_data("<%= raw spreadsheet_id %>", "<%= raw col %>", <%= raw row %>);      
+      $('#block_<%= block.id %>').html(str);
+    });
+    </script>
+  <% end %>
+<% end %>
+    

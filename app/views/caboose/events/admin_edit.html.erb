@@ -54,7 +54,6 @@ g = @event.calendar_event_group
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
-<%= javascript_include_tag "jquery-ui/datepicker" %>
 <script type="text/javascript">
 
 var modal = false;
@@ -79,7 +78,7 @@ $(document).ready(function() {
       { name: 'all_day'     , nice_name: 'All day'      , type: 'checkbox' , value: <%= raw e.all_day ? 1 : 0 %>, width: 100, after_update: after_all_day_update },
       { name: 'repeats'     , nice_name: 'Repeats'      , type: 'checkbox' , value: <%= raw e.repeats ? 1 : 0 %>, width: 100, after_update: after_repeats_update }      
     ],
-    on_load: function() { modal.autosize(); }    
+    on_load: function() { modal.autosize(); console.log('Testing'); }    
   });  
   new ModelBinder({
     name: 'CalendarEventGroup',

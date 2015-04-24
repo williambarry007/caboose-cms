@@ -1,0 +1,30 @@
+<div class="post-details-wrapper">
+	<div class="constrain">
+		<% if post.image && !post.image.url.blank? && !post.image.url.include?('placehold') %>
+			<img src="<%= post.image.url(:large) %>" class="post-image">
+		<% end %>
+		<div class="post-text">
+			<h2 class="post-title"><%= post.title %></h2>
+			<h6 class="post-date"><%= post.created_at.in_time_zone(logged_in_user.timezone).strftime("%B %-d, %Y, %l:%M%P") %></h6>
+			<div class='share-icons clearfix'>
+        <!-- Twitter  -->
+        <div class="twitter-share-button-wrapper"><a href="https://twitter.com/share" class="twitter-share-button"   
+          data-text="<%= post.title %>"
+          data-count="none"
+          data-lang="en">Tweet</a></div>        
+        <!-- Facebook -->
+        <div class="fb-share-button" 
+          data-type="button"></div>
+      </div>
+			<hr />
+			<div class="post-body richtext">
+				<%== post.body %>
+			</div>
+		</div>
+	</div>
+</div>
+
+<% content_for :caboose_js do %>
+  <script id='facebook-jssdk' src='//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=759174044117392&version=v2.0'></script>
+  <script id='twitter-wjs'    src='https://platform.twitter.com/widgets.js'></script>
+<% end %>

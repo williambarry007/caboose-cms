@@ -1,0 +1,16 @@
+
+<% if params[:edit] %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/admin" %>
+<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag 'caboose/admin_post_edit_content' %>
+<script type='text/javascript'>
+
+var controller = false;
+$(document).ready(function() {
+  controller = new PostContentController(<%= @post.id %>);  
+});
+
+</script>
+<% end %>
+<% end %>

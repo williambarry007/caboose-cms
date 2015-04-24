@@ -94,6 +94,20 @@ namespace :caboose do
     end
     
   end
+  
+  desc "Set post slugs and URIs"
+  task :set_post_slugs => :environment do
+    Caboose::Post.where("slug is null or uri is null").all.each do |p|
+      p.set_slug_and_uri(p.title)      
+    end
+  end
+  
+  desc "Create blocsk for posts that were on the old post system"
+  task :set_post_blocks => :environment do
+    Caboose::Post.where("slug is null or uri is null").all.each do |p|
+      p.set_slug_and_uri(p.title)      
+    end
+  end
 
   #=============================================================================
   
@@ -200,6 +214,6 @@ namespace :assets do
         i = i + 1
       end
     end
-  end
+  end    
     
 end

@@ -1,0 +1,27 @@
+
+<%= render :partial => 'caboose/posts/admin_header' %>
+    
+<p><div id='post_<%= @post.id %>_preview'   ></div></p>
+
+<%= render :partial => 'caboose/posts/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Post',
+    id: <%= @post.id %>,
+    update_url: '/admin/posts/<%= @post.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'preview'   , nice_name: 'Preview'   , type: 'richtext'  , value: <%= raw Caboose.json(@post.preview    )        %>, width: 600, height: 400 }                  
+    ]
+  });
+});
+
+</script>
+<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>    
+<%= raw caboose_tinymce %>      
+<% end %>

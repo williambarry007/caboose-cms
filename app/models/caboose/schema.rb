@@ -147,6 +147,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Block => [
         [ :page_id               , :integer ],
+        [ :post_id               , :integer ],
         [ :parent_id             , :integer ],
         [ :block_type_id         , :integer ],
         [ :sort_order            , :integer , { :default => 0 }],
@@ -446,14 +447,19 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Post => [
         [ :site_id              , :integer    ],
         [ :title                , :text       ],
+        [ :subtitle             , :text       ],
+        [ :author               , :text       ],
         [ :body                 , :text 		  ],
+        [ :preview              , :text       ],
         [ :hide                 , :boolean    ],
         [ :image_url            , :text 		  ],
         [ :published            , :boolean    ],
         [ :created_at           , :datetime   ],
         [ :updated_at           , :datetime   ],
-        [ :image                , :attachment ]
-      ],
+        [ :image                , :attachment ],
+        [ :slug                 , :string     ],        
+        [ :uri                  , :string     ]
+      ],      
       Caboose::PostCategory => [
         [ :site_id  , :integer ],
         [ :name     , :string  ]
@@ -586,7 +592,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :analytics_id            , :string     ],
         [ :use_retargeting         , :boolean     , { :default => false }],
         [ :date_js_updated         , :datetime   ],
-        [ :date_css_updated        , :datetime   ]
+        [ :date_css_updated        , :datetime   ],
+        [ :default_layout_id       , :integer    ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],

@@ -4,47 +4,71 @@ module Caboose
   class BlocksController < ApplicationController
     
     helper :application
+    before_filter :before_blocks_action
     
+    def before_blocks_action
+      @p = params[:page_id] ? Page.find(params[:page_id]) : Post.find(params[:post_id])
+    end
+    
+    def page_or_post
+      return params[:page_id] ? 'page' : 'post'
+    end
+          
     #===========================================================================
     # Admin actions
     #===========================================================================
     
     # GET /admin/pages/:page_id/blocks
+    # GET /admin/posts/:post_id/blocks
     def admin_index
       return if !user_is_allowed('pages', 'view')
-      blocks = Block.where(:page_id => params[:page_id]).reorder(:sort_order)
-      render :json => blocks      
+      #h = params[:post_id] ? { :post_id => params[:post_id] } : { :page_id => params[:page_id] }
+      #blocks = Block.where(h).reorder(:sort_order)
+      #render :json => blocks
+      render :json => @p.block      
     end
 
     # GET /admin/pages/:page_id/blocks/:id/new
     # GET /admin/pages/:page_id/blocks/new
+    # GET /admin/posts/:post_id/blocks/:id/new
+    # GET /admin/posts/:post_id/blocks/new
     def admin_new
       return unless user_is_allowed('pages', 'add')
-                  
+
       if params[:id]
         block_type_id = params[:block_type_id]
         block_type_id = Block.find(params[:id]).block_type.default_child_block_type_id if block_type_id.nil?                 
         if block_type_id                                  
           b = Block.new
-          b.page_id = params[:page_id].to_i
+          if params[:page_id]
+            b.page_id = params[:page_id].to_i
+          else
+            b.post_id = params[:post_id].to_i
+          end
           b.parent_id = params[:id]
           b.block_type_id = block_type_id
           b.sort_order = Block.where(:parent_id => params[:id]).count              
           b.save
-          b.create_children        
-          redirect_to "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+          b.create_children
+          if params[:page_id]
+            redirect_to "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+          else
+            redirect_to "/admin/posts/#{b.post_id}/blocks/#{b.id}/edit"
+          end
           return
         end
       end
     
-      @page = Page.find(params[:page_id])
-      @block = params[:id] ? Block.find(params[:id]) : Block.new(:page_id => params[:page_id])
+      @page = Page.find(params[:page_id]) if params[:page_id]              
+      @post = Post.find(params[:post_id]) if params[:post_id]      
+      @block = params[:id] ? Block.find(params[:id]) : (params[:page_id] ? Block.new(:page_id => params[:page_id]) : Block.new(:post_id => params[:post_id]))
       @after_id = params[:after_id] ? params[:after_id] : nil
       @before_id = params[:before_id] ? params[:before_id] : nil
       render :layout => 'caboose/modal'                
     end
     
     # GET /admin/pages/:page_id/blocks/:id
+    # GET /admin/posts/:post_id/blocks/:id
     def admin_show
       return unless user_is_allowed('pages', 'edit')      
       block = Block.find(params[:id])
@@ -52,7 +76,9 @@ module Caboose
     end
     
     # GET /admin/pages/:page_id/blocks/tree
-    # GET /admin/pages/:page_id/blocks/:id/tree    
+    # GET /admin/pages/:page_id/blocks/:id/tree
+    # GET /admin/posts/:post_id/blocks/tree
+    # GET /admin/posts/:post_id/blocks/:id/tree    
     def admin_tree
       return unless user_is_allowed('pages', 'edit')      
       
@@ -61,9 +87,10 @@ module Caboose
         b = Block.find(params[:id])
         blocks << { 'id' => b.id, 'children' => admin_tree_helper(b), 'field_type' => b.block_type.field_type }
       else
-        Block.where("parent_id is null and page_id = ?", params[:page_id]).reorder(:sort_order).all.each do |b|      
+        q = params[:page_id] ? ["parent_id is null and page_id = ?", params[:page_id]] : ["parent_id is null and post_id = ?", params[:post_id]] 
+        Block.where(q).reorder(:sort_order).all.each do |b|      
           blocks << { 'id' => b.id, 'allow_child_blocks' => b.block_type.allow_child_blocks, 'children' => admin_tree_helper(b), 'field_type' => b.block_type.field_type }
-        end
+        end        
       end
       render :json => blocks
     end        
@@ -77,6 +104,7 @@ module Caboose
     end      
       
     # GET /admin/pages/:page_id/blocks/:id/render
+    # GET /admin/posts/:post_id/blocks/:id/render
     def admin_render
       return unless user_is_allowed('pages', 'edit')      
       b = Block.find(params[:id])      
@@ -85,34 +113,50 @@ module Caboose
         bt = BlockType.where(:name => 'richtext').first 
         b.block_type_id = bt.id
         b.save
-      end
-      #b.create_children
-      html = b.render(b, {
-        :empty_text => params[:empty_text],
-        :editing => true
+      end      
+      html = b.render(b, {                
+        :view => nil,
+        :controller_view_content => nil,
+        :modal => false,
+        :editing => true,
+        :empty_text => params[:empty_text],            
+        :css => '|CABOOSE_CSS|',                     
+        :js => '|CABOOSE_JAVASCRIPT|',
+        :csrf_meta_tags => '|CABOOSE_CSRF|',
+        :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
+        :logged_in_user => @logged_in_user,
+        :site => @site,
+        :page => params[:page_id] ? @p : nil,
+        :post => params[:post_id] ? @p : nil,            
+        :request => request
       })
       render :json => html            
-    end
-    
+    end        
+          
     # GET /admin/pages/:page_id/blocks/render
+    # GET /admin/posts/:post_id/blocks/render
     def admin_render_all
-      return unless user_is_allowed('pages', 'edit')
-      p = Page.find(params[:page_id])
-      blocks = Block.where("page_id = ? and parent_id is null", p.id).reorder(:sort_order).collect do |b|
-        #bt = b.block_type
-        #if bt.nil?
-        #  bt = BlockType.where(:name => 'richtext').first 
-        #  b.block_type_id = bt.id
-        #  b.save
-        #end
-        #b.create_children
+      return unless user_is_allowed('pages', 'edit')            
+      blocks = Block.where("#{page_or_post}_id = ? and parent_id is null", @p.id).reorder(:sort_order).collect do |b|        
         {
           :id => b.id,
           :block_type_id => b.block_type.id,
           :sort_order => b.sort_order,
           :html => b.render(b, {
-            :empty_text => params[:empty_text],
-            :editing => true
+            :view => nil,
+            :controller_view_content => nil,
+            :modal => false,
+            :editing => true,
+            :empty_text => params[:empty_text],            
+            :css => '|CABOOSE_CSS|',                     
+            :js => '|CABOOSE_JAVASCRIPT|',
+            :csrf_meta_tags => '|CABOOSE_CSRF|',
+            :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
+            :logged_in_user => @logged_in_user,
+            :site => @site,
+            :page => params[:page_id] ? @p : nil,
+            :post => params[:post_id] ? @p : nil,            
+            :request => request
           })        
         }
       end
@@ -120,11 +164,10 @@ module Caboose
     end
     
     # GET /admin/pages/:page_id/blocks/render-second-level
+    # GET /admin/posts/:post_id/blocks/render-second-level
     def admin_render_second_level
-      return unless user_is_allowed('pages', 'edit')
-      p = Page.find(params[:page_id])
-      @p = p
-      blocks = p.block.children.collect do |b|
+      return unless user_is_allowed('pages', 'edit')                  
+      blocks = @p.block.children.collect do |b|
         {           
           :id => b.id,
           :block_type_id => b.block_type.id,
@@ -141,22 +184,21 @@ module Caboose
             :csrf_meta_tags2 => '|CABOOSE_CSRF|',    
             :logged_in_user => @logged_in_user,
             :site => @site,
-            :page => p
+            :page => params[:page_id] ? @p : nil,
+            :post => params[:post_id] ? @p : nil,            
+            :request => request       
           })
         }
       end
-      render :json => blocks
-      #render :layout => false
-      
-      #respond_to do |format|        
-      #  format.json
-      #end
+      render :json => blocks      
     end
     
     # GET /admin/pages/:page_id/blocks/:id/edit
+    # GET /admin/posts/:post_id/blocks/:id/edit
     def admin_edit
       return unless user_is_allowed('pages', 'edit')
-      @page = Page.find(params[:page_id])
+      @page = Page.find(params[:page_id]) if params[:page_id]
+      @post = Post.find(params[:post_id]) if params[:post_id]
       @block = Block.find(params[:id])
       @block.create_children
       @modal = true
@@ -173,9 +215,11 @@ module Caboose
     end
     
     # GET /admin/pages/:page_id/blocks/:id/advanced
+    # GET /admin/posts/:post_id/blocks/:id/advanced
     def admin_edit_advanced
       return unless user_is_allowed('pages', 'edit')
-      @page = Page.find(params[:page_id])
+      @page = Page.find(params[:page_id]) if params[:page_id]
+      @post = Post.find(params[:post_id]) if params[:post_id]
       @block = Block.find(params[:id])
       @block.create_children      
       render :layout => 'caboose/modal'      
@@ -183,6 +227,8 @@ module Caboose
     
     # POST /admin/pages/:page_id/blocks
     # POST /admin/pages/:page_id/blocks/:id
+    # POST /admin/posts/:post_id/blocks
+    # POST /admin/posts/:post_id/blocks/:id
     def admin_create
       return unless user_is_allowed('pages', 'add')
 
@@ -191,8 +237,12 @@ module Caboose
           'redirect' => nil
       })
 
-      b = Block.new
-      b.page_id = params[:page_id].to_i
+      b = Block.new      
+      if params[:page_id]
+        b.page_id = params[:page_id].to_i
+      else
+        b.post_id = params[:post_id].to_i
+      end
       b.parent_id = params[:id] ? params[:id] : nil
       b.block_type_id = params[:block_type_id]
                       
@@ -245,11 +295,16 @@ module Caboose
 
       # Send back the response
       #resp.block = b
-      resp.redirect = "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+      if params[:page_id]
+        resp.redirect = "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+      else
+        resp.redirect = "/admin/posts/#{b.post_id}/blocks/#{b.id}/edit"
+      end        
       render :json => resp
     end
     
     # PUT /admin/pages/:page_id/blocks/:id
+    # PUT /admin/posts/:post_id/blocks/:id
     def admin_update
       return unless user_is_allowed('pages', 'edit')
       
@@ -292,13 +347,15 @@ module Caboose
       end
       
       # Trigger the page cache to be updated
-      pc = PageCache.where(:page_id => b.page_id).first
-      if pc
-        pc.refresh = true
-        pc.save
-        PageCacher.delay.refresh
-      else
-        PageCacher.delay.cache(b.page_id)
+      if params[:page_id]
+        pc = PageCache.where(:page_id => b.page_id).first
+        if pc
+          pc.refresh = true
+          pc.save
+          PageCacher.delay.refresh
+        else
+          PageCacher.delay.cache(b.page_id)
+        end
       end
                 
       resp.success = save && b.save
@@ -307,6 +364,7 @@ module Caboose
     end
     
     # POST /admin/pages/:page_id/blocks/:id/image
+    # POST /admin/posts/:post_id/blocks/:id/image
     def admin_update_image
       return unless user_is_allowed('pages', 'edit')
       
@@ -321,6 +379,7 @@ module Caboose
     end
     
     # POST /admin/pages/:page_id/blocks/:id/file
+    # POST /admin/posts/:post_id/blocks/:id/file
     def admin_update_file
       return unless user_is_allowed('pages', 'edit')
       
@@ -335,6 +394,7 @@ module Caboose
     end
     
     # DELETE /admin/pages/:page_id/blocks/:id
+    # DELETE /admin/posts/:post_id/blocks/:id
     def admin_delete
       return unless user_is_allowed('pages', 'delete')
       
@@ -342,7 +402,11 @@ module Caboose
       b = Block.find(params[:id])
       parent_id = b.parent_id
       if b.parent_id
-        resp.redirect = "/admin/pages/#{b.page_id}/blocks/#{b.parent_id}/edit"
+        if params[:page_id]
+          resp.redirect = "/admin/pages/#{b.page_id}/blocks/#{b.parent_id}/edit"
+        else
+          resp.redirect = "/admin/posts/#{b.post_id}/blocks/#{b.parent_id}/edit"
+        end        
       else
         resp.close = true
       end
@@ -361,6 +425,7 @@ module Caboose
     end
     
     # PUT /admin/pages/:page_id/blocks/:id/move-up
+    # PUT /admin/posts/:post_id/blocks/:id/move-up
     def admin_move_up
       return unless user_is_allowed('pages', 'delete')
       
@@ -372,33 +437,11 @@ module Caboose
       else
         resp.success = "The block has been moved up successfully."
       end
-        
-      #if b.sort_order == 0
-      #  resp.error = "The block is already at the top."
-      #else
-      #  b2 = nil
-      #  
-      #  new_sort_order = b.sort_order - 1
-      #  while new_sort_order > 0 do
-      #    b2 = Block.where("parent_id = ? and sort_order = ?", b.parent_id, new_sort_order).first
-      #    break if b2
-      #    new_sort_order = new_sort_order - 1
-      #  end
-      #  if b2
-      #    b2.sort_order = new_sort_order + 1
-      #    b2.save
-      #  else
-      #    new_sort_order = 1
-      #  end
-      #  b.sort_order = new_sort_order
-      #  b.save
-      #  resp.success = "The block has been moved up successfully."
-      #end
-
       render :json => resp
     end
     
     # PUT /admin/pages/:page_id/blocks/:id/move-down
+    # PUT /admin/posts/:post_id/blocks/:id/move-down
     def admin_move_down
       return unless user_is_allowed('pages', 'delete')
       
@@ -419,5 +462,4 @@ module Caboose
     end
 		
   end
-  
 end

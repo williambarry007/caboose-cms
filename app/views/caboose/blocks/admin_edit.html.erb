@@ -1,4 +1,6 @@
 <%
+base_url = @block.page_id ? "/admin/pages/#{@block.page_id}/blocks" : "/admin/posts/#{@block.post_id}/blocks"
+
 update_on_close = false
 @block.block_type.children.each do |bt|
   update_on_close = true if bt.field_type == 'image' || bt.field_type == 'file'
@@ -6,17 +8,14 @@ end
 
 crumbs = []
 b = @block
-while b
-  href    = b.id == @block.id ? "#" : "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
-  #onclick = b.id == @block.id ? " onclick=\"$('#advanced').slideToggle(100, function() { modal.autosize(); });\"" : ''  
+while b    
+  href = b.id == @block.id ? "#" : "#{base_url}/#{b.id}/edit"  
   text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
-  #crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"
   crumbs << "<a href=\"#{href}\">#{text}</a>"
   b = b.parent
 end
 
 %>
-<!--<h2 style='margin-top: 0; padding-top: 0;'>Edit <%= @block.name ? @block.name : @block.block_type.description %></h2>-->
 <h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
 
 <% if @block.block_type.use_render_function_for_layout %>
@@ -77,7 +76,7 @@ end
     <p>This block doesn't have any content yet.</p>
   <% end %>
   <% if @block.block_type.allow_child_blocks %>
-    <a href='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>/new'>Add a child block!</a>
+    <a href='<%= raw base_url %>/<%= @block.id %>/new'>Add a child block!</a>    
   <% end %>
 <% end %>
 <div id='message'></div>
@@ -88,7 +87,7 @@ end
 <% end %>
 <input type='button' value='Move Up'   onclick="controller.move_up();" />
 <input type='button' value='Move Down' onclick="controller.move_down();" />
-<input type='button' value='Advanced'  onclick="window.location='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.id %>/advanced';" />
+<input type='button' value='Advanced'  onclick="window.location='<%= raw base_url %>/<%= @block.id %>/advanced';" />
 </p>
 
 <% content_for :caboose_css do %>

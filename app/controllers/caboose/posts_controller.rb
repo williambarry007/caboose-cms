@@ -8,13 +8,33 @@ module Caboose
     	@posts = Post.where(:published => true).limit(5).order('created_at DESC')
     end
     
+    ## GET /posts/:id
+    #def detail
+    #	@post = Post.find_by_id(params[:id])
+    #	unless @post.present?
+    #		flash[:notice] = 'The posts post you tried to access does not exist.'
+    #		redirect_to action: :index
+    #	end
+    #end
+    
     # GET /posts/:id
-    def detail
-    	@post = Post.find_by_id(params[:id])
-    	unless @post.present?
-    		flash[:notice] = 'The posts post you tried to access does not exist.'
-    		redirect_to action: :index
-    	end
+    # GET /posts/:year/:month/:day/:slug
+    def show
+      
+      # Make sure we're not under construction or on a forwarded domain
+      return if under_construction_or_forwarding_domain?
+      
+      if params[:id]
+        @post = Post.where(:id => params[:id]).first
+      else      
+        # Find the page with an exact URI match        
+        uri = "#{params[:year]}/#{params[:month]}/#{params[:day]}/#{params[:slug]}"
+        @post = Post.where(:site_id => @site.id, :uri => request.fullpath).first
+      end      
+      render :file => "caboose/extras/error404" and return if @post.nil?                 
+
+      @post = Caboose.plugin_hook('post_content', @post)
+      @editmode = !params['edit'].nil? && user.is_allowed('posts', 'edit') ? true : false  
     end
   
     #=============================================================================
@@ -37,9 +57,23 @@ module Caboose
       @posts = @gen.items    
       render :layout => 'caboose/admin'
     end
+    
+    # GET /admin/posts/:id/json
+    def admin_json_single
+      return if !user_is_allowed('posts', 'edit')    
+      @post = Post.find(params[:id])
+      render :json => @post
+    end
   
     # GET /admin/posts/:id/edit
     def admin_edit_general
+      return if !user_is_allowed('posts', 'edit')    
+      @post = Post.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # GET /admin/posts/:id/preview
+    def admin_edit_preview
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])
       render :layout => 'caboose/admin'
@@ -49,7 +83,16 @@ module Caboose
     def admin_edit_content
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @post.body
+        @post.preview = @post.body
+        @post.body = nil
+        @post.save
+      end
+      if @post.block.nil?      
+        redirect_to "/admin/posts/#{@post.id}/layout"
+        return
+      end
+      @editing = true
     end
     
     # GET /admin/posts/:id/categories
@@ -63,10 +106,28 @@ module Caboose
       end
       render :layout => 'caboose/admin'
     end
+    
+    # GET /admin/posts/:id/layout
+    def admin_edit_layout
+      return unless user_is_allowed('posts', 'edit')      
+      @post = Post.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # PUT /admin/posts/:id/layout
+    def admin_update_layout
+      return unless user_is_allowed('posts', 'edit')      
+      bt = BlockType.find(params[:block_type_id])
+      Block.where(:post_id => params[:id]).destroy_all
+      Block.create(:post_id => params[:id], :block_type_id => params[:block_type_id], :name => bt.name)
+      resp = Caboose::StdClass.new({
+        'redirect' => "/admin/posts/#{params[:id]}/content"
+      })
+      render :json => resp
+    end
   
     # POST /admin/posts/:id
-    def admin_update
-      #Caboose.log(params)
+    def admin_update      
       return if !user_is_allowed('posts', 'edit')
       
       resp = Caboose::StdClass.new({'attributes' => {}})
@@ -74,18 +135,22 @@ module Caboose
       
       save = true
       params.each do |name, value|    
-        case name
-          when 'category_id'    then post.category_id = value
-          when 'title'          then post.title = value
-          when 'body'           then post.body = value          
-          when 'published'      then post.published = value.to_i == 1
-          when 'created_at'     then post.created_at = DateTime.parse(value)
+        case name                      
+          when 'site_id'    then post.site_id    = value.to_i
+          when 'slug'       then post.set_slug_and_uri(value)                        
+          when 'title'      then post.title      = value            
+          when 'subtitle'   then post.subtitle   = value
+          when 'author'     then post.author     = value
+          when 'body'       then post.body       = value
+          when 'preview'    then post.preview    = value
+          when 'hide'       then post.hide       = value
+          when 'image_url'  then post.image_url  = value
+          when 'published'  then post.published  = value
+          when 'created_at' then post.created_at = DateTime.parse(value)
+          when 'updated_at' then post.updated_at = DateTime.parse(value)
         end
       end
-      resp.success = save && post.save
-      if params[:image]
-        resp.attributes['image'] = { 'value' => post.image.url(:thumb) }
-      end
+      resp.success = save && post.save      
       render :json => resp
     end
     
@@ -120,13 +185,14 @@ module Caboose
     
       post = Post.new
       post.site_id = @site.id
-      post.title = params[:title]      
+      post.title = params[:title]                  
       post.published = false
   
       if post.title == nil || post.title.length == 0
         resp.error = 'A title is required.'      
       else
-        post.save
+        post.save        
+        post.set_slug_and_uri(post.title)                
         resp.redirect = "/admin/posts/#{post.id}/edit"
       end
       

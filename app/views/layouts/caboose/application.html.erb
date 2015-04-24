@@ -19,17 +19,24 @@
 <%= yield :caboose_css %>
 <% end %>
   <%  
-  b = @page.block
+  b = @post ? @post.block : @page.block
+  #Caboose.log(@post)
   #Caboose.log(@page.block.inspect)
   if b.nil?
-    bt = Caboose::BlockType.where(:name => 'layout_basic').first
-    Caboose::Block.create(:page_id => @page.id, :block_type_id => bt.id)    
-    b = @page.block
+    bt = @site.default_layout
+    if @post                    
+      Caboose::Block.create(:post_id => @post.id, :block_type_id => bt.id)    
+      b = @post.block            
+    else            
+      Caboose::Block.create(:page_id => @page.id, :block_type_id => bt.id)    
+      b = @page.block      
+    end
     b.create_children
   end
   #b.log_helper
   options = {
-    :request => @request,    
+    :request => @request,
+    :post => @post,    
     :page => @page,
     :view => self,
     :controller_view_content => yield,

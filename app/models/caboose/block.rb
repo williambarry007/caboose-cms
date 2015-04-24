@@ -4,6 +4,7 @@ class Caboose::Block < ActiveRecord::Base
   
   #after_find :get_master_value # TODO
   
+  belongs_to :post
   belongs_to :page
   belongs_to :block_type
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
@@ -21,7 +22,8 @@ class Caboose::Block < ActiveRecord::Base
     }
   do_not_validate_attachment_file_type :image
   
-  attr_accessible :id, 
+  attr_accessible :id,
+    :post_id,
     :page_id, 
     :parent_id,
     :block_type_id,
@@ -77,6 +79,7 @@ class Caboose::Block < ActiveRecord::Base
       #end      
       if self.child(bt2.name).nil?
         b = Caboose::Block.create(
+          :post_id => self.post_id,
           :page_id => self.page_id,
           :parent_id => self.id, 
           :block_type_id => bt_id,
@@ -282,7 +285,8 @@ class Caboose::Block < ActiveRecord::Base
     kids = self.children.collect { |b| b.js_hash }
     bt = self.block_type    
     return {
-      'id'             => self.id,           
+      'id'             => self.id,     
+      'post_id'        => self.post_id,      
       'page_id'        => self.page_id,      
       'parent_id'      => self.parent_id,
       'parent_title'   => self.parent ? self.parent.title : '',
@@ -345,10 +349,18 @@ class Caboose::Block < ActiveRecord::Base
     return if !self.block_type.is_global    
     return if !Caboose::Block.includes(:page).where("blocks.id <> ? and block_type_id = ? and pages.site_id = ?", self.id, self.block_type_id, site_id).exists?        
     
-    sql = ["update blocks set value = ? where id in (
-        select B.id from blocks B left join pages P on B.page_id = P.id
+    sql = nil
+    if self.page_id
+      sql = ["update blocks set value = ? where id in (
+          select B.id from blocks B left join pages P on B.page_id = P.id
+          where B.id <> ? and B.block_type_id = ? and P.site_id = ?
+        )", value, self.id, self.block_type_id, site_id]
+    elsif self.post_id      
+      sql = ["update blocks set value = ? where id in (
+        select B.id from blocks B left join posts P on B.post_id = P.id
         where B.id <> ? and B.block_type_id = ? and P.site_id = ?
-      )", value, self.id, self.block_type_id, site_id]       
+      )", value, self.id, self.block_type_id, site_id]
+    end
     ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, sql))            
   end
   

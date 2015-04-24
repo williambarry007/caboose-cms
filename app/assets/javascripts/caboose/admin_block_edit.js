@@ -19,10 +19,20 @@ BlockController.prototype = {
     this.set_child_blocks_editable();
     this.set_clickable();
   },
+  
+  base_url: function(b)
+  {    
+    return '/admin/' + (b.page_id ? 'pages/' + b.page_id : 'posts/' + b.post_id) + '/blocks';        
+  },
+  
+  block_url: function(b)
+  {         
+    return this.base_url(b) + '/' + b.id;          
+  },
     
   edit_block: function(block_id)
-  {
-    window.location = '/admin/pages/' + this.block.page_id + '/blocks/' + block_id + '/edit';    
+  {    
+    window.location = this.block_url(that.block) + '/edit';    
   },    
     
   /*****************************************************************************
@@ -33,7 +43,7 @@ BlockController.prototype = {
   {        
     var that = this;                
     $.ajax({      
-      url: '/admin/pages/' + this.block.page_id + '/blocks/tree',
+      url: that.base_url(that.block) + '/tree',
       success: function(blocks) {        
         $(blocks).each(function(i,b) {
           that.set_clickable_helper(b);                      
@@ -139,17 +149,17 @@ BlockController.prototype = {
     if (bt.fixed_placeholder)              h['fixed_placeholder'] = bt.fixed_placeholder;      
     if (bt.options || bt.options_function) h['options_url'] = '/admin/block-types/' + bt.id + '/options';
     else if (bt.options_url)               h['options_url'] = bt.options_url;
-    if (bt.field_type == 'file')           h['update_url'] = '/admin/pages/' + b.page_id + '/blocks/' + b.id + '/file';
+    if (bt.field_type == 'file')           h['update_url'] = that.block_url(b) + '/file';
     if (bt.field_type == 'image')
     {
-      h['update_url'] = '/admin/pages/' + b.page_id + '/blocks/' + b.id + '/image'
+      h['update_url'] = that.block_url(b) + '/image'
       h['image_refresh_delay'] = 100;
     }
         
     m = new ModelBinder({
       name: 'Block',
       id: b.id,
-      update_url: '/admin/pages/' + b.page_id + '/blocks/' + b.id,
+      update_url: that.block_url(b),
       authenticity_token: that.authenticity_token,
       attributes: [h]            
     });
@@ -206,7 +216,7 @@ BlockController.prototype = {
     }
     modal.autosize("<p class='loading'>Adding block...</p>");
     $.ajax({
-      url: '/admin/pages/' + that.block.page_id + '/blocks/' + that.block.id,
+      url: that.block_url(block),
       type: 'post',
       data: { block_type_id: block_type_id },
       success: function(resp) {
@@ -230,7 +240,7 @@ BlockController.prototype = {
     }
     modal.autosize("<p class='loading'>Deleting block...</p>");
     $.ajax({
-      url: '/admin/pages/' + that.block.page_id + '/blocks/' + that.block.id,
+      url: that.block_url(that.block),
       type: 'delete',    
       success: function(resp) {
         if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
@@ -248,7 +258,7 @@ BlockController.prototype = {
     var that = this;
     modal.autosize("<p class='loading'>Moving up...</p>");
     $.ajax({
-      url: '/admin/pages/' + that.block.page_id + '/blocks/' + that.block.id + '/move-up',
+      url: that.block_url(that.block) + '/move-up',
       type: 'put',    
       success: function(resp) {
         if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
@@ -266,7 +276,7 @@ BlockController.prototype = {
     var that = this;
     modal.autosize("<p class='loading'>Moving down...</p>");
     $.ajax({
-      url: '/admin/pages/' + that.block.page_id + '/blocks/' + that.block.id + '/move-down',
+      url: that.block_url(that.block) + '/move-down',
       type: 'put',    
       success: function(resp) {
         if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");

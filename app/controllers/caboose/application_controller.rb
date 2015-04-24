@@ -255,6 +255,41 @@ module Caboose
     def admin_bulk_add()    raise 'This method should be overridden.' end
     def admin_delete()      raise 'This method should be overridden.' end
     def admin_bulk_delete() raise 'This method should be overridden.' end
+      
+    # Make sure we're not under construction or on a forwarded domain
+    def under_construction_or_forwarding_domain?
+      
+      d = Caboose::Domain.where(:domain => request.host_with_port).first
+      if d.nil?
+        Caboose.log("Could not find domain for #{request.host_with_port}\nAdd this domain to the caboose site.")
+      elsif d.under_construction == true
+        if d.site.under_construction_html && d.site.under_construction_html.strip.length > 0 
+          render :text => d.site.under_construction_html
+        else 
+          render :file => 'caboose/application/under_construction', :layout => false
+        end
+        return true
+      # See if we're on a forwarding domain
+      elsif d.primary == false && d.forward_to_primary == true
+        pd = d.site.primary_domain
+        if pd && pd.domain != request.host
+          url = "#{request.protocol}#{pd.domain}"
+          if request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
+            url << request.fullpath
+          end
+          redirect_to url
+          return true
+        end
+      # Check for a 301 redirect
+      else
+        new_url = PermanentRedirect.match(@site.id, request.fullpath)        
+        if new_url
+          redirect_to new_url, :status => 301
+          return true
+        end        
+      end
+      return false
+    end
             
   end
 end

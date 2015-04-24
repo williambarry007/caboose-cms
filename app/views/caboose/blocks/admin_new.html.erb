@@ -1,9 +1,10 @@
 <%
+base_url = @block.page_id ? "/admin/pages/#{@block.page_id}/blocks" : "/admin/posts/#{@block.post_id}/blocks"
 
 crumbs = []
 b = @block
 while b
-  href    = b.id == @block.id ? "#" : "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
+  href    = b.id == @block.id ? "#" : "#{base_url}/#{b.id}/edit"
   onclick = b.id == @block.id ? " onclick=\"$('#block_#{@block.id}_block_type_id_container').slideToggle(100, function() { modal.autosize(); });\"" : ''
   text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
   crumbs << "<a href=\"#{href}\"#{onclick}>#{text}</a>"     
@@ -16,7 +17,7 @@ b = @block
 <h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
 <h1>New Block</h1>
 -->
-<form action='/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>' method='post' id='new_block_form' onsubmit="return false;">
+<form action='<%= raw base_url %>/<%= b.id %>' method='post' id='new_block_form' onsubmit="return false;">
 <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
 <input type='hidden' name='block_type_id' id='block_type_id' value='' />
 <% if @before_id %><input type='hidden' name='before_id' value='<%= @before_id %>' /><% end %>
@@ -85,7 +86,7 @@ function add_child_block(block_type_id)
   modal.autosize("<p class='loading'>Adding block...</p>");
   $('#block_type_id').val(block_type_id);
   $.ajax({
-    url: '/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>',
+    url: '<%= raw base_url %>/<%= b.id %>',
     type: 'post',
     data: $('#new_block_form').serialize(),
     success: function(resp) {

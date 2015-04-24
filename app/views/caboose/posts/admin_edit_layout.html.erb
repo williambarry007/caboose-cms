@@ -1,0 +1,48 @@
+
+<%= render :partial => 'caboose/posts/admin_header' %>
+
+<h2>Update Post Layout</h2>
+
+<form action='/admin/posts/<%= @post.id %>' method='put' id='layout_form'>
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
+<p><select name='block_type_id'>
+  <option value=''>-- Select a layout --</option>
+  <% cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id } %>
+  <% Caboose::BlockType.includes(:block_type_site_memberships).where("block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, @site.id).reorder(:description).all.each do |bt| %>    
+    <option value="<%= bt.id %>"><%= bt.description %></option>
+  <% end %>
+</select></p>
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/posts/<%= @post.id %>';" />
+<input type='submit' value='Update Post Layout' />
+</p>
+</form>
+
+<%= render :partial => 'caboose/posts/admin_footer' %>
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  $('#layout_form').submit(function() {    
+    update_post_layout(<%= @post.id %>);
+    return false;
+  });
+});
+
+function update_post_layout(post_id)
+{
+  $('#message').html("<p class='loading'>Updating layout...</p>");
+  $.ajax({
+    url: '/admin/posts/' + post_id + '/layout',
+    type: 'put',
+    data: $('#layout_form').serialize(),    
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect
+    }
+  });
+}
+
+</script>
+<% end %>

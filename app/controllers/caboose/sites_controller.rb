@@ -148,7 +148,8 @@ module Caboose
           when 'use_store'                then site.use_store               = value
           when 'use_retargeting'          then site.use_retargeting         = value
           when 'custom_css'               then site.custom_css              = value            
-          when 'custom_js'                then site.custom_js               = value                        
+          when 'custom_js'                then site.custom_js               = value
+          when 'default_layout_id'        then site.default_layout_id       = value
     	  end
     	end
     	
@@ -212,6 +213,17 @@ module Caboose
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
       
       options = Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }}
+      render :json => options
+    end
+    
+    # GET /admin/sites/:id/default-layout-options
+    def admin_default_layout_options
+      return if !user_is_allowed('sites', 'view')
+      cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id }
+      block_types = Caboose::BlockType.includes(:block_type_site_memberships).where("block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, params[:id]).reorder(:description).all
+      options = block_types.collect do |bt|
+        { 'value' => bt.id, 'text' => bt.description } 
+      end      
       render :json => options
     end
     

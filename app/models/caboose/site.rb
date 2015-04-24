@@ -20,6 +20,11 @@ class Caboose::Site < ActiveRecord::Base
   do_not_validate_attachment_file_type :logo
   attr_accessible :id, :name, :description, :under_construction_html
   
+  def default_layout    
+    return Caboose::BlockType.where(:id => self.default_layout_id).first if self.default_layout_id
+    return Caboose::BlockType.where(:name => 'layout_basic').first
+  end
+  
   def smtp_config
     c = Caboose::SmtpConfig.where(:site_id => self.id).first
     c = Caboose::SmtpConfig.create(:site_id => self.id) if c.nil?

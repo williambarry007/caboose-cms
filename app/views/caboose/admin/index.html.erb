@@ -1,38 +1,51 @@
+<%
+@nav = Caboose.plugin_hook('admin_nav', [], @logged_in_user, @page, @site)
+return_url = session[:caboose_station_return_url].nil? ? '/' : session[:caboose_station_return_url]
+return_url = '/' if return_url.starts_with?('/admin/') || return_url == '/admin'
+
+width = 200
+@nav.each {|item| width = 400 if item['id'] == @tab } if @tab
+%>
+
 <h1>Admin</h1>
 
+<ul>
+  <!--
+  <li id='nav_item_logout'><a href='/logout'><span class='icon'></span><span class='text'>Logout</span></a>
+  <li id='nav_item_myaccount'><a href='/my-account'><span class='icon'></span><span class='text'>My Account</span></a>
+  -->
+  <% i = 0 %>
+  <% @nav.each do |item| %>
+    <% id = item['id'].nil? ? i.to_s : item['id'] %>
+    <% href = item['href'].nil? ? '#' : item['href'] %>
+    <% modal = item['modal'].nil? ? false : item['modal'] %>
+    <li id='nav_item_<%= id %>'><a href='<%= href %>'<%= raw (modal ? " rel='modal'" : "") %>><span class='icon'></span><span class='text'><%= item['text'] %></span></a>
+    <% if (!item['children'].nil? && item['children'].count > 0) %>
+      <ul>
+        <% item['children'].each do |item2| %>
+          <% modal = item2['modal'].nil? ? false : item2['modal'] %>
+          <li><a href='<%= item2['href'] %>'<%= raw (modal ? " rel='modal'" : "") %>><%= item2['text'] %></a></li>
+        <% end %>
+      </ul>
+    <% end %>
+    </li>
+    <% i + 1 %>
+  <% end %>
+</ul>
+
 <%= content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/station" %>
 <script type='text/javascript'>
-
+var modal = false;
+var station = false;
 $(document).ready(function() {
-  open_colorbox();  
+  modal = new CabooseModal(<%= width %>);
+  station = new CabooseStation(modal<%= raw @tab ? ", '#{@tab}'" : '' %>);
 });
-
-function open_colorbox() {
-  $.colorbox({
-    href: '/login?modal=1&return_url=<%= @return_url %>',
-    iframe: true,
-    innerWidth: 200,
-    innerHeight:  50,
-    scrolling: false,
-    transition: 'fade',
-    closeButton: false,
-    onComplete: fix_colorbox,
-    opacity: 0.50,
-    onClosed: function() { open_colorbox(); }   
-  });
-}
-
-function fix_colorbox() {
-  $("#cboxTopLeft"      ).css('background', '#111');
-  $("#cboxTopRight"     ).css('background', '#111');
-  $("#cboxBottomLeft"   ).css('background', '#111');
-  $("#cboxBottomRight"  ).css('background', '#111');
-  $("#cboxMiddleLeft"   ).css('background', '#111');
-  $("#cboxMiddleRight"  ).css('background', '#111');
-  $("#cboxTopCenter"    ).css('background', '#111');
-  $("#cboxBottomCenter" ).css('background', '#111');
-  $("#cboxClose"        ).hide(); 
-}
-
 </script>
+<% end %>
+<%= content_for :caboose_css do %>
+<style type='text/css'>
+
+</style>
 <% end %>

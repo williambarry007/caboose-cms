@@ -4,6 +4,7 @@ module Caboose
       
     # GET /admin
     def index
+      return if !user_is_allowed('admin', 'view')
       #if logged_in?
       #  redirect_to '/admin/pages'
       #  return

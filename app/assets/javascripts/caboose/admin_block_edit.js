@@ -21,7 +21,7 @@ BlockController.prototype = {
   },
   
   base_url: function(b)
-  {    
+  {
     return '/admin/' + (b.page_id ? 'pages/' + b.page_id : 'posts/' + b.post_id) + '/blocks';        
   },
   
@@ -32,7 +32,7 @@ BlockController.prototype = {
     
   edit_block: function(block_id)
   {    
-    window.location = this.block_url(that.block) + '/edit';    
+    window.location = this.base_url(this.block) + '/' + block_id + '/edit';    
   },    
     
   /*****************************************************************************

@@ -141,7 +141,7 @@ module Caboose
           when 'outside_length'     then sp.outside_length      = value.to_f
           when 'outside_width'      then sp.outside_width       = value.to_f
           when 'outside_height'     then sp.outside_height      = value.to_f
-          when 'volume'             then sp.height              = value.to_f
+          when 'volume'             then sp.volume              = value.to_f
           when 'empty_weight'       then sp.empty_weight        = value.to_f
           when 'cylinder'           then sp.cylinder            = value.to_i
           when 'flat_rate_price'    then sp.flat_rate_price     = value.to_f
@@ -217,13 +217,6 @@ module Caboose
     end
     
     # GET /admin/shipping-methods/options
-    # GET /admin/shipping-packages/shipping-method-options
-    def admin_shipping_method_options
-      options = ShippingMethod.reorder(:carrier, :service_name).all.collect { |sm| { :value => sm.id, :text => sm.service_name }}
-      render :json => options              
-    end
-    
-    # GET /admin/shipping-methods/options
     # GET /admin/shipping-packages/:id/shipping-method-options
     def admin_shipping_method_options
       options = nil
@@ -231,7 +224,7 @@ module Caboose
         sp = ShippingPackage.find(params[:id])
         options = sp.shipping_methods.reorder(:carrier, :service_name).all.collect { |sm| { :value => sm.id, :text => sm.service_name }}
       else
-        options = ShippingMethod.reorder(:carrier, :service_name).all.collect { |sm| { :value => sm.id, :text => sm.service_name }}
+        options = ShippingMethod.reorder(:carrier, :service_name).all.collect { |sm| { :value => sm.id, :text => "#{sm.service_code} - #{sm.service_name}" }}        
       end
       render :json => options              
     end
@@ -242,7 +235,7 @@ module Caboose
       options = []
       ShippingPackage.where(:site_id => @site.id).reorder('name').all.each do |sp|
         prefix = sp.name ? sp.name : "#{sp.outside_length}x#{sp.outside_width}x#{sp.outside_height}"
-        sp.shipping_methods.each do |sm|
+        sp.shipping_methods.reorder("carrier, service_name").each do |sm|
           options << { 'value' => "#{sp.id}_#{sm.id}", 'text' => "#{prefix} - #{sm.carrier} - #{sm.service_name}" }
         end
       end

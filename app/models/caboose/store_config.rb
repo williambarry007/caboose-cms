@@ -39,6 +39,11 @@ module Caboose
       :length_unit,
       :weight_unit
       
+    WEIGHT_UNIT_METRIC   = 'g'
+    WEIGHT_UNIT_IMPERIAL = 'oz'
+    LENGTH_UNIT_METRIC   = 'cm'
+    LENGTH_UNIT_IMPERIAL = 'in'
+      
     def next_order_number
       x = Order.where("order_number is not null").reorder("order_number desc").limit(1).first
       return x.order_number + 1 if x

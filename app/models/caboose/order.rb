@@ -306,14 +306,14 @@ module Caboose
         )
         
         case sc.pp_name
-          when 'authorize.net'        
-                    
+          when 'authorize.net'            
             response = AuthorizeNet::SIM::Transaction.new(
               sc.pp_username, 
               sc.pp_password,                      
               self.total,
               :transaction_type => OrderTransaction::TYPE_VOID,
-              :transaction_id => t.transaction_id
+              :transaction_id => t.transaction_id,
+              :test => sc.pp_testing
             )                    
             self.update_attributes(
               :financial_status => Order::FINANCIAL_STATUS_VOIDED,

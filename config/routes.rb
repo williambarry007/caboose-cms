@@ -82,11 +82,12 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   # Store
   #=============================================================================  
-  
+    
   get     "/admin/store/shipping-method-options"    => "store#shipping_method_options"
   get     "/admin/store/payment-processor-options"  => "store#payment_processor_options"        
   get     "/admin/store/length-unit-options"        => "store#length_unit_options"
   get     "/admin/store/weight-unit-options"        => "store#weight_unit_options"
+  get     "/admin/store/json"                       => "store#admin_json_single"
   get     "/admin/store/payment"                    => "store#admin_edit_payment"
   get     "/admin/store/shipping"                   => "store#admin_edit_shipping"
   get     "/admin/store/tax"                        => "store#admin_edit_tax"
@@ -585,19 +586,21 @@ Caboose::Engine.routes.draw do
   put     "/admin/orders/:order_id/line-items/:id"            => "line_items#admin_update"  
   delete  "/admin/orders/:order_id/line-items/:id"            => "line_items#admin_delete"
   
-  get     "admin/orders/:order_id/packages/json"      => "order_packages#admin_json"      
-  put     "admin/orders/:order_id/packages/:id"       => "order_packages#admin_update"
-  post    "admin/orders/:order_id/packages"           => "order_packages#admin_add"
-  delete  "admin/orders/:order_id/packages/:id"       => "order_packages#admin_delete"    
+  get     "/admin/orders/:order_id/packages/json"               => "order_packages#admin_json"
+  get     "/admin/orders/:order_id/packages/:id/calculate-shipping" => "order_packages#calculate_shipping"    
+  get     "/admin/orders/:order_id/packages/:id/shipping-rates" => "order_packages#shipping_rates"
+  put     "/admin/orders/:order_id/packages/:id"                => "order_packages#admin_update"
+  post    "/admin/orders/:order_id/packages"                    => "order_packages#admin_add"
+  delete  "/admin/orders/:order_id/packages/:id"                => "order_packages#admin_delete"    
     
   get     "/admin/orders/:order_id/packages/json"     => "line_items#admin_json"  
   put     "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_update"
   delete  "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_delete"
   
-  get     "admin/orders/:order_id/billing-address/json"   => "billing_addresses#admin_json"      
-  put     "admin/orders/:order_id/billing-address"        => "billing_addresses#admin_update"
-  get     "admin/orders/:order_id/shipping-address/json"  => "shipping_addresses#admin_json"      
-  put     "admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"
+  get     "/admin/orders/:order_id/billing-address/json"   => "billing_addresses#admin_json"      
+  put     "/admin/orders/:order_id/billing-address"        => "billing_addresses#admin_update"
+  get     "/admin/orders/:order_id/shipping-address/json"  => "shipping_addresses#admin_json"      
+  put     "/admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"
   
   #=============================================================================
   # Gift cards

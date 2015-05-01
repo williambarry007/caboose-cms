@@ -1,17 +1,3 @@
-<% 
-	font1_url = "http://fonts.gstatic.com/s/arvo/v8/id5a4BCjbenl5Gkqonw_Rw.ttf"
-	font1_family = "Arvo"
-	font1_variant = "italic"
-
-	font2_url = "http://fonts.gstatic.com/s/shadowsintolight/v6/clhLqOv7MXn459PTh0gXYAW_5bEze-iLRNvGrRpJsfM.ttf"
-	font2_family = "Shadows Into Light"
-	font2_variant = "regular"
-
-	font3_url = "http://fonts.gstatic.com/s/playfairdisplay/v10/UC3ZEjagJi85gF9qFaBgIKqwMe2wjvZrAR44M0BJZ48.ttf"
-	font3_family = "Playfair Display"
-	font3_variant = "900"
-%>
-
 <% if @site.use_fonts %>
 
 <div class="constrain clearfix">
@@ -405,13 +391,11 @@
 						change_preview(first_font, first_variant);
 			  	}
 			  	else {
-			  		console.log("Error connecting to Google Fonts API");
 			  		$("#message").html("<p class='note error'>Error connecting to the Google Fonts API</p>");
 			  	}
 			  },
 			  error: function(resp) {
 			  	$(".constrain.clearfix").html("<p style='text-align:center;'>Sorry, this domain is not setup for Google Fonts yet.</p>");
-
 			  }
 			});
 

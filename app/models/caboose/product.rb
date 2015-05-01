@@ -13,6 +13,7 @@ module Caboose
     has_many :variants, :class_name => 'Caboose::Variant', :order => 'option1_sort_order, option2_sort_order, option3_sort_order'
     has_many :product_images, :class_name => 'Caboose::ProductImage'
     has_many :product_inputs, :class_name => 'Caboose::ProductInput'
+    has_many :modifications, :class_name => 'Caboose::Modification', :order => 'sort_order'
     has_many :reviews, :class_name => 'Caboose::Review'
     has_many :product_category_sorts, :class_name => 'Caboose::ProductCategorySort'
     

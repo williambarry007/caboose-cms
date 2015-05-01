@@ -7,11 +7,15 @@ may_delete3 = p.variants.collect{|v| v.option3 }.uniq.count == 1
 %>
 <%= render :partial => 'caboose/products/admin_header' %>
 
-<p class='note' style='font-size: 85%; font-weight: normal; line-height: 140%;'>Product options allow you to present a group of similar products as a single 
-product to the end user.  Common options include color, size, and style.  
-But an option can be anything.  So for example, you could create a "Sleave" option for 
-shirts that are either long or short sleeved.  Or you could create a "Tip" option 
-for chopsticks that are either rounded or squared at the tip.  It's up to you.</p>
+<h2>Options</h2>
+
+<p class='note' style='font-size: 85%; font-weight: normal; line-height: 140%;'>
+  Product options allow you to present a group of similar products as a single 
+  product to the end user.  Common options include color, size, and style.  
+  But an option can be anything.  So for example, you could create a "Sleave" option for 
+  shirts that are either long or short sleeved.  Or you could create a "Tip" option 
+  for chopsticks that are either rounded or squared at the tip.  It's up to you.
+</p>
 
 <table>
 <tr><td><div id='product_<%= p.id %>_option1'></div></td><td><div id='product_<%= p.id %>_default1'></div></td></tr>
@@ -19,17 +23,23 @@ for chopsticks that are either rounded or squared at the tip.  It's up to you.</
 <tr><td><div id='product_<%= p.id %>_option3'></div></td><td><div id='product_<%= p.id %>_default3'></div></td></tr>
 </table>
 
+<h2>Modifications</h2>
+
+<p class='note' style='font-size: 85%; font-weight: normal; line-height: 140%;'>
+  Product modifications are similar to options, but they don't affect the inventory.
+  Modifications are things that are done to a product after it has been ordered.
+  For example, engraved vs not engraved.
+</p>
+
+<div id='mods'></div>
 <div id='message'></div>
 
 <%= render :partial => 'caboose/products/admin_footer' %>
 <% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/admin_edit_modifications' %>
 <script type='text/javascript'>
 
-var modal = false;
-$(window).load(function() {
-  modal = new CabooseModal(800);
-});
-
+var mods_controller = false;
 $(document).ready(function() {
   m = new ModelBinder({
     name: 'Product',
@@ -45,7 +55,17 @@ $(document).ready(function() {
       { name: 'default3' , nice_name: 'Default value' , type: 'text', value: <%= raw Caboose.json(p.default3) %>, width: 285, fixed_placeholder: true } 
     ]
   });
+  
+  mods_controller = new ModificationsController({
+    product_id: <%= p.id %>,
+    authenticity_token: '<%= form_authenticity_token %>',
+  });  
 });
 
 </script>
+<% end %>
+<% content_for :caboose_css do %>
+<style type='text/css'>
+div.modification { border: #ccc 1px solid; padding: 10px; margin-bottom: 10px; }
+</style>
 <% end %>

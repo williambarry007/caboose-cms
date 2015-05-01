@@ -74,6 +74,12 @@ module Caboose
           when 'fedex_password'            then sc.fedex_password            = value
           when 'fedex_key'                 then sc.fedex_key                 = value
           when 'fedex_account'             then sc.fedex_account             = value
+          when 'ups_min'                   then sc.ups_min                   = value
+          when 'ups_max'                   then sc.ups_max                   = value
+          when 'usps_min'                  then sc.usps_min                  = value
+          when 'usps_max'                  then sc.usps_max                  = value
+          when 'fedex_min'                 then sc.fedex_min                 = value                
+          when 'fedex_max'                 then sc.fedex_max                 = value        
           when 'taxcloud_api_id'           then sc.taxcloud_api_id           = value
           when 'taxcloud_api_key'          then sc.taxcloud_api_key          = value
           when 'origin_address1'           then sc.origin_address1           = value

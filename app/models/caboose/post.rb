@@ -25,7 +25,9 @@ class Caboose::Post < ActiveRecord::Base
     :styles => {
       :tiny  => '75x75>',
       :thumb => '150x150>',
-      :large => '400x400>'
+      :large => '400x400>',
+      :huge => '1000x1000'
+      
     }
   do_not_validate_attachment_file_type :image
   

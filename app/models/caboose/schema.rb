@@ -309,6 +309,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :gift_wrap             , :boolean   , { :default => false }],
         [ :hide_prices           , :boolean   , { :default => false }]
       ],
+      Caboose::LineItemModification => [                          
+        [ :line_item_id           , :integer ],
+        [ :modification_id        , :integer ],
+        [ :modification_value_id  , :integer ],
+        [ :input                  , :string  ]
+      ],
       Caboose::MediaCategory => [
         [ :parent_id         , :integer ],
         [ :site_id           , :integer ],
@@ -325,6 +331,20 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :name              , :string     ],
         [ :description       , :text       ],
         [ :file              , :attachment ]
+      ],
+      Caboose::Modification => [      
+        [ :product_id               , :integer ],
+        [ :sort_order               , :integer  , { :default => 0 }],
+        [ :name                     , :string  ]             
+      ],
+      Caboose::ModificationValue => [
+        [ :modification_id   , :integer  ],
+        [ :sort_order        , :integer   , { :default => 0 }],
+        [ :value             , :string   ],
+        [ :is_default        , :boolean   , { :default => false }],
+        [ :price             , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :requires_input    , :boolean   , { :default => false }],        
+        [ :input_description , :string   ]
       ],
       Caboose::OrderTransaction => [
         [ :order_id              , :integer  ],
@@ -645,11 +665,17 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :ups_origin_account        , :string  ],
         [ :usps_username             , :string  ],
         [ :usps_secret_key           , :string  ],
-        [ :usps_publishable_key      , :string  ],
+        [ :usps_publishable_key      , :string  ],                
         [ :fedex_username            , :string  ],
         [ :fedex_password            , :string  ],
         [ :fedex_key                 , :string  ],
         [ :fedex_account             , :string  ],
+        [ :ups_min                   , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :ups_max                   , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :usps_min                  , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :usps_max                  , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :fedex_min                 , :decimal  , { :precision => 8, :scale => 2 }],                
+        [ :fedex_max                 , :decimal  , { :precision => 8, :scale => 2 }],
         [ :taxcloud_api_id           , :string  ],
         [ :taxcloud_api_key          , :string  ],                
         [ :origin_address1           , :string  ],

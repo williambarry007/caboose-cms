@@ -33,13 +33,19 @@ sc = @store_config
 <p><div id='storeconfig_<%= sc.id %>_ups_password'             ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_ups_key'                  ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_ups_origin_account'       ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_ups_min'                  ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_ups_max'                  ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_usps_username'            ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_usps_secret_key'          ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_usps_publishable_key'     ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_usps_min'                 ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_usps_max'                 ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_fedex_username'           ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_fedex_password'           ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_fedex_key'                ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_fedex_account'            ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_min'                ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_fedex_max'                ></div></p>
 
 <%= render :partial => 'caboose/store/admin_footer' %>
 
@@ -65,6 +71,12 @@ $(document).ready(function() {
       { name: 'fedex_password'           , nice_name: 'FedEx Password'                    , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_password             ) %>, width: 400 },
       { name: 'fedex_key'                , nice_name: 'FedEx Key'                         , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_key                  ) %>, width: 400 },
       { name: 'fedex_account'            , nice_name: 'FedEx Account'                     , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_account              ) %>, width: 400 },
+      { name: 'ups_min'                  , nice_name: 'UPS Min'                           , type: 'text'     , value: <%= raw Caboose.json(sc.ups_min                    ) %>, width: 400 },   
+      { name: 'ups_max'                  , nice_name: 'UPS Max'                           , type: 'text'     , value: <%= raw Caboose.json(sc.ups_max                    ) %>, width: 400 }, 
+      { name: 'usps_min'                 , nice_name: 'USPS Min'                          , type: 'text'     , value: <%= raw Caboose.json(sc.usps_min                   ) %>, width: 400 }, 
+      { name: 'usps_max'                 , nice_name: 'USPS Max'                          , type: 'text'     , value: <%= raw Caboose.json(sc.usps_max                   ) %>, width: 400 }, 
+      { name: 'fedex_min'                , nice_name: 'FedEx Min'                         , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_min                  ) %>, width: 400 }, 
+      { name: 'fedex_max'                , nice_name: 'FedEx Max'                         , type: 'text'     , value: <%= raw Caboose.json(sc.fedex_max                  ) %>, width: 400 }, 
       { name: 'origin_address1'          , nice_name: 'Address 1'                         , type: 'text'     , value: <%= raw Caboose.json(sc.origin_address1            ) %>, width: 400 },
       { name: 'origin_address2'          , nice_name: 'Address 2'                         , type: 'text'     , value: <%= raw Caboose.json(sc.origin_address2            ) %>, width: 400 },      
       { name: 'origin_city'              , nice_name: 'City'                              , type: 'text'     , value: <%= raw Caboose.json(sc.origin_city                ) %>, width: 400 },

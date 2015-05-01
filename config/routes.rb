@@ -456,6 +456,25 @@ Caboose::Engine.routes.draw do
   get  '/checkout/empty'                      => 'checkout#empty'
   
   #=============================================================================
+  # Product Modifications  
+  #=============================================================================
+  
+  get    "/admin/products/:product_id/modifications/:mod_id/values/json"        => "modification_values#admin_json"
+  get    "/admin/products/:product_id/modifications/:mod_id/values/:id/json"    => "modification_values#admin_json_single"
+  put    "/admin/products/:product_id/modifications/:mod_id/values/:id"         => "modification_values#admin_update"
+  post   "/admin/products/:product_id/modifications/:mod_id/values"             => "modification_values#admin_add"
+  delete "/admin/products/:product_id/modifications/:mod_id/values/:id"         => "modification_values#admin_delete"
+  put    "/admin/products/:product_id/modifications/:mod_id/values/sort-order"  => "modification_values#admin_update_sort_order"            
+
+  get    "/admin/products/:product_id/modifications/json"        => "modifications#admin_json"
+  get    "/admin/products/:product_id/modifications/:id/json"    => "modifications#admin_json_single"
+  put    "/admin/products/:product_id/modifications/:id"         => "modifications#admin_update"
+  post   "/admin/products/:product_id/modifications"             => "modifications#admin_add"
+  delete "/admin/products/:product_id/modifications/:id"         => "modifications#admin_delete"
+  put    "/admin/products/:product_id/modifications/sort-order"  => "modifications#admin_update_sort_order"            
+
+    
+  #=============================================================================
   # Products  
   #=============================================================================
     

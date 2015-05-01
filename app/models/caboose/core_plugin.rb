@@ -9,6 +9,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item = { 'id' => 'core', 'text' => 'Settings', 'children' => [] }                        
     item['children'] << { 'id' => 'blocktypes'       , 'text' => 'AB Test Variants'    , 'href' => '/admin/ab-variants'        , 'modal' => false } if user.is_allowed('abvariants'   , 'view')    
     item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'         , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'   , 'view')
+    item['children'] << { 'id' => 'fonts'            , 'text' => 'Fonts'               , 'href' => '/admin/fonts'              , 'modal' => false } if user.is_allowed('fonts'        , 'view') if site.use_fonts
     item['children'] << { 'id' => 'redirects'        , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'    , 'view')
     item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'         , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'  , 'view')    
     item['children'] << { 'id' => 'roles'            , 'text' => 'Roles'               , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'        , 'view')

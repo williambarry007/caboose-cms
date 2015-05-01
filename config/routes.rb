@@ -73,7 +73,7 @@ Caboose::Engine.routes.draw do
   delete  "/admin/sites/:id"                        => "sites#admin_delete"
   post    "/admin/sites/:id/members"                => "sites#admin_add_member"
   delete  "/admin/sites/:id/members/:user_id"       => "sites#admin_remove_member"
-  
+
   post    "/admin/sites/:site_id/domains"           => "domains#admin_add"
   put     "/admin/sites/:site_id/domains/:id"       => "domains#admin_update"
   delete  "/admin/sites/:site_id/domains/:id"       => "domains#admin_delete"
@@ -110,6 +110,14 @@ Caboose::Engine.routes.draw do
   get     "/admin/social"               => "social#admin_edit"  
   put     "/admin/social"               => "social#admin_update"
   get     "/admin/analytics"            => "social#analytics"
+
+
+  #=============================================================================
+  # Fonts
+  #=============================================================================  
+  
+  get     "/admin/fonts"               => "fonts#admin_index"
+  put     "/admin/fonts"               => "fonts#admin_update"
 
 
   #=============================================================================

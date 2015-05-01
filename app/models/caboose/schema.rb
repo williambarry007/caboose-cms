@@ -278,6 +278,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :under_construction , :boolean, { :default => false }],
         [ :forward_to_primary , :boolean, { :default => false }]
       ],
+      Caboose::Font => [
+        [ :site_id            , :integer ],
+        [ :name               , :string  ],
+        [ :family             , :string  ],
+        [ :variant            , :string  ],
+        [ :url                , :string  ]
+      ],
       Caboose::GiftCard => [
         [ :site_id         , :integer  ],        
         [ :name            , :string   ],
@@ -587,6 +594,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :description             , :text       ],
         [ :under_construction_html , :text       ],
         [ :use_store               , :boolean     , { :default => false }],
+        [ :use_fonts               , :boolean     , { :default => true  }],
         [ :logo                    , :attachment ],        
         [ :is_master               , :boolean     , { :default => false }],
         [ :analytics_id            , :string     ],

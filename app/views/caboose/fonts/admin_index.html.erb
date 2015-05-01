@@ -408,6 +408,10 @@
 			  		console.log("Error connecting to Google Fonts API");
 			  		$("#message").html("<p class='note error'>Error connecting to the Google Fonts API</p>");
 			  	}
+			  },
+			  error: function(resp) {
+			  	$(".constrain.clearfix").html("<p style='text-align:center;'>Sorry, this domain is not setup for Google Fonts yet.</p>");
+
 			  }
 			});
 

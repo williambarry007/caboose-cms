@@ -120,189 +120,45 @@ module Caboose
       render :json => resp
     end
     
-    # GET /admin/orders/line-item-status-options
-    def admin_line_item_status_options
-      arr = ['pending', 'ready to ship', 'shipped', 'backordered', 'canceled']
-      options = []
-      arr.each do |status|
-        options << {
-          :value => status,
-          :text  => status
-        }
-      end
-      render :json => options
-    end
-    
-    # GET /admin/orders/:id/capture
-    def capture_funds
+    # GET /admin/orders/:order_id/packages/:id/calculate-shipping
+    def calculate_shipping
       return if !user_is_allowed('orders', 'edit')
-      
-      response = Caboose::StdClass.new({
-        'refresh' => nil,
-        'error'   => nil,
-        'success' => nil
-      })
-      
-      order = Order.find(params[:id])
-      
-      if order.financial_status == 'captured'
-        resp.error = "Funds for this order have already been captured."    
-      elsif order.total > order.auth_amount
-        resp.error = "The order total exceeds the authorized amount."
-      else
-        if PaymentProcessor.capture(order)
-          order.update_attribute(:financial_status, 'captured')
-          response.success = 'Captured funds successfully'
-        else
-          response.error = 'Error capturing funds'
-        end
-          
-        #if (order.discounts.any? && order.total < order.discounts.first.amount_current) || PaymentProcessor.capture(order)
-        #  order.financial_status = 'captured'
-        #  order.save
-        #  
-        #  if order.discounts.any?
-        #    order.update_attribute(:amount_discounted, order.discounts.first.amount_current)
-        #    order.update_gift_cards
-        #  end
-        #  
-        #  response.success = "Captured funds successfully"
-        #else
-        #  response.error = "Error capturing funds."
-        #end
-      end
-      
-      render :json => response
-    end
 
-    # GET /admin/orders/:id/void
-    #def void
-    #  return if !user_is_allowed('orders', 'edit')
-    #
-    #  response = Caboose::StdClass.new({
-    #    'refresh' => nil,
-    #    'error' => nil,
-    #    'success' => nil
-    #  })
-    #
-    #  order = Order.find(params[:id])
-    #
-    #  if order.financial_status == 'captured'
-    #    response.error = "This order has already been captured, you will need to refund instead"
-    #  else
-    #    if order.total < order.amount_discounted || PaymentProcessor.void(order)
-    #      order.financial_status = 'cancelled'
-    #      order.status = 'voided'
-    #      order.save
-    #    
-    #      response.success = "Order voided successfully"
-    #    else
-    #      response.error = "Error voiding order."
-    #    end
-    #  end
-    #
-    #  render json: response
-    #end
-  
-    # GET /admin/orders/:id/refund
-    # def refund
-    #   return if !user_is_allowed('orders', 'edit')
-    # 
-    #   response = Caboose::StdClass.new({
-    #     'refresh' => nil,
-    #     'error' => nil,
-    #     'success' => nil
-    #   })
-    # 
-    #   order = Order.find(params[:id])
-    # 
-    #   if order.financial_status != 'captured'
-    #     response.error = "This order hasn't been captured yet, you will need to void instead"
-    #   else
-    #     ap order.total
-    #     ap order.amount_discounted
-    #     
-    #     if order.total < order.amount_discounted || PaymentProcessor.refund(order)
-    #       order.financial_status = 'refunded'
-    #       order.status = 'refunded'
-    #       order.save
-    #       
-    #       discount = order.discounts.first
-    #       ap '==========================='
-    #       ap order.amount_discounted + discount.amount_current
-    #       ap '==========================='
-    #       discount.update_attribute(:amount_current, order.amount_discounted + discount.amount_current) if order.discounts.any?
-    #       
-    #       response.success = "Order refunded successfully"
-    #     else
-    #       response.error = "Error refunding order."
-    #     end
-    #   end
-    # 
-    #   render json: response
-    # end
+      op = OrderPackage.find(params[:id])
+      order = op.order
+      
+      render :json => { :error => "Empty order" } and return if order.nil?
+      render :json => { :error => "No shippable items in order package" } and return if !order.has_shippable_items?
+      render :json => { :error => "Empty shipping address" } and return if order.shipping_address.nil?
 
-    # GET /admin/orders/status-options
-    def admin_status_options
-      return if !user_is_allowed('categories', 'view')
-      statuses = ['cart', 'pending', 'ready to ship', 'shipped', 'canceled']
-      options = []
-      statuses.each do |s|
-        options << {
-          'text' => s,
-          'value' => s
-        }
-      end       
-      render :json => options    
+      rate = ShippingCalculator.calculate_rate(op)
+      render :json => { :error => "No rate found for given shipping package and method" } and return if rate.nil?
+
+      op.total = rate
+      op.save
+      
+      order.calculate_shipping
+      order.calculate_total
+      order.save
+      
+      render :json => { :error => "No rate found for shipping method" } and return if rate.nil?                   
+      render :json => { :success => true, :rate => rate }            
     end
     
-    # GET /admin/orders/test-info
-    def admin_mail_test_info
-      TestMailer.test_info.deliver
-      render :text => "Sent email to info@tuskwearcollection.com on #{DateTime.now.strftime("%F %T")}"
-    end
-    
-    # GET /admin/orders/test-gmail
-    def admin_mail_test_gmail
-      TestMailer.test_gmail.deliver
-      render :text => "Sent email to william@nine.is on #{DateTime.now.strftime("%F %T")}"
-    end
-    
-    # GET /admin/orders/google-feed
-    def admin_google_feed
-      d2 = DateTime.now
-      d1 = DateTime.now
-      if Caboose::Setting.exists?(:name => 'google_feed_date_last_submitted')                  
-        d1 = Caboose::Setting.where(:name => 'google_feed_date_last_submitted').first.value      
-        d1 = DateTime.parse(d1)
-      elsif Order.exists?("status = 'shipped' and date_authorized is not null")
-        d1 = Order.where("status = ? and date_authorized is not null", 'shipped').reorder("date_authorized DESC").limit(1).pluck('date_authorized')
-        d1 = DateTime.parse(d1)
-      end
+    # GET /admin/orders/:order_id/packages/:id/shipping-rates
+    def shipping_rates
+      return if !user_is_allowed('orders', 'edit')
+
+      op = OrderPackage.find(params[:id])
+      order = op.order
       
-      # Google Feed Docs
-      # https://support.google.com/trustedstoresmerchant/answer/3272612?hl=en&ref_topic=3272286?hl=en
-      tsv = ["merchant order id\ttracking number\tcarrier code\tother carrier name\tship date"]            
-      if Order.exists?("status = 'shipped' and date_authorized > '#{d1.strftime("%F %T")}'")
-        Order.where("status = ? and date_authorized > ?", 'shipped', d1).reorder(:id).all.each do |order|
-          tracking_numbers = order.line_items.collect{ |li| li.tracking_number }.compact.uniq
-          tn = tracking_numbers && tracking_numbers.count >= 1 ? tracking_numbers[0] : ""
-          tsv << "#{order.id}\t#{tn}\tUPS\t\t#{order.date_shipped.strftime("%F")}"                              
-        end
-      end
-      
-      # Save when we made the last call
-      setting = if Caboose::Setting.exists?(:name => 'google_feed_date_last_submitted')
-        Caboose::Setting.where(:name => 'google_feed_date_last_submitted').first
-      else
-        Caboose::Setting.new(:name => 'google_feed_date_last_submitted')
-      end
-      
-      setting.value = d2.strftime("%F %T")
-      setting.save            
-                   
-      # Print out the lines
-      render :text => tsv.join("\n")
+      render :json => { :error => "Empty order" } and return if order.nil?
+      render :json => { :error => "No shippable items in order package" } and return if !order.has_shippable_items?
+      render :json => { :error => "Empty shipping address" } and return if order.shipping_address.nil?
+                                                        
+      rates = ShippingCalculator.order_package_rates(op)      
+      render :json => rates            
     end
+            
   end
 end

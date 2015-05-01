@@ -6,14 +6,28 @@ OrderController.prototype = {
   order_id: false,
   order: false,
   authenticity_token: false,
+  store_config: false,
   
   init: function(params)
   {
     for (var i in params)
       this[i] = params[i];
     
+    var that = this;            
+    $(document).ready(function() {
+      that.get_store_config();
+      that.refresh(); 
+    });
+  },
+  
+  get_store_config: function()
+  {
     var that = this;
-    $(document).ready(function() { that.refresh(); });
+    $.ajax({
+      url: '/admin/store/json',
+      success: function(sc) { that.store_config = sc; },
+      async: false
+    });    
   },
   
   refresh: function(after)
@@ -484,15 +498,11 @@ OrderController.prototype = {
           var tr = $('<tr/>');
           if (j == 0)
           {
-            tr.append($('<td/>').attr('rowspan', line_items.length)
-              .append($('<div/>').attr('id', 'orderpackage_' + op.id + '_package_method'))
-              .append($('<div/>').attr('id', 'orderpackage_' + op.id + '_status'))
-              .append($('<div/>').attr('id', 'orderpackage_' + op.id + '_tracking_number'))
-              .append($('<div/>').attr('id', 'orderpackage_' + op.id + '_total'))
-            );
+            tr.append($('<td/>').attr('rowspan', line_items.length).attr('valign', 'top').append(that.package_summary(op, line_items)));
           }                       
           tr.append($('<td/>')
             .append(that.line_item_link(li))
+            .append(that.line_item_weight(li))
             .append(that.gift_options(li))
             .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
           );
@@ -526,6 +536,26 @@ OrderController.prototype = {
           );
       }
     });
+  },
+  
+  package_summary: function(op, line_items)
+  {
+    var that = this;
+    
+    var total_weight = 0.0;
+    $.each(line_items, function(i, li) {      
+      total_weight += li.variant.weight * li.quantity;
+    });
+    
+    var div = $('<div/>');                
+    div.append($('<div/>').attr('id', 'orderpackage_' + op.id + '_package_method'));
+    div.append($('<div/>').attr('id', 'orderpackage_' + op.id + '_status'));
+    div.append($('<div/>').attr('id', 'orderpackage_' + op.id + '_tracking_number'));
+    div.append($('<div/>').attr('id', 'orderpackage_' + op.id + '_total'));    
+    div.append($('<div/>').attr('id', 'orderpackage_' + op.id + '_total_weight').html("Total weight: " + total_weight + " " + that.store_config.weight_unit));
+    div.append($('<a/>').attr('href','#').data('order_package_id', op.id).html('Recalculate').click(function(e) { e.preventDefault(); that.calculate_shipping($(this).data('order_package_id')); }));            
+    div.append($('<div/>').attr('id', 'order_package_' + op.id + '_message'));            
+    return div;
   },
   
   gift_options: function(li)
@@ -568,6 +598,16 @@ OrderController.prototype = {
         that.line_item_options($(this).data('li_id'), $(this).data('order_package_id'));
       });
     return link;    
+  },
+  
+  line_item_weight: function(li)
+  {
+    var that = this;
+    var v = li.variant;
+    div = $('<div/>');
+    div.append("Unit Weight: " + Math.floor(v.weight) + " " + that.store_config.weight_unit + "<br />");
+    div.append("Total Weight: " + Math.floor(v.weight * li.quantity) + " " + that.store_config.weight_unit);
+    return div;        
   },
   
   line_item_options: function(li_id, order_package_id)
@@ -865,6 +905,27 @@ OrderController.prototype = {
       url: '/admin/orders/' + that.order_id + '/calculate-handling',
       success: function(resp) { that.refresh_order(function() { $('#order_' + that.order.id + '_handling').val(that.order.handling); }); }
     });
+  },
+  
+  calculate_shipping: function(order_package_id)
+  {
+    var that = this;
+    $('#order_package_' + order_package_id + '_message').html("<p class='loading'>Calculating...</p>");
+    var shipping_method_id = $('');
+    $.ajax({
+      url: '/admin/orders/' + that.order_id + '/packages/' + order_package_id + '/calculate-shipping',
+      success: function(resp) {
+        if (resp.error)
+          $('#order_package_' + order_package_id + '_message').html("<p class='note error'>" + resp.error + "</p>");
+        else
+        {
+          that.refresh_order(function() { 
+            $('#orderpackage_' + order_package_id + '_total').val(resp.rate); 
+          });
+          $('#order_package_' + order_package_id + '_message').empty();
+        }
+      }
+    });    
   },
   
   has_shippable_items: function()

@@ -111,12 +111,22 @@ module Caboose
     end
     
     # Gets the activemerchant package based on the shipping package
-    def activemerchant_package      
+    def activemerchant_package
+      sc = self.order.site.store_config
+      
       weight = 0.0
-      self.line_items.each{ |li| weight = weight + li.variant.weight }
-      weight = weight * 0.035274 # Convert from grams to ounces
+      self.line_items.each{ |li| weight = weight + (li.variant.weight * li.quantity) }      
+      weight = weight * 0.035274 if sc.weight_unit == StoreConfig::WEIGHT_UNIT_METRIC # grams to ounces
+      
       sp = self.shipping_package
-      return Package.new(weight, [sp.outside_length, sp.outside_width, sp.outside_height], :units => :imperial)
+      dimensions = [sp.outside_length, sp.outside_width, sp.outside_height]
+      if sc.length_unit == StoreConfig::LENGTH_UNIT_METRIC # cm to inches
+        dimensions[0] = dimensions[0] / 2.54
+        dimensions[1] = dimensions[0] / 2.54
+        dimensions[2] = dimensions[0] / 2.54
+      end
+      
+      return Package.new(weight, dimensions, :units => :imperial)
     end
 
   end

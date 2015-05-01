@@ -4,6 +4,13 @@ module Caboose
   class StoreController < ApplicationController
     layout 'caboose/admin'
     
+    # GET /admin/store/json
+    def admin_json_single
+      return if !user_is_allowed('orders', 'view')
+      sc = @site.store_config
+      render :json => sc      
+    end
+    
     # GET /admin/store
     def admin_edit_general
       return if !user_is_allowed('sites', 'edit')
@@ -129,6 +136,6 @@ module Caboose
       ]
       render :json => options
     end
-    
+        
   end
 end

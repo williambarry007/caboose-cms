@@ -4,7 +4,7 @@ v = @variant
 
 error_message = nil
 if @highlight_variant_id # Make sure we're not trying to highlight a deleted variant
-  v = Variant.where(:id => @highlight_variant_id).first
+  v = Caboose::Variant.where(:id => @highlight_variant_id).first
   if v.nil?
     error_message = "<p class='note error'>The variant you want to highlight is not in the database.</p>"
   elsif v.status == 'Deleted'
@@ -33,7 +33,7 @@ end
 
 <% content_for :caboose_css do %>
 <style type='text/css'>
-tr.highlight td { background: #ffff99 }
+tr.highlight td { background: #ffffcc !important; }
 td.sort_handle { background: #ccc; width: 20px; }
 
 ul {
@@ -89,6 +89,7 @@ $(document).ready(function() {
       { show: false , name: 'downloadable'              , nice_name: 'Downloadable'                     , sort: 'downloadable'      , type: 'checkbox' , value: function(v) { return v.downloadable        }, text: function(v) { return v.downloadable      ? 'Yes' : 'No' }, width: 50, align: 'center' , bulk_edit: true },
       { show: false , name: 'download_path'             , nice_name: 'Download path'                    , sort: 'download_path'     , type: 'text'     , value: function(v) { return v.download_path       }, width: 50, align: 'left'   , bulk_edit: true }      
     ],
+    <% if @highlight_variant_id %>highlight_id: <%= @highlight_variant_id %>,<% end %>
     new_model_text: 'New Variant',
     new_model_fields: [
       { name: 'alternate_id'      , nice_name: 'Alternate ID' , type: 'text', width: 400 },

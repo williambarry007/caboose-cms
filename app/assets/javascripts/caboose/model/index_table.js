@@ -377,7 +377,9 @@ IndexTable.prototype = {
   {
     var that = this;
     
-    var tr = $('<tr/>').attr('id', 'model_row_' + m.id); 
+    var tr = $('<tr/>').attr('id', 'model_row_' + m.id);
+    if (that.highlight_id && that.highlight_id == m.id)
+      tr.addClass('highlight');
       
     if (that.allow_bulk_edit || that.allow_bulk_delete || that.allow_duplicate)
     {

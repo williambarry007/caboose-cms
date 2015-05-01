@@ -99,6 +99,7 @@ module Caboose
           when 'custom_tax_function'       then sc.custom_tax_function       = value        
           when 'length_unit'               then sc.length_unit               = value
           when 'weight_unit'               then sc.weight_unit               = value
+          when 'download_instructions'     then sc.download_instructions     = value
           when 'download_url_expires_in'   then sc.download_url_expires_in   = value            
           when 'starting_order_number'     then sc.starting_order_number     = value                
     	  end

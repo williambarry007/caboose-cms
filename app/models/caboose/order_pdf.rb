@@ -44,12 +44,17 @@ module Caboose
       case sc.pp_name
         when 'authorize.net'
           
-          t = AuthorizeNet::Reporting::Transaction.new(sc.pp_username, sc.pp_password)
-          resp = t.get_transaction_details(ot.transaction_id)
-          t2 = resp.transaction
-          if t2
-            self.card_type = t2.payment_method.card_type.upcase
-            self.card_number = t2.payment_method.card_number.gsub('X', '')
+          if ot 
+            t = AuthorizeNet::Reporting::Transaction.new(sc.pp_username, sc.pp_password)
+            resp = t.get_transaction_details(ot.transaction_id)
+            t2 = resp.transaction
+            if t2
+              self.card_type = t2.payment_method.card_type.upcase
+              self.card_number = t2.payment_method.card_number.gsub('X', '')
+            end
+          else 
+            self.card_type = ""
+            self.card_number = ""
           end
           
       end
@@ -219,26 +224,30 @@ module Caboose
         { :content => "Card Type", :width => 127, :border_width => 0 },
         { :content => self.card_type.blank? ? "N/A" : self.card_type, :width => 128, :border_width => 0 }
       ]
-      tbl2 << [
-        { :content => "Transaction ID", :width => 127, :border_width => 0 },
-        { :content => trans.transaction_id.to_s, :width => 128, :border_width => 0 }
-      ]
-      tbl2 << [
-        { :content => "Gateway Response", :width => 127, :border_width => 0},
-        { :content => trans.response_code.to_s, :width => 128, :border_width => 0  }
-      ]
+      if trans
+        tbl2 << [
+          { :content => "Transaction ID", :width => 127, :border_width => 0 },
+          { :content => trans.transaction_id.to_s, :width => 128, :border_width => 0 }
+        ]
+        tbl2 << [
+          { :content => "Gateway Response", :width => 127, :border_width => 0},
+          { :content => trans.response_code.to_s, :width => 128, :border_width => 0  }
+        ]
+      end
       tbl3 << [
         { :content => "Card Number", :width => 127, :border_width => 0},
         { :content => self.card_number ? ("XXXX XXXX XXXX " + self.card_number) : "N/A", :width => 128, :border_width => 0 }
       ]
-      tbl3 << [
-        { :content => "Transaction Time", :width => 127, :border_width => 0},
-        { :content => trans.date_processed.strftime("%d %b %Y %H:%M:%S %p"), :width => 128, :border_width => 0  }
-      ]
-      tbl3 << [
-        { :content => "Payment Process", :width => 127, :border_width => 0},
-        { :content => trans.success ? "Successful" : "Failed", :width => 128, :border_width => 0  }
-      ]
+      if trans
+        tbl3 << [
+          { :content => "Transaction Time", :width => 127, :border_width => 0},
+          { :content => trans.date_processed.strftime("%d %b %Y %H:%M:%S %p"), :width => 128, :border_width => 0  }
+        ]
+        tbl3 << [
+          { :content => "Payment Process", :width => 127, :border_width => 0},
+          { :content => trans.success ? "Successful" : "Failed", :width => 128, :border_width => 0  }
+        ]
+      end
       tbl << [
         { :content => "Authorization Details", :colspan => 2, :font_style => :bold }
       ]

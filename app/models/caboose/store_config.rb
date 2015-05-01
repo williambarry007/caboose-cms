@@ -37,6 +37,7 @@ module Caboose
       :custom_shipping_function,   
       :custom_tax_function,                  
       :length_unit,
+      :download_instructions,
       :weight_unit
       
     WEIGHT_UNIT_METRIC   = 'g'

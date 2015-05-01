@@ -3,7 +3,9 @@
 <p>Please allow up to 48 hours for your order to be processed.  Orders are processed during normal business hours Monday through Friday.</p>
 
 <% if @last_order.has_downloadable_items? %>
-  <p>Your order contained downloadable items. Download your items with the links below:</p>
+	<% sc = Caboose::StoreConfig.where(:site_id => @site.id).last %>
+	<% instr = (sc && !sc.download_instructions.blank?) ? sc.download_instructions : "Your order contained downloadable items. Download your items with the links below:" %>
+  <p><%= instr %></p>
   <ul id='downloads'>
     <% @last_order.line_items.each do |li| %>
       <% if li.variant.downloadable %>

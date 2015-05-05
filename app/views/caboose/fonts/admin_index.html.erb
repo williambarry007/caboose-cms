@@ -10,34 +10,34 @@
 		</div>
 		<ul class="font-list" data-min="0" data-max="10">
 			<li class="font-li clearfix selected" id="1" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="2" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="3" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="4" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="5" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="6" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="7" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="8" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="9" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 			<li class="font-li clearfix" id="10" data-family="" data-index="0">
-				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grump wizards make toxic brew for the evil Queen and Jack.</h2>
+				<h2 class="font-name">Font Name</h2><h2 class="font-test">Grumpy wizards make toxic brew for the evil Queen and Jack.</h2>
 			</li>
 		</ul>
 	</div>
@@ -48,7 +48,7 @@
 	<div class="font-preview-box">
 		<h2 class="font-preview">Font Preview - <span class="family">Open Sans</span></h2>
 		<p class="font-preview">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia, expedita. Alias consequuntur, tenetur, asperiores quisquam voluptatibus deserunt itaque officiis quas beatae iusto at aliquam debitis, a nihil unde, dolore est. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa debitis corporis saepe eum alias eius cum eaque ipsam ducimus sunt, nobis ab quia vitae hic laudantium unde pariatur sapiente numquam.</p>
-		<a href="#" class="btn alternate font-preview" style="margin-top:20px;">Click Here</a>
+		<a href="#" class="caboose-btn font-preview" style="margin-top:20px;">Click Here</a>
 	</div>
 	<div class="set-buttons grid-row clearfix">
 		<div class="unit1of3">
@@ -289,7 +289,7 @@
 				variant = font.variants[0];
 				load_css(i, variant);
 				var index = (i % 10) + 1;
-				console.log("family: " + font.family, ", index: " + index);
+		//		console.log("family: " + font.family, ", index: " + index);
 				$(".font-li:nth-of-type(" + index + ")").find("h2").css("font-family",font.family);
 				$(".font-li:nth-of-type(" + index + ")").find(".font-name").html(font.family);
 				$(".font-li:nth-of-type(" + index + ")").data("family",font.family);
@@ -354,7 +354,7 @@
 		}
 
 		function save_font(family, variant, url, name) {
-			console.log("saving font: " + family + " " + variant + " " + url + " " + name);
+	//		console.log("saving font: " + family + " " + variant + " " + url + " " + name);
 			$.ajax({
 			  url: '/admin/fonts',
 			  type: 'put',

@@ -1,10 +1,6 @@
 module Caboose
   class FontsController < ApplicationController
     layout 'caboose/admin'
-      
-    # def before_action
-    #   @page = Page.page_with_uri(request.host_with_port, '/admin')
-    # end
     
     # GET /admin/fonts
     def admin_index

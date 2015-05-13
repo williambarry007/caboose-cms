@@ -1,0 +1,78 @@
+<%
+mvif = @modification_value_input_field    
+%>
+<h1>Edit Input Field</h1>
+
+<p><div id='inputfield_<%= mvif.id %>_name'          ></div></p>
+<p><div id='inputfield_<%= mvif.id %>_description'   ></div></p>
+<p><div id='inputfield_<%= mvif.id %>_field_type'    ></div></p>
+<p><div id='inputfield_<%= mvif.id %>_default_value' ></div></p>          
+<p><div id='inputfield_<%= mvif.id %>_width'         ></div></p>
+<p><div id='inputfield_<%= mvif.id %>_height'        ></div></p>
+<p><div id='inputfield_<%= mvif.id %>_options'       ></div></p>
+<p><div id='inputfield_<%= mvif.id %>_options_url'   ></div></p>
+          
+<div id='message'></div>
+<p>
+  <input type='button' value='Close' onclick="modal.close();" />
+  <input type='button' value='Delete Field' onclick="delete_field();" />
+</p>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'InputField',
+    id: <%= mvif.id %>,
+    update_url: '/admin/products/<%= @product.id %>/modifications/<%= @modification.id %>/values/<%= mvif.modification_value_id %>/input-fields/<%= mvif.id %>',
+    authenticity_token: <%= raw Caboose.json(form_authenticity_token) %>,
+    attributes: [              
+      { name: 'name'          , nice_name: 'Name'          , type: 'text'   , value: <%= raw Caboose.json(mvif.name          ) %>, width: 400 },                
+      { name: 'description'   , nice_name: 'Description'   , type: 'text'   , value: <%= raw Caboose.json(mvif.description   ) %>, width: 400 },
+      { name: 'field_type'    , nice_name: 'Field Type'    , type: 'select' , value: <%= raw Caboose.json(mvif.field_type    ) %>, width: 400 },                
+      { name: 'default_value' , nice_name: 'Default Value' , type: 'text'   , value: <%= raw Caboose.json(mvif.default_value ) %>, width: 400 },
+      { name: 'width'         , nice_name: 'Width'         , type: 'text'   , value: <%= raw Caboose.json(mvif.width         ) %>, width: 400 },
+      { name: 'height'        , nice_name: 'Height'        , type: 'text'   , value: <%= raw Caboose.json(mvif.height        ) %>, width: 400 },
+      { name: 'options'       , nice_name: 'Options'       , type: 'text'   , value: <%= raw Caboose.json(mvif.options       ) %>, width: 400 },
+      { name: 'options_url'   , nice_name: 'Options URL'   , type: 'text'   , value: <%= raw Caboose.json(mvif.options_url   ) %>, width: 400 }
+    ]
+  });
+});
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(440);
+});
+
+function delete_field(confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>')
+      .addClass('note error')
+      .append("Are you sure you want to delete the field?<br /><br />")
+      .append($("<input/>").attr('type', 'button').val('Confirm').click(function() { delete_field(true); }))
+      .append(' ')
+      .append($("<input/>").attr('type', 'button').val('Cancel').click(function() { $('#message').empty(); modal.autosize(); }));    
+    modal.autosize(p);
+    return;
+  }
+  modal.autosize("<p class='loading'>Deleting field...</p>");
+  $.ajax({    
+    url: '/admin/products/<%= @product.id %>/modifications/<%= @modification.id %>/values/<%= mvif.modification_value_id %>/input-fields/<%= mvif.id %>',
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error)
+        modal.autosize("<p class='note error'>" + resp.error + "</p>");
+      if (resp.success)
+      {
+        parent.controller.refresh();
+        modal.close();        
+      }
+    }
+  });
+}
+
+</script>
+<% end %>

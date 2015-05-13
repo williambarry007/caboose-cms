@@ -1,1 +1,115 @@
+<p><img src='<%= @order.site.logo.url(:thumb) %>' /></p>
+
+<!-- <h1>Thank you for your order!</h1> -->
 <h1>New Order Received</h1>
+
+<h4><a href="<%= @order.site.store_config.pp_relay_domain %>/admin/orders/<%= @order.id %>" target="_blank" title="View Order">View Order</a></h4>
+
+<h2>Order Details</h2>
+
+<p>Order #<%= @order.order_number %></p>
+
+<table border='1' style='border-collapse: collapse;'>
+  <tr>
+    <th>Package</th>
+    <th>Line Item</th>
+    <th>Unit Price</th>
+    <th>Quantity</th>
+    <th>Subtotal</th>
+  </tr>
+  <% @order.order_packages.each do |op| %>
+    <% op.line_items.each_with_index do |li, i| %>
+      <% v = li.variant %>
+      <% p = v.product %>
+      <tr>
+        <% if i == 0 %>
+          <td rowspan="<%= op.line_items.count %>">
+            <div><%= op.shipping_method.service_name %></div>
+            <div><%= op.status %></div>
+            <% if op.tracking_number %><div><%= op.tracking_number %></div><% end %>
+          </td>
+        <% end %>
+        <td>
+          <p><%= p.title %></p>
+          <% if li.is_gift %>
+            <p>This item is a gift.</p>
+            <ul>
+              <li><% if li.gift_wrap %>Gift wrap (<%= number_to_currency(p.gift_wrap_price) %>)<% else %>Do not gift wrap<% end %></li>
+              <li><% if li.include_gift_message %>Gift message: <%= li.gift_message %><% else %>No gift message<% end %></li>
+              <li><% if li.hide_prices %>Hide all prices<% else %>Show all prices<% end %></li>
+            </ul>
+          <% end %>
+        </td>
+        <td align='right'><%= number_to_currency(li.unit_price) %></td>
+        <td align='right'><%= li.quantity %></td>
+        <td align='right'><%= number_to_currency(li.subtotal) %></td>
+      </tr>
+    <% end %>
+  <% end %>  
+  <% @order.line_items.each do |li| %>
+    <% next if li.order_package_id %>
+    <% v = li.variant %>
+    <% p = v.product %>
+    <tr>
+      <td>
+        <% if v.downloadable %>
+          <p>This item is downloadable.</p>          
+          <p><a href='<%= @order.site.store_config.pp_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>        
+        <% else %>
+          Not assigned to a package
+        <% end %>
+      </td>      
+      <td>
+        <p><%= p.title %></td></p>
+        <% if li.is_gift %>
+          <p>This item is a gift.</p>
+          <ul>
+            <li><% if li.gift_wrap %>Gift wrap (<%= number_to_currency(p.gift_wrap_price) %>)<% else %>Do not gift wrap<% end %></li>
+            <li><% if li.include_gift_message %>Gift message: <%= li.gift_message %><% else %>No gift message<% end %></li>
+            <li><% if li.hide_prices %>Hide all prices<% else %>Show all prices<% end %></li>
+          </ul>
+        <% end %>
+      </td>
+      <td align='right'><%= number_to_currency(li.unit_price) %></td>
+      <td align='right'><%= li.quantity %></td>
+      <td align='right'><%= number_to_currency(li.subtotal) %></td>
+    </tr>  
+  <% end %>
+  <tr><td colspan="4" align='right'>Subtotal:               </td><td align='right'><%= number_to_currency(@order.subtotal) %></td></tr>
+  <tr><td colspan="4" align='right'>Tax:                    </td><td align='right'><%= number_to_currency(@order.tax)      %></td></tr>
+  <tr><td colspan="4" align='right'>Shipping and Handling:  </td><td align='right'><%= number_to_currency(@order.shipping + @order.handling) %></td></tr>
+  <% if @order.gift_wrap && @order.gift_wrap > 0 %>  
+    <tr><td colspan="4" align='right'>Gift wrap:            </td><td align='right'><%= number_to_currency(@order.gift_wrap) %></td></tr>
+  <% end %>
+  <% if @order.discounts %>
+    <% @order.discounts.each do |d| %>
+      <tr><td colspan="4" align='right'>"<%= d.gift_card.code %>" gift card: </td><td align='right'><%= number_to_currency(d.amount) %></td></tr>
+    <% end %>
+  <% end %>
+  <% if @order.custom_discount %>
+    <tr><td colspan="4" align='right'>Discount: </td><td align='right'><%= number_to_currency(@order.custom_discount) %></td></tr>
+  <% end %>      
+  <tr><td colspan="4" align='right'>Total:     </td><td align='right'><%= number_to_currency(@order.total) %></td></tr>
+</table>
+
+<% if @order.shipping_address %>
+  <% sa = @order.shipping_address %>
+  <h2>Shipping Address</h2>
+  <p>
+    <%= sa.first_name %> <%= sa.last_name %><br />
+    <%= sa.address1 %><br />
+    <% if sa.address2 && sa.address2.strip.length > 0 %><%= sa.address2 %><br /><% end %>
+    <%= sa.city %>, <%= sa.state %> <%= sa.zip %>
+  </p>
+<% end %>
+
+<% if @order.billing_address %>
+  <% ba = @order.billing_address %>
+  <h2>Billing Address</h2>
+  <p>
+    <%= ba.first_name %> <%= ba.last_name %><br />
+    <%= ba.address1 %><br />
+    <% if ba.address2 && ba.address2.strip.length > 0 %><%= ba.address2 %><br /><% end %>
+    <%= ba.city %>, <%= ba.state %> <%= ba.zip %>
+  </p>
+<% end %>

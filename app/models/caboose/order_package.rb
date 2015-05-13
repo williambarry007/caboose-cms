@@ -126,7 +126,7 @@ module Caboose
         dimensions[2] = dimensions[0] / 2.54
       end
       
-      return Package.new(weight, dimensions, :units => :imperial)
+      return ActiveShipping::Package.new(weight, dimensions, :units => :imperial)
     end
 
   end

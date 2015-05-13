@@ -3,7 +3,7 @@ require 'active_shipping'
 
 module Caboose
   class ShippingCalculator
-    
+        
     def self.custom_rates(store_config, order)          
       return eval(store_config.custom_shipping_function)    
     end
@@ -81,12 +81,12 @@ module Caboose
       order = op.order
       sc = order.site.store_config
       sa = order.shipping_address
-      origin      = Location.new(:country => sc.origin_country, :state => sc.origin_state, :city => sc.origin_city, :zip => sc.origin_zip)
-      destination = Location.new(:country => sc.origin_country, :state => sa.state, :city => sa.city, :postal_code => sa.zip)
+      origin      = ActiveShipping::Location.new(:country => sc.origin_country, :state => sc.origin_state, :city => sc.origin_city, :zip => sc.origin_zip)
+      destination = ActiveShipping::Location.new(:country => sc.origin_country, :state => sa.state, :city => sa.city, :postal_code => sa.zip)
       carriers = {}      
-      carriers['UPS']   = UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account)  if sc.ups_username   && sc.ups_username.strip.length   > 0 
-      carriers['USPS']  = USPS.new( :login => sc.usps_username)                                                                                             if sc.usps_username  && sc.usps_username.strip.length  > 0
-      carriers['FedEx'] = FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)        if sc.fedex_username && sc.fedex_username.strip.length > 0
+      carriers['UPS']   = ActiveShipping::UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account)  if sc.ups_username   && sc.ups_username.strip.length   > 0 
+      carriers['USPS']  = ActiveShipping::USPS.new( :login => sc.usps_username)                                                                                             if sc.usps_username  && sc.usps_username.strip.length  > 0
+      carriers['FedEx'] = ActiveShipping::FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)        if sc.fedex_username && sc.fedex_username.strip.length > 0
       
       sp = op.shipping_package                            
       package = op.activemerchant_package
@@ -115,22 +115,22 @@ module Caboose
       order = op.order
       sc = order.site.store_config
       sa = order.shipping_address
-      origin      = Location.new(:country => sc.origin_country, :state => sc.origin_state, :city => sc.origin_city, :zip => sc.origin_zip)
-      destination = Location.new(:country => sc.origin_country, :state => sa.state, :city => sa.city, :postal_code => sa.zip)
+      origin      = ActiveShipping::Location.new(:country => sc.origin_country, :state => sc.origin_state, :city => sc.origin_city, :zip => sc.origin_zip)
+      destination = ActiveShipping::Location.new(:country => sc.origin_country, :state => sa.state, :city => sa.city, :postal_code => sa.zip)
 
       carrier = case op.shipping_method.carrier                    
-        when 'UPS'   then UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account) 
-        when 'USPS'  then USPS.new( :login => sc.usps_username)
-        when 'FedEx' then FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)
+        when 'UPS'   then ActiveShipping::UPS.new(  :login => sc.ups_username, :password => sc.ups_password, :key => sc.ups_key, :origin_account => sc.ups_origin_account) 
+        when 'USPS'  then ActiveShipping::USPS.new( :login => sc.usps_username)
+        when 'FedEx' then ActiveShipping::FedEx.new(:login => sc.fedex_username, :password => sc.fedex_password, :key => sc.fedex_key, :account => sc.fedex_account)
         end
         
-      Caboose.log(op.shipping_method.inspect)
+      #Caboose.log(op.shipping_method.inspect)
 
       sm = op.shipping_method
       package = op.activemerchant_package                                        
       resp = carrier.find_rates(origin, destination, package)                        
       resp.rates.sort_by(&:price).each do |rate|
-        Caboose.log("rate.service_code = #{rate.service_code}, rate.service_name = #{rate.service_name}")
+        #Caboose.log("rate.service_code = #{rate.service_code}, rate.service_name = #{rate.service_name}")
         sm2 = ShippingMethod.where( :carrier => sm.carrier, :service_code => rate.service_code, :service_name => rate.service_name).first
         sm2 = ShippingMethod.create(:carrier => sm.carrier, :service_code => rate.service_code, :service_name => rate.service_name) if sm2.nil?
         if sm2.id == sm.id                    

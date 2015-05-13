@@ -52,6 +52,7 @@ Caboose.Store.Modules.CheckoutPayment = (function() {
     {    
       $('#message').html("<p class='loading'>Processing payment...</p>");
       $('form#payment').submit();
+      $('#checkout-continue button').hide();
     }
   };
   
@@ -98,5 +99,8 @@ function relay_handler(resp)
   else if (resp.error)  
     $('#message').html("<p class='note error'>" + resp.error + "</p>");
   else
+  {
     $('#message').html("<p class='note error'>There was an error processing your payment.</p>");
+    $('#checkout-continue button').show();
+  }
 }

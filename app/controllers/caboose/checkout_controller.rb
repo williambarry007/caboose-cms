@@ -298,13 +298,19 @@ module Caboose
     def authnet_relay
       Caboose.log("Authorize.net relay, order #{params[:x_invoice_id]}")
       
-      if params[:x_invoice_num].nil?
+      if params[:x_invoice_num].nil? || params[:x_invoice_num].strip.length == 0
         Caboose.log("Error: no x_invoice_id in given parameters.")
         render :json => { :error => "Invalid x_invoice_id." }
         return
       end
       
-      order = Caboose::Order.find(params[:x_invoice_num])
+      order = Caboose::Order.where(:id => params[:x_invoice_num].to_i).first
+      if order.nil?
+        Caboose.log("Error: can't find order for x_invoice_num #{params[:x_invoice_num]}.")
+        render :json => { :error => "Invalid x_invoice_id." }
+        return
+      end
+            
       ot = Caboose::OrderTransaction.new(
         :order_id => order.id,
         :date_processed => DateTime.now.utc,

@@ -50,6 +50,7 @@
     :logged_in_user => @logged_in_user,
     :site => @site
   }
+  @block_options.each{ |k,v| options[k] = v } if @block_options      
     
   str = nil    
   #if @use_page_cache

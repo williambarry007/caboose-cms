@@ -162,50 +162,72 @@ class Caboose::Block < ActiveRecord::Base
       if site.nil?
         self.block_message(block, "Error: site variable is nil.")
       end
-        
-      begin                        
-        str = view.render(:partial => "../../sites/#{site.name}/blocks/#{full_name}", :locals => options2)        
-      rescue ActionView::MissingTemplate => ex
-        #Caboose.log("Can't find partial: ../../sites/#{site.name}/blocks/#{full_name}")
-        begin
-          str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.name}", :locals => options2)                    
-        rescue ActionView::MissingTemplate => ex
-          #Caboose.log("Can't find partial: ../../sites/#{site.name}/blocks/#{block.block_type.name}")
-          begin                        
-            str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.field_type}", :locals => options2)            
-          rescue ActionView::MissingTemplate
-            #Caboose.log("Can't find partial: ../../sites/#{site.name}/blocks/#{block.block_type.field_type}")
-            begin
-              str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)        
-            rescue ActionView::MissingTemplate
-              #Caboose.log("Can't find partial: caboose/blocks/#{full_name}")
-              begin          
-                str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2)                    
-              rescue ActionView::MissingTemplate
-                #Caboose.log("Can't find partial: caboose/blocks/#{block.block_type.name}")
-                begin                        
-                  str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2)            
-                rescue Exception => ex                  
-                  #Caboose.log("Can't find partial: caboose/blocks/#{block.block_type.field_type}")
-                  str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
-                end
-              rescue Exception => ex                          
-                str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
-              end
-            rescue Exception => ex              
-              str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
-            end
-          rescue Exception => ex                  
-            str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
-          end                              
-        rescue Exception => ex                                                     
-          str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
-        end        
-      rescue Exception => ex        
-        str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
-      end                    
+              
+      #begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{full_name}", :locals => options2) 
+      #rescue ActionView::MissingTemplate => ex        
+      #  begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.name}", :locals => options2) 
+      #  rescue ActionView::MissingTemplate => ex          
+      #    begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.field_type}", :locals => options2) 
+      #    rescue ActionView::MissingTemplate => ex            
+      #      begin str = view.render(:partial => "../../app/views/caboose/blocks/#{full_name}", :locals => options2) 
+      #      rescue ActionView::MissingTemplate => ex                                          
+      #        begin str = view.render(:partial => "../../app/views/caboose/blocks/#{block.block_type.name}", :locals => options2) 
+      #        rescue ActionView::MissingTemplate => ex                
+      #          begin str = view.render(:partial => "../../app/views/caboose/blocks/#{block.block_type.field_type}", :locals => options2) 
+      #          rescue ActionView::MissingTemplate => ex                  
+      #          begin str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)  
+      #          rescue ActionView::MissingTemplate => ex                  
+      #            begin str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2) 
+      #            rescue ActionView::MissingTemplate => ex                    
+      #              begin str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2) 
+      #              rescue Exception => ex 
+      #                str = "<p class='note error'>#{self.block_message(block, ex)}</p>" 
+      #              end
+      #            rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
+      #            end
+      #          rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
+      #          end
+      #        rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
+      #        end                              
+      #      rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
+      #      end
+      #    rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
+      #    end
+      #  rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
+      #  end
+      #rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
+      #end
+      
+      arr = [
+        "../../sites/#{site.name}/blocks/#{full_name}",
+        "../../sites/#{site.name}/blocks/#{block.block_type.name}",
+        "../../sites/#{site.name}/blocks/#{block.block_type.field_type}",
+        "../../app/views/caboose/blocks/#{full_name}",
+        "../../app/views/caboose/blocks/#{block.block_type.name}",
+        "../../app/views/caboose/blocks/#{block.block_type.field_type}",
+        "caboose/blocks/#{full_name}",                
+        "caboose/blocks/#{block.block_type.name}",                
+        "caboose/blocks/#{block.block_type.field_type}"
+      ]
+      str = self.render_helper(view, options2, block, full_name, arr, 0)
+
     end    
     return str
+  end
+  
+  def render_helper(view, options, block, full_name, arr, i)
+    return "<p class='note error'>Could not find block view anywhere.</p>" if i > arr.count
+    begin
+      str = view.render(:partial => arr[i], :locals => options)
+      #Caboose.log("Level #{i+1} for #{full_name}: Found partial #{arr[i]}")
+      rescue ActionView::MissingTemplate => ex
+        #Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")        
+        str = render_helper(view, options, block, full_name, arr, i+1)
+      rescue Exception => ex 
+        #Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")
+        str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
+    end
+    return str      
   end
   
   def block_message(block, ex)    

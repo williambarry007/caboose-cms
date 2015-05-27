@@ -52,6 +52,7 @@ module Caboose
 
       # Now get the rates for those packages            
       @rates = ShippingCalculator.rates(@order)
+      Caboose.log(@rates)
       
       #Caboose.log(@rates.inspect)
       @logged_in_user = logged_in_user      

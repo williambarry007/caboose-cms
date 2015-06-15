@@ -23,7 +23,7 @@
 		%>
   </tr>
 <% @users.each do |user| %>
-  <tr onclick="window.location='/admin/users/<%= user.id %>/edit';">
+  <tr onclick="window.location='/admin/users/<%= user.id %>';">
     <td><%= user.first_name %></td>
     <td><%= user.last_name %></td>
     <td><%= user.username %></td>
@@ -36,8 +36,6 @@
 
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
-$(document).ready(function() { 
-  var modal = new CabooseModal(500);
-});
+
 </script>
 <% end %>

@@ -5,7 +5,7 @@
 <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' /> 
 <p><select name='parent_id'>
   <option value=''>-- Select a parent role --</option>
-  <% Caboose::Role.flat_tree(' - ').each do |r| %>
+  <% Caboose::Role.flat_tree(@site.id, ' - ').each do |r| %>
     <option value='<%= r.id %>'><%= r.name %></option>
   <% end %>
 </select></p>

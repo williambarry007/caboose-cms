@@ -14,6 +14,8 @@
 //= require jquery
 //= require jquery_ujs
 //= require colorbox-rails
+//= require caboose/jquery.datetimepicker
 //= require caboose/jquery.placeholder
 //= require caboose/jquery.detect
 //= require caboose/modal_integration
+//= require caboose/admin_main

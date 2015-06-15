@@ -48,7 +48,7 @@ module Caboose
     def edit
       return if !user_is_allowed('users', 'edit')
       @edituser = User.find(params[:id])    
-      @all_roles = Role.tree
+      @all_roles = Role.tree(@site.id)
       @roles = Role.roles_with_user(@edituser.id)
     end
     

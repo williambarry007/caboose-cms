@@ -556,6 +556,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :rating                , :decimal   ] 
       ],
       Caboose::Role => [
+        [ :site_id              , :integer  ],
         [ :parent_id            , :integer  ],
         [ :name                 , :string   ],
         [ :description          , :string   ]

@@ -1,20 +1,30 @@
 
 <h1>Editing Role</h1>
+
+<p><input type='button' value='< Back' onclick="window.location='/admin/roles';" /></p>
+
 <div id="role_<%= @role.id %>_name"></div>
 <div id="role_<%= @role.id %>_parent_id"></div>
 <div id="role_<%= @role.id %>_description"></div>
+
 <h3>Members</h3>
-<div id='members'>
-  <table class='data'>
-    <% Caboose::User.reorder("last_name, first_name").all.each do |u| %>
-      <% is_member = Caboose::RoleMembership.where(:role_id => @role.id, :user_id => u.id).exists? %>
-      <tr>
-        <td><input type='checkbox' name='user<%= u.id %>' <%= raw is_member ? "checked='true'" : '' %> onclick="toggle_role(<%= u.id %>, <%= @role.id %>, $(this).prop('checked'));" /></td>
-        <td><%= u.first_name %> <%= u.last_name %> (<%= u.email %>)</td>
-      </tr>
-    <% end %>
-  </table>
-</div>
+<% users = Caboose::User.where(:site_id => @site.id).reorder("last_name, first_name").all %>
+<% if users && users.count > 0 %>
+  <div id='members'>
+    <table class='data'>
+      <% users.each do |u| %>
+        <% is_member = Caboose::RoleMembership.where(:role_id => @role.id, :user_id => u.id).exists? %>
+        <tr>
+          <td><input type='checkbox' name='user<%= u.id %>' <%= raw is_member ? "checked='true'" : '' %> onclick="toggle_role(<%= u.id %>, <%= @role.id %>, $(this).prop('checked'));" /></td>
+          <td><%= u.first_name %> <%= u.last_name %> (<%= u.email %>)</td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+<% else %>
+  <p>There are no users for this site.</p>
+<% end %>
+
 <h3>Permissions</h3>
 <div id='permissions'>
   <table class='data'>
@@ -27,6 +37,7 @@
     <% end %>
   </table>
 </div>
+
 <div id="role_<%= @role.id %>_members"></div>
 <div id="role_<%= @role.id %>_permissions"></div>
 <div id="message"></div>
@@ -42,11 +53,6 @@
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
 
-var modal = false;
-$(window).load(function() {  
-  modal = new CabooseModal(600, 600);
-});
-
 $(document).ready(function() {
   new ModelBinder({
     name: 'Role',
@@ -59,8 +65,7 @@ $(document).ready(function() {
       { name: 'parent_id'   , nice_name: 'Parent'      , type: 'select', value: <%= @role.parent_id %>, text: "<%= @role.parent.nil? ? '[No parent]' : @role.parent.name %>", show_controls: true, loading_message: 'Getting roles...', options_url: '/admin/roles/options', width: 590, message: 'message' },    
       { name: 'name'        , nice_name: 'Name'        , type: 'text' , value: "<%= @role.name %>"        , width: 590 , message: 'message' },
       { name: 'description' , nice_name: 'Description' , type: 'text' , value: "<%= @role.description %>" , width: 590 , message: 'message' }      
-    ],
-    on_load: function() { modal.autosize(); }
+    ]    
   });  
 });
 

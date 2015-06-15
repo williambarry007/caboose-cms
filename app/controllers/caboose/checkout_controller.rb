@@ -153,6 +153,9 @@ module Caboose
       # Save the order
       @order.save
       
+      # Decrement quantities of variants
+      @order.decrement_quantities
+      
       # Clear the cart and re-initialize                    
       session[:cart_id] = nil
       init_cart
@@ -363,15 +366,19 @@ module Caboose
       
       # Go ahead and capture funds if the order only contained downloadable items
       @order = Order.find(params[:order_id])
-      if !@order.has_shippable_items?
-        capture_resp = @order.capture_funds
-        if capture_resp.error
-          @resp.success = false
-          @resp.error = capture_resp.error
-        end        
-      end
       
-      if @resp.success        
+      if @resp.success
+        if !@order.has_shippable_items?
+          capture_resp = @order.capture_funds
+          if capture_resp.error
+            @resp.success = false
+            @resp.error = capture_resp.error
+          end        
+        end
+        
+        # Decrement quantities of variants
+        @order.decrement_quantities
+    
         session[:cart_id] = nil
         init_cart
       end

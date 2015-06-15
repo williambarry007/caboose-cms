@@ -47,17 +47,9 @@ module Caboose
         render :file => 'caboose/extras/error' and return
       end
       
-      @site = Site.find(params[:id])      
-      
-      # Create an admin user for the account
-      if !User.where(:username => 'admin', :site_id => @site.id).exists?
-        admin_user = User.create(:username => 'admin', :email => 'admin@nine.is', :site_id => @site.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose'))        
-        admin_role = Role.where(:name => 'Admin').first        
-        if admin_user && admin_role                      
-          RoleMembership.create(:user_id => admin_user.id, :role_id => admin_role.id)          
-        end
-      end
-      
+      @site = Site.find(params[:id])            
+      @site.init_users_and_roles
+            
     end
     
     # GET /admin/sites/:id/block-types
@@ -117,17 +109,8 @@ module Caboose
         StoreConfig.create(:site_id => site.id)
         SmtpConfig.create( :site_id => site.id)
         resp.redirect = "/admin/sites/#{site.id}"
-      end
-      
-      # Create an admin user for the account
-      if !User.where(:username => 'admin', :site_id => site.id).exists?        
-        admin_user = User.create(:username => 'admin', :email => 'admin@nine.is', :site_id => site.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose'))
-        admin_role = Role.where(:name => 'Admin').first
-        if admin_role
-          RoleMembership.create(:user_id => admin_user.id, :role_id => admin_role.id)        
-        end
-      end
-      
+      end      
+      site.init_users_and_roles            
       render :json => resp
     end
     

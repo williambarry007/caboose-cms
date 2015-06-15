@@ -10,7 +10,7 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 <p><div id='user_<%= @edituser.id %>_email'      ></div></p>
 <div id='roles'>
 <table class='data'>
-<% Caboose::Role.flat_tree.each do |r| %>
+<% Caboose::Role.flat_tree(@site.id).each do |r| %>
 <% is_member = Caboose::RoleMembership.where(:role_id => r.id, :user_id => @edituser.id).exists? %>
 <tr><td><input type='checkbox' name='role<%= r.id %>' <%= is_member ? "checked='true'" : '' %> onclick="toggle_role(<%= @edituser.id %>, <%= r.id %>, $(this).prop('checked'));" /></td><td><%= r.name %></td></tr>
 <% end %>
@@ -32,10 +32,6 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
-var modal = false;
-$(window).load(function() {  
-  modal = new CabooseModal(500);
-});
 
 $(document).ready(function() {
   new ModelBinder({
@@ -48,8 +44,7 @@ $(document).ready(function() {
       { name: 'last_name'  , nice_name: 'Last name' , type: 'text', value: <%= raw Caboose.json(@edituser.last_name)  %>, width: 280 },
       { name: 'username'   , nice_name: 'Username'  , type: 'text', value: <%= raw Caboose.json(@edituser.username)   %>, width: 280 },
       { name: 'email'      , nice_name: 'Email'     , type: 'text', value: <%= raw Caboose.json(@edituser.email)      %>, width: 280 }
-    ],
-    on_load: function() { modal.autosize(); }
+    ]    
   });  
 });
 

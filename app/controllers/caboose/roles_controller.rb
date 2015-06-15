@@ -9,7 +9,7 @@ module Caboose
     # GET /admin/roles
     def index
       return unless user_is_allowed('roles', 'view')
-      top_roles = Role.tree
+      top_roles = Role.tree(@site.id)
       arr = []
       top_roles.each { |r| arr += add_role_options(r, 0) }
       @roles = arr        
@@ -36,12 +36,18 @@ module Caboose
           'redirect' => nil
       })
       
-      role = Role.new()
-      role.parent_id = params[:parent_id]
-      role.name = params[:name]    
-      role.save
-      
-      resp.redirect = "/admin/roles/#{role.id}/edit"
+      parent = Role.where(:id => params[:parent_id]).first
+      if parent.nil?
+        resp.error = "Parent role must be part of this site."
+      else              
+        role = Role.new()
+        role.site_id = @site.id
+        role.parent_id = params[:parent_id]
+        role.name = params[:name]    
+        role.save
+        resp.redirect = "/admin/roles/#{role.id}"
+      end
+            
       render json: resp
     end
     
@@ -61,8 +67,12 @@ module Caboose
     	  	  role.description = value
     	  	when "parent_id"
     	  	  value = value.to_i
+    	  	  p = Role.where(:id => value).first
     	  	  if role.id == value
     	  	    resp.error = "You can't set the parent to be this role."
+    	  	    save = false
+    	  	  elsif value != -1 && (p.nil? || p.site_id != role.site_id)
+    	  	    resp.error = "Invalid parent."
     	  	    save = false
     	  		elsif role.is_ancestor_of?(value)
     	  		  resp.error = "You can't set the parent to be one of the child roles."
@@ -71,8 +81,7 @@ module Caboose
     	  		  role.parent_id = value
     	  		  if value == -1
     	  		    resp.attributes = { 'parent_id' => { 'text' => '[No parent]' }}
-    	  		  else
-    	  		    p = Role.find(value)
+    	  		  else    	  		    
     	  		    resp.attributes = { 'parent_id' => { 'text' => p.name }}
     	  		  end
     	  		end    	  		
@@ -114,7 +123,7 @@ module Caboose
     # GET /admin/roles/options
     def options
       return unless user_is_allowed('roles', 'view')
-      @top_roles = Role.tree
+      @top_roles = Role.tree(@site.id)
       arr = [{ 
         "value" => -1, 
         "text" => 'Top Level'

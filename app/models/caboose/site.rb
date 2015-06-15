@@ -106,4 +106,29 @@ class Caboose::Site < ActiveRecord::Base
     self.save
   end
   
+  def init_users_and_roles
+        
+    admin_user = Caboose::User.where(:username => 'admin', :site_id => self.id).first    
+    admin_user = Caboose::User.create(:username => 'admin', :email => 'admin@nine.is', :site_id => self.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose')) if admin_user.nil?
+                          
+    admin_role = Caboose::Role.where(:site_id => self.id, :name => 'Admin').first    
+    admin_role = Caboose::Role.create(:site_id => self.id, :parent_id => -1, :name => 'Admin') if admin_role.nil?
+    
+    elo_role = Caboose::Role.where(:site_id => self.id, :name => 'Everyone Logged Out').first
+    elo_role = Caboose::Role.create(:site_id => self.id, :parent_id => -1, :name => 'Everyone Logged Out') if elo_role.nil?
+    
+    eli_role = Caboose::Role.where(:site_id => self.id, :name => 'Everyone Logged In').first
+    eli_role = Caboose::Role.create(:site_id => self.id, :parent_id => elo_role.id, :name => 'Everyone Logged In') if eli_role.nil?
+    
+    # Make sure the admin role has the admin "all" permission
+    admin_perm = Caboose::Permission.where(:resource => 'all', :action => 'all').first
+    rp = Caboose::RolePermission.where(:role_id => admin_role.id, :permission_id => admin_perm.id).first
+    rp = Caboose::RolePermission.create(:role_id => admin_role.id, :permission_id => admin_perm.id) if rp.nil?
+    
+    # Make sure the admin user is a member of the admin role
+    rm = Caboose::RoleMembership.where(:role_id => admin_role.id, :user_id => admin_user.id).first
+    rm = Caboose::RoleMembership.create(:role_id => admin_role.id, :user_id => admin_user.id) if rm.nil?
+        
+  end
+  
 end

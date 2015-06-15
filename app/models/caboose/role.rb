@@ -1,19 +1,16 @@
 
 class Caboose::Role < ActiveRecord::Base
   self.table_name = "roles"
-  belongs_to :parent, :class_name => "Caboose::Role"
-
-  #has_and_belongs_to_many :users
-  has_many :role_memberships
-  has_many :users, :through => :role_memberships
-    
-  #has_and_belongs_to_many :permissions
-  has_many :role_permissions
-  has_many :permissions, :through => :role_permissions  
   
+  belongs_to :site, :class_name => 'Caboose::Site'
+  belongs_to :parent, :class_name => "Caboose::Role"  
+  has_many :role_memberships
+  has_many :users, :through => :role_memberships      
+  has_many :role_permissions
+  has_many :permissions, :through => :role_permissions    
   has_many :page_permissions
 
-  attr_accessible :name, :description, :parent_id
+  attr_accessible :name, :description, :parent_id, :site_id
   attr_accessor :children
      
   def self.admin_role
@@ -71,13 +68,13 @@ class Caboose::Role < ActiveRecord::Base
     return self.where("users.id" => user_id).all(:include => :users)
   end
   
-  def self.tree
-    return self.where(:parent_id => -1).reorder("name").all
+  def self.tree(site_id)
+    return self.where(:parent_id => -1, :site_id => site_id).reorder("name").all
   end
   
-  def self.flat_tree(prefix = '-')
+  def self.flat_tree(site_id, prefix = '-')
     arr = []
-    self.tree.each do |r|
+    self.tree(site_id).each do |r|
       arr += self.flat_tree_helper(r, prefix, '')
     end
     return arr

@@ -46,7 +46,11 @@ $(document).ready(function() {
   m = new ModelBinder({
     name: 'Block',
     id: <%= b.id %>,
+  <% if b.post_id %>
+    update_url: '/admin/posts/<%= b.post_id %>/blocks/<%= b.id %>',
+  <% else %>
     update_url: '/admin/pages/<%= b.page_id %>/blocks/<%= b.id %>',
+  <% end %>
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [{      
       name: 'block_type_id',

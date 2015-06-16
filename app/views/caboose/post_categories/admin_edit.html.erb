@@ -1,0 +1,66 @@
+<h1>Edit Category</h1>
+
+<p><div class="push-below" id="postcategory_<%= @category.id %>_name"></div></p>
+
+<h2>Posts</h2>
+
+<% if @category.posts.any? %>
+  <ul>
+    <% @category.posts.each do |post| %>
+      <li><a href="/admin/posts/<%= post.id %>"><%= post.title %></a></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>This category has no associated posts.</p>
+<% end %>
+
+<div id="message"></div>
+<p>
+<input type="button" value="< Back" onclick="window.location='/admin/post-categories';" />
+<input type="button" value="Delete Category" onclick="delete_category(<%= @category.id %>)" />
+</p>
+
+<% content_for :caboose_css do %>
+  <style>
+    .push-below { margin-bottom: 24px; }
+  </style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'PostCategory',
+    id: <%= @category.id %>,
+    update_url: '/admin/post-categories/<%= @category.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+
+      { name: 'name'       , nice_name: 'Name'    , type: 'text'    , value: <%= raw Caboose.json(@category.name)               %> , width: 400 }
+    ]
+  });
+});
+
+function delete_category(cat_id, confirm) {
+  if (!confirm) {
+    var p = $('<p/>').addClass('note error').css('margin-bottom', '10px')
+      .append("Are you sure you want to delete the category?<br />This can't be undone.<br /><br />")
+      .append($('<input/>').attr('type', 'button').val('Yes').click(function() { delete_category(cat_id, true); })).append(' ')
+      .append($('<input/>').attr('type', 'button').val('No').click(function() { $('#message').empty(); }));          
+    $('#message').empty().append(p);    
+    return;
+  }
+  $('#message').html("<p class='loading'>Deleting the category...</p>");  
+  $.ajax({
+    url: '/admin/post-categories/' + cat_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+</script>
+<% end %>

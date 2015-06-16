@@ -372,6 +372,23 @@ Caboose::Engine.routes.draw do
   get     "/admin/posts"                           => "posts#admin_index"
   post    "/admin/posts"                           => "posts#admin_add"  
   delete  "/admin/posts/:id"                       => "posts#admin_delete"
+
+  #=============================================================================
+  # Post Categories
+  #=============================================================================
+
+  get     "/admin/post-categories"                         => "post-categories#admin_index"
+  get     "/admin/post-categories/new"                     => "post-categories#admin_new"
+  get     "/admin/post-categories/options"                 => "post-categories#admin_options"
+  get     '/admin/post-categories/status-options'          => 'post-categories#admin_status_options'
+  get     "/admin/post-categories/:id/sort-children"       => "post-categories#admin_sort_children"
+  put     "/admin/post-categories/:id/children/sort-order" => "post-categories#admin_update_sort_order"
+  get     "/admin/post-categories/:id/products/json"       => "post-categories#admin_category_products"  
+  get     "/admin/post-categories/:id"                     => "post-categories#admin_edit"  
+  put     "/admin/post-categories/:id"                     => "post-categories#admin_update"    
+  post    "/admin/post-categories/:id"                     => "post-categories#admin_update"  
+  post    "/admin/post-categories"                         => "post-categories#admin_add"
+  delete  "/admin/post-categories/:id"                     => "post-categories#admin_delete"
         
   #=============================================================================
   # Google Spreadsheets

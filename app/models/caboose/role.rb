@@ -10,7 +10,11 @@ class Caboose::Role < ActiveRecord::Base
   has_many :permissions, :through => :role_permissions    
   has_many :page_permissions
 
-  attr_accessible :name, :description, :parent_id, :site_id
+  attr_accessible :id,
+    :name, 
+    :description,
+    :parent_id,
+    :site_id
   attr_accessor :children
      
   def self.admin_role

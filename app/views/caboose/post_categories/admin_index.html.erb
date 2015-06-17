@@ -1,0 +1,16 @@
+<h1>Post Categories</h1>
+<a href='/admin/post-categories/new'>New Category</a>
+
+<% cats = Caboose::PostCategory.where(:site_id => @site.id).order(:name).all %>
+<ul>
+<% cats.each do |c| %>
+	<li><a href="/admin/post-categories/<%= c.id %>" title="<%= c.name %>"><%= c.name %></a>
+<% end %>
+</ul>
+
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+	
+</script>
+<% end %>

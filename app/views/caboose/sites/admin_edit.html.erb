@@ -46,7 +46,7 @@ user_ids = [] if user_ids.nil?
 <div id='members'>
 <table class='data'>
 <tr><th>User</th><th>None</th><th>User</th><th>Admin</th></tr>
-<% Caboose::User.reorder('last_name, first_name').all.each do |u| %>
+<% Caboose::User.where(:site_id => @site.id).reorder('last_name, first_name').all.each do |u| %>
   <tr>
     <td><%= u.first_name %> <%= u.last_name %> (<%= u.email %>)</td>
     <td align='center'><input type='radio' name='user<%= u.id %>' <%= !admin_ids.include?(u.id) && !user_ids.include?(u.id) ? "checked='true'" : '' %> onclick="remove_site_membership(<%= s.id %>, <%= u.id %>);" /></td>

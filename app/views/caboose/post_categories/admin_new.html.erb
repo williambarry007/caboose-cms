@@ -1,0 +1,43 @@
+<h1>New Category</h1>
+
+<form action="/admin/categories" method="post" id="new_form">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
+	<p><input type="text" name="name" id='name' placeholder="Category Name" /></p>
+	<div id="message"></div>	
+	<input type="button" value="< Back" onclick="window.location='/admin/post-categories';" />
+	<input type="submit" value="Add Category"  onclick="add_category(); return false" />
+</form>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>	
+<script type='text/javascript'>
+
+function add_category() {
+  $('#message').html("<p class='loading'>Adding category...</p>");
+	var stay = $('#stay').prop('checked');
+	
+	$.ajax({
+		url: '/admin/post-categories',
+		type: 'post',
+		data: $('#new_form').serialize(),
+		success: function(resp) {
+			if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
+			if (resp.redirect)
+			{
+			  if (stay)
+        {
+          $('#name').val('');          
+          get_category_options();
+          $('#message').html("<p class='note succes'>The category has been added successfully.</p>");
+          setTimeout(function() { $('#message').empty(); }, 2000);
+        }
+        else if (resp.redirect)
+          window.location = resp.redirect;
+      }
+		}
+	});
+}
+
+
+</script>
+<% end %>

@@ -8,15 +8,16 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     
     item = { 'id' => 'core', 'text' => 'Settings', 'children' => [] }                        
     item['children'] << { 'id' => 'blocktypes'       , 'text' => 'AB Test Variants'    , 'href' => '/admin/ab-variants'        , 'modal' => false } if user.is_allowed('abvariants'   , 'view')    
-    item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'         , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'   , 'view')
-    item['children'] << { 'id' => 'fonts'            , 'text' => 'Fonts'               , 'href' => '/admin/fonts'              , 'modal' => false } if user.is_allowed('fonts'        , 'view') if site.use_fonts
+    item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'         , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'   , 'view') if site.is_master == true
+    item['children'] << { 'id' => 'fonts'            , 'text' => 'Fonts'               , 'href' => '/admin/fonts'              , 'modal' => false } if user.is_allowed('fonts'        , 'view') if site.use_fonts == true
     item['children'] << { 'id' => 'redirects'        , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'    , 'view')
-    item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'         , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'  , 'view')    
+    item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'         , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'  , 'view')   
+    item['children'] << { 'id' => 'post_categories'  , 'text' => 'Post Categories'     , 'href' => '/admin/post-categories'    , 'modal' => false } if user.is_allowed('post_categories', 'view') 
     item['children'] << { 'id' => 'roles'            , 'text' => 'Roles'               , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'        , 'view')
     item['children'] << { 'id' => 'sites'            , 'text' => 'Sites'               , 'href' => '/admin/sites'              , 'modal' => false } if user.is_allowed('sites'        , 'view') if site.is_master == true        
     item['children'] << { 'id' => 'smtp'             , 'text' => 'SMTP (Mail)'         , 'href' => '/admin/smtp'               , 'modal' => false } if user.is_allowed('smtp'         , 'view')
     item['children'] << { 'id' => 'social'           , 'text' => 'Social Media'        , 'href' => '/admin/social'             , 'modal' => false } if user.is_allowed('social'       , 'view')
-    item['children'] << { 'id' => 'store'            , 'text' => 'Store'               , 'href' => '/admin/store'              , 'modal' => false } if user.is_allowed('store'        , 'view')
+    item['children'] << { 'id' => 'store'            , 'text' => 'Store'               , 'href' => '/admin/store'              , 'modal' => false } if user.is_allowed('store'        , 'view') if site.use_store == true
     item['children'] << { 'id' => 'users'            , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'        , 'view')      
     item['children'] << { 'id' => 'variables'        , 'text' => 'Variables'           , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'     , 'view')    
     nav << item if item['children'].count > 0

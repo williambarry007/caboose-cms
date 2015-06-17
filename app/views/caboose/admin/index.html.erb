@@ -19,7 +19,10 @@ width = 200
     <% id = item['id'].nil? ? i.to_s : item['id'] %>
     <% href = item['href'].nil? ? '#' : item['href'] %>
     <% modal = item['modal'].nil? ? false : item['modal'] %>
-    <li id='nav_item_<%= id %>'><a href='<%= href %>'<%= raw (modal ? " rel='modal'" : "") %>><span class='icon'></span><span class='text'><%= item['text'] %></span></a>
+    <li id='nav_item_<%= id %>'>
+      <% if href != "#" %><a href='<%= href %>'<%= raw (modal ? " rel='modal'" : "") %>><% end %>
+        <span class='icon'></span><span class='text'><%= item['text'] %></span>
+      <% if href != "#" %></a><% end %>
     <% if (!item['children'].nil? && item['children'].count > 0) %>
       <ul>
         <% item['children'].each do |item2| %>

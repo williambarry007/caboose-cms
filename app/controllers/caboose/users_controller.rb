@@ -116,7 +116,8 @@ module Caboose
             :last_name  => last_name,
             :email      => email,
             :username   => username,          
-            :password   => Digest::SHA1.hexdigest(Caboose::salt + password)
+            :password   => Digest::SHA1.hexdigest(Caboose::salt + password),
+            :site_id    => @site.id
           )
           good_count = good_count + 1
         end
@@ -142,6 +143,7 @@ module Caboose
       
       user = User.new()
       user.email = params[:email] ? params[:email].strip.downcase : nil
+      user.site_id = @site.id
       
       if user.email.length == 0
         resp.error = "Please enter a valid email address."

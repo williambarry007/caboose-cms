@@ -141,3 +141,15 @@ Paperclip.interpolates :model_url do |attachment, style|
   # Otherwise S3
   return "#{Caboose::cdn_domain}/#{attachment.path}"
 end
+
+Paperclip.interpolates :block_file_upload_name do |attachment, style|
+  b = attachment.instance
+  return b.id if b.file_upload_name.nil? || b.file_upload_name.strip.length == 0
+  return b.file_upload_name        
+end
+
+Paperclip.interpolates :block_image_upload_name do |attachment, style|
+  b = attachment.instance
+  return b.id if b.image_upload_name.nil? || b.image_upload_name.strip.length == 0
+  return b.image_upload_name        
+end

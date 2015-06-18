@@ -371,6 +371,13 @@ module Caboose
       resp = StdClass.new({'attributes' => {}})
       b = Block.find(params[:id])
       b.image = params[:value]
+      
+      str = params[:value].original_filename
+      arr = str.split('.')
+      arr.pop
+      str = arr.join('.')      
+      b.image_upload_name = b.unique_image_upload_name(str)      
+      
       b.save
       resp.success = true 
       resp.attributes = { 'value' => { 'value' => b.image.url(:tiny) }}
@@ -386,6 +393,13 @@ module Caboose
       resp = StdClass.new({'attributes' => {}})
       b = Block.find(params[:id])
       b.file = params[:value]
+      
+      str = params[:value].original_filename
+      arr = str.split('.')
+      arr.pop
+      str = arr.join('.')      
+      b.file_upload_name = b.unique_file_upload_name(str)
+      
       b.save
       resp.success = true      
       resp.attributes = { 'value' => { 'value' => b.file.url }}

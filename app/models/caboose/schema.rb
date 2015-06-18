@@ -146,17 +146,19 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :extension      , :string     ]
       ],
       Caboose::Block => [
-        [ :page_id               , :integer ],
-        [ :post_id               , :integer ],
-        [ :parent_id             , :integer ],
-        [ :block_type_id         , :integer ],
-        [ :sort_order            , :integer , { :default => 0 }],
-        [ :constrain             , :boolean , { :default => false }],
-        [ :full_width            , :boolean , { :default => false }],
-        [ :name                  , :string  ],
-        [ :value                 , :text    ],
+        [ :page_id               , :integer    ],
+        [ :post_id               , :integer    ],
+        [ :parent_id             , :integer    ],
+        [ :block_type_id         , :integer    ],
+        [ :sort_order            , :integer     , { :default => 0     }],
+        [ :constrain             , :boolean     , { :default => false }],
+        [ :full_width            , :boolean     , { :default => false }],
+        [ :name                  , :string     ],
+        [ :value                 , :text       ],
         [ :file                  , :attachment ],
-        [ :image                 , :attachment ]
+        [ :file_upload_name      , :string     ],
+        [ :image                 , :attachment ],
+        [ :image_upload_name     , :string     ]
       ],
       Caboose::BlockType => [        
         [ :parent_id                       , :integer ],

@@ -9,10 +9,10 @@ class Caboose::Block < ActiveRecord::Base
   belongs_to :block_type
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
   has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :dependent => :delete_all, :order => 'sort_order'
-  has_attached_file :file, :path => ':path_prefixuploads/:id.:extension'
-  do_not_validate_attachment_file_type :file
+  has_attached_file :file, :path => ':path_prefixuploads/:block_file_upload_name.:extension'
+  do_not_validate_attachment_file_type :file  
   has_attached_file :image,
-    :path => ':path_prefixuploads/:id_:style.:extension',
+    :path => ':path_prefixuploads/:block_image_upload_name_:style.:extension',
     :default_url => "http://placehold.it/300x300",
     :styles => {
       :tiny  => '160x120>',
@@ -444,6 +444,50 @@ class Caboose::Block < ActiveRecord::Base
       return false if b.full_width == true
     end
     return true
+  end
+  
+  def unique_file_upload_name(str)
+    base = str.downcase.gsub(' ', '-').gsub(/[^\w-]/, '')
+    str = "#{base}"
+    i = 1
+    while Caboose::Block.where("id <> ? and file_upload_name = ?", self.id, str).exists? && i < 100 do
+      str = "#{base}-#{i}"
+      i = i + 1
+    end
+    return str              
+  end
+  
+  def unique_image_upload_name(str)
+    base = str.downcase.gsub(' ', '-').gsub(/[^\w-]/, '')
+    str = "#{base}"
+    i = 1
+    while Caboose::Block.where("id <> ? and image_upload_name = ?", self.id, str).exists? && i < 100 do
+      str = "#{base}-#{i}"
+      i = i + 1
+    end
+    return str              
+  end
+  
+  def self.unique_file_upload_name(str)
+    base = str.downcase.gsub(' ', '-').gsub(/[^\w-]/, '')
+    str = "#{base}"
+    i = 1
+    while Caboose::Block.where("file_upload_name = ?", str).exists? && i < 100 do
+      str = "#{base}-#{i}"
+      i = i + 1
+    end
+    return str              
+  end
+  
+  def self.unique_image_upload_name(str)
+    base = str.downcase.gsub(' ', '-').gsub(/[^\w-]/, '')
+    str = "#{base}"
+    i = 1
+    while Caboose::Block.where("image_upload_name = ?", str).exists? && i < 100 do
+      str = "#{base}-#{i}"
+      i = i + 1
+    end
+    return str              
   end
 
 end

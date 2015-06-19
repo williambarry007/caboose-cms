@@ -93,24 +93,16 @@ module Caboose
       self.total           = 0.00 if self.total.nil?
     end
            
-    def decrement_quantities
-      return false if self.decremented
-      
+    def decrement_quantities            
       self.line_items.each do |line_item|
         line_item.variant.update_attribute(:quantity, line_item.variant.quantity_in_stock - line_item.quantity)
-      end
-      
-      self.update_attribute(:decremented, true)
+      end            
     end
     
-    def increment_quantities
-      return false if !self.decremented
-      
+    def increment_quantities            
       self.line_items.each do |line_item|
         line_item.variant.update_attribute(:quantity, line_item.variant.quantity_in_stock - line_item.quantity)
-      end
-      
-      self.update_attribute(:decremented, false)
+      end            
     end
     
     def resend_confirmation

@@ -34,7 +34,7 @@ module Caboose
     
     # GET /cart/item-count
     def item_count
-      render :json => { :item_count => @order.item_count }
+      render :json => { :item_count => @order.item_count }            
     end
     
     # POST /cart
@@ -56,12 +56,13 @@ module Caboose
           :subtotal   => unit_price * qty,
           :status     => 'pending'
         )
-      end       
+      end
+      GA.delay.event(@site.id, 'cart', 'add', "Product #{v.product.id}, Variant #{v.id}")
       render :json => { 
         :success => li.save, 
         :errors => li.errors.full_messages,
         :item_count => @order.item_count 
-      }
+      }      
     end
     
     # PUT /cart/:line_item_id
@@ -126,6 +127,7 @@ module Caboose
         @order.calculate
         resp.success = true
         resp.order_total = @order.total
+        GA.delay.event(@site.id, 'giftcard', 'add', "Giftcard #{gc.id}")
       end
       render :json => resp
     end

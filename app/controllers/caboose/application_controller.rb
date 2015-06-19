@@ -13,7 +13,7 @@ module Caboose
       parse_url_params if Caboose.use_url_params
       
       @use_page_cache = !request.fullpath.starts_with?('/admin')
-      
+            
       # Get the site we're working with      
       domain = Domain.where(:domain => request.host_with_port).first
       @site = domain ? domain.site : nil
@@ -38,6 +38,7 @@ module Caboose
       @tasks        = {}
       @page_tasks   = {}
       @is_real_page = false
+      @ga_events    = []
       
       #if @find_page
         @page = Page.page_with_uri(request.host_with_port, request.fullpath)
@@ -79,6 +80,14 @@ module Caboose
       end                  
     end
     
+    def add_ga_event(cat, action, label = nil, value = nil)
+      # Category String Required  Typically the object that was interacted with (e.g. button)
+      # Action   String Required  The type of interaction (e.g. click)
+      # Label    String Option    Useful for categorizing events (e.g. nav buttons)
+      # Value    Number Option    Values must be non-negative. Useful to pass counts (e.g. 4 times)
+      @ga_events << [cat, action, label, value]
+    end
+
     # Parses any parameters in the URL and adds them to the params
     def parse_url_params      
       return if !Caboose.use_url_params      

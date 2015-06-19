@@ -48,9 +48,10 @@
     :csrf_meta_tags => '|CABOOSE_CSRF|',
     :csrf_meta_tags2 => '|CABOOSE_CSRF|',
     :logged_in_user => @logged_in_user,
-    :site => @site
+    :site => @site,
+    :ga_events => @ga_events
   }
-  @block_options.each{ |k,v| options[k] = v } if @block_options      
+  @block_options.each{ |k,v| options[k] = v } if @block_options  
     
   str = nil    
   #if @use_page_cache
@@ -88,6 +89,8 @@
   if @site.use_retargeting
     js << b.partial('retargeting', options)
   end
+      
+  js << b.partial('ga', options)  
   
   str.gsub!('|CABOOSE_CSS|'        , css)
   str.gsub!('|CABOOSE_PROTOCOL|'   , protocol)  

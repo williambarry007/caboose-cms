@@ -652,7 +652,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :rss_url              , :string ],
         [ :google_plus_url      , :string ],
         [ :linkedin_url         , :string ],
-        [ :google_analytics_id  , :string ]
+        [ :google_analytics_id  , :string ],
+        [ :auto_ga_js           , :boolean , { :default => false }]
       ],
       Caboose::StackableGroup => [       
         [ :name           , :string  ],

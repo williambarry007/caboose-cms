@@ -27,6 +27,7 @@ module Caboose
             @sale_categories[cat] = [] if @sale_categories[cat].nil?
             @sale_categories[cat] << p
           end
+          add_ga_event('products', 'view', 'Sales')
           render 'caboose/products/sales' and return
           
         elsif params[:id].to_i > 0 && Product.exists?(params[:id])
@@ -38,6 +39,7 @@ module Caboose
           @reviews        = Review.where(:product_id => @product.id).limit(10).order("id DESC") || nil
           @logged_in_user = logged_in_user
           
+          add_ga_event('products', 'view', "Product #{@product.id}")
           render 'caboose/products/details' and return
         end
       end
@@ -116,10 +118,11 @@ module Caboose
       @products = @pager.items
       @category = if @filter['category_id'] then Category.find(@filter['category_id'].to_i) else nil end
       
-      @pager.set_item_count            
+      @pager.set_item_count
+      add_ga_event('products', 'view', "Category #{cat.id}")      
     end
     
-    def show
+    def show      
     end
     
     # GET /product/info

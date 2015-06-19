@@ -55,7 +55,9 @@ module Caboose
       Caboose.log(@rates)
       
       #Caboose.log(@rates.inspect)
-      @logged_in_user = logged_in_user      
+      @logged_in_user = logged_in_user
+
+      add_ga_event('checkout', 'shipping')      
     end
     
     # Step 4 - Gift cards
@@ -65,6 +67,7 @@ module Caboose
       redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
       redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
       @logged_in_user = logged_in_user
+      add_ga_event('checkout', 'gift-cards')
     end
     
     # Step 5 - Payment
@@ -107,6 +110,7 @@ module Caboose
           @form_url = Caboose::PaymentProcessor.form_url(@order)
       end
       @logged_in_user = logged_in_user
+      add_ga_event('checkout', 'payment')
     end
         
     # GET /checkout/confirm
@@ -125,6 +129,7 @@ module Caboose
         end
       end
       @logged_in_user = logged_in_user
+      add_ga_event('checkout', 'confirm_without_payment')
     end
     
     # POST /checkout/confirm
@@ -171,7 +176,7 @@ module Caboose
       
       # Find the last order for the user
       @last_order = Order.where(:customer_id => @logged_in_user.id).order("id desc").limit(1).first
-
+      add_ga_event('checkout', 'thanks')
     end
     
     #===========================================================================

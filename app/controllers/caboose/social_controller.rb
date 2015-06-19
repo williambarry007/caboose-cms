@@ -35,6 +35,7 @@ module Caboose
           when 'google_plus_url'      then sc.google_plus_url      = value
           when 'linkedin_url'         then sc.linkedin_url         = value
           when 'google_analytics_id'  then sc.google_analytics_id  = value
+          when 'auto_ga_js'           then sc.auto_ga_js           = value
     	  end
     	end
     	

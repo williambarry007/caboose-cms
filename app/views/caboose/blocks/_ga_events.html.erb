@@ -1,0 +1,16 @@
+<% if ga_events && ga_events.count > 0 %>
+<script type='text/javascript'>
+<% ga_events.each do |arr| %>
+  <%
+  cat    = arr[0] ? arr[0] : nil 
+  action = arr[1] ? arr[1] : nil 
+  label  = arr[2] ? arr[2] : nil 
+  value  = arr[3] ? arr[3] : nil
+  arr2 = [cat, action]
+  arr2 << (label ? label : '') if label || (label.nil? && value)    
+  arr2 << value if value          
+  %>
+  ga('send', 'event', <% arr2.each do |x| %>, <%= raw Caboose.json(x) %><% end %>);
+<% end %>
+</script>
+<% end %>

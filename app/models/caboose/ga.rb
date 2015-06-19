@@ -22,7 +22,7 @@ module Caboose
       params['el'] = label if label
       params['ev'] = value if value    
 
-      HTTParty.get('https://www.google-analytics.com', { 'query' => params })      
+      HTTParty.post('http://www.google-analytics.com/collect', :body => params)      
     end
     
   end  

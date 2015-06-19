@@ -95,13 +95,13 @@ module Caboose
            
     def decrement_quantities            
       self.line_items.each do |line_item|
-        line_item.variant.update_attribute(:quantity, line_item.variant.quantity_in_stock - line_item.quantity)
+        line_item.variant.update_attribute(:quantity_in_stock, line_item.variant.quantity_in_stock - line_item.quantity)
       end            
     end
     
     def increment_quantities            
       self.line_items.each do |line_item|
-        line_item.variant.update_attribute(:quantity, line_item.variant.quantity_in_stock - line_item.quantity)
+        line_item.variant.update_attribute(:quantity_in_stock, line_item.variant.quantity_in_stock - line_item.quantity)
       end            
     end
     

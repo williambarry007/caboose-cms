@@ -146,7 +146,7 @@ module Caboose
           when 'hide'       then post.hide       = value
           when 'image_url'  then post.image_url  = value
           when 'published'  then post.published  = value
-          when 'created_at' then post.created_at = DateTime.parse(value)
+          when 'created_at' then post.created_at = DateTime.strptime(value,'%m/%d/%Y')
           when 'updated_at' then post.updated_at = DateTime.parse(value)
         end
       end

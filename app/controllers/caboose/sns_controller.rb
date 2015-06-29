@@ -10,8 +10,10 @@ module Caboose
 
     # POST /admin/sns
     def admin_add
-      body = JSON.parse(request.raw_post, {symbolize_names: true})
-      if body[:Subject] == 'Amazon S3 Notification'
+      body = JSON.parse(request.raw_post, {symbolize_names: true})      
+      if body[:Type] && body[:Type] == "SubscriptionConfirmation"
+        Caboose.log("SNS Subscription SubscribeURL\n#{body[:SubscribeURL]}")
+      elsif body[:Subject] == 'Amazon S3 Notification'
         msg = JSON.parse(body[:Message])
         if msg['Records']
           msg['Records'].each do |r|

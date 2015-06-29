@@ -1,0 +1,49 @@
+
+<h1>Media</h1>
+
+<p><a href='http://d9hjv462jiw15.cloudfront.net/media-images/22_tiny.jpg?1435603149'>Download</a></p>
+
+<div id='left_content'>
+  <div id='categories'></div>
+  <div id='controls'></div>
+</div>
+<div id='right_content'>
+  <div id='uploader'></div>
+  <div id='media'></div>
+</div>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/admin_media_index' %>
+<link rel="stylesheet" href="/assets/plupload/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/admin_media_index.js' %>
+<%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
+
+<!-- production -->
+<script type="text/javascript" src="/assets/plupload/plupload.full.min.js"></script>
+<script type="text/javascript" src="/assets/plupload/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+                
+<!-- debug 
+<script type="text/javascript" src="/assets/plupload/moxie.js"></script>
+<script type="text/javascript" src="/assets/plupload/plupload.dev.js"></script>
+<script type="text/javascript" src="/assets/plupload/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+-->
+
+<script type="text/javascript">
+
+var controller = false;
+$(document).ready(function() {
+  controller = new MediaController({
+    top_cat_id: <%= raw Caboose.json(@media_category ? @top_media_category.id : false) %>,
+    cat_id: <%= raw Caboose.json(@media_category ? @media_category.id : false) %>,
+    s3_upload_url: '<%= raw @s3_upload_url %>',		      		  	
+	  aws_access_key_id: '<%= raw @aws_access_key_id %>',		
+	  policy: '<%= raw @policy %>',
+	  signature: '<%= raw @signature %>'
+  });	
+});
+
+</script>
+<% end %>

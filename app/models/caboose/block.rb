@@ -9,6 +9,8 @@ class Caboose::Block < ActiveRecord::Base
   belongs_to :block_type
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
   has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :dependent => :delete_all, :order => 'sort_order'
+  belongs_to :media_file
+  belongs_to :media_image
   has_attached_file :file, :path => ':path_prefixuploads/:block_file_upload_name.:extension'
   do_not_validate_attachment_file_type :file  
   has_attached_file :image,
@@ -19,9 +21,9 @@ class Caboose::Block < ActiveRecord::Base
       :thumb => '400x300>',
       :large => '640x480>',
       :huge  => '1400x1050>'
-    }
+    }  
   do_not_validate_attachment_file_type :image
-  
+      
   attr_accessible :id,
     :post_id,
     :page_id, 

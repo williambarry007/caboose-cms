@@ -1,0 +1,115 @@
+
+#left_content {
+  width: 280px;
+  float: left; 
+}
+
+#right_content {
+  margin-left: 300px; 
+}
+
+#categories {  
+  ul {
+    list-style: none; 
+    margin: 0; 
+    padding: 0;
+    
+    li {       
+      list-style: none; 
+      margin: 0;
+      padding: 0;
+      
+      a {
+        display: block;
+        margin: 0 0 2px 0;
+        padding: 4px 8px;
+        background: #ddd;
+        border: #999 1px solid;
+        color: #000;
+        text-decoration: none;
+        
+        &:hover {
+          background-color: #fff799;        
+        }
+      }
+      
+      &.selected {
+        a {
+          font-weight: bold;
+          background-color: #90dbf9;
+        }
+      }
+      &.cat_hover {
+        a {
+          background-color: #fff799 !important;
+        }
+      }
+    }    
+  }
+}
+
+#controls {
+  #delete {
+    p.delete_dropper {        
+      padding: 8px 8px;
+      background: #ddd;
+      border: #999 1px solid;
+      color: #000;
+      text-decoration: none;
+    }
+    &.hover {
+      p.delete_dropper {        
+        background-color: #fff799 !important;    
+      }
+    }
+  }
+}
+
+#the_uploader {
+  margin-bottom: 20px;
+  padding-right: 20px; 
+}
+    
+#media {
+  ul {
+    list-style: none; 
+    margin: 0 0 20px 0; 
+    padding: 0; 
+    
+    li { 
+      position: relative;
+      list-style: none; 
+      margin: 4px; 
+      padding: 0;   
+      display: inline-block;
+      width: 150px;
+      height: 150px;
+      overflow: hidden;
+      background-color: #666;
+      background-position: center;
+      background-size: contain; 
+      background-repeat: no-repeat;
+      border: #666 4px solid;
+        
+      span.name { 
+        display: block; 
+        position: absolute; 
+        bottom: 4px; 
+        width: 150px; 
+        text-align: center;        
+        color: #fff; 
+        text-decoration: none !important;                                   
+      }
+      &:hover {
+        background-color: #fff799;
+        border: #fff799 4px solid;
+        span { background-color: #fff799; color: #000; }
+      }
+      &.selected {
+        background-color: #90dbf9;
+        border: #90dbf9 4px solid;
+        span { background-color: #90dbf9; color: #000; }
+      }
+    }
+  }
+}

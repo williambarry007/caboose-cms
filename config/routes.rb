@@ -111,14 +111,23 @@ Caboose::Engine.routes.draw do
   put     "/admin/social"               => "social#admin_update"
   get     "/admin/analytics"            => "social#analytics"
 
+  #=============================================================================
+  # Amazon SNS
+  #=============================================================================
 
+  get    "/admin/sns/confirm" => "sns#admin_confirm"
+  post   "/admin/sns/confirm" => "sns#admin_confirm"
+  get    "/admin/sns"         => "sns#admin_index"      
+  post   "/admin/sns"         => "sns#admin_add"
+  put    "/admin/sns/:id"     => "sns#admin_update"
+  delete "/admin/sns/:id"     => "sns#admin_delete"                        
+    
   #=============================================================================
   # Fonts
   #=============================================================================  
   
   get     "/admin/fonts"               => "fonts#admin_index"
   put     "/admin/fonts"               => "fonts#admin_update"
-
 
   #=============================================================================
   # Shipping Packages
@@ -200,22 +209,26 @@ Caboose::Engine.routes.draw do
   # Images
   #=============================================================================
   
-  get     "/admin/images"                => "images#admin_index"
-  get     "/admin/images/s3"             => "images#admin_sign_s3"
-  get     "/admin/images/s3-result"      => "images#admin_s3_result"  
-  get     "/admin/images/new"            => "images#admin_new"
-  get     "/admin/images/json"           => "images#admin_json"
-  get     "/admin/images/:id/process"    => "images#admin_process"
-  get     "/admin/images/:id/finished"   => "images#admin_process_finished"
-  get     "/admin/images/:id"            => "images#admin_edit"  
-  put     "/admin/images/:id"            => "images#admin_update"
-  post    "/admin/images/:id/image"      => "images#admin_update_image"  
-  post    "/admin/images"                => "images#admin_add"
-  delete  "/admin/images/:id"            => "images#admin_delete"
+  post    "/admin/media/pre-upload"     => "media#admin_pre_upload"
+  get     "/admin/media"                => "media#admin_index"    
+  get     "/admin/media/new"            => "media#admin_new"
+  get     "/admin/media/json"           => "media#admin_json"
+  get     "/admin/media/:id/process"    => "media#admin_process"
+  get     "/admin/media/:id/finished"   => "media#admin_process_finished"
+  get     "/admin/media/:id"            => "media#admin_edit"  
+  put     "/admin/media/:id"            => "media#admin_update"
+  post    "/admin/media/:id/image"      => "media#admin_update_image"  
+  post    "/admin/media"                => "media#admin_add"
+  delete  "/admin/media/bulk"           => "media#admin_bulk_delete"
+  delete  "/admin/media/:id"            => "media#admin_delete"
   
-  post    "/admin/media-categories"      => "media_categories#admin_add"
-  put     "/admin/media-categories/:id"  => "media_categories#admin_update"      
-  delete  "/admin/media-categories/:id"  => "media_categories#admin_delete"
+  
+  get     "/admin/media-categories/json"        => "media_categories#admin_json"
+  get     "/admin/media-categories/flat-tree"   => "media_categories#admin_flat_tree"
+  post    "/admin/media-categories"             => "media_categories#admin_add"
+  post    "/admin/media-categories/:id/attach"  => "media_categories#admin_attach"
+  put     "/admin/media-categories/:id"         => "media_categories#admin_update"      
+  delete  "/admin/media-categories/:id"         => "media_categories#admin_delete"
   
   #=============================================================================
   # Settings

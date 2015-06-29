@@ -329,18 +329,15 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :site_id           , :integer ],
         [ :name              , :string  ]        
       ],
-      Caboose::MediaImage => [
+      Caboose::Media => [
         [ :media_category_id , :integer    ],
         [ :name              , :string     ],
         [ :description       , :text       ],
-        [ :image             , :attachment ]
-      ],
-      Caboose::MediaFile => [
-        [ :media_category_id , :integer    ],
-        [ :name              , :string     ],
-        [ :description       , :text       ],
-        [ :file              , :attachment ]
-      ],
+        [ :original_name     , :string     ],
+        [ :image             , :attachment ],
+        [ :file              , :attachment ],
+        [ :processed         , :boolean     , { :default => false }]
+      ],      
       Caboose::Modification => [      
         [ :product_id               , :integer ],
         [ :sort_order               , :integer  , { :default => 0 }],

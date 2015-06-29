@@ -1,6 +1,21 @@
 
 module Caboose
   class MediaCategoriesController < ApplicationController
+    
+    # GET /admin/media-categories/json
+    def admin_json
+      return unless user_is_allowed('mediacategories', 'view')       
+      tree = Caboose::MediaCategory.flat_tree(@site.id)
+      render :json => tree
+    end
+    
+    # GET /admin/media-categories/flat-tree
+    def admin_flat_tree
+      return unless user_is_allowed('mediacategories', 'view')
+      prefix = params[:prefix] ? params[:prefix] : '-&nbsp;&nbsp;'
+      tree = Caboose::MediaCategory.flat_tree(@site.id, prefix)
+      render :json => tree
+    end
 
     # POST /admin/media-categories
     def admin_add
@@ -32,7 +47,15 @@ module Caboose
       save = true      
       params.each do |name, value|
         case name          
-          when 'name' then cat.name = value            
+          when 'name' then cat.name = value
+          when 'parent_id'
+            parent = MediaCategory.find(value.to_i)
+            if cat.is_ancestor_of?(parent)
+              resp.error = "The new parent cannot be a child of itself."
+              save = false
+            else
+              cat.parent_id = value
+            end            
         end
       end
     
@@ -44,13 +67,26 @@ module Caboose
     def admin_delete
       return unless user_is_allowed('mediacategories', 'delete')
       cat = MediaCategory.find(params[:id])
-      cat.destroy
+      Media.where(:media_category_id => cat.id).destroy_all
+      cat.destroy            
+      render :json => { :success => true }
+    end
+    
+    # POST /admin/media-categories/:id/attach
+    def admin_attach
+      return unless user_is_allowed('mediacategories', 'view')
       
-      resp = StdClass.new({
-        'redirect' => '/admin/media-categories'
-      })
-      render :json => resp
-    end       
-		
+      media_category_id = params[:id]
+      ids = params[:media_id]
+      ids = [ids] if !ids.is_a?(Array)
+      ids.each do |id|
+        m = Media.where(:id => id).first
+        next if m.nil?
+        m.update_attribute(:media_category_id, media_category_id)
+      end
+        
+      render :json => { :success => true }
+    end
+        		
   end
 end

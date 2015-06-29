@@ -267,7 +267,7 @@ module Caboose
       
     # Make sure we're not under construction or on a forwarded domain
     def under_construction_or_forwarding_domain?
-      
+            
       d = Caboose::Domain.where(:domain => request.host_with_port).first
       if d.nil?
         Caboose.log("Could not find domain for #{request.host_with_port}\nAdd this domain to the caboose site.")

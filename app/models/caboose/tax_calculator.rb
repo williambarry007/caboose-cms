@@ -25,7 +25,7 @@ module Caboose
       sa = order.shipping_address
       if sa.nil? || sa.address1.nil? || sa.city.nil? || sa.state.nil? || sa.zip.nil?        
         sa = order.billing_address
-      end      
+      end
       return 0.00 if sa.nil? || sa.address1.nil? || sa.city.nil? || sa.state.nil? || sa.zip.nil?
       
       TaxCloud.configure do |config|

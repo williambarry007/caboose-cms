@@ -153,3 +153,9 @@ Paperclip.interpolates :block_image_upload_name do |attachment, style|
   return b.id if b.image_upload_name.nil? || b.image_upload_name.strip.length == 0
   return b.image_upload_name        
 end
+
+Paperclip.interpolates :media_name do |attachment, style|
+  m = attachment.instance
+  return '' if m.name.nil? || m.name.strip.length == 0
+  return m.name            
+end

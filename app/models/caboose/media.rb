@@ -10,10 +10,11 @@ class Caboose::Media < ActiveRecord::Base
   has_attached_file :image, 
     :path => ':path_prefixmedia/:id_:media_name_:style.:extension',
     :default_url => 'http://placehold.it/300x300',    
-    :styles => {
-      :tiny  => '150x200>',
-      :thumb => '300x400>',
-      :large => '600x800>'
+    :styles => {      
+      :tiny  => '160x120>',
+      :thumb => '400x300>',
+      :large => '640x480>',
+      :huge  => '1400x1050>'
     }
     #:s3_headers => lambda { |attachment| { "Content-Disposition" => "attachment; filename=\"#{attachment.name}\"" }}
   do_not_validate_attachment_file_type :image  

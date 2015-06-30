@@ -1,9 +1,4 @@
 <%
-Caboose.log(block.id)
-image_src = block.child('image_src')
-Caboose.log(image_src)
-Caboose.log(image_src.media_id)
-
 img       = block.child_value('image_src')
 img_style = block.child_value('image_style')
 link      = block.child_value('link')
@@ -19,13 +14,6 @@ mr.downcase! if mr
 mb.downcase! if mb 
 ml.downcase! if ml 
 url = img ? img.url(img_style.downcase.to_sym) : nil
-url = nil
-
-if image_src && image_src.media  
-  url = image_src.media.image.url(img_style.downcase.to_sym)
-elsif img
-  url = img.url(img_style.downcase.to_sym)
-end
 
 img = nil
 alt = block.child_value('alt_text').blank? ? "" : block.child_value('alt_text')
@@ -62,7 +50,7 @@ if url && !url.include?('missing.png')
   end
 end 
 if editing && img.nil?
-  %><p id='block_<%= block.id %>'>TPlease upload an image.</p><%
+  %><p id='block_<%= block.id %>'>Please upload an image.</p><%
 else
   %><%= raw img %><%
 end

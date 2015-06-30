@@ -4,8 +4,15 @@ namespace :caboose do
   
   desc "Migrate block images to media"
   task :migrate_block_images_to_media => :environment do
-    Caboose::Block.where("image_file_name is not null").reorder(:id).limit(1).all.each do |b|
-      b.migrate_media
+    Caboose::Block.where("image_file_name is not null and media_id is null").reorder(:id).all.each do |b|
+      b.delay.migrate_media
+    end
+  end
+  
+  desc "Migrate block files to media"
+  task :migrate_block_files_to_media => :environment do
+    Caboose::Block.where("file_file_name is not null and media_id is null").reorder(:id).all.each do |b|
+      b.delay.migrate_media
     end
   end
         

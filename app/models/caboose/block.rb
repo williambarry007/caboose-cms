@@ -62,16 +62,16 @@ class Caboose::Block < ActiveRecord::Base
   def child_value(name)
     b = self.child(name)
     return nil if b.nil?
-    #if b.block_type.field_type == 'image'
-    #  return b.media.image if b.media
-    #  return b.image
-    #end
-    #if b.block_type.field_type == 'file'
-    #  return b.media.file if b.media
-    #  return b.file
-    #end    
-    return b.image if b.block_type.field_type == 'image'
-    return b.file  if b.block_type.field_type == 'file'
+    if b.block_type.field_type == 'image'
+      return b.media.image if b.media
+      return b.image
+    end
+    if b.block_type.field_type == 'file'
+      return b.media.file if b.media
+      return b.file
+    end    
+    #return b.image if b.block_type.field_type == 'image'
+    #return b.file  if b.block_type.field_type == 'file'
     return b.value        
   end
   
@@ -218,7 +218,7 @@ class Caboose::Block < ActiveRecord::Base
         "caboose/blocks/#{block.block_type.name}",                
         "caboose/blocks/#{block.block_type.field_type}"
       ]
-      Caboose.log(arr)
+      #Caboose.log(arr)
       str = self.render_helper(view, options2, block, full_name, arr, 0)
 
     end    

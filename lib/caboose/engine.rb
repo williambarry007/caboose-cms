@@ -78,14 +78,14 @@ module Caboose
         'caboose/*.gif',        
         
         # Javascript
-        'caboose/*.js',                
+        'caboose/*.js',        
         'caboose/model/*.js',        
         'jquery.js',
         'jquery_ujs.js',
         'jquery-ui.js',
         'colorbox-rails.js',
         'colorbox-rails/jquery.colorbox-min.js',
-        'colorbox-rails/colorbox-links.js',        
+        'colorbox-rails/colorbox-links.js',                
         'tinymce/preinit.js',
         'tinymce/plugins/caboose/plugin.js',
         'tinymce/themes/modern/theme.js',
@@ -106,6 +106,20 @@ module Caboose
         'colorbox-rails/colorbox-rails.css',
         'jquery-ui.css',                
         '*/css/application.css', # Site CSS
+        
+        # PLUpload        
+        'plupload/i18n/*.js',
+        'plupload/jquery.plupload.queue/css/*.css',
+        'plupload/jquery.plupload.queue/img/*.gif',
+        'plupload/jquery.plupload.queue/img/*.png',
+        'plupload/jquery.plupload.queue/*.js',
+        'plupload/jquery.ui.plupload/css/*.css',
+        'plupload/jquery.ui.plupload/img/*.gif',
+        'plupload/jquery.ui.plupload/img/*.png',
+        'plupload/jquery.ui.plupload/*.js',
+        'plupload/*.js',
+        'plupload/*.swf',
+        'plupload/*.xap',        
 
         # Fonts
         'caboose/fonts/avenir-medium.eot',

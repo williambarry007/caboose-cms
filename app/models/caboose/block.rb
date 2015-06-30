@@ -6,11 +6,10 @@ class Caboose::Block < ActiveRecord::Base
   
   belongs_to :post
   belongs_to :page
+  belongs_to :media
   belongs_to :block_type
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
   has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :dependent => :delete_all, :order => 'sort_order'
-  belongs_to :media_file
-  belongs_to :media_image
   has_attached_file :file, :path => ':path_prefixuploads/:block_file_upload_name.:extension'
   do_not_validate_attachment_file_type :file  
   has_attached_file :image,
@@ -55,7 +54,7 @@ class Caboose::Block < ActiveRecord::Base
     #end
   end
   
-  def full_name
+  def full_name    
     return self.name if parent_id.nil?
     return "#{parent.full_name}_#{self.name}"
   end
@@ -63,6 +62,14 @@ class Caboose::Block < ActiveRecord::Base
   def child_value(name)
     b = self.child(name)
     return nil if b.nil?
+    #if b.block_type.field_type == 'image'
+    #  return b.media.image if b.media
+    #  return b.image
+    #end
+    #if b.block_type.field_type == 'file'
+    #  return b.media.file if b.media
+    #  return b.file
+    #end    
     return b.image if b.block_type.field_type == 'image'
     return b.file  if b.block_type.field_type == 'file'
     return b.value        
@@ -211,6 +218,7 @@ class Caboose::Block < ActiveRecord::Base
         "caboose/blocks/#{block.block_type.name}",                
         "caboose/blocks/#{block.block_type.field_type}"
       ]
+      Caboose.log(arr)
       str = self.render_helper(view, options2, block, full_name, arr, 0)
 
     end    
@@ -491,5 +499,36 @@ class Caboose::Block < ActiveRecord::Base
     end
     return str              
   end
+  
+  def migrate_media
+    
+    if self.block_type.field_type == 'image' && !self.image_file_name.nil? && self.media_id.nil?
+      
+      site_id = self.page_id ? self.page.site_id : self.post.site_id
+      cat = Caboose::MediaCategory.top_category(site_id)      
+      m = Caboose::Media.create(:media_category_id => cat.id, :original_name => self.image_file_name, :name => Caboose::Media.upload_name(self.image_file_name))        
+      m.image = URI.parse(self.image.url(:original))
+      m.processed = true
+      m.save
+      
+      self.media_id = m.id
+      self.save
+    
+    elsif self.block_type.field_type == 'file' && !self.file_file_name.nil? && self.media_id.nil?
+      
+      site_id = self.page_id ? self.page.site_id : self.post.site_id
+      cat = Caboose::MediaCategory.top_category(site_id)      
+      m = Caboose::Media.create(:media_category_id => cat.id, :original_name => self.file_file_name, :name => Caboose::Media.upload_name(self.file_file_name))        
+      m.file = URI.parse(self.file.url)
+      m.processed = true
+      m.save
+      
+      self.media_id = m.id
+      self.save
+      
+    end
+    
+  end
+    
 
 end

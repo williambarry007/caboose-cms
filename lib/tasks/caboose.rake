@@ -1,7 +1,14 @@
 require "caboose/version"
 
 namespace :caboose do
-
+  
+  desc "Migrate block images to media"
+  task :migrate_block_images_to_media => :environment do
+    Caboose::Block.where("image_file_name is not null").reorder(:id).limit(1).all.each do |b|
+      b.migrate_media
+    end
+  end
+        
   desc "Update expired caches and cache pages that aren't cached"
   task :cache_pages => :environment do    
     Caboose::PageCacher.delay.refresh    

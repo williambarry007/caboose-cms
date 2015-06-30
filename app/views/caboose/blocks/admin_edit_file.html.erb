@@ -1,0 +1,73 @@
+<%
+base_url = @block.page_id ? "/admin/pages/#{@block.page_id}/blocks" : "/admin/posts/#{@block.post_id}/blocks"
+crumbs = []
+b = @block
+while b    
+  href = b.id == @block.id ? "#" : "#{base_url}/#{b.id}/edit"  
+  text = b.name ? "#{b.block_type.description} (#{b.name})" : b.block_type.description  
+  crumbs << "<a href=\"#{href}\">#{text}</a>"
+  b = b.parent
+end
+
+url = nil
+name = nil
+if @block.media  
+  url = @block.media.file_url
+  name = @block.media.file_file_name
+  name = @block.media.image_file_name if name.nil?
+elsif @block.image
+  url = @block.file.url
+  name = @block.file_file_name  
+end
+
+%>
+<h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
+
+<div id='left_content'>
+  <div id='categories'></div>
+  <div id='controls'>
+    <% if url.nil? || url.include?('missing') %>            
+      <p>Please select a file.</p>
+    <% else %>
+      <p>Current File</p>
+      <p><%= name %></p>
+    <% end %>    
+  </div>
+</div>
+<div id='right_content'>
+  <div id='uploader'></div>
+  <div id='media'></div>
+</div>
+
+<p>
+<input type='button' value='< Back'       onclick="window.location='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.parent_id %>/edit';" />
+<input type='button' value='Close'        onclick="parent.controller.render_blocks(); modal.close();" />
+<input type='button' value='Manage Media' onclick="parent.window.location='/admin/media';" />
+</p>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/admin_block_edit_image' %>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/block_media_controller" %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {  
+  modal = new CabooseModal(800);
+});
+  
+var controller = false;
+$(document).ready(function() {  
+  controller = new BlockMediaController({          
+    <% if @block.page_id %>page_id: <%= @block.page_id %><% else %>post_id: <%= @block.post_id %><% end %>,
+    block_id: <%= @block.id %>,
+    block_parent_id: <%= @block.parent_id %>,              
+    authenticity_token: '<%= form_authenticity_token %>'    
+  });    
+});    
+
+</script>
+<% end %>

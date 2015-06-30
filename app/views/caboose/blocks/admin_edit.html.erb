@@ -41,12 +41,12 @@ end
   <!-- Stop -->
 <% elsif @block.block_type.field_type != 'block' %>
   <p><div id='block_<%= @block.id %>_value'></div></p>
-<% else %>  
+<% else %>
   <% if @block.children.count > 0 %>  
-    <% @block.children.order(:sort_order).each do |b| %>
-      <% if b.block_type.field_type != 'block' && b.block_type.field_type != 'richtext' %>
+    <% @block.children.order(:sort_order).each do |b| %>      
+      <% if b.block_type.field_type != 'block' && b.block_type.field_type != 'richtext' && b.block_type.field_type != 'image' && b.block_type.field_type != 'file' %>        
         <div style='margin-bottom: 10px;'><div id='block_<%= b.id %>_value'></div></div>
-      <% else %>
+      <% else %>        
         <%
         #Caboose.log(b.value)
         #Caboose.log(b.name)

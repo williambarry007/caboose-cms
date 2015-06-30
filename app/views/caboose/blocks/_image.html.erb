@@ -1,58 +1,14 @@
-<%
-img       = block.child_value('image_src')
-img_style = block.child_value('image_style')
-link      = block.child_value('link')
-align     = block.child_value('align')
-width     = block.child_value('width')
-height    = block.child_value('height')
-mt        = block.child_value('margin_top')
-mr        = block.child_value('margin_right')
-mb        = block.child_value('margin_bottom')
-ml        = block.child_value('margin_left')
-mt.downcase! if mt 
-mr.downcase! if mr 
-mb.downcase! if mb 
-ml.downcase! if ml 
-url = img ? img.url(img_style.downcase.to_sym) : nil
-
-img = nil
-if url && !url.include?('missing.png')  
-  style = []
-  if align == 'Center'
-    ml = 'auto'
-    mr = 'auto'
-    style << "display: block"
-  end
-  
-  ml = "#{ml}px" if ml && ml != 'auto' && !ml.ends_with?('px') && !ml.ends_with?('em') && !ml.ends_with?('%') 
-  mr = "#{mr}px" if mr && mr != 'auto' && !mr.ends_with?('px') && !mr.ends_with?('em') && !mr.ends_with?('%')
-  mt = "#{mt}px" if mt && mt != 'auto' && !mt.ends_with?('px') && !mt.ends_with?('em') && !mt.ends_with?('%')
-  mb = "#{mb}px" if mb && mb != 'auto' && !mb.ends_with?('px') && !mb.ends_with?('em') && !mb.ends_with?('%')
-  
-  style << "width: #{width}px"       if width
-  style << "max-height: #{height}px" if height
-  style << "float: left"             if align == 'Left'
-  style << "float: right"            if align == 'Right'
-  style << "margin-left:   #{ml}"    if ml
-  style << "margin-right:  #{mr}"    if mr
-  style << "margin-top:    #{mt}"    if mt
-  style << "margin-bottom: #{mb}"    if mb  
-  style = style.join('; ')  
-  
-  img = "<img src='#{url}' style='#{style}' id='block_#{block.id}' />"
-  if link && link.strip.length > 0
-    if editing
-      img = "<a href='#'>#{img}</a>"            
-    else
-      img = "<a href='#{link}'>#{img}</a>"
-    end
-  end
-end 
-
-if editing && img.nil?
+<% 
+url = nil
+if block.media  
+  url = block.media.image.url(:tiny)
+elsif block.image
+  url = block.image.url(:tiny)
+end
+ 
+if editing && url.nil?
   %><p id='block_<%= block.id %>'>Please upload an image.</p><%
 else
-  %><%= raw img %><%
+  %><img src='<%= raw url %>' id='block_<%= block.id %>' /><%
 end
-
 %>

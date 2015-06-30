@@ -206,11 +206,21 @@ module Caboose
       @document_domain = request.host
       @document_domain.gsub('http://', '')
       @document_domain.gsub('https://', '')
-
-      begin        
-        render "caboose/blocks/admin_edit_#{@block.block_type.full_name}", :layout => 'caboose/modal'
-      rescue
-        render :layout => 'caboose/modal'
+            
+      full_name = @block.block_type.full_name
+      begin
+        if full_name != 'image'  
+          render "caboose/blocks/admin_edit_#{@block.block_type.full_name}", :layout => 'caboose/modal'
+        else
+          render :layout => 'caboose/modal'
+        end
+      rescue ActionView::MissingTemplate => ex        
+        begin        
+          render "caboose/blocks/admin_edit_#{@block.block_type.field_type}", :layout => 'caboose/modal'
+        rescue ActionView::MissingTemplate => ex        
+          render :layout => 'caboose/modal'
+          Caboose.log('test4')
+        end
       end
     end
     
@@ -322,6 +332,7 @@ module Caboose
           when 'sort_order'    then b.sort_order    = v
           when 'constrain'     then b.constrain     = v
           when 'full_width'    then b.full_width    = v
+          when 'media_id'      then b.media_id      = v
           when 'name'          then b.name          = v
           when 'value'         then
             

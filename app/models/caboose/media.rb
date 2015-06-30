@@ -90,5 +90,10 @@ class Caboose::Media < ActiveRecord::Base
     return '' if str.nil?
     return File.basename(str, File.extname(str)).downcase.gsub(' ', '-').gsub(/[^\w-]/, '')
   end
+  
+  def file_url
+    return self.image.url(:original) if self.image && !self.image.url(:original).starts_with?('http://placehold.it')
+    return self.file.url    
+  end
       
 end

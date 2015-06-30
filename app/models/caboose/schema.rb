@@ -149,10 +149,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :page_id               , :integer    ],
         [ :post_id               , :integer    ],
         [ :parent_id             , :integer    ],
+        [ :media_id              , :integer    ],
         [ :block_type_id         , :integer    ],
         [ :sort_order            , :integer     , { :default => 0     }],
         [ :constrain             , :boolean     , { :default => false }],
-        [ :full_width            , :boolean     , { :default => false }],
+        [ :full_width            , :boolean     , { :default => false }],        
         [ :name                  , :string     ],
         [ :value                 , :text       ],
         [ :file                  , :attachment ],
@@ -925,10 +926,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
     
     # Make sure a top-level media category for each site exists
     Caboose::Site.all.each do |site|
-      cat = Caboose::MediaCategory.where("parent_id is null and site_id = ? and name = ?", site.id, 'Images').first
-      Caboose::MediaCategory.create(:site_id => site.id, :name => 'Images') if cat.nil?
-      cat = Caboose::MediaCategory.where("parent_id is null and site_id = ? and name = ?", site.id, 'Files').first
-      Caboose::MediaCategory.create(:site_id => site.id, :name => 'Files') if cat.nil?
+      cat = Caboose::MediaCategory.where(:site_id => site.id, :parent_id => nil, :name => 'Media').first
+      Caboose::MediaCategory.create(:site_id => site.id, :parent_id => nil, :name => 'Media') if cat.nil?      
     end
     
     # Make sure a default category exists for all products

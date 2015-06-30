@@ -96,5 +96,9 @@ class Caboose::Media < ActiveRecord::Base
     return self.image.url(:original) if self.image && !self.image.url(:original).starts_with?('http://placehold.it')
     return self.file.url    
   end
+  
+  def reprocess_image
+    self.image.reprocess!
+  end
       
 end

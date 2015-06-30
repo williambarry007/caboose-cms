@@ -2,13 +2,16 @@ require "caboose/version"
 
 namespace :caboose do
   
+  desc "Reprocess media images"
+  task :reprocess_media_images => :environment do    
+    Caboose::Media.where("image_file_name is not null").reorder(:id).all.each do |m|
+      m.delay.reprocess_image            
+    end
+  end
+  
   desc "Migrate block images to media"
   task :migrate_block_images_to_media => :environment do
-    Caboose::Block.where("image_file_name is not null").reorder(:id).all.each do |b|
-      #next if b.page.nil?
-      #site_id = b.page.site_id      
-      #next if site_id.nil?
-      #next if site_id == 1          
+    Caboose::Block.where("image_file_name is not null and media_id is null").reorder(:id).all.each do |b|                
       b.delay.migrate_media
     end
   end

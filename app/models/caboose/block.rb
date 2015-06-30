@@ -506,7 +506,8 @@ class Caboose::Block < ActiveRecord::Base
       
       site_id = self.page_id ? self.page.site_id : self.post.site_id
       cat = Caboose::MediaCategory.top_category(site_id)      
-      m = Caboose::Media.create(:media_category_id => cat.id, :original_name => self.image_file_name, :name => Caboose::Media.upload_name(self.image_file_name))        
+      m = self.media
+      m = Caboose::Media.create(:media_category_id => cat.id, :original_name => self.image_file_name, :name => Caboose::Media.upload_name(self.image_file_name)) if m.nil?      
       m.image = URI.parse(self.image.url(:original))
       m.processed = true
       m.save
@@ -517,8 +518,9 @@ class Caboose::Block < ActiveRecord::Base
     elsif self.block_type.field_type == 'file' && !self.file_file_name.nil? && self.media_id.nil?
       
       site_id = self.page_id ? self.page.site_id : self.post.site_id
-      cat = Caboose::MediaCategory.top_category(site_id)      
-      m = Caboose::Media.create(:media_category_id => cat.id, :original_name => self.file_file_name, :name => Caboose::Media.upload_name(self.file_file_name))        
+      cat = Caboose::MediaCategory.top_category(site_id)
+      m = self.media      
+      m = Caboose::Media.create(:media_category_id => cat.id, :original_name => self.file_file_name, :name => Caboose::Media.upload_name(self.file_file_name)) if m.nil?        
       m.file = URI.parse(self.file.url)
       m.processed = true
       m.save

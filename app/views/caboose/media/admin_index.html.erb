@@ -12,7 +12,7 @@
 
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/admin_media_index' %>
-<link rel="stylesheet" href="/assets/plupload/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<%= stylesheet_link_tag 'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css' %>
 <% end %>
 
 <% content_for :caboose_js do %>
@@ -20,8 +20,8 @@
 <%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
 
 <!-- production -->
-<script type="text/javascript" src="/assets/plupload/plupload.full.min.js"></script>
-<script type="text/javascript" src="/assets/plupload/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<%= javascript_include_tag 'plupload/plupload.full.min.js' %>
+<%= javascript_include_tag 'plupload/jquery.ui.plupload/jquery.ui.plupload.js' %>
                 
 <!-- debug 
 <script type="text/javascript" src="/assets/plupload/moxie.js"></script>

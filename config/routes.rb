@@ -215,6 +215,7 @@ Caboose::Engine.routes.draw do
   get     "/admin/media/json"           => "media#admin_json"
   get     "/admin/media/:id/process"    => "media#admin_process"
   get     "/admin/media/:id/finished"   => "media#admin_process_finished"
+  get     "/admin/media/:id/description" => "media#admin_edit_description"
   get     "/admin/media/:id"            => "media#admin_edit"  
   put     "/admin/media/:id"            => "media#admin_update"
   post    "/admin/media/:id/image"      => "media#admin_update_image"  

@@ -237,7 +237,10 @@ MediaController.prototype = {
           .addClass('media')          
           .data('media_id', m.id)
           .click(function(e) { that.select_media($(this).data('media_id')); })
-          .append($('<span/>').addClass('name').html(m.name));
+          .append($('<span/>').addClass('name').html(m.name).click(function(e) {
+            e.stopPropagation();
+            that.edit_media_description($(this).parent().data('media_id'));
+          }))          
         if (m.image_urls)
           li.append($('<img/>').attr('src', m.image_urls.tiny_url));                                      
         if (that.selected_media.indexOf(m.id) > -1)
@@ -328,6 +331,39 @@ MediaController.prototype = {
       data: { ids: that.selected_media },      
       success: function(resp) { that.refresh_categories(); that.refresh_media(); that.print_controls(); }            
     });    
+  },
+  
+  edit_media_description: function(media_id)
+  {
+    var that = this;
+    caboose_modal_url('/admin/media/' + media_id + '/description');
+    
+    //var div = $('<div/>').attr('id', 'media_' + media_id + '_description');
+    //$('#media').append(div);
+    //new ModelBinder({
+    //  name: 'Media',
+    //  id: media_id,
+    //  update_url: '/admin/media/' + media_id,
+    //  authenticity_token: that.authenticity_token,
+    //  attributes: [
+    //    {
+    //      name: 'description', nice_name: 'Description', type: 'textarea', value: '', width: 400, height: 100, fixed_placeholder: true,        
+    //      after_update: function() { $('#media_' + media_id + '_description_container').remove(); },
+    //      after_cancel: function() { $('#media_' + media_id + '_description_container').remove(); }          
+    //    }
+    //  ]      
+    //});
+    //var options = {      
+    //  iframe: true,
+    //  innerWidth: 200,
+    //  innerHeight:  50,
+    //  scrolling: false,
+    //  transition: 'fade',
+    //  closeButton: false,
+    //  onComplete: caboose_fix_colorbox,
+    //  opacity: 0.50       
+    //};
+    //setTimeout(function() { $('#media_' + media_id + '_description_container').colorbox(options); }, 2000);
   },
   
   //============================================================================

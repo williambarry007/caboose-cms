@@ -62,6 +62,13 @@ module Caboose
       @media = Media.find(params[:id])
       render :layout => 'caboose/admin'
     end
+    
+    # GET /admin/media/:id/description
+    def admin_edit_description
+      return unless user_is_allowed('media', 'edit')
+      @media = Media.find(params[:id])
+      render :layout => 'caboose/modal'
+    end
             
     # PUT /admin/media/:id
     def admin_update

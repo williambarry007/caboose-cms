@@ -1,0 +1,32 @@
+<%
+m = @media
+%>
+<h1>Edit Description</h1>
+<p><div id='media_<%= m.id %>_description' ></div></p>
+
+<div id='message'></div>
+<p><input type='button' value='Close' onclick="modal.close();" /></p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(600);
+});
+
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'Media',
+    id: <%= m.id %>,
+    update_url: '/admin/media/<%= m.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [      
+      { name: 'description' , nice_name: 'Description' , type: 'textarea' , value: <%= raw Caboose.json(m.description) %>, width: 560, height: 200, fixed_placeholder: false }      
+    ]
+  });
+});
+
+</script>
+<% end %>

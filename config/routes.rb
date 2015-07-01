@@ -223,12 +223,13 @@ Caboose::Engine.routes.draw do
   delete  "/admin/media/:id"            => "media#admin_delete"
   
   
-  get     "/admin/media-categories/json"        => "media_categories#admin_json"
-  get     "/admin/media-categories/flat-tree"   => "media_categories#admin_flat_tree"
-  post    "/admin/media-categories"             => "media_categories#admin_add"
-  post    "/admin/media-categories/:id/attach"  => "media_categories#admin_attach"
-  put     "/admin/media-categories/:id"         => "media_categories#admin_update"      
-  delete  "/admin/media-categories/:id"         => "media_categories#admin_delete"
+  get     "/admin/media-categories/json"       => "media_categories#admin_json"
+  get     "/admin/media-categories/options"    => "media_categories#admin_options"
+  get     "/admin/media-categories/flat-tree"  => "media_categories#admin_flat_tree"
+  post    "/admin/media-categories"            => "media_categories#admin_add"
+  post    "/admin/media-categories/:id/attach" => "media_categories#admin_attach"
+  put     "/admin/media-categories/:id"        => "media_categories#admin_update"      
+  delete  "/admin/media-categories/:id"        => "media_categories#admin_delete"
   
   #=============================================================================
   # Settings

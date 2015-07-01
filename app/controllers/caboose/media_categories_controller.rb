@@ -16,6 +16,15 @@ module Caboose
       tree = Caboose::MediaCategory.flat_tree(@site.id, prefix)
       render :json => tree
     end
+    
+    # GET /admin/media-categories/options
+    def admin_options
+      return unless user_is_allowed('mediacategories', 'view')
+      prefix = params[:prefix] ? params[:prefix] : '-&nbsp;&nbsp;'
+      tree = Caboose::MediaCategory.flat_tree(@site.id, prefix)
+      options = tree.collect{ |mc| { 'value' => mc.id, 'text' => mc.name }}
+      render :json => tree
+    end
 
     # POST /admin/media-categories
     def admin_add
@@ -86,7 +95,7 @@ module Caboose
       end
         
       render :json => { :success => true }
-    end
+    end        
         		
   end
 end

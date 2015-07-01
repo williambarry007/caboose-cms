@@ -23,7 +23,7 @@ module Caboose
       prefix = params[:prefix] ? params[:prefix] : '-&nbsp;&nbsp;'
       tree = Caboose::MediaCategory.flat_tree(@site.id, prefix)
       options = tree.collect{ |mc| { 'value' => mc[:id], 'text' => mc[:name] }}
-      render :json => tree
+      render :json => options
     end
 
     # POST /admin/media-categories

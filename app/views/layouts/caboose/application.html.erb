@@ -1,19 +1,19 @@
 <% if @page && @page.title != 'Access Denied' %>
 <% content_for :js do %>
-<%= javascript_include_tag "caboose/application" %>
-<%= javascript_include_tag @site.name == 'application' ? 'application' : "#{@site.name}/js/application" %>
+<%= gzip_javascript_include_tag "caboose/application" %>
+<%= gzip_javascript_include_tag @site.name == 'application' ? 'application' : "#{@site.name}/js/application" %>
 <script>window.loggedIn = <%= logged_in?.to_json %></script>
 <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
-<% @page.linked_resources_map[:js].each do |r| %><%= javascript_include_tag r %><% end %>
+<% @page.linked_resources_map[:js].each do |r| %><%= gzip_javascript_include_tag r %><% end %>
 <% if @site.date_js_updated %><script type='text/javascript' src="<%= raw @site.custom_js_url %>"></script><% end %>
 <% if @page.custom_js && @page.custom_js.strip.length > 0 %><script type='text/javascript'><%= raw @page.custom_js %></script><% end %>
 <%= yield :caboose_js %>
 <% end %>
 <% content_for :css do %>
-<%= stylesheet_link_tag 'caboose/application' %>
-<%= stylesheet_link_tag @site.name == 'application' ? 'application' : "#{@site.name}/css/application" %>
-<% Caboose::stylesheets.each do |css| %><%= stylesheet_link_tag(css) %><% end %>
-<% @page.linked_resources_map[:css].each do |r| %><%= stylesheet_link_tag r %><% end %>
+<%= gzip_stylesheet_link_tag 'caboose/application' %>
+<%= gzip_stylesheet_link_tag @site.name == 'application' ? 'application' : "#{@site.name}/css/application" %>
+<% Caboose::stylesheets.each do |css| %><%= gzip_stylesheet_link_tag(css) %><% end %>
+<% @page.linked_resources_map[:css].each do |r| %><%= gzip_stylesheet_link_tag r %><% end %>
 <% if @site.date_css_updated %><link rel='stylesheet' type='text/css' url="<%= raw @site.custom_css_url %>" /><% end %>
 <% if @page.custom_css && @page.custom_css.strip.length > 0 %><style><%= raw @page.custom_css %></style><% end %>
 <%= yield :caboose_css %>

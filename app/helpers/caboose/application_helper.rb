@@ -26,6 +26,20 @@ tinyMCE.init({
     def parent_categories
       Caboose::Category.find(1).children.where(:status => 'Active')
     end
+          
+    def gzip_javascript_include_tag(asset)
+      tag = javascript_include_tag asset    
+      tag = tag.gsub(/\.js/i, ".js.gz") if Rails.env.production? && request.accept_encoding =~ /gzip/i
+      #tag = tag.gsub(/\.js/i, ".js.gz") if request.accept_encoding =~ /gzip/i
+      tag.html_safe
+    end
+    
+    def gzip_stylesheet_link_tag(asset)      
+      tag = stylesheet_link_tag asset          
+      tag = tag.gsub(/\.css/i, ".css.gz") if Rails.env.production? && request.accept_encoding =~ /gzip/i
+      #tag = tag.gsub(/\.css/i, ".css.gz") if request.accept_encoding =~ /gzip/i
+      tag.html_safe
+    end
     
   end
 end

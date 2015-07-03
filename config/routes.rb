@@ -168,6 +168,7 @@ Caboose::Engine.routes.draw do
   get     "/admin/users/new"                 => "users#new"
   get     "/admin/users/import"              => "users#import_form"
   post    "/admin/users/import"              => "users#import"  
+  get     "/admin/users/:id/su/:token"       => "users#admin_su_token"
   get     "/admin/users/:id/su"              => "users#admin_su"
   get     "/admin/users/:id/edit-password"   => "users#edit_password"
   get     "/admin/users/:id"                 => "users#edit"  

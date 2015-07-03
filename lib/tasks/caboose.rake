@@ -9,18 +9,16 @@ namespace :caboose do
     end
   end
   
-  desc "Migrate block images to media"
-  task :migrate_block_images_to_media => :environment do
+  desc "Migrate block images and files to media"
+  task :migrate_block_assets_to_media => :environment do
     Caboose::Block.where("image_file_name is not null and media_id is null").reorder(:id).all.each do |b|                
       b.delay.migrate_media
-    end
-  end
-  
-  desc "Migrate block files to media"
-  task :migrate_block_files_to_media => :environment do
+    end  
     Caboose::Block.where("file_file_name is not null and media_id is null").reorder(:id).all.each do |b|
       b.delay.migrate_media
     end
+    Caboose::BlockType.where(:id => 19).update_all('name' => 'image2')    
+    Caboose::Block.where(:block_type_id => 19).update_all('name' => 'image2')
   end
         
   desc "Update expired caches and cache pages that aren't cached"

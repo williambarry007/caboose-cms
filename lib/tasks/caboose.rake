@@ -2,6 +2,71 @@ require "caboose/version"
 
 namespace :caboose do
   
+  desc "Create a new lite site"
+  task :create_site => :environment do
+    puts "\n"
+    puts "--------------------------------------------------------------------------------\n"
+    puts "Create a new Nine Lite site\n"
+    puts "--------------------------------------------------------------------------------\n"
+
+    input = ''
+    STDOUT.puts "What is the name of the site?"
+    input = STDIN.gets.chomp
+    puts "\n"
+
+    input2 = ''
+    STDOUT.puts "What is the ID of the home page?"
+    input2 = STDIN.gets.chomp
+    puts "\n"
+
+    input3 = ''
+    STDOUT.puts "E-commerce? (y/n)"
+    input3 = STDIN.gets.chomp
+    puts "\n"
+
+    if !input.blank? && !input2.blank? && !input3.blank?
+      helper = SiteHelper.new(input,input2,input3)
+      helper.create_site
+
+      puts "\n"
+      puts "--------------------------------------------------------------------------------\n"
+      puts "Choo! Choo! Your site is set up!\n"
+      puts "--------------------------------------------------------------------------------\n"
+    else
+      puts "Invalid site name or home page ID"
+    end
+  end
+
+  desc "Create blocks for new site"
+  task :create_site_blocks => :environment do
+    puts "\n"
+    puts "--------------------------------------------------------------------------------\n"
+    puts "Create blocks for new site\n"
+    puts "--------------------------------------------------------------------------------\n"
+
+    input = ''
+    STDOUT.puts "What is the name of the site?"
+    input = STDIN.gets.chomp
+    puts "\n"
+
+    input2 = ''
+    STDOUT.puts "E-commerce? (y/n)"
+    input2 = STDIN.gets.chomp
+    puts "\n"
+
+    if !input.blank? && !input2.blank?
+      helper = SiteHelper.new(input,"0",input2)
+      helper.create_site_blocks
+
+      puts "\n"
+      puts "--------------------------------------------------------------------------------\n"
+      puts "Choo! Choo! Your blocks have been created!\n"
+      puts "--------------------------------------------------------------------------------\n"
+    else
+      puts "Invalid site name."
+    end
+  end
+    
   desc "Reprocess media images"
   task :reprocess_media_images => :environment do    
     Caboose::Media.where("image_file_name is not null").reorder(:id).all.each do |m|

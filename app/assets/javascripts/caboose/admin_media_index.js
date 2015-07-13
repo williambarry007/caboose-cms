@@ -66,7 +66,7 @@ MediaController.prototype = {
 		    },		
 		    file_data_name: 'file', // optional, but better be specified directly
 		    filters: {			
-		    	max_file_size: '10mb', // Maximum file size			
+		    	max_file_size: '100mb', // Maximum file size			
 		    	mime_types: [{ title: "Upload files", extensions: "jpg,jpeg,png,gif,tif,tiff,pdf,doc,docx,odt,odp,ods,ppt,pptx,xls,xlsx,zip,tgz,csv,txt" }] // Specify what files to browse for		    	
 		    },		
 		    flash_swf_url: '../../js/Moxie.swf', // Flash settings		

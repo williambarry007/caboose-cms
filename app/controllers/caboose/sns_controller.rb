@@ -19,19 +19,17 @@ module Caboose
           msg['Records'].each do |r|
             if r['eventName'] && r['eventName'].starts_with?('ObjectCreated')          
               if r['s3'] && r['s3']['object'] && r['s3']['object']['key']
-                #Caboose.log(r['eventName'])
-                #Caboose.log(r['s3']['object']['key'])
-                
-                key = r['s3']['object']['key']
+                                
+                key = URI.decode(r['s3']['object']['key']).gsub('+', ' ')
                 Caboose.log("Processing #{key}")
 
                 arr = key.split('_')
                 media_category_id = arr.shift
-                original_name = arr.join('_')                
+                original_name = arr.join('_')  
                 name = Caboose::Media.upload_name(original_name)
-                                      
-                m = Media.where(:media_category_id => media_category_id, :original_name => original_name, :name => name).first                  
-                m = Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :processed => false) if m.nil?
+                                                                      
+                m = Media.where(:media_category_id => media_category_id, :original_name => original_name, :name => name).first
+                m = Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :processed => false) if m.nil?                
                 m.process                
       
               end

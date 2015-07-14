@@ -230,7 +230,7 @@ MediaController.prototype = {
     if (that.cat.media.length > 0)
     {      
       $.each(that.cat.media, function(i, m) {
-        if (m.image_urls && m.processed == false)
+        if (m.media_type == 'image' && m.processed == false)
           processing = true
         var li = $('<li/>')          
           .attr('id', 'media' + m.id)
@@ -261,7 +261,7 @@ MediaController.prototype = {
         start: function() { $(this).data("origPosition", $(this).position()); }
       });
     });    
-  },
+  },     
   
   //============================================================================
         

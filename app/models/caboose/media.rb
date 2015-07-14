@@ -74,10 +74,18 @@ class Caboose::Media < ActiveRecord::Base
       :description  => self.description,
       :processed    => self.processed,
       :image_urls   => self.image_urls,
-      :file_url     => self.file ? self.file.url : nil       
+      :file_url     => self.file ? self.file.url : nil,
+      :media_type   => self.is_image? ? 'image' : 'file'
     }    
   end
   
+  def is_image?
+    image_extensions = ['.jpg', '.jpeg', '.gif', '.png', '.tif']
+    ext = File.extname(self.original_name).downcase
+    return true if image_extensions.include?(ext)
+    return false    
+  end
+          
   def image_urls
     return nil if self.image.nil? || self.image.url(:tiny).starts_with?('http://placehold.it')
     return {

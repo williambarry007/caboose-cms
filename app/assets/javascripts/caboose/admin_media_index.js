@@ -251,8 +251,8 @@ MediaController.prototype = {
     else
       ul = $('<p/>').html("This category is empty.");
     $('#media').empty().append(ul);
-    if (processing)
-      setTimeout(function() { that.refresh(); }, 2000);
+    //if (processing)
+    //  setTimeout(function() { that.refresh(); }, 2000);
     
     $.each(that.cat.media, function(i, m) {
       $('li.media').draggable({

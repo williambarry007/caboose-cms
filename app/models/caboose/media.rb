@@ -39,8 +39,11 @@ class Caboose::Media < ActiveRecord::Base
     bucket = config['bucket']
         
     key = "#{self.media_category_id}_#{self.original_name}"
+    Caboose.log("key before encoding: #{key}")
     key = URI.encode(key.gsub(' ', '+'))
+    Caboose.log("key after encoding: #{key}")
     uri = "http://#{bucket}-uploads.s3.amazonaws.com/#{key}"
+    Caboose.log("uri: #{uri}")
     
     image_extensions = ['.jpg', '.jpeg', '.gif', '.png', '.tif']
     ext = File.extname(key).downcase

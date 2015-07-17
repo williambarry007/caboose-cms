@@ -15,6 +15,10 @@ MediaController.prototype = {
 	uploader: false,
   refresh_unprocessed_images: false,	
 	  
+  
+  
+  
+  
   init: function(params) {
     var that = this;
     for (var i in params)
@@ -37,6 +41,7 @@ MediaController.prototype = {
     that.refresh_categories();
     that.refresh_media();
     that.print_controls();
+    
   },
       
   toggle_uploader: function()
@@ -115,6 +120,8 @@ MediaController.prototype = {
       async: false,      
       success: function(resp) { 
         that.categories = resp;
+        if (!that.cat_id)
+          that.cat_id = that.categories[0].id;
         that.print_categories();
         if (after) after();
       }        
@@ -144,8 +151,7 @@ MediaController.prototype = {
     var ul = $('<ul/>');
     if (that.categories.length > 0)
     {      
-      $.each(that.categories, function(i, cat) {
-        
+      $.each(that.categories, function(i, cat) {        
         var li = $('<li/>')
           .addClass('category')
           .attr('id', 'cat' + cat.id)
@@ -241,7 +247,7 @@ MediaController.prototype = {
           .append($('<span/>').addClass('name').html(m.name).click(function(e) {
             e.stopPropagation();
             that.edit_media_description($(this).parent().data('media_id'));
-          }))          
+          }));
         if (m.image_urls)
           li.append($('<img/>').attr('src', m.image_urls.tiny_url));                                      
         if (that.selected_media.indexOf(m.id) > -1)
@@ -280,6 +286,16 @@ MediaController.prototype = {
       that.selected_media[that.selected_media.length] = media_id;
       $('#media' + media_id).addClass('selected ui-selected').css('top', '0').css('left', '0');
     }        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
   },
   
   select_all_media: function()

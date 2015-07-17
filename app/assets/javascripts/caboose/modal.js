@@ -13,6 +13,7 @@
 //= require_tree ../../templates
 //= require jquery
 //= require jquery_ujs
+//= require jquery-ui
 //= require colorbox-rails
 //= require caboose/jquery.datetimepicker
 //= require caboose/jquery.placeholder

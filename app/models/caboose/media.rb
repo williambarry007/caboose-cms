@@ -5,10 +5,10 @@ class Caboose::Media < ActiveRecord::Base
 
   self.table_name = "media"
   belongs_to :media_category
-  has_attached_file :file, :path => ':path_prefixmedia/:id_:media_name.:extension'
+  has_attached_file :file, :path => ':caboose_prefixmedia/:id_:media_name.:extension'
   do_not_validate_attachment_file_type :file  
   has_attached_file :image, 
-    :path => ':path_prefixmedia/:id_:media_name_:style.:extension',
+    :path => ':caboose_prefixmedia/:id_:media_name_:style.:extension',
     :default_url => 'http://placehold.it/300x300',    
     :styles => {      
       :tiny  => '160x120>',
@@ -72,13 +72,14 @@ class Caboose::Media < ActiveRecord::Base
   
   def api_hash
     {
-      :id           => self.id,
-      :name         => self.name,
-      :description  => self.description,
-      :processed    => self.processed,
-      :image_urls   => self.image_urls,
-      :file_url     => self.file ? self.file.url : nil,
-      :media_type   => self.is_image? ? 'image' : 'file'
+      :id            => self.id,
+      :name          => self.name,
+      :original_name => self.original_name,
+      :description   => self.description,
+      :processed     => self.processed,
+      :image_urls    => self.image_urls,
+      :file_url      => self.file ? self.file.url : nil,
+      :media_type    => self.is_image? ? 'image' : 'file'
     }    
   end
   

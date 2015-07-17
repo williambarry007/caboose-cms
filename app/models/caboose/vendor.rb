@@ -6,7 +6,7 @@ module Caboose
     belongs_to :site    
     has_many :products
     has_attached_file :image, 
-      :path => ':path_prefixvendors/:id_:style.:extension',    
+      :path => ':caboose_prefixvendors/:id_:style.:extension',    
       :default_url => 'http://placehold.it/300x300',    
       :styles => {
         :tiny  => '150x200>',

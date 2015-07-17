@@ -17,6 +17,9 @@ module Caboose
       # Get the site we're working with      
       domain = Domain.where(:domain => request.host_with_port).first
       @site = domain ? domain.site : nil
+      
+      # Set the site in any mailers
+      CabooseMailer.site = @site
         
       # Make sure someone is logged in
       if !logged_in?      

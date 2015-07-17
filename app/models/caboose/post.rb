@@ -20,7 +20,7 @@ class Caboose::Post < ActiveRecord::Base
     :updated_at
     
   has_attached_file :image, 
-    :path => ':path_prefixposts/:id_:style.:extension',
+    :path => ':caboose_prefixposts/:id_:style.:extension',
     :default_url => 'http://placehold.it/300x300',
     :styles => {
       :tiny  => '75x75>',

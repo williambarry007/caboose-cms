@@ -11,7 +11,7 @@ class Caboose::Site < ActiveRecord::Base
   has_many :post_categories, :class_name => 'Caboose::PostCategory'
   has_one :store_config
   has_attached_file :logo, 
-    :path => ':path_prefixsite_logos/:id_:style.:extension',    
+    :path => ':caboose_prefixsite_logos/:id_:style.:extension',    
     :default_url => 'http://placehold.it/300x300',    
     :styles => {
       :tiny  => '150x200>',

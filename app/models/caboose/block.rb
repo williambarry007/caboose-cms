@@ -10,10 +10,10 @@ class Caboose::Block < ActiveRecord::Base
   belongs_to :block_type
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
   has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :dependent => :delete_all, :order => 'sort_order'
-  has_attached_file :file, :path => ':path_prefixuploads/:block_file_upload_name.:extension'
+  has_attached_file :file, :path => ':caboose_prefixuploads/:block_file_upload_name.:extension'
   do_not_validate_attachment_file_type :file  
   has_attached_file :image,
-    :path => ':path_prefixuploads/:block_image_upload_name_:style.:extension',
+    :path => ':caboose_prefixuploads/:block_image_upload_name_:style.:extension',
     :default_url => "http://placehold.it/300x300",
     :styles => {
       :tiny  => '160x120>',

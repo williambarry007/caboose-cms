@@ -83,8 +83,8 @@ module Caboose
 		  bob.password_reset_id = rand
 		  bob.password_reset_sent = DateTime.now
 		  bob.save
-		  
-		  LoginMailer.configure_for_site(@site.id).forgot_password_email(bob).deliver
+		  		  
+		  LoginMailer.forgot_password_email(bob).deliver
 		  		  
 		  resp.success = "We just sent you an email.  The reset link inside is good for 3 days."
 		  render :json => resp

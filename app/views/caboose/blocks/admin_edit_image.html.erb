@@ -1,4 +1,27 @@
-<%
+<%  
+config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
+access_key = config['access_key_id']
+secret_key = config['secret_access_key']
+bucket     = config['bucket']      
+policy = {        
+  "expiration" => 1.hour.from_now.utc.xmlschema,
+  "conditions" => [
+    { "bucket" => "#{bucket}-uploads" },          
+    { "acl" => "public-read" },
+    [ "starts-with", "$key", '' ],
+    #[ "starts-with", "$Content-Type", 'image/' ],          
+    [ 'starts-with', '$name', '' ], 	
+    [ 'starts-with', '$Filename', '' ],          
+  ]
+}
+@policy = Base64.encode64(policy.to_json).gsub(/\n/,'')      
+@signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), secret_key, @policy)).gsub("\n","")
+@s3_upload_url = "https://#{bucket}-uploads.s3.amazonaws.com/"
+@aws_access_key_id = access_key                                                
+@top_media_category = Caboose::MediaCategory.top_category(@site.id)      
+
+#===============================================================================
+
 base_url = @block.page_id ? "/admin/pages/#{@block.page_id}/blocks" : "/admin/posts/#{@block.post_id}/blocks"
 crumbs = []
 b = @block
@@ -9,32 +32,19 @@ while b
   b = b.parent
 end
 
-url = nil
-if @block.media  
-  url = @block.media.image.url(:tiny)
-elsif @block.image
-  url = @block.image.url(:tiny)
-end
-
 %>
 <h2 style='margin-top: 0; padding-top: 0;'><%= raw crumbs.reverse.join(' > ') %></h2>
 
 <div id='left_content'>
-  <div id='categories'></div>
-  <div id='controls'>
-    <% if url.nil? %>            
-      <p>Please upload an image.</p>
-    <% else %>
-      <p>Current Image</p>
-      <p><img src='<%= raw url %>' /></p>
-    <% end %>    
-  </div>
+  <div id='categories'></div>  
 </div>
 <div id='right_content'>
+  <div id='controls'></div>
   <div id='uploader'></div>
   <div id='media'></div>
 </div>
 
+<p style='clear: both;'>&nbsp;</p>
 <p>
 <input type='button' value='< Back'       onclick="window.location='/admin/pages/<%= @block.page_id %>/blocks/<%= @block.parent_id %>/edit';" />
 <input type='button' value='Close'        onclick="parent.controller.render_blocks(); modal.close();" />
@@ -43,27 +53,46 @@ end
 
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/admin_block_edit_image' %>
+<%= stylesheet_link_tag 'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css' %>
 <% end %>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <%= javascript_include_tag "caboose/block_media_controller" %>
+<%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
+
+<%= javascript_include_tag 'plupload/plupload.full.min.js' %> 
+<%= javascript_include_tag 'plupload/jquery.ui.plupload/jquery.ui.plupload.js' %>
+<%
+#javascript_include_tag 'plupload/moxie.js'
+#javascript_include_tag 'plupload/plupload.dev.js'
+#javascript_include_tag 'plupload/jquery.ui.plupload/jquery.ui.plupload.js'
+%>
+
 <script type='text/javascript'>
 
 var modal = false;
 $(window).load(function() {  
-  modal = new CabooseModal(800);
+  modal = new CabooseModal(900);
 });
-  
+
 var controller = false;
-$(document).ready(function() {  
-  controller = new BlockMediaController({          
+$(document).ready(function() {
+  controller = new BlockMediaController({
     <% if @block.page_id %>page_id: <%= @block.page_id %><% else %>post_id: <%= @block.post_id %><% end %>,
-    block_id: <%= @block.id %>,
-    block_parent_id: <%= @block.parent_id %>,              
-    authenticity_token: '<%= form_authenticity_token %>'    
-  });    
-});    
+    block_id: <%= @block.id %>,    
+    block_parent_id: <%= @block.parent_id %>,    
+    media_id: <% if @block.media_id %><%= @block.media_id %><% else %>false<% end %>, 
+    authenticity_token: '<%= form_authenticity_token %>',    
+    top_cat_id: <%= raw Caboose.json(@top_media_category.id) %>,
+    cat_id: <% if @block.media_id %><%= @block.media.media_category_id %><% else %><%= @top_media_category.id %><% end %>,
+    s3_upload_url: '<%= raw @s3_upload_url %>',		      		  	
+	  aws_access_key_id: '<%= raw @aws_access_key_id %>',		
+	  policy: '<%= raw @policy %>',
+	  signature: '<%= raw @signature %>',
+	  refresh_unprocessed_images: false
+  });	
+});
 
 </script>
 <% end %>

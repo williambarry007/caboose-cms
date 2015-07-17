@@ -40,6 +40,7 @@ module Caboose
       if !cat.save
         resp.error = cat.errors.first[1]
       else
+        resp.new_id = cat.id
         resp.refresh = true
       end
      

@@ -20,7 +20,7 @@ BlockMediaController.prototype = {
 	uploader: false,
   refresh_unprocessed_images: false,
   upload_extensions: "jpg,jpeg,png,gif,tif,tiff,pdf,doc,docx,odt,odp,ods,ppt,pptx,xls,xlsx,zip,tgz,csv,txt",
-  file_view: 'thumbnail',
+  file_view: 'thumbnail',    
 	  
   init: function(params) {
     var that = this;
@@ -219,6 +219,8 @@ BlockMediaController.prototype = {
     $('#media').empty().append(ul);
     if (that.refresh_unprocessed_images == true && processing)
       setTimeout(function() { that.refresh(); }, 2000);
+    if (modal)
+      modal.autosize();
     
     $.each(that.cat.media, function(i, m) {
       $('li.media').draggable({

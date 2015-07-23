@@ -3,7 +3,7 @@ p = @product
 %>
 <%= render :partial => 'caboose/products/admin_header' %>
 
-<form action='/admin/products/<%= p.id %>/images' method='post' enctype='multipart/form-data' id='new_image_form' target='new_image_iframe'>
+<!-- <form action='/admin/products/<%= p.id %>/images' method='post' enctype='multipart/form-data' id='new_image_form' target='new_image_iframe'>
 <input type='hidden' name='authenticity_token' value="<%= form_authenticity_token %>" />
 <p><input type='file' name='new_image' id='new_image' />
 <input type='submit' value='Add Image' onclick='add_image();' /></p>
@@ -11,12 +11,75 @@ p = @product
 <div id='new_image_message'></div>
 <iframe id='new_image_iframe' name='new_image_iframe' style='display: none;'></iframe>
 <div id='message'></div>
+ -->
+
+<!-- <p>Upload new product images at the <a href="/admin/media">media browser</a>.</p> -->
+
+
+
+
+
+
+<h2>Product Images</h2>
+
+<div id='left_content' style="width:150px;">
+<!--   <div id='categories'></div> -->
+  <div id='controls'></div>
+</div>
+<div id='right_content' style="margin-left:170px;">
+  <div id='uploader'></div>
+  <div id='media'></div>
+</div>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/admin_media_index' %>
+<%= stylesheet_link_tag 'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css' %>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/admin_media_index.js' %>
+<%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
+
+<!-- production -->
+<%= javascript_include_tag 'plupload/plupload.full.min.js' %>
+<%= javascript_include_tag 'plupload/jquery.ui.plupload/jquery.ui.plupload.js' %>
+                
+<!-- debug 
+<script type="text/javascript" src="/assets/plupload/moxie.js"></script>
+<script type="text/javascript" src="/assets/plupload/plupload.dev.js"></script>
+<script type="text/javascript" src="/assets/plupload/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+-->
+
+<script type="text/javascript">
+
+var controller = false;
+$(document).ready(function() {
+  controller = new MediaController({
+    top_cat_id: <%= raw Caboose.json(@media_category ? @top_media_category.id : false) %>,
+    cat_id: <%= raw Caboose.json(@media_category ? @media_category.id : false) %>,
+    s3_upload_url: '<%= raw @s3_upload_url %>',                 
+    aws_access_key_id: '<%= raw @aws_access_key_id %>',   
+    policy: '<%= raw @policy %>',
+    signature: '<%= raw @signature %>',
+    refresh_unprocessed_images: false
+  }); 
+});
+
+</script>
+<% end %>
+
+
+
+<hr style="margin:40px 0 20px 0;"/>
+
 
 <div id='images'>
+  <h4>Assign Images to Variants</h4>
   <% if p.product_images.count > 0 %>
     <ul id='images_list' class='clearfix'>
       <% p.product_images.reorder(:position).each do |img| %>
-        <% url = img.image.url(:tiny) %>
+        <% url = img.url(:tiny) %>
         <li id='img_<%= img.id %>'><div id='img_<%= img.id %>_container'><a href="javascript:select_image(<%= img.id %>);"><img src='<%= url %>' width='75' /></a></div></li> 
       <% end %>
     </ul>
@@ -38,6 +101,9 @@ p = @product
 #images div.selected img { border: #ff3333 4px solid; }
 #images_list { list-style: none; margin: 0; padding: 0; }
 #images_list li { list-style: none; margin: 0 10px 10px 0; padding: 0; float: left; }
+.delete_dropper {
+  margin-top: 0;
+}
 </style>
 <% end %>
 <% content_for :caboose_js do %>
@@ -115,7 +181,7 @@ function select_image(image_id, confirm)
   
   $('#variants').empty().append('<br/>');
   $('#variants').append($('<div/>').attr('id','delete_message'));
-  $('#variants').append($('<input/>').attr('type','button').val('Delete Image').click(function() { delete_image(image_id); }));  
+ // $('#variants').append($('<input/>').attr('type','button').val('Delete Image').click(function() { delete_image(image_id); }));  
   $('#variants').append(tbl);  
 }
 

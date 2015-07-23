@@ -92,7 +92,8 @@ module Caboose
     # DELETE /admin/media/:id
     def admin_delete
       return unless user_is_allowed('media', 'delete')
-      Media.find(params[:id]).destroy                  
+      Media.find(params[:id]).destroy
+      ProductImage.where(:media_id => params[:id]).destroy_all
       render :json => { :success => true }
     end
     
@@ -103,6 +104,7 @@ module Caboose
       if ids
         ids.each do |id|                
           Media.where(:id => id).destroy_all
+          ProductImage.where(:media_id => id).destroy_all
         end
       end
       render :json => { :success => true }
@@ -115,7 +117,13 @@ module Caboose
       original_name = params[:name]
       name = Caboose::Media.upload_name(original_name)                        
       m = Media.where(:media_category_id => media_category_id, :original_name => original_name, :name => name).first
-      Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :processed => false) if m.nil?
+      if m.nil?
+        m = Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :processed => false)
+      end
+      p = Product.where(:media_category_id => media_category_id).last
+      if p
+        pi = ProductImage.create(:product_id => p.id, :media_id => m.id)
+      end
       render :json => { :success => true }
     end
     

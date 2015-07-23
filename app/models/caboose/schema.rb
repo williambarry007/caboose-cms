@@ -521,7 +521,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :stackable_group_id    , :integer   ],
         [ :on_sale               , :boolean   , { :default => false }],
         [ :allow_gift_wrap       , :boolean   , { :default => false }],
-        [ :gift_wrap_price       , :decimal   , { :precision => 8, :scale => 2 }]
+        [ :gift_wrap_price       , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :media_category_id     , :integer   ]
       ],         
       Caboose::ProductImage => [
         [ :product_id            , :integer  ],
@@ -534,7 +535,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :image_updated_at      , :datetime ],
         [ :square_offset_x       , :integer  ],
         [ :square_offset_y       , :integer  ],
-        [ :square_scale_factor   , :numeric  ]
+        [ :square_scale_factor   , :numeric  ],
+        [ :media_id              , :integer  ]
       ],
       Caboose::ProductImageVariant => [
         [ :product_image_id      , :integer ],

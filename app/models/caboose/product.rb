@@ -4,6 +4,7 @@ module Caboose
     self.primary_key = 'id'
 
     belongs_to :site    
+    belongs_to :media_category    
     belongs_to :stackable_group, :class_name => 'Caboose::StackableGroup'
     belongs_to :vendor, :class_name => 'Caboose::Vendor'
     has_many :customizations, :class_name => 'Caboose::Product', :through => :customization_memberships
@@ -45,7 +46,8 @@ module Caboose
       :stackable_group_id    ,
       :on_sale               ,
       :allow_gift_wrap       ,
-      :gift_wrap_price
+      :gift_wrap_price       ,
+      :media_category_id
 
     STATUS_ACTIVE = 'Active'
     STATUS_INACTIVE = 'Inactive'

@@ -1,6 +1,54 @@
 require "caboose/version"
 
 namespace :caboose do
+
+  desc "Create media categories for existing products on all sites"
+  task :create_product_media_categories => :environment do
+    sites = Caboose::Site.where(:use_store => true).all.each do |s|
+      puts "Processing categories for " + s.description
+      # Create the parent level Media category if it doesn't exist
+      media_category = Caboose::MediaCategory.where(:name => "Media", :site_id => s.id).where("parent_id IS NULL").exists? ? Caboose::MediaCategory.where(:name => "Media", :site_id => s.id).where("parent_id IS NULL").last : Caboose::MediaCategory.new
+      media_category.name = "Media"
+      media_category.site_id = s.id
+      media_category.save
+      # Create the Products category if it doesn't exist
+      product_category = Caboose::MediaCategory.where(:name => "Products", :site_id => s.id).exists? ? Caboose::MediaCategory.where(:name => "Products", :site_id => s.id).last : Caboose::MediaCategory.new
+      product_category.parent_id = media_category.id
+      product_category.name = "Products"
+      product_category.site_id = s.id
+      product_category.save
+      # Create new category for each product
+      Caboose::Product.where(:site_id => s.id).all.each do |p|
+        puts "Creating media category for " + p.title
+        p_category = Caboose::MediaCategory.where(:name => p.title, :site_id => s.id).exists? ? Caboose::MediaCategory.where(:name => p.title, :site_id => s.id).last : Caboose::MediaCategory.new
+        p_category.name = p.title
+        p_category.parent_id = product_category.id
+        p_category.site_id = s.id
+        p_category.save
+        p.media_category_id = p_category.id
+        p.save
+      end
+    end
+  end
+
+  desc "Migrate product images to media"
+  task :migate_product_images_to_media => :environment do
+    Caboose::ProductImage.where("image_file_name is not null AND media_id IS NULL").order("id DESC").all.each do |product_image|
+      next if product_image.product.nil?
+      puts "Saving media for Product Image " + product_image.id.to_s
+      m = nil
+      m = Caboose::Media.where(:id => product_image.media_id).first
+      m = Caboose::Media.create(:media_category_id => product_image.product.media_category_id) if m.nil?
+      product_image.media_id = m.id
+      product_image.save
+      m.original_name = product_image.image_file_name
+      m.name = Caboose::Media.upload_name(m.original_name)      
+      m.image = URI.parse(product_image.image.url(:original))
+      m.processed = true
+      m.save
+    end
+  end
+
   
   desc "Create a new lite site"
   task :create_site => :environment do

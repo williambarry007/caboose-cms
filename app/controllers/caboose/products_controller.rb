@@ -284,7 +284,29 @@ module Caboose
     # GET /admin/products/:id/images
     def admin_edit_images    
       return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:id])
+      @product = Product.find(params[:id])  
+      config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
+      access_key = config['access_key_id']
+      secret_key = config['secret_access_key']
+      bucket     = config['bucket']      
+      policy = {        
+        "expiration" => 1.hour.from_now.utc.xmlschema,
+        "conditions" => [
+          { "bucket" => "#{bucket}-uploads" },          
+          { "acl" => "public-read" },
+          [ "starts-with", "$key", '' ],      
+          [ 'starts-with', '$name', '' ],   
+          [ 'starts-with', '$Filename', '' ],          
+        ]
+      }
+      @policy = Base64.encode64(policy.to_json).gsub(/\n/,'')      
+      @signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), secret_key, @policy)).gsub("\n","")
+      @s3_upload_url = "https://#{bucket}-uploads.s3.amazonaws.com/"
+      @aws_access_key_id = access_key                            
+          
+      @top_media_category = @product.media_category.parent
+      @media_category = @product.media_category
+
       render :layout => 'caboose/admin'
     end
     
@@ -341,7 +363,11 @@ module Caboose
           when 'site_id'            then product.site_id            = value
           when 'vendor_id'          then product.vendor_id          = value
           when 'alternate_id'       then product.alternate_id       = value          
-          when 'title'              then product.title              = value
+          when 'title'
+            product.title = value
+            c = MediaCategory.where(:id => product.media_category_id).last
+            c.name = value
+            c.save
           when 'caption'            then product.caption            = value
           when 'featured'           then product.featured           = value
           when 'description'        then product.description        = value          
@@ -409,6 +435,10 @@ module Caboose
         resp.error = "The title cannot be empty."
       else
         p = Product.new(:site_id => @site.id, :title => name)
+        mc = MediaCategory.where(:site_id => @site.id).where("parent_id IS NULL").exists? ? MediaCategory.where(:site_id => @site.id).where("parent_id IS NULL").last : MediaCategory.create(:name => "Media", :site_id => @site.id)
+        pc = MediaCategory.where(:name => "Products", :site_id => @site.id).exists? ? MediaCategory.where(:name => "Products", :site_id => @site.id).last : MediaCategory.create(:name => "Products", :site_id => @site.id, :parent_id => mc.id)
+        c = MediaCategory.create(:site_id => @site.id, :name => name, :parent_id => pc.id)
+        p.media_category_id = c.id
         p.save
         resp.redirect = "/admin/products/#{p.id}/general"
       end

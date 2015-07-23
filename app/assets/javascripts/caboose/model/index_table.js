@@ -40,7 +40,7 @@ IndexTable.prototype = {
   //   fixed_placeholder: false,
   //   width: 200,   
   // }]
-  fields: [],
+  fields: [],    
   
   //============================================================================
   // Additional parameters
@@ -84,7 +84,9 @@ IndexTable.prototype = {
   bulk_import_fields: false,  
   no_models_text: "There are no models right now.",
   new_model_text: 'New',
-  new_model_fields: [{ name: 'name', nice_name: 'Name', type: 'text', width: 400 }],
+  new_model_fields: [{ name: 'name', nice_name: 'Name', type: 'text', width: 400 }],  
+  search_fields: false,
+  custom_row_controls: false,
           
   //============================================================================
   // End of parameters
@@ -113,7 +115,7 @@ IndexTable.prototype = {
       if (f.editable == null) f.editable = true;
     });
     this.init_local_storage();    
-    this.get_visible_columns();
+    this.get_visible_columns();    
     
     $(window).on('hashchange', function() { that.refresh(); });        
     this.refresh();
@@ -122,19 +124,6 @@ IndexTable.prototype = {
   parse_querystring: function()
   {
     var b = {};
-    
-    // Get the hash values
-    var a = window.location.hash;    
-    if (a.length > 0)
-    {
-      a = a.substr(1).split('&');
-      for (var i=0; i<a.length; ++i)
-      {
-        var p = a[i].split('=', 2);
-        if (p.length == 1) b[p[0]] = "";
-        else b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-      }
-    }          
     
     // Get the querystring values
     a = window.location.search;
@@ -148,6 +137,30 @@ IndexTable.prototype = {
         else b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
       }
     }
+    
+    // Redirect to the hash page if we have a querystring
+    if (!$.isEmptyObject(b))
+    {
+      var qs = [];
+      for (var i in b)
+        qs[qs.length] = '' + i + '=' + b[i];      
+      var uri = window.location.pathname + '#' + qs.join('&');
+      window.location = uri;
+      return;
+    };
+    
+    // Get the hash values
+    var a = window.location.hash;    
+    if (a.length > 0)
+    {
+      a = a.substr(1).split('&');
+      for (var i=0; i<a.length; ++i)
+      {
+        var p = a[i].split('=', 2);
+        if (p.length == 1) b[p[0]] = "";
+        else b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+      }
+    }          
     
     // Set both hash and querystring values in the pager
     for (var i in b)
@@ -166,13 +179,17 @@ IndexTable.prototype = {
     //}
   },
 
-  refresh: function()
+  refresh: function(skip_parse_querystring)
   {
-    this.pager = { options: { page: 1 }, params: {}};
-    this.parse_querystring();
-        
     var that = this;
-    var $el = $('#' + this.container + '_table_container').length > 0 ? $('#' + this.container + '_table_container') : $('#' + this.container);
+    
+    if (!skip_parse_querystring)
+    {
+      that.pager = { options: { page: 1 }, params: {}};
+      that.parse_querystring();
+    }
+            
+    var $el = $('#' + that.container + '_table_container').length > 0 ? $('#' + that.container + '_table_container') : $('#' + that.container);
     $el.html("<p class='loading'>Refreshing...</p>");        
     $.ajax({
       url: that.refresh_url,
@@ -187,8 +204,7 @@ IndexTable.prototype = {
           var m = that.models[i];                              
           m.id = parseInt(m.id);          
         }        
-        that.print();
-        that.populate_search_form();
+        that.print();        
       },
       error: function() { $('#' + this.container).html("<p class='note error'>Error retrieving data.</p>"); }
     });
@@ -252,19 +268,22 @@ IndexTable.prototype = {
     else
     {
       var controls = $('<p/>');
-      if (this.allow_add         ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_new'            ).val(that.new_model_text ).click(function(e) { that.new_form();       })).append(' ');                                   
-                                   controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_columns' ).val('Show/Hide Columns' ).click(function(e) { that.toggle_columns(); })).append(' ');
-      if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'      ).val('Bulk Edit'         ).click(function(e) { that.bulk_edit();      })).append(' ');
-      if (this.allow_bulk_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import'    ).val('Import'            ).click(function(e) { that.bulk_import();    })).append(' ');
-      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'      ).val('Duplicate'         ).click(function(e) { that.duplicate();      })).append(' ');
-      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete'    ).val('Delete'            ).click(function(e) { that.bulk_delete();    })).append(' ');
+      if (this.allow_add         ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_new'            ).val(that.new_model_text     ).click(function(e) { that.new_form();           })).append(' ');                                   
+                                   controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_columns' ).val('Show/Hide Columns'     ).click(function(e) { that.toggle_columns();     })).append(' ');
+      if (this.search_fields     ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_search'  ).val('Show/Hide Search Form' ).click(function(e) { that.toggle_search_form(); })).append(' ');                                   
+      if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'      ).val('Bulk Edit'             ).click(function(e) { that.bulk_edit();          })).append(' ');
+      if (this.allow_bulk_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import'    ).val('Import'                ).click(function(e) { that.bulk_import();        })).append(' ');
+      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'      ).val('Duplicate'             ).click(function(e) { that.duplicate();          })).append(' ');
+      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete'    ).val('Delete'                ).click(function(e) { that.bulk_delete();        })).append(' ');
                           
       var c = $('#' + that.container);
-      c.empty()        
-        .append($('<div/>').attr('id', that.container + '_controls').append(controls))
-        .append($('<div/>').attr('id', that.container + '_message'))
-        .append($('<div/>').attr('id', that.container + '_table_container').append(table))        
-        .append($('<div/>').attr('id', that.container + '_pager').append(pager_div));      
+      c.empty();        
+      c.append($('<div/>').attr('id', that.container + '_controls').append(controls));
+      //if (this.search_fields)
+      //  c.append(that.search_form());
+      c.append($('<div/>').attr('id', that.container + '_message'));
+      c.append($('<div/>').attr('id', that.container + '_table_container').append(table));        
+      c.append($('<div/>').attr('id', that.container + '_pager').append(pager_div));
       
       if (model_count == 0)
       {
@@ -296,14 +315,6 @@ IndexTable.prototype = {
         }
       });      
     }
-  },
-  
-  populate_search_form: function()
-  {    
-    var pp = this.pager_params();    
-    $.each(this.search_form_fields, function(i, f) {      
-      $('#' + f).val(pp[f]);
-    });      
   },
   
   all_models_selected: function()
@@ -492,7 +503,7 @@ IndexTable.prototype = {
     cols[col] = checked;
     localStorage.setItem(this.container + '_cols', JSON.stringify(cols));            
   },
-  
+    
   toggle_columns: function()
   {
     var that = this;
@@ -762,7 +773,9 @@ IndexTable.prototype = {
   {                           
     var p = this.pager_params(h);                  
   	var qs = [];
-  	$.each(p, function(k,v) { qs.push('' + k + '=' + encodeURIComponent(v)); });
+  	$.each(p, function(k,v) {  	  
+  	  if (k != '[object Object]') qs.push('' + k + '=' + encodeURIComponent(v)); 
+  	});
   	return '#' + qs.join('&');  	
   },
   
@@ -842,5 +855,78 @@ IndexTable.prototype = {
     });
   },
   
+  //============================================================================
+  // Seach Form
+  //============================================================================
   
+  toggle_search_form: function()
+  {    
+    var that = this;    
+    var form = that.search_form();
+    that.show_message(form, 'toggle_search_form');    
+  },
+  
+  search_form: function()
+  {
+    var that = this;
+    
+    var pp = that.pager_params();
+    var tbody = $('<tbody/>');
+    $.each(that.search_fields, function(i, f) {
+      var tr = $('<tr/>').append($('<td/>').attr('align', 'right').html(f.nice_name));
+      var td = $('<td/>');
+      if (f.type == 'text')
+      {
+        td.append($('<input/>').attr('name', f.name).attr('id', f.name).val(pp[f.name]));
+      }
+      else if (f.type == 'select')
+      {
+        var options = false;
+        if (!f.options && f.options_url)
+        {
+          $.ajax({
+            url: f.options_url,
+            type: 'get',
+            success: function(resp) { f.options = resp; },
+            async: false
+          });
+        }
+        var select = $('<select/>').attr('name', f.name).attr('id', f.name);
+        if (f.empty_option_text)
+          select.append($('<option/>').val('').html(f.empty_option_text));
+        $.each(f.options, function(j, option) {
+          var opt = $('<option/>').val(option.value).html(option.text);
+          if (pp[f.name] == option.value)
+            opt.attr('selected', true);
+          select.append(opt);            
+        });
+        td.append(select);
+      }
+      tr.append(td);
+      tbody.append(tr);
+    });    
+    var form = $('<form/>')
+      .attr('id', 'search_form')
+      .append($('<table/>').append(tbody))
+      .append($('<p/>').append($('<input/>').attr('type', 'submit').val('Search').click(function(e) { e.preventDefault(); that.search(); })));
+    return form;
+  },
+  
+  populate_search_form: function()
+  {    
+    var pp = this.pager_params();    
+    $.each(this.search_form_fields, function(i, f) {      
+      $('#' + f).val(pp[f]);
+    });      
+  },
+  
+  search: function()
+  {
+    var that = this;
+    $.each(that.search_fields, function(i, f) {      
+      that.pager.params[f.name] = $('#'+f.name).val();
+    });
+    window.location.hash = that.pager_hash();
+    that.refresh(true);
+  }      
 };

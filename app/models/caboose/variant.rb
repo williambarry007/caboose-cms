@@ -11,6 +11,8 @@ module Caboose
     belongs_to :product
     has_many :product_image_variants
     has_many :product_images, :through => :product_image_variants
+    belongs_to :flat_rate_shipping_method, :class_name => 'Caboose::ShippingMethod'
+    belongs_to :flat_rate_shipping_package, :class_name => 'Caboose::ShippingPackage'
     
     attr_accessible :id,
       :alternate_id,
@@ -37,7 +39,12 @@ module Caboose
       :sku,
       :available,
       :cylinder,
-      :shipping_unit_value
+      :shipping_unit_value,
+      :flat_rate_shipping,
+      :flat_rate_shipping_single,
+      :flat_rate_shipping_combined,
+      :flat_rate_shipping_method_id,
+      :flat_rate_shipping_package_id
     
     after_initialize do |v|
       v.price       = 0.00 if v.price.nil?
@@ -85,7 +92,9 @@ module Caboose
     def as_json(options={})
       self.attributes.merge({
         :images => self.product_images.any? ? self.product_images : [self.product.product_images.first],
-        :title => "#{self.product.title} (#{self.options.join(', ')})"
+        :title => "#{self.product.title} (#{self.options.join(', ')})",
+        :flat_rate_shipping_package => self.flat_rate_shipping_package,
+        :flat_rate_shipping_method => self.flat_rate_shipping_method                
       })
     end
     

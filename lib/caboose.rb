@@ -124,6 +124,9 @@ module Caboose
   mattr_accessor :from_address  
   @@from_address = ''
   
+  mattr_accessor :uploads_bucket  
+  @@uploads_bucket = ''
+  
 end
 
 # These are used so that both local filestorage and S3 can work without having to change paperclip paths in models

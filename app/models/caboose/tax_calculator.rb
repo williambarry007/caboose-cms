@@ -54,7 +54,8 @@ module Caboose
         :origin      => origin,
         :destination => destination
       )
-      order.line_items.each_with_index do |li, i|        
+      order.line_items.each_with_index do |li, i|
+        next if !li.variant.taxable # Skip any non-taxable items        
         transaction.cart_items << TaxCloud::CartItem.new(
           :index    => i,
           :item_id  => li.variant.id,

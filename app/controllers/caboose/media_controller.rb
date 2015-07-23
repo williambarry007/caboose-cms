@@ -16,11 +16,12 @@ module Caboose
       config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
       access_key = config['access_key_id']
       secret_key = config['secret_access_key']
-      bucket     = config['bucket']      
+      bucket     = config['bucket']
+      bucket = Caboose::uploads_bucket && Caboose::uploads_bucket.strip.length > 0 ? Caboose::uploads_bucket : "#{bucket}-uploads"       
       policy = {        
         "expiration" => 1.hour.from_now.utc.xmlschema,
         "conditions" => [
-          { "bucket" => "#{bucket}-uploads" },          
+          { "bucket" => bucket },          
           { "acl" => "public-read" },
           [ "starts-with", "$key", '' ],
           #[ "starts-with", "$Content-Type", 'image/' ],          

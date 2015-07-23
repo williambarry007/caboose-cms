@@ -65,7 +65,7 @@ module Caboose
       })
       render :json => {
         :pager => pager,
-        :models => pager.items
+        :models => pager.items.as_json(:include => [:flat_rate_shipping_package, :flat_rate_shipping_method])
       }      
     end
     
@@ -116,25 +116,34 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name        
-          when 'alternate_id'       then v.alternate_id       = value
-          when 'sku'                then v.sku                = value
-          when 'barcode'            then v.barcode            = value
-          when 'price'              then v.price              = value                      
-          when 'quantity_in_stock'  then v.quantity_in_stock  = value
-          when 'ignore_quantity'    then v.ignore_quantity    = value
-          when 'allow_backorder'    then v.allow_backorder    = value
-          when 'status'             then v.status             = value
-          when 'weight'             then v.weight             = value
-          when 'length'             then v.length             = value
-          when 'width'              then v.width              = value
-          when 'height'             then v.height             = value
-          when 'option1'            then v.option1            = value
-          when 'option2'            then v.option2            = value
-          when 'option3'            then v.option3            = value
-          when 'requires_shipping'  then v.requires_shipping  = value
-          when 'taxable'            then v.taxable            = value
-          when 'downloadable'       then v.downloadable       = value
-          when 'download_path'      then v.download_path      = value
+          when 'alternate_id'                  then v.alternate_id                  = value
+          when 'sku'                           then v.sku                           = value
+          when 'barcode'                       then v.barcode                       = value
+          when 'price'                         then v.price                         = value                      
+          when 'quantity_in_stock'             then v.quantity_in_stock             = value
+          when 'ignore_quantity'               then v.ignore_quantity               = value
+          when 'allow_backorder'               then v.allow_backorder               = value
+          when 'status'                        then v.status                        = value
+          when 'weight'                        then v.weight                        = value
+          when 'length'                        then v.length                        = value
+          when 'width'                         then v.width                         = value
+          when 'height'                        then v.height                        = value
+          when 'option1'                       then v.option1                       = value
+          when 'option2'                       then v.option2                       = value
+          when 'option3'                       then v.option3                       = value
+          when 'requires_shipping'             then v.requires_shipping             = value
+          when 'taxable'                       then v.taxable                       = value
+          when 'flat_rate_shipping'            then v.flat_rate_shipping            = value
+          when 'flat_rate_shipping_single'     then v.flat_rate_shipping_single     = value
+          when 'flat_rate_shipping_combined'   then v.flat_rate_shipping_combined   = value
+          when 'flat_rate_shipping_package_id' then v.flat_rate_shipping_package_id = value
+          when 'flat_rate_shipping_method_id'  then v.flat_rate_shipping_method_id  = value
+          when 'flat_rate_shipping_package_method_id' then
+            arr = value.split('_')
+            v.flat_rate_shipping_package_id = arr[0].to_i
+            v.flat_rate_shipping_method_id  = arr[1].to_i
+          when 'downloadable'                then v.downloadable                = value
+          when 'download_path'               then v.download_path               = value
             
           when 'sale_price'
             v.sale_price = value            

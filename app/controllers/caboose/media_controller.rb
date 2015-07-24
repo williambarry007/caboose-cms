@@ -31,7 +31,7 @@ module Caboose
       }
       @policy = Base64.encode64(policy.to_json).gsub(/\n/,'')      
       @signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), secret_key, @policy)).gsub("\n","")
-      @s3_upload_url = "https://#{bucket}-uploads.s3.amazonaws.com/"
+      @s3_upload_url = "https://#{bucket}.s3.amazonaws.com/"
       @aws_access_key_id = access_key                            
       
       id = params[:media_category_id]        

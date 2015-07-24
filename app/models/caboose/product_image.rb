@@ -46,7 +46,7 @@ module Caboose
     end
     
     def url(size) # 'tiny', 'thumb', 'medium', 'large', 'huge'
-      return self.media.image.url(size) if !self.media_id.blank?
+      return self.media.image.url(size) if self.media
       return self.image.url(size)
     end
     

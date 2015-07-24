@@ -37,13 +37,11 @@ class Caboose::Media < ActiveRecord::Base
     
     config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
     bucket = config['bucket']
+    bucket = Caboose::uploads_bucket && Caboose::uploads_bucket.strip.length > 0 ? Caboose::uploads_bucket : "#{bucket}-uploads"
         
-    key = "#{self.media_category_id}_#{self.original_name}"
-    Caboose.log("key before encoding: #{key}")
-    key = URI.encode(key.gsub(' ', '+'))
-    Caboose.log("key after encoding: #{key}")
-    uri = "http://#{bucket}-uploads.s3.amazonaws.com/#{key}"
-    Caboose.log("uri: #{uri}")
+    key = "#{self.media_category_id}_#{self.original_name}"    
+    key = URI.encode(key.gsub(' ', '+'))    
+    uri = "http://#{bucket}.s3.amazonaws.com/#{key}"    
     
     image_extensions = ['.jpg', '.jpeg', '.gif', '.png', '.tif']
     ext = File.extname(key).downcase
@@ -64,7 +62,7 @@ class Caboose::Media < ActiveRecord::Base
     #end
            
     # Remove the temp file            
-    bucket = AWS::S3::Bucket.new("#{bucket}-uploads")
+    bucket = AWS::S3::Bucket.new(bucket)
     obj = bucket.objects[key]
     obj.delete
          

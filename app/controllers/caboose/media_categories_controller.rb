@@ -93,6 +93,13 @@ module Caboose
         m = Media.where(:id => id).first
         next if m.nil?
         m.update_attribute(:media_category_id, media_category_id)
+        p = Product.where(:media_category_id => media_category_id).last
+        if p
+          pi = ProductImage.where(:media_id => id).exists? ? ProductImage.where(:media_id => id).first : ProductImage.create(:media_id => id, :product_id => p.id)
+          pi.product_id = p.id
+          pi.save
+          ProductImageVariant.where(:product_image_id => pi.id).destroy_all
+        end
       end
         
       render :json => { :success => true }

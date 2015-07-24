@@ -3,6 +3,7 @@ module Caboose
     self.table_name = 'store_product_images'
     
     belongs_to :product
+    belongs_to :media
     has_many :product_image_variants
     has_many :variants, :through => :product_image_variants
         
@@ -17,7 +18,8 @@ module Caboose
       :image_updated_at,
       :square_offset_x,
       :square_offset_y,
-      :square_scale_factor
+      :square_scale_factor,
+      :media_id
       
     has_attached_file :image,      
       :path => ':caboose_prefixproducts/:product_id_:id_:style.:extension',      
@@ -44,7 +46,8 @@ module Caboose
     end
     
     def url(size) # 'tiny', 'thumb', 'medium', 'large', 'huge'
-      self.image.url(size)
+      return self.media.image.url(size) if !self.media_id.blank?
+      return self.image.url(size)
     end
     
     def urls

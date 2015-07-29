@@ -179,7 +179,8 @@ module Caboose
           when 'zip'                  then user.zip                 = value
           when 'phone'                then user.phone               = value
           when 'fax'                  then user.fax                 = value
-          when 'utc_offset'           then user.utc_offset          = value.to_f        
+          when 'utc_offset'           then user.utc_offset          = value.to_f
+          when 'locked'               then user.locked              = value
     	  	when "password"			  
     	  	  confirm = params[:password2]
     	  		if (value != confirm)			

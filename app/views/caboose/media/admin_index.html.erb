@@ -11,11 +11,17 @@
 
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/admin_media_index' %>
+<%
+#=stylesheet_link_tag 'caboose/nestable.css' 
+%>
 <%= stylesheet_link_tag 'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css' %>
 <% end %>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/model/all' %>
+<%
+#= javascript_include_tag 'caboose/jquery.nestable.js' 
+%>
 <%= javascript_include_tag 'caboose/admin_media_index.js' %>
 <%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
 

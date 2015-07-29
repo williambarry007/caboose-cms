@@ -1,40 +1,62 @@
 
-class Caboose::Authenticator
+module Caboose
+  class Authenticator
 
-  def authenticate(username, password, site = nil)
-    resp = Caboose::StdClass.new(
-      'error' => nil,
-      'user' => nil 
-    )
-    pass = Digest::SHA1.hexdigest(Caboose::salt + password)
-    
-    user = Caboose::User.where(:username => username, :site_id => site.id).first
-    user = Caboose::User.where(:email    => username, :site_id => site.id).first if user.nil?
-            
-    valid_credentials = false
-    if user && user.password == pass 
-      valid_credentials = true
-    elsif site      
-      mp = Caboose::Setting.where(:site_id => site.id, :name => 'master_password').first
-      mp = mp ? mp.value : nil
-      if mp && mp.strip.length > 0 && mp == pass
+    def authenticate(username, password, site = nil, request = nil)
+      resp = StdClass.new        
+      pass = Digest::SHA1.hexdigest(Caboose::salt + password)
+      
+      user = User.where(:username => username, :site_id => site.id).first
+      user = User.where(:email    => username, :site_id => site.id).first if user.nil?
+      
+      ll = LoginLog.new      
+      ll.username       = username      
+      ll.date_attempted = DateTime.now.utc                    
+      ll.user_id        = user.id           if user
+      ll.site_id        = user.site_id      if user
+      ll.ip             = request.remote_ip if request
+              
+      valid_credentials = false
+      if user && user.password == pass 
         valid_credentials = true
-      end
-    end
-    
-    if valid_credentials
-      resp.user = user
-    else
-      resp.error = "Invalid credentials"
-    end
-    
-    #resp.user = Caboose::User.where(:username => username, :password => pass).first    
-    #if (resp.user.nil?)
-    #  resp.user = Caboose::User.where(:email => username, :password => pass).first
-    #end                
-    #resp.error = "Invalid credentials" if resp.user.nil?
+        resp.user = user
+        ll.success = true      
         
-    return resp
+      elsif user && user.password != pass
+        
+        fail_count = Caboose::LoginLog.fail_count(user)
+        if (fail_count+1) >= user.site.login_fail_lock_count
+          user.locked = true
+          user.save        
+          LoginMailer.locked_account(user).deliver
+          resp.error = "Too many failed login attempts. Your account has been locked and the site administrator has been notified."
+          ll.success = false
+        else
+          attempts_left = user.site.login_fail_lock_count - fail_count - 1
+          resp.error = "Invalid password. You have #{attempts_left} attempt#{attempts_left == 1 ? '' : 's'} left before your account is locked."
+          ll.success = false
+        end                      
+            
+      elsif site
+        
+        mp = Setting.where(:site_id => site.id, :name => 'master_password').first
+        mp = mp ? mp.value : nil
+        if mp && mp.strip.length > 0 && mp == pass
+          resp.user = user
+          ll.success = true
+        else
+          resp.error = "Invalid credentials"
+          ll.success = false
+        end
+        
+      else
+        resp.error = "Invalid credentials"
+        ll.success = false
+      end
+      
+      ll.save        
+      return resp
+    end
+    
   end
-  
 end

@@ -50,6 +50,20 @@ class Caboose::MediaCategory < ActiveRecord::Base
     return arr
   end
   
+  def self.tree_hash(site_id)
+    top_cat = self.where(:parent_id => nil, :site_id => site_id).first
+    return self.tree_hash_helper(top_cat)        
+  end
+  
+  def self.tree_hash_helper(cat)
+    return {
+      :id => cat.id,
+      :name => cat.name,
+      :media_count => cat.media.count,
+      :children => cat.children.collect{ |kid| self.tree_hash_helper(kid) }
+    }
+  end
+  
   def is_ancestor_of?(cat)    
     if cat.is_a?(Integer) || cat.is_a?(String)
       cat_id = cat.to_i

@@ -228,6 +228,7 @@ Caboose::Engine.routes.draw do
   get     "/admin/media-categories/json"       => "media_categories#admin_json"
   get     "/admin/media-categories/options"    => "media_categories#admin_options"
   get     "/admin/media-categories/flat-tree"  => "media_categories#admin_flat_tree"
+  get     "/admin/media-categories/tree"       => "media_categories#admin_tree"    
   post    "/admin/media-categories"            => "media_categories#admin_add"
   post    "/admin/media-categories/:id/attach" => "media_categories#admin_attach"
   put     "/admin/media-categories/:id"        => "media_categories#admin_update"      

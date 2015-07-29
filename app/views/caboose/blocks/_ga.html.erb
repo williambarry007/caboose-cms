@@ -23,5 +23,23 @@ if sc.auto_ga_js && sc.google_analytics_id
     ga('send', 'event'<% arr2.each do |x| %>, <%= raw Caboose.json(x) %><% end %>);
       <% end %>    
     <% end %>
+    <% if sc.google_analytics_id2 && sc.google_analytics_id2.strip.length > 0 %> 
+      ga('create', '<%= raw sc.google_analytics_id2 %>', 'auto', {'name': 'property2'});      
+      ga('property2.send', 'pageview');
+      <% if ga_events && ga_events.count > 0 %>    
+        <% ga_events.each do |arr| %>
+          <%
+          cat    = arr[0] ? arr[0] : nil 
+          action = arr[1] ? arr[1] : nil 
+          label  = arr[2] ? arr[2] : nil 
+          value  = arr[3] ? arr[3] : nil
+          arr2 = [cat, action]
+          arr2 << (label ? label : '') if label || (label.nil? && value)    
+          arr2 << value if value          
+          %>
+      ga('property2.send', 'event'<% arr2.each do |x| %>, <%= raw Caboose.json(x) %><% end %>);
+        <% end %>    
+      <% end %>
+    <% end %>    
   </script>
 <% end %>

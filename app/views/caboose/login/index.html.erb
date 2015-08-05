@@ -20,10 +20,8 @@
 	<ul id="login-options">
 		<li><a href="/register?return_url=<%= @return_url %>" class='register'>Need to register?</a></li>
 		<li><a href="/login/forgot-password?return_url=<%= @return_url %>" class='forgot'>Forgot your password?</a></li>
-	</ul>
-	
-	<div id="message"></div>
-	
+	</ul>	
+	<div style='clear: both;' id="message"></div>	
 	<p class="buttons">
 	  <input type="button" class="btn" value="Cancel" onclick="parent.$.fn.colorbox.close();" />
 		<input type="submit" class="btn" value="Login" onclick='login(); return false;' />

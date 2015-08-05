@@ -1,3 +1,0 @@
-
-
-if arr['dog'] && arr['dog']['name'] && arr['dog']['name']['first_name']

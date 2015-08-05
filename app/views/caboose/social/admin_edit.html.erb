@@ -14,6 +14,7 @@ sc = @social_config
 <p><div id="socialconfig_<%= sc.id %>_google_plus_url"      ></div></p>
 <p><div id="socialconfig_<%= sc.id %>_linkedin_url"         ></div></p>
 <p><div id="socialconfig_<%= sc.id %>_google_analytics_id"  ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_google_analytics_id2" ></div></p>
 <p><div id="socialconfig_<%= sc.id %>_auto_ga_js"           ></div></p>
       
 <div id='message'></div>
@@ -30,17 +31,18 @@ $(document).ready(function() {
     update_url: '/admin/social',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [      
-      { name: 'facebook_page_id'    , nice_name: 'Facebook Page ID'               , type: 'text'     , value: <%= raw Caboose.json(sc.facebook_page_id) %>, width: 500 },
-      { name: 'twitter_username'    , nice_name: 'Twitter Username'               , type: 'text'     , value: <%= raw Caboose.json(sc.twitter_username) %>, width: 500 },
-      { name: 'instagram_username'  , nice_name: 'Instagram Username'             , type: 'text'     , value: <%= raw Caboose.json(sc.instagram_username) %>, width: 500 },
-      { name: 'youtube_url'         , nice_name: 'YouTube Channel ID'             , type: 'text'     , value: <%= raw Caboose.json(sc.youtube_url) %>, width: 500 },
-      { name: 'pinterest_url'       , nice_name: 'Pinterest URL'                  , type: 'text'     , value: <%= raw Caboose.json(sc.pinterest_url) %>, width: 500 },
-      { name: 'vimeo_url'           , nice_name: 'Vimeo URL'                      , type: 'text'     , value: <%= raw Caboose.json(sc.vimeo_url) %>, width: 500 },
-      { name: 'rss_url'             , nice_name: 'RSS Feed URL'                   , type: 'text'     , value: <%= raw Caboose.json(sc.rss_url) %>, width: 500 },
-      { name: 'google_plus_url'     , nice_name: 'Google Plus URL'                , type: 'text'     , value: <%= raw Caboose.json(sc.google_plus_url) %>, width: 500 },
-      { name: 'linkedin_url'        , nice_name: 'LinkedIn URL'                   , type: 'text'     , value: <%= raw Caboose.json(sc.linkedin_url) %>, width: 500 },
-      { name: 'google_analytics_id' , nice_name: 'Google Analytics Tracking ID'   , type: 'text'     , value: <%= raw Caboose.json(sc.google_analytics_id) %>, width: 500 },
-      { name: 'auto_ga_js'          , nice_name: 'Auto Embed Google Analytics JS' , type: 'checkbox' , value: <%= sc.auto_ga_js ? 1 : 0 %>, width: 500 }
+      { name: 'facebook_page_id'     , nice_name: 'Facebook Page ID'                       , type: 'text'     , value: <%= raw Caboose.json(sc.facebook_page_id) %>, width: 500 },
+      { name: 'twitter_username'     , nice_name: 'Twitter Username'                       , type: 'text'     , value: <%= raw Caboose.json(sc.twitter_username) %>, width: 500 },
+      { name: 'instagram_username'   , nice_name: 'Instagram Username'                     , type: 'text'     , value: <%= raw Caboose.json(sc.instagram_username) %>, width: 500 },
+      { name: 'youtube_url'          , nice_name: 'YouTube Channel ID'                     , type: 'text'     , value: <%= raw Caboose.json(sc.youtube_url) %>, width: 500 },
+      { name: 'pinterest_url'        , nice_name: 'Pinterest URL'                          , type: 'text'     , value: <%= raw Caboose.json(sc.pinterest_url) %>, width: 500 },
+      { name: 'vimeo_url'            , nice_name: 'Vimeo URL'                              , type: 'text'     , value: <%= raw Caboose.json(sc.vimeo_url) %>, width: 500 },
+      { name: 'rss_url'              , nice_name: 'RSS Feed URL'                           , type: 'text'     , value: <%= raw Caboose.json(sc.rss_url) %>, width: 500 },
+      { name: 'google_plus_url'      , nice_name: 'Google Plus URL'                        , type: 'text'     , value: <%= raw Caboose.json(sc.google_plus_url) %>, width: 500 },
+      { name: 'linkedin_url'         , nice_name: 'LinkedIn URL'                           , type: 'text'     , value: <%= raw Caboose.json(sc.linkedin_url) %>, width: 500 },
+      { name: 'google_analytics_id'  , nice_name: 'Primary Google Analytics Tracking ID'   , type: 'text'     , value: <%= raw Caboose.json(sc.google_analytics_id) %>, width: 500 },
+      { name: 'google_analytics_id2' , nice_name: 'Secondary Google Analytics Tracking ID' , type: 'text'     , value: <%= raw Caboose.json(sc.google_analytics_id2) %>, width: 500 },
+      { name: 'auto_ga_js'           , nice_name: 'Auto Embed Google Analytics JS'         , type: 'checkbox' , value: <%= sc.auto_ga_js ? 1 : 0 %>, width: 500 }
     ]    
   });
       

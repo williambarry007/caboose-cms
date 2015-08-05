@@ -325,6 +325,14 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :modification_value_id  , :integer ],
         [ :input                  , :string  ]
       ],
+      Caboose::LoginLog => [
+        [ :site_id        , :integer  ],
+        [ :username       , :string   ],
+        [ :user_id        , :integer  ],
+        [ :date_attempted , :datetime ],
+        [ :ip             , :string   ],        
+        [ :success        , :boolean   , { :default => false }]      
+      ],
       Caboose::MediaCategory => [
         [ :parent_id         , :integer ],
         [ :site_id           , :integer ],
@@ -620,11 +628,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :use_fonts               , :boolean     , { :default => true  }],
         [ :logo                    , :attachment ],        
         [ :is_master               , :boolean     , { :default => false }],
-        [ :analytics_id            , :string     ],
+        [ :analytics_id            , :string     ],        
         [ :use_retargeting         , :boolean     , { :default => false }],
         [ :date_js_updated         , :datetime   ],
         [ :date_css_updated        , :datetime   ],
-        [ :default_layout_id       , :integer    ]
+        [ :default_layout_id       , :integer    ],
+        [ :login_fail_lock_count   , :integer     , { :default => 5 }]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
@@ -653,6 +662,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :google_plus_url      , :string ],
         [ :linkedin_url         , :string ],
         [ :google_analytics_id  , :string ],
+        [ :google_analytics_id2 , :string ],
         [ :auto_ga_js           , :boolean , { :default => false }]
       ],
       Caboose::StackableGroup => [       
@@ -724,16 +734,17 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :zip                  , :string     ],
         [ :phone                , :string     ],
         [ :fax                  , :string     ],        
-        [ :timezone             , :string     , { :default => 'Central Time (US & Canada)' }],        
+        [ :timezone             , :string      , { :default => 'Central Time (US & Canada)' }],        
         [ :password             , :string     ],
         [ :password_reset_id    , :string     ],
         [ :password_reset_sent  , :datetime   ],
         [ :token                , :string     ],
         [ :date_created         , :datetime   ],
         [ :image                , :attachment ],
-        [ :is_guest             , :boolean    , { :default => false }],
+        [ :is_guest             , :boolean     , { :default => false }],
         [ :customer_profile_id  , :string     ],
-        [ :payment_profile_id   , :string     ]
+        [ :payment_profile_id   , :string     ],
+        [ :locked               , :boolean     , { :default => false }]
       ],
       Caboose::Variant => [
         [ :product_id                    , :integer  ],
@@ -745,21 +756,21 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_sale_starts              , :datetime ],
         [ :date_sale_ends                , :datetime ],
         [ :date_sale_end                 , :datetime ],        
-        [ :available                     , :boolean  ],
-        [ :quantity_in_stock             , :integer   , :default => 0 ],        
-        [ :ignore_quantity               , :boolean  ],
-        [ :allow_backorder               , :boolean  ],
+        [ :available                     , :boolean   , { :default => true  }],
+        [ :quantity_in_stock             , :integer   , { :default => 0     }],        
+        [ :ignore_quantity               , :boolean   , { :default => false }],
+        [ :allow_backorder               , :boolean   , { :default => false }],
         [ :weight                        , :decimal  ],
         [ :length                        , :decimal  ],
         [ :width                         , :decimal  ],
         [ :height                        , :decimal  ],
         [ :volume                        , :decimal  ],
-        [ :cylinder                      , :boolean  ],
+        [ :cylinder                      , :boolean   , { :default => false }],
         [ :option1                       , :string   ],
         [ :option2                       , :string   ],
         [ :option3                       , :string   ],
-        [ :requires_shipping             , :boolean  ],
-        [ :taxable                       , :boolean  ],        
+        [ :requires_shipping             , :boolean   , { :default => true  }],
+        [ :taxable                       , :boolean   , { :default => true  }],        
         [ :shipping_unit_value           , :numeric  ],
         [ :flat_rate_shipping            , :boolean   , { :default => false }],
         [ :flat_rate_shipping_package_id , :integer  ],
@@ -796,6 +807,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
     #  end
     #  c.remove_column(:pages, :content)
     #end
+    
+    #c.change_column :store_variants, :taxable, :boolean
 
     admin_user = nil
     if !Caboose::User.exists?(:username => 'admin')

@@ -1,0 +1,8 @@
+<%
+d = @user.site.primary_domain
+d = @user.site.domains.first if d.nil?
+%>
+
+<h1>Account Locked</h1>
+<p>The account for <%= @user.email %> on the site "<%= @user.site.description %>" has been locked due to too many failed login attempts.</p>
+<p><a href='http://<%= d.domain %>/admin/users/<%= @user.id %>'>Manage this user</a></p>

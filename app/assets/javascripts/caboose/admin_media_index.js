@@ -13,11 +13,8 @@ MediaController.prototype = {
 	signature: false,
 	selected_media: false,
 	uploader: false,
-  refresh_unprocessed_images: false,	
-	  
-  
-  
-  
+  refresh_unprocessed_images: false,
+  allow_edit: false,
   
   init: function(params) {
     var that = this;
@@ -249,10 +246,14 @@ MediaController.prototype = {
             that.edit_media_description($(this).parent().data('media_id'));
           }));
         if (m.image_urls)
-          li.append($('<img/>').attr('src', m.image_urls.tiny_url));                                      
+          li.append($('<img/>').attr('src', m.image_urls.tiny_url).attr("id","image-" + m.id));                                      
         if (that.selected_media.indexOf(m.id) > -1)
           li.addClass('selected ui-selected');
-        ul.append(li);      
+        if (that.allow_edit && m.image_urls) {
+          var link = $("<a/>").attr("onclick","edit_i(" + m.id + ",'" + m.image_urls.tiny_url + "');").html("Edit Image");
+          li.append(link);
+        }
+        ul.append(li);
       });
     }
     else
@@ -452,3 +453,5 @@ MediaController.prototype = {
   },
   
 };
+
+

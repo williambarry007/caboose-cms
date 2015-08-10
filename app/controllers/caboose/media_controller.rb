@@ -89,6 +89,22 @@ module Caboose
       resp.success = save && m.save
       render :json => resp
     end
+
+    # POST /admin/media/edit-image
+    def admin_edit_image
+      new_url = params[:new_url]
+      media_id = params[:media_id]
+      resp = StdClass.new({'attributes' => {}})
+      if !new_url.blank? && !media_id.blank?
+        m = Media.find(media_id.gsub("image-",""))
+        m.image = new_url
+        m.save
+        resp.success = "Saved image!"
+      else
+        resp.error = "Couldn't save image"
+      end
+      render :json => resp
+    end
     
     # DELETE /admin/media/:id
     def admin_delete

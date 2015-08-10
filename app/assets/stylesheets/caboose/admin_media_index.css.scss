@@ -83,22 +83,39 @@
       padding: 0;   
       display: inline-block;
       width: 150px;
-      height: 150px;
+      height: 165px;
       overflow: hidden;
       background-color: #666;
       background-position: center;
       background-size: contain; 
       background-repeat: no-repeat;
       border: #666 4px solid;
-        
+      img {
+        max-height: 120px;
+        max-width: 90%;
+      }
       span.name { 
         display: block; 
         position: absolute; 
-        bottom: 4px; 
+        bottom: 18px; 
         width: 150px; 
         text-align: center;        
         color: #fff; 
         text-decoration: none !important;                                   
+      }
+      a {
+        text-decoration: underline;
+        cursor: pointer;
+        display: block;
+        font-size: 13px;
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+        width: 100%;
+        color: #000;
+        &:hover {
+          color: blue;
+        }
       }
       &:hover {
         background-color: #fff799;

@@ -35,6 +35,7 @@
 <script type="text/javascript" src="/assets/plupload/jquery.ui.plupload/jquery.ui.plupload.js"></script>
 -->
 
+<script type="text/javascript" src="http://feather.aviary.com/imaging/v2/editor.js"></script>
 <script type="text/javascript">
 
 var controller = false;
@@ -46,9 +47,60 @@ $(document).ready(function() {
 	  aws_access_key_id: '<%= raw @aws_access_key_id %>',		
 	  policy: '<%= raw @policy %>',
 	  signature: '<%= raw @signature %>',
-	  refresh_unprocessed_images: false
-  });	
+	  refresh_unprocessed_images: false,
+    allow_edit: true
+  });
 });
+
+function update_media_image(new_url, media_id) {
+  $.ajax({
+    url: '/admin/media/edit-image',
+    type: 'post',
+    data: {
+      new_url: new_url,
+      media_id: media_id
+    },
+    success: function(resp) {
+      if(resp.error) {
+        console.log("image not saved");
+      } 
+      if(resp.success) {
+        console.log("image saved")
+      }
+    }
+  });
+}
+
+var featherEditor = new Aviary.Feather({
+  apiKey: '933414ee42934e8b81d8cd2226a5a13b',
+  theme: 'light',
+  enableCORS: false,
+  maxSize: 1600,
+  onSave: function(imageID, newURL) {
+    var img = document.getElementById(imageID);
+    img.src = newURL;
+    update_media_image(newURL, imageID);
+  }
+});
+
+function launchEditor(id, src) {
+  featherEditor.launch({
+      image: id,
+      url: src
+  });
+  return false;
+}
+
+function edit_i(image_id, image_url) {
+  launchEditor( "image-" + image_id, image_url.replace("tiny", "original") );
+}
+
 
 </script>
 <% end %>
+
+<%
+# Adobe Image Editor SDK Credentials
+# CLIENT SECRETf42be039-1af0-41d8-89bb-fdebdb557d3d
+# CLIENT ID (DEVELOPMENT MODE)*933414ee42934e8b81d8cd2226a5a13b
+%>

@@ -219,9 +219,9 @@ Caboose::Engine.routes.draw do
   get     "/admin/media/:id/description" => "media#admin_edit_description"
   get     "/admin/media/:id"            => "media#admin_edit"  
   put     "/admin/media/:id"            => "media#admin_update"
-  post    "/admin/media/:id/image"      => "media#admin_update_image"  
-  post    "/admin/media"                => "media#admin_add"
-  post    "/admin/media/edit-image"     => "media#admin_edit_image"
+  post    "/admin/media/:id/image"      => "media#admin_update_image"
+  #post    "/admin/media/edit-image"     => "media#admin_edit_image"  
+  post    "/admin/media"                => "media#admin_add"  
   delete  "/admin/media/bulk"           => "media#admin_bulk_delete"
   delete  "/admin/media/:id"            => "media#admin_delete"
   

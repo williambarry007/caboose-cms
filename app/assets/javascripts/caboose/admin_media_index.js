@@ -13,8 +13,11 @@ MediaController.prototype = {
 	signature: false,
 	selected_media: false,
 	uploader: false,
-  refresh_unprocessed_images: false,
+  refresh_unprocessed_images: true,
   allow_edit: false,
+  feather_editor: false,
+  media_ids: [],
+  processing_media_ids: [],
   
   init: function(params) {
     var that = this;
@@ -29,7 +32,7 @@ MediaController.prototype = {
         .append($('<a/>').attr('href', '#').html('Select All').click(function(e) { e.preventDefault(); that.select_all_media(); }))
       )
       .append($('<div/>').attr('id', 'the_uploader'));          
-    that.refresh();    
+    that.refresh();        
   },    
   
   refresh: function()
@@ -37,8 +40,7 @@ MediaController.prototype = {
     var that = this;
     that.refresh_categories();
     that.refresh_media();
-    that.print_controls();
-    
+    that.print_controls();    
   },
       
   toggle_uploader: function()
@@ -133,11 +135,29 @@ MediaController.prototype = {
       type: 'get',
       async: false,
       data: { media_category_id: that.cat_id },
-      success: function(resp) { 
+      success: function(resp) {
         that.cat = resp;
         that.cat_id = that.cat.id;
         that.selected_media = [];
-        that.print_media();
+        //that.print_media();
+        
+        var mids = [];
+        var pmids = [];        
+        if (that.cat.media.length > 0)
+        {      
+          $.each(that.cat.media, function(i, m) {
+            mids.push(m.id);
+            if (m.media_type == 'image' && m.processed == false)
+              pmids.push(m.id);
+          });
+        }                                                
+        if (mids.join(',') != that.media_ids.join(',') || pmids.join(',') != that.processing_media_ids.join(','))          
+          that.print_media();
+        else if (pmids.length > 0)
+          setTimeout(function() { that.refresh_media(); }, 2000);
+          
+        that.media_ids = mids;
+        that.processing_media_ids = pmids;
       }        
     });
   },
@@ -249,18 +269,21 @@ MediaController.prototype = {
           li.append($('<img/>').attr('src', m.image_urls.tiny_url).attr("id","image-" + m.id));                                      
         if (that.selected_media.indexOf(m.id) > -1)
           li.addClass('selected ui-selected');
-        if (that.allow_edit && m.image_urls) {
-          var link = $("<a/>").attr("onclick","edit_i(" + m.id + ",'" + m.image_urls.tiny_url + "');").html("Edit Image");
-          li.append(link);
+        if (that.allow_edit && m.image_urls) 
+        {
+          li.append($("<a/>")
+            .html("Edit Image")
+            .click(function() { that.edit_image($(this).parent().data('media_id')); })
+          );
         }
         ul.append(li);
       });
     }
     else
       ul = $('<p/>').html("This category is empty.");
-    $('#media').empty().append(ul);
+    $('#media').empty().append(ul);    
     if (that.refresh_unprocessed_images == true && processing)
-      setTimeout(function() { that.refresh(); }, 2000);
+      setTimeout(function() { that.refresh_media(); }, 2000);
     
     $.each(that.cat.media, function(i, m) {
       $('li.media').draggable({
@@ -451,6 +474,81 @@ MediaController.prototype = {
       }            
     });    
   },
+    
+  media_with_id: function(media_id) 
+  {
+    var that = this;
+    var m = false;
+    if (that.cat.media.length > 0)
+    {      
+      $.each(that.cat.media, function(i, m2) {        
+        if (parseInt(m2.id) == parseInt(media_id))
+        {
+          m = m2;
+          return false;
+        }
+      });
+    }
+    return m;
+  },        
+  
+  //============================================================================
+  // Aviary
+  //============================================================================
+
+  edit_image: function(media_id) 
+  {
+    var that = this;
+    var m = that.media_with_id(media_id);    
+        
+    if (that.feather_editor != false)
+    {
+      that.edit_image_helper(m);
+      return;
+    }    
+    that.feather_editor = new Aviary.Feather({
+      apiKey: '933414ee42934e8b81d8cd2226a5a13b',
+      theme: 'light',
+      enableCORS: false,
+      maxSize: 1600,
+      onSave: function(media_id, new_url) { return that.update_image(media_id, new_url); },
+      onLoad: function() { that.edit_image_helper(m); }
+    });        
+  },
+  
+  edit_image_helper: function(m)
+  {
+    console.log(m.image_urls.original_url);
+    var that = this;
+    that.feather_editor.launch({
+      image: 'image-' + m.id,
+      url: m.image_urls.original_url
+    });
+  },
+  
+  update_image: function(image_id, new_url) 
+  {
+    var that = this;    
+    var media_id = parseInt(image_id.replace('image-', ''));
+
+    that.feather_editor.showWaitIndicator();
+    $.ajax({
+      url: '/admin/media/' + media_id,
+      type: 'put',
+      data: { image_url: new_url },
+      success: function(resp) {
+        if(resp.error)   { alert("Error saving image:\n\n" + resp.error); } 
+        if(resp.success) {
+          that.feather_editor.hideWaitIndicator();
+          var src = $('#image-' + media_id).attr('src').split('?')[0];                    
+          $('#image-' + media_id).attr('src', src + '?' +  Date.now());
+          that.feather_editor.close();
+          that.refresh_media();
+        }
+      }
+    });
+    return false;
+  }
   
 };
 

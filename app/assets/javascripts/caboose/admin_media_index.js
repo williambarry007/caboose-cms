@@ -236,23 +236,29 @@ MediaController.prototype = {
       $.each(that.cat.media, function(i, m) {
         if (m.media_type == 'image' && m.processed == false)
           processing = true
-        var li = $('<li/>')          
+        var li = $('<li/>')
           .attr('id', 'media' + m.id)
           .addClass('media')          
           .data('media_id', m.id)
           .click(function(e) { that.select_media($(this).data('media_id')); })
-          .append($('<span/>').addClass('name').html(m.name).click(function(e) {
+          .append($('<span/>').addClass('name').html(m.original_name).click(function(e) {
             e.stopPropagation();
             that.edit_media_description($(this).parent().data('media_id'));
           }));
         if (m.image_urls)
-          li.append($('<img/>').attr('src', m.image_urls.tiny_url).attr("id","image-" + m.id));                                      
+          li.append($('<img/>').attr('src', m.image_urls.tiny_url).attr("id","image-" + m.id));  
+        else if (m.original_name) {
+          var ext = m.original_name.match(/\.[0-9a-z]+$/i);
+          if (ext && ext.length > 0)
+            li.append($('<img/>').attr('src', '/assets/caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
+        }                                  
         if (that.selected_media.indexOf(m.id) > -1)
           li.addClass('selected ui-selected');
         if (that.allow_edit && m.image_urls) {
           var link = $("<a/>").attr("onclick","edit_i(" + m.id + ",'" + m.image_urls.tiny_url + "');").html("Edit Image");
           li.append(link);
         }
+        li.append($("<a/>").attr("onclick","download_m(" + m.id + ");").addClass("dl").html("Download"));
         ul.append(li);
       });
     }

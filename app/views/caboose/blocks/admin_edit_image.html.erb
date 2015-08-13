@@ -85,7 +85,7 @@ $(document).ready(function() {
     media_id: <% if @block.media_id %><%= @block.media_id %><% else %>false<% end %>, 
     authenticity_token: '<%= form_authenticity_token %>',    
     top_cat_id: <%= raw Caboose.json(@top_media_category.id) %>,
-    cat_id: <% if @block.media_id %><%= @block.media.media_category_id %><% else %><%= @top_media_category.id %><% end %>,
+    cat_id: <% if @block.media %><%= @block.media.media_category_id %><% else %><%= @top_media_category.id %><% end %>,
     s3_upload_url: '<%= raw @s3_upload_url %>',		      		  	
 	  aws_access_key_id: '<%= raw @aws_access_key_id %>',		
 	  policy: '<%= raw @policy %>',

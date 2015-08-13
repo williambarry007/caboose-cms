@@ -90,6 +90,7 @@
       background-size: contain; 
       background-repeat: no-repeat;
       border: #666 4px solid;
+      text-align: center;
       img {
         max-height: 120px;
         max-width: 90%;
@@ -97,24 +98,38 @@
       span.name { 
         display: block; 
         position: absolute; 
-        bottom: 18px; 
+        bottom: 18px;
+        font-size: 13px;
         width: 150px; 
         text-align: center;        
         color: #fff; 
         text-decoration: none !important;                                   
       }
+      .file-icon {
+        display: block;
+        width: 80px;
+        margin: 10px auto 0 auto;
+      }
       a {
         text-decoration: underline;
         cursor: pointer;
-        display: block;
+        display: inline-block;
         font-size: 13px;
         position: absolute;
         bottom: 0;
+        left: 0;
         text-align: center;
-        width: 100%;
         color: #000;
         &:hover {
           color: blue;
+        }
+        &.dl {
+          right: 0;
+          left: initial;
+          width: 100%;
+          &.i {
+            width: auto;
+          }
         }
       }
       &:hover {

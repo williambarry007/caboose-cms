@@ -126,6 +126,10 @@
         &.dl {
           right: 0;
           left: initial;
+          width: 100%;
+          &.i {
+            width: auto;
+          }
         }
       }
       &:hover {

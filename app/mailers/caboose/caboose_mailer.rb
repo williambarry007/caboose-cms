@@ -8,6 +8,7 @@ module Caboose
     @@site = nil
     
     before_filter do |mailer|
+      puts "Configuring mailer..."
       config = SmtpConfig.where(:site_id => @@site.id).first    
       self.smtp_settings['user_name']            = config.user_name
       self.smtp_settings['password']             = config.password

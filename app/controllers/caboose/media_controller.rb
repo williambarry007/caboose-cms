@@ -82,26 +82,50 @@ module Caboose
       params.each do |name, value|
         case name
           when 'name'         then m.name         = value
-          when 'description'  then m.description  = value          
+          when 'description'  then m.description  = value
+          when 'image_url'    then
+            m.processed = false
+            m.delay.download_image_from_url(value)
         end
       end
-    
-      resp.success = save && m.save
+      
+      m.save
+      resp.success = save
       render :json => resp
     end
 
     # POST /admin/media/edit-image
-    def admin_edit_image
+    #def admin_edit_image
+    #  new_url = params[:new_url]
+    #  media_id = params[:media_id]
+    #  resp = StdClass.new({'attributes' => {}})
+    #  if !new_url.blank? && !media_id.blank?
+    #    m = Media.find(media_id.gsub("image-",""))
+    #    m.image = new_url
+    #    m.save
+    #    resp.success = "Saved image!"
+    #  else
+    #    resp.error = "Couldn't save image"
+    #  end
+    #  render :json => resp
+    #end
+    
+    # POST /admin/media/:id/image
+    def admin_update_image
+      return unless user_is_allowed('media', 'edit')
+      
+      resp = StdClass.new
       new_url = params[:new_url]
-      media_id = params[:media_id]
-      resp = StdClass.new({'attributes' => {}})
-      if !new_url.blank? && !media_id.blank?
-        m = Media.find(media_id.gsub("image-",""))
-        m.image = new_url
+      m = Media.where(:id => params[:id]).first
+      
+      if m.nil?
+        resp.error = "Invalid media id."              
+      elsif new_url.nil? || new_url.strip.length == 0
+        resp.error = "Invalid image URL."
+      else                
+        m.image = URI.parse(new_url)
         m.save
-        resp.success = "Saved image!"
-      else
-        resp.error = "Couldn't save image"
+        resp.success = "Image saved successfully."              
       end
       render :json => resp
     end

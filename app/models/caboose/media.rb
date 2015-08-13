@@ -68,6 +68,12 @@ class Caboose::Media < ActiveRecord::Base
          
   end
   
+  def download_image_from_url(url)
+    self.image = URI.parse(url)
+    self.processed = true
+    self.save
+  end
+  
   def api_hash
     {
       :id            => self.id,

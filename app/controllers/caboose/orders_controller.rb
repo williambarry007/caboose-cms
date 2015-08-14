@@ -84,7 +84,7 @@ module Caboose
       return if !user_is_allowed('orders', 'edit')
            
       order = Order.find(params[:id])
-      resp = order.capture_funds
+      resp = order.capture_funds      
       
       render :json => resp
     end
@@ -176,7 +176,11 @@ module Caboose
             order.custom_discount = value
             order.discount = order.calculate_discount
             order.total = order.calculate_total
-          when 'status'          then order.status          = value
+          when 'status'          then
+            order.status = value
+            if value == 'Shipped'
+              order.date_shipped = DateTime.now.utc
+            end            
           when 'customer_id'     then order.customer_id     = value            
         end
       end

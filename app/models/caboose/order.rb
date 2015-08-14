@@ -260,6 +260,11 @@ module Caboose
             ot.auth_code      = response.authorization_code
             ot.response_code  = response.response_code            
             ot.save
+            
+            if ot.success
+              self.date_captured = DateTime.now.utc
+              self.save              
+            end
                                     
             self.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
             resp.success = 'Captured funds successfully'

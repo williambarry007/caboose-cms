@@ -57,7 +57,7 @@ module Caboose
       #Caboose.log(@rates.inspect)
       @logged_in_user = logged_in_user
 
-      add_ga_event('checkout', 'shipping')      
+      add_ga_event('Ecommerce', 'Checkout', 'Shipping')            
     end
     
     # Step 4 - Gift cards
@@ -66,8 +66,8 @@ module Caboose
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
       redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
-      @logged_in_user = logged_in_user
-      add_ga_event('checkout', 'gift-cards')
+      @logged_in_user = logged_in_user      
+      add_ga_event('Ecommerce', 'Checkout', 'Gift Cards')
     end
     
     # Step 5 - Payment
@@ -109,8 +109,8 @@ module Caboose
         when 'payscape'
           @form_url = Caboose::PaymentProcessor.form_url(@order)
       end
-      @logged_in_user = logged_in_user
-      add_ga_event('checkout', 'payment')
+      @logged_in_user = logged_in_user      
+      add_ga_event('Ecommerce', 'Checkout', 'Payment Form')
     end
         
     # GET /checkout/confirm
@@ -128,8 +128,8 @@ module Caboose
           return
         end
       end
-      @logged_in_user = logged_in_user
-      add_ga_event('checkout', 'confirm_without_payment')
+      @logged_in_user = logged_in_user      
+      add_ga_event('Ecommerce', 'Checkout', 'Confirm Without Payment')
     end
     
     # POST /checkout/confirm
@@ -175,8 +175,8 @@ module Caboose
       @logged_in_user = logged_in_user
       
       # Find the last order for the user
-      @last_order = Order.where(:customer_id => @logged_in_user.id).order("id desc").limit(1).first
-      add_ga_event('checkout', 'thanks')
+      @last_order = Order.where(:customer_id => @logged_in_user.id).order("id desc").limit(1).first            
+      add_ga_event('Ecommerce', 'Checkout', 'Payment', (@last_order.total*100).to_i)
     end
     
     #===========================================================================

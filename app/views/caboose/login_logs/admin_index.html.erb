@@ -1,41 +1,41 @@
+
 <h1>Login Logs</h1>
-
-<form action='/admin/users' method='get' class='search_form'>
-<input type='text' name='first_name_like' value="<%= @gen.params['first_name_like'] %>" placeholder='First name' />
-<input type='text' name='last_name_like'  value="<%= @gen.params['last_name_like']  %>" placeholder='Last name' />
-<input type='text' name='email_like'      value="<%= @gen.params['email_like']      %>" placeholder='Email' />
-<input type='submit' value='Search' />
-</form>
-
-<p>
-<a href='/admin/users/new'>New User</a> |
-<a href='/admin/users/import'>Import CSV</a>
-</p>
-
-<table class='data' id='users_table'>
-  <tr>
-    <%= raw @gen.sortable_table_headings({
-				'first_name' => 'First Name',
-				'last_name, first_name'	=> 'Last Name',
-				'username' => 'Username',
-				'email'	=> 'Email'
-			})
-		%>
-  </tr>
-<% @users.each do |user| %>
-  <tr onclick="window.location='/admin/users/<%= user.id %>';">
-    <td><%= user.first_name %></td>
-    <td><%= user.last_name %></td>
-    <td><%= user.username %></td>
-    <td><%= user.email %></td>
-  </tr>
-<% end %>
-</table>
-
-<p><%= raw @gen.generate %></p>
+<div id='login_logs'></div>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
 <script type='text/javascript'>
+
+$(document).ready(function() {
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'login_logs',
+    base_url: '/admin/login-logs',
+    allow_add: false,
+    allow_bulk_import: false,
+    allow_bulk_edit: false,
+    allow_bulk_delete: false,
+    allow_duplicate: false,
+    allow_advanced_edit: false,
+    fields: [       
+      { show: true, name: 'username'        , nice_name: 'Username'   , sort: 'username'       , type: 'text'     , value: function(ll) { return ll.username       }, width: 150, align: 'left', bulk_edit: false, editable: false },
+      { show: true, name: 'user_id'         , nice_name: 'User ID'    , sort: 'user_id'        , type: 'text'     , value: function(ll) { return ll.user_id        }, width: 150, align: 'left', bulk_edit: false, editable: false },    
+      { show: true, name: 'date_attempted'  , nice_name: 'Date'       , sort: 'date_attempted' , type: 'text'     , value: function(ll) { return ll.date_attempted }, width: 150, align: 'left', bulk_edit: false, editable: false },
+      { show: true, name: 'ip'              , nice_name: 'IP Address' , sort: 'ip'             , type: 'text'     , value: function(ll) { return ll.ip             }, width: 150, align: 'left', bulk_edit: false, editable: false },
+      { show: true, name: 'success'         , nice_name: 'Success'    , sort: 'success'        , type: 'checkbox' , value: function(ll) { return ll.success        }, width: 150, align: 'left', bulk_edit: false, editable: false }            
+    ],
+    search_fields: [
+      { name: 'username_like'       , nice_name: 'Username'   , type: 'text'     , width: 150, align: 'left' },
+      { name: 'user_id'             , nice_name: 'User ID'    , type: 'text'     , width: 150, align: 'left' },    
+      { name: 'date_attempted_gte'  , nice_name: 'Date Min'   , type: 'text'     , width: 150, align: 'left' },
+      { name: 'date_attempted_lte'  , nice_name: 'Date Max'   , type: 'text'     , width: 150, align: 'left' },
+      { name: 'ip_like'             , nice_name: 'IP Address' , type: 'text'     , width: 150, align: 'left' },
+      { name: 'success'             , nice_name: 'Success'    , type: 'checkbox' , width: 150, align: 'left' }      
+    ],
+    no_models_text: "There are no login logs right now."
+  });        
+});
 
 </script>
 <% end %>

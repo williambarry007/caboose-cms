@@ -19,9 +19,10 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 </div>
 <div id='message'></div>
 <div id='controls'>
-<input type='button' value='Back'           onclick="window.location='/admin/users';" />
-<input type='button' value='Reset Password' onclick="window.location='/admin/users/<%= @edituser.id %>/edit-password';" />
-<input type='button' value='Delete User'    onclick="delete_user(<%= @edituser.id %>);" />
+<input type='button' value='Back'                     onclick="window.location='/admin/users';" />
+<input type='button' value='Login Logs for this User' onclick="window.location='/admin/login-logs?user_id=<%= @edituser.id %>';" />
+<input type='button' value='Reset Password'           onclick="window.location='/admin/users/<%= @edituser.id %>/edit-password';" />
+<input type='button' value='Delete User'              onclick="delete_user(<%= @edituser.id %>);" />
 </div>
 
 <% content_for :caboose_css do %>

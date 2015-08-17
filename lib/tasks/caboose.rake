@@ -151,12 +151,18 @@ namespace :caboose do
     
   desc "Creates/verifies that all database tables and fields are correctly added."
   task :db => :environment do
-    Caboose::Schema.create_schema
-    Caboose::Schema.load_data    
-    if class_exists?('Schema')
-      Schema.create_schema
-      Schema.load_data
+    Caboose::schemas.each do |schema_class|
+      S = schema_class.constantize
+      S.create_schema
+      S.load_data
     end
+      
+    #Caboose::Schema.create_schema
+    #Caboose::Schema.load_data    
+    #if class_exists?('Schema')
+    #  Schema.create_schema
+    #  Schema.load_data
+    #end
     caboose_correct_sequences
   end
 

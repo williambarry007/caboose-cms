@@ -80,6 +80,13 @@ Caboose::Engine.routes.draw do
   put     "/admin/sites/:site_id/domains/:id/set-primary" => "domains#admin_set_primary"
         
   #=============================================================================
+  # Login Logs
+  #=============================================================================
+    
+  get "/admin/login-logs/json"      => "login_logs#admin_json"  
+  get "/admin/login-logs"           => "login_logs#admin_index"
+    
+  #=============================================================================
   # Store
   #=============================================================================  
     

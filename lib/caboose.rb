@@ -14,7 +14,10 @@ module Caboose
   
   mattr_accessor :plugins
   @@plugins = ['Caboose::CorePlugin']
-
+  
+  mattr_accessor :schemas
+  @@schemas = ['Caboose::Schema', 'Schema']
+  
   # Any paths to modeljs javascript files  
   mattr_accessor :modeljs_js_files
   @@modeljs_js_files = []

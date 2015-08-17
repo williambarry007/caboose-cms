@@ -54,8 +54,11 @@ Caboose.Store.Modules.Product = (function() {
   self.initalize_zoom = function(image_url) {
     var big_image = $("#product-images").children("figure").first();
     big_image.data("zoom-image",image_url);
-    if (typeof elevateZoom !== 'undefined') {
+    try {
       big_image.elevateZoom();
+    }
+    catch(err) {
+      console.log("Missing image zoom script.");
     }
   }
   

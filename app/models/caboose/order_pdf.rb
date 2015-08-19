@@ -63,7 +63,7 @@ module Caboose
 
     def order_info
 
-      order_info = "Order Number: #{order.id}\n"
+      order_info = "Order Number: #{order.order_number}\n"
       order_info << "Order Date: #{order.date_created.strftime('%d %b %Y %H:%M:%S %p')}\n"
       order_info << "Status: #{order.status.capitalize}\n"
       tbl = []

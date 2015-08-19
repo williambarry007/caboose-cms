@@ -6,7 +6,8 @@ shipping_address << "<br />#{sa.city}, #{sa.state} #{sa.zip}"
 %>
 <p align='center'><img src='https://dmwwflw4i3miv.cloudfront.net/logo.png' /></p>
 
-<h1>Order #<%= @order.id %></h1>
+<h1>Order #<%= @order.order_number %></h1>
+<p>Order ID: <%= @order.id %></p>
 
 <table class='data'>
 <tr>

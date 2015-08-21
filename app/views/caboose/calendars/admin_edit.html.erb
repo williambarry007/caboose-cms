@@ -1,6 +1,7 @@
 
 <h1>Edit Calendar</h1>
 <p><div id='calendar_<%= @calendar.id %>_name'        ></div></p>
+<p><div id='calendar_<%= @calendar.id %>_color'       ></div></p>
 <p><div id='calendar_<%= @calendar.id %>_description' ></div></p>
 
 <div id='calendar'>
@@ -68,7 +69,8 @@ $(document).ready(function() {
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'name'        , nice_name: 'Name'        , type: 'text'    , value: <%= raw Caboose.json(@calendar.name        ) %>, width: 400 },
-      { name: 'description' , nice_name: 'Description' , type: 'textarea', value: <%= raw Caboose.json(@calendar.description ) %>, width: 400, height: 100 }      
+      { name: 'description' , nice_name: 'Description' , type: 'textarea', value: <%= raw Caboose.json(@calendar.description ) %>, width: 400, height: 100 },
+      { name: 'color' , nice_name: 'Color' , type: 'color', value: <%= raw Caboose.json(@calendar.color ) %>, width: 400, height: 100 }  
     ]    
   });  
   $('#calendar td')
@@ -129,6 +131,9 @@ function delete_calendar(calendar_id, confirm)
 #calendar td ul li { margin: 0; padding: 0; list-style: none; }
 #calendar td ul li a { display: block; }
 #calendar td ul li a:hover { background: #fff; }
+.calendar_<%= @calendar.id %>_color_bound_color {
+  width: 100px !important;
+}
 
 </style>
 <% end %>

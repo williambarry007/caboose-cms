@@ -216,21 +216,22 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   # Images
   #=============================================================================
-  
-  post    "/admin/media/pre-upload"     => "media#admin_pre_upload"
-  get     "/admin/media"                => "media#admin_index"    
-  get     "/admin/media/new"            => "media#admin_new"
-  get     "/admin/media/json"           => "media#admin_json"
-  get     "/admin/media/:id/process"    => "media#admin_process"
-  get     "/admin/media/:id/finished"   => "media#admin_process_finished"
-  get     "/admin/media/:id/description" => "media#admin_edit_description"
-  get     "/admin/media/:id"            => "media#admin_edit"  
-  put     "/admin/media/:id"            => "media#admin_update"
-  post    "/admin/media/:id/image"      => "media#admin_update_image"
-  #post    "/admin/media/edit-image"     => "media#admin_edit_image"  
-  post    "/admin/media"                => "media#admin_add"  
-  delete  "/admin/media/bulk"           => "media#admin_bulk_delete"
-  delete  "/admin/media/:id"            => "media#admin_delete"
+
+  get     "/admin/media/last-upload-processed" => "media#admin_last_upload_processed"
+  post    "/admin/media/pre-upload"            => "media#admin_pre_upload"
+  get     "/admin/media"                       => "media#admin_index"    
+  get     "/admin/media/new"                   => "media#admin_new"
+  get     "/admin/media/json"                  => "media#admin_json"
+  get     "/admin/media/:id/process"           => "media#admin_process"
+  get     "/admin/media/:id/finished"          => "media#admin_process_finished"
+  get     "/admin/media/:id/description"       => "media#admin_edit_description"
+  get     "/admin/media/:id"                   => "media#admin_edit"  
+  put     "/admin/media/:id"                   => "media#admin_update"
+  post    "/admin/media/:id/image"             => "media#admin_update_image"
+  #post    "/admin/media/edit-image"           => "media#admin_edit_image"  
+  post    "/admin/media"                       => "media#admin_add"  
+  delete  "/admin/media/bulk"                  => "media#admin_bulk_delete"
+  delete  "/admin/media/:id"                   => "media#admin_delete"
   
   
   get     "/admin/media-categories/json"       => "media_categories#admin_json"
@@ -624,6 +625,7 @@ Caboose::Engine.routes.draw do
   # Orders
   #=============================================================================
   
+  get     "/admin/orders/summary-report"              => "orders#admin_summary_report"
   get     "/admin/orders/weird-test"                  => "orders#admin_weird_test"
   get     "/admin/orders"                             => "orders#admin_index"
   get     "/admin/orders/test-info"                   => "orders#admin_mail_test_info"

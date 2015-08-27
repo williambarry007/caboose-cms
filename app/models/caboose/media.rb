@@ -53,14 +53,12 @@ class Caboose::Media < ActiveRecord::Base
     self.processed = true
     self.save
     
-    # Set the downloadable file names
-    #bucket = AWS::S3::Bucket.new(bucket)
-    #['tiny', 'thumb', 'large'].each do |style|            
-    #  obj = bucket.objects["media/#{self.id}_#{style}#{ext}"]
-    #  obj.content_disposition = 'attachment; filename="' + self.name + '"'
-    #  obj.store
-    #end
-           
+    # Remember when the last upload processing happened
+    s = Setting.where(:site_id => self.media_category.site_id, :name => 'last_upload_processed').first
+    s = Setting.create(:site_id => self.media_category.site_id, :name => 'last_upload_processed') if s.nil?
+    s.value = DateTime.now.utc.strftime("%FT%T%z")
+    s.save
+
     # Remove the temp file            
     bucket = AWS::S3::Bucket.new(bucket)
     obj = bucket.objects[key]

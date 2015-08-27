@@ -49,6 +49,16 @@ module Caboose
       cat = id ? MediaCategory.find(id) : MediaCategory.top_category(@site.id)      
       render :json => cat.api_hash
     end
+    
+    # GET /admin/media/last-upload-processed
+    def admin_last_upload_processed
+      return if !user_is_allowed('media', 'view')
+      render :json => false and return if @site.nil?
+      #Setting.where(:site_id => @site.id, :name => 'last_upload_processed').destroy_all      
+      s = Setting.where(:site_id => @site.id, :name => 'last_upload_processed').first      
+      s = Setting.create(:site_id => @site.id, :name => 'last_upload_processed', :value => DateTime.now.utc.strftime("%FT%T%z")) if s.nil?                  
+      render :json => { :last_upload_processed => s.value }
+    end
 
     # GET /admin/media/new
     def admin_new

@@ -41,7 +41,7 @@ module Caboose
       @tasks        = {}
       @page_tasks   = {}
       @is_real_page = false
-      @ga_events    = []
+      @ga_events    = []      
       
       #if @find_page
         @page = Page.page_with_uri(request.host_with_port, request.fullpath)

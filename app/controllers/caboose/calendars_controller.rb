@@ -40,7 +40,7 @@ module Caboose
         case name
           when 'name'         then calendar.name         = value
           when 'description'  then calendar.description  = value
-          when 'color'        then calendar.color        = value       
+          when 'color'        then calendar.color        = value
         end
       end
     

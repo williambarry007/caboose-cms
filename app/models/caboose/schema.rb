@@ -209,7 +209,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Calendar => [
         [ :site_id      , :integer  ],
         [ :name         , :string   ],
-        [ :description  , :text     ]  
+        [ :description  , :text     ],
+        [ :color        , :string   ]
       ],
       Caboose::CalendarEvent => [
         [ :calendar_id              , :integer  ],

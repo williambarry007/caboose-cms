@@ -24,7 +24,8 @@ module Caboose
         'sort'           => 'id',
         'desc'           => 1,
         'base_url'       => '/admin/orders',
-        'use_url_params' => false
+        'use_url_params' => false,
+        'items_per_page' => 100
       })
       
       @orders    = @pager.items

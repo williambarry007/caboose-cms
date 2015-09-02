@@ -54,8 +54,8 @@ class Caboose::Media < ActiveRecord::Base
     self.save
     
     # Remember when the last upload processing happened
-    s = Setting.where(:site_id => self.media_category.site_id, :name => 'last_upload_processed').first
-    s = Setting.create(:site_id => self.media_category.site_id, :name => 'last_upload_processed') if s.nil?
+    s = Caboose::Setting.where(:site_id => self.media_category.site_id, :name => 'last_upload_processed').first
+    s = Caboose::Setting.create(:site_id => self.media_category.site_id, :name => 'last_upload_processed') if s.nil?
     s.value = DateTime.now.utc.strftime("%FT%T%z")
     s.save
 

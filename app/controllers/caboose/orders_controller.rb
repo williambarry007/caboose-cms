@@ -24,7 +24,8 @@ module Caboose
         'sort'           => 'id',
         'desc'           => 1,
         'base_url'       => '/admin/orders',
-        'use_url_params' => false
+        'use_url_params' => false,
+        'items_per_page' => 100
       })
       
       @orders    = @pager.items
@@ -208,6 +209,17 @@ module Caboose
       order = Order.find(params[:id])
       order.delay.send_payment_authorization_email      
       render :json => { :success => true }
+    end
+    
+    # GET /admin/orders/summary-report
+    def admin_summary_report
+      return if !user_is_allowed('orders', 'view')
+
+      @d1 = params[:d1] ? DateTime.strptime("#{params[:d1]} 00:00:00", '%Y-%m-%d %H:%M:%S') : DateTime.strptime(DateTime.now.strftime("%Y-%m-01 00:00:00"), '%Y-%m-%d %H:%M:%S')
+      @d2 = params[:d2] ? DateTime.strptime("#{params[:d2]} 00:00:00", '%Y-%m-%d %H:%M:%S') : @d1 + 1.month      
+      @rows = OrderReporter.summary_report(@site.id, @d1, @d2)
+      
+      render :layout => 'caboose/admin'    
     end
 
     # GET /admin/orders/status-options

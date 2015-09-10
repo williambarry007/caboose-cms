@@ -4,7 +4,7 @@ namespace :caboose do
 
   desc "Update the on sale value for all products and variants"
   task :update_products_on_sale => :environment do    
-    Product.update_on_sale
+    Caboose::Product.update_on_sale
   end
     
   desc "Create media categories for existing products on all sites"

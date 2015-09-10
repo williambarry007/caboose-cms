@@ -127,16 +127,16 @@ module Caboose
     end
         
     # GET /admin/categories/status-options
-    def admin_status_options      
+    def admin_status_options
       render :json => [
         { :value => 'Active'   , :text => 'Active'    },
         { :value => 'Inactive' , :text => 'Inactive'  },
         { :value => 'Deleted'  , :text => 'Deleted'   }
       ]
     end
-    
+
     # GET /admin/categories/options
-    def admin_options      
+    def admin_options
       @options = []
       cat = Category.where("site_id = ? and parent_id is null", @site.id).first      
       if cat.nil?
@@ -145,25 +145,25 @@ module Caboose
       admin_options_helper(cat, '')
       render :json => @options
     end
-        
+
     def admin_options_helper(cat, prefix)
       @options << { :value => cat.id, :text => "#{prefix}#{cat.name}" }      
       cat.children.each do |c|
         admin_options_helper(c, "#{prefix} - ")
       end      
     end
-    
+
     # GET /admin/categories/:category_id/products/json
-    def admin_category_products                  
+    def admin_category_products
       query = ["select P.id, P.title from store_category_memberships CM
         left join store_products P on P.id = CM.product_id
-        where CM.category_id = ?
+        where CM.category_id = ? AND P.status = 'Active'
         order by CM.sort_order, P.title", params[:id]]             
       rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))
       arr = rows.collect{ |row| { :id => row[0], :title => row[1] }}
       render :json => arr
     end
-    
+
   end
 end
 

@@ -6,7 +6,7 @@ module Caboose
     # GET /station
     def index
       @user = logged_in_user
-      page_id = params['page_id'].nil? ? 1 : params['page_id']
+      page_id = params['page_id'].nil? ? Page.index_page(@site.id).id : params['page_id']
       @page = Page.find(page_id)
       @tab = params['tab']
       

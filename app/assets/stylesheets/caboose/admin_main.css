@@ -381,6 +381,48 @@ Page Bar Generator
 
 /******************************************************************************/
 
+#htabs_container {  
+  width: 100%;
+}
+#htabs { 
+  width: 100%;        
+  list-style: none; 
+  margin: 0 0 0 -30px; 
+  padding: 0;
+  border-top: #ccc 0px solid;
+}
+#htabs li { 
+  display: inline-block;
+  list-style: none; 
+  margin: 0; 
+  padding: 0;    
+  text-align: center;
+} 
+#htabs a {
+  display: block;
+  margin: 0;
+  padding: 16px 12px 12px 12px;
+  text-decoration: none;
+  background: #efefef;
+  border-bottom: #ccc 1px solid;  
+  color: #000;
+}
+#htabs a:hover {
+  background: #666;
+  color: #fff;  
+}
+#htabs li.selected a {
+  background: transparent;
+  color: #000;
+  font-weight: bold;  
+  border-bottom: #fff 1px solid;
+}
+#htabs_content {
+  clear: left;  
+}
+
+/******************************************************************************/
+
 #tabs { 
   width: 200px;  
   float: left;  

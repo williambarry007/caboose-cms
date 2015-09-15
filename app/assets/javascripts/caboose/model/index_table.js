@@ -99,17 +99,27 @@ IndexTable.prototype = {
     options: { page: 1 }, 
     params: {}
   },
+
+  add_to_url: function(url, str)
+  {
+    if (url.indexOf('?') > -1)
+    {
+      bu = url.split('?');
+      return bu.shift() + str + '?' + bu.join('?');
+    }
+    return url + str;
+  },
   
   // Constructor
   init: function(params) {
     for (var thing in params)
       this[thing] = params[thing];    
         
-    var that = this;
-    if (!this.refresh_url          ) this.refresh_url           = this.base_url + '/json';
-    if (!this.bulk_update_url      ) this.bulk_update_url       = this.base_url + '/bulk';    
-    if (!this.bulk_delete_url      ) this.bulk_delete_url       = this.base_url + '/bulk';
-    if (!this.add_url              ) this.add_url               = this.base_url;
+    var that = this;        
+    if (!this.refresh_url          ) this.refresh_url     = this.add_to_url(this.base_url, '/json');
+    if (!this.bulk_update_url      ) this.bulk_update_url = this.add_to_url(this.base_url, '/bulk');   
+    if (!this.bulk_delete_url      ) this.bulk_delete_url = this.add_to_url(this.base_url, '/bulk');
+    if (!this.add_url              ) this.add_url = this.base_url;
          
     $.each(this.fields, function(i, f) {
       if (f.editable == null) f.editable = true;
@@ -821,7 +831,10 @@ IndexTable.prototype = {
     var form = $('<form/>').attr('id', 'new_form')
       .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(that.form_authenticity_token));
     $.each(this.new_model_fields, function(i, f) {
-      form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
+      if (f.type == 'hidden')
+        form.append($('<input/>').attr('type', 'hidden').attr('name', f.name).val(f.value));
+      else
+        form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
     });
     form.append($('<div/>').attr('id', that.container + '_new_message'));
     form.append($('<p>')        

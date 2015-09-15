@@ -29,7 +29,7 @@ module Caboose
       })
       
       @orders    = @pager.items
-      @customers = Caboose::User.reorder('last_name, first_name').all
+      @customers = Caboose::User.where(:site_id => @site.id).reorder('last_name, first_name').all
       
       render :layout => 'caboose/admin'
     end

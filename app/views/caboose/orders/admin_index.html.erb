@@ -15,7 +15,9 @@
       <optgroup label='Status' style='width: 100px'>
         <option value=''>-- All customers --</option>        
         <% @customers.each do |c| %>
-          <option value='<%= c.id %>'<%= @pager.params['customer_id'] == c.id ? " selected='true'" : '' %>><%= "#{c.last_name}, #{c.first_name}" %></option>
+          <option value='<%= c.id %>'<%= @pager.params['customer_id'] == c.id ? " selected='true'" : '' %>>
+            <%= c.first_name.blank? && c.last_name.blank? ? c.username : "#{c.last_name}, #{c.first_name}" %>
+          </option>
         <% end %>
       </optgroup>
     </select></p>

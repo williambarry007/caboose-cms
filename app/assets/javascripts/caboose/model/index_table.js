@@ -804,24 +804,29 @@ IndexTable.prototype = {
   },
   
   current_message: false,
-  show_message: function(el, name) {
+  show_message: function(el, name, after) {
     var that = this;
     if (that.current_message == name)
     {
       $('#' + that.container + '_message').slideUp(function() { $('#' + that.container + '_message').empty().css('margin-bottom', 0); });
       that.current_message = false;
+      if (after) after();
       return;
     }
     if (!$('#' + that.container + '_message').is(':empty'))
     {
-      $('#' + that.container + '_message').slideUp(function() { $('#' + that.container + '_message').empty().append(el).css('margin-bottom', '10px').slideDown(); });
-      that.current_message = name;
+      $('#' + that.container + '_message').slideUp(function() { 
+        $('#' + that.container + '_message').empty().append(el).css('margin-bottom', '10px').slideDown();
+        if (after) after();
+      });
+      that.current_message = name;      
       return;
     }
     else     
     {
       $('#' + that.container + '_message').hide().empty().append(el).css('margin-bottom', '10px').slideDown();
       that.current_message = name;
+      if (after) after();
     }
   },
   
@@ -830,11 +835,16 @@ IndexTable.prototype = {
     var that = this;          
     var form = $('<form/>').attr('id', 'new_form')
       .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(that.form_authenticity_token));
+    var focus_field = false;
     $.each(this.new_model_fields, function(i, f) {
       if (f.type == 'hidden')
         form.append($('<input/>').attr('type', 'hidden').attr('name', f.name).val(f.value));
       else
+      {
         form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
+        if (!focus_field)
+          focus_field = f.name;
+      }
     });
     form.append($('<div/>').attr('id', that.container + '_new_message'));
     form.append($('<p>')        
@@ -843,8 +853,8 @@ IndexTable.prototype = {
     );        
     var div = $('<div/>').addClass('note')
       .append($('<h2/>').css('margin-top', 0).css('padding-top', 0).html(that.new_model_text))
-      .append(form);
-    that.show_message(div);
+      .append(form);        
+    that.show_message(div, null, function() { $('#new_form input[name="' + focus_field + '"]').focus(); });
   },
     
   add_model: function() 

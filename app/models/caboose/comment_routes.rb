@@ -19,30 +19,23 @@ module Caboose
           if line =~ /^(.*?)class (.*?)Controller(.*?)$/
             class_name = line.gsub(/^(.*?)class (.*?)Controller(.*?)$/, '\2').gsub(/([A-Z])/, '_\1').downcase
             class_name[0] = '' if class_name[0] == '_'
-            next
-          end
-          if line =~ /# CLASS PRIORITY: \d/
-            class_priority = line.gsub(/# ROUTES PRIORITY: (\d*?)$/, '\1').to_i            
-            next
-          end
-          if line =~ /# ROUTE PRIORITY: \d/
-            route_priority = line.gsub(/# ROUTE PRIORITY: (\d*?)$/, '\1').to_i            
-            next
-          end          
-          if line.starts_with?('def ')
+          elsif line =~ /# @class_route_priority \d/
+            class_priority = line.gsub(/# @class_route_priority (\d*?)$/, '\1').to_i
+          elsif line =~ /# @route_priority \d/
+            route_priority = line.gsub(/# @route_priority (\d*?)$/, '\1').to_i
+          elsif line.starts_with?('def ')
             actions << [line.gsub('def ', ''), uris, route_priority]              
             uris = []
             route_priority = 20
-          end          
-          if    line =~ /# GET (.*?)/       then uris << "get    \"#{line.gsub(/# GET (.*?)/       , '\1')}\""          
-          elsif line =~ /# POST (.*?)/      then uris << "post   \"#{line.gsub(/# POST (.*?)/      , '\1')}\""          
-          elsif line =~ /# PUT (.*?)/       then uris << "put    \"#{line.gsub(/# PUT (.*?)/       , '\1')}\""          
-          elsif line =~ /# DELETE (.*?)/    then uris << "delete \"#{line.gsub(/# DELETE (.*?)/    , '\1')}\""
+          elsif line =~ /# @route GET (.*?)/       then uris << "get    \"#{line.gsub(/# @route GET (.*?)/       , '\1')}\""          
+          elsif line =~ /# @route POST (.*?)/      then uris << "post   \"#{line.gsub(/# @route POST (.*?)/      , '\1')}\""          
+          elsif line =~ /# @route PUT (.*?)/       then uris << "put    \"#{line.gsub(/# @route PUT (.*?)/       , '\1')}\""          
+          elsif line =~ /# @route DELETE (.*?)/    then uris << "delete \"#{line.gsub(/# @route DELETE (.*?)/    , '\1')}\""
           end
         end      
         classes << [class_name, actions, class_priority]
       end
-      puts "--------------------------------------------------------------------"
+
       routes = []
       classes.sort_by{ |arr| arr[2] }.each do |carr|
         
@@ -51,11 +44,7 @@ module Caboose
         
         # Get the longest URI so we can make routes that line up vertically
         longest = ''
-        actions.each do |action, uris|          
-          uris.each do |uri|
-            longest = uri if uri.length > longest.length
-          end
-        end
+        actions.each{ |action, uris| uris.each{ |uri| longest = uri if uri.length > longest.length }}
         length = longest.length + 1
         
         # Make the route line

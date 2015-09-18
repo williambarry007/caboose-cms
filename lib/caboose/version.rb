@@ -1,3 +1,3 @@
 module Caboose
-  VERSION = '0.6.31'
+  VERSION = '0.6.32'
 end

@@ -55,8 +55,12 @@ module Caboose
     # GET /admin/orders/:id
     def admin_edit
       return if !user_is_allowed('orders', 'edit')
-      @order = Order.find(params[:id])
-      #@order.calculate
+      @order = Order.where(:id => params[:id]).first
+
+      if params[:id].nil? || @order.nil?
+        render :file => 'caboose/orders/admin_invalid_order', :layout => 'caboose/admin'
+        return
+      end            
       render :layout => 'caboose/admin'
     end
     

@@ -832,13 +832,37 @@ IndexTable.prototype = {
   
   new_form: function()
   {
-    var that = this;          
+    var that = this;
+    
+    $.each(this.new_model_fields, function(i, f) {
+      if (f.options_url && !f.options)
+      {
+        $.ajax({
+          url: f.options_url,
+          type: 'get',
+          success: function(resp) { f.options = resp },
+          async: false          
+        });
+      }
+    });        
+    
     var form = $('<form/>').attr('id', 'new_form')
       .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(that.form_authenticity_token));
     var focus_field = false;
     $.each(this.new_model_fields, function(i, f) {
       if (f.type == 'hidden')
         form.append($('<input/>').attr('type', 'hidden').attr('name', f.name).val(f.value));
+      else if (f.type == 'select')
+      {       
+        var select = $('<select/>').attr('name', f.name);
+        $.each(f.options, function(i, option) {
+          var opt = $('<option/>').val(option.value).html(option.text);
+          if (f.value && f.value == option.value)
+            opt.attr('selected', 'true');
+          select.append(opt);
+        });
+        form.append(select);
+      }
       else
       {
         form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));

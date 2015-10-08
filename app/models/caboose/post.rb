@@ -75,7 +75,7 @@ class Caboose::Post < ActiveRecord::Base
     if fv.nil?
       f = Caboose::PostCustomField.where(:site_id => self.site_id, :key => key).first
       return nil if f.nil?
-      fv = Caboose::PostCustomFieldValue.create(:post_id => self.id, :key => key, :value => f.default_value, :sort_order => f.sort_order)
+      fv = Caboose::PostCustomFieldValue.create(:post_id => self.id, :post_custom_field_id => f.id, :key => key, :value => f.default_value, :sort_order => f.sort_order)
     end
     return fv.value
   end

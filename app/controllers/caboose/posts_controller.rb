@@ -69,13 +69,14 @@ module Caboose
     def admin_edit_general
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])
+      @post.verify_custom_field_values_exist
       render :layout => 'caboose/admin'
     end
     
     # GET /admin/posts/:id/preview
     def admin_edit_preview
       return if !user_is_allowed('posts', 'edit')    
-      @post = Post.find(params[:id])
+      @post = Post.find(params[:id])      
       render :layout => 'caboose/admin'
     end
     

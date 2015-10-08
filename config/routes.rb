@@ -417,6 +417,20 @@ Caboose::Engine.routes.draw do
   delete  "/admin/post-categories/:id"                     => "post-categories#admin_delete"
         
   #=============================================================================
+  # Post Custom Fields and Values
+  #=============================================================================
+  
+  put    "/admin/post-custom-field-values/:id"      => "post_custom_field_values#admin_update"
+  get    "/admin/post-custom-fields/json"           => "post_custom_fields#admin_json"
+  get    "/admin/post-custom-fields/:field-options" => "post_custom_fields#admin_options"  
+  get    "/admin/post-custom-fields/:id/json"       => "post_custom_fields#admin_json_single"  
+  get    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_edit"
+  put    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_update"
+  get    "/admin/post-custom-fields"                => "post_custom_fields#admin_index"        
+  post   "/admin/post-custom-fields"                => "post_custom_fields#admin_add"
+  delete "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_delete"
+        
+  #=============================================================================
   # Google Spreadsheets
   #=============================================================================
   

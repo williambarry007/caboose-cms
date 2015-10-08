@@ -507,6 +507,22 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :post_id          , :integer ],
         [ :post_category_id , :integer ]
       ],
+      Caboose::PostCustomField => [
+        [ :site_id           , :integer ],
+        [ :key               , :string  ],
+        [ :name              , :string  ],
+        [ :field_type        , :string  ],
+        [ :default_value     , :text    ],
+        [ :options           , :text    ],
+        [ :sort_order        , :integer  , { :default => 0 }]
+      ],
+      Caboose::PostCustomFieldValue => [
+        [ :post_id              , :integer ],
+        [ :post_custom_field_id , :integer ],
+        [ :key                  , :string  ],
+        [ :value                , :text    ],
+        [ :sort_order           , :integer  , { :default => 0 }]
+      ],
       Caboose::Product => [
         [ :site_id               , :integer   ],
         [ :alternate_id          , :string    ],

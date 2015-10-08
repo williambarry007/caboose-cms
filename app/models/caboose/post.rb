@@ -2,15 +2,16 @@
 class Caboose::Post < ActiveRecord::Base
   self.table_name = "posts"
   
+  has_many :post_custom_field_values    
   has_many :post_category_memberships
-  has_many :post_categories, :through => :post_category_memberships
+  has_many :post_categories, :through => :post_category_memberships  
   belongs_to :site
   
   attr_accessible :id,        
     :site_id     ,
     :title       ,
     :subtitle    ,
-    :author      ,
+    :author      ,    
     :body        ,
     :preview     ,
     :hide        ,
@@ -68,5 +69,22 @@ class Caboose::Post < ActiveRecord::Base
     self.uri = new_uri
     self.save        
   end  
+  
+  def custom_field_value(key)
+    fv = Caboose::PostCustomFieldValue.where(:post_id => self.id, :key => key).first
+    if fv.nil?
+      f = Caboose::PostCustomField.where(:site_id => self.site_id, :key => key).first
+      return nil if f.nil?
+      fv = Caboose::PostCustomFieldValue.create(:post_id => self.id, :key => key, :value => f.default_value, :sort_order => f.sort_order)
+    end
+    return fv.value
+  end
+  
+  def verify_custom_field_values_exist
+    Caboose::PostCustomField.where(:site_id => self.site_id).all.each do |f|
+      fv = Caboose::PostCustomFieldValue.where(:post_id => self.id, :post_custom_field_id => f.id).first                  
+      Caboose::PostCustomFieldValue.create(:post_id => self.id, :post_custom_field_id => f.id, :key => f.key, :value => f.default_value, :sort_order => f.sort_order) if fv.nil?
+    end
+  end
 
 end

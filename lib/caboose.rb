@@ -1,4 +1,5 @@
-require "caboose/engine"
+require 'caboose/engine'
+require 'asset_sync'
 
 module Caboose
   

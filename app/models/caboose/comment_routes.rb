@@ -52,7 +52,7 @@ module Caboose
           action = arr[0]
           uris = arr[1]
           uris.each do |uri|
-            puts "#{uri.ljust(length, ' ')} => \"#{class_name}\##{action}\""
+            #puts "#{uri.ljust(length, ' ')} => \"#{class_name}\##{action}\""
             routes << "#{uri.ljust(length, ' ')} => \"#{class_name}\##{action}\"" 
           end
         end

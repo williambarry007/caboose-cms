@@ -40,7 +40,7 @@ Gem::Specification.new do |s|
 
   # Production  
   s.add_dependency "pg"
-  s.add_dependency "rails", "~> 3.2.13"
+  s.add_dependency "rails", "~> 3.2.22"
   s.add_dependency "underscore-rails"
   s.add_dependency "jquery-rails", "~> 3.1.1"
   s.add_dependency "jquery-ui-rails", "~> 5.0.0"    
@@ -53,12 +53,16 @@ Gem::Specification.new do |s|
   s.add_dependency "httparty"
   s.add_dependency "authorize-net"
   s.add_dependency "prawn"
+  s.add_dependency "prawn-table"
   s.add_dependency "active_shipping"  
   s.add_dependency "nokogiri"
   s.add_dependency 'box_packer'
-  s.add_dependency 'authorizenet'  
-  #s.add_dependency 'tax_cloud'  
-  #s.add_dependency "aws-sdk"
+  s.add_dependency 'authorizenet'
+  s.add_dependency 'delayed_job_active_record'  
+  s.add_dependency 'tax_cloud'
+  s.add_dependency 'aws-sdk', '< 2.0'
+  s.add_dependency 'asset_sync'
+  s.add_dependency 'unf'    
   #s.add_dependency "oauth"
   #s.add_dependency "roxml"
   #s.add_dependency "spreadsheet"

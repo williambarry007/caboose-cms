@@ -1,5 +1,6 @@
 require 'caboose/engine'
 require 'asset_sync'
+require 'delayed_job_active_record'
 
 module Caboose
   

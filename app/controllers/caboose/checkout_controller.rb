@@ -1,4 +1,4 @@
-require 'authorizenet'
+require 'authorize_net'
   
 module Caboose
   class CheckoutController < Caboose::ApplicationController

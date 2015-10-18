@@ -311,8 +311,8 @@ IndexTable.prototype = {
       $.each(that.fields, function(j, field) {
         if (field.show && field.editable)
         {            
-          var attrib = $.extend({}, field);
-          attrib['value'] = field.value(m);
+          var attrib = $.extend({}, field);          
+          attrib['value'] = field.value(m);           
           attrib['fixed_placeholder'] = false;
           attrib['after_update'] = function() { that.refresh_single(m.id); };
           new ModelBinder({

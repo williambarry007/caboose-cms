@@ -89,7 +89,10 @@ BoundSelect = BoundControl.extend({
                 this2.save();
               }, true);
             }
-            caboose_modal_url(this2.attribute.quick_add_url);            
+            if (typeof this2.attribute.quick_add_url == 'string')
+              caboose_modal_url(this2.attribute.quick_add_url);
+            else
+              caboose_modal_url(this2.attribute.quick_add_url(this2.model));
           }
           else
           {

@@ -463,6 +463,22 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :block                 , :binary  ],
         [ :refresh               , :boolean , { :default => false }]        
       ],
+      Caboose::PageCustomField => [
+        [ :site_id           , :integer ],
+        [ :key               , :string  ],
+        [ :name              , :string  ],
+        [ :field_type        , :string  ],
+        [ :default_value     , :text    ],
+        [ :options           , :text    ],
+        [ :sort_order        , :integer  , { :default => 0 }]
+      ],
+      Caboose::PageCustomFieldValue => [
+        [ :page_id              , :integer ],
+        [ :page_custom_field_id , :integer ],
+        [ :key                  , :string  ],
+        [ :value                , :text    ],
+        [ :sort_order           , :integer  , { :default => 0 }]
+      ],
       Caboose::PagePermission => [
         [ :role_id , :integer  ],
         [ :page_id , :integer  ],

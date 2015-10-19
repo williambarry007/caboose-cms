@@ -162,6 +162,14 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
+    # GET /admin/page/:id/custom-fields
+    def admin_edit_custom_fields
+      return if !user_is_allowed('pages', 'edit')    
+      @page = Page.find(params[:id])
+      @page.verify_custom_field_values_exist
+      render :layout => 'caboose/modal'
+    end
+    
     # GET /admin/pages/:id/permissions
     def admin_edit_permissions
       return unless user_is_allowed('pages', 'edit')

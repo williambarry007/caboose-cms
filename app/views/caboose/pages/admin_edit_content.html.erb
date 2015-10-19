@@ -63,8 +63,9 @@ $(document).ready(function() {
   $('body').append($('<div/>')        
     .attr('id', 'tiny_header')
     .append($('<a/>').attr('href', '/admin/pages').html("< Back"))
-    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/layout').html("Page Layout"))
-    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>').html("Page Settings"))        
+    .append($('<a/>').attr('href', '#').html('Custom Fields').click(function(e) { e.preventDefault(); caboose_modal_url('/admin/pages/<%= @page.id %>/custom-fields'); }))
+    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/layout').html("Layout"))
+    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>').html("Settings"))    
   );    
 });
 

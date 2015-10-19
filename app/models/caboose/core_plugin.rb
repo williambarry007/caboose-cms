@@ -11,7 +11,8 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'blocktypes'       , 'text' => 'Block Types'         , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'       , 'view') if site.is_master == true
     item['children'] << { 'id' => 'fonts'            , 'text' => 'Fonts'               , 'href' => '/admin/fonts'              , 'modal' => false } if user.is_allowed('fonts'            , 'view') if site.use_fonts == true
     item['children'] << { 'id' => 'redirects'        , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'        , 'view')
-    item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'         , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'      , 'view')   
+    item['children'] << { 'id' => 'permissions'      , 'text' => 'Permissions'         , 'href' => '/admin/permissions'        , 'modal' => false } if user.is_allowed('permissions'      , 'view')
+    item['children'] << { 'id' => 'pagecustomfields' , 'text' => 'Page Custom Fields'  , 'href' => '/admin/page-custom-fields' , 'modal' => false } if user.is_allowed('pagecustomfields' , 'view')
     item['children'] << { 'id' => 'post_categories'  , 'text' => 'Post Categories'     , 'href' => '/admin/post-categories'    , 'modal' => false } if user.is_allowed('post_categories'  , 'view')
     item['children'] << { 'id' => 'postcustomfields' , 'text' => 'Post Custom Fields'  , 'href' => '/admin/post-custom-fields' , 'modal' => false } if user.is_allowed('postcustomfields' , 'view')
     item['children'] << { 'id' => 'roles'            , 'text' => 'Roles'               , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'            , 'view')

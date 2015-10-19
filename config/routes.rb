@@ -265,10 +265,11 @@ Caboose::Engine.routes.draw do
   get     "/admin/pages/robots-options"    => "pages#admin_robots_options"
   get     "/admin/pages/format-options"    => "pages#admin_content_format_options"
   get     "/admin/pages/new"               => "pages#admin_new"
-  get     "/admin/pages/:id/block-options" => "pages#admin_block_options"
+  get     "/admin/pages/:id/block-options" => "pages#admin_block_options"  
   get     "/admin/pages/:id/uri"           => "pages#admin_page_uri"
   get     "/admin/pages/:id/delete"        => "pages#admin_delete_form"  
   get     "/admin/pages/:id/sitemap"       => "pages#admin_sitemap"  
+  get     "/admin/pages/:id/custom-fields" => "pages#admin_edit_custom_fields"
   get     "/admin/pages/:id/permissions"   => "pages#admin_edit_permissions"
   get     "/admin/pages/:id/css"           => "pages#admin_edit_css"
   get     "/admin/pages/:id/js"            => "pages#admin_edit_js"
@@ -429,6 +430,20 @@ Caboose::Engine.routes.draw do
   get    "/admin/post-custom-fields"                => "post_custom_fields#admin_index"        
   post   "/admin/post-custom-fields"                => "post_custom_fields#admin_add"
   delete "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_delete"
+  
+  #=============================================================================
+  # Page Custom Fields and Values
+  #=============================================================================
+  
+  put    "/admin/page-custom-field-values/:id"      => "page_custom_field_values#admin_update"
+  get    "/admin/page-custom-fields/json"           => "page_custom_fields#admin_json"
+  get    "/admin/page-custom-fields/:field-options" => "page_custom_fields#admin_options"  
+  get    "/admin/page-custom-fields/:id/json"       => "page_custom_fields#admin_json_single"  
+  get    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_edit"
+  put    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_update"
+  get    "/admin/page-custom-fields"                => "page_custom_fields#admin_index"        
+  post   "/admin/page-custom-fields"                => "page_custom_fields#admin_add"
+  delete "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_delete"
         
   #=============================================================================
   # Google Spreadsheets

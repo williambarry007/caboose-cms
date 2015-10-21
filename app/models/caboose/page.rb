@@ -369,6 +369,15 @@ class Caboose::Page < ActiveRecord::Base
       return nil if f.nil?
       fv = Caboose::PageCustomFieldValue.create(:page_id => self.id, :page_custom_field_id => f.id, :key => key, :value => f.default_value, :sort_order => f.sort_order)
     end
+    f = fv.page_custom_field
+    return fv.value if f.nil?
+    case f.field_type
+      when Caboose::PageCustomField::FIELD_TYPE_TEXT     then return fv.value
+      when Caboose::PageCustomField::FIELD_TYPE_SELECT   then return fv.value
+      when Caboose::PageCustomField::FIELD_TYPE_CHECKBOX then return fv.value == '1'
+      when Caboose::PageCustomField::FIELD_TYPE_DATE     then return fv.value ? Date.strptime(fv.value, "%Y-%m-%d") : nil
+      when Caboose::PageCustomField::FIELD_TYPE_DATETIME then return fv.value ? DateTime.strptime(fv.value, "%Y-%m-%d %H:%i:%s") : nil
+    end  
     return fv.value
   end
   

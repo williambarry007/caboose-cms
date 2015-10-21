@@ -166,7 +166,8 @@ module Caboose
     # GET /admin/pages/:page_id/blocks/render-second-level
     # GET /admin/posts/:post_id/blocks/render-second-level
     def admin_render_second_level
-      return unless user_is_allowed('pages', 'edit')                  
+      return unless user_is_allowed('pages', 'edit')      
+      view = ActionView::Base.new(ActionController::Base.view_paths)      
       blocks = @p.block.children.collect do |b|
         {           
           :id => b.id,
@@ -186,7 +187,8 @@ module Caboose
             :site => @site,
             :page => params[:page_id] ? @p : nil,
             :post => params[:post_id] ? @p : nil,            
-            :request => request       
+            :request => request,
+            :params => params
           })
         }
       end

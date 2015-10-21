@@ -86,7 +86,8 @@ class Caboose::Block < ActiveRecord::Base
       return b.media.file if b.media
       return b.file
     end    
-    return options[:view].render(:inline => b.value, :locals => options)                    
+    view = options && options[:view] ? options[:view] : ActionView::Base.new(ActionController::Base.view_paths)    
+    return view.render(:inline => b.value, :locals => options)                    
   end
   
   def child(name)

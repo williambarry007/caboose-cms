@@ -1,4 +1,5 @@
 require 'prawn'
+require 'prawn/table'
 
 module Caboose
   class PendingOrdersPdf < Prawn::Document

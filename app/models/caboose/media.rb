@@ -35,7 +35,11 @@ class Caboose::Media < ActiveRecord::Base
   def process
     #return if self.processed
     
-    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]    
+    AWS.config({ 
+      :access_key_id => config['access_key_id'],
+      :secret_access_key => config['secret_access_key']  
+    })
     bucket = config['bucket']
     bucket = Caboose::uploads_bucket && Caboose::uploads_bucket.strip.length > 0 ? Caboose::uploads_bucket : "#{bucket}-uploads"
         

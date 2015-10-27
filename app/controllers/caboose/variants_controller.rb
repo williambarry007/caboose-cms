@@ -96,7 +96,11 @@ module Caboose
       if !v.downloadable
         resp.error = "This variant is not downloadable."
       else
-        config = YAML.load_file("#{::Rails.root}/config/aws.yml")        
+        config = YAML.load_file("#{::Rails.root}/config/aws.yml")
+        AWS.config({ 
+          :access_key_id => config[Rails.env]['access_key_id'],
+          :secret_access_key => config[Rails.env]['secret_access_key']  
+        })        
         bucket = AWS::S3::Bucket.new(config[Rails.env]['bucket'])
         s3object = AWS::S3::S3Object.new(bucket, v.download_path)
         resp.url = s3object.url_for(:read, :expires => expires_in.minutes).to_s

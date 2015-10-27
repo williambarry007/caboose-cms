@@ -43,8 +43,12 @@ module Caboose
       end
       
       # Generate the download URL and redirect to it
-      sc = @site.store_config
-      config = YAML.load_file("#{::Rails.root}/config/aws.yml")        
+      sc = @site.store_config              
+      config = YAML.load_file("#{::Rails.root}/config/aws.yml")
+      AWS.config({ 
+        :access_key_id => config[Rails.env]['access_key_id'],
+        :secret_access_key => config[Rails.env]['secret_access_key']  
+      })          
       bucket = AWS::S3::Bucket.new(config[Rails.env]['bucket'])
       s3object = AWS::S3::S3Object.new(bucket, li.variant.download_path)
       url = s3object.url_for(:read, :expires => sc.download_url_expires_in.to_i.minutes).to_s

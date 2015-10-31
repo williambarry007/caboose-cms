@@ -339,6 +339,9 @@ module Caboose
         order.status = Order::STATUS_PENDING
         order.order_number = @site.store_config.next_order_number
         order.date_authorized = DateTime.now.utc
+        
+        # Tell taxcloud the order was authorized
+        Caboose::TaxCalculator.authorized(order)
          
         # Take funds from any gift cards that were used on the order
         order.take_gift_card_funds

@@ -89,7 +89,10 @@ module Caboose
       return if !user_is_allowed('orders', 'edit')
            
       order = Order.find(params[:id])
-      resp = order.capture_funds      
+      resp = order.capture_funds   
+      
+      # Tell taxcloud the order was captured
+      Caboose::TaxCalculator.captured(order)
       
       render :json => resp
     end

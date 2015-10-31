@@ -228,6 +228,13 @@ module Caboose
       return false
     end
     
+    def has_taxable_items?
+      self.line_items.each do |li|
+        return true if li.variant.taxable && li.variant.taxable == true
+      end
+      return false
+    end        
+
     # Capture funds from a previously authorized transaction
     def capture_funds
       

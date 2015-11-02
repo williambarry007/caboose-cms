@@ -23,7 +23,8 @@ module Caboose
     	    'sort'			     => 'name',
     		  'desc'			     => false,
     		  'base_url'		   => '/admin/sites',
-    		  'use_url_params' => false
+    		  'use_url_params' => false,
+    		  'items_per_page' => 100
     	})
     	@sites = @pager.items
     end

@@ -32,7 +32,7 @@ module Caboose
         'sort'  => 'name',
         'desc'  => 'false',
         'base_url' => "/admin/block-types",
-        'items_per_page' => 10,
+        'items_per_page' => 100,
         'skip' => ['parent_id_null']
       })      
       render :json => {

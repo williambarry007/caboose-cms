@@ -280,7 +280,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :domain             , :string  ],
         [ :primary            , :boolean, { :default => false }],
         [ :under_construction , :boolean, { :default => false }],
-        [ :forward_to_primary , :boolean, { :default => false }]
+        [ :forward_to_primary , :boolean, { :default => false }],
+        [ :forward_to_uri     , :string  ]
       ],
       Caboose::Font => [
         [ :site_id            , :integer ],

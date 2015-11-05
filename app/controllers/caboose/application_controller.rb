@@ -287,7 +287,9 @@ module Caboose
         pd = d.site.primary_domain
         if pd && pd.domain != request.host
           url = "#{request.protocol}#{pd.domain}"
-          if request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
+          if d.forward_to_uri && d.forward_to_uri.strip.length > 0
+            url << d.forward_to_uri
+          elsif request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
             url << request.fullpath
           end
           redirect_to url

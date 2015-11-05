@@ -41,6 +41,7 @@ module Caboose
           when 'domain'             then d.domain             = value
           when 'under_construction' then d.under_construction = value
           when 'forward_to_primary' then d.forward_to_primary = value
+          when 'forward_to_uri'     then d.forward_to_uri     = value
           when 'primary'            then
             d.primary = value
             Domain.where(:site_id => params[:site_id]).all.each do |d2|

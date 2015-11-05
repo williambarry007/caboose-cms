@@ -25,6 +25,7 @@ user_ids = [] if user_ids.nil?
     <th>Primary</th>
     <th>Under Construction</th>
     <th>Forward to Primary</th>
+    <th>Forward to URI</th>
     <th>Delete</th>
   </tr>
   <% @site.domains.order(:id).all.each do |d| %>
@@ -33,6 +34,7 @@ user_ids = [] if user_ids.nil?
     <td align='center'><input type='radio'    name='primary_domain' <%= d.primary? ? "checked='true'" : '' %> onclick="set_primary_domain(<%= s.id %>, <%= d.id %>);" /></td>
     <td align='center'><input type='checkbox' name='under_construction_<%= d.id %>' <%= d.under_construction ? "checked='true'" : '' %> onclick="set_under_construction(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
     <td align='center'><input type='checkbox' name='forward_to_primary_<%= d.id %>' <%= d.forward_to_primary ? "checked='true'" : '' %> onclick="set_forward_to_primary(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
+    <td align='center'><input type='text'     name='forward_to_uri_<%= d.id %>' value="<%= d.forward_to_uri %>" onchange="set_forward_to_uri(<%= s.id %>, <%= d.id %>, $(this).val());" /></td>
     <td align='center'><input type='button'   value='Delete' onclick="delete_domain(<%= @site.id %>, <%= d.id %>);" /></td>    
   </tr>
   <% end %>
@@ -95,6 +97,15 @@ function set_forward_to_primary(site_id, domain_id, checked)
     url: '/admin/sites/' + site_id + '/domains/' + domain_id,
     type: 'put',
     data: { forward_to_primary: checked ? 1 : 0 }
+  });
+}
+
+function set_forward_to_uri(site_id, domain_id, val)
+{
+  $.ajax({
+    url: '/admin/sites/' + site_id + '/domains/' + domain_id,
+    type: 'put',
+    data: { forward_to_uri: val }
   });
 }
 

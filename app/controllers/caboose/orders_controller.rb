@@ -92,7 +92,7 @@ module Caboose
       resp = order.capture_funds   
       
       # Tell taxcloud the order was captured
-      Caboose::TaxCalculator.captured(order)
+      #Caboose::TaxCalculator.captured(order)
       
       render :json => resp
     end

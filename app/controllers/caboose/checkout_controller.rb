@@ -341,7 +341,7 @@ module Caboose
         order.date_authorized = DateTime.now.utc
         
         # Tell taxcloud the order was authorized
-        Caboose::TaxCalculator.authorized(order)
+        #Caboose::TaxCalculator.authorized(order)
          
         # Take funds from any gift cards that were used on the order
         order.take_gift_card_funds

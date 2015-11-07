@@ -30,14 +30,14 @@ module Caboose
     
     def self.authorized(order)
       t = self.transaction(order)
-      return if t.nil?
+      return if t.nil? || t.cart_items.nil? || t.cart_items.count == 0        
       t.order_id = order.id
       t.authorized            
     end
     
     def self.captured(order)
-      t = self.transaction(order)
-      return if t.nil?
+      t = self.transaction(order)      
+      return if t.nil? || t.cart_items.nil? || t.cart_items.count == 0
       t.order_id = order.id
       t.captured            
     end

@@ -18,18 +18,18 @@ module Caboose
         order by concat(date_part('year', date_authorized), '-', date_part('month', date_authorized), '-', date_part('day', date_authorized))",
         @site.id, 'authorized', 'captured', @d1, @d2]
       rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, q))
-    return rows.collect { |row|
-      {
-        'user_id'          => row[0],
-        'facility_id'      => row[1],
-        'amount'           => row[2],
-        'first_name'       => row[3],
-        'last_name'        => row[4],
-        'facility_name'    => row[5],
-        'vendor_type_name' => row[6],
-        'anniversary_date' => row[7]        
+      return rows.collect { |row|
+        {
+          'user_id'          => row[0],
+          'facility_id'      => row[1],
+          'amount'           => row[2],
+          'first_name'       => row[3],
+          'last_name'        => row[4],
+          'facility_name'    => row[5],
+          'vendor_type_name' => row[6],
+          'anniversary_date' => row[7]        
+        }
       }
-    }
       
       @pager = Caboose::PageBarGenerator.new(params, {
         'site_id'              => @site.id,

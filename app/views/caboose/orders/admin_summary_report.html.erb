@@ -6,9 +6,6 @@ shipping = 0.0
 handling = 0.0
 discount = 0.0
 total    = 0.0
-@rows.each do |row|
-  Caboose.log(row)
-end
 @rows.each do |row|  
   count    = count    + row.count    
   subtotal = subtotal + row.subtotal 

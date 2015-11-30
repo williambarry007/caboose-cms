@@ -160,12 +160,10 @@ module Caboose
         'search_like'    => '', 
         'category_id'    => '',
         'category_name'  => '',
-        'vendor_id'      => '',
-        'vendor_name'    => '',
+        'vendor_id'      => '',        
         'vendor_status'  => '',
         'price_gte'      => '',
-        'price_lte'      => '',
-        'price'          => '',
+        'price_lte'      => '',        
         'variant_status' => '',          
         'price'          => params[:filters] && params[:filters][:missing_prices] ? 0 : ''
       }, {

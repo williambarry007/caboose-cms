@@ -99,17 +99,27 @@ IndexTable.prototype = {
     options: { page: 1 }, 
     params: {}
   },
+
+  add_to_url: function(url, str)
+  {
+    if (url.indexOf('?') > -1)
+    {
+      bu = url.split('?');
+      return bu.shift() + str + '?' + bu.join('?');
+    }
+    return url + str;
+  },
   
   // Constructor
   init: function(params) {
     for (var thing in params)
       this[thing] = params[thing];    
         
-    var that = this;
-    if (!this.refresh_url          ) this.refresh_url           = this.base_url + '/json';
-    if (!this.bulk_update_url      ) this.bulk_update_url       = this.base_url + '/bulk';    
-    if (!this.bulk_delete_url      ) this.bulk_delete_url       = this.base_url + '/bulk';
-    if (!this.add_url              ) this.add_url               = this.base_url;
+    var that = this;        
+    if (!this.refresh_url          ) this.refresh_url     = this.add_to_url(this.base_url, '/json');
+    if (!this.bulk_update_url      ) this.bulk_update_url = this.add_to_url(this.base_url, '/bulk');   
+    if (!this.bulk_delete_url      ) this.bulk_delete_url = this.add_to_url(this.base_url, '/bulk');
+    if (!this.add_url              ) this.add_url = this.base_url;
          
     $.each(this.fields, function(i, f) {
       if (f.editable == null) f.editable = true;
@@ -301,8 +311,8 @@ IndexTable.prototype = {
       $.each(that.fields, function(j, field) {
         if (field.show && field.editable)
         {            
-          var attrib = $.extend({}, field);
-          attrib['value'] = field.value(m);
+          var attrib = $.extend({}, field);          
+          attrib['value'] = field.value(m);           
           attrib['fixed_placeholder'] = false;
           attrib['after_update'] = function() { that.refresh_single(m.id); };
           new ModelBinder({
@@ -794,34 +804,71 @@ IndexTable.prototype = {
   },
   
   current_message: false,
-  show_message: function(el, name) {
+  show_message: function(el, name, after) {
     var that = this;
     if (that.current_message == name)
     {
       $('#' + that.container + '_message').slideUp(function() { $('#' + that.container + '_message').empty().css('margin-bottom', 0); });
       that.current_message = false;
+      if (after) after();
       return;
     }
     if (!$('#' + that.container + '_message').is(':empty'))
     {
-      $('#' + that.container + '_message').slideUp(function() { $('#' + that.container + '_message').empty().append(el).css('margin-bottom', '10px').slideDown(); });
-      that.current_message = name;
+      $('#' + that.container + '_message').slideUp(function() { 
+        $('#' + that.container + '_message').empty().append(el).css('margin-bottom', '10px').slideDown();
+        if (after) after();
+      });
+      that.current_message = name;      
       return;
     }
     else     
     {
       $('#' + that.container + '_message').hide().empty().append(el).css('margin-bottom', '10px').slideDown();
       that.current_message = name;
+      if (after) after();
     }
   },
   
   new_form: function()
   {
-    var that = this;          
+    var that = this;
+    
+    $.each(this.new_model_fields, function(i, f) {
+      if (f.options_url && !f.options)
+      {
+        $.ajax({
+          url: f.options_url,
+          type: 'get',
+          success: function(resp) { f.options = resp },
+          async: false          
+        });
+      }
+    });        
+    
     var form = $('<form/>').attr('id', 'new_form')
       .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(that.form_authenticity_token));
+    var focus_field = false;
     $.each(this.new_model_fields, function(i, f) {
-      form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
+      if (f.type == 'hidden')
+        form.append($('<input/>').attr('type', 'hidden').attr('name', f.name).val(f.value));
+      else if (f.type == 'select')
+      {       
+        var select = $('<select/>').attr('name', f.name);
+        $.each(f.options, function(i, option) {
+          var opt = $('<option/>').val(option.value).html(option.text);
+          if (f.value && f.value == option.value)
+            opt.attr('selected', 'true');
+          select.append(opt);
+        });
+        form.append(select);
+      }
+      else
+      {
+        form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
+        if (!focus_field)
+          focus_field = f.name;
+      }
     });
     form.append($('<div/>').attr('id', that.container + '_new_message'));
     form.append($('<p>')        
@@ -830,8 +877,8 @@ IndexTable.prototype = {
     );        
     var div = $('<div/>').addClass('note')
       .append($('<h2/>').css('margin-top', 0).css('padding-top', 0).html(that.new_model_text))
-      .append(form);
-    that.show_message(div);
+      .append(form);        
+    that.show_message(div, null, function() { $('#new_form input[name="' + focus_field + '"]').focus(); });
   },
     
   add_model: function() 

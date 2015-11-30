@@ -71,8 +71,23 @@ class Caboose::Block < ActiveRecord::Base
       return b.file
     end    
     #return b.image if b.block_type.field_type == 'image'
-    #return b.file  if b.block_type.field_type == 'file'
+    #return b.file  if b.block_type.field_type == 'file'        
     return b.value        
+  end
+  
+  def rendered_child_value(name, options)
+    b = self.child(name)
+    return nil if b.nil?
+    if b.block_type.field_type == 'image'
+      return b.media.image if b.media
+      return b.image
+    end
+    if b.block_type.field_type == 'file'
+      return b.media.file if b.media
+      return b.file
+    end    
+    view = options && options[:view] ? options[:view] : ActionView::Base.new(ActionController::Base.view_paths)    
+    return view.render(:inline => b.value, :locals => options)                    
   end
   
   def child(name)

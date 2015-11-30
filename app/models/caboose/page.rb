@@ -9,6 +9,7 @@ class Caboose::Page < ActiveRecord::Base
   has_many :blocks, :order => 'sort_order'
   has_many :page_tags, :class_name => 'Caboose::PageTag', :dependent => :delete_all, :order => 'tag'  
   has_one :page_cache
+  has_many :page_custom_field_values
   attr_accessible :id      ,        
     :site_id               ,
     :parent_id             ,
@@ -359,6 +360,32 @@ class Caboose::Page < ActiveRecord::Base
   
   def self.pages_with_tag(parent_id, tag)
     self.includes(:page_tags).where(:hide => false, :parent_id => 1, :page_tags => { :tag => tag }).reorder('sort_order, title').all
+  end
+  
+  def custom_field_value(key)
+    fv = Caboose::PageCustomFieldValue.where(:page_id => self.id, :key => key).first
+    if fv.nil?
+      f = Caboose::PageCustomField.where(:site_id => self.site_id, :key => key).first
+      return nil if f.nil?
+      fv = Caboose::PageCustomFieldValue.create(:page_id => self.id, :page_custom_field_id => f.id, :key => key, :value => f.default_value, :sort_order => f.sort_order)
+    end
+    f = fv.page_custom_field
+    return fv.value if f.nil?
+    case f.field_type
+      when Caboose::PageCustomField::FIELD_TYPE_TEXT     then return fv.value
+      when Caboose::PageCustomField::FIELD_TYPE_SELECT   then return fv.value
+      when Caboose::PageCustomField::FIELD_TYPE_CHECKBOX then return fv.value == '1'
+      when Caboose::PageCustomField::FIELD_TYPE_DATE     then return fv.value ? Date.strptime(fv.value, "%Y-%m-%d") : nil
+      when Caboose::PageCustomField::FIELD_TYPE_DATETIME then return fv.value ? DateTime.strptime(fv.value, "%Y-%m-%d %H:%i:%s") : nil
+    end  
+    return fv.value
+  end
+  
+  def verify_custom_field_values_exist
+    Caboose::PageCustomField.where(:site_id => self.site_id).all.each do |f|
+      fv = Caboose::PageCustomFieldValue.where(:page_id => self.id, :page_custom_field_id => f.id).first                  
+      Caboose::PageCustomFieldValue.create(:page_id => self.id, :page_custom_field_id => f.id, :key => f.key, :value => f.default_value, :sort_order => f.sort_order) if fv.nil?
+    end
   end
 
 end

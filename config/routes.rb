@@ -216,21 +216,22 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   # Images
   #=============================================================================
-  
-  post    "/admin/media/pre-upload"     => "media#admin_pre_upload"
-  get     "/admin/media"                => "media#admin_index"    
-  get     "/admin/media/new"            => "media#admin_new"
-  get     "/admin/media/json"           => "media#admin_json"
-  get     "/admin/media/:id/process"    => "media#admin_process"
-  get     "/admin/media/:id/finished"   => "media#admin_process_finished"
-  get     "/admin/media/:id/description" => "media#admin_edit_description"
-  get     "/admin/media/:id"            => "media#admin_edit"  
-  put     "/admin/media/:id"            => "media#admin_update"
-  post    "/admin/media/:id/image"      => "media#admin_update_image"
-  #post    "/admin/media/edit-image"     => "media#admin_edit_image"  
-  post    "/admin/media"                => "media#admin_add"  
-  delete  "/admin/media/bulk"           => "media#admin_bulk_delete"
-  delete  "/admin/media/:id"            => "media#admin_delete"
+
+  get     "/admin/media/last-upload-processed" => "media#admin_last_upload_processed"
+  post    "/admin/media/pre-upload"            => "media#admin_pre_upload"
+  get     "/admin/media"                       => "media#admin_index"    
+  get     "/admin/media/new"                   => "media#admin_new"
+  get     "/admin/media/json"                  => "media#admin_json"
+  get     "/admin/media/:id/process"           => "media#admin_process"
+  get     "/admin/media/:id/finished"          => "media#admin_process_finished"
+  get     "/admin/media/:id/description"       => "media#admin_edit_description"
+  get     "/admin/media/:id"                   => "media#admin_edit"  
+  put     "/admin/media/:id"                   => "media#admin_update"
+  post    "/admin/media/:id/image"             => "media#admin_update_image"
+  #post    "/admin/media/edit-image"           => "media#admin_edit_image"  
+  post    "/admin/media"                       => "media#admin_add"  
+  delete  "/admin/media/bulk"                  => "media#admin_bulk_delete"
+  delete  "/admin/media/:id"                   => "media#admin_delete"
   
   
   get     "/admin/media-categories/json"       => "media_categories#admin_json"
@@ -264,10 +265,11 @@ Caboose::Engine.routes.draw do
   get     "/admin/pages/robots-options"    => "pages#admin_robots_options"
   get     "/admin/pages/format-options"    => "pages#admin_content_format_options"
   get     "/admin/pages/new"               => "pages#admin_new"
-  get     "/admin/pages/:id/block-options" => "pages#admin_block_options"
+  get     "/admin/pages/:id/block-options" => "pages#admin_block_options"  
   get     "/admin/pages/:id/uri"           => "pages#admin_page_uri"
   get     "/admin/pages/:id/delete"        => "pages#admin_delete_form"  
   get     "/admin/pages/:id/sitemap"       => "pages#admin_sitemap"  
+  get     "/admin/pages/:id/custom-fields" => "pages#admin_edit_custom_fields"
   get     "/admin/pages/:id/permissions"   => "pages#admin_edit_permissions"
   get     "/admin/pages/:id/css"           => "pages#admin_edit_css"
   get     "/admin/pages/:id/js"            => "pages#admin_edit_js"
@@ -414,6 +416,34 @@ Caboose::Engine.routes.draw do
   post    "/admin/post-categories/:id"                     => "post-categories#admin_update"  
   post    "/admin/post-categories"                         => "post-categories#admin_add"
   delete  "/admin/post-categories/:id"                     => "post-categories#admin_delete"
+        
+  #=============================================================================
+  # Post Custom Fields and Values
+  #=============================================================================
+  
+  put    "/admin/post-custom-field-values/:id"      => "post_custom_field_values#admin_update"
+  get    "/admin/post-custom-fields/json"           => "post_custom_fields#admin_json"
+  get    "/admin/post-custom-fields/:field-options" => "post_custom_fields#admin_options"  
+  get    "/admin/post-custom-fields/:id/json"       => "post_custom_fields#admin_json_single"  
+  get    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_edit"
+  put    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_update"
+  get    "/admin/post-custom-fields"                => "post_custom_fields#admin_index"        
+  post   "/admin/post-custom-fields"                => "post_custom_fields#admin_add"
+  delete "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_delete"
+  
+  #=============================================================================
+  # Page Custom Fields and Values
+  #=============================================================================
+  
+  put    "/admin/page-custom-field-values/:id"      => "page_custom_field_values#admin_update"
+  get    "/admin/page-custom-fields/json"           => "page_custom_fields#admin_json"
+  get    "/admin/page-custom-fields/:field-options" => "page_custom_fields#admin_options"  
+  get    "/admin/page-custom-fields/:id/json"       => "page_custom_fields#admin_json_single"  
+  get    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_edit"
+  put    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_update"
+  get    "/admin/page-custom-fields"                => "page_custom_fields#admin_index"        
+  post   "/admin/page-custom-fields"                => "page_custom_fields#admin_add"
+  delete "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_delete"
         
   #=============================================================================
   # Google Spreadsheets
@@ -624,6 +654,7 @@ Caboose::Engine.routes.draw do
   # Orders
   #=============================================================================
   
+  get     "/admin/orders/summary-report"              => "orders#admin_summary_report"
   get     "/admin/orders/weird-test"                  => "orders#admin_weird_test"
   get     "/admin/orders"                             => "orders#admin_index"
   get     "/admin/orders/test-info"                   => "orders#admin_mail_test_info"

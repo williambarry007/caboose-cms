@@ -30,7 +30,9 @@ module Caboose
         pd = d.site.primary_domain
         if pd && pd.domain != request.host
           url = "#{request.protocol}#{pd.domain}"
-          if request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
+          if d.forward_to_uri && d.forward_to_uri.strip.length > 0
+            url << d.forward_to_uri
+          elsif request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
             url << request.fullpath
           end
           redirect_to url
@@ -160,6 +162,14 @@ module Caboose
       #return if !Page.is_allowed(logged_in_user, params[:id], 'edit')            
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
+    end
+    
+    # GET /admin/page/:id/custom-fields
+    def admin_edit_custom_fields
+      return if !user_is_allowed('pages', 'edit')    
+      @page = Page.find(params[:id])
+      @page.verify_custom_field_values_exist
+      render :layout => 'caboose/modal'
     end
     
     # GET /admin/pages/:id/permissions

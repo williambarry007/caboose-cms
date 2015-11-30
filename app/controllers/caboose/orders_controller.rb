@@ -24,11 +24,12 @@ module Caboose
         'sort'           => 'id',
         'desc'           => 1,
         'base_url'       => '/admin/orders',
-        'use_url_params' => false
+        'use_url_params' => false,
+        'items_per_page' => 100
       })
       
       @orders    = @pager.items
-      @customers = Caboose::User.reorder('last_name, first_name').all
+      @customers = Caboose::User.where(:site_id => @site.id).reorder('last_name, first_name').all
       
       render :layout => 'caboose/admin'
     end
@@ -54,8 +55,12 @@ module Caboose
     # GET /admin/orders/:id
     def admin_edit
       return if !user_is_allowed('orders', 'edit')
-      @order = Order.find(params[:id])
-      #@order.calculate
+      @order = Order.where(:id => params[:id]).first
+
+      if params[:id].nil? || @order.nil?
+        render :file => 'caboose/orders/admin_invalid_order', :layout => 'caboose/admin'
+        return
+      end            
       render :layout => 'caboose/admin'
     end
     
@@ -84,7 +89,10 @@ module Caboose
       return if !user_is_allowed('orders', 'edit')
            
       order = Order.find(params[:id])
-      resp = order.capture_funds      
+      resp = order.capture_funds   
+      
+      # Tell taxcloud the order was captured
+      #Caboose::TaxCalculator.captured(order)
       
       render :json => resp
     end
@@ -208,6 +216,17 @@ module Caboose
       order = Order.find(params[:id])
       order.delay.send_payment_authorization_email      
       render :json => { :success => true }
+    end
+    
+    # GET /admin/orders/summary-report
+    def admin_summary_report
+      return if !user_is_allowed('orders', 'view')
+
+      @d1 = params[:d1] ? DateTime.strptime("#{params[:d1]} 00:00:00", '%Y-%m-%d %H:%M:%S') : DateTime.strptime(DateTime.now.strftime("%Y-%m-01 00:00:00"), '%Y-%m-%d %H:%M:%S')
+      @d2 = params[:d2] ? DateTime.strptime("#{params[:d2]} 00:00:00", '%Y-%m-%d %H:%M:%S') : @d1 + 1.month      
+      @rows = OrderReporter.summary_report(@site.id, @d1, @d2)
+      
+      render :layout => 'caboose/admin'    
     end
 
     # GET /admin/orders/status-options

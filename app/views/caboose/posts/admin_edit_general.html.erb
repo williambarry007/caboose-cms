@@ -6,6 +6,11 @@
 <p><div id='post_<%= @post.id %>_title'     ></div></p>
 <p><div id='post_<%= @post.id %>_subtitle'  ></div></p>
 <p><div id='post_<%= @post.id %>_author'    ></div></p>
+<% @post.post_custom_field_values.each do |fv| %>
+  <% f = fv.post_custom_field %>
+  <% next if f.nil? %>
+  <p><div id='postcustomfieldvalue_<%= fv.id %>_value'></div></p>
+<% end %>
 <p><div id='post_<%= @post.id %>_created_at'></div></p>
 <p><div id='post_<%= @post.id %>_published' ></div></p>
 <p><div id='post_<%= @post.id %>_image'     ></div></p>
@@ -23,15 +28,35 @@ $(document).ready(function() {
     update_url: '/admin/posts/<%= @post.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'slug'      , nice_name: 'Slug'      , type: 'text'      , value: <%= raw Caboose.json(@post.slug       )        %>, width: 600, after_update: function() { refresh_uri(); } },
-      { name: 'title'     , nice_name: 'Title'     , type: 'text'      , value: <%= raw Caboose.json(@post.title      )        %>, width: 600, after_update: function() { refresh_uri(); } }, 
-      { name: 'subtitle'  , nice_name: 'Subtitle'  , type: 'text'      , value: <%= raw Caboose.json(@post.subtitle   )        %>, width: 600 },
-      { name: 'author'    , nice_name: 'Author'    , type: 'text'      , value: <%= raw Caboose.json(@post.author     )        %>, width: 600 },    
-      { name: 'created_at'    , nice_name: 'Date Published'    , type: 'date'      , value: <%= raw Caboose.json( @post.created_at.strftime('%m/%d/%Y')     )        %>, width: 600 },     
-      { name: 'published' , nice_name: 'Published' , type: 'checkbox'  , value: <%= raw @post.published ? true : false         %>, width: 600 },
-      { name: 'image'     , nice_name: 'Image'     , type: 'image'     , value: <%= raw Caboose.json(@post.image.url(:thumb))  %>, width: 600, update_url: '/admin/posts/<%= @post.id %>/image' }            
+      { name: 'slug'       , nice_name: 'Slug'           , type: 'text'      , value: <%= raw Caboose.json(@post.slug       )        %>, width: 600, after_update: function() { refresh_uri(); } },
+      { name: 'title'      , nice_name: 'Title'          , type: 'text'      , value: <%= raw Caboose.json(@post.title      )        %>, width: 600, after_update: function() { refresh_uri(); } }, 
+      { name: 'subtitle'   , nice_name: 'Subtitle'       , type: 'text'      , value: <%= raw Caboose.json(@post.subtitle   )        %>, width: 600 },
+      { name: 'author'     , nice_name: 'Author'         , type: 'text'      , value: <%= raw Caboose.json(@post.author     )        %>, width: 600 },    
+      { name: 'created_at' , nice_name: 'Date Published' , type: 'date'      , value: <%= raw Caboose.json(@post.created_at.strftime('%m/%d/%Y')     )        %>, width: 600 },     
+      { name: 'published'  , nice_name: 'Published'      , type: 'checkbox'  , value: <%= raw @post.published ? true : false         %>, width: 600 },
+      { name: 'image'      , nice_name: 'Image'          , type: 'image'     , value: <%= raw Caboose.json(@post.image.url(:thumb))  %>, width: 600, update_url: '/admin/posts/<%= @post.id %>/image' }            
     ]
   });
+  <% @post.post_custom_field_values.each do |fv| %>
+    <% f = fv.post_custom_field %>
+    <% next if f.nil? %>
+    new ModelBinder({
+      name: 'PostCustomFieldValue',
+      id: <%= fv.id %>,
+      update_url: '/admin/post-custom-field-values/<%= fv.id %>',
+      authenticity_token: '<%= form_authenticity_token %>',
+      attributes: [
+        {
+          name:      'value',
+          nice_name: <%= raw Caboose.json(f.name) %>,
+          type:      <%= raw Caboose.json(f.field_type) %>,
+          value:     <%= raw Caboose.json(fv.value) %>,
+          width:     600
+          <% if f.field_type == 'select' %>, options_url: '/admin/post-custom-fields/<%= f.id %>/options'<% end %>
+        }                    
+      ]
+    });
+  <% end %>
 });
 
 function refresh_uri()

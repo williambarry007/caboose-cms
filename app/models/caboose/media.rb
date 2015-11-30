@@ -35,7 +35,11 @@ class Caboose::Media < ActiveRecord::Base
   def process
     #return if self.processed
     
-    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]    
+    AWS.config({ 
+      :access_key_id => config['access_key_id'],
+      :secret_access_key => config['secret_access_key']  
+    })
     bucket = config['bucket']
     bucket = Caboose::uploads_bucket && Caboose::uploads_bucket.strip.length > 0 ? Caboose::uploads_bucket : "#{bucket}-uploads"
         
@@ -53,14 +57,12 @@ class Caboose::Media < ActiveRecord::Base
     self.processed = true
     self.save
     
-    # Set the downloadable file names
-    #bucket = AWS::S3::Bucket.new(bucket)
-    #['tiny', 'thumb', 'large'].each do |style|            
-    #  obj = bucket.objects["media/#{self.id}_#{style}#{ext}"]
-    #  obj.content_disposition = 'attachment; filename="' + self.name + '"'
-    #  obj.store
-    #end
-           
+    # Remember when the last upload processing happened
+    s = Caboose::Setting.where(:site_id => self.media_category.site_id, :name => 'last_upload_processed').first
+    s = Caboose::Setting.create(:site_id => self.media_category.site_id, :name => 'last_upload_processed') if s.nil?
+    s.value = DateTime.now.utc.strftime("%FT%T%z")
+    s.save
+
     # Remove the temp file            
     bucket = AWS::S3::Bucket.new(bucket)
     obj = bucket.objects[key]

@@ -61,7 +61,7 @@ BoundDate = BoundControl.extend({
     //  onSelect: function() { this2.save(); }      
     //});
     $('#'+this.el).datetimepicker({
-      format: 'm/d/Y',
+      format: this2.attribute.date_format ? this2.attribute.date_format : 'm/d/Y',
       //formatDate: 'm/d/Y',
       timepicker: false,      
       //formatTime: 'g:i a', // 12-hour format without leading zeros + lowercase am/pm 

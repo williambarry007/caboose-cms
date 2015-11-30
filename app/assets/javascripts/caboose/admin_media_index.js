@@ -15,9 +15,8 @@ MediaController.prototype = {
 	uploader: false,
   refresh_unprocessed_images: true,
   allow_edit: false,
-  feather_editor: false,
-  media_ids: [],
-  processing_media_ids: [],
+  feather_editor: false,  
+  last_upload_processed: false,
   
   init: function(params) {
     var that = this;
@@ -139,25 +138,27 @@ MediaController.prototype = {
         that.cat = resp;
         that.cat_id = that.cat.id;
         that.selected_media = [];
-        //that.print_media();
+        that.print_media();                
+      }        
+    });
+  },
+  
+  check_processing_status: function() 
+  {     
+    var that = this;
+    if (!that.last_upload_processed)
+      that.last_upload_processed = new Date();
         
-        var mids = [];
-        var pmids = [];        
-        if (that.cat.media.length > 0)
-        {      
-          $.each(that.cat.media, function(i, m) {
-            mids.push(m.id);
-            if (m.media_type == 'image' && m.processed == false)
-              pmids.push(m.id);
-          });
-        }                                                
-        if (mids.join(',') != that.media_ids.join(',') || pmids.join(',') != that.processing_media_ids.join(','))          
-          that.print_media();
-        else if (pmids.length > 0)
-          setTimeout(function() { that.refresh_media(); }, 2000);
-          
-        that.media_ids = mids;
-        that.processing_media_ids = pmids;
+    $.ajax({
+      url: '/admin/media/last-upload-processed',
+      type: 'get',            
+      success: function(resp) {                
+        var d = Date.parse(resp['last_upload_processed']);        
+        if (d > that.last_upload_processed)          
+          that.refresh_media();          
+        else
+          setTimeout(function() { that.check_processing_status(); }, 2000);          
+        that.last_upload_processed = d;                                                        
       }        
     });
   },
@@ -291,7 +292,10 @@ MediaController.prototype = {
       ul = $('<p/>').html("This category is empty.");
     $('#media').empty().append(ul);    
     if (that.refresh_unprocessed_images == true && processing)
-      setTimeout(function() { that.refresh_media(); }, 2000);
+    {
+      //setTimeout(function() { that.refresh_media(); }, 2000);
+      setTimeout(function() { that.check_processing_status(); }, 2000);
+    }
     
     $.each(that.cat.media, function(i, m) {
       $('li.media').draggable({

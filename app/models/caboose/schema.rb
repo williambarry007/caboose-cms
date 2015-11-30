@@ -280,7 +280,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :domain             , :string  ],
         [ :primary            , :boolean, { :default => false }],
         [ :under_construction , :boolean, { :default => false }],
-        [ :forward_to_primary , :boolean, { :default => false }]
+        [ :forward_to_primary , :boolean, { :default => false }],
+        [ :forward_to_uri     , :string  ]
       ],
       Caboose::Font => [
         [ :site_id            , :integer ],
@@ -473,6 +474,22 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :block                 , :binary  ],
         [ :refresh               , :boolean , { :default => false }]        
       ],
+      Caboose::PageCustomField => [
+        [ :site_id           , :integer ],
+        [ :key               , :string  ],
+        [ :name              , :string  ],
+        [ :field_type        , :string  ],
+        [ :default_value     , :text    ],
+        [ :options           , :text    ],
+        [ :sort_order        , :integer  , { :default => 0 }]
+      ],
+      Caboose::PageCustomFieldValue => [
+        [ :page_id              , :integer ],
+        [ :page_custom_field_id , :integer ],
+        [ :key                  , :string  ],
+        [ :value                , :text    ],
+        [ :sort_order           , :integer  , { :default => 0 }]
+      ],
       Caboose::PagePermission => [
         [ :role_id , :integer  ],
         [ :page_id , :integer  ],
@@ -516,6 +533,22 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::PostCategoryMembership => [
         [ :post_id          , :integer ],
         [ :post_category_id , :integer ]
+      ],
+      Caboose::PostCustomField => [
+        [ :site_id           , :integer ],
+        [ :key               , :string  ],
+        [ :name              , :string  ],
+        [ :field_type        , :string  ],
+        [ :default_value     , :text    ],
+        [ :options           , :text    ],
+        [ :sort_order        , :integer  , { :default => 0 }]
+      ],
+      Caboose::PostCustomFieldValue => [
+        [ :post_id              , :integer ],
+        [ :post_custom_field_id , :integer ],
+        [ :key                  , :string  ],
+        [ :value                , :text    ],
+        [ :sort_order           , :integer  , { :default => 0 }]
       ],
       Caboose::Product => [
         [ :site_id               , :integer   ],

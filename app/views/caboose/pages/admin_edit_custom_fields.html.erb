@@ -1,0 +1,45 @@
+
+<h1>Custom Fields</h1>
+<% @page.page_custom_field_values.each do |fv| %>
+  <p><div id='pagecustomfieldvalue_<%= fv.id %>_value'></div></p>
+<% end %>
+
+<p><input type='button' value='Close' onclick="modal.close();" /></p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+  setTimeout(function() { modal.autosize(); }, 1000);
+});
+
+$(document).ready(function() {  
+  <% @page.page_custom_field_values.each do |fv| %>
+    <% f = fv.page_custom_field %>
+    new ModelBinder({
+      name: 'PageCustomFieldValue',
+      id: <%= fv.id %>,
+      update_url: '/admin/page-custom-field-values/<%= fv.id %>',
+      authenticity_token: '<%= form_authenticity_token %>',
+      attributes: [
+        {
+          name:      'value',
+          nice_name: <%= raw Caboose.json(f.name) %>,
+          type:      <%= raw Caboose.json(f.field_type) %>,
+          value:     <%= raw Caboose.json(fv.value) %>,
+          width:     600,
+          after_update: function() { parent.controller.render_blocks(); },
+          after_cancel: function() { parent.controller.render_blocks(); }
+          <% if f.field_type == 'select' %>, options_url: '/admin/page-custom-fields/<%= f.id %>/options'<% end %>
+        }                    
+      ],
+      on_load: function() { if (modal) modal.autosize(); }
+    });
+  <% end %>
+});
+
+</script>
+<% end %>

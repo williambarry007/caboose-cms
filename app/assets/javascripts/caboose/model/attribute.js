@@ -28,7 +28,9 @@ Attribute.prototype = {
   minute_increment: 15,
   hour_increment: 1,
   show_check_all: true,
-  show_empty_option: false,  
+  show_empty_option: false,
+  quick_add_url: false,
+  quick_add_text: 'Add New',  
   
   update_url: false,
   options_url: false,
@@ -59,10 +61,10 @@ Attribute.prototype = {
 		});
   },
   
-  populate_options: function(after) {
+  populate_options: function(after, refresh) {
     if (!this.options_url)
       return;        
-    if (this.options)
+    if (this.options && !refresh)
     {
       if (after) after();
       return;

@@ -12,4 +12,8 @@ class Caboose::CaboosePlugin
     return nav
   end
   
+  def self.login_success(return_url, user_id)    
+    return return_url
+  end
+  
 end

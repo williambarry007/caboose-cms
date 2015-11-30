@@ -17,6 +17,7 @@ BoundDateTime = BoundControl.extend({
     $('#'+this.el).wrap($('<div/>')
       .attr('id', this.el + '_container')
       .addClass('mb_container')
+      .addClass('mb_date_time_container')
       .css('position', 'relative')
     );
     $('#'+this.el+'_container').empty();

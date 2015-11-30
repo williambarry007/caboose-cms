@@ -1,4 +1,5 @@
 require 'prawn'
+require 'prawn/table'
 
 module Caboose
   class PendingOrdersPdf < Prawn::Document
@@ -52,7 +53,7 @@ module Caboose
     end
 
     def order_info(order)
-      order_info = "Order Number: #{order.id}\n"
+      order_info = "Order Number: #{order.order_number}\n"
       order_info << "Order Date: #{order.date_created ? order.date_created.strftime('%d %b %Y %H:%M:%S %p') : ''}\n"
       order_info << "Status: #{order.status.capitalize}\n"
       tbl = []

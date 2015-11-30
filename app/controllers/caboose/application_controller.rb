@@ -8,15 +8,16 @@ module Caboose
     
     @find_page = true    
     
-    def before_before_action            
+    def before_before_action           
+      
       # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
       
       @use_page_cache = !request.fullpath.starts_with?('/admin')
             
       # Get the site we're working with      
-      domain = Domain.where(:domain => request.host_with_port).first
-      @site = domain ? domain.site : nil
+      @domain = Domain.where(:domain => request.host_with_port).first
+      @site = @domain ? @domain.site : nil
       
       # Set the site in any mailers
       CabooseMailer.site = @site
@@ -41,7 +42,7 @@ module Caboose
       @tasks        = {}
       @page_tasks   = {}
       @is_real_page = false
-      @ga_events    = []
+      @ga_events    = []      
       
       #if @find_page
         @page = Page.page_with_uri(request.host_with_port, request.fullpath)
@@ -52,7 +53,7 @@ module Caboose
       @logged_in_user = logged_in_user  
       
       # Initialize the card
-      init_cart if @site && @site.use_store && !domain.under_construction
+      init_cart if @site && @site.use_store && !@domain.under_construction
       
       before_action
     end
@@ -286,7 +287,9 @@ module Caboose
         pd = d.site.primary_domain
         if pd && pd.domain != request.host
           url = "#{request.protocol}#{pd.domain}"
-          if request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
+          if d.forward_to_uri && d.forward_to_uri.strip.length > 0
+            url << d.forward_to_uri
+          elsif request.fullpath && request.fullpath.strip.length > 0 && request.fullpath.strip != '/'
             url << request.fullpath
           end
           redirect_to url

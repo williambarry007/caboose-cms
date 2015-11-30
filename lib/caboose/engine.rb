@@ -66,6 +66,11 @@ module Caboose
     end
     return str2
   end
+  
+  def Caboose.random_string(length)
+    o = [('a'..'z'),('A'..'Z'),('0'..'9')].map { |i| i.to_a }.flatten
+    return (0...length).map { o[rand(o.length)] }.join
+  end
 
   class Engine < ::Rails::Engine
     isolate_namespace Caboose

@@ -65,10 +65,40 @@ BoundSelect = BoundControl.extend({
         .attr('id', this2.el + '_select')
         .addClass('mb_fake')
         .css('width', $('#'+this2.el).outerWidth())        
-        .on('change', function() {
+        .on('change', function() {                
           var v = $('#'+this2.el+'_select').val();
-          $('#'+this2.el).val(v);                    
-          this2.save();                     
+          if (this2.attribute.quick_add_url && v == 'quickadd')
+          {                        
+            caboose_modal_close_handler = function(new_id) {              
+              this2.attribute.populate_options(function() {
+                var select2 = $('#' + this2.el + '_select');
+                select2.empty();
+                if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html('-- Empty --'));
+                if (this2.attribute.quick_add_url)      select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
+                $.each(this2.attribute.options, function(i, option) {
+                  var opt = $('<option/>').val(option.value).html(option.text);
+                  if (option.value == new_id)
+                  {
+                    this2.attribute.text = option.text;
+                    $('#'+this2.el).val(this2.attribute.text);
+                    opt.attr('selected', 'true');
+                  }
+                  select.append(opt);
+                });
+                $('#'+this2.el).val(new_id);
+                this2.save();
+              }, true);
+            }
+            if (typeof this2.attribute.quick_add_url == 'string')
+              caboose_modal_url(this2.attribute.quick_add_url);
+            else
+              caboose_modal_url(this2.attribute.quick_add_url(this2.model));
+          }
+          else
+          {
+            $('#'+this2.el).val(v);                    
+            this2.save();
+          }
         });        
       // Make sure the existing value is in the list of options
       var exists = false;
@@ -87,7 +117,9 @@ BoundSelect = BoundControl.extend({
         });
       }      
       if (this2.attribute.show_empty_option)      
-        select.append($('<option/>').val('').html('-- Empty --'));        
+        select.append($('<option/>').val('').html('-- Empty --'));
+      if (this2.attribute.quick_add_url)      
+        select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
       $.each(this2.attribute.options, function(i, option) {
         var opt = $('<option/>')
           .val(option.value)

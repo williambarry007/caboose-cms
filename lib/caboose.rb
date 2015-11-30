@@ -1,4 +1,7 @@
-require "caboose/engine"
+require 'caboose/engine'
+require 'asset_sync'
+require 'delayed_job_active_record'
+require 'awesome_print'
 
 module Caboose
   

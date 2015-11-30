@@ -1,0 +1,97 @@
+<%
+count    = 0
+subtotal = 0.0
+tax      = 0.0
+shipping = 0.0
+handling = 0.0
+discount = 0.0
+total    = 0.0
+@rows.each do |row|  
+  count    = count    + row.count    
+  subtotal = subtotal + row.subtotal 
+  tax      = tax      + row.tax      
+  shipping = shipping + row.shipping 
+  handling = handling + row.handling 
+  discount = discount + row.discount 
+  total    = total    + row.total
+end
+day_count = @rows.count
+%>
+
+<h1>Order Summary Report</h1>
+
+<form action='/admin/orders/summary-report' method='get' id='search_form'>
+  <p>
+     <input type='text' id='d1' name='d1' value='<%= @d1.strftime('%Y-%m-%d') %>' /> -
+     <input type='text' id='d2' name='d2' value='<%= @d2.strftime('%Y-%m-%d') %>' />
+     <input type='submit' value='Change Date Range' />
+   </p>
+</form>
+
+<table class='data'>
+  <tr><th>&nbsp;</th><th>Total</th><th>Daily Average</th></tr>  
+  <tr><td>Count     </td><td align='right'><%= count                       %></td><td align='right'><%= sprintf('%.1f', count.to_f / day_count) %></td></tr>     
+  <tr><td>Subtotal  </td><td align='right'>$<%= sprintf('%.2f', subtotal ) %></td><td align='right'>$<%= sprintf('%.2f', subtotal   / day_count) %></td></tr>
+  <tr><td>Tax       </td><td align='right'>$<%= sprintf('%.2f', tax      ) %></td><td align='right'>$<%= sprintf('%.2f', tax        / day_count) %></td></tr>
+  <tr><td>Shipping  </td><td align='right'>$<%= sprintf('%.2f', shipping ) %></td><td align='right'>$<%= sprintf('%.2f', shipping   / day_count) %></td></tr>
+  <tr><td>Handling  </td><td align='right'>$<%= sprintf('%.2f', handling ) %></td><td align='right'>$<%= sprintf('%.2f', handling   / day_count) %></td></tr>
+  <tr><td>Discount  </td><td align='right'>$<%= sprintf('%.2f', discount ) %></td><td align='right'>$<%= sprintf('%.2f', discount   / day_count) %></td></tr>
+  <tr><td>Total     </td><td align='right'>$<%= sprintf('%.2f', total    ) %></td><td align='right'>$<%= sprintf('%.2f', total      / day_count) %></td></tr>
+</table><br />
+
+<div id='counts_chart'></div>
+<div id='totals_chart'></div>
+<p></p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %> 
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type='text/javascript'> 
+    
+google.load('visualization', '1.1', {packages: ['corechart']});
+google.setOnLoadCallback(drawChart);
+
+function drawChart() 
+{       
+  var counts = new google.visualization.DataTable();
+  counts.addColumn('date', 'Date');
+  counts.addColumn('number', 'Count');
+  <% @rows.each do |row| %>
+  counts.addRow([new Date(<%= row.date.strftime('%Y') %>, <%= row.date.strftime('%-m').to_i - 1 %>, <%= row.date.strftime('%-d') %>), <%= row.count %>]);
+<% end %>
+    
+  var counts_chart = new google.visualization.ColumnChart(document.getElementById('counts_chart'));
+  counts_chart.draw(counts, {        
+    title: 'Daily Order Counts',
+    width:  1200,
+    height: 800,
+    hAxis: { label: 'Date' },
+    vAxis: { label: 'Count' },    
+    trendlines: { 0: { type: 'polynomial' } }
+  });
+  
+  var totals = new google.visualization.DataTable();
+  totals.addColumn('date', 'Date');
+  totals.addColumn('number', 'Total');
+  <% @rows.each do |row| %>
+  totals.addRow([new Date(<%= row.date.strftime('%Y') %>, <%= row.date.strftime('%-m').to_i - 1 %>, <%= row.date.strftime('%-d') %>), <%= row.total %>]);
+<% end %>
+    
+  var totals_chart = new google.visualization.ColumnChart(document.getElementById('totals_chart'));
+  totals_chart.draw(totals, {        
+    title: 'Daily Order Totals',
+    width:  1200,
+    height: 800,
+    hAxis: { label: 'Date' },
+    vAxis: { label: 'Total' },    
+    trendlines: { 0: { type: 'polynomial' } }
+  });    
+}
+
+$(document).ready(function() {
+  $('#d1').datepicker({ dateFormat: 'yy-mm-dd' });
+  $('#d2').datepicker({ dateFormat: 'yy-mm-dd' });
+});
+
+</script>
+<% end %>

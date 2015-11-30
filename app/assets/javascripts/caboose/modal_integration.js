@@ -83,6 +83,8 @@ function caboose_modal_url(url)
   });
 }
 
+var caboose_modal_close_handler = function(var1){};
+
 function caboose_fix_colorbox() {
   var color = '#111';
   if (typeof COLORBOX_COLOR !== 'undefined')

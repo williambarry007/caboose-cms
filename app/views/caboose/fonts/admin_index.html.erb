@@ -303,7 +303,13 @@
 			$(".body-variant-selector").html("");
 			if ( font && font.variants ) {
 				$.each(font.variants, function(key, variant) {
-					$("#variant-selector").append("<option value='" + variant + "'>" + variant + "</option>");
+					if (font.variant_names && font.variant_names[key]) {
+						$("#variant-selector").append("<option value='" + variant + "'>" + font.variant_names[key] + "</option>");
+					}
+					else {
+						$("#variant-selector").append("<option value='" + variant + "'>" + variant + "</option>");
+					}
+					
 					$(".body-variant-selector").append("<option value='" + variant + "'>" + variant + "</option>");
 				});
 			}
@@ -411,10 +417,13 @@
 			  		variants: [ <% variants.each_with_index do |v,i| %>
 			  			"<%= v.style ? (v.weight == 'regular' && v.style == 'italic' ? 'italic' : (v.style + v.weight)) : v.weight %>",
 			  		<% end %> ],
+			  		variant_names: [ <% variants.each_with_index do |v,i| %>
+			  			"<%= v.variant %>",
+			  		<% end %> ],
 			  		version: "custom"
 			  	});
 			  <% end %>
-	//		  		console.dir(resp.items);
+			  		console.dir(resp.items);
 			  		window.google_fonts = resp.items;
 						update_fonts(0, 10);
 			  		var first_font = $(".font-li.selected").data("index");
@@ -441,6 +450,7 @@
 				event.preventDefault(); 
 				var font_id = $(".font-li.selected").data("index");
 				var variant = $("#variant-selector").val();
+				var variant_name = $("#variant-selector option:selected").first().text();
 				var font = window.google_fonts[font_id];
 				var preview = $("#font" + $(this).attr("id") + "-preview");
 				preview.css("font-family",font.family);
@@ -458,7 +468,7 @@
 					preview.css("font-weight","normal");
 				}
 				preview.find(".family").html(font.family);
-				preview.find(".variant").html(variant);
+				preview.find(".variant").html(variant_name);
 				save_font(font.family, variant, font.files[variant], $(this).data("name"));
 			});
 

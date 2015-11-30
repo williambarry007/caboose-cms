@@ -298,7 +298,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :variant            , :string  ],
         [ :ttf_url            , :string  ],
         [ :weight             , :string  ],
-        [ :style              , :string  ]
+        [ :style              , :string  ],
+        [ :sort_order         , :integer ]
       ],
       Caboose::GiftCard => [
         [ :site_id         , :integer  ],        

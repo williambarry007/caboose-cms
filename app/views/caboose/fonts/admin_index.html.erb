@@ -107,7 +107,7 @@
 			font-weight: normal;
 		}
 		.caboose-btn {
-			padding: 8px 15px;
+			padding: 0 15px;
 		}
 		.final-box p .bold-italic {
 			font-family: "body-font-bold-italic";
@@ -315,7 +315,11 @@
 				var head  = document.getElementsByTagName('head')[0];
 				var cssId = font_id + "_" + variant;
 				if (!document.getElementById(cssId)) {
-					var css = document.createTextNode("@font-face {font-family:'" + font.family + "';src:url('" + font.files[variant] + "') format('truetype');font-weight:normal;font-style:normal;}");
+		//			console.dir(font);
+					var weight = variant.replace("italic","").replace("regular","normal");
+					var style = variant.indexOf("italic") >= 0 ? "italic" : "normal";
+					weight = weight == "" ? "normal" : weight;
+					var css = document.createTextNode("@font-face {font-family:'" + font.family + "';src:url('" + font.files[variant] + "') format('truetype');font-weight:" + weight + ";font-style:" + style + ";}");
 					var style  = document.createElement('style');
 					style.appendChild(css);
 					style.id = cssId;
@@ -347,7 +351,9 @@
 
 		function change_preview(font_id, variant) {
 			var font = window.google_fonts[font_id];
+		//	console.dir(font);
 			$(".font-preview").css("font-family",font.family);
+			$(".font-preview .family").text(font.family);
 			if ( variant.indexOf("italic") >= 0 ) {
 				$(".font-preview").css("font-style","italic");
 			}
@@ -392,23 +398,23 @@
 			  type: 'get',
 			  success: function(resp) {
 			  	if ( resp.items ) {
-			  		console.dir(resp.items);
+	//		  		console.dir(resp.items);
 			  <% fonts = Caboose::FontFamily.all %>
 			  <% fonts.each do |f| %>
-			  	<% variants = f.font_variants.all %>
+			  	<% variants = f.font_variants.order(:sort_order).all %>
 			  	resp.items.unshift({
 			  		category: "sans-serif",
 			  		family: "<%= f.name %>",
 			  		files: { <% variants.each do |v| %>
-			  			<%= v.style + v.weight %>: "<%= v.ttf_url %>",
+			  			<%= v.style ? (v.weight == 'regular' && v.style == 'italic' ? 'italic' : (v.style + v.weight)) : v.weight %>: "<%= v.ttf_url %>",
 			  		<% end %> },
 			  		variants: [ <% variants.each_with_index do |v,i| %>
-			  			"<%= v.weight + v.style %>",
+			  			"<%= v.style ? (v.weight == 'regular' && v.style == 'italic' ? 'italic' : (v.style + v.weight)) : v.weight %>",
 			  		<% end %> ],
 			  		version: "custom"
 			  	});
 			  <% end %>
-			  		console.dir(resp.items);
+	//		  		console.dir(resp.items);
 			  		window.google_fonts = resp.items;
 						update_fonts(0, 10);
 			  		var first_font = $(".font-li.selected").data("index");

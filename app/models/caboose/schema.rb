@@ -290,6 +290,17 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :variant            , :string  ],
         [ :url                , :string  ]
       ],
+      Caboose::FontFamily => [
+        [ :name               , :string  ]
+      ],
+      Caboose::FontVariant => [
+        [ :font_family_id     , :integer ],
+        [ :variant            , :string  ],
+        [ :ttf_url            , :string  ],
+        [ :weight             , :string  ],
+        [ :style              , :string  ],
+        [ :sort_order         , :integer ]
+      ],
       Caboose::GiftCard => [
         [ :site_id         , :integer  ],        
         [ :name            , :string   ],

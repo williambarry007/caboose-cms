@@ -18,7 +18,8 @@ module Caboose
         'customer_id'          => '', 
         'status'               => Order::STATUS_PENDING,
         'shipping_method_code' => '',
-        'id'                   => ''
+        'id'                   => '',
+        'order_number'         => ''
       }, {
         'model'          => 'Caboose::Order',
         'sort'           => 'id',

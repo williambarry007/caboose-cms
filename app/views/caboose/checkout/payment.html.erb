@@ -124,11 +124,13 @@ store_config = @site.store_config
 var SHOW_RELAY = <%= @show_relay ? 'true' : 'false' %>;
 
 var cart = false;
+var CABOOSE_ORDER_TOTAL = 0.0;
 $(document).ready(function() {
   cart = new Cart({
     allow_edit_line_items: false,
     allow_edit_gift_cards: false
   });
+  CABOOSE_ORDER_TOTAL = <%= Caboose.json(@order.total); %>;
 });
 
 </script>

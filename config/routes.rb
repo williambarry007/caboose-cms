@@ -513,6 +513,7 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   
   get  '/checkout'                 => 'checkout#index'
+  get  '/checkout/total'           => 'checkout#verify_total'  
   post '/checkout/attach-user'     => 'checkout#attach_user'
   post '/checkout/attach-guest'    => 'checkout#attach_guest'
   get  '/checkout/addresses'       => 'checkout#addresses'

@@ -49,10 +49,31 @@ Caboose.Store.Modules.CheckoutPayment = (function() {
       }
     }
     else
-    {    
-      $('#message').html("<p class='loading'>Processing payment...</p>");
-      $('form#payment').submit();
-      $('#checkout-continue button').hide();
+    {
+      // Verify that the order total is correct before submitting
+      $('#message').html("<p class='loading'>Verifying order total...</p>");
+      var total_is_correct = true;      
+      $.ajax({
+        url: '/checkout/total',
+        type: 'get',
+        success: function(x) {
+          if (parseFloat(x) != CABOOSE_ORDER_TOTAL)                      
+            total_is_correct = false;           
+        },
+        async: false                  
+      });      
+      
+      if (total_is_correct == false)
+      {
+        $('#message').html("<p class='note error'>It looks like the order total has changed since this page has refreshed. Please submit your order again after this page refreshes.");
+        setTimeout(function() { window.location.reload(true); }, 3000);
+      }
+      else
+      {
+        $('#message').html("<p class='loading'>Processing payment...</p>");
+        $('form#payment').submit();
+        $('#checkout-continue button').hide();
+      }
     }
   };
   

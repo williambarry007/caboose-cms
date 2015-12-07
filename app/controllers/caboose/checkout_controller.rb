@@ -181,6 +181,16 @@ module Caboose
     end
     
     #===========================================================================
+        
+    # GET /checkout/total
+    def verify_total
+      total = 0.00
+      if logged_in?              
+        @order.calculate
+        total = @order.total
+      end
+      render :json => total
+    end
     
     # GET /checkout/address
     def address

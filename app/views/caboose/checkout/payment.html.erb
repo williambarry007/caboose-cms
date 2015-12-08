@@ -130,7 +130,7 @@ $(document).ready(function() {
     allow_edit_line_items: false,
     allow_edit_gift_cards: false
   });
-  CABOOSE_ORDER_TOTAL = <%= Caboose.json(@order.total); %>;
+  CABOOSE_ORDER_TOTAL = parseFloat(<%= raw Caboose.json(@order.total); %>);
 });
 
 </script>

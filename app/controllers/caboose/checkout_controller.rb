@@ -362,10 +362,16 @@ module Caboose
         # Take funds from any gift cards that were used on the order
         order.take_gift_card_funds
         
-        # Send out emails                
-        OrdersMailer.delay.configure_for_site(@site.id).customer_new_order(order).deliver
-        OrdersMailer.delay.configure_for_site(@site.id).fulfillment_new_order(order).deliver
-                
+        # Send out emails 
+        begin
+          OrdersMailer.configure_for_site(@site.id).customer_new_order(order).deliver
+          OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(order).deliver        
+        rescue
+          puts "=================================================================="
+          puts "Error sending out order confirmation emails for order ID #{@order.id}"
+          puts "=================================================================="
+        end
+                              
         # Emit order event
         Caboose.plugin_hook('order_authorized', order)        
       else

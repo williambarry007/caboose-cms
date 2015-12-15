@@ -189,18 +189,7 @@ module Caboose
         @order.calculate
         total = @order.total
       end
-      #render :json => total.to_f
-      ap @order
-      
-      render :json => {
-        :subtotal  => @order.calculate_subtotal.to_f  ,
-        :tax       => @order.calculate_tax.to_f       ,
-        :shipping  => @order.calculate_shipping.to_f  ,
-        :handling  => @order.calculate_handling.to_f  ,
-        :gift_wrap => @order.calculate_gift_wrap.to_f ,
-        :discount  => @order.calculate_discount.to_f  ,
-        :total     => @order.calculate_total.to_f             
-      }
+      render :json => total.to_f      
     end
     
     # GET /checkout/address

@@ -185,11 +185,22 @@ module Caboose
     # GET /checkout/total
     def verify_total
       total = 0.00
-      if logged_in?              
+      if logged_in?
         @order.calculate
         total = @order.total
       end
-      render :json => total
+      #render :json => total.to_f
+      ap @order
+      
+      render :json => {
+        :subtotal  => @order.calculate_subtotal.to_f  ,
+        :tax       => @order.calculate_tax.to_f       ,
+        :shipping  => @order.calculate_shipping.to_f  ,
+        :handling  => @order.calculate_handling.to_f  ,
+        :gift_wrap => @order.calculate_gift_wrap.to_f ,
+        :discount  => @order.calculate_discount.to_f  ,
+        :total     => @order.calculate_total.to_f             
+      }
     end
     
     # GET /checkout/address
@@ -356,10 +367,10 @@ module Caboose
         # Take funds from any gift cards that were used on the order
         order.take_gift_card_funds
         
-        # Send out emails        
-        OrdersMailer.configure_for_site(@site.id).customer_new_order(order).deliver
-        OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(order).deliver        
-        
+        # Send out emails                
+        OrdersMailer.delay.configure_for_site(@site.id).customer_new_order(order).deliver
+        OrdersMailer.delay.configure_for_site(@site.id).fulfillment_new_order(order).deliver
+                
         # Emit order event
         Caboose.plugin_hook('order_authorized', order)        
       else

@@ -144,24 +144,14 @@ module Caboose
       g.helper false        
     end
     
+    #initializer 'caboose.site_mvc', :after => :finish_hook do |app|  
+    #  # Add the MVC files for each site    
+    #  Caboose::Site.reorder(:name).all.each do |site|      
+    #    Rails.application.config.paths['app/controllers'] << "sites/#{site.name}/controllers"
+    #    Rails.application.config.paths['app/models']      << "sites/#{site.name}/models"
+    #    Rails.application.config.paths['app/views']       << "sites/#{site.name}/views"
+    #  end
+    #end
+      
   end
 end
-    
-#initializer 'caboose_store.payment_processor', :after => :finish_hook do |app|
-#  case Caboose::payment_processor
-#    when 'authorize.net'
-#      Caboose::PaymentProcessor = Caboose::PaymentProcessors::Authorizenet
-#    when 'payscape'
-#      Caboose::PaymentProcessor = Caboose::PaymentProcessors::Payscape
-#  end
-#end
-#
-#initializer 'caboose_store.cart', :after => :finish_hook do |app|
-#  ActiveSupport.on_load(:action_controller) do
-#    include Caboose::BootStrapper
-#  end
-#  
-#  Caboose::User.class_eval do
-#    self.primary_key = :id
-#  end
-#end

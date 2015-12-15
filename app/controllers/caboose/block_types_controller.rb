@@ -6,14 +6,14 @@ module Caboose
     # Admin actions
     #===========================================================================
     
-    # GET /admin/block-types
+    # @route GET /admin/block-types
     def admin_index
       return if !user_is_allowed('pages', 'view')
       @block_types = BlockType.where("parent_id is null or parent_id = 0").reorder(:name).all
       render :layout => 'caboose/admin'      
     end
     
-    # GET /admin/block-types/json
+    # @route GET /admin/block-types/json
     def admin_json
       h = {        
         'name'              => '',
@@ -41,15 +41,15 @@ module Caboose
       }
     end
     
-    # GET /admin/block-types/:id/json
+    # @route GET /admin/block-types/:id/json
     def admin_json_single
       return if !user_is_allowed('pages', 'view')
       block_type = BlockType.find(params[:id])
       render :json => block_type.as_json(:include => :sites)      
     end
 
-    # GET /admin/block-types/new
-    # GET /admin/block-types/:id/new
+    # @route GET /admin/block-types/new
+    # @route GET /admin/block-types/:id/new
     def admin_new
       return unless user_is_allowed('pages', 'add')      
       @block_type = BlockType.new
@@ -57,21 +57,21 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/block-types/:id
-    def admin_edit
-      return unless user_is_allowed('pages', 'edit')      
-      @block_type = BlockType.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # GET /admin/block-types/:id/icon
+    # @route GET /admin/block-types/:id/icon
     def admin_edit_icon
       return unless user_is_allowed('pages', 'edit')      
       @block_type = BlockType.find(params[:id])
       render :layout => 'caboose/modal'
     end
     
-    # POST /admin/block-types
+    # @route GET /admin/block-types/:id
+    def admin_edit
+      return unless user_is_allowed('pages', 'edit')      
+      @block_type = BlockType.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # @route POST /admin/block-types
     def admin_create
       return unless user_is_allowed('pages', 'add')
 
@@ -94,7 +94,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/block-types/:id
+    # @route PUT /admin/block-types/:id
     def admin_update
       return unless user_is_allowed('pages', 'edit')
       
@@ -139,7 +139,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/block-types/:id
+    # @route DELETE /admin/block-types/:id
     def admin_delete
       return unless user_is_allowed('pages', 'delete')                  
       BlockType.find(params[:id]).destroy            
@@ -148,65 +148,50 @@ module Caboose
       })
       render :json => resp
     end
-    
-    # GET /admin/block-types/field-type-options
+        
+    # @route_priority 1
+    # @route GET /admin/block-types/:field-options
+    # @route GET /admin/block-types/options
+    # @route GET /admin/block-types/:id/options
     def admin_field_type_options
-      return unless user_is_allowed('pages', 'edit')      
-      options = [ 
-        { 'value' => 'checkbox'           , 'text' => 'Checkbox'                     }, 
-        { 'value' => 'checkbox_multiple'  , 'text' => 'Checkbox (multiple)'          }, 
-        { 'value' => 'image'              , 'text' => 'Image'                        },
-        { 'value' => 'file'               , 'text' => 'File'                         },
-        { 'value' => 'richtext'           , 'text' => 'Rich Text'                    }, 
-        { 'value' => 'select'             , 'text' => 'Multiple choice (select box)' }, 
-        { 'value' => 'text'               , 'text' => 'Textbox'                      }, 
-        { 'value' => 'textarea'           , 'text' => 'Textarea'                     },
-        { 'value' => 'block'              , 'text' => 'Block'                        }
-      ]      
-      render :json => options
-    end
-    
-    # GET /admin/block-types/site-options
-    def admin_site_options
       return unless user_is_allowed('pages', 'edit')
-      options = Site.reorder("description, name").all.collect do |s| 
-        { 
-          'value' => s.id, 
-          'text' => s.description && s.description.strip.length > 0 ? s.description : s.name
-        }
-      end                        
-      render :json => options
-    end
-    
-    # GET /admin/block-types/:id/options
-    def admin_value_options
-      return unless user_is_allowed('pages', 'edit')
-      bt = BlockType.find(params[:id])            
+
       options = []
-      if bt.options_function
-        options = bt.render_options
-      elsif bt.options
-        options = bt.options.strip.split("\n").collect { |line| { 'value' => line, 'text' => line }}
+      case params[:field]
+        when nil
+          if params[:id]          
+            bt = BlockType.find(params[:id])            
+            options = []
+            if bt.options_function
+              options = bt.render_options
+            elsif bt.options
+              options = bt.options.strip.split("\n").collect { |line| { 'value' => line, 'text' => line }}
+            end
+          else                  
+            options = BlockType.where("parent_id is null").reorder(:name).all.collect do |bt| 
+              { 'value' => bt.id, 'text' => bt.description } 
+            end
+          end
+        when 'field-type'
+          options = [ 
+            { 'value' => 'checkbox'           , 'text' => 'Checkbox'                     }, 
+            { 'value' => 'checkbox_multiple'  , 'text' => 'Checkbox (multiple)'          }, 
+            { 'value' => 'image'              , 'text' => 'Image'                        },
+            { 'value' => 'file'               , 'text' => 'File'                         },
+            { 'value' => 'richtext'           , 'text' => 'Rich Text'                    }, 
+            { 'value' => 'select'             , 'text' => 'Multiple choice (select box)' }, 
+            { 'value' => 'text'               , 'text' => 'Textbox'                      }, 
+            { 'value' => 'textarea'           , 'text' => 'Textarea'                     },
+            { 'value' => 'block'              , 'text' => 'Block'                        }
+          ]
+        when 'site'      
+          options = Site.reorder("description, name").all.collect{ |s| { 'value' => s.id, 'text' => s.description && s.description.strip.length > 0 ? s.description : s.name }}
+        when 'tree'          
+          options = []            
+          BlockType.where("parent_id is null or parent_id = 0").reorder(:name).all.each do |bt|        
+            admin_tree_options_helper(options, bt, '')         
+          end
       end        
-      render :json => options
-    end
-    
-    # GET /admin/block-types/options
-    def admin_options
-      return unless user_is_allowed('pages', 'edit')      
-      options = BlockType.where("parent_id is null").reorder(:name).all.collect do |bt| 
-        { 'value' => bt.id, 'text' => bt.description } 
-      end      
-      render :json => options
-    end
-    
-    # GET /admin/block-types/tree-options
-    def admin_tree_options
-      return unless user_is_allowed('pages', 'edit')
-      options = []            
-      BlockType.where("parent_id is null or parent_id = 0").reorder(:name).all.each do |bt|        
-        admin_tree_options_helper(options, bt, '')         
-      end      
       render :json => options
     end
     
@@ -221,7 +206,7 @@ module Caboose
     # Store Actions
     #===========================================================================
     
-    # GET /admin/block-types/store
+    # @route GET /admin/block-types/store
     def admin_store_index
       return unless user_is_allowed('blocktypestore', 'add')
       @pager = PageBarGenerator.new(params, {
@@ -239,14 +224,7 @@ module Caboose
     	render :layout => 'caboose/admin'
     end
     
-    # GET /admin/block-types/store/:block_type_summary_id
-    def admin_store_details
-      return unless user_is_allowed('blocktypestore', 'add')
-      @block_type_summary = BlockTypeSummary::find(params[:block_type_summary_id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # GET /admin/block-types/store/:block_type_summary_id/download
+    # @route GET /admin/block-types/store/:block_type_summary_id/download
     def admin_store_download
       return unless user_is_allowed('blocktypestore', 'add')
 
@@ -257,11 +235,18 @@ module Caboose
       render :json => resp
     end
     
+    # @route GET /admin/block-types/store/:block_type_summary_id
+    def admin_store_details
+      return unless user_is_allowed('blocktypestore', 'add')
+      @block_type_summary = BlockTypeSummary::find(params[:block_type_summary_id])
+      render :layout => 'caboose/admin'
+    end
+            
     #===========================================================================
     # Public Repo Actions
     #===========================================================================
     
-    # GET /caboose/block-types
+    # @route GET /caboose/block-types
     def api_block_type_list
       arr = BlockType.where("parent_id is null and share = ?", true).reorder(:name).all.collect do |bt|
         { 'name' => bt.name, 'description' => bt.description }
@@ -269,7 +254,7 @@ module Caboose
       render :json => arr      
     end
     
-    # GET /caboose/block-types/:name
+    # @route GET /caboose/block-types/:name
     def api_block_type
       bt = BlockType.where(:name => params[:name]).first
       render :json => { 'error' => 'Invalid block type.' } if bt.nil?            

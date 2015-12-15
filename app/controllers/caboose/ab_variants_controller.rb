@@ -6,7 +6,7 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
 
-    # GET /admin/ab_variants
+    # @route GET /admin/ab_variants
     def admin_index
       return unless user_is_allowed_to 'view', 'ab_variants'
 
@@ -19,19 +19,19 @@ module Caboose
       @variants = @gen.items
     end
 
-    # GET /admin/ab_variants/new
+    # @route GET /admin/ab_variants/new
     def admin_new
       return unless user_is_allowed_to 'add', 'ab_variants'
       @variant = AbVariant.new
     end
 
-    # GET /admin/ab_variants/:id
+    # @route GET /admin/ab_variants/:id
     def admin_edit
       return unless user_is_allowed_to 'edit', 'ab_variants'
       @variant = AbVariant.find(params[:id])
     end
 
-    # POST /admin/ab-variants
+    # @route POST /admin/ab-variants
     def admin_create
       return unless user_is_allowed_to 'edit', 'ab_variants'
 
@@ -53,7 +53,7 @@ module Caboose
       render json: resp
     end
 
-    # PUT /admin/ab_variants/:id
+    # @route PUT /admin/ab_variants/:id
     def admin_update
       return unless user_is_allowed_to 'edit', 'ab_variants'
 
@@ -76,7 +76,7 @@ module Caboose
       render :json => resp
     end
 
-    # DELETE /admin/ab_variants/:id
+    # @route DELETE /admin/ab_variants/:id
     def admin_destroy
       return unless user_is_allowed_to 'delete', 'ab_variants'      
       AbVariants.find(params[:id]).destroy

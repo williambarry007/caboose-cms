@@ -18,8 +18,8 @@ module Caboose
     # Admin actions
     #===========================================================================
     
-    # GET /admin/pages/:page_id/blocks
-    # GET /admin/posts/:post_id/blocks
+    # @route GET /admin/pages/:page_id/blocks
+    # @route GET /admin/posts/:post_id/blocks
     def admin_index
       return if !user_is_allowed('pages', 'view')
       #h = params[:post_id] ? { :post_id => params[:post_id] } : { :page_id => params[:page_id] }
@@ -28,10 +28,10 @@ module Caboose
       render :json => @p.block      
     end
 
-    # GET /admin/pages/:page_id/blocks/:id/new
-    # GET /admin/pages/:page_id/blocks/new
-    # GET /admin/posts/:post_id/blocks/:id/new
-    # GET /admin/posts/:post_id/blocks/new
+    # @route GET /admin/pages/:page_id/blocks/:id/new
+    # @route GET /admin/pages/:page_id/blocks/new
+    # @route GET /admin/posts/:post_id/blocks/:id/new
+    # @route GET /admin/posts/:post_id/blocks/new
     def admin_new
       return unless user_is_allowed('pages', 'add')
 
@@ -67,18 +67,18 @@ module Caboose
       render :layout => 'caboose/modal'                
     end
     
-    # GET /admin/pages/:page_id/blocks/:id
-    # GET /admin/posts/:post_id/blocks/:id
+    # @route GET /admin/pages/:page_id/blocks/:id
+    # @route GET /admin/posts/:post_id/blocks/:id
     def admin_show
       return unless user_is_allowed('pages', 'edit')      
       block = Block.find(params[:id])
       render :json => block      
     end
     
-    # GET /admin/pages/:page_id/blocks/tree
-    # GET /admin/pages/:page_id/blocks/:id/tree
-    # GET /admin/posts/:post_id/blocks/tree
-    # GET /admin/posts/:post_id/blocks/:id/tree    
+    # @route GET /admin/pages/:page_id/blocks/tree
+    # @route GET /admin/pages/:page_id/blocks/:id/tree
+    # @route GET /admin/posts/:post_id/blocks/tree
+    # @route GET /admin/posts/:post_id/blocks/:id/tree    
     def admin_tree
       return unless user_is_allowed('pages', 'edit')      
       
@@ -103,8 +103,8 @@ module Caboose
       return arr
     end      
       
-    # GET /admin/pages/:page_id/blocks/:id/render
-    # GET /admin/posts/:post_id/blocks/:id/render
+    # @route GET /admin/pages/:page_id/blocks/:id/render
+    # @route GET /admin/posts/:post_id/blocks/:id/render
     def admin_render
       return unless user_is_allowed('pages', 'edit')      
       b = Block.find(params[:id])      
@@ -133,8 +133,8 @@ module Caboose
       render :json => html            
     end        
           
-    # GET /admin/pages/:page_id/blocks/render
-    # GET /admin/posts/:post_id/blocks/render
+    # @route GET /admin/pages/:page_id/blocks/render
+    # @route GET /admin/posts/:post_id/blocks/render
     def admin_render_all
       return unless user_is_allowed('pages', 'edit')            
       blocks = Block.where("#{page_or_post}_id = ? and parent_id is null", @p.id).reorder(:sort_order).collect do |b|        
@@ -163,8 +163,8 @@ module Caboose
       render :json => blocks
     end
     
-    # GET /admin/pages/:page_id/blocks/render-second-level
-    # GET /admin/posts/:post_id/blocks/render-second-level
+    # @route GET /admin/pages/:page_id/blocks/render-second-level
+    # @route GET /admin/posts/:post_id/blocks/render-second-level
     def admin_render_second_level
       return unless user_is_allowed('pages', 'edit')      
       view = ActionView::Base.new(ActionController::Base.view_paths)      
@@ -195,8 +195,8 @@ module Caboose
       render :json => blocks      
     end
     
-    # GET /admin/pages/:page_id/blocks/:id/edit
-    # GET /admin/posts/:post_id/blocks/:id/edit
+    # @route GET /admin/pages/:page_id/blocks/:id/edit
+    # @route GET /admin/posts/:post_id/blocks/:id/edit
     def admin_edit
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:page_id]) if params[:page_id]

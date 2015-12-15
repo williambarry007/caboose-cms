@@ -1,14 +1,14 @@
 module Caboose
   class BillingAddressesController < Caboose::ApplicationController
             
-    # GET /admin/orders/:order_id/billing-address/json
+    # @route GET /admin/orders/:order_id/billing-address/json
     def admin_json
       return if !user_is_allowed('orders', 'edit')    
       order = Order.find(params[:order_id])      
       render :json => order.billing_address      
     end
       
-    # PUT /admin/orders/:order_id/billing-address
+    # @route PUT /admin/orders/:order_id/billing-address
     def admin_update
       return if !user_is_allowed('orders', 'edit')
       
@@ -48,7 +48,7 @@ module Caboose
     
     #===========================================================================
     
-    # GET /my-account/orders/:order_id/billing-address/json
+    # @route GET /my-account/orders/:order_id/billing-address/json
     def my_account_json
       return if !logged_in?    
       order = Order.find(params[:order_id])      
@@ -59,7 +59,7 @@ module Caboose
       render :json => order.billing_address      
     end
     
-    # PUT /my-account/orders/:order_id/billing-address
+    # @route PUT /my-account/orders/:order_id/billing-address
     def my_account_update
       return if !logged_in?
       

@@ -66,7 +66,7 @@ Caboose.Store.Modules.CheckoutPayment = (function() {
       if (total_is_correct == false)
       {
         $('#message').html("<p class='note error'>It looks like the order total has changed since this page has refreshed. Please submit your order again after this page refreshes.");
-        setTimeout(function() { window.location.reload(true); }, 3000);
+        setTimeout(function() { window.location.reload(true); }, 3000);                
       }
       else
       {

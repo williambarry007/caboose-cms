@@ -2,7 +2,7 @@
 module Caboose
   class BlockTypeStoreController < ApplicationController
         
-    # GET /admin/block-types/store
+    # @route GET /admin/block-types/store
     def admin_index
       return unless user_is_allowed('blocktypestore', 'add')
       @pager = PageBarGenerator.new(params, {
@@ -20,14 +20,7 @@ module Caboose
     	render :layout => 'caboose/admin'
     end
     
-    # GET /admin/block-types/store/:block_type_summary_id
-    def admin_details
-      return unless user_is_allowed('blocktypestore', 'add')
-      @block_type_summary = BlockTypeSummary::find(params[:block_type_summary_id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # GET /admin/block-types/store/:block_type_summary_id/download
+    # @route GET /admin/block-types/store/:block_type_summary_id/download
     def admin_download
       return unless user_is_allowed('blocktypestore', 'add')
 
@@ -37,6 +30,13 @@ module Caboose
       resp = StdClass.new('success' => 'The block type has been downloaded successfully.')
       render :json => resp
     end
-		
+    
+    # @route GET /admin/block-types/store/:block_type_summary_id
+    def admin_details
+      return unless user_is_allowed('blocktypestore', 'add')
+      @block_type_summary = BlockTypeSummary::find(params[:block_type_summary_id])
+      render :layout => 'caboose/admin'
+    end
+    
   end  
 end

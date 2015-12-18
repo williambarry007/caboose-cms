@@ -163,7 +163,7 @@ class Caboose::Page < ActiveRecord::Base
 
     # Allow a user id to be sent instead of a user object
     user = User.find(user) if user.is_a?(Integer)
-    user.role_ids = [Role.logged_out_role_id] if user.role_ids.nil?
+    user.role_ids = [Role.logged_out_role_id(user.site_id)] if user.role_ids.nil?
 
     t = PagePermission.table    
     reqs = nil

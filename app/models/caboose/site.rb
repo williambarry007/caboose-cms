@@ -108,17 +108,18 @@ class Caboose::Site < ActiveRecord::Base
   
   def init_users_and_roles
         
-    admin_user = Caboose::User.where(:username => 'admin', :site_id => self.id).first    
-    admin_user = Caboose::User.create(:username => 'admin', :email => 'admin@nine.is', :site_id => self.id, :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose')) if admin_user.nil?
-                          
-    admin_role = Caboose::Role.where(:site_id => self.id, :name => 'Admin').first    
-    admin_role = Caboose::Role.create(:site_id => self.id, :parent_id => -1, :name => 'Admin') if admin_role.nil?
-    
-    elo_role = Caboose::Role.where(:site_id => self.id, :name => 'Everyone Logged Out').first
-    elo_role = Caboose::Role.create(:site_id => self.id, :parent_id => -1, :name => 'Everyone Logged Out') if elo_role.nil?
-    
-    eli_role = Caboose::Role.where(:site_id => self.id, :name => 'Everyone Logged In').first
-    eli_role = Caboose::Role.create(:site_id => self.id, :parent_id => elo_role.id, :name => 'Everyone Logged In') if eli_role.nil?
+    admin_user = Caboose::User.where( :site_id => self.id, :username => 'admin').first    
+    admin_user = Caboose::User.create(:site_id => self.id, :username => 'admin', :email => 'admin@nine.is', :password => Digest::SHA1.hexdigest(Caboose::salt + 'caboose')) if admin_user.nil?                          
+    admin_role = Caboose::Role.where( :site_id => self.id, :name => 'Admin').first    
+    admin_role = Caboose::Role.create(:site_id => self.id, :parent_id => -1, :name => 'Admin') if admin_role.nil?    
+    elo_user   = Caboose::User.where( :site_id => self.id, :username => 'elo').first    
+    elo_user   = Caboose::User.create(:site_id => self.id, :username => 'elo', :email => 'elo@nine.is') if elo_user.nil?    
+    elo_role   = Caboose::Role.where( :site_id => self.id, :name => 'Everyone Logged Out').first
+    elo_role   = Caboose::Role.create(:site_id => self.id, :name => 'Everyone Logged Out', :parent_id => -1) if elo_role.nil?    
+    eli_user   = Caboose::User.where( :site_id => self.id, :username => 'eli').first    
+    eli_user   = Caboose::User.create(:site_id => self.id, :username => 'eli', :email => 'eli@nine.is') if eli_user.nil?    
+    eli_role   = Caboose::Role.where( :site_id => self.id, :name => 'Everyone Logged In').first
+    eli_role   = Caboose::Role.create(:site_id => self.id, :name => 'Everyone Logged In', :parent_id => elo_role.id) if eli_role.nil?
     
     # Make sure the admin role has the admin "all" permission
     admin_perm = Caboose::Permission.where(:resource => 'all', :action => 'all').first
@@ -128,6 +129,14 @@ class Caboose::Site < ActiveRecord::Base
     # Make sure the admin user is a member of the admin role
     rm = Caboose::RoleMembership.where(:role_id => admin_role.id, :user_id => admin_user.id).first
     rm = Caboose::RoleMembership.create(:role_id => admin_role.id, :user_id => admin_user.id) if rm.nil?
+    
+    # Make sure the elo user is a member of the elo role
+    rm = Caboose::RoleMembership.where( :role_id => elo_role.id, :user_id => elo_user.id).first
+    rm = Caboose::RoleMembership.create(:role_id => elo_role.id, :user_id => elo_user.id) if rm.nil?
+    
+    # Make sure the eli user is a member of the eli role
+    rm = Caboose::RoleMembership.where( :role_id => eli_role.id, :user_id => eli_user.id).first
+    rm = Caboose::RoleMembership.create(:role_id => eli_role.id, :user_id => eli_user.id) if rm.nil?
         
   end
   

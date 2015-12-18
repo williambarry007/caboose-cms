@@ -162,7 +162,7 @@ module Caboose
     # Returns the currently logged in user
     def logged_in_user
       if (!logged_in?)
-        return User.logged_out_user
+        return User.logged_out_user(@site.id)
       end
       #return nil if !logged_in?
       return session["app_user"]

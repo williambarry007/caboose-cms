@@ -2,6 +2,13 @@ require "caboose/version"
 require 'aws-sdk'
 
 namespace :caboose do
+  
+  desc "Verify ELO and ELI roles exist for all sites"
+  task :init_site_users_and_roles => :environment do
+    Caboose::Site.all.each do |site|
+      site.init_users_and_roles
+    end    
+  end
 
   desc "Update the on sale value for all products and variants"
   task :update_products_on_sale => :environment do    

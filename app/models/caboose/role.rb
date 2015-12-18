@@ -17,38 +17,37 @@ class Caboose::Role < ActiveRecord::Base
     :site_id
   attr_accessor :children
      
-  def self.admin_role
-    return self.where('name' => 'Admin').first
+  def self.admin_role(site_id)
+    return self.where(:site_id => site_id, :name => 'Admin').first
   end
   
-  def self.admin_role_id
-    return self.where('name' => 'Admin').limit(1).pluck(:id)[0]
+  def self.admin_role_id(site_id)
+    return self.where(:site_id => site_id, :name => 'Admin').limit(1).pluck(:id)[0]
   end
   
-  def self.logged_out_role
-    return self.where('name' => 'Everyone Logged Out').first
+  def self.logged_out_role(site_id)
+    return self.where(:site_id => site_id, :name => 'Everyone Logged Out').first
   end
   
-  def self.logged_out_role_id
-    return self.where('name' => 'Everyone Logged Out').limit(1).pluck(:id)[0]
+  def self.logged_out_role_id(site_id)
+    return self.where(:site_id => site_id, :name => 'Everyone Logged Out').limit(1).pluck(:id)[0]
   end
   
-  def self.logged_in_role
-    return self.where('name' => 'Everyone Logged In').first
+  def self.logged_in_role(site_id)
+    return self.where(:site_id => site_id, :name => 'Everyone Logged In').first
   end
   
-  def self.logged_in_role_id
-    return self.where('name' => 'Everyone Logged In').limit(1).pluck(:id)[0]
+  def self.logged_in_role_id(site_id)
+    return self.where(:site_id => site_id, :name => 'Everyone Logged In').limit(1).pluck(:id)[0]
   end
   
-  def is_allowed(resource, action)
-    
+  def is_allowed(resource, action)    
     # Check for the admin permission
     for perm in permissions
       return true if (perm.resource == "all" && perm.action == "all")
     end
         
-    if (resource.is_a?(Caboose::Page))
+    if (resource.is_a?(Caboose::Page))      
       for perm in page_permissions
         return true if (perm.page_id == resource.id && perm.action == action)
       end        

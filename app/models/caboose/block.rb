@@ -85,7 +85,8 @@ class Caboose::Block < ActiveRecord::Base
     if b.block_type.field_type == 'file'
       return b.media.file if b.media
       return b.file
-    end    
+    end
+    return "" if b.value.nil? || b.value.strip.length == 0
     view = options && options[:view] ? options[:view] : ActionView::Base.new(ActionController::Base.view_paths)    
     return view.render(:inline => b.value, :locals => options)                    
   end

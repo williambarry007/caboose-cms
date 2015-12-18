@@ -25,6 +25,16 @@ module Caboose
       self.amount = 0.00 if self.amount.nil?        
     end
     
+    def self.type_from_authnet_status(status)
+      case status
+        when 'settledSuccessfully'        then OrderTransaction::TYPE_CAPTURE
+        when 'voided'                     then OrderTransaction::TYPE_VOID
+        when 'declined'                   then OrderTransaction::TYPE_AUTHORIZE
+        when 'authorizedPendingCapture'   then OrderTransaction::TYPE_AUTHORIZE
+        when 'refundSettledSuccessfully'  then OrderTransaction::TYPE_REFUND
+      end
+    end
+    
   end
 end
    

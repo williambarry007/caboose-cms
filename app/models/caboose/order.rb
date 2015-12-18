@@ -422,6 +422,33 @@ module Caboose
       OrdersMailer.configure_for_site(self.site_id).customer_payment_authorization(self).deliver
     end
     
+    def determine_statuses
+      
+      auth    = false
+      capture = false
+      void    = false
+      refund  = false
+      
+      self.order_transactions.each do |ot|
+        auth    = true if ot.transaction_type == OrderTransaction::TYPE_AUTHORIZE && ot.success == true
+        capture = true if ot.transaction_type == OrderTransaction::TYPE_CAPTURE   && ot.success == true
+        void    = true if ot.transaction_type == OrderTransaction::TYPE_VOID      && ot.success == true
+        refund  = true if ot.transaction_type == OrderTransaction::TYPE_REFUND    && ot.success == true
+      end
+      
+      if    refund  then self.financial_status = Order::FINANCIAL_STATUS_REFUNDED
+      elsif void    then self.financial_status = Order::FINANCIAL_STATUS_VOIDED
+      elsif capture then self.financial_status = Order::FINANCIAL_STATUS_CAPTURED
+      elsif auth    then self.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED
+      else               self.financial_status = Order::FINANCIAL_STATUS_PENDING
+      end
+    
+      self.status = Order::STATUS_PENDING if self.status == Order::STATUS_CART && (refund || void || capture || auth) 
+      
+      self.save
+
+    end
+    
   end
 end
 

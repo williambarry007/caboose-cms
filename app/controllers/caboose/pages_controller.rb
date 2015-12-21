@@ -178,7 +178,17 @@ module Caboose
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
-     
+    
+    # PUT /admin/pages/:id/update-child-permissions
+    def admin_update_child_permissions
+      return unless user_is_allowed('pages', 'edit')      
+      page = Page.find(params[:id])
+      if page
+        Page.update_child_perms(page.id)
+      end
+      render :json => { :success => true }
+    end
+               
     # GET /admin/pages/:id/content
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')      

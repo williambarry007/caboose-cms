@@ -16,6 +16,9 @@
   </tr>
 <% end %>
 </table>
+
+<div id='message'></div>
+<p><input type='button' value='Copy Permissions to Child Pages' onclick='update_child_permissions(<%= @page.id %>);' /></p>
   
 <%= render :partial => 'caboose/pages/admin_footer' %>
 
@@ -39,6 +42,28 @@ function toggle_page_permission(role_id, checked, action)
       action2: action 
     },
     success: function(resp) {}
+  });
+}
+
+function update_child_permissions(page_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append("Are you sure you want to copy the permissions to child pages?<br /><br />")
+      .append($('<input/>').attr('type', 'button').val('Yes').click(function(e) { update_child_permissions(page_id, true); })).append(' ')
+      .append($('<input/>').attr('type', 'button').val('No').click(function(e) { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').empty().append("<p class='loading'>Setting child permissions...</p>");
+  $.ajax({
+    url: '/admin/pages/' + page_id + '/update-child-permissions',
+    type: 'put',    
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.success) $('#message').html("<p class='note success'>The permissions have been set successfully.</p>");    
+    }
   });
 }
 

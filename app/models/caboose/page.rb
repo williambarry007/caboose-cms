@@ -126,14 +126,15 @@ class Caboose::Page < ActiveRecord::Base
   def self.update_child_perms(page_id)
     page = self.find(page_id)
       
-    viewers_ids   = Role.roles_with_page_permission(page_id, 'view').collect {|r| r.id }
-    editors_ids   = Role.roles_with_page_permission(page_id, 'edit').collect {|r| r.id }
-    approvers_ids = Role.roles_with_page_permission(page_id, 'approve').collect {|r| r.id }   
-    
+    viewer_ids   = Caboose::PagePermission.where(:page_id => page_id, :action => 'view'   ).all.collect{ |pp| pp.role_id }
+    editor_ids   = Caboose::PagePermission.where(:page_id => page_id, :action => 'edit'   ).all.collect{ |pp| pp.role_id }
+    approver_ids = Caboose::PagePermission.where(:page_id => page_id, :action => 'approve').all.collect{ |pp| pp.role_id }   
+                              
     self.update_child_perms_helper(page, viewer_ids, editor_ids, approver_ids)
   end
   
   def self.update_child_perms_helper(page, viewer_ids, editor_ids, approver_ids)
+    
     self.update_authorized_for_action(page.id, 'view'     , viewer_ids)
     self.update_authorized_for_action(page.id, 'edit'     , editor_ids)
     self.update_authorized_for_action(page.id, 'approve'  , approver_ids)

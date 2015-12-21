@@ -153,7 +153,7 @@ module Caboose
     # @route GET /admin/block-types/:field-options
     # @route GET /admin/block-types/options
     # @route GET /admin/block-types/:id/options
-    def admin_field_type_options
+    def admin_options
       return unless user_is_allowed('pages', 'edit')
 
       options = []

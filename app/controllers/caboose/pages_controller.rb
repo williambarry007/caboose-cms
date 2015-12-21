@@ -185,7 +185,7 @@ module Caboose
       page = Page.find(params[:id])
       if page
         Page.update_child_perms(page.id)
-      end
+      end 
       render :json => { :success => true }
     end
                

@@ -41,12 +41,12 @@ class Caboose::User < ActiveRecord::Base
     eli = Caboose::Role.logged_in_role(self.site_id)
     return true if self.id != elo.id && eli.is_allowed(resource, action)
     for role in roles
-      Caboose.log("Checking permissions for #{role.name} role")
+      #Caboose.log("Checking permissions for #{role.name} role")
       if role.is_allowed(resource, action)
-        Caboose.log("Role #{role.name} is allowed to view page")
+        #Caboose.log("Role #{role.name} is allowed to view page")
         return true
       else
-        Caboose.log("Role #{role.name} is not allowed to view page")
+        #Caboose.log("Role #{role.name} is not allowed to view page")
       end
       #return true if role.is_allowed(resource, action)
     end

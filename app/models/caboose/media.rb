@@ -49,11 +49,14 @@ class Caboose::Media < ActiveRecord::Base
     
     image_extensions = ['.jpg', '.jpeg', '.gif', '.png', '.tif']
     ext = File.extname(key).downcase
+    mimetype = Caboose::Mimetype.mimetype_for_extension(ext)
     if image_extensions.include?(ext)    
       self.image = URI.parse(uri)
+      self.image_content_type = mimetype if mimetype
     else
       self.file = URI.parse(uri)
-    end
+      self.file_content_type = mimetype if mimetype      
+    end    
     self.processed = true
     self.save
     

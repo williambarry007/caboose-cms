@@ -4,7 +4,7 @@ require 'prawn/table'
 module Caboose
   class PendingOrdersPdf < Prawn::Document
     
-    attr_accessor :orders, :card_type, :card_number
+    attr_accessor :orders, :card_type, :card_number, :print_card_details
     
     def to_pdf
       
@@ -36,7 +36,8 @@ module Caboose
       return str
     end
     
-    def get_card_details(order)      
+    def get_card_details(order)
+      return if self.print_card_details && self.print_card_details == false                  
       sc = order.site.store_config
       ot = order.order_transactions.where(:transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
       return if ot.nil?        

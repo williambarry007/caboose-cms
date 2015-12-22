@@ -5,8 +5,9 @@
 
 <table class='data' id='viewers'>
 <tr><th>Role</th><th>View</th><th>Edit</th></tr>
+<% admin_role = Caboose::Role.admin_role(@site.id) %>
 <% Caboose::Role.flat_tree(@site.id, ' - ').each do |r| %>
-  <% next if r.id == 1 %>
+  <% next if r.id == admin_role.id %>
   <% may_view = Caboose::PagePermission.where(:role_id => r.id, :page_id => @page.id, :action => 'view').exists? %>
   <% may_edit = Caboose::PagePermission.where(:role_id => r.id, :page_id => @page.id, :action => 'edit').exists? %>
   <tr>

@@ -1,5 +1,6 @@
 require 'uri'
 require 'httparty'
+require 'aws-sdk'
 
 class Caboose::Media < ActiveRecord::Base
 
@@ -49,7 +50,7 @@ class Caboose::Media < ActiveRecord::Base
     
     image_extensions = ['.jpg', '.jpeg', '.gif', '.png', '.tif']
     ext = File.extname(key).downcase
-    mimetype = Caboose::Mimetype.mimetype_for_extension(ext)
+    mimetype = Caboose::Mimetype.mimetype_for_extension(ext)        
     if image_extensions.include?(ext)    
       self.image = URI.parse(uri)
       self.image_content_type = mimetype if mimetype

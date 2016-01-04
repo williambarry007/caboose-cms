@@ -5,7 +5,8 @@ v = @variant
 <%= render :partial => 'caboose/products/admin_header' %>
   
 <div id='variant_<%= v.id %>_sku'></div>
-<div id='variant_<%= v.id %>_barcode'></div>                
+<div id='variant_<%= v.id %>_barcode'></div>
+<div id='variant_<%= v.id %>_cost'></div>
 <div id='variant_<%= v.id %>_price'></div>
 <div id='variant_<%= v.id %>_quantity_in_stock'></div>
 <div id='variant_<%= v.id %>_taxable'></div>
@@ -36,7 +37,8 @@ $(document).ready(function() {
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'sku'                 , nice_name: 'SKU'                , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.sku                 ) %>, width: 250 },                         
-      { name: 'barcode'             , nice_name: 'Barcode'            , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.barcode             ) %>, width: 250 }, 
+      { name: 'barcode'             , nice_name: 'Barcode'            , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.barcode             ) %>, width: 250 },
+      { name: 'cost'                , nice_name: 'Cost of Goods'      , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.cost                ) %>, width: 250 },
       { name: 'price'               , nice_name: 'Price'              , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.price               ) %>, width: 250 }, 
       { name: 'quantity_in_stock'   , nice_name: 'Quantity'           , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.quantity_in_stock   ) %>, width: 250 }, 
       { name: 'weight'              , nice_name: 'Weight (grams)'     , type: 'text'     , align_right: true, value: <%= raw Caboose.json(v.weight              ) %>, width: 200 }, 

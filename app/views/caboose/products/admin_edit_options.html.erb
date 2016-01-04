@@ -18,9 +18,9 @@ may_delete3 = p.variants.collect{|v| v.option3 }.uniq.count == 1
 </p>
 
 <table>
-<tr><td><div id='product_<%= p.id %>_option1'></div></td><td><div id='product_<%= p.id %>_default1'></div></td></tr>
-<tr><td><div id='product_<%= p.id %>_option2'></div></td><td><div id='product_<%= p.id %>_default2'></div></td></tr>
-<tr><td><div id='product_<%= p.id %>_option3'></div></td><td><div id='product_<%= p.id %>_default3'></div></td></tr>
+<tr><td><div id='product_<%= p.id %>_option1'></div></td><td><div id='product_<%= p.id %>_default1'></div></td><td><div id='product_<%= p.id %>_option1_media'></div></td></tr>
+<tr><td><div id='product_<%= p.id %>_option2'></div></td><td><div id='product_<%= p.id %>_default2'></div></td><td><div id='product_<%= p.id %>_option2_media'></div></td></tr>
+<tr><td><div id='product_<%= p.id %>_option3'></div></td><td><div id='product_<%= p.id %>_default3'></div></td><td><div id='product_<%= p.id %>_option3_media'></div></td></tr>
 </table>
 
 <h2>Modifications</h2>
@@ -41,18 +41,24 @@ may_delete3 = p.variants.collect{|v| v.option3 }.uniq.count == 1
 
 var mods_controller = false;
 $(document).ready(function() {
+  console.log(<%= raw p.option1_media %>);
+  console.log(<%= raw p.option2_media %>);
+  console.log(<%= raw p.option3_media %>);
   m = new ModelBinder({
     name: 'Product',
     id: <%= p.id %>,
     update_url: '/admin/products/<%= p.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'option1'  , nice_name: 'Option 1'      , type: 'text', value: <%= raw Caboose.json(p.option1)  %>, width: 250, fixed_placeholder: true },                         
-      { name: 'option2'  , nice_name: 'Option 2'      , type: 'text', value: <%= raw Caboose.json(p.option2)  %>, width: 250, fixed_placeholder: true }, 
-      { name: 'option3'  , nice_name: 'Option 3'      , type: 'text', value: <%= raw Caboose.json(p.option3)  %>, width: 250, fixed_placeholder: true },
-      { name: 'default1' , nice_name: 'Default value' , type: 'text', value: <%= raw Caboose.json(p.default1) %>, width: 285, fixed_placeholder: true },                         
-      { name: 'default2' , nice_name: 'Default value' , type: 'text', value: <%= raw Caboose.json(p.default2) %>, width: 285, fixed_placeholder: true }, 
-      { name: 'default3' , nice_name: 'Default value' , type: 'text', value: <%= raw Caboose.json(p.default3) %>, width: 285, fixed_placeholder: true } 
+      { name: 'option1'       , nice_name: 'Option 1'      , type: 'text'     , value: <%= raw Caboose.json(p.option1)        %>, width: 250, fixed_placeholder: true },                         
+      { name: 'option2'       , nice_name: 'Option 2'      , type: 'text'     , value: <%= raw Caboose.json(p.option2)        %>, width: 250, fixed_placeholder: true }, 
+      { name: 'option3'       , nice_name: 'Option 3'      , type: 'text'     , value: <%= raw Caboose.json(p.option3)        %>, width: 250, fixed_placeholder: true },            
+      { name: 'option1_media' , nice_name: 'Uses Image'    , type: 'checkbox' , value: <%= raw Caboose.json(p.option1_media)  %>, width: 150, fixed_placeholder: true, align: 'right' },                         
+      { name: 'option2_media' , nice_name: 'Uses Image'    , type: 'checkbox' , value: <%= raw Caboose.json(p.option2_media)  %>, width: 150, fixed_placeholder: true, align: 'right' }, 
+      { name: 'option3_media' , nice_name: 'Uses Image'    , type: 'checkbox' , value: <%= raw Caboose.json(p.option3_media)  %>, width: 150, fixed_placeholder: true, align: 'right' },
+      { name: 'default1'      , nice_name: 'Default value' , type: 'text'     , value: <%= raw Caboose.json(p.default1)       %>, width: 285, fixed_placeholder: true },                         
+      { name: 'default2'      , nice_name: 'Default value' , type: 'text'     , value: <%= raw Caboose.json(p.default2)       %>, width: 285, fixed_placeholder: true }, 
+      { name: 'default3'      , nice_name: 'Default value' , type: 'text'     , value: <%= raw Caboose.json(p.default3)       %>, width: 285, fixed_placeholder: true } 
     ]
   });
   

@@ -381,6 +381,9 @@ module Caboose
           when 'option1'            then product.option1            = value
           when 'option2'            then product.option2            = value
           when 'option3'            then product.option3            = value
+          when 'option1_media'      then product.option1_media      = value
+          when 'option2_media'      then product.option2_media      = value
+          when 'option3_media'      then product.option3_media      = value
           when 'default1'
             product.default1 = value
             Variant.where(:product_id => product.id, :option1 => nil).each do |p|

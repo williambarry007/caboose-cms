@@ -32,7 +32,10 @@ module Caboose
       :category_id           ,      
       :option1               ,
       :option2               ,
-      :option3               ,      
+      :option3               ,
+      :option1_media         ,
+      :option2_media         ,
+      :option3_media         ,      
       :default1              ,
       :default2              ,
       :default3              ,
@@ -159,12 +162,30 @@ module Caboose
       self.variants.where(:status => 'Active').reorder(:option1_sort_order).pluck(:option1).uniq.reject { |x| x.nil? || x.empty? }
     end
     
+    def option1_values_with_media
+      h = {}
+      self.variants.where("status = ? and option1 is not null", 'Active').reorder(:option1_sort_order).each{ |v| h[v.option1] = v.option1_media }      
+      return h      
+    end
+    
     def option2_values
       self.variants.where(:status => 'Active').reorder(:option2_sort_order).pluck(:option2).uniq.reject { |x| x.nil? || x.empty? }
     end
     
+    def option2_values_with_media                                                               
+      h = {}
+      self.variants.where("status = ? and option2 is not null", 'Active').reorder(:option2_sort_order).each{ |v| h[v.option2] = v.option2_media }      
+      return h      
+    end
+    
     def option3_values
       self.variants.where(:status => 'Active').reorder(:option3_sort_order).pluck(:option3).uniq.reject { |x| x.nil? || x.empty? }
+    end
+    
+    def option3_values_with_media
+      h = {}
+      self.variants.where("status = ? and option3 is not null", 'Active').reorder(:option3_sort_order).each{ |v| h[v.option3] = v.option3_media }      
+      return h      
     end
     
     def toggle_category(cat_id, value)            

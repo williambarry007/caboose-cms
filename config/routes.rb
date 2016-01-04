@@ -1,5 +1,9 @@
 Caboose::Engine.routes.draw do
   
+  #if Caboose::use_comment_routes
+  #  eval(Caboose::CommentRoutes.controller_routes)      
+  #end
+  
   #=============================================================================
   # Front end
   #=============================================================================
@@ -580,6 +584,9 @@ Caboose::Engine.routes.draw do
 
   get     "/admin/products/:product_id/variants"                         => "variants#admin_index"
   get     "/admin/products/:product_id/variants/json"                    => "variants#admin_json"  
+  get     "/admin/products/:product_id/variants/option1-media"           => "variants#admin_edit_option1_media"
+  get     "/admin/products/:product_id/variants/option2-media"           => "variants#admin_edit_option2_media"
+  get     "/admin/products/:product_id/variants/option3-media"           => "variants#admin_edit_option3_media"
   get     "/admin/products/:product_id/variants/sort-order"              => "variants#admin_edit_sort_order"
   put     '/admin/products/:product_id/variants/option1-sort-order'      => 'variants#admin_update_option1_sort_order'
   put     '/admin/products/:product_id/variants/option2-sort-order'      => 'variants#admin_update_option2_sort_order'

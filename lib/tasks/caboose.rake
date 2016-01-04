@@ -3,6 +3,16 @@ require 'aws-sdk'
 
 namespace :caboose do
   
+  desc "Show all comment routes in controllers"  
+  task :routes, [:arg1] => :environment do |t, args|    
+    puts Caboose::CommentRoutes.controller_routes(args ? args.first : nil)        
+  end
+  
+  desc "Compare routes in controllers with routes in the routes file"
+  task :compare_routes => :environment do    
+    puts Caboose::CommentRoutes.compare_routes
+  end
+  
   desc "Verify ELO and ELI roles exist for all sites"
   task :init_site_users_and_roles => :environment do
     Caboose::Site.all.each do |site|

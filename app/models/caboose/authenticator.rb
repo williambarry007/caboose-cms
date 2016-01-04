@@ -27,8 +27,8 @@ module Caboose
         fail_count = Caboose::LoginLog.fail_count(user)
         if (fail_count+1) >= user.site.login_fail_lock_count
           user.locked = true
-          user.save        
-          LoginMailer.locked_account(user).deliver
+          user.save                      
+          LoginMailer.configure_for_site(user.site.id).locked_account(user).deliver
           resp.error = "Too many failed login attempts. Your account has been locked and the site administrator has been notified."
           ll.success = false
         else

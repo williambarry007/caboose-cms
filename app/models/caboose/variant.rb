@@ -13,15 +13,20 @@ module Caboose
     has_many :product_images, :through => :product_image_variants
     belongs_to :flat_rate_shipping_method, :class_name => 'Caboose::ShippingMethod'
     belongs_to :flat_rate_shipping_package, :class_name => 'Caboose::ShippingPackage'
+    belongs_to :option1_media, :class_name => 'Caboose::Media'
+    belongs_to :option2_media, :class_name => 'Caboose::Media'
+    belongs_to :option3_media, :class_name => 'Caboose::Media'
     
     attr_accessible :id,
       :alternate_id,
       :product_id,
       :barcode,            # Returns the barcode value of the variant.
+      :cost,               # Cost of goods (don't show to customer)
       :price,              # Variant’s price.
       :sale_price,
       :date_sale_starts,
       :date_sale_end,
+      :clearance,
       :ignore_quantity,
       :quantity,
       :quantity_in_stock,
@@ -33,7 +38,13 @@ module Caboose
       :height,             # Height of variant in inches
       :option1,            # Returns the value of option1 for given variant
       :option2,            # If a product has a second option defined, then returns the value of this variant's option2.
-      :option3,            # If a product has a third option defined, then returns the value of this variant's option3.  
+      :option3,            # If a product has a third option defined, then returns the value of this variant's option3.
+      :option1_color,      
+      :option2_color,      
+      :option3_color,
+      :option1_media_id,      
+      :option2_media_id,      
+      :option3_media_id,            
       :requires_shipping,  # Returns true if the variant is shippable or false if it is a service or a digital good.    
       :taxable,            # Returns true if the variant is taxable or false if it is not.
       :sku,

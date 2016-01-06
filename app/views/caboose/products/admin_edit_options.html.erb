@@ -40,10 +40,7 @@ may_delete3 = p.variants.collect{|v| v.option3 }.uniq.count == 1
 <script type='text/javascript'>
 
 var mods_controller = false;
-$(document).ready(function() {
-  console.log(<%= raw p.option1_media %>);
-  console.log(<%= raw p.option2_media %>);
-  console.log(<%= raw p.option3_media %>);
+$(document).ready(function() {  
   m = new ModelBinder({
     name: 'Product',
     id: <%= p.id %>,

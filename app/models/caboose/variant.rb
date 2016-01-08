@@ -27,6 +27,7 @@ module Caboose
       :date_sale_starts,
       :date_sale_end,
       :clearance,
+      :clearance_price,
       :ignore_quantity,
       :quantity,
       :quantity_in_stock,

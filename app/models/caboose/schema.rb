@@ -809,6 +809,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_sale_ends                , :datetime ],
         [ :date_sale_end                 , :datetime ],        
         [ :clearance                     , :boolean   , { :default => false }],
+        [ :clearance_price               , :decimal   , { :precision => 8, :scale => 2 }],
         [ :available                     , :boolean   , { :default => true  }],
         [ :quantity_in_stock             , :integer   , { :default => 0     }],        
         [ :ignore_quantity               , :boolean   , { :default => false }],

@@ -129,6 +129,7 @@ module Caboose
           when 'ignore_quantity'               then v.ignore_quantity               = value
           when 'allow_backorder'               then v.allow_backorder               = value
           when 'clearance'                     then v.clearance                     = value
+          when 'clearance_price'               then v.clearance_price               = value
           when 'status'                        then v.status                        = value
           when 'weight'                        then v.weight                        = value
           when 'length'                        then v.length                        = value
@@ -443,6 +444,8 @@ module Caboose
           when 'quantity_in_stock'  then variants.each { |v| v.quantity_in_stock  = value }
           when 'ignore_quantity'    then variants.each { |v| v.ignore_quantity    = value }
           when 'allow_backorder'    then variants.each { |v| v.allow_backorder    = value }
+          when 'clearance'          then variants.each { |v| v.clearance          = value }
+          when 'clearance_price'    then variants.each { |v| v.clearance_price    = value }
           when 'status'             then variants.each { |v| v.status             = value }
           when 'weight'             then variants.each { |v| v.weight             = value }
           when 'length'             then variants.each { |v| v.length             = value }

@@ -40,6 +40,7 @@ v = @variant
 <div id='variant_<%= v.id %>_date_sale_ends'     ></div>
 <div id='variant_<%= v.id %>_time_sale_ends'     ></div>
 <div id='variant_<%= v.id %>_clearance'          ></div>
+<div id='variant_<%= v.id %>_clearance_price'    ></div>
     </td>
     <td valign='top' colspan='4'4>
 <h2>Flat Rate Shipping</h2>
@@ -83,7 +84,8 @@ $(document).ready(function() {
       { name: 'sale_price'                           , nice_name: 'Sale price'                       , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.sale_price                   ) %> },
       { name: 'date_sale_starts'                     , nice_name: 'Sale starts'                      , type: 'datetime' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.date_sale_starts ? v.date_sale_starts.in_time_zone(@logged_in_user.timezone).strftime('%m/%d/%Y %I:%M %P') : '') %> },      
       { name: 'date_sale_ends'                       , nice_name: 'Sale ends'                        , type: 'datetime' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.date_sale_ends   ? v.date_sale_ends.in_time_zone(@logged_in_user.timezone).strftime('%m/%d/%Y %I:%M %P')   : '') %> },
-      { name: 'clearance'                            , nice_name: 'On Clearance'                     , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.clearance                    ) %> },      
+      { name: 'clearance'                            , nice_name: 'On Clearance'                     , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.clearance                    ) %> },
+      { name: 'clearance_price'                      , nice_name: 'Clearance price'                  , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.clearance_price              ) %> },      
       { name: 'quantity_in_stock'                    , nice_name: 'Quantity'                         , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.quantity_in_stock            ) %> }, 
       { name: 'ignore_quantity'                      , nice_name: 'Ignore Quantity'                  , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.ignore_quantity              ) %> },
       { name: 'weight'                               , nice_name: 'Weight (<%= sc.weight_unit %>)'   , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.weight                       ) %> }, 

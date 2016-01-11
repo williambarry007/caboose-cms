@@ -130,9 +130,9 @@ module Caboose
       p = Product.find(params[:id])
       render :json => { 
         :product => p,
-        :option1_values => p.option1_values,
-        :option2_values => p.option2_values,
-        :option3_values => p.option3_values
+        :option1_values => p.option1_values_with_media(true),
+        :option2_values => p.option2_values_with_media(true),
+        :option3_values => p.option3_values_with_media(true)
       }
     end
     

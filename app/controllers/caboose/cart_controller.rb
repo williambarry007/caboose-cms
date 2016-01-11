@@ -47,7 +47,7 @@ module Caboose
         li.quantity += qty
         li.subtotal = li.unit_price * li.quantity
       else
-        unit_price = v.on_sale? ? v.sale_price : v.price
+        unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)
         li = LineItem.new(
           :order_id   => @order.id,
           :variant_id => v.id,

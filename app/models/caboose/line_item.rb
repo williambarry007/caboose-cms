@@ -89,7 +89,7 @@ module Caboose
     
     def verify_unit_price      
       if self.unit_price.nil?
-        self.unit_price = self.variant.on_sale? ? self.variant.sale_price : self.variant.price
+        self.unit_price = self.variant.clearance && self.variant.clearance_price ? self.variant.clearance_price : (self.variant.on_sale? ? self.variant.sale_price : self.variant.price)
         self.save
       end      
     end

@@ -449,6 +449,13 @@ module Caboose
 
     end
     
+    def hide_prices_for_any_line_item?
+      self.line_items.each do |li|
+        return true if li.hide_prices
+      end
+      return false
+    end
+    
   end
 end
 

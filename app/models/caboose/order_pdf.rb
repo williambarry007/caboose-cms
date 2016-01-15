@@ -125,8 +125,8 @@ module Caboose
         { :content => "Quantity"   , :align => :right , :valign => :bottom }
       ]
       if !hide_prices
-        tbl << { :content => "Price"      , :align => :right , :valign => :bottom }
-        tbl << { :content => "Amount"     , :align => :right , :valign => :bottom }
+        tbl[0] << { :content => "Price"      , :align => :right , :valign => :bottom }
+        tbl[0] << { :content => "Amount"     , :align => :right , :valign => :bottom }
       end
 
       order.calculate
@@ -211,7 +211,7 @@ module Caboose
         tbl << [{ :content => "Grand Total"                    , :colspan => 6, :align => :right, :font_style => :bold }, { :content => "$"     + sprintf("%.2f", order.total                           ) , :align => :right, :font_style => :bold }]
       end
       
-      table tbl , :position => 7, :width => 530
+      table tbl , :position => 7, :width => 530      
     end
     
     def gift_options(li)          

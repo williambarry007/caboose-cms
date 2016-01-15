@@ -124,8 +124,8 @@ module Caboose
         { :content => "Quantity"   , :align => :right , :valign => :bottom }
       ]
       if !hide_prices
-        tbl << { :content => "Price"      , :align => :right , :valign => :bottom }
-        tbl << { :content => "Amount"     , :align => :right , :valign => :bottom }
+        tbl[0] << { :content => "Price"      , :align => :right , :valign => :bottom }
+        tbl[0] << { :content => "Amount"     , :align => :right , :valign => :bottom }
       end
       
       #order.calculate

@@ -62,5 +62,45 @@ module Caboose
       return days2            
     end
     
+    def OrderReporter.city_report(site_id, d1, d2)
+      q = ["select 
+        count(*),
+        sum(O.subtotal),
+        sum(O.tax),
+        sum(O.shipping),
+        sum(O.handling),
+        sum(O.discount),          
+        sum(O.total),
+        SA.city,
+        SA.state
+        from store_orders O
+        left join store_addresses SA on O.shipping_address_id = SA.id
+        where O.site_id = ?
+        and (O.financial_status = ? or O.financial_status = ?)
+        and O.date_authorized >= ?
+        and O.date_authorized < ?
+        group by concat(SA.city, ', ', SA.state), SA.state, SA.city
+        order by SA.state, SA.city",
+        site_id, 'authorized', 'captured', d1, d2]                        
+      rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, q))
+      
+      arr = []
+      rows.each do |row|        
+        arr << Caboose::StdClass.new(           
+          :count    => row[0].to_i,
+          :subtotal => row[1].to_f,
+          :tax      => row[2].to_f,
+          :shipping => row[3].to_f,
+          :handling => row[4].to_f,
+          :discount => row[5].to_f,
+          :total    => row[6].to_f,
+          :city     => row[7],
+          :state    => row[8]
+        )
+      end
+            
+      return arr            
+    end
+    
   end
 end

@@ -661,6 +661,7 @@ Caboose::Engine.routes.draw do
   # Orders
   #=============================================================================
   
+  get     "/admin/orders/city-report"                 => "orders#admin_city_report"
   get     "/admin/orders/summary-report"              => "orders#admin_summary_report"
   get     "/admin/orders/weird-test"                  => "orders#admin_weird_test"
   get     "/admin/orders"                             => "orders#admin_index"

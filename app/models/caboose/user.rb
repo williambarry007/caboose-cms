@@ -34,10 +34,15 @@ class Caboose::User < ActiveRecord::Base
     #return self::LOGGED_OUT_USER_ID
   end
   
-  def is_allowed(resource, action)
-    
+  def is_logged_out_user?
+    return self.id == Caboose::User.logged_out_user_id(self.site_id)    
+  end
+  
+  def is_allowed(resource, action)          
     elo = Caboose::Role.logged_out_role(self.site_id)
-    return true if elo.is_allowed(resource, action)
+    elo_is_allowed = elo.is_allowed(resource, action)    
+    return true if elo_is_allowed
+    return false if !elo_is_allowed && self.is_logged_out_user?     
     eli = Caboose::Role.logged_in_role(self.site_id)
     return true if self.id != elo.id && eli.is_allowed(resource, action)
     for role in roles

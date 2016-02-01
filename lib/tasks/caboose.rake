@@ -2,7 +2,7 @@ require "caboose/version"
 require 'aws-sdk'
 
 namespace :caboose do
-  
+        
   desc "Show all comment routes in controllers"  
   task :routes, [:arg1] => :environment do |t, args|    
     puts Caboose::CommentRoutes.controller_routes(args ? args.first : nil)        

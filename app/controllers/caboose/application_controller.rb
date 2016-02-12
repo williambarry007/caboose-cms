@@ -124,7 +124,14 @@ module Caboose
       
     # Logs in a user
     def login_user(user, remember = false)
-      session["app_user"] = user
+      session["app_user"] = Caboose::StdClass.new(      
+        user.id         ,
+        user.site_id    ,
+        user.first_name ,
+        user.last_name  ,
+        user.username   ,
+        user.email      ,                             
+      )  
       cookies.permanent[:caboose_user_id] = user.id if remember
     end
     

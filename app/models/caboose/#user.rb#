@@ -97,7 +97,7 @@ class Caboose::User < ActiveRecord::Base
   end
 
   #def marshal_dump      
-  #  [
+  #  [ 
   #    self.id                   ,
   #    self.site_id              ,
   #    self.first_name           ,

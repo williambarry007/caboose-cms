@@ -95,4 +95,61 @@ class Caboose::User < ActiveRecord::Base
     end
     return nil
   end
+
+  def marshal_dump      
+    [
+      self.id                   ,
+      self.site_id              ,
+      self.first_name           ,
+      self.last_name            ,
+      self.username             ,
+      self.email                ,
+      self.address              ,
+      self.address2             ,
+      self.city                 ,
+      self.state                ,
+      self.zip                  ,
+      self.phone                ,
+      self.fax                  ,
+      self.timezone             ,        
+      self.password             ,
+      self.password_reset_id    ,
+      self.password_reset_sent  ,
+      self.token                ,
+      self.date_created         ,
+      self.image                ,
+      self.is_guest             ,
+      self.customer_profile_id  ,
+      self.payment_profile_id   ,
+      self.locked               
+    ]
+  end
+
+  def marshal_load array    
+    self.id                   ,
+    self.site_id              ,
+    self.first_name           ,
+    self.last_name            ,
+    self.username             ,
+    self.email                ,
+    self.address              ,
+    self.address2             ,
+    self.city                 ,
+    self.state                ,
+    self.zip                  ,
+    self.phone                ,
+    self.fax                  ,
+    self.timezone             ,        
+    self.password             ,
+    self.password_reset_id    ,
+    self.password_reset_sent  ,
+    self.token                ,
+    self.date_created         ,
+    self.image                ,
+    self.is_guest             ,
+    self.customer_profile_id  ,
+    self.payment_profile_id   ,
+    self.locked = array
+  end  
+
 end

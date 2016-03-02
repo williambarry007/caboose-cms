@@ -124,21 +124,21 @@ module Caboose
       
     # Logs in a user
     def login_user(user, remember = false)
-      session["app_user"] = Caboose::StdClass.new(      
-        user.id         ,
-        user.site_id    ,
-        user.first_name ,
-        user.last_name  ,
-        user.username   ,
-        user.email      ,                             
-      )  
+      session["app_user"] = Caboose::StdClass.new({      
+        :id         => user.id         ,
+        :site_id    => user.site_id    ,
+        :first_name => user.first_name ,
+        :last_name  => user.last_name  ,
+        :username   => user.username   ,
+        :email      => user.email                             
+      })  
       cookies.permanent[:caboose_user_id] = user.id if remember
     end
     
     # Returns whether or not a user is logged in
     def logged_in?
       validate_token
-      validate_cookie
+      validate_cookie                                                                                                                                                          
       return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1 && session["app_user"].id != User::LOGGED_OUT_USER_ID     
       return false
     end
@@ -172,7 +172,7 @@ module Caboose
         return User.logged_out_user(@site.id)
       end
       #return nil if !logged_in?
-      return session["app_user"]
+      return Caboose::User.where(:id => session["app_user"].id).first
     end
     
     # DEPRECATED: Use user_is_allowed_to(action, resource)

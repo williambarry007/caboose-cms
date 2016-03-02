@@ -10,7 +10,8 @@ module Caboose
       classes = {'zzz_all_domains' => []}            
       Rails.application.config.paths['app/controllers'].each do |controller_path|
         #files = Dir.glob(Rails.root.join(controller_path, '*.rb'))        
-        files = controller ? Dir.glob(Rails.root.join(controller_path, "#{controller}_controller.rb")) : Dir.glob(Rails.root.join(controller_path, '**/*.rb'))        
+        #files = controller ? Dir.glob(Rails.root.join(controller_path, "#{controller}_controller.rb")) : Dir.glob(Rails.root.join(controller_path, '**/*.rb'))
+        files = controller ? Dir.glob(Rails.root.join(controller_path, "#{controller}_controller.rb")) : Dir.glob(Rails.root.join(controller_path, '*.rb'))        
         for file in files    
           f = Rails.root.join('app', 'controllers', file)
           f2 = File.open(f, "r")

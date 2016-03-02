@@ -81,7 +81,7 @@ module Caboose
         and O.date_authorized < ?
         group by concat(SA.city, ', ', SA.state), SA.state, SA.city
         order by SA.state, SA.city",
-        site_id, 'authorized', 'captured', d1, d2]                        
+        site_id, 'authorized', 'captured', d1, d2]
       rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, q))
       
       arr = []

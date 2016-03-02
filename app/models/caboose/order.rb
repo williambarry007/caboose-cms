@@ -137,6 +137,8 @@ module Caboose
       self.update_column(:gift_wrap , self.calculate_gift_wrap )
       self.update_column(:discount  , self.calculate_discount  )
       self.update_column(:total     , self.calculate_total     )
+      self.update_column(:cost      , self.calculate_cost      )
+      self.update_column(:profit    , self.calculate_profit    )
     end
     
     def calculate_subtotal
@@ -184,6 +186,22 @@ module Caboose
     
     def calculate_total
       return (self.subtotal + self.tax + self.shipping + self.handling + self.gift_wrap) - self.discount
+    end
+    
+    def calculate_cost      
+      x = 0.0
+      invalid_cost = false
+      self.line_items.each do |li|
+        invalid_cost = true if li.variant.nil? || li.variant.cost.nil?
+        x = x + (li.variant.cost * li.quantity)
+      end
+      return 0.00 if invalid_cost
+      return x            
+    end
+    
+    def calculate_profit
+      return 0.00 if self.cost.nil?
+      return (self.total - (self.tax ? self.tax : 0.00) - (self.shipping ? self.shipping : 0.00) - (self.handling ? self.handling : 0.00) - (self.gift_wrap ? self.gift_wrap : 0.00)) - self.cost
     end
     
     def shipping_and_handling
@@ -343,7 +361,7 @@ module Caboose
         
       end
       return resp      
-    end
+    end        
       
     #def refund
     #      

@@ -13,6 +13,14 @@ namespace :caboose do
     puts Caboose::CommentRoutes.compare_routes
   end
   
+  desc "Calculate order profits"  
+  task :calculate_order_profits => :environment do        
+    Caboose::Order.where("status = ? or status = ? or status = ?", Caboose::Order::STATUS_PENDING, Caboose::Order::STATUS_READY_TO_SHIP, Caboose::Order::STATUS_SHIPPED).reorder(:id).all.each do |order|
+      order.update_column(:cost   , order.calculate_cost   )
+      order.update_column(:profit , order.calculate_profit )
+    end                    
+  end
+  
   desc "Verify ELO and ELI roles exist for all sites"
   task :init_site_users_and_roles => :environment do
     Caboose::Site.all.each do |site|

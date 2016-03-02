@@ -6,6 +6,8 @@ shipping = 0.0
 handling = 0.0
 discount = 0.0
 total    = 0.0
+cost     = 0.0
+profit   = 0.0
 @rows.each do |row|  
   count    = count    + row.count    
   subtotal = subtotal + row.subtotal 
@@ -14,6 +16,8 @@ total    = 0.0
   handling = handling + row.handling 
   discount = discount + row.discount 
   total    = total    + row.total
+  cost     = cost     + row.cost
+  profit   = profit   + row.profit
 end
 day_count = @rows.count
 %>
@@ -30,13 +34,15 @@ day_count = @rows.count
 
 <table class='data'>
   <tr><th>&nbsp;</th><th>Total</th><th>Daily Average</th></tr>  
-  <tr><td>Count     </td><td align='right'><%= count                       %></td><td align='right'><%= sprintf('%.1f', count.to_f / day_count) %></td></tr>     
-  <tr><td>Subtotal  </td><td align='right'>$<%= sprintf('%.2f', subtotal ) %></td><td align='right'>$<%= sprintf('%.2f', subtotal   / day_count) %></td></tr>
-  <tr><td>Tax       </td><td align='right'>$<%= sprintf('%.2f', tax      ) %></td><td align='right'>$<%= sprintf('%.2f', tax        / day_count) %></td></tr>
-  <tr><td>Shipping  </td><td align='right'>$<%= sprintf('%.2f', shipping ) %></td><td align='right'>$<%= sprintf('%.2f', shipping   / day_count) %></td></tr>
-  <tr><td>Handling  </td><td align='right'>$<%= sprintf('%.2f', handling ) %></td><td align='right'>$<%= sprintf('%.2f', handling   / day_count) %></td></tr>
-  <tr><td>Discount  </td><td align='right'>$<%= sprintf('%.2f', discount ) %></td><td align='right'>$<%= sprintf('%.2f', discount   / day_count) %></td></tr>
-  <tr><td>Total     </td><td align='right'>$<%= sprintf('%.2f', total    ) %></td><td align='right'>$<%= sprintf('%.2f', total      / day_count) %></td></tr>
+  <tr><td>Count         </td><td align='right'><%= count                       %></td><td align='right'><%= sprintf('%.1f', count.to_f / day_count) %></td></tr>     
+  <tr><td>Subtotal      </td><td align='right'>$<%= sprintf('%.2f', subtotal ) %></td><td align='right'>$<%= sprintf('%.2f', (subtotal > 0 && day_count > 0 ? (subtotal   / day_count) : 0.00)) %></td></tr>
+  <tr><td>Tax           </td><td align='right'>$<%= sprintf('%.2f', tax      ) %></td><td align='right'>$<%= sprintf('%.2f', (tax      > 0 && day_count > 0 ? (tax        / day_count) : 0.00)) %></td></tr>
+  <tr><td>Shipping      </td><td align='right'>$<%= sprintf('%.2f', shipping ) %></td><td align='right'>$<%= sprintf('%.2f', (shipping > 0 && day_count > 0 ? (shipping   / day_count) : 0.00)) %></td></tr>
+  <tr><td>Handling      </td><td align='right'>$<%= sprintf('%.2f', handling ) %></td><td align='right'>$<%= sprintf('%.2f', (handling > 0 && day_count > 0 ? (handling   / day_count) : 0.00)) %></td></tr>
+  <tr><td>Discount      </td><td align='right'>$<%= sprintf('%.2f', discount ) %></td><td align='right'>$<%= sprintf('%.2f', (discount > 0 && day_count > 0 ? (discount   / day_count) : 0.00)) %></td></tr>
+  <tr><td>Total         </td><td align='right'>$<%= sprintf('%.2f', total    ) %></td><td align='right'>$<%= sprintf('%.2f', (total    > 0 && day_count > 0 ? (total      / day_count) : 0.00)) %></td></tr>
+  <tr><td>Cost of Goods </td><td align='right'>$<%= sprintf('%.2f', cost     ) %></td><td align='right'>$<%= sprintf('%.2f', (cost     > 0 && day_count > 0 ? (cost       / day_count) : 0.00)) %></td></tr>
+  <tr><td>Profit        </td><td align='right'>$<%= sprintf('%.2f', profit   ) %></td><td align='right'>$<%= sprintf('%.2f', (profit   > 0 && day_count > 0 ? (profit     / day_count) : 0.00)) %></td></tr>
 </table><br />
 
 <div id='counts_chart'></div>

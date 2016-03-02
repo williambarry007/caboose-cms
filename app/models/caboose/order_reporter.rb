@@ -4,13 +4,15 @@ module Caboose
     def OrderReporter.summary_report(site_id, d1, d2)
       q = ["select 
           concat(date_part('year', date_authorized), '-', date_part('month', date_authorized), '-', date_part('day', date_authorized)),
-          count(*),
+          count(*),          
           sum(subtotal),
           sum(tax),
           sum(shipping),
           sum(handling),
           sum(discount),          
-          sum(total)
+          sum(total),
+          sum(cost),
+          sum(profit)
         from store_orders
         where site_id = ?
         and (financial_status = ? or financial_status = ?)
@@ -32,7 +34,9 @@ module Caboose
           :shipping => row[4].to_f,
           :handling => row[5].to_f,
           :discount => row[6].to_f,
-          :total    => row[7].to_f
+          :total    => row[7].to_f,
+          :cost     => row[8].to_f,
+          :profit   => row[9].to_f
         )
       end      
       days.sort_by!{ |h| h.date }
@@ -49,7 +53,9 @@ module Caboose
             :shipping => 0.0,
             :handling => 0.0,
             :discount => 0.0,
-            :total    => 0.0
+            :total    => 0.0,
+            :cost     => 0.0,
+            :profit   => 0.0
           )
           last_day = last_day + 1.day
         end

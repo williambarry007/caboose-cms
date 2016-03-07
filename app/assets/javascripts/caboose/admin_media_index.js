@@ -278,7 +278,7 @@ MediaController.prototype = {
         if (that.allow_edit && m.image_urls) li.append($("<a/>").html("Edit Image").click(function() { that.edit_image($(this).parent().data('media_id')); }));
         else                                 li.append($("<a/>").attr('href', m.file_url).html("Direct URL"));
         if ( m.image_urls )                  li.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
-        else                                 li.append($("<a/>").addClass("dl").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
+        else                                 li.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
         ul.append(li);
       });
     }

@@ -7,7 +7,7 @@ var Attribute = function(params) {
   this.value_clean = this.value;  
 };
 
-Attribute.prototype = {
+Attribute.prototype = {  
   name: false,
   nice_name: false,
   type: false,
@@ -53,7 +53,7 @@ Attribute.prototype = {
 				  this2.value_clean = this2.value;
 				}				
 				if (after) after(resp);        				
-				if (this2.after_update) this2.after_update();				
+				if (this2.after_update) this2.after_update(this2);				
 			},
 			error: function() { 
 			  if (after) after(false);

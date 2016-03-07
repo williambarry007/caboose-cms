@@ -34,6 +34,28 @@ ModelBinder.tinymce_current_control = function() {
   return ModelBinder.tinymce_control(id);    
 };
 
+ModelBinder.find_control = function(model_name, model_id, attribute_name) {  
+  var control = false;
+  $.each(all_model_binders, function(i, mb) {
+    if (mb.model.name == model_name && mb.model.id == model_id) {
+      $.each(mb.controls, function(i, c) {        
+        if (c.attribute.name == attribute_name) { control = c; return false; }
+      });
+    }
+    if (control) return false;
+  });
+  return control;  
+};
+
+ModelBinder.repopulate_options_for_control = function(model_name, model_id, attribute_name) {    
+  var control = ModelBinder.find_control(model_name, model_id, attribute_name);  
+  if (control)
+  {
+    control.attribute.options = false;
+    control.init({});
+  }
+};
+
 //==============================================================================
 
 ModelBinder.options = {};
@@ -75,29 +97,26 @@ ModelBinder.prototype = {
   options: {},
   
   init: function(params) {
-    this.model = new Model({        
+    var that = this;    
+    that.model = new Model({        
       name: params['name'],
       id: params['id'],
       attributes: [],
       attributes_clean: []
     });
-    if (params['update_url'])         this.model.update_url = params['update_url'];
-    if (params['success'])            this.success = params['success'];
-    if (params['authenticity_token']) this.authenticity_token = params['authenticity_token'];
-    if (params['on_load'])            this.on_load = params['on_load'];
-      
-    var m = this.model;
-    $.each(params['attributes'], function(i, attrib) {
-      m.attributes[m.attributes.length] = new Attribute(attrib);
-    });
-    //this.model.populate_options();
+    if (params['update_url'])         that.model.update_url = params['update_url'];
+    if (params['success'])            that.success = params['success'];
+    if (params['authenticity_token']) that.authenticity_token = params['authenticity_token'];
+    if (params['on_load'])            that.on_load = params['on_load'];
 
-    var this2 = this;
-    $.each(this.model.attributes, function(i, attrib) {      
+    $.each(params['attributes'], function(i, attrib) {
+      that.model.attributes[that.model.attributes.length] = new Attribute(attrib);
+    });        
+    $.each(that.model.attributes, function(i, attrib) {      
       var opts = {
-        model: this2.model,
+        model:     that.model,
         attribute: attrib,
-        binder: this2
+        binder:    that
       };
       var control = false;
       
@@ -119,21 +138,29 @@ ModelBinder.prototype = {
         control_class = "";
         $.each(attrib.type.split('-'), function(j, word) { control_class += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });
         control = eval("new Bound" + control_class + "(opts)"); 
-      }
-      
-      this2.controls.push(control);    
+      }      
+      that.controls.push(control);    
     });
             
-    if (this.on_load)
-      this.on_load();
+    if (that.on_load)
+      that.on_load();
   },
   
+  reinit: function(control_id)
+  {
+    console.log('Reinitializing ' + control_id + '...');
+    var that = this;
+    var c = that.control_with_id(control_id);
+    console.log(c);
+    if (c) c.init({});
+  },
+    
   control_with_id: function(id)
   {
     var control = false
-    var this2 = this;
+    var that = this;
     $.each(this.controls, function(i, c) {
-      if (id == (this2.model.name + "_" + this2.model.id + "_" + c.attribute.name).toLowerCase())
+      if (id == (that.model.name + "_" + that.model.id + "_" + c.attribute.name).toLowerCase())
       {        
         control = c; 
         return false;

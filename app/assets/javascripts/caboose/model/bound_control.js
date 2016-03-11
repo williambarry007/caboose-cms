@@ -1,17 +1,17 @@
 
 BoundControl = Class.extend({
     
-  el: false,        // The DOM element to which the object is bound  
-  model: false,     // The model to which the control is bound
-  attribute: false, // The attribute of the model
-  binder: false,    // The model binder
-  
-  init: function(params) {},  // Constructor  
-  view: function() {},        // Sets the control in a view state
-  edit: function() {},        // Sets the control in an edit state
-  save: function() {},        // Sends the value in the control to the model to be saved
+  el: false,         // The DOM element to which the object is bound
+  model: false,      // The model to which the control is bound
+  attribute: false,  // The attribute of the model
+  binder: false,     // The model binder
+    
+  init:   function(params) {},  // Constructor  
+  view:   function() {},        // Sets the control in a view state
+  edit:   function() {},        // Sets the control in an edit state
+  save:   function() {},        // Sends the value in the control to the model to be saved
   cancel: function() {},      // Cancels the edit
-  error: function(str) {},     // Shows an error
+  error:  function(str) {},     // Shows an error
 
   show_loader: function() {
     var w = $('#'+this.el).outerWidth();

@@ -38,7 +38,7 @@ Attribute.prototype = {
   s3: false,
   
   save: function(after) {          
-    if (this.before_update) this.before_update();    
+    //if (this.before_update) this.before_update();    
     var this2 = this;
     $.ajax({
       url: this.update_url,
@@ -53,7 +53,7 @@ Attribute.prototype = {
 				  this2.value_clean = this2.value;
 				}				
 				if (after) after(resp);        				
-				if (this2.after_update) this2.after_update(this2);				
+				//if (this2.after_update) this2.after_update(this2);				
 			},
 			error: function() { 
 			  if (after) after(false);

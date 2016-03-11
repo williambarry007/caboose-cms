@@ -64,10 +64,10 @@ BoundText = BoundControl.extend({
     if (this.attribute.value == this.attribute.value_clean)
       return;
     
-    this.show_loader();        
-    var this2 = this;
+    this.show_loader();    
+    var this2 = this;    
     
-    this.model.save(this.attribute, function(resp) {
+    this.binder.save(this.attribute, function(resp) {
       this2.save_attempts = 0;
       if (resp.error)
       {
@@ -111,6 +111,13 @@ BoundText = BoundControl.extend({
     $('#'+this.el+'_message').slideDown();
     var this2 = this;
     setTimeout(function() { $('#'+this2.el+'_message').slideUp(function() { $(this).empty(); }); }, 3000);
+  },
+  
+  set_value: function(v) {
+    var that = this;
+    $('#'+this.el).val(v);
+    this.attribute.value = v;
+    this.attribute.value_clean = v;
   }
   
 });

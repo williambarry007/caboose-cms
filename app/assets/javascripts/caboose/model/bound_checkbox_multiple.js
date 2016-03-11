@@ -127,6 +127,7 @@ BoundCheckboxMultiple = BoundControl.extend({
     var data = {};
     data[this.attribute.name] = [value,(checked ? 1 : 0)];
     
+    
     $.ajax({
       url: this.attribute.update_url,
       type: 'put',
@@ -139,9 +140,9 @@ BoundCheckboxMultiple = BoundControl.extend({
 				      that.attribute[thing] = resp.attributes[that.attribute.name][thing];				  
 				  that.attribute.value_clean = that.attribute.value;
 				  
-				  that.binder.active_control = that;
-				  if (that.binder.success)
-				    that.binder.success(that);				  
+				  b.active_control = that;
+				  if (this2.binder.success)
+				    this2.binder.success(that);				  
 				}								
 				else if (resp.error)
 				  that.error(resp.error);    				

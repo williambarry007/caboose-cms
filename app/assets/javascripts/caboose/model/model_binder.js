@@ -2,11 +2,22 @@
 var all_model_binders = [];
 var ModelBinder = function(params) { 
   this.init(params);
-  all_model_binders[all_model_binders.length] = this;
+  ModelBinder.add_to_all_model_binders(this);
 };
 
-ModelBinder.tinymce_init = function() {
-  alert('ModelBinder.tinymce_init');
+ModelBinder.add_to_all_model_binders = function(mb) {
+  var exists = false;  
+  for (var i=0; i<all_model_binders.length; i++) {
+    var m = all_model_binders[i].model;
+    if (m.name == mb.model.name && parseInt(m.id) == parseInt(mb.model.id))
+    {
+      all_model_binders[i] = mb;             
+      exists = true;
+      break;
+    }
+  }
+  if (!exists)   
+    all_model_binders[all_model_binders.length] = mb;  
 };
 
 ModelBinder.remove_from_all_model_binders = function(model_name, id) {
@@ -16,6 +27,10 @@ ModelBinder.remove_from_all_model_binders = function(model_name, id) {
      arr[arr.length] = mb;      
   });
   all_model_binders = arr;  
+};
+
+ModelBinder.tinymce_init = function() {
+  alert('ModelBinder.tinymce_init');
 };
 
 ModelBinder.tinymce_control = function(id) {  
@@ -34,27 +49,47 @@ ModelBinder.tinymce_current_control = function() {
   return ModelBinder.tinymce_control(id);    
 };
 
-ModelBinder.find_control = function(model_name, model_id, attribute_name) {  
-  var control = false;
-  $.each(all_model_binders, function(i, mb) {
+ModelBinder.find_control = function(model_name, model_id, attribute_name) {    
+  for (var i=0; i<all_model_binders.length; i++) {
+    var mb = all_model_binders[i];
     if (mb.model.name == model_name && mb.model.id == model_id) {
-      $.each(mb.controls, function(i, c) {        
-        if (c.attribute.name == attribute_name) { control = c; return false; }
-      });
-    }
-    if (control) return false;
-  });
-  return control;  
+      for (var j=0; j<mb.controls.length; j++) {
+        var c = mb.controls[j];                          
+        if (c.attribute.name == attribute_name) {
+          return c;
+        }
+      }
+    }    
+  }  
+  return false;
 };
 
-ModelBinder.repopulate_options_for_control = function(model_name, model_id, attribute_name) {    
-  var control = ModelBinder.find_control(model_name, model_id, attribute_name);  
-  if (control)
-  {
-    control.attribute.options = false;
-    control.init({});
-  }
-};
+//ModelBinder.print_all_model_binders = function() {
+//  console.log("-----------------------------------------------------------------");
+//  console.log("All model binders");
+//  for (var i=0; i<all_model_binders.length; i++) {
+//    var mb = all_model_binders[i];                                
+//    console.log(mb.model.name + ' | ' + mb.model.id);                                                      
+//  }
+//  console.log("-----------------------------------------------------------------");  
+//};
+
+//ModelBinder.print_all_controls = function() {
+//  
+//  count = 0;
+//  for (var i=0; i<all_model_binders.length; i++) { count += all_model_binders[i].controls.length; }
+//  
+//  console.log("-----------------------------------------------------------------");
+//  console.log("All controls (" + count + ")");
+//  for (var i=0; i<all_model_binders.length; i++) {
+//    var mb = all_model_binders[i];              
+//    for (var j=0; j<mb.controls.length; j++) {      
+//      var c = mb.controls[j];              
+//      console.log(mb.model.name + ' | ' + mb.model.id +  ' | ' + c.attribute.name); //c.model.name + ' | ' + c.model.id + ' | ' + c.attribute.name + ' | ' + c.attribute.options_url);                                                  
+//    }
+//  }
+//  console.log("-----------------------------------------------------------------");
+//};
 
 //==============================================================================
 
@@ -90,14 +125,16 @@ ModelBinder.wait_for_options = function(url, after) {
 
 ModelBinder.prototype = {
   model: false,
-  controls: [],
+  controls: false,
   on_load: false,
   success: false,
   authenticity_token: false,
-  options: {},
+  options: false,
   
   init: function(params) {
-    var that = this;    
+    var that = this;
+    that.controls = [];
+    that.options = {};
     that.model = new Model({        
       name: params['name'],
       id: params['id'],
@@ -111,17 +148,19 @@ ModelBinder.prototype = {
 
     $.each(params['attributes'], function(i, attrib) {
       that.model.attributes[that.model.attributes.length] = new Attribute(attrib);
-    });        
+    });
     $.each(that.model.attributes, function(i, attrib) {      
       var opts = {
-        model:     that.model,
         attribute: attrib,
+        model:     that.model,        
         binder:    that
       };
+      //console.log(that.model.name + ' | ' + that.model.id + ' | ' + attrib.name);      
       var control = false;
       
       if (attrib.type == 'text')                   control = new BoundText(opts);
       else if (attrib.type == 'color')             control = new BoundColor(opts);
+      else if (attrib.type == 'date')              control = new BoundDate(opts);
       else if (attrib.type == 'datetime')          control = new BoundDateTime(opts);
       else if (attrib.type == 'date-time')         control = new BoundDateTime(opts);
       else if (attrib.type == 'date_time')         control = new BoundDateTime(opts);
@@ -137,13 +176,15 @@ ModelBinder.prototype = {
       {
         control_class = "";
         $.each(attrib.type.split('-'), function(j, word) { control_class += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });
-        control = eval("new Bound" + control_class + "(opts)"); 
-      }      
-      that.controls.push(control);    
-    });
+        control = eval("new Bound" + control_class + "(opts)");
+        //console.log("ModelBinder Error: unsupported attribute type \"" + attrib.type + "\"");
+      }
+      if (control)
+        that.controls.push(control);      
+    }); 
             
     if (that.on_load)
-      that.on_load();
+      that.on_load();    
   },
   
   reinit: function(control_id)
@@ -174,5 +215,26 @@ ModelBinder.prototype = {
     $(this.controls).each(function(i, control) { 
       control.cancel(); 
     });    
+  },
+  
+  save: function(attrib, after) {
+    if (!attrib.update_url)
+      attrib.update_url = this.model.update_url;
+    if (attrib.before_update) attrib.before_update(this);
+    attrib.save(after);      
+    if (attrib.after_update) attrib.after_update(this);
+  },
+
+  repopulate_options_for_control: function(attribute_name) 
+  { 
+    for (var i=0; i<this.controls.length; i++)
+    { 
+      var c = this.controls[i];
+      if (c.attribute.name == attribute_name)
+      {
+        c.attribute.options = false;
+        c.init({});
+      }      
+    }
   }
 };

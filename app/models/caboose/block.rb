@@ -117,6 +117,7 @@ class Caboose::Block < ActiveRecord::Base
   end
                                             
   def render(block, options)
+    #Caboose.log("block.full_name = #{block.full_name}")
     #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")                
     if block && block.is_a?(String)
       #Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")                                          
@@ -232,7 +233,7 @@ class Caboose::Block < ActiveRecord::Base
         "../../app/views/caboose/blocks/#{block.block_type.field_type}",
         "caboose/blocks/#{full_name}",                
         "caboose/blocks/#{block.block_type.name}",                
-        "caboose/blocks/#{block.block_type.field_type}"
+        "caboose/blocks/#{block.block_type.field_type}"                
       ]
       #Caboose.log(arr)
       str = self.render_helper(view, options2, block, full_name, arr, 0)
@@ -246,7 +247,7 @@ class Caboose::Block < ActiveRecord::Base
     begin
       str = view.render(:partial => arr[i], :locals => options)
       #Caboose.log("Level #{i+1} for #{full_name}: Found partial #{arr[i]}")
-      rescue ActionView::MissingTemplate => ex
+      rescue ActionView::MissingTemplate => ex        
         #Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")        
         str = render_helper(view, options, block, full_name, arr, i+1)
       rescue Exception => ex 

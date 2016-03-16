@@ -3,7 +3,7 @@ module Caboose
   class AdminController < ApplicationController
       
     # @route GET /admin
-    def index
+    def index      
       return if !user_is_allowed('admin', 'view')
       #if logged_in?
       #  redirect_to '/admin/pages'

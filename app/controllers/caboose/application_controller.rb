@@ -16,16 +16,19 @@ module Caboose
       @use_page_cache = !request.fullpath.starts_with?('/admin')
             
       # Get the site we're working with      
-      @domain = Domain.where(:domain => request.host_with_port).first
-      @site = @domain ? @domain.site : nil
+      @domain = Domain.where(:domain => request.host_with_port).first      
+      @site = @domain ? @domain.site : nil      
+      if @domain.nil? || @site.nil?
+        Caboose.log("Error: No site configured for #{request.host_with_port}")
+      end
       
       # Set the site in any mailers
       CabooseMailer.site = @site
         
       # Make sure someone is logged in
-      if !logged_in?      
-        elo = User.find(User::LOGGED_OUT_USER_ID)        
-        login_user(elo)
+      if !logged_in? && @site                
+        elo = User.logged_out_user(@site.id)        
+        login_user(elo) if elo
       end
       
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
@@ -138,8 +141,8 @@ module Caboose
     # Returns whether or not a user is logged in
     def logged_in?
       validate_token
-      validate_cookie                                                                                                                                                          
-      return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1 && session["app_user"].id != User::LOGGED_OUT_USER_ID     
+      validate_cookie
+      return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1 && session["app_user"].id != User.logged_out_user_id(@site.id)
       return false
     end
     
@@ -157,11 +160,13 @@ module Caboose
     end
     
     # Checks to see if a remember me cookie value is present.    
-    def validate_cookie
-      if cookies[:caboose_user_id] && User.exists?(cookies[:caboose_user_id])
-        user = User.find(cookies[:caboose_user_id])
-        login_user(user)
-        return true
+    def validate_cookie     
+      if cookies[:caboose_user_id]
+        user = User.where(:id => cookies[:caboose_user_id]).first
+        if user        
+          login_user(user)
+          return true
+        end
       end
       return false
     end

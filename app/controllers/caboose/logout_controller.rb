@@ -5,7 +5,7 @@ module Caboose
       Caboose.plugin_hook('before_logout')
       
       logout_user
-      elo = User.find(User::LOGGED_OUT_USER_ID)        
+      elo = User.logged_out_user(@site.id)        
       login_user(elo)      
       redirect_to params[:return_url] ? params[:return_url] : "/"    
     end

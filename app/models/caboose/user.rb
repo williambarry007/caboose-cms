@@ -38,6 +38,10 @@ class Caboose::User < ActiveRecord::Base
     return self.id == Caboose::User.logged_out_user_id(self.site_id)    
   end
   
+  def is_super_admin?
+    return self.username == 'superadmin'    
+  end
+  
   def is_allowed(resource, action)          
     elo = Caboose::Role.logged_out_role(self.site_id)
     elo_is_allowed = elo.is_allowed(resource, action)    

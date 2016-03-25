@@ -108,5 +108,40 @@ class Caboose::Role < ActiveRecord::Base
     role = Role.find(role) if role.is_a?(Integer)
     return role.is_ancestor_of?(self)      
   end    
+  
+  def duplicate(site_id)
+    r = Caboose::Role.where(:site_id => site_id, :name => self.name).first
+    return if r
+
+    # If we're at the top of the role hierarchy
+    if self.parent_id == -1
+      r = Caboose::Role.create(
+        :site_id => site_id,
+        :parent_id => -1, 
+        :name => r.name,
+        :description => r.description
+      )
+      self.role_permissions.each{ |rp| Caboose::RolePermission.create(:permission_id => rp.permission_id, :role_id => r.id) }
+      self.children.each{ |r2| r2.duplicate(site_id) }
+      return
+    end
+    
+    # Otherwise, there is a parent, try to find it
+    new_parent = Caboose::Role.where(:site_id => site_id, :name => self.parent.name).first
+    if new_parent
+      r = Caboose::Role.create(
+        :site_id => site_id,
+        :parent_id => new_parent.id, 
+        :name => r.name,
+        :description => r.description
+      )
+      self.role_permissions.each{ |rp| Caboose::RolePermission.create(:permission_id => rp.permission_id, :role_id => r.id) }
+      self.children.each{ |r2| r2.duplicate(site_id) }
+      return
+    end
+    
+    # Since we can't find the parent, recursively duplicate the current role's parent into the new site
+    self.parent.duplicate(site_id)
+  end
     	
 end

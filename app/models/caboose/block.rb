@@ -28,12 +28,13 @@ class Caboose::Block < ActiveRecord::Base
     :page_id, 
     :parent_id,
     :block_type_id,
+    :media_id,
     :sort_order,
     :constrain,
     :full_width,
     :name,
-    :value        
-    
+    :value            
+        
   after_initialize :caste_value
   before_save :caste_value
   
@@ -547,6 +548,37 @@ class Caboose::Block < ActiveRecord::Base
       
     end
     
+  end
+  
+  # Assumes that we start the duplicate process at the top level block
+  def duplicate_page_block(site_id, page_id, new_block_type_id = nil, new_parent_id = nil)        
+    m = self.media_id ? self.media.duplicate(site_id) : nil
+    b = Caboose::Block.create(
+      :page_id            => page_id,          
+      :post_id            => nil,         
+      :parent_id          => new_parent_id,
+      :media_id           => self.media_id ? m.id : nil,
+      :block_type_id      => new_block_type_id,    
+      :sort_order         => self.sort_order,
+      :constrain          => self.constrain,
+      :full_width         => self.full_width,
+      :name               => self.name,
+      :value              => self.value
+    )    
+    self.children.each do |b2|
+      if b2.name 
+        # The block is part of the block type, so we have to find the corresponding child block in the new block type        
+        bt = Caboose::BlockType.where(:parent_id => new_block_type_id, :name => b2.name).first
+        if bt
+          b2.duplicate_page_block(site_id, page_id, bt.id, b.id)
+        else
+          # Don't duplicate it because the corresponding child block doesn't exist in the new block type
+        end
+      else
+        # The block is a child block that isn't part of the block type definition
+        b2.duplicate_page_block(site_id, page_id, b2.block_type_id, b.id)
+      end
+    end
   end
     
 

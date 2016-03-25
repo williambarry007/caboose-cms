@@ -1,0 +1,159 @@
+
+<%= render :partial => 'caboose/pages/admin_header' %>
+
+<div id='message'></div>
+
+<%= render :partial => 'caboose/pages/admin_footer' %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  duplicate_page();          
+});
+
+var site = false;
+var parent = false;
+var block_type = false;
+var duplicate_children = false;
+
+function duplicate_page(site, parent, block_type, duplicate_children, child_block_type)
+{
+  <% if @logged_in_user.is_super_admin? %> 
+  if (!site)
+  {
+    sites = false;
+    $.ajax({
+      url: '/admin/sites/options',
+      type: 'get',
+      success: function(resp) { sites = resp; },
+      async: false                    
+    });
+    var select = $('<select/>').change(function() {      
+      var so = $(this).find('option:selected');
+      duplicate_page({ id: so.val(), name: so.html() }); 
+    });
+    select.append($('<option/>').html("-- Select a site --"));
+    $.each(sites, function(i, s) { select.append($('<option/>').val(s.value).html(s.text)); });
+    $('#message').empty().append($('<p/>').addClass('note')
+      .append("Select a site into which the new page will go.<br /><br />")
+      .append(select)      
+    );
+    return;    
+  }
+  <% else %>
+  site = { id: <%= @site.id %>, name: <%= raw Caboose.json(@site.name) %> };
+  <% end %>
+  if (!parent)
+  {        
+    pages = false;
+    $.ajax({
+      url: '/admin/pages/sitemap-options?site_id=' + site.id,
+      type: 'get',
+      success: function(resp) { pages = resp; },
+      async: false                    
+    });
+    var select = $('<select/>').change(function() { 
+      var so = $(this).find('option:selected');
+      duplicate_page(site, { id: so.val(), title: so.html() }); 
+    });
+    select.append($('<option/>').html("-- Select a parent page --"));
+    $.each(pages, function(i, p) { select.append($('<option/>').val(p.value).html(p.text)); });
+    $('#message').empty().append($('<p/>').addClass('note')
+      <% if @logged_in_user.is_super_admin? %>.append("You are duplicating this page into the \"" + site.name + "\" site.<br />")<% end %>
+      .append("Select a parent for the new page.<br /><br />")
+      .append(select).append('<br /><br />')
+      .append($('<input/>').attr('type', 'button').val('< Back').click(function() { duplicate_page(); }))      
+    );
+    return;    
+  }
+  if (!block_type)
+  {        
+    block_types = false;
+    $.ajax({
+      url: '/admin/block-types/layout-options?site_id=' + site.id,
+      type: 'get',
+      success: function(resp) { block_types = resp; },
+      async: false                    
+    });
+    var select = $('<select/>').change(function() { 
+      var so = $(this).find('option:selected');
+      duplicate_page(site, parent, { id: so.val(), name: so.html() }); 
+    });
+    select.append($('<option/>').html("-- Select a block type --"));
+    $.each(block_types, function(i, bt) { select.append($('<option/>').val(bt.value).html(bt.text)); });
+    $('#message').empty().append($('<p/>').addClass('note')
+      <% if @logged_in_user.is_super_admin? %>
+        .append("You are duplicating this page into the \"" + site.name + "\" site under the \"" + parent.title + "\" page.<br />")        
+      <% else %>
+        .append("You are duplicating this page under the \"" + parent.title + "\" page.<br />")
+      <% end %>
+      .append("Select a new layout for the new page.<br /><br />")      
+      .append(select).append('<br /><br />')
+      .append($('<input/>').attr('type', 'button').val('< Back').click(function() { duplicate_page(site); }))      
+    );
+    return;    
+  }
+  if (typeof duplicate_children == 'undefined')  
+  {        
+    $('#message').empty().append($('<p/>').addClass('note')
+      <% if @logged_in_user.is_super_admin? %>
+        .append("You are duplicating this page into the \"" + site.name + "\" site under the \"" + parent.title + "\" page using the \"" + block_type.name + "\" layout.<br />")        
+      <% else %>
+        .append("You are duplicating this page under the \"" + parent.title + "\" page using the \"" + block_type.name + "\" layout.<br />")
+      <% end %>                        
+      .append("Do you want to duplicate this page's children?<br /><br />")
+      .append($('<input/>').attr('type', 'button').val('Yes').click(function() { duplicate_page(site, parent, block_type, true  ); })).append(' ')
+      .append($('<input/>').attr('type', 'button').val('No' ).click(function() { duplicate_page(site, parent, block_type, false ); })).append('<br /><br />')
+      .append($('<input/>').attr('type', 'button').val('< Back').click(function() { duplicate_page(site, parent); }))
+    );
+    return;
+  }
+  if (duplicate_children && !child_block_type)
+  {        
+    block_types = false;
+    $.ajax({
+      url: '/admin/block-types/layout-options?site_id=' + site.id,
+      type: 'get',
+      success: function(resp) { block_types = resp; },
+      async: false                    
+    });
+    var select = $('<select/>').change(function() { 
+      var so = $(this).find('option:selected');
+      duplicate_page(site, parent, block_type, duplicate_children, { id: so.val(), name: so.html() }); 
+    });
+    select.append($('<option/>').html("-- Select a block type --"));
+    $.each(block_types, function(i, bt) { select.append($('<option/>').val(bt.value).html(bt.text)); });
+    $('#message').empty().append($('<p/>').addClass('note')
+      <% if @logged_in_user.is_super_admin? %>
+        .append("You are duplicating this page into the \"" + site.name + "\" site under the \"" + parent.title + "\" page using the \"" + block_type.name + "\" layout.<br />")        
+      <% else %>
+        .append("You are duplicating this page under the \"" + parent.title + "\" page using the \"" + block_type.name + "\" layout.<br />")
+      <% end %>                        
+      .append("Since you have chosen to duplicate child pages, please select the layout for those new child pages:<br /><br />")                        
+      .append(select).append('<br /><br />')
+      .append($('<input/>').attr('type', 'button').val('< Back').click(function() { duplicate_page(site, parent, block_type); }))      
+    );
+    return;    
+  }
+      
+  $('#message').html("<p class='loading'>Duplicating page...</p>");
+  $.ajax({
+    url: '/admin/pages/<%= @page.id %>/duplicate',
+    type: 'post',
+    data: {
+      site_id: site.id,
+      parent_id: parent.id,
+      block_type_id: block_type.id,
+      duplicate_children: duplicate_children,
+      child_block_type_id: (typeof child_block_type == 'undefined' ? null : child_block_type.id)            
+    },
+    success: function(resp) {
+      if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.success) $('#message').html("<p class='note success'>The page has been successfully duplicated.</p>");
+    }
+  });
+}
+
+</script>
+<% end %>

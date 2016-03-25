@@ -271,6 +271,8 @@ Caboose::Engine.routes.draw do
   get     "/admin/pages/new"               => "pages#admin_new"
   get     "/admin/pages/:id/block-options" => "pages#admin_block_options"  
   get     "/admin/pages/:id/uri"           => "pages#admin_page_uri"
+  get     "/admin/pages/:id/duplicate"     => "pages#admin_duplicate_form"
+  post    "/admin/pages/:id/duplicate"     => "pages#admin_duplicate"
   get     "/admin/pages/:id/delete"        => "pages#admin_delete_form"  
   get     "/admin/pages/:id/sitemap"       => "pages#admin_sitemap"  
   get     "/admin/pages/:id/custom-fields" => "pages#admin_edit_custom_fields"

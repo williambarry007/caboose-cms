@@ -6,8 +6,13 @@ module Caboose
       resp = StdClass.new        
       pass = Digest::SHA1.hexdigest(Caboose::salt + password)
       
-      user = User.where(:username => username, :site_id => site.id).first
-      user = User.where(:email    => username, :site_id => site.id).first if user.nil?
+      user = nil
+      if username == 'superadmin'
+        user = User.where(:username => username).first        
+      else
+        user = User.where(:username => username, :site_id => site.id).first
+        user = User.where(:email    => username, :site_id => site.id).first if user.nil?
+      end
       
       ll = LoginLog.new      
       ll.username       = username      

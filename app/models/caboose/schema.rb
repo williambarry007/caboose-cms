@@ -869,6 +869,14 @@ class Caboose::Schema < Caboose::Utilities::Schema
     
     #c.change_column :store_variants, :taxable, :boolean
 
+    super_admin_user = nil
+    if !Caboose::User.exists?(:username => 'superadmin')
+      super_admin_user = Caboose::User.create(:first_name => 'Super', :last_name => 'Admin', :username => 'superadmin', :email => 'superadmin@nine.is')
+      super_admin_user.password = Digest::SHA1.hexdigest(Caboose::salt + 'caboose')
+      super_admin_user.save
+    end
+    super_admin_user = Caboose::User.where(:username => 'superadmin').first if super_admin_user.nil?
+    
     admin_user = nil
     if !Caboose::User.exists?(:username => 'admin')
       admin_user = Caboose::User.create(:first_name => 'Admin', :last_name => 'User', :username => 'admin', :email => 'william@nine.is')
@@ -881,16 +889,19 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::User.create(:id => Caboose::User::LOGGED_OUT_USER_ID, :first_name => 'Logged', :last_name => 'Out', :username => 'elo', :email => 'elo@nine.is')
     end
 
+    Caboose::Role.create(:parent_id => -1           , :name => 'Super Admin'         ) if !Caboose::Role.exists?(:name =>  'Super Admin'         )
+    super_admin_role = Caboose::Role.where(:name => 'Super Admin'         ).first
     Caboose::Role.create(:parent_id => -1           , :name => 'Admin'               ) if !Caboose::Role.exists?(:name =>  'Admin'               )
-    admin_role  = Caboose::Role.where(:name => 'Admin'               ).first
+    admin_role       = Caboose::Role.where(:name => 'Admin'               ).first
     Caboose::Role.create(:parent_id => -1           , :name => 'Everyone Logged Out' ) if !Caboose::Role.exists?(:name =>  'Everyone Logged Out' )
-    elo_role    = Caboose::Role.where(:name => 'Everyone Logged Out' ).first
+    elo_role         = Caboose::Role.where(:name => 'Everyone Logged Out' ).first
     Caboose::Role.create(:parent_id => elo_role.id  , :name => 'Everyone Logged In'  ) if !Caboose::Role.exists?(:name =>  'Everyone Logged In'  )
-    eli_role    = Caboose::Role.where(:name => 'Everyone Logged In'  ).first
+    eli_role         = Caboose::Role.where(:name => 'Everyone Logged In'  ).first
 
     Caboose::User.create(:first_name => 'John', :last_name => 'Doe', :username => 'elo', :email => 'william@nine.is') if !Caboose::User.exists?(:username => 'elo')
     elo_user = Caboose::User.where(:username => 'elo').first
-
+        
+    Caboose::Permission.create(:resource => 'all'         , :action => 'super'  ) if !Caboose::Permission.exists?(:resource => 'all'	       , :action => 'super'  )
     Caboose::Permission.create(:resource => 'all'         , :action => 'all'    ) if !Caboose::Permission.exists?(:resource => 'all'	       , :action => 'all'    )
     Caboose::Permission.create(:resource => 'users'	      , :action => 'view'   ) if !Caboose::Permission.exists?(:resource => 'users'	     , :action => 'view'   )
     Caboose::Permission.create(:resource => 'users'	      , :action => 'edit'   ) if !Caboose::Permission.exists?(:resource => 'users'	     , :action => 'edit'   )
@@ -904,6 +915,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
     Caboose::Permission.create(:resource => 'permissions' , :action => 'edit'   ) if !Caboose::Permission.exists?(:resource => 'permissions' , :action => 'edit'   )
     Caboose::Permission.create(:resource => 'permissions' , :action => 'delete' ) if !Caboose::Permission.exists?(:resource => 'permissions' , :action => 'delete' )
     Caboose::Permission.create(:resource => 'permissions' , :action => 'add'    ) if !Caboose::Permission.exists?(:resource => 'permissions' , :action => 'add'    )
+    
+    # Add the super admin user to the super admin role
+    Caboose::RoleMembership.create(:user_id => super_admin_user.id, :role_id => super_admin_role.id) if !Caboose::RoleMembership.exists?(:user_id => super_admin_user.id, :role_id => super_admin_role.id)
 
     # Add the admin user to the admin role
     Caboose::RoleMembership.create(:user_id => admin_user.id, :role_id => admin_role.id) if !Caboose::RoleMembership.exists?(:user_id => admin_user.id, :role_id => admin_role.id)
@@ -911,9 +925,14 @@ class Caboose::Schema < Caboose::Utilities::Schema
     # Add the elo to the elo role
     Caboose::RoleMembership.create(:user_id => elo_user.id, :role_id => elo_role.id) if !Caboose::RoleMembership.exists?(:user_id => elo_user.id, :role_id => elo_role.id)
 
-    # Add the all/all permission to the admin role
+    # Add the all/super permission to the super admin role
+    super_admin_perm = Caboose::Permission.where(:resource => 'all', :action => 'super').first
+    Caboose::RolePermission.create(:role_id => super_admin_role.id, :permission_id => super_admin_perm.id) if !Caboose::RolePermission.exists?(:role_id => super_admin_role.id, :permission_id => super_admin_perm.id)
+    
+    # Add the all/all permission to the admin role and super admin role
     admin_perm = Caboose::Permission.where(:resource => 'all', :action => 'all').first
-    Caboose::RolePermission.create(:role_id => admin_role.id, :permission_id => admin_perm.id) if !Caboose::RolePermission.exists?(:role_id => admin_role.id, :permission_id => admin_perm.id)
+    Caboose::RolePermission.create(:role_id => admin_role.id       , :permission_id => admin_perm.id) if !Caboose::RolePermission.exists?(:role_id => admin_role.id       , :permission_id => admin_perm.id)
+    Caboose::RolePermission.create(:role_id => super_admin_role.id , :permission_id => admin_perm.id) if !Caboose::RolePermission.exists?(:role_id => super_admin_role.id , :permission_id => admin_perm.id)
 
     # Create the necessary pages
     Caboose::Page.create(:title => 'Home'  , :parent_id => -1, :hide => 0, :layout => 'home', :uri => '') if !Caboose::Page.exists?(:title => 'Home')

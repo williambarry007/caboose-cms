@@ -191,6 +191,14 @@ module Caboose
           BlockType.where("parent_id is null or parent_id = 0").reorder(:name).all.each do |bt|        
             admin_tree_options_helper(options, bt, '')         
           end
+        when 'layout'
+          options = []
+          cat_ids = BlockTypeCategory.layouts.collect{ |cat| cat.id }
+          q = ["block_type_category_id in (?)", cat_ids]
+          q = ["block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, params[:site_id]] if params[:site_id]                                                                
+          BlockType.includes(:block_type_site_memberships).where(q).reorder(:description).all.each do |bt|    
+            options << { 'value' => bt.id, 'text' => bt.description }
+          end    
       end        
       render :json => options
     end

@@ -472,6 +472,37 @@ module Caboose
       resp.success = save && page.save
       render json: resp
     end
+    
+    # GET /admin/pages/:page_id/duplicate
+    def admin_duplicate_form
+      return unless user_is_allowed('pages', 'add')
+      @page = Page.find(params[:id])      
+      render :layout => 'caboose/admin'      
+    end
+    
+    # POST /admin/pages/:page_id/duplicate
+    def admin_duplicate
+      return unless user_is_allowed('pages', 'add')
+      
+      resp = Caboose::StdClass.new
+      
+      p = Page.where(:id => params[:id]).first      
+      site_id              = params[:site_id]
+      parent_id            = params[:parent_id]
+      block_type_id        = params[:block_type_id]
+      child_block_type_id  = params[:child_block_type_id]
+      duplicate_children   = params[:duplicate_children] ? true : false
+      
+      if p.nil?            then resp.error = "Invalid page"
+      elsif site_id.nil?   then resp.error = "Invalid site"
+      elsif parent_id.nil? then resp.error = "Invalid parent"
+      else
+        resp.new_id = p.duplicate(site_id, parent_id, duplicate_children, block_type_id, child_block_type_id)
+        resp.success = true
+      end
+      
+      render :json => resp
+    end
       
     # GET /admin/pages/:page_id/delete
     def admin_delete_form
@@ -502,9 +533,16 @@ module Caboose
     # GET /admin/pages/sitemap-options
     def admin_sitemap_options
       parent_id = params[:parent_id]
-      p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
+      p = nil
+      if params[:site_id] && @site.is_master && user_is_allowed('admin', 'admin') 
+        p = parent_id ? Page.find(parent_id) : Page.index_page(params[:site_id].to_i)
+      else
+        p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
+      end
       options = []
-      sitemap_helper(p, options)     	  
+      if p
+        sitemap_helper(p, options)
+     	end
       render :json => options 		
     end
 

@@ -1041,6 +1041,5 @@ class Caboose::Schema < Caboose::Utilities::Schema
     if Caboose::ShippingMethod.all.count == 0
       Caboose::ShippingMethodLoader.load_shipping_methods
     end
-
   end
 end

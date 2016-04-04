@@ -35,7 +35,7 @@ module Caboose
     		  'use_url_params' => false
     	})
     	render :json => {
-    	  :pages => pager,
+    	  :pager => pager,
     	  :models => pager.items
     	}
     end

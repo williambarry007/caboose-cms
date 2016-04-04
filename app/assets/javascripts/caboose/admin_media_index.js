@@ -63,7 +63,7 @@ MediaController.prototype = {
 		    	key: that.cat_id + '_${filename}', // use filename as a key
 		    	Filename: that.cat_id + '_${filename}', // adding this to keep consistency across the runtimes
 		    	acl: 'public-read',
-		    	//'Content-Type': 'image/jpeg',
+          'Content-Type': '',
 		    	AWSAccessKeyId: that.aws_access_key_id,		
 		    	policy: that.policy,
 		    	signature: that.signature
@@ -77,6 +77,7 @@ MediaController.prototype = {
 		    silverlight_xap_url: '../../js/Moxie.xap', // Silverlight settings
         init: {
           BeforeUpload: function(up, file) {        
+            up.settings.multipart_params["Content-Type"] = file.type;
             $.ajax({
               url: '/admin/media/pre-upload',
               type: 'post',

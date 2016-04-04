@@ -24,7 +24,7 @@ module Caboose
           { "bucket" => bucket },          
           { "acl" => "public-read" },
           [ "starts-with", "$key", '' ],
-          #[ "starts-with", "$Content-Type", 'image/' ],          
+          [ "starts-with", "$Content-Type", "" ],
           [ 'starts-with', '$name', '' ], 	
           [ 'starts-with', '$Filename', '' ],          
         ]

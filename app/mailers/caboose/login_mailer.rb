@@ -3,12 +3,12 @@ module Caboose
 
     def forgot_password_email(user)
       @user = user
-      mail(:to => user.email, :subject => "#{Caboose::website_name} Forgot Password")
+      mail(:to => user.email, :subject => "#{user.site.name.capitalize} Forgot Password")
     end
 
     def locked_account(user)
       @user = user
-      mail(:to => user.email, :subject => "#{Caboose::website_name} Locked Account")
+      mail(:to => user.email, :subject => "#{user.site.name.capitalize} Locked Account")
     end    
 
   end

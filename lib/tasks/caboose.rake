@@ -2,7 +2,17 @@ require "caboose/version"
 require 'aws-sdk'
 
 namespace :caboose do
-        
+  
+  desc "Update super admin password"
+  task :update_superadmin_password => :environment do
+    sa = Caboose::User.where(:username => 'superadmin').first        
+    print "Enter a new password: "
+    sa.password = STDIN.noecho(&:gets).chomp
+    puts "\n\nThe password has been updated.\n\n"    
+    sa.password = Digest::SHA1.hexdigest(Caboose::salt + sa.password)
+    sa.save    
+  end
+          
   desc "Show all comment routes in controllers"  
   task :routes, [:arg1] => :environment do |t, args|    
     puts Caboose::CommentRoutes.controller_routes(args ? args.first : nil)        

@@ -337,6 +337,10 @@ class Caboose::Page < ActiveRecord::Base
     return true if pid == parent_id
     return self.is_child(parent_id, pid)
   end
+  
+  def is_child_of?(parent_id)
+    return Caboose::Page.is_child(parent_id, self.id)
+  end
 
   def linked_resources_map
     resources = { js: [], css: [] }
@@ -431,7 +435,7 @@ class Caboose::Page < ActiveRecord::Base
 
     self.block.duplicate_page_block(site_id, p.id, block_type_id)
         
-    if duplicate_children
+    if duplicate_children && !p.is_child_of?(self.id)
       self.children.each do |p2|
         p2.duplicate(site_id, p.id, duplicate_children, child_block_type_id, child_block_type_id)
       end

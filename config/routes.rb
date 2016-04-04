@@ -174,21 +174,23 @@ Caboose::Engine.routes.draw do
   # Users
   #=============================================================================
   
-  get     "/admin/users"                     => "users#index"  
-  get     "/admin/users/options"             => "users#options"
-  get     "/admin/users/new"                 => "users#new"
-  get     "/admin/users/import"              => "users#import_form"
-  post    "/admin/users/import"              => "users#import"  
+  get     "/admin/users"                     => "users#admin_index"
+  get     "/admin/users/json"                => "users#admin_json"        
+  get     "/admin/users/options"             => "users#admin_options"
+  get     "/admin/users/new"                 => "users#admin_new"
+  get     "/admin/users/import"              => "users#admin_import_form"
+  post    "/admin/users/import"              => "users#admin_import"
+  get     "/admin/users/:id/json"            => "users#admin_json_single"
   get     "/admin/users/:id/su/:token"       => "users#admin_su_token"
   get     "/admin/users/:id/su"              => "users#admin_su"
-  get     "/admin/users/:id/edit-password"   => "users#edit_password"
-  get     "/admin/users/:id"                 => "users#edit"  
-  put     "/admin/users/:id"                 => "users#update"
-  post    "/admin/users"                     => "users#create"
-  delete  "/admin/users/:id"                 => "users#destroy"
+  get     "/admin/users/:id/edit-password"   => "users#admin_edit_password"
+  get     "/admin/users/:id"                 => "users#admin_edit"  
+  put     "/admin/users/:id"                 => "users#admin_update"
+  post    "/admin/users"                     => "users#admin_add"
+  delete  "/admin/users/:id"                 => "users#admin_delete"
   
-  post    "/admin/users/:id/roles/:role_id"  => "users#add_to_role"  
-  delete  "/admin/users/:id/roles/:role_id"  => "users#remove_from_role"
+  post    "/admin/users/:id/roles/:role_id"  => "users#admin_add_to_role"  
+  delete  "/admin/users/:id/roles/:role_id"  => "users#admin_remove_from_role"
   
   #=============================================================================
   # Roles

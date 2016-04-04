@@ -681,6 +681,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :use_fonts               , :boolean     , { :default => true  }],
         [ :logo                    , :attachment ],        
         [ :is_master               , :boolean     , { :default => false }],
+        [ :allow_self_registration , :boolean     , { :default => false }],
         [ :analytics_id            , :string     ],        
         [ :use_retargeting         , :boolean     , { :default => false }],
         [ :date_js_updated         , :datetime   ],

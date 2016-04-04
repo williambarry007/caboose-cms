@@ -99,5 +99,24 @@ class Caboose::User < ActiveRecord::Base
     end
     return nil
   end
+  
+  def toggle_roles(role_id, value)            
+    if value.to_i > 0 # Add to role                   
+      if role_id == 'all'
+        Caboose::RoleMembership.where(:user_id => self.id).destroy_all      
+        Caboose::Role.where(:site_id => self.site_id).reorder(:name).all.each{ |r| RoleMembership.create(:user_id => self.id, :role_id => r.id) }                          
+      else
+        if !Caboose::RoleMembership.where(:user_id => self.id, :role_id => role_id.to_i).exists?
+          Caboose::RoleMembership.create( :user_id => self.id, :role_id => role_id.to_i)
+        end      
+      end
+    else # Remove from role    
+      if role_id == 'all'
+        Caboose::RoleMembership.where(:user_id => self.id).destroy_all                          
+      else
+        Caboose::RoleMembership.where(:user_id => self.id, :role_id => role_id.to_i).destroy_all      
+      end
+    end
+  end
 
 end

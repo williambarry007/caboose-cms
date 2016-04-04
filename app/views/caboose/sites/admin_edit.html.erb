@@ -13,6 +13,7 @@ user_ids = [] if user_ids.nil?
 <p><div id='site_<%= @site.id %>_under_construction_html' ></div></p>
 <p><div id='site_<%= @site.id %>_use_store'               ></div></p>
 <p><div id='site_<%= @site.id %>_use_fonts'               ></div></p>
+<p><div id='site_<%= @site.id %>_allow_self_registration' ></div></p>
 <p><div id='site_<%= @site.id %>_default_layout_id'       ></div></p>
 
 <h2>Domains</h2>
@@ -71,13 +72,14 @@ $(document).ready(function() {
     update_url: '/admin/sites/<%= @site.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'logo'                    , nice_name: 'Logo'                     , type: 'image'    , value: <%= raw Caboose.json(@site.logo ? @site.logo.url(:thumb) : '') %>, width: 400, update_url: '/admin/sites/<%= @site.id %>/logo' },
-      { name: 'name'                    , nice_name: 'Name'                     , type: 'text'     , value: <%= raw Caboose.json(@site.name)                     %>, width: 400 },
-      { name: 'description'             , nice_name: 'Description'              , type: 'textarea' , value: <%= raw Caboose.json(@site.description)              %>, width: 600, height: 75 },
-      { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html)  %>, width: 600, height: 75 },
-      { name: 'use_store'               , nice_name: 'Enable Store'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_store ? true : false) %>, width: 400 },
-      { name: 'use_fonts'               , nice_name: 'Enable Fonts'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_fonts ? true : false) %>, width: 400 },
-      { name: 'default_layout_id'       , nice_name: 'Default Layout'           , type: 'select'   , value: <%= raw Caboose.json(@site.default_layout_id)        %>, width: 600, options_url: "/admin/sites/<%= @site.id %>/default-layout-options" }      
+      { name: 'logo'                    , nice_name: 'Logo'                     , type: 'image'    , value: <%= raw Caboose.json(@site.logo ? @site.logo.url(:thumb) : '')     %>, width: 400, update_url: '/admin/sites/<%= @site.id %>/logo' },
+      { name: 'name'                    , nice_name: 'Name'                     , type: 'text'     , value: <%= raw Caboose.json(@site.name)                                   %>, width: 400 },
+      { name: 'description'             , nice_name: 'Description'              , type: 'textarea' , value: <%= raw Caboose.json(@site.description)                            %>, width: 600, height: 75 },
+      { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html)                %>, width: 600, height: 75 },
+      { name: 'use_store'               , nice_name: 'Enable Store'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_store               ? true : false) %>, width: 400 },
+      { name: 'use_fonts'               , nice_name: 'Enable Fonts'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_fonts               ? true : false) %>, width: 400 },
+      { name: 'allow_self_registration' , nice_name: 'Allow Self Registration'  , type: 'checkbox' , value: <%= raw Caboose.json(@site.allow_self_registration ? true : false) %>, width: 400 },
+      { name: 'default_layout_id'       , nice_name: 'Default Layout'           , type: 'select'   , value: <%= raw Caboose.json(@site.default_layout_id)                      %>, width: 600, options_url: "/admin/sites/<%= @site.id %>/default-layout-options" }      
     ]    
   });       
 });

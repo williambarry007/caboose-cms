@@ -5,8 +5,9 @@
   <p><div id='user_<%= @user.id %>_last_name'  ></div></p>
   <p><div id='user_<%= @user.id %>_email'      ></div></p>
   <p><div id='user_<%= @user.id %>_phone'      ></div></p>
-  <div id='message'></div>
+  <div id='message2'></div>
   <p>
+    <input type='button' value='Reset Password' class='btn' onclick="reset_user_password();" />
   <% if @site.use_store %>
     <input type='button' value='Order History' class='btn' onclick="window.location='/my-account/orders';" />
   <% end %>
@@ -37,6 +38,46 @@ $(document).ready(function() {
     }
   });  
 });
+
+function reset_user_password(pass1, pass2)
+{
+  if (!pass1)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append("Please enter your password:<br /><br />")
+      .append($('<input/>').attr('type', 'password').attr('id', 'pass1').css('width', '200px')).append(' ')
+      .append($('<input/>').attr('type', 'button').val('Continue').click(function(e) { reset_user_password($('#pass1').val()); }))
+      .append("<br /><br />Passwords must be 8 characters long.");
+    $('#message2').empty().append(p);
+    return;    
+  }
+  if (!pass2)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append("Please enter it again to confirm:<br /><br />")
+      .append($('<input/>').attr('type', 'password').attr('id', 'pass2').css('width', '200px')).append(' ')
+      .append($('<input/>').attr('type', 'button').val('Continue').click(function(e) { reset_user_password(pass1, $('#pass2').val()); }))
+      .append("<br /><br />Passwords must be 8 characters long.");      
+    $('#message2').empty().append(p);
+    return;    
+  }
+  $('#message2').html("<p class='loading'>Setting password...</p>");
+  $.ajax({
+    url: '/my-account',
+    type: 'put',
+    data: {
+      password: pass1,
+      confirm: pass2
+    },
+    success: function(resp) {
+      if (resp.error) $('#message2').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.success) {
+        $('#message2').html("<p class='note success'>The password has been successfully updated.</p>");
+        setTimeout(function() { $('#message2').empty(); }, 3000);
+      }
+    }      
+  });  
+}
 
 </script>
 <% end %>

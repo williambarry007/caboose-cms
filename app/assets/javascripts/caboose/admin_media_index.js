@@ -63,7 +63,7 @@ MediaController.prototype = {
 		    	key: that.cat_id + '_${filename}', // use filename as a key
 		    	Filename: that.cat_id + '_${filename}', // adding this to keep consistency across the runtimes
 		    	acl: 'public-read',
-          'Content-Type': '',
+          //'Content-Type': '',
 		    	AWSAccessKeyId: that.aws_access_key_id,		
 		    	policy: that.policy,
 		    	signature: that.signature

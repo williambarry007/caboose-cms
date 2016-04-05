@@ -74,6 +74,33 @@ class Caboose::Media < ActiveRecord::Base
          
   end
   
+  def set_image_content_type(content_type)
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]    
+    AWS.config({ 
+      :access_key_id => config['access_key_id'],
+      :secret_access_key => config['secret_access_key']  
+    })
+    bucket = config['bucket']
+    ext = File.extname(self.image_file_name)[1..-1]
+    self.image.styles.each do |style|
+      k = "media/#{self.id}_#{self.name}_#{style}.#{ext}"
+      bucket.objects[k].copy_from(k, :content_type => content_type) # a copy needs to be done to change the content-type
+    end
+  end
+  
+  def set_file_content_type(content_type)
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]    
+    AWS.config({ 
+      :access_key_id => config['access_key_id'],
+      :secret_access_key => config['secret_access_key']  
+    })
+    bucket = config['bucket']
+    ext = File.extname(self.image_file_name)[1..-1]
+    has_attached_file :file, :path => ':caboose_prefixmedia/:id_:media_name.:extension'
+    k = "media/#{self.id}_#{self.name}.#{ext}"
+    bucket.objects[k].copy_from(k, :content_type => content_type) # a copy needs to be done to change the content-type    
+  end
+  
   def download_image_from_url(url)
     self.image = URI.parse(url)
     self.processed = true

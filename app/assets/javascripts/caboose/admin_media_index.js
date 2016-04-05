@@ -77,7 +77,7 @@ MediaController.prototype = {
 		    silverlight_xap_url: '../../js/Moxie.xap', // Silverlight settings
         init: {
           BeforeUpload: function(up, file) {        
-            up.settings.multipart_params["Content-Type"] = file.type;
+            //up.settings.multipart_params["Content-Type"] = file.type;
             $.ajax({
               url: '/admin/media/pre-upload',
               type: 'post',

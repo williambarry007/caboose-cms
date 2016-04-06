@@ -52,17 +52,19 @@ class Caboose::Media < ActiveRecord::Base
 
     content_type = self.image_content_type || self.file_content_type
 
-    if self.image_content_type
+    if is_image?
       self.image = URI.parse(uri)
       self.image_content_type = content_type
-      self.processed = true
-      self.save
     else
       self.file = URI.parse(uri)
       self.file_content_type = content_type
-      self.processed = true
-      self.save
-      set_file_content_type(content_type)
+    end
+    self.processed = true
+    self.save
+
+    # Set the content-type metadata on S3
+    if !is_image?
+      self.set_file_content_type(content_type)
     end
 
     # Remember when the last upload processing happened

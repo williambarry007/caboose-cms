@@ -83,7 +83,8 @@ MediaController.prototype = {
               type: 'post',
               data: {
                 media_category_id: that.cat_id,
-                name: file.name 
+                name: file.name,
+                file_type: file.type
               },
               success: function(resp) {},
               async: false          

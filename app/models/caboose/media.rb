@@ -24,7 +24,9 @@ class Caboose::Media < ActiveRecord::Base
     :name,
     :original_name,
     :description, 
-    :processed
+    :processed,
+    :image_content_type,
+    :file_content_type
     
    has_attached_file :sample
    
@@ -47,20 +49,22 @@ class Caboose::Media < ActiveRecord::Base
     key = "#{self.media_category_id}_#{self.original_name}"    
     key = URI.encode(key.gsub(' ', '+'))    
     uri = "http://#{bucket}.s3.amazonaws.com/#{key}"    
-    
-    image_extensions = ['.jpg', '.jpeg', '.gif', '.png', '.tif']
-    ext = File.extname(key).downcase
-    mimetype = Caboose::Mimetype.mimetype_for_extension(ext)        
-    if image_extensions.include?(ext)    
+
+    content_type = self.image_content_type || self.file_content_type
+
+    if self.image_content_type
       self.image = URI.parse(uri)
-      self.image_content_type = mimetype if mimetype
+      self.image_content_type = content_type
+      self.processed = true
+      self.save
     else
       self.file = URI.parse(uri)
-      self.file_content_type = mimetype if mimetype      
-    end    
-    self.processed = true
-    self.save
-    
+      self.file_content_type = content_type
+      self.processed = true
+      self.save
+      set_file_content_type(content_type)
+    end
+
     # Remember when the last upload processing happened
     s = Caboose::Setting.where(:site_id => self.media_category.site_id, :name => 'last_upload_processed').first
     s = Caboose::Setting.create(:site_id => self.media_category.site_id, :name => 'last_upload_processed') if s.nil?
@@ -80,7 +84,8 @@ class Caboose::Media < ActiveRecord::Base
       :access_key_id => config['access_key_id'],
       :secret_access_key => config['secret_access_key']  
     })
-    bucket = config['bucket']
+    s3 = AWS::S3.new
+    bucket = s3.buckets[config['bucket']]
     ext = File.extname(self.image_file_name)[1..-1]
     self.image.styles.each do |style|
       k = "media/#{self.id}_#{self.name}_#{style}.#{ext}"
@@ -94,9 +99,10 @@ class Caboose::Media < ActiveRecord::Base
       :access_key_id => config['access_key_id'],
       :secret_access_key => config['secret_access_key']  
     })
-    bucket = config['bucket']
-    ext = File.extname(self.image_file_name)[1..-1]
-    has_attached_file :file, :path => ':caboose_prefixmedia/:id_:media_name.:extension'
+    s3 = AWS::S3.new
+    bucket = s3.buckets[config['bucket']]
+    ext = File.extname(self.file_file_name)[1..-1]
+    # has_attached_file :file, :path => ':caboose_prefixmedia/:id_:media_name.:extension'
     k = "media/#{self.id}_#{self.name}.#{ext}"
     bucket.objects[k].copy_from(k, :content_type => content_type) # a copy needs to be done to change the content-type    
   end

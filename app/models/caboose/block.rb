@@ -276,17 +276,41 @@ class Caboose::Block < ActiveRecord::Base
     return erb.result(locals.instance_eval { binding })
   end
   
-  def partial(name, options)    
-    defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil }
-    options2 = nil
+  def partial(name, options)
+    defaults = {
+      :view => nil,
+      :controller_view_content => nil,
+      :modal => false,
+      :empty_text => '',
+      :editing => false,
+      :css => nil,
+      :js => nil,
+      :csrf_meta_tags => nil,
+      :csrf_meta_tags2 => nil,    
+      :logged_in_user => nil
+    }
+    options2 = nil        
     if options.is_a?(Hash)
       options2 = defaults.merge(options)
     else
-      options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }        
+      #options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }
+      options2 = {
+        :view                    => options.view                    ? options.view                    : nil,
+        :controller_view_content => options.controller_view_content ? options.controller_view_content : nil,
+        :modal                   => options.modal                   ? options.modal                   : nil,
+        :empty_text              => options.empty_text              ? options.empty_text              : nil,
+        :editing                 => options.editing                 ? options.editing                 : nil,
+        :css                     => options.css                     ? options.css                     : nil,
+        :js                      => options.js                      ? options.js                      : nil,
+        :csrf_meta_tags          => options.csrf_meta_tags          ? options.csrf_meta_tags          : nil,
+        :csrf_meta_tags2         => options.csrf_meta_tags2         ? options.csrf_meta_tags2         : nil,
+        :logged_in_user          => options.logged_in_user          ? options.logged_in_user          : nil
+      }
     end
-    options2[:block] = self
+    options2[:block] = block
     
-    view = ActionView::Base.new(ActionController::Base.view_paths)
+    view = options2[:view]     
+    view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?        
     site = options[:site]
     
     begin

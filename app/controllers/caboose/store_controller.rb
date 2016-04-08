@@ -63,6 +63,8 @@ module Caboose
           when 'pp_password'               then sc.pp_password               = value
           when 'pp_testing'                then sc.pp_testing                = value
           when 'pp_relay_domain'           then sc.pp_relay_domain           = value
+          when 'stripe_secret_key'         then sc.stripe_secret_key         = value
+          when 'stripe_publishable_key'    then sc.stripe_publishable_key    = value
           when 'ups_username'              then sc.ups_username              = value
           when 'ups_password'              then sc.ups_password              = value
           when 'ups_key'                   then sc.ups_key                   = value

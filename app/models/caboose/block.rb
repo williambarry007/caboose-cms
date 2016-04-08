@@ -307,7 +307,7 @@ class Caboose::Block < ActiveRecord::Base
         :logged_in_user          => options.logged_in_user          ? options.logged_in_user          : nil
       }
     end
-    options2[:block] = block
+    options2[:block] = self
     
     view = options2[:view]     
     view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?        

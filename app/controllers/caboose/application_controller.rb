@@ -37,7 +37,7 @@ module Caboose
       AbTesting.init(request.session_options[:id]) if Caboose.use_ab_testing            
       
       # Try to find the page
-      @request = request
+      @request = request      
       @page = Page.new
       @crumbtrail = Crumbtrail.new      
       @subnav       = {}

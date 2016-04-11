@@ -144,7 +144,9 @@ module Caboose
           if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)
           #  Caboose.log("image path: #{li.variant.product.product_images.first.url(:tiny)}")
           #  image = ""
-            image = open("#{li.variant.product.product_images.first.url(:tiny)}")
+            url = li.variant.product.product_images.first.url(:tiny)
+            url = "http:#{url}" if url.starts_with?('//')
+            image = open(url)
           else
             image = ""
           end
@@ -179,8 +181,10 @@ module Caboose
         if li.variant.product.option3 && li.variant.option3 then options += li.variant.product.option3 + ": " + li.variant.option3 + "\n" end
         if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)
        #   Caboose.log("image path: #{li.variant.product.product_images.first.url(:tiny)}")
-       #   image = ""
-          image = open("#{li.variant.product.product_images.first.url(:tiny)}")
+       #   image = ""          
+          url = li.variant.product.product_images.first.url(:tiny)          
+          url = "http:#{url}" if url.starts_with?('//')
+          image = open(url)
         else
           image = ""
         end

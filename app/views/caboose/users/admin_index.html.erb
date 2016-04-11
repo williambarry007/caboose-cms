@@ -27,7 +27,13 @@ $(document).ready(function() {
     new_model_text: 'New User',
     no_models_text: 'There are no users right now.',
     new_model_fields: [
-      { name: 'email', nice_name: 'Email', type: 'text', width: 400 }      
+      { name: 'email', nice_name: 'Email', type: 'text', width: 400 }                 
+    ],
+    search_fields: [          
+      { name: 'first_name_like' , nice_name: 'First name' , type: 'text', width: 400 },
+      { name: 'last_name_like'  , nice_name: 'Last name'  , type: 'text', width: 400 },
+      { name: 'username_like'   , nice_name: 'Username'   , type: 'text', width: 400 },
+      { name: 'email_like'      , nice_name: 'Email'      , type: 'text', width: 400 }
     ],
     bulk_import_fields: ['email'],
     bulk_import_url: '/admin/users/bulk'

@@ -87,18 +87,17 @@ module Caboose
           return
         end
       end
-      
-      store_config = @site.store_config
-      case store_config.pp_name
-        when 'authorize.net'
-          
-          sc = @site.store_config
+            
+      sc = @site.store_config
+      case sc.pp_name
+        when StoreConfig::PAYMENT_PROCESSOR_AUTHORIZENET
+                    
           @sim_transaction = AuthorizeNet::SIM::Transaction.new(
             sc.authnet_api_login_id, 
             sc.authnet_api_transaction_key, 
-            @order.total,            
-            #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
+            @order.total,
             :relay_response => 'TRUE',
+            #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
             #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay",
             :relay_url => "#{sc.authnet_relay_domain}/checkout/authnet-relay",
             :transaction_type => 'AUTH_ONLY',                        
@@ -106,14 +105,22 @@ module Caboose
           )
           @request = request
           @show_relay = params[:show_relay] && params[:show_relay].to_i == 1
+                  
+        when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+                    
+          Stripe.api_key = sc.stripe_secret_key
+          token = params[:stripeToken]
           
-        when 'payscape'
-          @form_url = Caboose::PaymentProcessor.form_url(@order)
       end
       @logged_in_user = logged_in_user      
       add_ga_event('Ecommerce', 'Checkout', 'Payment Form')
     end
         
+    # Step 5 - Stripe Payment Form
+    # POST /checkout/stripe-payment
+    #def stripe_payment
+    #end
+      
     # GET /checkout/confirm
     def confirm_without_payment
       redirect_to '/checkout'           and return if !logged_in?

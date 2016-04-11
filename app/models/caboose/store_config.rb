@@ -52,6 +52,9 @@ module Caboose
     WEIGHT_UNIT_IMPERIAL = 'oz'
     LENGTH_UNIT_METRIC   = 'cm'
     LENGTH_UNIT_IMPERIAL = 'in'
+    
+    PAYMENT_PROCESSOR_AUTHORIZENET
+    PAYMENT_PROCESSOR_STRIPE
       
     def next_order_number
       x = Order.where("order_number is not null").reorder("order_number desc").limit(1).first

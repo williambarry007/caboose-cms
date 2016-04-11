@@ -94,13 +94,13 @@ module Caboose
           
           sc = @site.store_config
           @sim_transaction = AuthorizeNet::SIM::Transaction.new(
-            sc.pp_username, 
-            sc.pp_password, 
+            sc.authnet_api_login_id, 
+            sc.authnet_api_transaction_key, 
             @order.total,            
             #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
             :relay_response => 'TRUE',
             #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay",
-            :relay_url => "#{sc.pp_relay_domain}/checkout/authnet-relay",
+            :relay_url => "#{sc.authnet_relay_domain}/checkout/authnet-relay",
             :transaction_type => 'AUTH_ONLY',                        
             :test => sc.pp_testing
           )

@@ -43,7 +43,7 @@ module Caboose
       return if ot.nil?        
       case sc.pp_name
         when 'authorize.net'
-          t = AuthorizeNet::Reporting::Transaction.new(sc.pp_username, sc.pp_password)
+          t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
           resp = t.get_transaction_details(ot.transaction_id)
           t2 = resp.transaction
           if t2

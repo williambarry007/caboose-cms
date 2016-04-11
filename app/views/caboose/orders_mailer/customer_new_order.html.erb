@@ -51,7 +51,7 @@
       <td>
         <% if v.downloadable %>
           <p>This item is downloadable.</p>          
-          <p><a href='<%= @order.site.store_config.pp_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>        
+          <p><a href='<%= @order.site.store_config.authnet_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>        
         <% else %>
           Not assigned to a package
         <% end %>

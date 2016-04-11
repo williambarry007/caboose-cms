@@ -19,7 +19,7 @@ class Caboose::PaymentProcessors::Authorizenet < Caboose::PaymentProcessors::Bas
   def self.void(order)
     sc = order.site.store_config
     response = AuthorizeNet::SIM::Transaction.new(
-      sc.pp_username, sc.pp_password, order.total,
+      sc.authnet_api_login_id, sc.authnet_api_transaction_key, order.total,
       :transaction_type => 'VOID',
       :transaction_id => order.transaction_id
     )    
@@ -29,7 +29,7 @@ class Caboose::PaymentProcessors::Authorizenet < Caboose::PaymentProcessors::Bas
   def self.capture(order)
     sc = order.site.store_config
     response = AuthorizeNet::SIM::Transaction.new(
-      sc.pp_username, sc.pp_password, order.total,
+      sc.authnet_api_login_id, sc.authnet_api_transaction_key, order.total,
       :transaction_type => 'CAPTURE_ONLY',
       :transaction_id => order.transaction_id
     )    
@@ -39,7 +39,7 @@ class Caboose::PaymentProcessors::Authorizenet < Caboose::PaymentProcessors::Bas
   def self.refund(order)
     sc = order.site.store_config
     response = AuthorizeNet::SIM::Transaction.new(
-      sc.pp_username, sc.pp_password, order.total,
+      sc.authnet_api_login_id, sc.authnet_api_transaction_key, order.total,
       :transaction_type => 'CREDIT',
       :transaction_id => order.transaction_id
     )    

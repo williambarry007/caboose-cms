@@ -81,7 +81,7 @@
   str = b.render(b, options) if str.nil?
         
   protocol = request.protocol
-  protocol = Caboose.plugin_hook('request_protocol', protocol, request)
+  #protocol = Caboose.plugin_hook('request_protocol', protocol, request)
   
   css = yield(:css)
   css.gsub!("<link href=\"//", "<link href=\"#{protocol}")

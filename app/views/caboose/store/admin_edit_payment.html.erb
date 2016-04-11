@@ -4,10 +4,16 @@ sc = @store_config
 <%= render :partial => 'caboose/store/admin_header' %>
 
 <p><div id='storeconfig_<%= sc.id %>_pp_name'                  ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_pp_username'              ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_pp_password'              ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_pp_relay_domain'          ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_pp_testing'               ></div></p>
+
+<h2>Authorize.net</h2>
+<p><div id='storeconfig_<%= sc.id %>_authnet_api_login_id'        ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_authnet_api_transaction_key' ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_authnet_relay_domain'        ></div></p>
+
+<h2>Stripe</h2>
+<p><div id='storeconfig_<%= sc.id %>_stripe_secret_key'           ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_stripe_publishable_key'      ></div></p>
 
 <%= render :partial => 'caboose/store/admin_footer' %>
 
@@ -22,11 +28,13 @@ $(document).ready(function() {
     update_url: '/admin/store',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'pp_name'                  , nice_name: 'Type'                              , type: 'select'   , value: <%= raw Caboose.json(sc.pp_name                    ) %>, width: 400 , options_url: '/admin/store/payment-processor-options' },
-      { name: 'pp_username'              , nice_name: 'Username'                          , type: 'text'     , value: <%= raw Caboose.json(sc.pp_username                ) %>, width: 400 },
-      { name: 'pp_password'              , nice_name: 'Password'                          , type: 'text'     , value: <%= raw Caboose.json(sc.pp_password                ) %>, width: 400 },
-      { name: 'pp_relay_domain'          , nice_name: 'Relay Domain'                      , type: 'text'     , value: <%= raw Caboose.json(sc.pp_relay_domain            ) %>, width: 400 },
-      { name: 'pp_testing'               , nice_name: 'Test Mode'                         , type: 'checkbox' , value: <%= raw Caboose.json(sc.pp_testing ? 1 : 0         ) %>, width: 400 }
+      { name: 'pp_name'                     , nice_name: 'Type'                 , type: 'select'   , value: <%= raw Caboose.json(sc.pp_name                     ) %>, width: 400 , options_url: '/admin/store/payment-processor-options' },
+      { name: 'pp_testing'                  , nice_name: 'Test Mode'            , type: 'checkbox' , value: <%= raw Caboose.json(sc.pp_testing ? 1 : 0          ) %>, width: 400 },
+      { name: 'authnet_api_login_id'        , nice_name: 'API Login ID'         , type: 'text'     , value: <%= raw Caboose.json(sc.authnet_api_login_id        ) %>, width: 400 },
+      { name: 'authnet_api_transaction_key' , nice_name: 'API Transaction Key'  , type: 'text'     , value: <%= raw Caboose.json(sc.authnet_api_transaction_key ) %>, width: 400 },
+      { name: 'authnet_relay_domain'        , nice_name: 'Relay Domain'         , type: 'text'     , value: <%= raw Caboose.json(sc.authnet_relay_domain        ) %>, width: 400 },
+      { name: 'stripe_secret_key'           , nice_name: 'Secret Key'           , type: 'text'     , value: <%= raw Caboose.json(sc.stripe_secret_key           ) %>, width: 400 },
+      { name: 'stripe_publishable_key'      , nice_name: 'Publishable Key'      , type: 'text'     , value: <%= raw Caboose.json(sc.stripe_publishable_key      ) %>, width: 400 }      
     ]    
   });
                                                                                                                                                                                     

@@ -277,7 +277,7 @@ module Caboose
         
         case sc.pp_name
           when 'authorize.net'
-            transaction = AuthorizeNet::AIM::Transaction.new(sc.pp_username, sc.pp_password)
+            transaction = AuthorizeNet::AIM::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
             response = transaction.prior_auth_capture(t.transaction_id, self.total)
             
             ot.success        = response.response_code && response.response_code == '1'            
@@ -330,8 +330,8 @@ module Caboose
         case sc.pp_name
           when 'authorize.net'            
             response = AuthorizeNet::SIM::Transaction.new(
-              sc.pp_username, 
-              sc.pp_password,                      
+              sc.authnet_api_login_id, 
+              sc.authnet_api_transaction_key,                      
               self.total,
               :transaction_type => OrderTransaction::TYPE_VOID,
               :transaction_id => t.transaction_id,

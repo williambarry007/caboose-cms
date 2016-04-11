@@ -5,11 +5,11 @@ module Caboose
     belongs_to :site    
     attr_accessible :id,
       :site_id,            
-      :pp_name,     
-      :pp_username,
-      :pp_password,
+      :pp_name,
       :pp_testing,
-      :pp_relay_url,
+      :authnet_api_login_id,        # pp_username
+      :authnet_api_transaction_key, # pp_password      
+      :authnet_relay_url,           # pp_relay_url
       :stripe_secret_key,
       :stripe_publishable_key,
       :ups_username,

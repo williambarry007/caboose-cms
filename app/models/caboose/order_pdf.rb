@@ -46,7 +46,7 @@ module Caboose
         when 'authorize.net'
           
           if ot 
-            t = AuthorizeNet::Reporting::Transaction.new(sc.pp_username, sc.pp_password)
+            t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
             resp = t.get_transaction_details(ot.transaction_id)
             t2 = resp.transaction
             if t2
@@ -143,7 +143,9 @@ module Caboose
           if li.variant.product.option2 && li.variant.option2 then options += li.variant.product.option2 + ": " + li.variant.option2 + "\n" end
           if li.variant.product.option3 && li.variant.option3 then options += li.variant.product.option3 + ": " + li.variant.option3 + "\n" end
           if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)
-            image = open("#{li.variant.product.product_images.first.url(:tiny)}")
+            url = li.variant.product.product_images.first.url(:tiny)
+            url = "http:#{url}" if url.starts_with?('//')
+            image = open(url)
           else
             image = ""
           end
@@ -176,8 +178,10 @@ module Caboose
         if li.variant.product.option1 && li.variant.option1 then options += li.variant.product.option1 + ": " + li.variant.option1 + "\n" end
         if li.variant.product.option2 && li.variant.option2 then options += li.variant.product.option2 + ": " + li.variant.option2 + "\n" end
         if li.variant.product.option3 && li.variant.option3 then options += li.variant.product.option3 + ": " + li.variant.option3 + "\n" end
-        if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)
-          image = open("#{li.variant.product.product_images.first.url(:tiny)}")
+        if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)          
+          url = li.variant.product.product_images.first.url(:tiny)
+          url = "http:#{url}" if url.starts_with?('//')
+          image = open(url)                      
         else
           image = ""
         end

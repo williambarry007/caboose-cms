@@ -90,7 +90,7 @@ module Caboose
             
       sc = @site.store_config
       case sc.pp_name
-        when StoreConfig::PAYMENT_PROCESSOR_AUTHORIZENET
+        when 'authorize.net'
                     
           @sim_transaction = AuthorizeNet::SIM::Transaction.new(
             sc.authnet_api_login_id, 
@@ -106,7 +106,7 @@ module Caboose
           @request = request
           @show_relay = params[:show_relay] && params[:show_relay].to_i == 1
                   
-        when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+        when 'stripe'
                     
           Stripe.api_key = sc.stripe_secret_key
           token = params[:stripeToken]

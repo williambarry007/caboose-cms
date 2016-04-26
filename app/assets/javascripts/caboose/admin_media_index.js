@@ -63,7 +63,7 @@ MediaController.prototype = {
 		    	key: that.cat_id + '_${filename}', // use filename as a key
 		    	Filename: that.cat_id + '_${filename}', // adding this to keep consistency across the runtimes
 		    	acl: 'public-read',
-		    	//'Content-Type': 'image/jpeg',
+          //'Content-Type': '',
 		    	AWSAccessKeyId: that.aws_access_key_id,		
 		    	policy: that.policy,
 		    	signature: that.signature
@@ -77,12 +77,14 @@ MediaController.prototype = {
 		    silverlight_xap_url: '../../js/Moxie.xap', // Silverlight settings
         init: {
           BeforeUpload: function(up, file) {        
+            //up.settings.multipart_params["Content-Type"] = file.type;
             $.ajax({
               url: '/admin/media/pre-upload',
               type: 'post',
               data: {
                 media_category_id: that.cat_id,
-                name: file.name 
+                name: file.name,
+                file_type: file.type
               },
               success: function(resp) {},
               async: false          
@@ -275,16 +277,10 @@ MediaController.prototype = {
         }                                  
         if (that.selected_media.indexOf(m.id) > -1)
           li.addClass('selected ui-selected');
-        if (that.allow_edit && m.image_urls) {
-          li.append($("<a/>")
-            .html("Edit Image")
-            .click(function() { that.edit_image($(this).parent().data('media_id')); })
-          );
-        }
-        if ( m.image_urls )
-          li.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
-        else
-          li.append($("<a/>").addClass("dl").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
+        if (that.allow_edit && m.image_urls) li.append($("<a/>").html("Edit Image").click(function() { that.edit_image($(this).parent().data('media_id')); }));
+        else                                 li.append($("<a/>").attr('href', m.file_url).html("Direct URL"));
+        if ( m.image_urls )                  li.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
+        else                                 li.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
         ul.append(li);
       });
     }
@@ -504,16 +500,22 @@ MediaController.prototype = {
     return m;
   },
 
-  download_image: function(media_id) {
+  download_image: function(media_id) {    
+    var that = this;
+    url = that.download_url(media_id);        
+    window.open(url);     
+  },
+  
+  download_url: function(media_id) {
     var that = this;
     var m = that.media_with_id(media_id);
     var url = '';
     if ( m.image_urls )
       url = m.image_urls.original_url;
     else
-      url = m.file_url
-    window.open(url);
-  }, 
+      url = m.file_url;
+    return url;     
+  },
   
   //============================================================================
   // Aviary

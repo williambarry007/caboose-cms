@@ -5,9 +5,60 @@ p = @product
 <%= render :partial => 'caboose/products/admin_header' %>
 
 <div id='options'>
-<% if p.option1 %><div id='option1_container'><h2><%= p.option1 %></h2><ul id='option1'><% p.option1_values.each do |option| %><li id='values_<%= option %>'><%= option %></li><% end %></ul></div><% end %>
-<% if p.option2 %><div id='option2_container'><h2><%= p.option2 %></h2><ul id='option2'><% p.option2_values.each do |option| %><li id='values_<%= option %>'><%= option %></li><% end %></ul></div><% end %>
-<% if p.option3 %><div id='option3_container'><h2><%= p.option3 %></h2><ul id='option3'><% p.option3_values.each do |option| %><li id='values_<%= option %>'><%= option %></li><% end %></ul></div><% end %>
+  <% if p.option1 %>
+    <div id='option1_container'>
+      <h2><%= p.option1 %></h2>
+      <ul id='option1'>
+        <% p.option1_values_with_media.each do |option, m| %>
+          <li id='values_<%= option %>'>
+            <span class='option_value'><%= option %><span>
+            <% if p.option1_media %>            
+              <div class='media' onclick="caboose_modal_url('/admin/products/<%= @product.id %>/variants/option1-media?option_value=<%= option %>');">
+                <% if m %><img src='<%= m.image.url(:tiny) %>' /><% else %>Edit Image<% end %>              
+              </div>
+            <% end %>
+            <div class='spacer'></div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <% if p.option2 %>
+    <div id='option2_container'>
+      <h2><%= p.option2 %></h2>
+      <ul id='option2'>
+        <% p.option2_values_with_media.each do |option, m| %>
+          <li id='values_<%= option %>'>
+            <span class='option_value'><%= option %><span>
+            <% if p.option2_media %>            
+              <div class='media' onclick="caboose_modal_url('/admin/products/<%= @product.id %>/variants/option2-media?option_value=<%= option %>');">
+                <% if m %><img src='<%= m.image.url(:tiny) %>' /><% else %>Edit Image<% end %>
+              </div>
+            <% end %>
+            <div class='spacer'></div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <% if p.option3 %>
+    <div id='option3_container'>
+      <h2><%= p.option3 %></h2>
+      <ul id='option3'>
+        <% p.option3_values_with_media.each do |option, m| %>
+          <li id='values_<%= option %>'>
+            <span class='option_value'><%= option %><span>
+            <% if p.option3_media %>            
+              <div class='media' onclick="caboose_modal_url('/admin/products/<%= @product.id %>/variants/option3-media?option_value=<%= option %>');">
+                <% if m %><img src='<%= m.image.url(:tiny) %>' /><% else %>Edit Image<% end %>              
+              </div>
+            <% end %>
+            <div class='spacer'></div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 </div>                                                               
 
 <div id='message'></div>
@@ -17,8 +68,11 @@ p = @product
 <% content_for :caboose_css do %>
 <style type='text/css'>
 #options div { width: 33%; float: left; }
+#options div.media { width: 100px; float: right; }
+#options div.media img { width: 100px; }
+#options div.spacer { width: auto; float: none; clear: both; }
 #options ul { margin: 0 10px 0 0; padding: 0; list-style: none; }
-#options li { margin: 0; padding: 4px 8px; list-style: none; border: #ccc 1px solid; }
+#options li { margin: 0; padding: 4px 8px; list-style: none; border: #ccc 1px solid; clear: right; }
 #message { clear: left; }
 </style>
 <% end %>

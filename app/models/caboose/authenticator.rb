@@ -6,8 +6,13 @@ module Caboose
       resp = StdClass.new        
       pass = Digest::SHA1.hexdigest(Caboose::salt + password)
       
-      user = User.where(:username => username, :site_id => site.id).first
-      user = User.where(:email    => username, :site_id => site.id).first if user.nil?
+      user = nil
+      if username == 'superadmin'
+        user = User.where(:username => username).first        
+      else
+        user = User.where(:username => username, :site_id => site.id).first
+        user = User.where(:email    => username, :site_id => site.id).first if user.nil?
+      end
       
       ll = LoginLog.new      
       ll.username       = username      
@@ -27,8 +32,8 @@ module Caboose
         fail_count = Caboose::LoginLog.fail_count(user)
         if (fail_count+1) >= user.site.login_fail_lock_count
           user.locked = true
-          user.save        
-          LoginMailer.locked_account(user).deliver
+          user.save                      
+          LoginMailer.configure_for_site(user.site.id).locked_account(user).deliver
           resp.error = "Too many failed login attempts. Your account has been locked and the site administrator has been notified."
           ll.success = false
         else

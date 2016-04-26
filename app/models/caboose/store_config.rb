@@ -5,11 +5,13 @@ module Caboose
     belongs_to :site    
     attr_accessible :id,
       :site_id,            
-      :pp_name,     
-      :pp_username,
-      :pp_password,
+      :pp_name,
       :pp_testing,
-      :pp_relay_url,      
+      :authnet_api_login_id,        # pp_username
+      :authnet_api_transaction_key, # pp_password      
+      :authnet_relay_url,           # pp_relay_url
+      :stripe_secret_key,
+      :stripe_publishable_key,
       :ups_username,
       :ups_password,
       :ups_key,
@@ -50,6 +52,9 @@ module Caboose
     WEIGHT_UNIT_IMPERIAL = 'oz'
     LENGTH_UNIT_METRIC   = 'cm'
     LENGTH_UNIT_IMPERIAL = 'in'
+    
+    PAYMENT_PROCESSOR_AUTHORIZENET = 'authorize.net'
+    PAYMENT_PROCESSOR_STRIPE = 'stripe'
       
     def next_order_number
       x = Order.where("order_number is not null").reorder("order_number desc").limit(1).first

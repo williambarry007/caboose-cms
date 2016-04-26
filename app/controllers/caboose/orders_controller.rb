@@ -18,7 +18,8 @@ module Caboose
         'customer_id'          => '', 
         'status'               => Order::STATUS_PENDING,
         'shipping_method_code' => '',
-        'id'                   => ''
+        'id'                   => '',
+        'order_number'         => ''
       }, {
         'model'          => 'Caboose::Order',
         'sort'           => 'id',
@@ -160,6 +161,9 @@ module Caboose
       return if !user_is_allowed('orders', 'edit')    
       
       pdf = PendingOrdersPdf.new
+      if params[:print_card_details]
+        pdf.print_card_details = params[:print_card_details].to_i == 1
+      end
       pdf.orders = Order.where(:site_id => @site.id, :status => Order::STATUS_PENDING).all      
       send_data pdf.to_pdf, :filename => "pending_orders.pdf", :type => "application/pdf", :disposition => "inline"            
     end
@@ -216,6 +220,17 @@ module Caboose
       order = Order.find(params[:id])
       order.delay.send_payment_authorization_email      
       render :json => { :success => true }
+    end
+    
+    # GET /admin/orders/city-report
+    def admin_city_report
+      return if !user_is_allowed('orders', 'view')
+
+      @d1 = params[:d1] ? DateTime.strptime("#{params[:d1]} 00:00:00", '%Y-%m-%d %H:%M:%S') : DateTime.strptime(DateTime.now.strftime("%Y-%m-01 00:00:00"), '%Y-%m-%d %H:%M:%S')
+      @d2 = params[:d2] ? DateTime.strptime("#{params[:d2]} 00:00:00", '%Y-%m-%d %H:%M:%S') : @d1 + 1.month      
+      @rows = OrderReporter.city_report(@site.id, @d1, @d2)
+      
+      render :layout => 'caboose/admin'    
     end
     
     # GET /admin/orders/summary-report

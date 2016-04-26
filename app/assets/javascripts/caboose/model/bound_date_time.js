@@ -73,7 +73,7 @@ BoundDateTime = BoundControl.extend({
     this.show_loader();        
     var this2 = this;
     
-    this.model.save(this.attribute, function(resp) {
+    this.binder.save(this.attribute, function(resp) {
       this2.save_attempts = 0;
       if (resp.error)
       {

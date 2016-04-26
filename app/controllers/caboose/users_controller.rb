@@ -19,10 +19,15 @@ module Caboose
     #===========================================================================
     
     # GET /admin/users
-    def index
+    def admin_index
+      return if !user_is_allowed('users', 'view')            
+    end
+    
+    # GET /admin/users/json
+    def admin_json
       return if !user_is_allowed('users', 'view')
       
-      @gen = PageBarGenerator.new(params, {
+      pager = PageBarGenerator.new(params, {
           'site_id'         => @site.id,
     		  'first_name_like' => '',
     		  'last_name_like'	=> '',
@@ -34,32 +39,42 @@ module Caboose
     		  'desc'			     => false,
     		  'base_url'		   => '/admin/users',
     		  'use_url_params' => false
-    	})
-    	@users = @gen.items
+    	})    	    	      
+    	render :json => {
+    	  :pager => pager,
+    	  :models => pager.items.as_json(:include => :roles)    	  
+    	}
+    end
+        
+    # GET /admin/users/:id/json
+    def admin_json_single
+      return if !user_is_allowed('users', 'view')    
+      u = User.find(params[:id])      
+      render :json => u.as_json(:include => :roles)
     end
     
     # GET /admin/users/new
-    def new
+    def admin_new
       return if !user_is_allowed('users', 'add')
       @newuser = User.new
     end
     
-    # GET /admin/users/1/edit
-    def edit
+    # GET /admin/users/:id
+    def admin_edit
       return if !user_is_allowed('users', 'edit')
       @edituser = User.find(params[:id])    
       @all_roles = Role.tree(@site.id)
       @roles = Role.roles_with_user(@edituser.id)
     end
     
-    # GET /admin/users/1/edit-password
-    def edit_password
+    # GET /admin/users/:id/edit-password
+    def admin_edit_password
       return if !user_is_allowed('users', 'edit')
       @edituser = User.find(params[:id])
     end
     
     # GET /admin/users/import
-    def import_form
+    def admin_import_form
       return if !user_is_allowed('users', 'edit')      
     end
     
@@ -69,7 +84,7 @@ module Caboose
     end
           
     # POST /admin/users/import
-    def import
+    def admin_import
       return if !user_is_allowed('users', 'add')
       
       resp = StdClass.new
@@ -133,7 +148,7 @@ module Caboose
     end
     
     # POST /admin/users
-    def create
+    def admin_add
       return if !user_is_allowed('users', 'add')
       
       resp = StdClass.new({
@@ -147,8 +162,8 @@ module Caboose
       
       if user.email.length == 0
         resp.error = "Please enter a valid email address."
-      elsif User.where(:email => user.email).exists?
-        resp.error = "That email is already in the system."
+      elsif User.where(:site_id => @site.id, :email => user.email).exists?
+        resp.error = "That email is already in the system for this site."
       else
         user.save
         resp.redirect = "/admin/users/#{user.id}"
@@ -157,8 +172,8 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/users/1
-    def update
+    # PUT /admin/users/:id
+    def admin_update
       return if !user_is_allowed('users', 'edit')
 
       resp = StdClass.new     
@@ -192,6 +207,7 @@ module Caboose
     	  		else
     	  		  user.password = Digest::SHA1.hexdigest(Caboose::salt + value)
     	  		end
+    	    when 'role_ids'             then user.toggle_roles(value[0], value[1])
     	  	when "roles"
     	  	  user.roles = [];
     	  	  value.each { |rid| user.roles << Role.find(rid) } unless value.nil?
@@ -203,14 +219,14 @@ module Caboose
     	render json: resp
     end
     
-    # POST /admin/users/1/update-pic
-    def update_pic
+    # POST /admin/users/:id/update-pic
+    def admin_update_pic
       @edituser = User.find(params[:id])
       @new_value = "Testing"
     end
       
-    # DELETE /admin/users/1
-    def destroy
+    # DELETE /admin/users/:id
+    def admin_delete
       return if !user_is_allowed('users', 'delete')
       user = User.find(params[:id])
       user.destroy
@@ -222,7 +238,7 @@ module Caboose
     end
     
     # POST /admin/users/:id/roles/:role_id
-    def add_to_role
+    def admin_add_to_role
       return if !user_is_allowed('users', 'edit')
       if !RoleMembership.where(:user_id => params[:id], :role_id => params[:role_id]).exists?
         RoleMembership.create(:user_id => params[:id], :role_id => params[:role_id])
@@ -231,14 +247,14 @@ module Caboose
     end
     
     # DELETE /admin/users/:id/roles/:role_id
-    def remove_from_role
+    def admin_remove_from_role
       return if !user_is_allowed('users', 'edit')
       RoleMembership.where(:user_id => params[:id], :role_id => params[:role_id]).destroy_all        
       render :json => true
     end
     
     # GET /admin/users/options
-    def options
+    def admin_options
       return if !user_is_allowed('users', 'view')
       @users = User.where(:site_id => @site.id).reorder('last_name, first_name').all
       options = @users.collect { |u| { 'value' => u.id, 'text' => "#{u.first_name} #{u.last_name} (#{u.email})"}}

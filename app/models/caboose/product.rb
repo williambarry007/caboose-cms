@@ -32,7 +32,10 @@ module Caboose
       :category_id           ,      
       :option1               ,
       :option2               ,
-      :option3               ,      
+      :option3               ,
+      :option1_media         ,
+      :option2_media         ,
+      :option3_media         ,      
       :default1              ,
       :default2              ,
       :default3              ,
@@ -159,12 +162,30 @@ module Caboose
       self.variants.where(:status => 'Active').reorder(:option1_sort_order).pluck(:option1).uniq.reject { |x| x.nil? || x.empty? }
     end
     
+    def option1_values_with_media(url_only = false)
+      h = {}
+      self.variants.where("status = ? and option1 is not null", 'Active').reorder(:option1_sort_order).each{ |v| h[v.option1] = url_only ? (v.option1_media && v.option1_media.image ? v.option1_media.image.url(:thumb) : false) : v.option1_media }      
+      return h      
+    end
+    
     def option2_values
       self.variants.where(:status => 'Active').reorder(:option2_sort_order).pluck(:option2).uniq.reject { |x| x.nil? || x.empty? }
     end
     
+    def option2_values_with_media(url_only = false)
+      h = {}
+      self.variants.where("status = ? and option2 is not null", 'Active').reorder(:option2_sort_order).each{ |v| h[v.option2] = url_only ? (v.option2_media && v.option2_media.image ? v.option2_media.image.url(:thumb) : false) : v.option2_media }      
+      return h      
+    end
+    
     def option3_values
       self.variants.where(:status => 'Active').reorder(:option3_sort_order).pluck(:option3).uniq.reject { |x| x.nil? || x.empty? }
+    end
+    
+    def option3_values_with_media(url_only = false)
+      h = {}
+      self.variants.where("status = ? and option3 is not null", 'Active').reorder(:option3_sort_order).each{ |v| h[v.option3] = url_only ? (v.option3_media && v.option3_media.image ? v.option3_media.image.url(:thumb) : false) : v.option3_media }      
+      return h      
     end
     
     def toggle_category(cat_id, value)            

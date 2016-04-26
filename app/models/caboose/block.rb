@@ -28,12 +28,13 @@ class Caboose::Block < ActiveRecord::Base
     :page_id, 
     :parent_id,
     :block_type_id,
+    :media_id,
     :sort_order,
     :constrain,
     :full_width,
     :name,
-    :value        
-    
+    :value            
+        
   after_initialize :caste_value
   before_save :caste_value
   
@@ -85,7 +86,8 @@ class Caboose::Block < ActiveRecord::Base
     if b.block_type.field_type == 'file'
       return b.media.file if b.media
       return b.file
-    end    
+    end
+    return "" if b.value.nil? || b.value.strip.length == 0
     view = options && options[:view] ? options[:view] : ActionView::Base.new(ActionController::Base.view_paths)    
     return view.render(:inline => b.value, :locals => options)                    
   end
@@ -116,6 +118,7 @@ class Caboose::Block < ActiveRecord::Base
   end
                                             
   def render(block, options)
+    #Caboose.log("block.full_name = #{block.full_name}")
     #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")                
     if block && block.is_a?(String)
       #Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")                                          
@@ -231,7 +234,7 @@ class Caboose::Block < ActiveRecord::Base
         "../../app/views/caboose/blocks/#{block.block_type.field_type}",
         "caboose/blocks/#{full_name}",                
         "caboose/blocks/#{block.block_type.name}",                
-        "caboose/blocks/#{block.block_type.field_type}"
+        "caboose/blocks/#{block.block_type.field_type}"                
       ]
       #Caboose.log(arr)
       str = self.render_helper(view, options2, block, full_name, arr, 0)
@@ -245,7 +248,7 @@ class Caboose::Block < ActiveRecord::Base
     begin
       str = view.render(:partial => arr[i], :locals => options)
       #Caboose.log("Level #{i+1} for #{full_name}: Found partial #{arr[i]}")
-      rescue ActionView::MissingTemplate => ex
+      rescue ActionView::MissingTemplate => ex        
         #Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")        
         str = render_helper(view, options, block, full_name, arr, i+1)
       rescue Exception => ex 
@@ -273,17 +276,41 @@ class Caboose::Block < ActiveRecord::Base
     return erb.result(locals.instance_eval { binding })
   end
   
-  def partial(name, options)    
-    defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil }
-    options2 = nil
+  def partial(name, options)
+    defaults = {
+      :view => nil,
+      :controller_view_content => nil,
+      :modal => false,
+      :empty_text => '',
+      :editing => false,
+      :css => nil,
+      :js => nil,
+      :csrf_meta_tags => nil,
+      :csrf_meta_tags2 => nil,    
+      :logged_in_user => nil
+    }
+    options2 = nil        
     if options.is_a?(Hash)
       options2 = defaults.merge(options)
     else
-      options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }        
+      #options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }
+      options2 = {
+        :view                    => options.view                    ? options.view                    : nil,
+        :controller_view_content => options.controller_view_content ? options.controller_view_content : nil,
+        :modal                   => options.modal                   ? options.modal                   : nil,
+        :empty_text              => options.empty_text              ? options.empty_text              : nil,
+        :editing                 => options.editing                 ? options.editing                 : nil,
+        :css                     => options.css                     ? options.css                     : nil,
+        :js                      => options.js                      ? options.js                      : nil,
+        :csrf_meta_tags          => options.csrf_meta_tags          ? options.csrf_meta_tags          : nil,
+        :csrf_meta_tags2         => options.csrf_meta_tags2         ? options.csrf_meta_tags2         : nil,
+        :logged_in_user          => options.logged_in_user          ? options.logged_in_user          : nil
+      }
     end
     options2[:block] = self
     
-    view = ActionView::Base.new(ActionController::Base.view_paths)
+    view = options2[:view]     
+    view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?        
     site = options[:site]
     
     begin
@@ -545,6 +572,37 @@ class Caboose::Block < ActiveRecord::Base
       
     end
     
+  end
+  
+  # Assumes that we start the duplicate process at the top level block
+  def duplicate_page_block(site_id, page_id, new_block_type_id = nil, new_parent_id = nil)        
+    m = self.media_id ? self.media.duplicate(site_id) : nil
+    b = Caboose::Block.create(
+      :page_id            => page_id,          
+      :post_id            => nil,         
+      :parent_id          => new_parent_id,
+      :media_id           => self.media_id ? m.id : nil,
+      :block_type_id      => new_block_type_id,    
+      :sort_order         => self.sort_order,
+      :constrain          => self.constrain,
+      :full_width         => self.full_width,
+      :name               => self.name,
+      :value              => self.value
+    )    
+    self.children.each do |b2|
+      if b2.name 
+        # The block is part of the block type, so we have to find the corresponding child block in the new block type        
+        bt = Caboose::BlockType.where(:parent_id => new_block_type_id, :name => b2.name).first
+        if bt
+          b2.duplicate_page_block(site_id, page_id, bt.id, b.id)
+        else
+          # Don't duplicate it because the corresponding child block doesn't exist in the new block type
+        end
+      else
+        # The block is a child block that isn't part of the block type definition
+        b2.duplicate_page_block(site_id, page_id, b2.block_type_id, b.id)
+      end
+    end
   end
     
 

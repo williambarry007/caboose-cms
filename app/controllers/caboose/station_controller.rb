@@ -10,7 +10,7 @@ module Caboose
       @page = Page.find(page_id)
       @tab = params['tab']
       
-      if (@user.nil? || @user == Caboose::User.logged_out_user)
+      if @user.nil? || @user.id == Caboose::User.logged_out_user_id(@site.id)
         redirect_to "/login"
       end
     end

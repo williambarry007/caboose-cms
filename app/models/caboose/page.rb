@@ -126,14 +126,15 @@ class Caboose::Page < ActiveRecord::Base
   def self.update_child_perms(page_id)
     page = self.find(page_id)
       
-    viewers_ids   = Role.roles_with_page_permission(page_id, 'view').collect {|r| r.id }
-    editors_ids   = Role.roles_with_page_permission(page_id, 'edit').collect {|r| r.id }
-    approvers_ids = Role.roles_with_page_permission(page_id, 'approve').collect {|r| r.id }   
-    
+    viewer_ids   = Caboose::PagePermission.where(:page_id => page_id, :action => 'view'   ).all.collect{ |pp| pp.role_id }
+    editor_ids   = Caboose::PagePermission.where(:page_id => page_id, :action => 'edit'   ).all.collect{ |pp| pp.role_id }
+    approver_ids = Caboose::PagePermission.where(:page_id => page_id, :action => 'approve').all.collect{ |pp| pp.role_id }   
+                              
     self.update_child_perms_helper(page, viewer_ids, editor_ids, approver_ids)
   end
   
   def self.update_child_perms_helper(page, viewer_ids, editor_ids, approver_ids)
+    
     self.update_authorized_for_action(page.id, 'view'     , viewer_ids)
     self.update_authorized_for_action(page.id, 'edit'     , editor_ids)
     self.update_authorized_for_action(page.id, 'approve'  , approver_ids)
@@ -163,7 +164,7 @@ class Caboose::Page < ActiveRecord::Base
 
     # Allow a user id to be sent instead of a user object
     user = User.find(user) if user.is_a?(Integer)
-    user.role_ids = [Role.logged_out_role_id] if user.role_ids.nil?
+    user.role_ids = [Role.logged_out_role_id(user.site_id)] if user.role_ids.nil?
 
     t = PagePermission.table    
     reqs = nil
@@ -336,6 +337,10 @@ class Caboose::Page < ActiveRecord::Base
     return true if pid == parent_id
     return self.is_child(parent_id, pid)
   end
+  
+  def is_child_of?(parent_id)
+    return Caboose::Page.is_child(parent_id, self.id)
+  end
 
   def linked_resources_map
     resources = { js: [], css: [] }
@@ -387,5 +392,54 @@ class Caboose::Page < ActiveRecord::Base
       Caboose::PageCustomFieldValue.create(:page_id => self.id, :page_custom_field_id => f.id, :key => f.key, :value => f.default_value, :sort_order => f.sort_order) if fv.nil?
     end
   end
+  
+  def duplicate(site_id, parent_id, duplicate_children = false, block_type_id = nil, child_block_type_id = nil)
+    p = Caboose::Page.create(
+      :site_id              => site_id                   ,  
+      :parent_id            => parent_id                 , 
+      :title                => self.title                , 
+      :menu_title           => self.menu_title           , 
+      :slug                 => self.slug                 , 
+      :alias                => self.alias                , 
+      :uri                  => self.uri                  , 
+      :redirect_url         => self.redirect_url         , 
+      :hide                 => self.hide                 , 
+      :content_format       => self.content_format       , 
+      :custom_css           => self.custom_css           , 
+      :custom_js            => self.custom_js            , 
+      :linked_resources     => self.linked_resources     , 
+      :layout               => self.layout               , 
+      :sort_order           => self.sort_order           , 
+      :custom_sort_children => self.custom_sort_children , 
+      :seo_title            => self.seo_title            , 
+      :meta_keywords        => self.meta_keywords        , 
+      :meta_description     => self.meta_description     , 
+      :meta_robots          => self.meta_robots          , 
+      :canonical_url        => self.canonical_url        , 
+      :fb_description       => self.fb_description       , 
+      :gp_description       => self.gp_description       
+    )
+    
+    self.page_tags.each{ |tag| Caboose::PageTag.create(:page_id => p.id, :tag => tag.tag) }
+    
+    self.page_custom_field_values.each do |v|
+      f = v.page_custom_field.duplicate(site_id)
+      v.duplicate(p.id, f.id)      
+    end
+    
+    self.page_permissions.each do |pp|
+      pp.role.duplicate(site_id)      
+      r = Caboose::Role.where(:site_id => site_id, :name => pp.role.name).first
+      Caboose::PagePermission.create(:page_id => p.id, :role_id => r.id, :action => pp.action)
+    end
 
+    self.block.duplicate_page_block(site_id, p.id, block_type_id)
+        
+    if duplicate_children && !p.is_child_of?(self.id)
+      self.children.each do |p2|
+        p2.duplicate(site_id, p.id, duplicate_children, child_block_type_id, child_block_type_id)
+      end
+    end
+  end
+  
 end

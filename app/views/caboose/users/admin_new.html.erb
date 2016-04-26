@@ -5,7 +5,10 @@
 <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' /> 
 <p><input type='text' name='email' id='email' placeholder='Email' value='' style='width: 400px;' /></p>
 <div id='message'></div>
-<p><input type='submit' value='Add User' /></p>
+<p>
+  <input type='button' value='< Back' onclick="window.location='/admin/users';" />
+  <input type='submit' value='Add User' />
+</p>
 </form>
 
 <% content_for :caboose_js do %>

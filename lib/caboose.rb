@@ -133,6 +133,9 @@ module Caboose
   mattr_accessor :uploads_bucket  
   @@uploads_bucket = ''
   
+  mattr_accessor :use_comment_routes
+  @@use_comment_routes = true
+  
 end
 
 # These are used so that both local filestorage and S3 can work without having to change paperclip paths in models

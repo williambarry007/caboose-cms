@@ -74,18 +74,17 @@ BoundCheckbox = BoundControl.extend({
   },
   
   save: function() {
-    
+    var that = this;    
     this.attribute.value = $('#'+this.el).prop('checked') ? 1 : 0;
-        
-    var this2 = this;
-    this.model.save(this.attribute, function(resp) {
-      $('#'+this2.el+'_check a').removeClass('loading');
-      if (resp.error) this2.error(resp.error);
+            
+    this.binder.save(this.attribute, function(resp) {
+      $('#'+that.el+'_check a').removeClass('loading');
+      if (resp.error) that.error(resp.error);
       else
       {
-        if (this2.binder.success)
-          this2.binder.success(this2);
-        this2.view();
+        if (that.binder.success)
+          that.binder.success(that);
+        that.view();
       }
     });
   },

@@ -9,9 +9,11 @@ BoundSelect = BoundControl.extend({
   message: false,
   placeholder: false,
  
-  init: function(params) {    
+  init: function(params) {
+    //console.log('control.model.id = ' + this.model.id);
     for (var thing in params)
       this[thing] = params[thing];
+    //console.log('control.model.id = ' + this.model.id);
     
     this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;
     this.message = this.el + '_message';
@@ -92,7 +94,7 @@ BoundSelect = BoundControl.extend({
             if (typeof this2.attribute.quick_add_url == 'string')
               caboose_modal_url(this2.attribute.quick_add_url);
             else
-              caboose_modal_url(this2.attribute.quick_add_url(this2.model));
+              caboose_modal_url(this2.attribute.quick_add_url(this2.model()));
           }
           else
           {
@@ -181,7 +183,7 @@ BoundSelect = BoundControl.extend({
       this.attribute.text = '-- Empty --';
         
     var this2 = this;    
-    this.model.save(this.attribute, function(resp) {      
+    this.binder.save(this.attribute, function(resp) {      
       $(this2.attribute.options).each(function(i,opt) {
         if (opt.value == this2.attribute.value)
           this2.attribute.text = opt.text;        

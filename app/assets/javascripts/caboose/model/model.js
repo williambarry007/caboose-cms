@@ -20,11 +20,12 @@ Model.prototype = {
   options_url: false,
   options: false,
   
-  save: function(attrib, after) {
-    if (!attrib.update_url)
-      attrib.update_url = this.update_url;    
-    attrib.save(after);        
-  },
+  // Moved to model binder
+  //save: function(attrib, after) {
+  //  if (!attrib.update_url)
+  //    attrib.update_url = this.update_url;    
+  //  attrib.save(after);        
+  //},
   
   populate_options: function(after, i) {
     if (i == null || i == undefined)
@@ -33,5 +34,10 @@ Model.prototype = {
       after();
     var this2 = this;
     this.attributes[i].populate_options(function() { this2.populate_options(after, i+1); });
+  },
+  
+  name_and_id: function() {
+    return this.model_name.toLowerCase() + '_' + this.model_id;
   }
+  
 };

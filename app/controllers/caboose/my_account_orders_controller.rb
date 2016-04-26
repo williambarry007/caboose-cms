@@ -55,11 +55,11 @@ module Caboose
         when 'authorize.net'
                       
           @sim_transaction = AuthorizeNet::SIM::Transaction.new(
-            sc.pp_username, 
-            sc.pp_password, 
+            sc.authnet_api_login_id, 
+            sc.authnet_api_transaction_key, 
             @order.total,                          
             :relay_response => 'TRUE',              
-            :relay_url => "#{sc.pp_relay_domain}/my-account/orders/authnet-relay",
+            :relay_url => "#{sc.authnet_relay_domain}/my-account/orders/authnet-relay",
             :transaction_type => 'AUTH_ONLY',                        
             :test => sc.pp_testing
           )

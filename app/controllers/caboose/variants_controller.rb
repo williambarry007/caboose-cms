@@ -123,10 +123,13 @@ module Caboose
           when 'alternate_id'                  then v.alternate_id                  = value
           when 'sku'                           then v.sku                           = value
           when 'barcode'                       then v.barcode                       = value
+          when 'cost'                          then v.cost                          = value
           when 'price'                         then v.price                         = value                      
           when 'quantity_in_stock'             then v.quantity_in_stock             = value
           when 'ignore_quantity'               then v.ignore_quantity               = value
           when 'allow_backorder'               then v.allow_backorder               = value
+          when 'clearance'                     then v.clearance                     = value
+          when 'clearance_price'               then v.clearance_price               = value
           when 'status'                        then v.status                        = value
           when 'weight'                        then v.weight                        = value
           when 'length'                        then v.length                        = value
@@ -259,6 +262,30 @@ module Caboose
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:product_id])      
       render :layout => 'caboose/admin'
+    end
+    
+    # GET /admin/products/:product_id/variants/option1-media  
+    def admin_edit_option1_media
+      return if !user_is_allowed('products', 'edit')    
+      @product = Product.find(params[:product_id])
+      @variants = Variant.where(:product_id => @product.id, :option1 => params[:option_value]).reorder(:option1_sort_order).all      
+      render :layout => 'caboose/modal'
+    end
+    
+    # GET /admin/products/:product_id/variants/option2-media  
+    def admin_edit_option2_media
+      return if !user_is_allowed('products', 'edit')    
+      @product = Product.find(params[:product_id])
+      @variants = Variant.where(:product_id => @product.id, :option2 => params[:option_value]).reorder(:option2_sort_order).all      
+      render :layout => 'caboose/modal'
+    end
+    
+    # GET /admin/products/:product_id/variants/option3-media  
+    def admin_edit_option3_media
+      return if !user_is_allowed('products', 'edit')    
+      @product = Product.find(params[:product_id])
+      @variants = Variant.where(:product_id => @product.id, :option3 => params[:option_value]).reorder(:option3_sort_order).all      
+      render :layout => 'caboose/modal'
     end
     
     # PUT /admin/products/:product_id/variants/option1-sort-order
@@ -417,6 +444,8 @@ module Caboose
           when 'quantity_in_stock'  then variants.each { |v| v.quantity_in_stock  = value }
           when 'ignore_quantity'    then variants.each { |v| v.ignore_quantity    = value }
           when 'allow_backorder'    then variants.each { |v| v.allow_backorder    = value }
+          when 'clearance'          then variants.each { |v| v.clearance          = value }
+          when 'clearance_price'    then variants.each { |v| v.clearance_price    = value }
           when 'status'             then variants.each { |v| v.status             = value }
           when 'weight'             then variants.each { |v| v.weight             = value }
           when 'length'             then variants.each { |v| v.length             = value }
@@ -425,6 +454,9 @@ module Caboose
           when 'option1'            then variants.each { |v| v.option1            = value }
           when 'option2'            then variants.each { |v| v.option2            = value }
           when 'option3'            then variants.each { |v| v.option3            = value }
+          when 'option1_media_id'   then variants.each { |v| v.option1_media_id   = value }
+          when 'option2_media_id'   then variants.each { |v| v.option2_media_id   = value }
+          when 'option3_media_id'   then variants.each { |v| v.option3_media_id   = value }
           when 'requires_shipping'  then variants.each { |v| v.requires_shipping  = value }
           when 'taxable'            then variants.each { |v| v.taxable            = value }
           when 'downloadable'       then variants.each { |v| v.downloadable       = value }

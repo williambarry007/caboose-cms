@@ -137,6 +137,8 @@ module Caboose
       self.update_column(:gift_wrap , self.calculate_gift_wrap )
       self.update_column(:discount  , self.calculate_discount  )
       self.update_column(:total     , self.calculate_total     )
+      self.update_column(:cost      , self.calculate_cost      )
+      self.update_column(:profit    , self.calculate_profit    )
     end
     
     def calculate_subtotal
@@ -184,6 +186,22 @@ module Caboose
     
     def calculate_total
       return (self.subtotal + self.tax + self.shipping + self.handling + self.gift_wrap) - self.discount
+    end
+    
+    def calculate_cost      
+      x = 0.0
+      invalid_cost = false
+      self.line_items.each do |li|
+        invalid_cost = true if li.variant.nil? || li.variant.cost.nil?
+        x = x + (li.variant.cost * li.quantity)
+      end
+      return 0.00 if invalid_cost
+      return x            
+    end
+    
+    def calculate_profit
+      return 0.00 if self.cost.nil?
+      return (self.total - (self.tax ? self.tax : 0.00) - (self.shipping ? self.shipping : 0.00) - (self.handling ? self.handling : 0.00) - (self.gift_wrap ? self.gift_wrap : 0.00)) - self.cost
     end
     
     def shipping_and_handling
@@ -259,7 +277,7 @@ module Caboose
         
         case sc.pp_name
           when 'authorize.net'
-            transaction = AuthorizeNet::AIM::Transaction.new(sc.pp_username, sc.pp_password)
+            transaction = AuthorizeNet::AIM::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
             response = transaction.prior_auth_capture(t.transaction_id, self.total)
             
             ot.success        = response.response_code && response.response_code == '1'            
@@ -312,8 +330,8 @@ module Caboose
         case sc.pp_name
           when 'authorize.net'            
             response = AuthorizeNet::SIM::Transaction.new(
-              sc.pp_username, 
-              sc.pp_password,                      
+              sc.authnet_api_login_id, 
+              sc.authnet_api_transaction_key,                      
               self.total,
               :transaction_type => OrderTransaction::TYPE_VOID,
               :transaction_id => t.transaction_id,
@@ -343,7 +361,7 @@ module Caboose
         
       end
       return resp      
-    end
+    end        
       
     #def refund
     #      
@@ -420,6 +438,40 @@ module Caboose
     
     def send_payment_authorization_email
       OrdersMailer.configure_for_site(self.site_id).customer_payment_authorization(self).deliver
+    end
+    
+    def determine_statuses
+      
+      auth    = false
+      capture = false
+      void    = false
+      refund  = false
+      
+      self.order_transactions.each do |ot|
+        auth    = true if ot.transaction_type == OrderTransaction::TYPE_AUTHORIZE && ot.success == true
+        capture = true if ot.transaction_type == OrderTransaction::TYPE_CAPTURE   && ot.success == true
+        void    = true if ot.transaction_type == OrderTransaction::TYPE_VOID      && ot.success == true
+        refund  = true if ot.transaction_type == OrderTransaction::TYPE_REFUND    && ot.success == true
+      end
+      
+      if    refund  then self.financial_status = Order::FINANCIAL_STATUS_REFUNDED
+      elsif void    then self.financial_status = Order::FINANCIAL_STATUS_VOIDED
+      elsif capture then self.financial_status = Order::FINANCIAL_STATUS_CAPTURED
+      elsif auth    then self.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED
+      else               self.financial_status = Order::FINANCIAL_STATUS_PENDING
+      end
+    
+      self.status = Order::STATUS_PENDING if self.status == Order::STATUS_CART && (refund || void || capture || auth) 
+      
+      self.save
+
+    end
+    
+    def hide_prices_for_any_line_item?
+      self.line_items.each do |li|
+        return true if li.hide_prices
+      end
+      return false
     end
     
   end

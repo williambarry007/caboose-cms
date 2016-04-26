@@ -62,7 +62,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'tax_cloud'
   s.add_dependency 'aws-sdk', '< 2.0'
   s.add_dependency 'asset_sync'
-  s.add_dependency 'unf'    
+  s.add_dependency 'unf'
+  s.add_dependency 'highline'
   #s.add_dependency "oauth"
   #s.add_dependency "roxml"
   #s.add_dependency "spreadsheet"
@@ -79,3 +80,4 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'launchy'
 
 end
+

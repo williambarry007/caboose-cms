@@ -16,8 +16,10 @@ module Caboose
       resp = StdClass.new('error' => '', 'redirect' => '')
       return_url = params[:return_url].nil? ? "/" : params[:return_url];
       
-      if (logged_in?)
+      if logged_in?
         resp.error = "Already logged in"
+      elsif !@site.allow_self_registration
+        resp.error = "This site doesn't allow self registration."
       else
         
         first_name  = params[:first_name]

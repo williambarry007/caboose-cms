@@ -3,7 +3,7 @@
 <!-- <h1>Thank you for your order!</h1> -->
 <h1>New Order Received</h1>
 
-<h4><a href="<%= @order.site.store_config.pp_relay_domain %>/admin/orders/<%= @order.id %>" target="_blank" title="View Order">View Order</a></h4>
+<h4><a href="<%= @order.site.store_config.authnet_relay_domain %>/admin/orders/<%= @order.id %>" target="_blank" title="View Order">View Order</a></h4>
 
 <h2>Order Details</h2>
 
@@ -54,7 +54,7 @@
       <td>
         <% if v.downloadable %>
           <p>This item is downloadable.</p>          
-          <p><a href='<%= @order.site.store_config.pp_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>        
+          <p><a href='<%= @order.site.store_config.authnet_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>        
         <% else %>
           Not assigned to a package
         <% end %>

@@ -1,9 +1,10 @@
 
+<h1>Register</h1>
+
 <form action='/register' method='post' id='register_form'>
 <p class='other_options'>
 <a href='/login?return_url=<%= @return_url %>'>Already a member?</a>
 </p>
-<h1>Register</h1>
 <input type='hidden'    name='return_url' value='<%= @return_url %>' />
 <input type='text'      name='first_name' id='first_name' placeholder='First name' />
 <input type='text'      name='last_name'  id='last_name'  placeholder='Last name' />

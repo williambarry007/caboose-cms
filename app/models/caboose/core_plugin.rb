@@ -67,5 +67,9 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
   def self.global_js_assets(files)
     return files
   end
+  
+  def self.request_protocol(current_value, request)
+    return current_value
+  end
 
 end

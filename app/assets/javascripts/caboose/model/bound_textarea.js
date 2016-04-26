@@ -77,28 +77,29 @@ BoundTextarea = BoundControl.extend({
   },
   
   save: function() {
-
+    var that = this;
+        
     this.attribute.value = $('#'+this.el).val();    
     if (this.attribute.value == this.attribute.value_clean)
       return;
-
+    
     this.hide_controls();
     this.show_loader();        
-    var this2 = this;
-    this.model.save(this.attribute, function(resp) {
+        
+    this.binder.save(this.attribute, function(resp) {
       if (resp.error)
       {
-        this2.hide_loader();
-        this2.error(resp.error);
+        that.hide_loader();
+        that.error(resp.error);
       }
       else
       {
-        this2.show_check(500);
-        $('#'+this2.el).val(this2.attribute.value);
-        $('#'+this2.el).removeClass('mb_dirty');
+        that.show_check(500);
+        $('#'+that.el).val(that.attribute.value);
+        $('#'+that.el).removeClass('mb_dirty');
 
-        if (this2.binder.success)
-          this2.binder.success(this2);
+        if (that.binder.success)
+          that.binder.success(that);
       }
     });
   },

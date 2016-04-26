@@ -73,8 +73,8 @@ BoundRichText = BoundControl.extend({
     if (this.attribute.value == this.attribute.value_clean)
       return;    
     
-    var this2 = this;
-    this.model.save(this.attribute, function(resp) {        
+    var this2 = this;    
+    this.binder.save(this.attribute, function(resp) {        
       if (resp.error)
       {        
         alert(resp.error);        

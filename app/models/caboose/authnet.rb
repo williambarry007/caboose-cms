@@ -22,8 +22,8 @@ module Caboose
       params = {
         "createCustomerProfileRequest" => {
           "merchantAuthentication" => {
-            "name"           => '9qR2qa4ZWn', #store_config.pp_username,
-            "transactionKey" => '386TLme2j8yp4BQy', #store_config.pp_password
+            "name"           => '9qR2qa4ZWn'        , # store_config.authnet_api_login_id,
+            "transactionKey" => '386TLme2j8yp4BQy'  , # store_config.authnet_api_transaction_key
           },
           "profile" => {
             "merchantCustomerId" => user.id,
@@ -60,8 +60,8 @@ module Caboose
       params = {
         "getHostedProfilePageRequest" => {
           "merchantAuthentication" => {
-            "name"           => '9qR2qa4ZWn', #store_config.pp_username,
-            "transactionKey" => '386TLme2j8yp4BQy', #store_config.pp_password
+            "name"           => '9qR2qa4ZWn'       , # store_config.authnet_api_login_id
+            "transactionKey" => '386TLme2j8yp4BQy' , # store_config.authnet_api_transaction_key
           },
           "customerProfileId" => user.customer_profile_id,
           "hostedProfileSettings" => {
@@ -135,6 +135,85 @@ module Caboose
     #  
     #  ap response
     #end
+        
+    def self.sync_order_transactions(site_id, d1, d2)
+              
+      site = Site.find(site_id)
+      sc = site.store_config
+      
+      # Get all the batches in the date period
+      rt = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)                      
+      resp = rt.get_settled_batch_list(d1, d2, true)
+      return false if !resp.success?          
+      batch_ids = []
+      batches = resp.batch_list
+      batch_ids = batches.collect{ |batch| batch.id }
+                  
+      orders = {}
+      
+      # Settled transactions
+      batch_ids.each do |batch_id|              
+        rt = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
+        resp = rt.get_transaction_list(batch_id)
+        next if !resp.success?
+        
+        transactions = resp.transactions
+        transactions.each do |t|
+          order_id = t.order.invoice_num
+          orders[order_id] = [] if orders[order_id].nil?
+          orders[order_id] << t
+        end
+      end
+      
+      # Unsettled transactions
+      rt = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
+      resp = rt.get_unsettled_transaction_list
+      if resp.success?        
+        transactions = resp.transactions
+        transactions.each do |t|           
+          order_id = t.order.invoice_num
+          orders[order_id] = [] if orders[order_id].nil?
+          orders[order_id] << t
+        end
+      end
+
+      # Verify all the transactions exist locally
+      orders.each do |order_id, transactions|                        
+        transactions.each do |t|
+          self.verify_order_transaction_exists(t)                                                                
+        end                                
+      end
+      
+      # Update the financial_status and status of all affected orders
+      orders.each do |order_id, transactions|      
+        order = Order.where(:id => order_id).first
+        next if order.nil?
+        order.determine_statuses
+      end                
+    end
     
+    def self.verify_order_transaction_exists(t)
+      
+      order_id = t.order.invoice_num
+      ttype = OrderTransaction.type_from_authnet_status(t.status)
+      
+      ot = OrderTransaction.where(:order_id => order_id, :transaction_id => t.id, :transaction_type => ttype).first
+      if ot   
+        puts "Found order transaction for #{t.id}."
+        return
+      end
+                
+      puts "Creating order transaction for #{t.id}..."      
+      ot = OrderTransaction.create(                      
+        :order_id         => order_id,
+        :transaction_id   => t.id,
+        :transaction_type => ttype,
+        :amount           => t.settle_amount,        
+        :date_processed   => t.submitted_at,        
+        :success          => !(t.status == 'declined')
+      )
+    end
+    
+        
   end
 end

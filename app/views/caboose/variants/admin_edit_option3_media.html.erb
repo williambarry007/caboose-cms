@@ -1,0 +1,94 @@
+<%  
+config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
+access_key = config['access_key_id']
+secret_key = config['secret_access_key']
+bucket     = config['bucket']      
+policy = {        
+  "expiration" => 1.hour.from_now.utc.xmlschema,
+  "conditions" => [
+    { "bucket" => "#{bucket}-uploads" },          
+    { "acl" => "public-read" },
+    [ "starts-with", "$key", '' ],
+    #[ "starts-with", "$Content-Type", 'image/' ],          
+    [ 'starts-with', '$name', '' ], 	
+    [ 'starts-with', '$Filename', '' ],          
+  ]
+}
+@policy = Base64.encode64(policy.to_json).gsub(/\n/,'')      
+@signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), secret_key, @policy)).gsub("\n","")
+@s3_upload_url = "https://#{bucket}-uploads.s3.amazonaws.com/"
+@aws_access_key_id = access_key                                                
+@top_media_category = Caboose::MediaCategory.top_category(@site.id)      
+
+%>
+<div id='left_content'>
+  <div id='categories'></div>  
+</div>
+<div id='right_content'>
+  <div id='controls'></div>
+  <div id='uploader'></div>
+  <div id='media'></div>
+</div>
+
+<p style='clear: both;'>&nbsp;</p>
+<p>
+<input type='button' value='Close'        onclick="parent.location.reload(true); modal.close();" />
+<input type='button' value='Manage Media' onclick="parent.window.location='/admin/media';" />
+</p>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/admin_block_edit_image' %>
+<%= stylesheet_link_tag 'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css' %>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/media_browser" %>
+<%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
+
+<%= javascript_include_tag 'plupload/plupload.full.min.js' %> 
+<%= javascript_include_tag 'plupload/jquery.ui.plupload/jquery.ui.plupload.js' %>
+<%
+#javascript_include_tag 'plupload/moxie.js'
+#javascript_include_tag 'plupload/plupload.dev.js'
+#javascript_include_tag 'plupload/jquery.ui.plupload/jquery.ui.plupload.js'
+%>
+
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {  
+  modal = new CabooseModal(900);
+});
+
+var controller = false;
+$(document).ready(function() {
+  b = new MediaBrowser({                
+    media_id: <% if @media %><%= @media.id %><% else %>false<% end %>, 
+    authenticity_token: '<%= form_authenticity_token %>',    
+    top_cat_id: <%= raw Caboose.json(@top_media_category.id) %>,
+    cat_id: <% if @media %><%= @media.media_category_id %><% else %><%= @top_media_category.id %><% end %>,
+    s3_upload_url: '<%= raw @s3_upload_url %>',		      		  	
+	  aws_access_key_id: '<%= raw @aws_access_key_id %>',		
+	  policy: '<%= raw @policy %>',
+	  signature: '<%= raw @signature %>',
+	  refresh_unprocessed_images: false,
+	  select_media: function(browser, media_id) {
+      $.ajax({
+        url: '/admin/products/<%= @product.id %>/variants/bulk',
+        type: 'put',
+        data: {
+          model_ids: <%= raw Caboose.json(@variants.collect{ |v| v.id }) %>, 
+          option3_media_id: media_id 
+        },
+        success: function(resp) {
+          parent.location.reload(true);
+          modal.close();                  
+        }
+      });        
+    },
+  });	
+});
+
+</script>
+<% end %>

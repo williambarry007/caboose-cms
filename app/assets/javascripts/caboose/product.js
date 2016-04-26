@@ -18,7 +18,7 @@ Caboose.Store.Modules.Product = (function() {
     self.$product = $('#product');
     self.$price = self.$product.find('#product-price');
     $("<span id='percent-off'></span").insertAfter(self.$price);
-    $("<span id='sale-price'></span").insertBefore(self.$price);
+    $("<span id='sale-price'></span").insertBefore(self.$price);    
     if (!self.$product.length) return false;
 
     $.get('/products/' + self.$product.data('id') + '/info', function(response) {
@@ -72,7 +72,7 @@ Caboose.Store.Modules.Product = (function() {
   self.render_options = function(callback) {
     self.$options = $('#product-options', self.$options);
     if (!self.$options.length) return false;
-    self.$options.empty().html(self.templates.options({ options: self.get_options_with_all_values() }));
+    self.$options.empty().html(self.templates.options({ product: self.product, options: self.get_options_with_all_values() }));
     if (callback) callback();
   };
   
@@ -91,7 +91,7 @@ Caboose.Store.Modules.Product = (function() {
   self.bind_events = function() {
     self.$images.find('ul > li > figure').on('click', self.thumb_click_handler);
     self.$images.children('figure').on('click', self.image_click_handler);
-    self.$options.find('ul').on('click', 'li', self.option_click_handler);
+    self.$options.find('ul').on('click', 'li', self.option_click_handler);    
   };
   
   self.thumb_click_handler = function(event) {
@@ -103,10 +103,13 @@ Caboose.Store.Modules.Product = (function() {
     window.location = $(event.target).css('background-image').match(/^url\("(.*)"\)$/)[1];
   };
   
-  self.option_click_handler = function(event) {
+  self.option_click_handler = function(event) {    
     var $target_option = $(event.delegateTarget)
     var $target_value  = $(event.target);
-    
+        
+    if ($target_value[0].nodeName == 'IMG')
+      $target_value = $target_value.parent();
+        
     if ($target_value.hasClass('selected')) {
       $target_value.removeClass('selected');
       $target_value = $();
@@ -270,8 +273,14 @@ Caboose.Store.Modules.Product = (function() {
     self.variant = variant;
     Caboose.Store.Modules.Cart.set_variant(variant);
     if (variant) self.set_image_from_variant(variant);
-    if (variant && self.$price.length) self.$price.empty().text('$' + parseFloat((variant.price * 100) / 100).toFixed(2));
-    if (variant && self.variant_on_sale(variant)) {
+    if (variant && self.$price.length) self.$price.empty().text('$' + parseFloat((variant.price * 100) / 100).toFixed(2));    
+    if (variant && variant.clearance == true) {
+      self.$price.addClass("on-clearance");
+      var percent = 100 - ((variant.clearance_price / variant.price) * 100).toFixed(0);
+      $("#percent-off").text("CLEARANCE! Save " + percent + "%");
+      $("#sale-price").text('$' + parseFloat((variant.clearance_price * 100) / 100).toFixed(2));
+    }    
+    else if (variant && self.variant_on_sale(variant)) {
       self.$price.addClass("on-sale");
       var percent = 100 - ((variant.sale_price / variant.price) * 100).toFixed(0);
       $("#percent-off").text("SALE! Save " + percent + "%");
@@ -279,6 +288,7 @@ Caboose.Store.Modules.Product = (function() {
     }
     else {
       self.$price.removeClass("on-sale");
+      self.$price.removeClass("on-clearance");
       $("#percent-off").text('');
       $("#sale-price").text('');
     }

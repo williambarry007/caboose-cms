@@ -1,5 +1,6 @@
 require 'uri'
 require 'httparty'
+require 'aws-sdk'
 
 class Caboose::Media < ActiveRecord::Base
 
@@ -23,7 +24,9 @@ class Caboose::Media < ActiveRecord::Base
     :name,
     :original_name,
     :description, 
-    :processed
+    :processed,
+    :image_content_type,
+    :file_content_type
     
    has_attached_file :sample
    
@@ -46,17 +49,24 @@ class Caboose::Media < ActiveRecord::Base
     key = "#{self.media_category_id}_#{self.original_name}"    
     key = URI.encode(key.gsub(' ', '+'))    
     uri = "http://#{bucket}.s3.amazonaws.com/#{key}"    
-    
-    image_extensions = ['.jpg', '.jpeg', '.gif', '.png', '.tif']
-    ext = File.extname(key).downcase
-    if image_extensions.include?(ext)    
+
+    content_type = self.image_content_type || self.file_content_type
+
+    if is_image?
       self.image = URI.parse(uri)
+      self.image_content_type = content_type
     else
       self.file = URI.parse(uri)
+      self.file_content_type = content_type
     end
     self.processed = true
     self.save
-    
+
+    # Set the content-type metadata on S3
+    if !is_image?
+      self.set_file_content_type(content_type)
+    end
+
     # Remember when the last upload processing happened
     s = Caboose::Setting.where(:site_id => self.media_category.site_id, :name => 'last_upload_processed').first
     s = Caboose::Setting.create(:site_id => self.media_category.site_id, :name => 'last_upload_processed') if s.nil?
@@ -70,7 +80,42 @@ class Caboose::Media < ActiveRecord::Base
          
   end
   
+  def set_image_content_type(content_type)
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]    
+    AWS.config({ 
+      :access_key_id => config['access_key_id'],
+      :secret_access_key => config['secret_access_key']  
+    })
+    s3 = AWS::S3.new
+    bucket = s3.buckets[config['bucket']]
+    ext = File.extname(self.image_file_name)[1..-1]
+    self.image.styles.each do |style|
+      k = "media/#{self.id}_#{self.name}_#{style}.#{ext}"
+      bucket.objects[k].copy_from(k, :content_type => content_type) # a copy needs to be done to change the content-type
+    end
+  end
+  
+  def set_file_content_type(content_type)
+    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]    
+    AWS.config({ 
+      :access_key_id => config['access_key_id'],
+      :secret_access_key => config['secret_access_key']  
+    })
+    s3 = AWS::S3.new
+    bucket = s3.buckets[config['bucket']]
+    ext = File.extname(self.file_file_name)[1..-1]
+    # has_attached_file :file, :path => ':caboose_prefixmedia/:id_:media_name.:extension'
+    k = "media/#{self.id}_#{self.name}.#{ext}"
+    bucket.objects[k].copy_from(k, :content_type => content_type) # a copy needs to be done to change the content-type    
+  end
+  
   def download_image_from_url(url)
+    self.image = URI.parse(url)
+    self.processed = true
+    self.save
+  end
+  
+  def download_file_from_url(url)
     self.image = URI.parse(url)
     self.processed = true
     self.save
@@ -118,6 +163,28 @@ class Caboose::Media < ActiveRecord::Base
   
   def reprocess_image
     self.image.reprocess!
+  end
+  
+  def duplicate(site_id)
+    cat = Caboose::MediaCategory.top_category(site_id)
+    m = Caboose::Media.create(      
+      :media_category_id  => cat.id                  ,
+      :name               => self.name               ,
+      :description        => self.description        ,
+      :original_name      => self.original_name      ,
+      :image_file_name    => self.image_file_name    ,
+      :image_content_type => self.image_content_type ,
+      :image_file_size    => self.image_file_size    ,
+      :image_updated_at   => self.image_updated_at   ,
+      :file_file_name     => self.file_file_name     ,
+      :file_content_type  => self.file_content_type  ,
+      :file_file_size     => self.file_file_size     ,
+      :file_updated_at    => self.file_updated_at    ,      
+      :processed          => false
+    )
+    m.delay.download_image_from_url(self.image.url(:original)) if self.image
+    m.delay.download_file_from_url(self.file.url) if self.file
+    return m
   end
       
 end

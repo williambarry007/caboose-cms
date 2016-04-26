@@ -24,23 +24,40 @@ class Caboose::User < ActiveRecord::Base
     self.email = self.email.downcase if self.email
   end
   
-  def self.logged_out_user
-    #return self.where('username' => 'elo').first
-    return self.where(:id => self::LOGGED_OUT_USER_ID).first
+  def self.logged_out_user(site_id)
+    return self.where(:site_id => site_id, :username => 'elo').first
+    #return self.where(:id => self::LOGGED_OUT_USER_ID).first
   end
   
-  def self.logged_out_user_id
-    #return self.where('username' => 'elo').limit(1).pluck(:id)[0]
-    return self::LOGGED_OUT_USER_ID
+  def self.logged_out_user_id(site_id)
+    return self.where(:site_id => site_id, :username => 'elo').limit(1).pluck(:id)[0]
+    #return self::LOGGED_OUT_USER_ID
   end
   
-  def is_allowed(resource, action)
-    elo = Caboose::Role.logged_out_role
-    return true if elo.is_allowed(resource, action)
-    eli = Caboose::Role.logged_in_role
+  def is_logged_out_user?
+    return self.id == Caboose::User.logged_out_user_id(self.site_id)    
+  end
+  
+  def is_super_admin?
+    return self.username == 'superadmin'    
+  end
+  
+  def is_allowed(resource, action)          
+    elo = Caboose::Role.logged_out_role(self.site_id)
+    elo_is_allowed = elo.is_allowed(resource, action)    
+    return true if elo_is_allowed
+    return false if !elo_is_allowed && self.is_logged_out_user?     
+    eli = Caboose::Role.logged_in_role(self.site_id)
     return true if self.id != elo.id && eli.is_allowed(resource, action)
-    for role in roles      
-      return true if role.is_allowed(resource, action)
+    for role in roles
+      #Caboose.log("Checking permissions for #{role.name} role")
+      if role.is_allowed(resource, action)
+        #Caboose.log("Role #{role.name} is allowed to view page")
+        return true
+      else
+        #Caboose.log("Role #{role.name} is not allowed to view page")
+      end
+      #return true if role.is_allowed(resource, action)
     end
     return false;
   end
@@ -82,4 +99,24 @@ class Caboose::User < ActiveRecord::Base
     end
     return nil
   end
+  
+  def toggle_roles(role_id, value)            
+    if value.to_i > 0 # Add to role                   
+      if role_id == 'all'
+        Caboose::RoleMembership.where(:user_id => self.id).destroy_all      
+        Caboose::Role.where(:site_id => self.site_id).reorder(:name).all.each{ |r| RoleMembership.create(:user_id => self.id, :role_id => r.id) }                          
+      else
+        if !Caboose::RoleMembership.where(:user_id => self.id, :role_id => role_id.to_i).exists?
+          Caboose::RoleMembership.create( :user_id => self.id, :role_id => role_id.to_i)
+        end      
+      end
+    else # Remove from role    
+      if role_id == 'all'
+        Caboose::RoleMembership.where(:user_id => self.id).destroy_all                          
+      else
+        Caboose::RoleMembership.where(:user_id => self.id, :role_id => role_id.to_i).destroy_all      
+      end
+    end
+  end
+
 end

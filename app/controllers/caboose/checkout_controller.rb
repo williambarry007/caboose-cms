@@ -87,33 +87,40 @@ module Caboose
           return
         end
       end
-      
-      store_config = @site.store_config
-      case store_config.pp_name
+            
+      sc = @site.store_config
+      case sc.pp_name
         when 'authorize.net'
-          
-          sc = @site.store_config
+                    
           @sim_transaction = AuthorizeNet::SIM::Transaction.new(
-            sc.pp_username, 
-            sc.pp_password, 
-            @order.total,            
-            #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
+            sc.authnet_api_login_id, 
+            sc.authnet_api_transaction_key, 
+            @order.total,
             :relay_response => 'TRUE',
+            #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
             #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay",
-            :relay_url => "#{sc.pp_relay_domain}/checkout/authnet-relay",
+            :relay_url => "#{sc.authnet_relay_domain}/checkout/authnet-relay",
             :transaction_type => 'AUTH_ONLY',                        
             :test => sc.pp_testing
           )
           @request = request
           @show_relay = params[:show_relay] && params[:show_relay].to_i == 1
+                  
+        when 'stripe'
+                    
+          Stripe.api_key = sc.stripe_secret_key
+          token = params[:stripeToken]
           
-        when 'payscape'
-          @form_url = Caboose::PaymentProcessor.form_url(@order)
       end
       @logged_in_user = logged_in_user      
       add_ga_event('Ecommerce', 'Checkout', 'Payment Form')
     end
         
+    # Step 5 - Stripe Payment Form
+    # POST /checkout/stripe-payment
+    #def stripe_payment
+    #end
+      
     # GET /checkout/confirm
     def confirm_without_payment
       redirect_to '/checkout'           and return if !logged_in?
@@ -149,9 +156,15 @@ module Caboose
       # Take funds from any gift cards that were used on the order
       @order.take_gift_card_funds
         
-      # Send out emails        
-      OrdersMailer.configure_for_site(@site.id).customer_new_order(@order).deliver
-      OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(@order).deliver        
+      # Send out emails
+      begin
+        OrdersMailer.configure_for_site(@site.id).customer_new_order(@order).deliver
+        OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(@order).deliver
+      rescue
+        puts "=================================================================="
+        puts "Error sending out order confirmation emails for order ID #{@order.id}"
+        puts "=================================================================="
+      end
         
       # Emit order event
       Caboose.plugin_hook('order_authorized', @order)
@@ -181,6 +194,16 @@ module Caboose
     end
     
     #===========================================================================
+        
+    # GET /checkout/total
+    def verify_total
+      total = 0.00
+      if logged_in?
+        @order.calculate
+        total = @order.total
+      end
+      render :json => total.to_f      
+    end
     
     # GET /checkout/address
     def address
@@ -346,10 +369,16 @@ module Caboose
         # Take funds from any gift cards that were used on the order
         order.take_gift_card_funds
         
-        # Send out emails        
-        OrdersMailer.configure_for_site(@site.id).customer_new_order(order).deliver
-        OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(order).deliver        
-        
+        # Send out emails 
+        begin
+          OrdersMailer.configure_for_site(@site.id).customer_new_order(order).deliver
+          OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(order).deliver        
+        rescue
+          puts "=================================================================="
+          puts "Error sending out order confirmation emails for order ID #{@order.id}"
+          puts "=================================================================="
+        end
+                              
         # Emit order event
         Caboose.plugin_hook('order_authorized', order)        
       else

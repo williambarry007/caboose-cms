@@ -87,6 +87,8 @@ IndexTable.prototype = {
   new_model_fields: [{ name: 'name', nice_name: 'Name', type: 'text', width: 400 }],  
   search_fields: false,
   custom_row_controls: false,
+  after_print: false,
+  table_class: 'data',
           
   //============================================================================
   // End of parameters
@@ -262,7 +264,7 @@ IndexTable.prototype = {
       $.each(that.models, function(i, m) {
         tbody.append(that.table_row(m));
       });                                
-      table = $('<table/>').addClass('data').css('margin-bottom', '10px').append(tbody);
+      table = $('<table/>').addClass(that.table_class).css('margin-bottom', '10px').append(tbody);      
       pager_div = this.pager_div();
     }
         
@@ -325,6 +327,7 @@ IndexTable.prototype = {
         }
       });      
     }
+    if (that.after_print) that.after_print();
   },
   
   all_models_selected: function()

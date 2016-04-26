@@ -69,12 +69,11 @@ module Caboose
 		  	return
 		  end
 		  
-		  bob = nil
-		  bob = Caboose::User.where(:username => username).first if Caboose::User.where(:username => username).exists?
-		  bob = Caboose::User.where(:email => username).first if bob.nil? && bob = Caboose::User.where(:email => username)
+		  bob = Caboose::User.where(:site_id => @site.id, :username => username).first
+		  bob = Caboose::User.where(:site_id => @site.id, :email    => username).first if bob.nil?		  
 		  
 		  if bob.nil?		
-			  resp.error = "The given username is not in our system."
+			  resp.error = "The given email or username is not in our system."
 			  render :json => resp
 			  return
 			end
@@ -83,8 +82,8 @@ module Caboose
 		  bob.password_reset_id = rand
 		  bob.password_reset_sent = DateTime.now
 		  bob.save
-		  		  
-		  LoginMailer.forgot_password_email(bob).deliver
+		  		  		  
+		  LoginMailer.configure_for_site(@site.id).forgot_password_email(bob).deliver		  
 		  		  
 		  resp.success = "We just sent you an email.  The reset link inside is good for 3 days."
 		  render :json => resp

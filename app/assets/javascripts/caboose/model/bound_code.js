@@ -88,7 +88,8 @@ BoundCode = BoundControl.extend({
     //this.hide_controls();
     //this.show_loader();        
     //var this2 = this;
-    //this.model.save(this.attribute, function(resp) {
+    //
+    //this.binder.save(this.attribute, function(resp) {
     //  if (resp.error)
     //  {
     //    this2.hide_loader();

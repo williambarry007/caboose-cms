@@ -1,0 +1,47 @@
+
+<h1>Users</h1>
+<div id='users'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {  
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'users',
+    base_url: '/admin/users',
+    allow_bulk_edit: true,
+    allow_bulk_delete: true,
+    allow_duplicate: false,
+    allow_advanced_edit: true,
+    fields: [      
+      { show: true  , bulk_edit: true  , name: 'first_name'         , nice_name: 'First name' , sort: 'first_name' , type: 'text'              , value: function(u) { return u.first_name    }, width: 100 },
+      { show: true  , bulk_edit: true  , name: 'last_name'          , nice_name: 'Last name'  , sort: 'last_name'  , type: 'text'              , value: function(u) { return u.last_name     }, width: 100 },
+      { show: true  , bulk_edit: true  , name: 'username'           , nice_name: 'Username'   , sort: 'username'   , type: 'text'              , value: function(u) { return u.username      }, width: 100 },
+      { show: true  , bulk_edit: true  , name: 'email'              , nice_name: 'Email'      , sort: 'email'      , type: 'text'              , value: function(u) { return u.email         }, width: 100 },
+      { show: true  , bulk_edit: true  , name: 'locked'             , nice_name: 'Locked'     , sort: 'locked'     , type: 'checkbox'          , value: function(u) { return u.locked        }, width: 30  },      
+      { show: true  , bulk_edit: true  , name: 'role_ids'           , nice_name: 'Roles'      , sort: 'email'      , type: 'checkbox-multiple' , value: function(u) { return get_role_ids(u) }, text: function(u) { return get_role_names(u); }, width: 250, options_url: '/admin/roles/options' }                  
+    ],
+    new_model_text: 'New User',
+    no_models_text: 'There are no users right now.',
+    new_model_fields: [
+      { name: 'email', nice_name: 'Email', type: 'text', width: 400 }                 
+    ],
+    search_fields: [          
+      { name: 'first_name_like' , nice_name: 'First name' , type: 'text', width: 400 },
+      { name: 'last_name_like'  , nice_name: 'Last name'  , type: 'text', width: 400 },
+      { name: 'username_like'   , nice_name: 'Username'   , type: 'text', width: 400 },
+      { name: 'email_like'      , nice_name: 'Email'      , type: 'text', width: 400 }
+    ],
+    bulk_import_fields: ['email'],
+    bulk_import_url: '/admin/users/bulk'
+  });        
+});
+
+function get_role_ids(u)   { return $(u.roles).map(function(i, r) { return r.id   }).get(); }
+function get_role_names(u) { return $(u.roles).map(function(i, r) { return r.name }).get(); }
+
+</script>
+<% end %>

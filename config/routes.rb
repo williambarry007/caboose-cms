@@ -1,5 +1,9 @@
 Caboose::Engine.routes.draw do
   
+  #if Caboose::use_comment_routes
+  #  eval(Caboose::CommentRoutes.controller_routes)      
+  #end
+  
   #=============================================================================
   # Front end
   #=============================================================================
@@ -170,21 +174,23 @@ Caboose::Engine.routes.draw do
   # Users
   #=============================================================================
   
-  get     "/admin/users"                     => "users#index"  
-  get     "/admin/users/options"             => "users#options"
-  get     "/admin/users/new"                 => "users#new"
-  get     "/admin/users/import"              => "users#import_form"
-  post    "/admin/users/import"              => "users#import"  
+  get     "/admin/users"                     => "users#admin_index"
+  get     "/admin/users/json"                => "users#admin_json"        
+  get     "/admin/users/options"             => "users#admin_options"
+  get     "/admin/users/new"                 => "users#admin_new"
+  get     "/admin/users/import"              => "users#admin_import_form"
+  post    "/admin/users/import"              => "users#admin_import"
+  get     "/admin/users/:id/json"            => "users#admin_json_single"
   get     "/admin/users/:id/su/:token"       => "users#admin_su_token"
   get     "/admin/users/:id/su"              => "users#admin_su"
-  get     "/admin/users/:id/edit-password"   => "users#edit_password"
-  get     "/admin/users/:id"                 => "users#edit"  
-  put     "/admin/users/:id"                 => "users#update"
-  post    "/admin/users"                     => "users#create"
-  delete  "/admin/users/:id"                 => "users#destroy"
+  get     "/admin/users/:id/edit-password"   => "users#admin_edit_password"
+  get     "/admin/users/:id"                 => "users#admin_edit"  
+  put     "/admin/users/:id"                 => "users#admin_update"
+  post    "/admin/users"                     => "users#admin_add"
+  delete  "/admin/users/:id"                 => "users#admin_delete"
   
-  post    "/admin/users/:id/roles/:role_id"  => "users#add_to_role"  
-  delete  "/admin/users/:id/roles/:role_id"  => "users#remove_from_role"
+  post    "/admin/users/:id/roles/:role_id"  => "users#admin_add_to_role"  
+  delete  "/admin/users/:id/roles/:role_id"  => "users#admin_remove_from_role"
   
   #=============================================================================
   # Roles
@@ -267,6 +273,8 @@ Caboose::Engine.routes.draw do
   get     "/admin/pages/new"               => "pages#admin_new"
   get     "/admin/pages/:id/block-options" => "pages#admin_block_options"  
   get     "/admin/pages/:id/uri"           => "pages#admin_page_uri"
+  get     "/admin/pages/:id/duplicate"     => "pages#admin_duplicate_form"
+  post    "/admin/pages/:id/duplicate"     => "pages#admin_duplicate"
   get     "/admin/pages/:id/delete"        => "pages#admin_delete_form"  
   get     "/admin/pages/:id/sitemap"       => "pages#admin_sitemap"  
   get     "/admin/pages/:id/custom-fields" => "pages#admin_edit_custom_fields"
@@ -284,8 +292,9 @@ Caboose::Engine.routes.draw do
   put     "/admin/pages/:id/layout"        => "pages#admin_update_layout"
   put     "/admin/pages/:id/viewers"       => "pages#admin_update_viewers"
   put     "/admin/pages/:id/editors"       => "pages#admin_update_editors"
-  get     "/admin/pages/:id"               => "pages#admin_edit_general"  
-  put     "/admin/pages/:id"               => "pages#admin_update"
+  get     "/admin/pages/:id"               => "pages#admin_edit_general"
+  put     "/admin/pages/:id/update-child-permissions" => "pages#admin_update_child_permissions"  
+  put     "/admin/pages/:id"               => "pages#admin_update"  
   get     "/admin/pages"                   => "pages#admin_index"
   post    "/admin/pages"                   => "pages#admin_create"  
   delete  "/admin/pages/:id"               => "pages#admin_delete"
@@ -354,16 +363,14 @@ Caboose::Engine.routes.draw do
   get     "/admin/block-types/store/:block_type_summary_id/download"  => "block_type_store#admin_download"  
   get     "/admin/block-types/store/:block_type_summary_id"           => "block_type_store#admin_details"  
   get     "/admin/block-types/store"                                  => "block_type_store#admin_index"
-      
-  get     "/admin/block-types/site-options"         => "block_types#admin_site_options"
-  get     "/admin/block-types/field-type-options"   => "block_types#admin_field_type_options"
-  get     "/admin/block-types/tree-options"         => "block_types#admin_tree_options"
-  get     "/admin/block-types/options"              => "block_types#admin_options"
+            
   get     "/admin/block-types/new"                  => "block_types#admin_new"
-  get     "/admin/block-types/json"                 => "block_types#admin_json"
+  get     "/admin/block-types/json"                 => "block_types#admin_json"    
+  get     "/admin/block-types/options"              => "block_types#admin_options"
+  get     "/admin/block-types/:field-options"       => "block_types#admin_options"
+  get     "/admin/block-types/:id/options"          => "block_types#admin_options"
   get     "/admin/block-types/:id/json"             => "block_types#admin_json_single"  
-  get     "/admin/block-types/:id/new"              => "block_types#admin_new"
-  get     "/admin/block-types/:id/options"          => "block_types#admin_value_options"
+  get     "/admin/block-types/:id/new"              => "block_types#admin_new"                  
   get     "/admin/block-types/:id/icon"             => "block_types#admin_edit_icon"
   get     "/admin/block-types/:id"                  => "block_types#admin_edit"            
   put     "/admin/block-types/:id"                  => "block_types#admin_update"
@@ -513,6 +520,7 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   
   get  '/checkout'                 => 'checkout#index'
+  get  '/checkout/total'           => 'checkout#verify_total'  
   post '/checkout/attach-user'     => 'checkout#attach_user'
   post '/checkout/attach-guest'    => 'checkout#attach_guest'
   get  '/checkout/addresses'       => 'checkout#addresses'
@@ -580,6 +588,9 @@ Caboose::Engine.routes.draw do
 
   get     "/admin/products/:product_id/variants"                         => "variants#admin_index"
   get     "/admin/products/:product_id/variants/json"                    => "variants#admin_json"  
+  get     "/admin/products/:product_id/variants/option1-media"           => "variants#admin_edit_option1_media"
+  get     "/admin/products/:product_id/variants/option2-media"           => "variants#admin_edit_option2_media"
+  get     "/admin/products/:product_id/variants/option3-media"           => "variants#admin_edit_option3_media"
   get     "/admin/products/:product_id/variants/sort-order"              => "variants#admin_edit_sort_order"
   put     '/admin/products/:product_id/variants/option1-sort-order'      => 'variants#admin_update_option1_sort_order'
   put     '/admin/products/:product_id/variants/option2-sort-order'      => 'variants#admin_update_option2_sort_order'
@@ -654,6 +665,7 @@ Caboose::Engine.routes.draw do
   # Orders
   #=============================================================================
   
+  get     "/admin/orders/city-report"                 => "orders#admin_city_report"
   get     "/admin/orders/summary-report"              => "orders#admin_summary_report"
   get     "/admin/orders/weird-test"                  => "orders#admin_weird_test"
   get     "/admin/orders"                             => "orders#admin_index"

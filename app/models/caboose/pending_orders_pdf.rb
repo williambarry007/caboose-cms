@@ -4,7 +4,7 @@ require 'prawn/table'
 module Caboose
   class PendingOrdersPdf < Prawn::Document
     
-    attr_accessor :orders, :card_type, :card_number
+    attr_accessor :orders, :card_type, :card_number, :print_card_details
     
     def to_pdf
       
@@ -36,13 +36,14 @@ module Caboose
       return str
     end
     
-    def get_card_details(order)      
+    def get_card_details(order)
+      return if self.print_card_details && self.print_card_details == false                  
       sc = order.site.store_config
       ot = order.order_transactions.where(:transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
       return if ot.nil?        
       case sc.pp_name
         when 'authorize.net'
-          t = AuthorizeNet::Reporting::Transaction.new(sc.pp_username, sc.pp_password)
+          t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
           resp = t.get_transaction_details(ot.transaction_id)
           t2 = resp.transaction
           if t2
@@ -113,16 +114,20 @@ module Caboose
     
     def order_table(order)
       
+      hide_prices = order.hide_prices_for_any_line_item?
+      
       tbl = []
       tbl << [
         { :content => "Package"    , :align => :left  , :valign => :bottom },
         { :content => "Product"    , :align => :left  , :valign => :bottom , :colspan => 2 },
         { :content => "Attributes" , :align => :left  , :valign => :bottom },
-        { :content => "Quantity"   , :align => :right , :valign => :bottom },        
-        { :content => "Price"      , :align => :right , :valign => :bottom },
-        { :content => "Amount"     , :align => :right , :valign => :bottom }
+        { :content => "Quantity"   , :align => :right , :valign => :bottom }
       ]
-
+      if !hide_prices
+        tbl[0] << { :content => "Price"      , :align => :right , :valign => :bottom }
+        tbl[0] << { :content => "Amount"     , :align => :right , :valign => :bottom }
+      end
+      
       #order.calculate
       
       order.order_packages.all.each do |pk|
@@ -139,7 +144,9 @@ module Caboose
           if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)
           #  Caboose.log("image path: #{li.variant.product.product_images.first.url(:tiny)}")
           #  image = ""
-            image = open("#{li.variant.product.product_images.first.url(:tiny)}")
+            url = li.variant.product.product_images.first.url(:tiny)
+            url = "http:#{url}" if url.starts_with?('//')
+            image = open(url)
           else
             image = ""
           end
@@ -156,8 +163,10 @@ module Caboose
           arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}\n#{self.gift_options(li)}", :borders => [:top, :right, :bottom], :width => 100 }
           arr << { :content => options }
           arr << { :content => "#{li.quantity}"                     , :align => :right }
-          arr << { :content => "$" + sprintf("%.2f", li.unit_price) , :align => :right }
-          arr << { :content => "$" + sprintf("%.2f", li.subtotal)   , :align => :right }
+          if !hide_prices
+            arr << { :content => "$" + sprintf("%.2f", li.unit_price) , :align => :right }
+            arr << { :content => "$" + sprintf("%.2f", li.subtotal)   , :align => :right }
+          end
 
           tbl << arr
           
@@ -172,8 +181,10 @@ module Caboose
         if li.variant.product.option3 && li.variant.option3 then options += li.variant.product.option3 + ": " + li.variant.option3 + "\n" end
         if li.variant.product.product_images.count > 0 && li.variant.product.product_images.first.url(:tiny)
        #   Caboose.log("image path: #{li.variant.product.product_images.first.url(:tiny)}")
-       #   image = ""
-          image = open("#{li.variant.product.product_images.first.url(:tiny)}")
+       #   image = ""          
+          url = li.variant.product.product_images.first.url(:tiny)          
+          url = "http:#{url}" if url.starts_with?('//')
+          image = open(url)
         else
           image = ""
         end
@@ -189,20 +200,24 @@ module Caboose
         arr << { :content => "#{li.variant.product.title}\n#{li.variant.sku}\n#{self.gift_options(li)}", :borders => [:top, :right, :bottom], :width => 100 }
         arr << { :content => options }
         arr << { :content => "#{li.quantity}"               , :align => :right }
-        if li.unit_price
-          arr << { :content => "$" + sprintf("%.2f", li.unit_price) , :align => :right }
-        else
-          arr << { :content => "" }
+        if !hide_prices
+          if li.unit_price
+            arr << { :content => "$" + sprintf("%.2f", li.unit_price) , :align => :right }
+          else
+            arr << { :content => "" }
+          end
+          arr << { :content => "$" + sprintf("%.2f", li.subtotal)   , :align => :right }
         end
-        arr << { :content => "$" + sprintf("%.2f", li.subtotal)   , :align => :right }
         tbl << arr
       end
       order.calculate
-      tbl << [{ :content => "Subtotal"                       , :colspan => 6, :align => :right                       }, { :content => "$"     + sprintf("%.2f", order.subtotal                        ) , :align => :right }]
-      tbl << [{ :content => "Discount"                       , :colspan => 6, :align => :right                       }, { :content => "(-) $" + sprintf("%.2f", order.discount ? order.discount : 0.0 ) , :align => :right }]
-      tbl << [{ :content => "Shipping and Handling Charges"  , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.shipping_and_handling           ) , :align => :right }]    
-      tbl << [{ :content => "Sales Tax"                      , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.tax ? order.tax : 0.0           ) , :align => :right }]
-      tbl << [{ :content => "Grand Total"                    , :colspan => 6, :align => :right, :font_style => :bold }, { :content => "$"     + sprintf("%.2f", order.total                           ) , :align => :right, :font_style => :bold }]
+      if !hide_prices
+        tbl << [{ :content => "Subtotal"                       , :colspan => 6, :align => :right                       }, { :content => "$"     + sprintf("%.2f", order.subtotal                        ) , :align => :right }]
+        tbl << [{ :content => "Discount"                       , :colspan => 6, :align => :right                       }, { :content => "(-) $" + sprintf("%.2f", order.discount ? order.discount : 0.0 ) , :align => :right }]
+        tbl << [{ :content => "Shipping and Handling Charges"  , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.shipping_and_handling           ) , :align => :right }]    
+        tbl << [{ :content => "Sales Tax"                      , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.tax ? order.tax : 0.0           ) , :align => :right }]
+        tbl << [{ :content => "Grand Total"                    , :colspan => 6, :align => :right, :font_style => :bold }, { :content => "$"     + sprintf("%.2f", order.total                           ) , :align => :right, :font_style => :bold }]
+      end
       
       table tbl , :position => 7, :width => 530
     end

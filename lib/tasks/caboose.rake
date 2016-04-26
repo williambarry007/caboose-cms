@@ -2,6 +2,41 @@ require "caboose/version"
 require 'aws-sdk'
 
 namespace :caboose do
+  
+  desc "Update super admin password"
+  task :update_superadmin_password => :environment do
+    sa = Caboose::User.where(:username => 'superadmin').first        
+    print "Enter a new password: "
+    sa.password = STDIN.noecho(&:gets).chomp
+    puts "\n\nThe password has been updated.\n\n"    
+    sa.password = Digest::SHA1.hexdigest(Caboose::salt + sa.password)
+    sa.save    
+  end
+          
+  desc "Show all comment routes in controllers"  
+  task :routes, [:arg1] => :environment do |t, args|    
+    puts Caboose::CommentRoutes.controller_routes(args ? args.first : nil)        
+  end
+  
+  desc "Compare routes in controllers with routes in the routes file"
+  task :compare_routes => :environment do    
+    puts Caboose::CommentRoutes.compare_routes
+  end
+  
+  desc "Calculate order profits"  
+  task :calculate_order_profits => :environment do        
+    Caboose::Order.where("status = ? or status = ? or status = ?", Caboose::Order::STATUS_PENDING, Caboose::Order::STATUS_READY_TO_SHIP, Caboose::Order::STATUS_SHIPPED).reorder(:id).all.each do |order|
+      order.update_column(:cost   , order.calculate_cost   )
+      order.update_column(:profit , order.calculate_profit )
+    end                    
+  end
+  
+  desc "Verify ELO and ELI roles exist for all sites"
+  task :init_site_users_and_roles => :environment do
+    Caboose::Site.all.each do |site|
+      site.init_users_and_roles
+    end    
+  end
 
   desc "Update the on sale value for all products and variants"
   task :update_products_on_sale => :environment do    
@@ -368,6 +403,34 @@ namespace :assets do
         `rm -rf #{host_fonts  }`
       end
     end
+  end
+   
+  desc "Create .gz versions of assets"
+  task :gzip => :environment do
+    zip_types = /\.(?:css|js)$/
+    public_assets = File.join(Rails.root, "public", Rails.application.config.assets.prefix)
+
+    Dir["#{public_assets}/**/*"].each do |f|
+      next unless f =~ zip_types
+
+      mtime = File.mtime(f)
+      gz_file = "#{f}.gz"
+      next if File.exist?(gz_file) && File.mtime(gz_file) >= mtime
+
+      File.open(gz_file, "wb") do |dest|
+        gz = Zlib::GzipWriter.new(dest, Zlib::BEST_COMPRESSION)
+        gz.mtime = mtime.to_i
+        IO.copy_stream(open(f), gz)
+        gz.close
+      end
+
+      File.utime(mtime, mtime, gz_file)
+    end
+  end
+
+  # Hook into existing assets:precompile task
+  Rake::Task["assets:precompile"].enhance do
+    Rake::Task["assets:gzip"].invoke
   end
 
   desc "Fix variant sort order"

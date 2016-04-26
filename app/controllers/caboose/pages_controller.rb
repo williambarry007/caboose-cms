@@ -45,9 +45,9 @@ module Caboose
         return
       end
 
-      user = logged_in_user            
+      user = logged_in_user      
       if !user.is_allowed(page, 'view')                
-        if user.id == User::LOGGED_OUT_USER_ID	
+        if user.id == User.logged_out_user_id(@site.id)
           redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)		  		
           return
         else
@@ -178,7 +178,17 @@ module Caboose
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
-     
+    
+    # PUT /admin/pages/:id/update-child-permissions
+    def admin_update_child_permissions
+      return unless user_is_allowed('pages', 'edit')      
+      page = Page.find(params[:id])
+      if page
+        Page.update_child_perms(page.id)
+      end 
+      render :json => { :success => true }
+    end
+               
     # GET /admin/pages/:id/content
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')      
@@ -462,6 +472,37 @@ module Caboose
       resp.success = save && page.save
       render json: resp
     end
+    
+    # GET /admin/pages/:page_id/duplicate
+    def admin_duplicate_form
+      return unless user_is_allowed('pages', 'add')
+      @page = Page.find(params[:id])      
+      render :layout => 'caboose/admin'      
+    end
+    
+    # POST /admin/pages/:page_id/duplicate
+    def admin_duplicate
+      return unless user_is_allowed('pages', 'add')
+      
+      resp = Caboose::StdClass.new
+      
+      p = Page.where(:id => params[:id]).first      
+      site_id              = params[:site_id]
+      parent_id            = params[:parent_id]
+      block_type_id        = params[:block_type_id]
+      child_block_type_id  = params[:child_block_type_id]
+      duplicate_children   = params[:duplicate_children] ? true : false
+      
+      if p.nil?            then resp.error = "Invalid page"
+      elsif site_id.nil?   then resp.error = "Invalid site"
+      elsif parent_id.nil? then resp.error = "Invalid parent"
+      else
+        resp.new_id = p.duplicate(site_id, parent_id, duplicate_children, block_type_id, child_block_type_id)
+        resp.success = true
+      end
+      
+      render :json => resp
+    end
       
     # GET /admin/pages/:page_id/delete
     def admin_delete_form
@@ -492,9 +533,16 @@ module Caboose
     # GET /admin/pages/sitemap-options
     def admin_sitemap_options
       parent_id = params[:parent_id]
-      p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
+      p = nil
+      if params[:site_id] && @site.is_master && user_is_allowed('admin', 'admin') 
+        p = parent_id ? Page.find(parent_id) : Page.index_page(params[:site_id].to_i)
+      else
+        p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
+      end
       options = []
-      sitemap_helper(p, options)     	  
+      if p
+        sitemap_helper(p, options)
+     	end
       render :json => options 		
     end
 

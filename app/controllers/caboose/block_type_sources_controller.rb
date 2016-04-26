@@ -5,27 +5,51 @@ module Caboose
     # Admin actions
     #===========================================================================
     
-    # GET /admin/block-type-sources
+    # @route GET /admin/block-type-sources
     def admin_index
       return if !user_is_allowed('blocktypesources', 'view')
       @block_type_sources = BlockTypeSource.reorder("priority, name").all
       render :layout => 'caboose/admin'      
     end
     
-    # GET /admin/block-type-sources/new    
+    # @route GET /admin/block-type-sources/new    
     def admin_new
       return unless user_is_allowed('blocktypesources', 'add')
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/block-type-sources/:id
+    # @route GET /admin/block-type-sources/:id/refresh
+    def admin_refresh      
+      return unless user_is_allowed('blocktypesources', 'edit')
+      
+      resp = StdClass.new
+
+      bts = BlockTypeSource.find(params[:id])           
+      if bts.refresh_summaries
+        resp.success = "Block types from the source have been refreshed successfully."
+      else
+        resp.error = "There was an error refreshing block types from the source."
+      end
+      render :json => resp      
+    end
+    
+    # @route GET /admin/block-type-sources/options
+    def admin_options
+      return unless user_is_allowed('blocktypesources', 'edit')      
+      options = BlockType.reorder(:name).all.collect do |bts| 
+        { 'value' => bts.id, 'text' => bts.name } 
+      end      
+      render :json => options
+    end
+    
+    # @route GET /admin/block-type-sources/:id
     def admin_edit
       return unless user_is_allowed('blocktypesources', 'edit')      
       @block_type_source = BlockTypeSource.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # POST /admin/block-type-sources
+    # @route POST /admin/block-type-sources
     def admin_create
       return unless user_is_allowed('blocktypesources', 'add')
 
@@ -44,7 +68,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/block-type-sources/:id
+    # @route PUT /admin/block-type-sources/:id
     def admin_update
       return unless user_is_allowed('blocktypesources', 'edit')
       
@@ -66,7 +90,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/block-type-sources/:id
+    # @route DELETE /admin/block-type-sources/:id
     def admin_delete
       return unless user_is_allowed('blocktypesources', 'delete')                  
       BlockTypeSource.find(params[:id]).destroy            
@@ -74,30 +98,6 @@ module Caboose
         'redirect' => "/admin/block-types/store/sources"
       })
       render :json => resp
-    end
-    
-    # GET /admin/block-type-sources/:id/refresh
-    def admin_refresh      
-      return unless user_is_allowed('blocktypesources', 'edit')
-      
-      resp = StdClass.new
-
-      bts = BlockTypeSource.find(params[:id])           
-      if bts.refresh_summaries
-        resp.success = "Block types from the source have been refreshed successfully."
-      else
-        resp.error = "There was an error refreshing block types from the source."
-      end
-      render :json => resp      
-    end
-    
-    # GET /admin/block-type-sources/options
-    def admin_options
-      return unless user_is_allowed('blocktypesources', 'edit')      
-      options = BlockType.reorder(:name).all.collect do |bts| 
-        { 'value' => bts.id, 'text' => bts.name } 
-      end      
-      render :json => options
     end
 		
   end  

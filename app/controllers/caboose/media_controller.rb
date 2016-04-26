@@ -24,7 +24,7 @@ module Caboose
           { "bucket" => bucket },          
           { "acl" => "public-read" },
           [ "starts-with", "$key", '' ],
-          #[ "starts-with", "$Content-Type", 'image/' ],          
+          #[ "starts-with", "$Content-Type", "" ],
           [ 'starts-with', '$name', '' ], 	
           [ 'starts-with', '$Filename', '' ],          
         ]
@@ -167,9 +167,15 @@ module Caboose
       media_category_id = params[:media_category_id]
       original_name = params[:name]
       name = Caboose::Media.upload_name(original_name)                        
+      file_type = params[:file_type]
+      if ['image/gif', 'image/jpeg', 'image/png', 'image/tiff'].include? file_type
+        image_content_type = file_type
+      else
+        file_content_type = file_type
+      end
       m = Media.where(:media_category_id => media_category_id, :original_name => original_name, :name => name).first
       if m.nil?
-        m = Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :processed => false)
+        m = Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :image_content_type => image_content_type, :file_content_type => file_content_type, :processed => false)
       end
       p = Product.where(:media_category_id => media_category_id).last
       if p

@@ -9,9 +9,11 @@
   <a class="caboose-btn" href='/admin/orders/new'>New Manual Order</a>
   <a class="caboose-btn" href='/admin/orders/print-pending' target='_blank'>Print Pending Orders</a>
   <a class="caboose-btn" href='/admin/orders/summary-report' target='_blank'>Summary Report</a>
+  <a class="caboose-btn" href='/admin/orders/city-report' target='_blank'>City Report</a>
 </p>
 <form action='/admin/orders' method='get' id='search_form' style='display: none;'>
-  <p><input type='text' name='id' placeholder='Order ID' value="<%= @pager.params['id'] %>" style='width: 100px;' /></p>
+  <p><input type='text' name='id'           placeholder='Order ID'     value="<%= @pager.params['id']           %>" style='width: 100px;' /></p>
+  <p><input type='text' name='order_number' placeholder='Order Number' value="<%= @pager.params['order_number'] %>" style='width: 100px;' /></p>
   <p><select name='customer_id'>
       <optgroup label='Status' style='width: 100px'>
         <option value=''>-- All customers --</option>        

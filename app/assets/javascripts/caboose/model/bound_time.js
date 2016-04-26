@@ -144,7 +144,8 @@ BoundTime = BoundControl.extend({
   save: function() {
     this.attribute.value = $('#'+this.el).val();
     var this2 = this;
-    this.model.save(this.attribute, function(resp) {      
+    
+    this.binder.save(this.attribute, function(resp) {      
       $(this2.attribute.options).each(function(i,opt) {
         if (opt.value == this2.attribute.value)
           this2.attribute.text = opt.text;        

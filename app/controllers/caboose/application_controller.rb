@@ -16,16 +16,19 @@ module Caboose
       @use_page_cache = !request.fullpath.starts_with?('/admin')
             
       # Get the site we're working with      
-      @domain = Domain.where(:domain => request.host_with_port).first
-      @site = @domain ? @domain.site : nil
+      @domain = Domain.where(:domain => request.host_with_port).first      
+      @site = @domain ? @domain.site : nil      
+      if @domain.nil? || @site.nil?
+        Caboose.log("Error: No site configured for #{request.host_with_port}")
+      end
       
       # Set the site in any mailers
       CabooseMailer.site = @site
         
       # Make sure someone is logged in
-      if !logged_in?      
-        elo = User.find(User::LOGGED_OUT_USER_ID)        
-        login_user(elo)
+      if !logged_in? && @site                
+        elo = User.logged_out_user(@site.id)        
+        login_user(elo) if elo
       end
       
       session['use_redirect_urls'] = true if session['use_redirect_urls'].nil?
@@ -34,7 +37,7 @@ module Caboose
       AbTesting.init(request.session_options[:id]) if Caboose.use_ab_testing            
       
       # Try to find the page
-      @request = request
+      @request = request      
       @page = Page.new
       @crumbtrail = Crumbtrail.new      
       @subnav       = {}
@@ -124,7 +127,14 @@ module Caboose
       
     # Logs in a user
     def login_user(user, remember = false)
-      session["app_user"] = user
+      session["app_user"] = Caboose::StdClass.new({      
+        :id         => user.id         ,
+        :site_id    => user.site_id    ,
+        :first_name => user.first_name ,
+        :last_name  => user.last_name  ,
+        :username   => user.username   ,
+        :email      => user.email                             
+      })  
       cookies.permanent[:caboose_user_id] = user.id if remember
     end
     
@@ -132,7 +142,7 @@ module Caboose
     def logged_in?
       validate_token
       validate_cookie
-      return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1 && session["app_user"].id != User::LOGGED_OUT_USER_ID     
+      return true if !session["app_user"].nil? && session["app_user"] != false && session["app_user"].id != -1 && session["app_user"].id != User.logged_out_user_id(@site.id)
       return false
     end
     
@@ -150,11 +160,13 @@ module Caboose
     end
     
     # Checks to see if a remember me cookie value is present.    
-    def validate_cookie
-      if cookies[:caboose_user_id] && User.exists?(cookies[:caboose_user_id])
-        user = User.find(cookies[:caboose_user_id])
-        login_user(user)
-        return true
+    def validate_cookie     
+      if cookies[:caboose_user_id]
+        user = User.where(:id => cookies[:caboose_user_id]).first
+        if user        
+          login_user(user)
+          return true
+        end
       end
       return false
     end
@@ -162,10 +174,10 @@ module Caboose
     # Returns the currently logged in user
     def logged_in_user
       if (!logged_in?)
-        return User.logged_out_user
+        return User.logged_out_user(@site.id)
       end
       #return nil if !logged_in?
-      return session["app_user"]
+      return Caboose::User.where(:id => session["app_user"].id).first
     end
     
     # DEPRECATED: Use user_is_allowed_to(action, resource)

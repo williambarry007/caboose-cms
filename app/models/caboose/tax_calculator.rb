@@ -10,6 +10,7 @@ module Caboose
     def self.tax(order)
       return 0.00 if !order.shipping_address
       return 0.00 if !order.has_taxable_items?
+      return 0.00 if !order.has_shippable_items?
 
       sc = order.site.store_config                                                      
       return self.custom_tax(sc, order) if !sc.auto_calculate_tax      

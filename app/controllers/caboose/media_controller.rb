@@ -44,7 +44,6 @@ module Caboose
     def admin_json
       return if !user_is_allowed('media', 'view')
       render :json => false and return if @site.nil?
-      
       id = params[:media_category_id]        
       cat = id ? MediaCategory.find(id) : MediaCategory.top_category(@site.id)      
       render :json => cat.api_hash
@@ -93,6 +92,7 @@ module Caboose
         case name
           when 'name'         then m.name         = value
           when 'description'  then m.description  = value
+          when 'sort_order'   then m.sort_order   = value
           when 'image_url'    then
             m.processed = false
             m.delay.download_image_from_url(value)
@@ -175,7 +175,8 @@ module Caboose
       end
       m = Media.where(:media_category_id => media_category_id, :original_name => original_name, :name => name).first
       if m.nil?
-        m = Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :image_content_type => image_content_type, :file_content_type => file_content_type, :processed => false)
+        max = Media.where(:media_category_id => media_category_id).maximum(:sort_order)
+        m = Media.create(:media_category_id => media_category_id, :sort_order => (max ? (max + 1) : 0), :original_name => original_name, :name => name, :image_content_type => image_content_type, :file_content_type => file_content_type, :processed => false)
       end
       p = Product.where(:media_category_id => media_category_id).last
       if p

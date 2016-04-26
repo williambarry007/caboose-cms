@@ -23,7 +23,8 @@ class Caboose::Media < ActiveRecord::Base
     :media_category_id, 
     :name,
     :original_name,
-    :description, 
+    :description,
+    :sort_order,
     :processed,
     :image_content_type,
     :file_content_type

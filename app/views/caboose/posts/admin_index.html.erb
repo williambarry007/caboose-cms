@@ -8,7 +8,7 @@
   				'id'         => 'ID #',
           'published'  => 'Published',
   				'title'	     => 'Title',
-  				'body'       => 'Body',
+  		#		'body'       => 'Body',
   				'created_at' => 'Date Created'
   			})
   		%>
@@ -18,7 +18,7 @@
         <td><%= raw p.id %></td>
         <td><%= p.published ? "Yes" : "No" %></td>
         <td><%= raw p.title %></td>
-        <td><%= raw Caboose.teaser_text(p.body, 100) %></td>
+   
         <td><%= p.created_at.strftime("%m/%d/%Y") %></td>    
       </tr>
     <% end %>

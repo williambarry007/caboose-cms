@@ -355,6 +355,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :media_category_id , :integer    ],
         [ :name              , :string     ],
         [ :description       , :text       ],
+        [ :sort_order        , :integer    ],
         [ :original_name     , :string     ],
         [ :image             , :attachment ],
         [ :file              , :attachment ],

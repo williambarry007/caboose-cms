@@ -18,7 +18,7 @@
   		%>
     </tr>
   <% @settings.each do |setting| %>
-    <tr onclick="window.location='/admin/settings/<%= setting.id %>/edit';">
+    <tr onclick="window.location='/admin/settings/<%= setting.id %>';">
       <td><%= setting.name  %></td>
       <td><%= setting.value %></td>    
     </tr>

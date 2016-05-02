@@ -1,12 +1,27 @@
 <%
 sc = @social_config
+ms = Caboose::Site.where(:is_master => true).first
+domain = ms ? (ms.primary_domain ? ms.primary_domain.domain : 'www.caboosecms.com') : 'www.caboosecms.com'
 %>
 <h1>Social Media Config</h1>
 
 <p>Find your Facebook page ID <a href="http://findmyfacebookid.com/" target="_blank">here</a>.</p>
 <p><div id="socialconfig_<%= sc.id %>_facebook_page_id"     ></div></p>
 <p><div id="socialconfig_<%= sc.id %>_twitter_username"     ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_instagram_username"   ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_instagram_username"   ></div>
+<% if sc.instagram_access_token %>
+<p style="margin-top:4px;width:518px;font-size:14px;color:green;text-align:right;">
+Authorized
+<a href="#" id="deauthorize-instagram" style="color:#949494;font-size:12px;margin-left:6px;">Deauthorize</a>
+</p><% end %>
+</p>
+<% if !sc.instagram_access_token %>
+<p style="margin-top:2px;width:518px;font-size:13px;color:#000;text-align:right;"><a href="https://api.instagram.com/oauth/authorize/?client_id=bac12987b6cb4262a004f3ffc388accc&redirect_uri=http://<%= domain %>/api/instagram&response_type=code&state=<%= @site.id %>">Authorize Instagram</a> (you must authorize to show posts on this website)
+<% if params[:instagram] && params[:instagram] == 'fail' %>
+<br /><span style="color:red;">Instagram login failed. Please try again.</span>
+<% end %>
+</p>
+<% end %>
 <p><div id="socialconfig_<%= sc.id %>_youtube_url"          ></div></p>
 <p><div id="socialconfig_<%= sc.id %>_pinterest_url"        ></div></p>
 <p><div id="socialconfig_<%= sc.id %>_vimeo_url"            ></div></p>
@@ -19,11 +34,32 @@ sc = @social_config
       
 <div id='message'></div>
 
+<% content_for :caboose_css do %>
+<style type="text/css">
+  #deauthorize-instagram:hover {
+    color: red !important;
+  }
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
 
 $(document).ready(function() {
+  $("#deauthorize-instagram").click(function(event) {
+    event.preventDefault();
+    $.ajax({
+      url: "/api/instagram",
+      type: 'delete',
+      data: {
+        site_id: <%= @site.id %>
+      },
+      success: function(data) {
+        document.location.reload(true);
+      }
+    });
+  });
     
   new ModelBinder({
     name: 'SocialConfig',

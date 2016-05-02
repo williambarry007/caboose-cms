@@ -752,6 +752,8 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   
   get "/api/products"               => "products#api_index"
+  get "/api/instagram"              => "social#authorize_instagram"
+  delete "/api/instagram"              => "social#deauthorize_instagram"
   get "/api/products/:id"           => "products#api_details"
   get "/api/products/:id/variants"  => "products#api_variants"  
   get "caboose/block-types"         => "block_types#api_block_type_list"

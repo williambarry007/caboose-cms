@@ -710,6 +710,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :facebook_page_id     , :string ],
         [ :twitter_username     , :string ],
         [ :instagram_username   , :string ],
+        [ :instagram_user_id    , :string ],
+        [ :instagram_access_token , :text ],
         [ :youtube_url          , :string ],
         [ :pinterest_url        , :string ],
         [ :vimeo_url            , :string ],

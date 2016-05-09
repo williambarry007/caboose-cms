@@ -11,7 +11,8 @@ class Caboose::SmtpConfig < ActiveRecord::Base
     :user_name            ,
     :password             ,
     :authentication       ,
-    :enable_starttls_auto
+    :enable_starttls_auto ,
+    :from_address
 
   AUTH_PLAIN = 'plain'
   AUTH_LOGIN = 'login'

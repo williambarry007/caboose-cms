@@ -43,7 +43,7 @@ module Caboose
       return false if self.min_order_total && order.total < self.min_order_total
       return true
     end
-    
+
   end
 end
 

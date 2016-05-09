@@ -16,6 +16,7 @@ module Caboose
         
     TYPE_AUTHORIZE = 'auth'
     TYPE_CAPTURE   = 'capture'
+    TYPE_AUTHCAP   = 'authcap'    
     TYPE_VOID      = 'void'
     TYPE_REFUND    = 'refund'
     

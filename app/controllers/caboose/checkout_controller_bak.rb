@@ -38,39 +38,9 @@ module Caboose
       )      
     end
     
-    # GET /checkout/stripe/json
-    def stripe_json
-      sc = @site.store_config
-      u = logged_in_user
-      render :json => {
-        :stripe_key     => sc.stripe_publishable_key.strip,        
-        :customer_id    => u.stripe_customer_id,                   
-        :card_last4     => u.card_last4,     
-        :card_brand     => u.card_brand,       
-        :card_exp_month => u.card_exp_month, 
-        :card_exp_year  => u.card_exp_year
-      }          
-    end
-    
-    # GET /checkout/authnet/json
-    def authnet_json
-      sc = @site.store_config
-      u = logged_in_user
-      render :json => {                
-        :customer_profile_id => u.authnet_customer_profile_id,
-        :payment_profile_id  => u.authnet_payment_profile_id,
-        :card_last4          => u.card_last4,     
-        :card_brand          => u.card_brand,       
-        :card_exp_month      => u.card_exp_month, 
-        :card_exp_year       => u.card_exp_year
-      }          
-    end
-    
-    #===========================================================================
-    
     # Step 1 - Login or register
     # GET /checkout
-    def index            
+    def index        
       if logged_in?
         if @order.customer_id.nil?
           @order.customer_id = logged_in_user.id
@@ -78,31 +48,7 @@ module Caboose
         end                        
         #redirect_to '/checkout/addresses'
         #return
-        
-        # See if any there are any empty order packages          
-        @order.order_packages.each do |op|
-          count = 0
-          @order.line_items.each do |li|
-            count = count + 1 if li.order_package_id == op.id
-          end
-          op.destroy if count == 0
-        end
-        
-        # See if any line items aren't associated with an order package
-        line_items_attached = true
-        @order.line_items.each do |li|
-          line_items_attached = false if li.order_package_id.nil?
-        end
-                                  
-        if @order.order_packages.count == 0 || !line_items_attached
-          @order.calculate                                          
-          LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
-          OrderPackage.where(:order_id => @order.id).destroy_all          
-          OrderPackage.create_for_order(@order)
-        end
-      
-        #render :file => "caboose/checkout/checkout_#{@site.store_config.pp_name}"
-        render :file => "caboose/checkout/checkout"
+        render :file => "caboose/checkout/checkout_#{@site.store_config.pp_name}"
       end
     end
     
@@ -150,22 +96,19 @@ module Caboose
       render :json => { :error => 'No shippable items.'     } and return if !@order.has_shippable_items?
       render :json => { :error => 'Empty shipping address.' } and return if @order.shipping_address.nil?      
       
-      @order.calculate            
-      order_packages = @order.order_packages
+      @order.calculate
       
-      if params[:recalculate_order_packages] || order_packages.count == 0 || order_packages.first.shipping_package_id.nil?
-        # Remove any order packages      
-        LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
-        OrderPackage.where(:order_id => @order.id).destroy_all      
-          
-        # Calculate what shipping packages we'll need            
-        OrderPackage.create_for_order(@order)
-      end
+      # Remove any order packages      
+      LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
+      OrderPackage.where(:order_id => @order.id).destroy_all      
+        
+      # Calculate what shipping packages we'll need            
+      OrderPackage.create_for_order(@order)
 
       # Now get the rates for those packages            
       rates = ShippingCalculator.rates(@order)      
       render :json => rates                  
-    end        
+    end
     
     # Step 4 - Gift cards
     # GET /checkout/gift-cards
@@ -257,10 +200,7 @@ module Caboose
       u.card_exp_year  = params[:card][:exp_year]
       u.save
       
-      render :json => {
-        :success => true,
-        :customer_id => u.stripe_customer_id
-      }      
+      render :json => true
     end
       
     # GET /checkout/confirm
@@ -285,55 +225,19 @@ module Caboose
     # POST /checkout/confirm
     def confirm
       render :json => { :error => 'Not logged in.'            } and return if !logged_in?
-      #render :json => { :error => 'Invalid billing address.'  } and return if @order.billing_address.nil?
-      render :json => { :error => 'Invalid shipping address.' } and return if @order.has_shippable_items? && @order.shipping_address.nil?      
-      render :json => { :error => 'Invalid shipping methods.' } and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?      
+      render :json => { :error => 'Invalid addresses.'        } and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
+      render :json => { :error => 'Invalid shipping methods.' } and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
+      render :json => { :error => 'Order requires payment.'   } and return if @order.total > 0.00
       
       resp = Caboose::StdClass.new
-      sc = @site.store_config
-      
-      ot = nil
-      error = false
-      if @order.total > 0
-        case sc.pp_name
-          when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
-                                    
-          when StoreConfig::PAYMENT_PROCESSOR_STRIPE
-            Stripe.api_key = sc.stripe_secret_key.strip
-            begin
-              c = Stripe::Charge.create(
-                :amount => (@order.total * 100).to_i,
-                :currency => 'usd',
-                :customer => logged_in_user.stripe_customer_id,
-                :capture => false,
-                :metadata => { :order_id => @order.id },
-                :statement_descriptor => "#{@site.name.length > (14 - @order.id.to_s.length) ? @site.name[0,22 - @order.id.to_s.length] : @site.name} Order ##{@order.id}"
-              )
-            rescue Exception => ex
-              render :json => { :error => ex.message }
-              return
-            end
-            ot = Caboose::OrderTransaction.create(
-              :order_id         => @order.id,
-              :transaction_id   => c.id,
-              :transaction_type => c.captured ? Caboose::OrderTransaction::TYPE_AUTHORIZE : Caboose::OrderTransaction::TYPE_AUTHCAP,     
-              :amount           => c.amount/100.0,              
-              :date_processed   => DateTime.now.utc,              
-              :success          => c.status == 'succeeded'
-            )            
-        end
-      end
-
-      if ot && !ot.success
-        render :json => { :error => error }
-        return
-      end
-      
+                  
       @order.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED
       @order.status = Order::STATUS_PENDING
-      @order.order_number = @site.store_config.next_order_number                           
+      @order.order_number = @site.store_config.next_order_number
+         
+      # Take funds from any gift cards that were used on the order
       @order.take_gift_card_funds
-      
+        
       # Send out emails
       begin
         OrdersMailer.configure_for_site(@site.id).customer_new_order(@order).deliver
@@ -343,7 +247,7 @@ module Caboose
         puts "Error sending out order confirmation emails for order ID #{@order.id}"
         puts "=================================================================="
       end
-      
+        
       # Emit order event
       Caboose.plugin_hook('order_authorized', @order)
       
@@ -372,12 +276,6 @@ module Caboose
     end
     
     #===========================================================================
-    
-    # GET /checkout/state-options
-    def state_options                            
-      options = Caboose::States.all.collect { |abbr, state| { 'value' => abbr, 'text' => abbr }}
-      render :json => options
-    end
         
     # GET /checkout/total
     def verify_total
@@ -396,7 +294,7 @@ module Caboose
         :billing_address => @order.billing_address
       }
     end
-            
+    
     # PUT /checkout/addresses
     def update_addresses
       
@@ -445,9 +343,8 @@ module Caboose
     end
     
     # PUT /checkout/shipping-address
-    def update_shipping_address      
-      resp = Caboose::StdClass.new
-            
+    def update_shipping_address
+      
       # Grab or create addresses
       sa = @order.shipping_address
       if sa.nil?
@@ -455,46 +352,18 @@ module Caboose
         @order.shipping_address_id = sa.id
         @order.save
       end
-            
-      save = true
-      recalc_shipping = false
-      params.each do |name, value|
-        case name                              
-          when 'address1' then recalc_shipping = true if sa.address1 != value
-          when 'address2' then recalc_shipping = true if sa.address2 != value          
-          when 'city'     then recalc_shipping = true if sa.city     != value
-          when 'state'    then recalc_shipping = true if sa.state    != value          
-          when 'zip'      then recalc_shipping = true if sa.zip      != value          
-        end        
-        case name          
-          when 'name'           then sa.name          = value          
-          when 'first_name'     then sa.first_name    = value
-          when 'last_name'      then sa.last_name     = value
-          when 'street'         then sa.street        = value
-          when 'address1'       then sa.address1      = value
-          when 'address2'       then sa.address2      = value
-          when 'company'        then sa.company       = value
-          when 'city'           then sa.city          = value
-          when 'state'          then sa.state         = value
-          when 'province'       then sa.province      = value
-          when 'province_code'  then sa.province_code = value
-          when 'zip'            then sa.zip           = value
-          when 'country'        then sa.country       = value
-          when 'country_code'   then sa.country_code  = value
-          when 'phone'          then sa.phone         = value
-        end                 
-      end      
-      if recalc_shipping
-        @order.order_packages.each do |op|          
-          op.shipping_method_id = nil
-          op.shipping_package_id = nil               
-          op.total = nil
-          op.save
-        end
-      end
-
-      resp.success = save && sa.save      
-      render :json => resp            
+                                                        
+      sa.first_name = params[:first_name]
+      sa.last_name  = params[:last_name]
+      sa.company    = params[:company]
+      sa.address1   = params[:address1]
+      sa.address2   = params[:address2]
+      sa.city       = params[:city]
+      sa.state      = params[:state]
+      sa.zip        = params[:zip]
+      sa.save
+                        
+      render :json => { :success => true }
     end
     
     # PUT /checkout/billing-address
@@ -685,34 +554,6 @@ module Caboose
       
       render :layout => false
     end
-    
-    # @route GET /checkout/authnet
-	  def authnet	  	
-	    if logged_in?
-	      redirect_to '/checkout'
-	      return
-	    end        
-      
-	  	authnet = Authnet.new
-	  	@logged_in_user = logged_in_user
-    
-      # Make sure the user has a customer profile				
-	  	authnet.verify_customer_profile(@logged_in_user)
-	  	@logged_in_user = Caboose::User.find(@logged_in_user.id)
-	  	
-	  	# Make sure any previously created payment profile is associated with the user		
-	  	authnet_helper.verify_payment_profile(@logged_in_user)
-	  	@logged_in_user = Caboose::User.find(@logged_in_user.id)
-	  	
-	  	@token = authnet_helper.get_hosted_profile_page_request(@logged_in_user.authnet_profile_id, "#{request.protocol}#{request.host_with_port}/checkout/billing-method/response")				
-	  	
-      render :layout => 'caboose/modal'		
-	  end
-	  
-	  # @route GET /checkout/payment-method/response
-	  def authnet_response_handler
-	    render :layout => 'caboose/empty'
-	  end
     
     #def relay
     #  

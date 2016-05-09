@@ -117,7 +117,7 @@ module Caboose
       weight = 0.0
       self.line_items.each{ |li| weight = weight + (li.variant.weight * li.quantity) }      
       weight = weight * 0.035274 if sc.weight_unit == StoreConfig::WEIGHT_UNIT_METRIC # grams to ounces
-      
+                  
       sp = self.shipping_package
       dimensions = [sp.outside_length, sp.outside_width, sp.outside_height]
       if sc.length_unit == StoreConfig::LENGTH_UNIT_METRIC # cm to inches

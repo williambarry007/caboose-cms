@@ -80,7 +80,7 @@ Caboose.Store.Modules.CheckoutLoginRegister = (function() {
             type: 'post',            
             success: function(resp2) {
               if (resp2.error) $('#message').html("<p class='note error'>" + resp2.error + "</p>");
-              else window.location = '/checkout/addresses';
+              else window.location = '/checkout';
             }
           });          
         }
@@ -108,7 +108,7 @@ Caboose.Store.Modules.CheckoutLoginRegister = (function() {
               if (resp2.error)
                 $('#message').html("<p class='note error'>" + resp2.error + "</p>");
               else
-                window.location = '/checkout/addresses';
+                window.location = '/checkout';
             }
           });
         }

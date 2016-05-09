@@ -1,0 +1,95 @@
+<%
+store_config = @site.store_config
+%>
+<div id="checkout">
+  <h2>Billing</h2>
+  <section style='width: 100%;'>
+    <section id='payment_method' style='width: 50%; float: left;'>
+      <h3>Payment Method</h3>
+      <div id='payment'></div>
+    </section>
+    <section id='billing_address' style='width: 50%; float: left;'>        
+      <h3>Billing Address</h3>
+      <% ba = @order.billing_address %>      
+      <form action="/checkout/billing-address" method="put" id='address_form'>        
+        <section id="checkout-address">  
+          <div class="wrapper">          
+            <section>
+              <fieldset id="billing">              
+                <input name="billing[first_name]" type="text" value="<%= ba ? ba.first_name : "" %>" class='first_name' placeholder='First Name' />
+                <input name="billing[last_name]"  type="text" value="<%= ba ? ba.last_name  : "" %>" class='last_name'  placeholder='Last Name'  />
+                <input name="billing[company]"    type="text" value="<%= ba ? ba.company    : "" %>" class='company'    placeholder='Company'    />
+                <input name="billing[address1]"   type="text" value="<%= ba ? ba.address1   : "" %>" class='address1'   placeholder='Address 1'  />
+                <input name="billing[address2]"   type="text" value="<%= ba ? ba.address2   : "" %>" class='address2'   placeholder='Address 2'  />
+                <input name="billing[city]"       type="text" value="<%= ba ? ba.city       : "" %>" class='city'       placeholder='City'       />
+                <select name="billing[state]" class='state'><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= ba && ba.state == abbr ? 'selected' : "" %>><%= abbr %></option><% end %></select>                
+                <input name="billing[zip]"        type="text" value="<%= ba ? ba.zip        : "" %>" class='zip'        placeholder='Zip' pattern="[0-9Zip       ]*" inputmode="numeric" />
+              </fieldset>
+            </section>        
+          </div>            
+        </section>
+      </form>    
+    </section>
+    <div style='clear: left;'></div>    
+  </section>
+  <section id="checkout-continue">        
+    <button class="blue">Continue to Order Confirmation</button>
+    <em>or</em>
+    <a href="/">return to the store</a>
+  </section>  
+</div>
+
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag 'https://js.stripe.com/v2/' %>
+<%= javascript_include_tag 'caboose/cart' %>
+<%= javascript_include_tag 'caboose/checkout_payment_stripe' %>
+<%= javascript_include_tag 'caboose/jquery.payment' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {     
+  var checkout_controller = new StripeCheckoutController({
+    stripe_key:  <%= raw Caboose.json(@site.store_config.stripe_publishable_key.strip) %>,
+    customer_id: <%= raw Caboose.json(@logged_in_user.stripe_customer_id) %>,  
+    card_brand:  <%= raw Caboose.json(@logged_in_user.card_brand) %>,
+    card_last4:  <%= raw Caboose.json(@logged_in_user.card_last4) %>,      
+    order_total: parseFloat(<%= raw Caboose.json(@order.total); %>)
+  });   
+});
+
+</script>
+<% end %>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/cart' %>
+<%= stylesheet_link_tag 'caboose/checkout' %>
+<style type='text/css'>
+
+#checkout h3 { font-size: 14pt; font-weight: bold; }
+
+.stripe_form { width: 230px; }
+.stripe_form .card_number_container { position: relative; width: 230px; }
+.stripe_form .card_number_container input { padding-left: 30px; height: 37px; font-size: 15px; width: 100%; }
+.stripe_form .card_number_container .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+
+.stripe_form .card_exp_container { position: relative; width: 115px; float: left; }    
+.stripe_form .card_exp_container input { padding-left: 30px; height: 37px; font-size: 15px; width: 115px; }
+.stripe_form .card_exp_container .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+
+.stripe_form .card_cvc_container { position: relative; width: 115px; float: left; }    
+.stripe_form .card_cvc_container input { padding-left: 30px; height: 37px; font-size: 15px; width: 115px; }
+.stripe_form .card_cvc_container .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+
+.stripe_form input[type='submit'] { width: 100%; }
+
+.stripe_form .note { width: 100%; margin-bottom: 10px !important; text-align: center; }
+
+#billing input.first_name { width: 150px !important; float: left; }
+#billing input.last_name  { width: 150px !important; }
+#billing input.company    { width: 300px !important; }
+#billing input.address1   { width: 300px !important; }
+#billing input.address2   { width: 300px !important; }
+#billing input.city       { width: 150px !important; float: left; }
+#billing select.state     { width:  75px !important; height: 36px !important; font-size: 1em; float: left; }          
+#billing input.zip        { width:  75px !important; }
+                
+</style>
+<% end %>

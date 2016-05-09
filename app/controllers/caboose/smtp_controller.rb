@@ -29,7 +29,8 @@ module Caboose
           when 'user_name'            then sc.user_name            = value
           when 'password'             then sc.password             = value
           when 'authentication'       then sc.authentication       = value
-          when 'enable_starttls_auto' then sc.enable_starttls_auto = value          
+          when 'enable_starttls_auto' then sc.enable_starttls_auto = value
+          when 'from_address'         then sc.from_address         = value
     	  end
     	end
     	

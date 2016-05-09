@@ -10,6 +10,7 @@ sc = @smtp_config
 <p><div id='smtpconfig_<%= sc.id %>_password'             ></div></p>
 <p><div id='smtpconfig_<%= sc.id %>_authentication'       ></div></p>
 <p><div id='smtpconfig_<%= sc.id %>_enable_starttls_auto' ></div></p>
+<p><div id='smtpconfig_<%= sc.id %>_from_address'         ></div></p>
       
 <div id='message'></div>
 
@@ -25,13 +26,14 @@ $(document).ready(function() {
     update_url: '/admin/smtp',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [      
-      { name: 'address'              , nice_name: 'Address'                 , type: 'text'     , value: <%= raw Caboose.json(sc.address              ) %>, width: 400 },  
+      { name: 'address'              , nice_name: 'Host'                    , type: 'text'     , value: <%= raw Caboose.json(sc.address              ) %>, width: 400 },  
       { name: 'port'                 , nice_name: 'Port'                    , type: 'text'     , value: <%= raw Caboose.json(sc.port                 ) %>, width: 400 },
       { name: 'domain'               , nice_name: 'Domain'                  , type: 'text'     , value: <%= raw Caboose.json(sc.domain               ) %>, width: 400 },
       { name: 'user_name'            , nice_name: 'Username'                , type: 'text'     , value: <%= raw Caboose.json(sc.user_name            ) %>, width: 400 },
       { name: 'password'             , nice_name: 'Password'                , type: 'text'     , value: <%= raw Caboose.json(sc.password             ) %>, width: 400 },
       { name: 'authentication'       , nice_name: 'Authentication'          , type: 'select'   , value: <%= raw Caboose.json(sc.authentication       ) %>, width: 400 , options_url: '/admin/smtp/auth-options' },
-      { name: 'enable_starttls_auto' , nice_name: 'Enable Start TLS Auto'   , type: 'checkbox' , value: <%= raw sc.enable_starttls_auto ? 1 : 0        %>, width: 400 }                  
+      { name: 'enable_starttls_auto' , nice_name: 'Enable Start TLS Auto'   , type: 'checkbox' , value: <%= raw sc.enable_starttls_auto ? 1 : 0        %>, width: 400 },
+      { name: 'from_address'         , nice_name: 'From Address'            , type: 'text'     , value: <%= raw Caboose.json(sc.from_address         ) %>, width: 400 }
     ]    
   });
       

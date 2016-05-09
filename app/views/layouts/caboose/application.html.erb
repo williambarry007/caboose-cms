@@ -83,6 +83,16 @@
   protocol = request.protocol
   #protocol = Caboose.plugin_hook('request_protocol', protocol, request)
   
+  # See if we're using cloudflare
+  if request.env['HTTP_CF_VISITOR'] && request.env['HTTP_CF_VISITOR'].include?('https')
+    protocol = 'https://'
+    request.env['REQUEST_URI']     = "https://#{request.env['REQUEST_URI'][7..-1]}" if (request.env['REQUEST_URI'] =~ %r"http://") == 0    
+    request.env['SERVER_PORT']     = '443' if request.env['SERVER_PORT'] == '80'
+    request.env['HTTP_REFERER']    = "https://#{request.env['HTTP_REFERER'][7..-1]}" if (request.env['HTTP_REFERER'] =~ %r"http://") == 0    
+    request.env['rack.url_scheme'] = 'https'
+    request.env['HTTPS']           = 'on'
+  end
+  
   css = yield(:css)
   css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
   css.gsub!("<link href='//" , "<link href='#{protocol}")

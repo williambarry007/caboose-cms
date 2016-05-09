@@ -12,7 +12,8 @@ module Caboose
       
       @gen = PageBarGenerator.new(params, {
     		  'name'        => nil,
-    		  'value'       => nil
+    		  'value'       => nil,
+          'site_id'     => @site.id
     		},{
     		  'model'       => 'Caboose::Setting',
     	    'sort'			  => 'name',

@@ -29,6 +29,8 @@ MediaController.prototype = {
         .append($('<a/>').attr('href', '#').html('Upload').click(function(e) { e.preventDefault(); that.toggle_uploader(); }))
         .append(' | ')
         .append($('<a/>').attr('href', '#').html('Select All').click(function(e) { e.preventDefault(); that.select_all_media(); }))
+        .append(' | ')
+        .append($('<a/>').attr('href', '#').attr('id', 'sort-btn').html('Sort').click(function(e) { e.preventDefault(); that.sort_media(); }))
       )
       .append($('<div/>').attr('id', 'the_uploader'));          
     that.refresh();        
@@ -40,6 +42,56 @@ MediaController.prototype = {
     that.refresh_categories();
     that.refresh_media();
     that.print_controls();    
+  },
+
+  change_sort_order: function(list) {
+    var that = this;
+   // console.log(list.toString());
+    $.ajax({
+      url: '/admin/media-categories/' + that.cat_id + '/sort-order',
+      type: 'put',
+      data: {
+        sort: list
+      },
+      success: function(resp) { 
+        console.log("success");
+      }        
+    });
+  },
+
+  sort_media: function() {
+    var that = this;
+    var btn = $("#sort-btn");
+    if ( btn.text() == "Sort" ) {
+      $("li.media").draggable("disable");
+      $("#sort-btn").text("Done Sorting");
+      $("li.media").css("cursor","move");
+      $("#media ul").sortable({
+        update: function(event, ui) {
+          var index = ui.item.index();
+          var start = ui.item.data('start');
+          var media_id = ui.item.attr("id").replace("media","");
+          var sort_list = [];
+          for(var i=1;i <= $("#media ul li").length; i++) {
+          //  console.log(i);
+            var m = $('#media ul li:nth-child(' + i + ')').attr('id').replace("media","");
+          //  if (m) {
+              sort_list.push(m);
+         //   }
+          }
+          that.change_sort_order(sort_list);
+        }
+      });
+      $("#media ul").sortable('enable');
+      $("#media ul li").css("border-color","#98FF97");
+    }
+    else if ( btn.text() == "Done Sorting") {
+      $("#media ul").sortable("disable");
+      $("li.media").draggable("enable");
+      $("li.media").css("cursor","default");
+      $("#sort-btn").text("Sort");
+      $("#media ul li").css("border-color","#666");
+    }
   },
       
   toggle_uploader: function()
@@ -299,7 +351,8 @@ MediaController.prototype = {
         revert: 'invalid',
         start: function() { $(this).data("origPosition", $(this).position()); }
       });
-    });    
+    });
+  //  $("#media ul").sortable();
   },     
   
   //============================================================================
@@ -318,14 +371,6 @@ MediaController.prototype = {
       that.selected_media[that.selected_media.length] = media_id;
       $('#media' + media_id).addClass('selected ui-selected').css('top', '0').css('left', '0');
     }        
-    
-    
-    
-    
-    
-    
-    
-    
     
     
   },
@@ -422,7 +467,8 @@ MediaController.prototype = {
     var that = this;
     that.cat_id = cat_id;
     that.print_categories();
-    that.refresh_media();        
+    that.refresh_media();
+    $("#sort-btn").text("Sort");
   },
   
   add_category: function(name)

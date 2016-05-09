@@ -1,3 +1,5 @@
+require 'httparty'
+
 module Caboose
   class SocialController < ApplicationController
     layout 'caboose/admin'
@@ -42,6 +44,55 @@ module Caboose
     	
     	resp.success = save && sc.save
     	render :json => resp
+    end
+
+
+    # GET /api/instagram
+    def authorize_instagram
+      code = params[:code]
+      site_id = params[:state]
+      site = Site.where(:id => site_id).first
+      master_site = Site.where(:is_master => true).first
+      master_domain = master_site ? (master_site.primary_domain ? master_site.primary_domain.domain : 'caboosecms.com') : 'caboosecms.com'
+      domain = site ? (site.primary_domain ? site.primary_domain.domain : 'www.caboosecms.com') : 'www.caboosecms.com'
+      resp = HTTParty.post(
+        'https://api.instagram.com/oauth/access_token',
+        :body => {
+          :client_id => 'bac12987b6cb4262a004f3ffc388accc',
+          :client_secret => 'ede277a5b2df47fe8efcb69a9fac8e07',
+          :grant_type => 'authorization_code',
+          :redirect_uri => 'http://' + master_domain + '/api/instagram',
+          :code => code
+        }
+      )
+      if resp
+        if resp['code'] && (resp['code'] == 400 || resp['code'] = '400')
+          redirect_to 'http://' + domain + '/admin/social?instagram=fail'
+        elsif !resp['access_token'].blank?
+          sc = SocialConfig.where(:site_id => site_id).first
+          sc.instagram_access_token = resp['access_token']
+          sc.instagram_user_id = resp['user']['id']
+          sc.instagram_username = resp['user']['username']
+          sc.save
+          redirect_to 'http://' + domain + '/admin/social?instagram=success'
+        end
+      else
+        redirect_to 'http://' + domain + '/admin/social?instagram=fail'
+      end      
+    end
+
+    # DELETE /api/instagram
+    def deauthorize_instagram
+      resp = StdClass.new     
+      site_id = params[:site_id]
+      site = Site.where(:id => site_id).first
+      sc = SocialConfig.where(:site_id => site.id).first
+      sc.instagram_username = nil
+      sc.instagram_user_id = nil
+      sc.instagram_access_token = nil
+      sc.save
+      resp.success = true
+      render :json => resp
     end
     
   end

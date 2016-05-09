@@ -57,9 +57,9 @@ $(document).ready(function() {
   new ModelBinder({
     name: 'Role',
     id: <%= @role.id %>,
-    listing_url: 'get /admin/roles',
-    update_url: 'put /admin/roles/<%= @role.id %>',
-    delete_url: 'delete /admin/roles/<%= @role.id %>',
+    listing_url: '/admin/roles',
+    update_url: '/admin/roles/<%= @role.id %>',
+    delete_url: '/admin/roles/<%= @role.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'parent_id'   , nice_name: 'Parent'      , type: 'select', value: <%= @role.parent_id %>, text: "<%= @role.parent.nil? ? '[No parent]' : @role.parent.name %>", show_controls: true, loading_message: 'Getting roles...', options_url: '/admin/roles/options', width: 590, message: 'message' },    

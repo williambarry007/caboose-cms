@@ -3,7 +3,7 @@ class Caboose::MediaCategory < ActiveRecord::Base
   self.table_name = "media_categories"  
   belongs_to :parent, :class_name => 'Caboose::MediaCategory'
   has_many :children, :class_name => 'Caboose::MediaCategory', :foreign_key => 'parent_id', :order => 'name'
-  has_many :media, :class_name => 'Caboose::Media', :order => 'name'  
+  has_many :media, :class_name => 'Caboose::Media', :order => 'sort_order'  
   attr_accessible :id, :site_id, :parent_id, :name
   
   def self.top_category(site_id)

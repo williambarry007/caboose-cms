@@ -246,6 +246,7 @@ Caboose::Engine.routes.draw do
   get     "/admin/media-categories/tree"       => "media_categories#admin_tree"    
   post    "/admin/media-categories"            => "media_categories#admin_add"
   post    "/admin/media-categories/:id/attach" => "media_categories#admin_attach"
+  put     "/admin/media-categories/:id/sort-order" => "media_categories#admin_update_sort_order"    
   put     "/admin/media-categories/:id"        => "media_categories#admin_update"      
   delete  "/admin/media-categories/:id"        => "media_categories#admin_delete"
   
@@ -751,6 +752,8 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   
   get "/api/products"               => "products#api_index"
+  get "/api/instagram"              => "social#authorize_instagram"
+  delete "/api/instagram"              => "social#deauthorize_instagram"
   get "/api/products/:id"           => "products#api_details"
   get "/api/products/:id/variants"  => "products#api_variants"  
   get "caboose/block-types"         => "block_types#api_block_type_list"

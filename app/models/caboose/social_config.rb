@@ -7,6 +7,8 @@ class Caboose::SocialConfig < ActiveRecord::Base
     :facebook_page_id     ,
     :twitter_username     ,
     :instagram_username   ,
+    :instagram_user_id    ,
+    :instagram_access_token,
     :youtube_url          ,
     :pinterest_url        ,
     :vimeo_url            ,

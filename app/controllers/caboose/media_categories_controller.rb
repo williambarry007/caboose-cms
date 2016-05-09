@@ -32,6 +32,21 @@ module Caboose
       render :json => Caboose::MediaCategory.tree_hash(@site.id)
     end
 
+    # PUT /admin/media-categories/:id/sort-order
+    def admin_update_sort_order
+      return unless user_is_allowed('mediacategories', 'edit')     
+      resp = Caboose::StdClass.new 
+      mc = MediaCategory.find(params[:id])
+      sort = params[:sort].to_a
+      sort.each_with_index do |s,i|
+        m = Media.where(:id => s.to_i).first
+        m.sort_order = i
+        m.save
+      end
+      resp.success = true
+      render :json => resp
+    end
+
     # POST /admin/media-categories
     def admin_add
       return unless user_is_allowed('mediacategories', 'add')

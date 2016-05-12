@@ -521,7 +521,7 @@ Caboose::Engine.routes.draw do
   #=============================================================================
   
   get  '/checkout'                            => 'checkout#index'
-  get  '/checkout/authnet'                    => 'checkout#authnet_payment_method'	  	
+  get  '/checkout/authnet'                    => 'checkout#authnet'	  	
   get  '/checkout/authnet/response'           => 'checkout#authnet_payment_method_response_handler'
   get  '/checkout/stripe/json'                => 'checkout#stripe_json'
   get  '/checkout/authnet/json'               => 'checkout#authnet_json'      

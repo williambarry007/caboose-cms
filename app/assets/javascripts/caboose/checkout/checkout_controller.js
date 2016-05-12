@@ -42,10 +42,8 @@ CheckoutController.prototype = {
         
     that.gift_cards_controller       = new GiftCardsController({           cc: that });
     that.shipping_address_controller = new ShippingAddressController({     cc: that });
-    if (that.pp_name == 'stripe')
-      that.payment_method_controller = new StripePaymentMethodController({ cc: that });
-    else if (that.pp_name == 'authnet')
-      that.payment_method_controller = new AuthnetPaymentMethodController({ cc: that });    
+    if (that.pp_name == 'stripe')       that.payment_method_controller = new StripePaymentMethodController({ cc: that });
+    else if (that.pp_name == 'authnet') that.payment_method_controller = new AuthnetPaymentMethodController({ cc: that });    
     that.cart_controller             = new CartController({                cc: that });
 
     that.refresh_and_print();    
@@ -117,10 +115,10 @@ CheckoutController.prototype = {
   {
     var that = this;
     var div = $('<div/>')            
-      .append($('<h2/>').html(confirm ? 'Confirm Order' : 'Checkout'))            
-      .append($('<section/>').attr('id', 'cart'))
-      .append($('<section/>').attr('id', 'gift_cards_container'))
+      .append($('<h2/>').html(confirm ? 'Confirm Order' : 'Checkout'))
       .append($('<section/>').attr('id', 'shipping_address_container'))
+      .append($('<section/>').attr('id', 'cart'))
+      .append($('<section/>').attr('id', 'gift_cards_container'))      
       .append($('<section/>').attr('id', 'payment_method_container'))      
       .append($('<div/>').attr('id', 'message'));      
     $('#'+that.container).empty().append(div);

@@ -2,10 +2,9 @@ require 'authorize_net'
   
 module Caboose
   class CheckoutController < Caboose::ApplicationController
-    
-    helper :authorize_net
+        
     before_filter :ensure_line_items, :only => [:step_one, :step_two]
-    protect_from_forgery :except => :authnet_relay
+    protect_from_forgery
     
     def ensure_line_items
       redirect_to '/checkout/empty' if @order.line_items.empty?
@@ -52,20 +51,6 @@ module Caboose
       }          
     end
     
-    # GET /checkout/authnet/json
-    def authnet_json
-      sc = @site.store_config
-      u = logged_in_user
-      render :json => {                
-        :customer_profile_id => u.authnet_customer_profile_id,
-        :payment_profile_id  => u.authnet_payment_profile_id,
-        :card_last4          => u.card_last4,     
-        :card_brand          => u.card_brand,       
-        :card_exp_month      => u.card_exp_month, 
-        :card_exp_year       => u.card_exp_year
-      }          
-    end
-    
     #===========================================================================
     
     # Step 1 - Login or register
@@ -93,9 +78,10 @@ module Caboose
         @order.line_items.each do |li|
           line_items_attached = false if li.order_package_id.nil?
         end
-                                  
-        if @order.order_packages.count == 0 || !line_items_attached
-          @order.calculate                                          
+          
+        ops = @order.order_packages
+        if ops.count == 0 || !line_items_attached
+          @order.calculate
           LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
           OrderPackage.where(:order_id => @order.id).destroy_all          
           OrderPackage.create_for_order(@order)
@@ -106,43 +92,6 @@ module Caboose
       end
     end
     
-    # Step 2 - Shipping and billing addresses
-    # GET /checkout/addresses
-    def addresses      
-      redirect_to '/checkout' if !logged_in?      
-      @logged_in_user = logged_in_user      
-    end
-    
-    # Step 3 - Shipping method
-    # GET /checkout/shipping
-    def shipping
-      redirect_to '/checkout'           and return if !logged_in?
-      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
-      
-      @order.calculate
-                  
-      if !@order.has_shippable_items?
-        redirect_to '/checkout/gift-cards'
-        return
-      end
-      
-      # Remove any order packages      
-      LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
-      OrderPackage.where(:order_id => @order.id).destroy_all      
-        
-      # Calculate what shipping packages we'll need            
-      OrderPackage.create_for_order(@order)
-
-      # Now get the rates for those packages            
-      @rates = ShippingCalculator.rates(@order)
-      Caboose.log(@rates)
-      
-      #Caboose.log(@rates.inspect)
-      @logged_in_user = logged_in_user
-
-      add_ga_event('Ecommerce', 'Checkout', 'Shipping')            
-    end
-    
     # Step 3 - Shipping method
     # GET /checkout/shipping/json
     def shipping_json
@@ -151,9 +100,9 @@ module Caboose
       render :json => { :error => 'Empty shipping address.' } and return if @order.shipping_address.nil?      
       
       @order.calculate            
-      order_packages = @order.order_packages
+      ops = @order.order_packages
       
-      if params[:recalculate_order_packages] || order_packages.count == 0 || order_packages.first.shipping_package_id.nil?
+      if params[:recalculate_order_packages] || ops.count == 0
         # Remove any order packages      
         LineItem.where(:order_id => @order.id).update_all(:order_package_id => nil)
         OrderPackage.where(:order_id => @order.id).destroy_all      
@@ -166,60 +115,6 @@ module Caboose
       rates = ShippingCalculator.rates(@order)      
       render :json => rates                  
     end        
-    
-    # Step 4 - Gift cards
-    # GET /checkout/gift-cards
-    def gift_cards
-      redirect_to '/checkout'           and return if !logged_in?
-      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
-      redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
-      @logged_in_user = logged_in_user      
-      add_ga_event('Ecommerce', 'Checkout', 'Gift Cards')
-    end
-    
-    # Step 5 - Payment
-    # GET /checkout/payment
-    def payment
-      redirect_to '/checkout'           and return if !logged_in?
-      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
-      redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
-      redirect_to '/checkout/confirm'   and return if @order.total == 0.00      
-      
-      # Make sure all the variants still exist      
-      @order.line_items.each do |li|
-        v = Variant.where(:id => li.variant_id).first
-        if v.nil? || v.status == 'Deleted'
-          render :file => 'caboose/checkout/deleted_variant'
-          return
-        end
-      end
-            
-      sc = @site.store_config
-      case sc.pp_name
-        when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
-                    
-          @sim_transaction = AuthorizeNet::SIM::Transaction.new(
-            sc.authnet_api_login_id, 
-            sc.authnet_api_transaction_key, 
-            @order.total,
-            :relay_response => 'TRUE',
-            #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay/#{@order.id}",
-            #:relay_url => "#{request.protocol}#{request.host_with_port}/checkout/authnet-relay",
-            :relay_url => "#{sc.authnet_relay_domain}/checkout/authnet-relay",
-            :transaction_type => 'AUTH_ONLY',                        
-            :test => sc.pp_testing
-          )
-          @request = request
-          @show_relay = params[:show_relay] && params[:show_relay].to_i == 1
-          render :file => 'caboose/checkout/payment_authnet'
-                  
-        when StoreConfig::PAYMENT_PROCESSOR_STRIPE                                 
-          render :file => 'caboose/checkout/payment_stripe'
-          
-      end
-      @logged_in_user = logged_in_user      
-      add_ga_event('Ecommerce', 'Checkout', 'Payment Form')
-    end
         
     # Step 5 - Update Stripe Details
     # PUT /checkout/stripe-details
@@ -262,25 +157,6 @@ module Caboose
         :customer_id => u.stripe_customer_id
       }      
     end
-      
-    # GET /checkout/confirm
-    def confirm_without_payment
-      redirect_to '/checkout'           and return if !logged_in?
-      redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
-      redirect_to '/checkout/shipping'  and return if @order.has_shippable_items? && @order.has_empty_shipping_methods?
-      redirect_to '/checkout/payment'   and return if @order.total > 0.00      
-      
-      # Make sure all the variants still exist      
-      @order.line_items.each do |li|
-        v = Variant.where(:id => li.variant_id).first
-        if v.nil? || v.status == 'Deleted'
-          render :file => 'caboose/checkout/deleted_variant'
-          return
-        end
-      end
-      @logged_in_user = logged_in_user      
-      add_ga_event('Ecommerce', 'Checkout', 'Confirm Without Payment')
-    end
     
     # POST /checkout/confirm
     def confirm
@@ -292,6 +168,15 @@ module Caboose
       resp = Caboose::StdClass.new
       sc = @site.store_config
       
+      # Make sure all the variants still exist      
+      @order.line_items.each do |li|
+        v = Variant.where(:id => li.variant_id).first
+        if v.nil? || v.status == 'Deleted'
+          render :json => { :error => 'One or more of the products you are purchasing are no longer available.' }
+          return
+        end
+      end
+            
       ot = nil
       error = false
       if @order.total > 0
@@ -322,14 +207,17 @@ module Caboose
               :success          => c.status == 'succeeded'
             )            
         end
+      elsif @order.line_items.count > 0
+        # Then the order didn't require payment
+        
       end
 
-      if ot && !ot.success
+      if @order.total > 0 && ot && !ot.success
         render :json => { :error => error }
         return
       end
-      
-      @order.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED
+                    
+      @order.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED if @order.total > 0
       @order.status = Order::STATUS_PENDING
       @order.order_number = @site.store_config.next_order_number                           
       @order.take_gift_card_funds
@@ -344,8 +232,8 @@ module Caboose
         puts "=================================================================="
       end
       
-      # Emit order event
-      Caboose.plugin_hook('order_authorized', @order)
+      # Emit order event      
+      Caboose.plugin_hook('order_authorized', @order) if @order.total > 0 
       
       # Save the order
       @order.save
@@ -569,211 +457,6 @@ module Caboose
                                    
       render :json => { :success => true }               
     end
-    
-    # GET /checkout/payment
-    #def payment
-    #  case Caboose::payment_processor
-    #    when StoreConfig::PAYMENT_PROCESSOR_AUTHNET                             
-    #      @sim_transaction = AuthorizeNet::SIM::Transaction.new(
-    #        Caboose::authorize_net_login_id,
-    #        Caboose::authorize_net_transaction_key,
-    #        @order.total,
-    #        :relay_url => "#{Caboose::root_url}/checkout/relay/#{@order.id}",
-    #        :transaction_type => 'AUTH_ONLY',
-    #        :test => true
-    #      )
-    #    when StoreConfig::PAYMENT_PROCESSOR_STRIPE
-    #
-    #  end      
-    #  render :layout => false
-    #end
         
-    # POST /checkout/authnet-relay
-    def authnet_relay
-      Caboose.log("Authorize.net relay, order #{params[:x_invoice_id]}")
-      
-      if params[:x_invoice_num].nil? || params[:x_invoice_num].strip.length == 0
-        Caboose.log("Error: no x_invoice_id in given parameters.")
-        render :json => { :error => "Invalid x_invoice_id." }
-        return
-      end
-      
-      order = Caboose::Order.where(:id => params[:x_invoice_num].to_i).first
-      if order.nil?
-        Caboose.log("Error: can't find order for x_invoice_num #{params[:x_invoice_num]}.")
-        render :json => { :error => "Invalid x_invoice_id." }
-        return
-      end
-            
-      ot = Caboose::OrderTransaction.new(
-        :order_id => order.id,
-        :date_processed => DateTime.now.utc,
-        :transaction_type => Caboose::OrderTransaction::TYPE_AUTHORIZE
-      )
-      ot.success        = params[:x_response_code] && params[:x_response_code] == '1'
-      ot.transaction_id = params[:x_trans_id] if params[:x_trans_id]              
-      ot.auth_code      = params[:x_auth_code] if params[:x_auth_code]
-      ot.response_code  = params[:x_response_code] if params[:x_response_code]
-      ot.amount         = order.total
-      ot.save
-      
-      error = nil
-      if ot.success
-        order.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED
-        order.status = Order::STATUS_PENDING
-        order.order_number = @site.store_config.next_order_number
-        order.date_authorized = DateTime.now.utc
-        
-        # Tell taxcloud the order was authorized
-        #Caboose::TaxCalculator.authorized(order)
-         
-        # Take funds from any gift cards that were used on the order
-        order.take_gift_card_funds
-        
-        # Send out emails 
-        begin
-          OrdersMailer.configure_for_site(@site.id).customer_new_order(order).deliver
-          OrdersMailer.configure_for_site(@site.id).fulfillment_new_order(order).deliver        
-        rescue
-          puts "=================================================================="
-          puts "Error sending out order confirmation emails for order ID #{@order.id}"
-          puts "=================================================================="
-        end
-                              
-        # Emit order event
-        Caboose.plugin_hook('order_authorized', order)        
-      else
-        order.financial_status = 'unauthorized'        
-        error = "There was a problem processing your payment."
-      end
-            
-      order.save
-      
-      @url = params[:x_after_relay]
-      @url << (ot.success ? "?success=1" : "?error=#{error}")             
-                  
-      render :layout => false
-    end
-    
-    # GET  /checkout/authnet-response/:order_id
-    # POST /checkout/authnet-response/:order_id    
-    def authnet_response
-      Caboose.log("Authorize.net response, order #{params[:order_id]}")
-      
-      @resp = Caboose::StdClass.new
-      @resp.success = true if params[:success]
-      @resp.error = params[:error] if params[:error]
-      
-      # Go ahead and capture funds if the order only contained downloadable items
-      @order = Order.find(params[:order_id])
-      
-      if @resp.success
-        if !@order.has_shippable_items?
-          capture_resp = @order.capture_funds
-          if capture_resp.error
-            @resp.success = false
-            @resp.error = capture_resp.error
-          end        
-        end
-        
-        # Decrement quantities of variants
-        @order.decrement_quantities
-    
-        session[:cart_id] = nil
-        init_cart
-      end
-      
-      render :layout => false
-    end
-    
-    # @route GET /checkout/authnet
-	  def authnet	  	
-	    if logged_in?
-	      redirect_to '/checkout'
-	      return
-	    end        
-      
-	  	authnet = Authnet.new
-	  	@logged_in_user = logged_in_user
-    
-      # Make sure the user has a customer profile				
-	  	authnet.verify_customer_profile(@logged_in_user)
-	  	@logged_in_user = Caboose::User.find(@logged_in_user.id)
-	  	
-	  	# Make sure any previously created payment profile is associated with the user		
-	  	authnet_helper.verify_payment_profile(@logged_in_user)
-	  	@logged_in_user = Caboose::User.find(@logged_in_user.id)
-	  	
-	  	@token = authnet_helper.get_hosted_profile_page_request(@logged_in_user.authnet_profile_id, "#{request.protocol}#{request.host_with_port}/checkout/billing-method/response")				
-	  	
-      render :layout => 'caboose/modal'		
-	  end
-	  
-	  # @route GET /checkout/payment-method/response
-	  def authnet_response_handler
-	    render :layout => 'caboose/empty'
-	  end
-    
-    #def relay
-    #  
-    #  # Check to see that the order has a valid total and was authorized
-    #  if @order.total > 0 && PaymentProcessor.authorize(@order, params)
-    #    
-    #    # Update order
-    #    @order.date_authorized  = DateTime.now
-    #    @order.auth_amount      = @order.total
-    #    @order.financial_status = 'authorized'
-    #    @order.status           = if @order.test? then 'testing' else 'pending' end
-    #    
-    #    # Send out notifications
-    #    OrdersMailer.customer_new_order(@order).deliver
-    #    OrdersMailer.fulfillment_new_order(@order).deliver
-    #    
-    #    # Clear everything
-    #    session[:cart_id] = nil
-    #    
-    #    # Emit order event
-    #    Caboose.plugin_hook('order_authorized', @order)
-    #    
-    #    # Decrement quantities of variants
-    #    @order.decrement_quantities
-    #  else
-    #    @order.financial_status = 'unauthorized'
-    #  end
-    #  
-    #  @order.save
-    #end
-    
-    # GET /checkout/authorize-by-gift-card
-    #def authorize_by_gift_card
-    #  if @order.total < @order.discounts.first.amount_current
-    #    
-    #    # Update order
-    #    @order.date_authorized  = DateTime.now
-    #    @order.auth_amount      = @order.total
-    #    @order.financial_status = 'authorized'
-    #    @order.status           = if @order.test? then 'testing' else 'pending' end
-    #    
-    #    # Send out notifications
-    #    OrdersMailer.customer_new_order(@order).deliver
-    #    OrdersMailer.fulfillment_new_order(@order).deliver
-    #    
-    #    # Clear everything
-    #    session[:cart_id] = nil
-    #    
-    #    # Emit order event
-    #    Caboose.plugin_hook('order_authorized', @order)
-    #    
-    #    # Decrement quantities of variants
-    #    @order.decrement_quantities
-    #    
-    #    @order.save
-    #    
-    #    redirect_to '/checkout/thanks'
-    #  else
-    #    redirect_to '/checkout/error'
-    #  end
-    #end
-    
   end
 end

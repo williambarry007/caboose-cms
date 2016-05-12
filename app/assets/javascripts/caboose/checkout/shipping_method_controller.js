@@ -68,9 +68,10 @@ ShippingMethodController.prototype = {
     if (all_rates.error)
     {
       //select = $('<p/>').append('Enter your shipping address to get shipping rates');
-      select = $('<p/>').append($('<a/>').attr('href','#').html("Enter your shipping address to get shipping rates")
-        .click(function() { $('html, body').animate({ scrollTop: $("#shipping_address_container").offset().top }, 2000); })
-      );
+      select = $('<a/>')
+        .attr('href','#')
+        .html("Enter your shipping address to get shipping rates")
+        .click(function() { $('html, body').animate({ scrollTop: $("#shipping_address_container").offset().top }, 2000); });      
     }
     else
     {

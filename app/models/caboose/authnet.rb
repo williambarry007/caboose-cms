@@ -1,4 +1,5 @@
-        
+require 'activemerchant'
+
 module Caboose
   class Authnet
     
@@ -201,7 +202,8 @@ module Caboose
       end
     
       # No customer profile, so create it 
-      resp = self.gateway.create_customer_profile({ :profile => { :merchant_customer_id => user.id, :email => user.email }})            
+      resp = self.gateway.create_customer_profile({ :profile => { :merchant_customer_id => user.id, :email => user.email }})
+      Caboose.log(resp.inspect)
       if resp.success?
         user.authnet_customer_profile_id = resp.params['customer_profile_id']
         user.save
@@ -219,7 +221,7 @@ module Caboose
     # Verifies that the user has a payment profile and that the payment profile is valid.
     # Creates an empty payment profile for the user if the payment profile is missing or invalid.  
     def verify_payment_profile(user)            
-      resp = self.gateway.get_customer_profile({ :customer_profile_id => user.authnet_customer_profile_id })    
+      resp = self.gateway.get_customer_profile({ :customer_profile_id => user.authnet_customer_profile_id })      
       if resp.success?
         arr = resp.params['profile']['payment_profiles']      
         arr = [arr] if arr && arr.is_a?(Hash)
@@ -268,9 +270,9 @@ module Caboose
       xml = ""
       xml << "<?xml version=\"1.0\"?>\n"
       xml << "<getHostedProfilePageRequest xmlns=\"AnetApi/xml/v1/schema/AnetApiSchema.xsd\">\n"    
-      xml << "  <merchantAuthentication>\n"
-      xml << "    <name>#{AUTHORIZE_NET_CONFIG['api_login_id']}</name>\n"
-      xml << "    <transactionKey>#{AUTHORIZE_NET_CONFIG['api_transaction_key']}</transactionKey>\n"
+      xml << "  <merchantAuthentication>\n"             
+      xml << "    <name>#{@api_login_id}</name>\n"
+      xml << "    <transactionKey>#{@api_transaction_key}</transactionKey>\n"
       xml << "  </merchantAuthentication>\n"
       xml << "  <customerProfileId>#{profile_id}</customerProfileId>\n"
       xml << "  <hostedProfileSettings>\n"

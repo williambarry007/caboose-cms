@@ -1,13 +1,13 @@
 module Caboose
-  class OrderPackage < ActiveRecord::Base
-    self.table_name = 'store_order_packages'
+  class InvoicePackage < ActiveRecord::Base
+    self.table_name = 'store_invoice_packages'
 
-    belongs_to :order
+    belongs_to :invoice
     belongs_to :shipping_package
     belongs_to :shipping_method
     has_many :line_items    
     attr_accessible :id, 
-      :order_id,
+      :invoice_id,
       :shipping_method_id,
       :shipping_package_id,
       :status,
@@ -23,22 +23,22 @@ module Caboose
       self.total = 0.00 if self.total.nil?
     end
     
-    def self.custom_order_packages(store_config, order)          
+    def self.custom_invoice_packages(store_config, invoice)          
       eval(store_config.custom_packages_function)    
     end
     
-    # Calculates the shipping packages required for all the items in the order
-    def self.create_for_order(order)
+    # Calculates the shipping packages required for all the items in the invoice
+    def self.create_for_invoice(invoice)
       
-      store_config = order.site.store_config            
+      store_config = invoice.site.store_config            
       if !store_config.auto_calculate_packages                        
-        self.custom_order_packages(store_config, order)
+        self.custom_invoice_packages(store_config, invoice)
         return
       end
                   
-      # Make sure all the line items in the order have a quantity of 1
+      # Make sure all the line items in the invoice have a quantity of 1
       extra_line_items = []
-      order.line_items.each do |li|        
+      invoice.line_items.each do |li|        
         if li.quantity > 1          
           (1..li.quantity).each{ |i|            
             extra_line_items << li.copy 
@@ -52,8 +52,8 @@ module Caboose
         li.save 
       end 
       
-      # Make sure all the items in the order have attributes set
-      order.line_items.each do |li|              
+      # Make sure all the items in the invoice have attributes set
+      invoice.line_items.each do |li|              
         v = li.variant
         next if v.downloadable
         Caboose.log("Error: variant #{v.id} has a zero weight") and return false if v.weight.nil? || v.weight == 0
@@ -65,11 +65,11 @@ module Caboose
         v.save
       end
             
-      # Reorder the items in the order by volume
-      line_items = order.line_items.sort_by{ |li| li.quantity * (li.variant.volume ? li.variant.volume : 0.00) * -1 }
+      # Reinvoice the items in the order by volume
+      line_items = invoice.line_items.sort_by{ |li| li.quantity * (li.variant.volume ? li.variant.volume : 0.00) * -1 }
                       
       # Get all the packages we're going to use      
-      all_packages = ShippingPackage.where(:site_id => order.site_id).reorder(:flat_rate_price).all      
+      all_packages = ShippingPackage.where(:site_id => invoice.site_id).reorder(:flat_rate_price).all      
       
       # Now go through each variant and fit it in a new or existing package            
       line_items.each do |li|        
@@ -77,10 +77,10 @@ module Caboose
         
         # See if the item will fit in any of the existing packages
         it_fits = false
-        order.order_packages.all.each do |op|
+        invoice.invoice_packages.all.each do |op|
           it_fits = op.fits(li)
           if it_fits            
-            li.order_package_id = op.id
+            li.invoice_package_id = op.id
             li.save            
             break
           end
@@ -92,8 +92,8 @@ module Caboose
         all_packages.each do |sp|
           it_fits = sp.fits(li.variant)          
           if it_fits            
-            op = OrderPackage.create(:order_id => order.id, :shipping_package_id => sp.id)
-            li.order_package_id = op.id
+            op = InvoicePackage.create(:invoice_id => invoice.id, :shipping_package_id => sp.id)
+            li.invoice_package_id = op.id
             li.save                          
             break
           end
@@ -112,7 +112,7 @@ module Caboose
     
     # Gets the activemerchant package based on the shipping package
     def activemerchant_package
-      sc = self.order.site.store_config
+      sc = self.invoice.site.store_config
       
       weight = 0.0
       self.line_items.each{ |li| weight = weight + (li.variant.weight * li.quantity) }      

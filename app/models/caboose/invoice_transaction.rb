@@ -1,11 +1,11 @@
 module Caboose
-  class OrderTransaction < ActiveRecord::Base
-    self.table_name  = 'store_order_transactions'
+  class InvoiceTransaction < ActiveRecord::Base
+    self.table_name  = 'store_invoice_transactions'
     self.primary_key = 'id'
     
-    belongs_to :order
+    belongs_to :invoice
     attr_accessible :id,    
-      :order_id,
+      :invoice_id,
       :transaction_id,
       :transaction_type,
       :amount,
@@ -27,11 +27,11 @@ module Caboose
     
     def self.type_from_authnet_status(status)
       case status
-        when 'settledSuccessfully'        then OrderTransaction::TYPE_CAPTURE
-        when 'voided'                     then OrderTransaction::TYPE_VOID
-        when 'declined'                   then OrderTransaction::TYPE_AUTHORIZE
-        when 'authorizedPendingCapture'   then OrderTransaction::TYPE_AUTHORIZE
-        when 'refundSettledSuccessfully'  then OrderTransaction::TYPE_REFUND
+        when 'settledSuccessfully'        then InvoiceTransaction::TYPE_CAPTURE
+        when 'voided'                     then InvoiceTransaction::TYPE_VOID
+        when 'declined'                   then InvoiceTransaction::TYPE_AUTHORIZE
+        when 'authorizedPendingCapture'   then InvoiceTransaction::TYPE_AUTHORIZE
+        when 'refundSettledSuccessfully'  then InvoiceTransaction::TYPE_REFUND
       end
     end
     

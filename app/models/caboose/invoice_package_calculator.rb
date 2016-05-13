@@ -2,42 +2,42 @@ require 'active_shipping'
 #include ActiveMerchant::Shipping
 
 module Caboose
-  class OrderPackageCalculator
+  class InvoicePackageCalculator
     
-    def self.custom_order_packages(store_config, order)          
+    def self.custom_invoice_packages(store_config, invoice)          
       return eval(store_config.custom_packages_function)    
     end
     
-    def self.order_packages(order)
+    def self.invoice_packages(invoice)
       return [] if Caboose::store_shipping.nil?
             
-      sc = order.site.store_config
+      sc = invoice.site.store_config
       if !sc.auto_calculate_packages        
-        order_packages = self.custom_order_packages(sc, order)
-        return order_packages        
+        invoice_packages = self.custom_invoice_packages(sc, invoice)
+        return invoice_packages        
       end
       
-      # Remove any order packages      
-      LineItem.where(:order_id => order.id).update_all(:order_package_id => nil)
-      OrderPackage.where(:order_id => order.id).destroy_all      
+      # Remove any invoice packages      
+      LineItem.where(:invoice_id => invoice.id).update_all(:invoice_package_id => nil)
+      InvoicePackage.where(:invoice_id => invoice.id).destroy_all      
         
       # Calculate what shipping packages we'll need            
-      OrderPackage.create_for_order(order)
+      InvoicePackage.create_for_invoice(invoice)
               
       return all_rates
     end
     
-    def self.rate(order)
-      return nil if !order.shipping_service_code
-      self.rates(order).each { |rate| return rate if rate[:service_code] == order.shipping_service_code }
+    def self.rate(invoice)
+      return nil if !invoice.shipping_service_code
+      self.rates(invoice).each { |rate| return rate if rate[:service_code] == invoice.shipping_service_code }
       return nil
     end
                 
-    # Calculates the packages required for all the items in the order
-    #def self.packages_for_order(order)
+    # Calculates the packages required for all the items in the invoice
+    #def self.packages_for_invoice(invoice)
     #
-    #  # Make sure all the items in the order have attributes set
-    #  order.line_items.each do |li|              
+    #  # Make sure all the items in the invoice have attributes set
+    #  invoice.line_items.each do |li|              
     #    v = li.variant
     #    Caboose.log("Error: variant #{v.id} has a zero weight") and return false if v.weight.nil? || v.weight == 0
     #    next if v.volume && v.volume > 0
@@ -48,9 +48,9 @@ module Caboose
     #    v.save
     #  end
     #        
-    #  # Reorder the items in the order by volume            
+    #  # Reinvoice the items in the order by volume            
     #  h = {}
-    #  order.line_items.each do |li|
+    #  invoice.line_items.each do |li|
     #    (1..li.quantity).each do |i|        
     #      v = li.variant          
     #      h[v.volume] = v          
@@ -58,7 +58,7 @@ module Caboose
     #  end      
     #  variants = h.sort_by{ |k,v| k }.collect{ |x| x[1] }
     #  
-    #  all_packages = ShippingPackage.reorder(:price).all
+    #  all_packages = ShippingPackage.reinvoice(:price).all
     #  packages = []
     #  
     #  # Now go through each variant and fit it in a new or existing package

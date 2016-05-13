@@ -1,7 +1,7 @@
 module Caboose
-  class OrderReporter
+  class InvoiceReporter
             
-    def OrderReporter.summary_report(site_id, d1, d2)
+    def InvoiceReporter.summary_report(site_id, d1, d2)
       q = ["select 
           concat(date_part('year', date_authorized), '-', date_part('month', date_authorized), '-', date_part('day', date_authorized)),
           count(*),          
@@ -13,7 +13,7 @@ module Caboose
           sum(total),
           sum(cost),
           sum(profit)
-        from store_orders
+        from store_invoices
         where site_id = ?
         and (financial_status = ? or financial_status = ?)
         and date_authorized >= ?
@@ -68,7 +68,7 @@ module Caboose
       return days2            
     end
     
-    def OrderReporter.city_report(site_id, d1, d2)
+    def InvoiceReporter.city_report(site_id, d1, d2)
       q = ["select 
         count(*),
         sum(O.subtotal),
@@ -79,7 +79,7 @@ module Caboose
         sum(O.total),
         SA.city,
         SA.state
-        from store_orders O
+        from store_invoices O
         left join store_addresses SA on O.shipping_address_id = SA.id
         where O.site_id = ?
         and (O.financial_status = ? or O.financial_status = ?)

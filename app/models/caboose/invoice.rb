@@ -1,10 +1,10 @@
 #
-# Order
+# Invoice
 #
 
 module Caboose        
-  class Order < ActiveRecord::Base
-    self.table_name  = 'store_orders'
+  class Invoice < ActiveRecord::Base
+    self.table_name  = 'store_invoices'
     self.primary_key = 'id'
 
     belongs_to :site    
@@ -13,13 +13,13 @@ module Caboose
     belongs_to :billing_address, :class_name => 'Caboose::Address'
     has_many :discounts    
     has_many :line_items, :order => :id
-    has_many :order_packages, :class_name => 'Caboose::OrderPackage'
-    has_many :order_transactions
+    has_many :invoice_packages, :class_name => 'Caboose::InvoicePackage'
+    has_many :invoice_transactions
     
     attr_accessible :id,
       :site_id,
       :alternate_id,
-      :order_number,      
+      :invoice_number,      
       :subtotal,
       :tax,            
       :shipping,
@@ -46,6 +46,15 @@ module Caboose
     STATUS_READY_TO_SHIP = 'ready to ship'
     STATUS_SHIPPED       = 'shipped'    
     STATUS_TESTING       = 'testing'
+    
+    # New
+    #STATUS_PENDING        = 'Pending'
+    #STATUS_OVERDUE        = 'Overdue'
+    #STATUS_UNDER_REVIEW   = 'Under Review'
+    #STATUS_PAID           = 'Paid'
+    #STATUS_PAID_BY_CHECK  = 'Paid By Check'
+    #STATUS_CANCELED       = 'Canceled'
+    #STATUS_WAIVED         = 'Waived'
 
     FINANCIAL_STATUS_PENDING    = 'pending'
     FINANCIAL_STATUS_AUTHORIZED = 'authorized'
@@ -106,7 +115,7 @@ module Caboose
     end
     
     def resend_confirmation
-      OrdersMailer.configure_for_site(self.site_id).customer_new_order(self).deliver
+      InvoicesMailer.configure_for_site(self.site_id).customer_new_invoice(self).deliver
     end
     
     def test?
@@ -154,9 +163,9 @@ module Caboose
     end
     
     def calculate_shipping      
-      return 0.0 if self.order_packages.nil? || self.order_packages.count == 0
+      return 0.0 if self.invoice_packages.nil? || self.invoice_packages.count == 0
       x = 0.0
-      self.order_packages.all.each{ |op| x = x + op.total }
+      self.invoice_packages.all.each{ |op| x = x + op.total }
       return x
     end
     
@@ -224,9 +233,9 @@ module Caboose
     end
     
     def has_empty_shipping_methods?
-      return true if self.order_packages.nil?
-      return true if self.order_packages.count == 0
-      self.order_packages.all.each do |op|
+      return true if self.invoice_packages.nil?
+      return true if self.invoice_packages.count == 0
+      self.invoice_packages.all.each do |op|
         return true if op.shipping_method_id.nil?
       end
       return false
@@ -257,21 +266,21 @@ module Caboose
     def capture_funds
       
       resp = StdClass.new      
-      t = OrderTransaction.where(:order_id => self.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
+      t = InvoiceTransaction.where(:invoice_id => self.id, :transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
             
-      if self.financial_status == Order::FINANCIAL_STATUS_CAPTURED
-        resp.error = "Funds for this order have already been captured."    
+      if self.financial_status == Invoice::FINANCIAL_STATUS_CAPTURED
+        resp.error = "Funds for this invoice have already been captured."    
       elsif self.total > t.amount
-        resp.error = "The order total exceeds the authorized amount."
+        resp.error = "The invoice total exceeds the authorized amount."
       elsif t.nil?
-        resp.error = "This order doesn't seem to be authorized."
+        resp.error = "This invoice doesn't seem to be authorized."
       else
                         
         sc = self.site.store_config
-        ot = Caboose::OrderTransaction.new(
-          :order_id => self.id,
+        ot = Caboose::InvoiceTransaction.new(
+          :invoice_id => self.id,
           :date_processed => DateTime.now.utc,
-          :transaction_type => OrderTransaction::TYPE_CAPTURE,
+          :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
           :amount => self.total
         )
         
@@ -291,7 +300,7 @@ module Caboose
               self.save              
             end
                                     
-            self.update_attribute(:financial_status, Order::FINANCIAL_STATUS_CAPTURED)
+            self.update_attribute(:financial_status, Invoice::FINANCIAL_STATUS_CAPTURED)
             resp.success = 'Captured funds successfully'
                                     
           when 'stripe'
@@ -307,23 +316,23 @@ module Caboose
       return resp
     end
         
-    # Void an authorized order
+    # Void an authorized invoice
     def void
             
       resp = StdClass.new
-      t = OrderTransaction.where(:order_id => self.id, :transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
+      t = InvoiceTransaction.where(:invoice_id => self.id, :transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       
-      if self.financial_status == Order::FINANCIAL_STATUS_CAPTURED
-        resp.error = "This order has already been captured, you will need to refund instead"
+      if self.financial_status == Invoice::FINANCIAL_STATUS_CAPTURED
+        resp.error = "This invoice has already been captured, you will need to refund instead"
       elsif t.nil?
-        resp.error = "This order doesn't seem to be authorized."
+        resp.error = "This invoice doesn't seem to be authorized."
       else
                 
         sc = self.site.store_config
-        ot = Caboose::OrderTransaction.new(
-          :order_id => self.id,
+        ot = Caboose::InvoiceTransaction.new(
+          :invoice_id => self.id,
           :date_processed => DateTime.now.utc,
-          :transaction_type => OrderTransaction::TYPE_VOID,
+          :transaction_type => InvoiceTransaction::TYPE_VOID,
           :amount => self.total
         )
         
@@ -333,17 +342,17 @@ module Caboose
               sc.authnet_api_login_id, 
               sc.authnet_api_transaction_key,                      
               self.total,
-              :transaction_type => OrderTransaction::TYPE_VOID,
+              :transaction_type => InvoiceTransaction::TYPE_VOID,
               :transaction_id => t.transaction_id,
               :test => sc.pp_testing
             )                    
             self.update_attributes(
-              :financial_status => Order::FINANCIAL_STATUS_VOIDED,
-              :status => Order::STATUS_CANCELED
+              :financial_status => Invoice::FINANCIAL_STATUS_VOIDED,
+              :status => Invoice::STATUS_CANCELED
             )
             self.save          
-            # TODO: Add the variant quantities ordered back        
-            resp.success = "Order voided successfully"
+            # TODO: Add the variant quantities invoiceed back        
+            resp.success = "Invoice voided successfully"
                         
             ot.success        = response.response_code && response.response_code == '1'            
             ot.transaction_id = response.transaction_id
@@ -352,10 +361,10 @@ module Caboose
             ot.save
           
           when 'stripe'
-            # TODO: Implement void order for strip
+            # TODO: Implement void invoice for strip
             
           when 'payscape'
-            # TODO: Implement void order for payscape
+            # TODO: Implement void invoice for payscape
             
         end
         
@@ -366,47 +375,47 @@ module Caboose
     #def refund
     #      
     #  resp = StdClass.new
-    #  t = OrderTransaction.where(:order_id => self.id, :transaction_type => OrderTransaction::TYPE_CAPTURE, :success => true).first
+    #  t = InvoiceTransaction.where(:invoice_id => self.id, :transaction_type => InvoiceTransaction::TYPE_CAPTURE, :success => true).first
     #      
-    #  if self.financial_status != Order::FINANCIAL_STATUS_CAPTURED
-    #    resp.error = "This order hasn't been captured yet, you will need to void instead"
+    #  if self.financial_status != Invoice::FINANCIAL_STATUS_CAPTURED
+    #    resp.error = "This invoice hasn't been captured yet, you will need to void instead"
     #  else
     #    
     #    sc = self.site.store_config
     #    case sc.pp_name
     #      when 'authorize.net'
     #      
-    #    if PaymentProcessor.refund(order)
-    #      order.update_attributes(
-    #        :financial_status => Order::FINANCIAL_STATUS_REFUNDED,
-    #        :status => Order::STATUS_CANCELED
+    #    if PaymentProcessor.refund(invoice)
+    #      invoice.update_attributes(
+    #        :financial_status => Invoice::FINANCIAL_STATUS_REFUNDED,
+    #        :status => Invoice::STATUS_CANCELED
     #      )
     #      
-    #      response.success = 'Order refunded successfully'
+    #      response.success = 'Invoice refunded successfully'
     #    else
-    #      response.error = 'Error refunding order'
+    #      response.error = 'Error refunding invoice'
     #    end
     #    
-    #    #if order.calculate_net < (order.amount_discounted || 0) || PaymentProcessor.refund(order)
-    #    #  order.financial_status = 'refunded'
-    #    #  order.status = 'refunded'
-    #    #  order.save
+    #    #if invoice.calculate_net < (invoice.amount_discounted || 0) || PaymentProcessor.refund(invoice)
+    #    #  invoice.financial_status = 'refunded'
+    #    #  invoice.status = 'refunded'
+    #    #  invoice.save
     #    #  
-    #    #  if order.discounts.any?
-    #    #    discount = order.discounts.first
-    #    #    amount_to_refund = order.calculate_net < order.amount_discounted ? order.calculate_net : order.amount_discounted
+    #    #  if invoice.discounts.any?
+    #    #    discount = invoice.discounts.first
+    #    #    amount_to_refund = invoice.calculate_net < invoice.amount_discounted ? invoice.calculate_net : invoice.amount_discounted
     #    #    discount.update_attribute(:amount_current, amount_to_refund + discount.amount_current)
     #    #  end
     #    #  
-    #    #  response.success = "Order refunded successfully"
+    #    #  response.success = "Invoice refunded successfully"
     #    #else
-    #    #  response.error = "Error refunding order."
+    #    #  response.error = "Error refunding invoice."
     #    #end
     #  end
     #
     #  render json: response
     #  
-    #  # return if !user_is_allowed('orders', 'edit')
+    #  # return if !user_is_allowed('invoices', 'edit')
     #  #     
     #  # response = Caboose::StdClass.new({
     #  #   'refresh' => nil,
@@ -414,22 +423,22 @@ module Caboose
     #  #   'success' => nil
     #  # })
     #  #     
-    #  # order = Order.find(params[:id])
+    #  # invoice = Invoice.find(params[:id])
     #  #     
-    #  # if order.financial_status != 'captured'
-    #  #   response.error = "This order hasn't been captured yet, you will need to void instead"
+    #  # if invoice.financial_status != 'captured'
+    #  #   response.error = "This invoice hasn't been captured yet, you will need to void instead"
     #  # else
-    #  #   if PaymentProcessor.refund(order)
-    #  #     order.financial_status = 'refunded'
-    #  #     order.status = 'refunded'
-    #  #     order.save
+    #  #   if PaymentProcessor.refund(invoice)
+    #  #     invoice.financial_status = 'refunded'
+    #  #     invoice.status = 'refunded'
+    #  #     invoice.save
     #  #     
-    #  #     # Add the variant quantities ordered back
-    #  #     order.cancel
+    #  #     # Add the variant quantities invoiceed back
+    #  #     invoice.cancel
     #  #     
-    #  #     response.success = "Order refunded successfully"
+    #  #     response.success = "Invoice refunded successfully"
     #  #   else
-    #  #     response.error = "Error refunding order."
+    #  #     response.error = "Error refunding invoice."
     #  #   end
     #  # end
     #  #     
@@ -437,7 +446,7 @@ module Caboose
     #end
     
     def send_payment_authorization_email
-      OrdersMailer.configure_for_site(self.site_id).customer_payment_authorization(self).deliver
+      InvoicesMailer.configure_for_site(self.site_id).customer_payment_authorization(self).deliver
     end
     
     def determine_statuses
@@ -447,21 +456,21 @@ module Caboose
       void    = false
       refund  = false
       
-      self.order_transactions.each do |ot|
-        auth    = true if ot.transaction_type == OrderTransaction::TYPE_AUTHORIZE && ot.success == true
-        capture = true if ot.transaction_type == OrderTransaction::TYPE_CAPTURE   && ot.success == true
-        void    = true if ot.transaction_type == OrderTransaction::TYPE_VOID      && ot.success == true
-        refund  = true if ot.transaction_type == OrderTransaction::TYPE_REFUND    && ot.success == true
+      self.invoice_transactions.each do |it|
+        auth    = true if it.transaction_type == InvoiceTransaction::TYPE_AUTHORIZE && it.success == true
+        capture = true if it.transaction_type == InvoiceTransaction::TYPE_CAPTURE   && it.success == true
+        void    = true if it.transaction_type == InvoiceTransaction::TYPE_VOID      && it.success == true
+        refund  = true if it.transaction_type == InvoiceTransaction::TYPE_REFUND    && it.success == true
       end
       
-      if    refund  then self.financial_status = Order::FINANCIAL_STATUS_REFUNDED
-      elsif void    then self.financial_status = Order::FINANCIAL_STATUS_VOIDED
-      elsif capture then self.financial_status = Order::FINANCIAL_STATUS_CAPTURED
-      elsif auth    then self.financial_status = Order::FINANCIAL_STATUS_AUTHORIZED
-      else               self.financial_status = Order::FINANCIAL_STATUS_PENDING
+      if    refund  then self.financial_status = Invoice::FINANCIAL_STATUS_REFUNDED
+      elsif void    then self.financial_status = Invoice::FINANCIAL_STATUS_VOIDED
+      elsif capture then self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
+      elsif auth    then self.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED
+      else               self.financial_status = Invoice::FINANCIAL_STATUS_PENDING
       end
     
-      self.status = Order::STATUS_PENDING if self.status == Order::STATUS_CART && (refund || void || capture || auth) 
+      self.status = Invoice::STATUS_PENDING if self.status == Invoice::STATUS_CART && (refund || void || capture || auth) 
       
       self.save
 
@@ -472,6 +481,11 @@ module Caboose
         return true if li.hide_prices
       end
       return false
+    end  
+    
+    def amount_not_paid
+      amount = self.vendor_transactions.where(:success => true).all.collect{ |vt| vt.amount }.sum
+      return self.total - amount
     end
     
   end

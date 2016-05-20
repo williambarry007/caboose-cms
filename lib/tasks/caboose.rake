@@ -3,6 +3,69 @@ require 'aws-sdk'
 
 namespace :caboose do
   
+  desc "Check ruby syntax in all ruby files"
+  task :check_syntax => :environment do    
+    puts "Checking syntax in all ruby files...\n\n"
+    
+    str = `find #{Rails.root} -name "*.rb"`
+    files = str ? str.strip.split("\n") : []
+    
+    errors = {}
+    files.each do |file|
+      str = `ruby -c #{file}`      
+      next if str.nil? || str.strip == 'Syntax OK'
+      errors[file] = str
+    end
+    
+    if errors.count == 0      
+      puts "                                           \n"
+      puts "             █████                         \n"
+      puts "            ███████                        \n"
+      puts "           ███   ██                        \n"
+      puts "           ██    ██                        \n"
+      puts "          ███    ███                       \n"
+      puts "          ███    ███                       \n"
+      puts "           ██     ███                      \n"
+      puts "           ███     ███                     \n"
+      puts "            ███     ████                   \n"
+      puts "             ██      ████                  \n"
+      puts "             ███       ███                 \n"
+      puts "              ███       ███                \n"
+      puts "              ███        ███               \n"
+      puts "               ██          ███             \n"
+      puts "           ███ ███          ██             \n"
+      puts "      ████████████           ███           \n"
+      puts "    ████████                  ███          \n"
+      puts "   ███                         █████████   \n"
+      puts "  ███    █████████                  █████  \n"
+      puts "  ██   ███████ ████                   ███  \n"
+      puts "  ██    ███       ███                  ██  \n"
+      puts "  ███           █████                  ██  \n"
+      puts "   ███       ████████                  ██  \n"
+      puts "    ████████████   ████                ██  \n"
+      puts "   ███ ██████       ████               ██  \n"
+      puts "   ███           ██████                ██  \n"
+      puts "    ████ ████ ██████████               ██  \n"
+      puts "     ████████████     ███             ███  \n"
+      puts "      ██           ███████       ███████   \n"
+      puts "      ████      ████████        ████████   \n"
+      puts "       ████████████   ███     ███          \n"
+      puts "          ███ █ █      ███   ███           \n"
+      puts "          ███      █████  █████            \n"
+      puts "           ██████████████████              \n"
+      puts "            ██████████████                 \n"
+      puts "\n"
+      puts "Syntax is OK in all files.\n"
+      puts "\n"
+    else
+      puts "\n"
+      puts "--------------------------------------------------------------------\n";
+      puts "IMPORTANT\n"
+      puts "Errors detected. Please correct before pushing to production."      
+      puts "--------------------------------------------------------------------\n";
+    end     
+  end
+  
   desc "Update super admin password"
   task :update_superadmin_password => :environment do
     sa = Caboose::User.where(:username => 'superadmin').first        

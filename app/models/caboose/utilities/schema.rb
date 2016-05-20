@@ -46,8 +46,14 @@ class Caboose::Utilities::Schema
     c = ActiveRecord::Base.connection
     self.schema.each do |model, columns|
       tbl = model.table_name
-      puts "Creating table #{tbl}..."
-      c.create_table tbl if !c.table_exists?(tbl)
+      puts "Creating table #{tbl}..."      
+      if !c.table_exists?(tbl)
+        if model.primary_key != 'id'          
+          c.create_table tbl, { :id => false, :force => true }
+        else
+          c.create_table tbl
+        end          
+      end            
       columns.each do |col|
         puts "Creating column #{tbl}.#{col[0]}..."
         
@@ -72,8 +78,11 @@ class Caboose::Utilities::Schema
         else                    
           c.execute("alter table #{tbl} alter column #{col[0]} type #{col[1]} using cast(#{col[0]} as #{col[1]})")
     
+        end        
+        if col[0].to_s == model.primary_key
+          c.execute("alter table #{tbl} add primary key (\"#{col[0].to_s}\")")
         end
-      end
+      end                  
     end
         
     create_indexes

@@ -866,9 +866,9 @@ IndexTable.prototype = {
         });
         form.append(select);
       }
-      else
+      else // text
       {
-        form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
+        form.append($('<p/>').append($('<input/>').attr('type', 'text').attr('id', 'new_form_' + f.name).attr('name', f.name).attr('placeholder', f.nice_name).css('width', '' + f.width + 'px')));
         if (!focus_field)
           focus_field = f.name;
       }
@@ -881,7 +881,19 @@ IndexTable.prototype = {
     var div = $('<div/>').addClass('note')
       .append($('<h2/>').css('margin-top', 0).css('padding-top', 0).html(that.new_model_text))
       .append(form);        
-    that.show_message(div, null, function() { $('#new_form input[name="' + focus_field + '"]').focus(); });
+    that.show_message(div, null, function() { 
+      $('#new_form input[name="' + focus_field + '"]').focus();
+      
+      $.each(that.new_model_fields, function(i, f) {
+        if (f.type == 'date')
+        {
+          $('#new_form_' + f.name).datetimepicker({
+            format: f.date_format ? f.date_format : 'm/d/Y',      
+            timepicker: false                        
+          });
+        }
+      });
+    });
   },
     
   add_model: function() 

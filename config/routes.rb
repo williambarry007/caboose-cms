@@ -648,18 +648,18 @@ Caboose::Engine.routes.draw do
           
   
 
-  get     "/admin/categories"                         => "categories#admin_index"
-  get     "/admin/categories/new"                     => "categories#admin_new"
-  get     "/admin/categories/options"                 => "categories#admin_options"
-  get     '/admin/categories/status-options'          => 'categories#admin_status_options'
-  get     "/admin/categories/:id/sort-children"       => "categories#admin_sort_children"
-  put     "/admin/categories/:id/children/sort-order" => "categories#admin_update_sort_order"
-  get     "/admin/categories/:id/products/json"       => "categories#admin_category_products"  
-  get     "/admin/categories/:id"                     => "categories#admin_edit"  
-  put     "/admin/categories/:id"                     => "categories#admin_update"    
-  post    "/admin/categories/:id"                     => "categories#admin_update"  
-  post    "/admin/categories"                         => "categories#admin_add"
-  delete  "/admin/categories/:id"                     => "categories#admin_delete"
+  # get     "/admin/categories"                         => "categories#admin_index"
+  # get     "/admin/categories/new"                     => "categories#admin_new"
+  # get     "/admin/categories/options"                 => "categories#admin_options"
+  # get     '/admin/categories/status-options'          => 'categories#admin_status_options'
+  # get     "/admin/categories/:id/sort-children"       => "categories#admin_sort_children"
+  # put     "/admin/categories/:id/children/sort-order" => "categories#admin_update_sort_order"
+  # get     "/admin/categories/:id/products/json"       => "categories#admin_category_products"  
+  # get     "/admin/categories/:id"                     => "categories#admin_edit"  
+  # put     "/admin/categories/:id"                     => "categories#admin_update"    
+  # post    "/admin/categories/:id"                     => "categories#admin_update"  
+  # post    "/admin/categories"                         => "categories#admin_add"
+  # delete  "/admin/categories/:id"                     => "categories#admin_delete"
   
   #=============================================================================  
   # Orders
@@ -718,33 +718,33 @@ Caboose::Engine.routes.draw do
   # Gift cards
   #=============================================================================
   
-  get    "/admin/gift-cards"                   => "gift_cards#admin_index"  
-  get    "/admin/gift-cards/json"              => "gift_cards#admin_json"
-  get    "/admin/gift-cards/new"               => "gift_cards#admin_new"        
-  get    "/admin/gift-cards/status-options"    => "gift_cards#admin_status_options"
-  get    "/admin/gift-cards/card-type-options" => "gift_cards#admin_card_type_options"
-  get    "/admin/gift-cards/:id/json"          => "gift_cards#admin_json_single"
-  get    "/admin/gift-cards/:id"               => "gift_cards#admin_edit"
-  put    "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_update"  
-  put    "/admin/gift-cards/:id"               => "gift_cards#admin_update"
-  post   "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_add"  
-  post   "/admin/gift-cards"                   => "gift_cards#admin_add"
-  delete "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_delete"
-  delete "/admin/gift-cards/:id"               => "gift_cards#admin_delete"
+  # get    "/admin/gift-cards"                   => "gift_cards#admin_index"  
+  # get    "/admin/gift-cards/json"              => "gift_cards#admin_json"
+  # get    "/admin/gift-cards/new"               => "gift_cards#admin_new"        
+  # get    "/admin/gift-cards/status-options"    => "gift_cards#admin_status_options"
+  # get    "/admin/gift-cards/card-type-options" => "gift_cards#admin_card_type_options"
+  # get    "/admin/gift-cards/:id/json"          => "gift_cards#admin_json_single"
+  # get    "/admin/gift-cards/:id"               => "gift_cards#admin_edit"
+  # put    "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_update"  
+  # put    "/admin/gift-cards/:id"               => "gift_cards#admin_update"
+  # post   "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_add"  
+  # post   "/admin/gift-cards"                   => "gift_cards#admin_add"
+  # delete "/admin/gift-cards/bulk"              => "gift_cards#admin_bulk_delete"
+  # delete "/admin/gift-cards/:id"               => "gift_cards#admin_delete"
       
   #=============================================================================
   # Vendors
   #=============================================================================
   
-  get     '/admin/vendors/options'        => 'vendors#options'
-  get     '/admin/vendors/status-options' => 'vendors#status_options'    
-  get     '/admin/vendors/new'            => 'vendors#admin_new'
-  get     '/admin/vendors/:id'            => 'vendors#admin_edit'
-  get     '/admin/vendors'                => 'vendors#admin_index'
-  post    '/admin/vendors/:id/image'      => 'vendors#admin_update_image'
-  put     '/admin/vendors/:id'            => 'vendors#admin_update'
-  post    '/admin/vendors'                => 'vendors#admin_add'
-  delete  '/admin/vendors/:id'            => 'vendors#admin_delete'
+  # get     '/admin/vendors/options'        => 'vendors#options'
+  # get     '/admin/vendors/status-options' => 'vendors#status_options'    
+  # get     '/admin/vendors/new'            => 'vendors#admin_new'
+  # get     '/admin/vendors/:id'            => 'vendors#admin_edit'
+  # get     '/admin/vendors'                => 'vendors#admin_index'
+  # post    '/admin/vendors/:id/image'      => 'vendors#admin_update_image'
+  # put     '/admin/vendors/:id'            => 'vendors#admin_update'
+  # post    '/admin/vendors'                => 'vendors#admin_add'
+  # delete  '/admin/vendors/:id'            => 'vendors#admin_delete'
     	
   #=============================================================================
   # API

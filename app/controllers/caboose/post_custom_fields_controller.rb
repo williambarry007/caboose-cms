@@ -3,13 +3,13 @@ module Caboose
     
     helper :application
          
-    # GET /admin/post-custom-fields    
+    # @route GET /admin/post-custom-fields    
     def admin_index
       return if !user_is_allowed_to 'view', 'postcustomfields'              
       render :layout => 'caboose/admin'    
     end
     
-    # GET /admin/post-custom-fields/json        
+    # @route GET /admin/post-custom-fields/json        
     def admin_json
       return if !user_is_allowed_to 'view', 'postcustomfields'
       pager = self.fields_pager        
@@ -33,21 +33,21 @@ module Caboose
       })
     end
     
-    # GET /admin/post-custom-fields/:id/json    
+    # @route GET /admin/post-custom-fields/:id/json    
     def admin_json_single
       return if !user_is_allowed_to 'view', 'postcustomfields'
       f = PostCustomField.find(params[:id])      
       render :json => f
     end
                       
-    # GET /admin/post-custom-fields/:id
+    # @route GET /admin/post-custom-fields/:id
     def admin_edit
       return if !user_is_allowed('postcustomfields', 'edit')    
       @post_custom_field = PostCustomField.find(params[:id])      
       render :layout => 'caboose/admin'
     end
         
-    # PUT /admin/post-custom-fields/:id
+    # @route PUT /admin/post-custom-fields/:id
     def admin_update      
       return if !user_is_allowed('postcustomfields', 'edit')
       
@@ -68,7 +68,7 @@ module Caboose
       render :json => resp
     end
   
-    # POST /admin/post-custom-fields
+    # @route POST /admin/post-custom-fields
     def admin_add
       return if !user_is_allowed('postcustomfields', 'add')
   
@@ -90,7 +90,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/post-custom-fields/:id
+    # @route DELETE /admin/post-custom-fields/:id
     def admin_delete
       return if !user_is_allowed('postcustomfields', 'edit')
 
@@ -108,7 +108,8 @@ module Caboose
       render :json => { 'redirect' => '/admin/post-custom-fields' }      
     end
         
-    # GET /admin/post-custom-fields/:field-options    
+    # @route_priority 1
+    # @route GET /admin/post-custom-fields/:field-options    
     def admin_options
       return if !user_is_allowed_to 'view', 'postcustomfields'  
 	    options = []

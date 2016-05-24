@@ -4,7 +4,7 @@ module Caboose
     
     helper :application
     
-    # PUT /admin/calendars/:calendar_id/event-groups/:id
+    # @route PUT /admin/calendars/:calendar_id/event-groups/:id
     def admin_update
       return unless user_is_allowed('calendars', 'edit')
       
@@ -36,28 +36,26 @@ module Caboose
       render :json => resp
     end
      
-    # GET /admin/event-groups/period-options
-    def admin_period_options
-      render :json => [
-        { 'value' => CalendarEventGroup::PERIOD_DAY   , 'text' => CalendarEventGroup::PERIOD_DAY   },
-        { 'value' => CalendarEventGroup::PERIOD_WEEK  , 'text' => CalendarEventGroup::PERIOD_WEEK  },
-        { 'value' => CalendarEventGroup::PERIOD_MONTH , 'text' => CalendarEventGroup::PERIOD_MONTH },
-        { 'value' => CalendarEventGroup::PERIOD_YEAR  , 'text' => CalendarEventGroup::PERIOD_YEAR  },
-      ]
-    end
-    
-    # GET /admin/event-groups/frequency-options
-    def admin_frequency_options
-      arr = (1..30).collect{ |i| { 'value' => i, 'text' => i }}
-      render :json => arr        
-    end
-    
-    # GET /admin/event-groups/repeat-by-options
-    def admin_repeat_by_options
-      render :json => [        
-        { 'value' => CalendarEventGroup::REPEAT_BY_DAY_OF_MONTH , 'text' => 'same day of the month' },
-        { 'value' => CalendarEventGroup::REPEAT_BY_DAY_OF_WEEK  , 'text' => 'same day of the week' },        
-      ]
+    # @route GET /admin/event-groups/:field-options
+    def admin_options
+      options = []
+      case params[:field]
+        when 'period'
+          options = [
+            { 'value' => CalendarEventGroup::PERIOD_DAY   , 'text' => CalendarEventGroup::PERIOD_DAY   },
+            { 'value' => CalendarEventGroup::PERIOD_WEEK  , 'text' => CalendarEventGroup::PERIOD_WEEK  },
+            { 'value' => CalendarEventGroup::PERIOD_MONTH , 'text' => CalendarEventGroup::PERIOD_MONTH },
+            { 'value' => CalendarEventGroup::PERIOD_YEAR  , 'text' => CalendarEventGroup::PERIOD_YEAR  },
+          ]
+        when 'frequency'
+          options = (1..30).collect{ |i| { 'value' => i, 'text' => i }}
+        when 'repeat-by'
+          options = [
+            { 'value' => CalendarEventGroup::REPEAT_BY_DAY_OF_MONTH , 'text' => 'same day of the month' },
+            { 'value' => CalendarEventGroup::REPEAT_BY_DAY_OF_WEEK  , 'text' => 'same day of the week' },        
+          ]
+      end      
+      render :json => options
     end
     
   end

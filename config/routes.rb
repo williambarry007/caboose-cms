@@ -419,57 +419,57 @@ Caboose::Engine.routes.draw do
   # Post Custom Fields and Values
   #=============================================================================
   
-  put    "/admin/post-custom-field-values/:id"      => "post_custom_field_values#admin_update"
-  get    "/admin/post-custom-fields/json"           => "post_custom_fields#admin_json"
-  get    "/admin/post-custom-fields/:field-options" => "post_custom_fields#admin_options"  
-  get    "/admin/post-custom-fields/:id/json"       => "post_custom_fields#admin_json_single"  
-  get    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_edit"
-  put    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_update"
-  get    "/admin/post-custom-fields"                => "post_custom_fields#admin_index"        
-  post   "/admin/post-custom-fields"                => "post_custom_fields#admin_add"
-  delete "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_delete"
+  #put    "/admin/post-custom-field-values/:id"      => "post_custom_field_values#admin_update"
+  #get    "/admin/post-custom-fields/json"           => "post_custom_fields#admin_json"
+  #get    "/admin/post-custom-fields/:field-options" => "post_custom_fields#admin_options"  
+  #get    "/admin/post-custom-fields/:id/json"       => "post_custom_fields#admin_json_single"  
+  #get    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_edit"
+  #put    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_update"
+  #get    "/admin/post-custom-fields"                => "post_custom_fields#admin_index"        
+  #post   "/admin/post-custom-fields"                => "post_custom_fields#admin_add"
+  #delete "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_delete"
   
   #=============================================================================
   # Page Custom Fields and Values
   #=============================================================================
   
-  put    "/admin/page-custom-field-values/:id"      => "page_custom_field_values#admin_update"
-  get    "/admin/page-custom-fields/json"           => "page_custom_fields#admin_json"
-  get    "/admin/page-custom-fields/:field-options" => "page_custom_fields#admin_options"  
-  get    "/admin/page-custom-fields/:id/json"       => "page_custom_fields#admin_json_single"  
-  get    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_edit"
-  put    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_update"
-  get    "/admin/page-custom-fields"                => "page_custom_fields#admin_index"        
-  post   "/admin/page-custom-fields"                => "page_custom_fields#admin_add"
-  delete "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_delete"
+  #put    "/admin/page-custom-field-values/:id"      => "page_custom_field_values#admin_update"
+  #get    "/admin/page-custom-fields/json"           => "page_custom_fields#admin_json"
+  #get    "/admin/page-custom-fields/:field-options" => "page_custom_fields#admin_options"  
+  #get    "/admin/page-custom-fields/:id/json"       => "page_custom_fields#admin_json_single"  
+  #get    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_edit"
+  #put    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_update"
+  #get    "/admin/page-custom-fields"                => "page_custom_fields#admin_index"        
+  #post   "/admin/page-custom-fields"                => "page_custom_fields#admin_add"
+  #delete "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_delete"
         
   #=============================================================================
   # Google Spreadsheets
   #=============================================================================
   
-  get     "/google-spreadsheets/:spreadsheet_id/csv" => "google_spreadsheets#csv_data"
+  #get     "/google-spreadsheets/:spreadsheet_id/csv" => "google_spreadsheets#csv_data"
       
   #=============================================================================
   # Calendar
   #=============================================================================
   
-  get     "/admin/calendars"                         => "calendars#admin_index"
-  get     "/admin/calendars/:id"                     => "calendars#admin_edit"
-  put     "/admin/calendars/:id"                     => "calendars#admin_update"
-  post    "/admin/calendars"                         => "calendars#admin_add"
-  delete  "/admin/calendars"                         => "calendars#admin_delete"
+  #get     "/admin/calendars"                         => "calendars#admin_index"
+  #get     "/admin/calendars/:id"                     => "calendars#admin_edit"
+  #put     "/admin/calendars/:id"                     => "calendars#admin_update"
+  #post    "/admin/calendars"                         => "calendars#admin_add"
+  #delete  "/admin/calendars/:id"                     => "calendars#admin_delete"
   
-  get     "/admin/calendars/:calendar_id/events"     => "events#admin_index"
-  get     "/admin/calendars/:calendar_id/events/new" => "events#admin_new"
-  get     "/admin/calendars/:calendar_id/events/:id" => "events#admin_edit"
-  put     "/admin/calendars/:calendar_id/events/:id" => "events#admin_update"
-  post    "/admin/calendars/:calendar_id/events"     => "events#admin_add"
-  delete  "/admin/calendars/:calendar_id/events/:id" => "events#admin_delete"
+  #get     "/admin/calendars/:calendar_id/events"     => "events#admin_index"
+  #get     "/admin/calendars/:calendar_id/events/new" => "events#admin_new"
+  #get     "/admin/calendars/:calendar_id/events/:id" => "events#admin_edit"
+  #put     "/admin/calendars/:calendar_id/events/:id" => "events#admin_update"
+  #post    "/admin/calendars/:calendar_id/events"     => "events#admin_add"
+  #delete  "/admin/calendars/:calendar_id/events/:id" => "events#admin_delete"
   
-  put     "/admin/calendars/:calendar_id/event-groups/:id" => "event_groups#admin_update"
-  get     "/admin/event-groups/period-options"             => "event_groups#admin_period_options"
-  get     "/admin/event-groups/frequency-options"          => "event_groups#admin_frequency_options"
-  get     "/admin/event-groups/repeat-by-options"          => "event_groups#admin_repeat_by_options"
+  #put     "/admin/calendars/:calendar_id/event-groups/:id" => "event_groups#admin_update"
+  #get     "/admin/event-groups/period-options"             => "event_groups#admin_period_options"
+  #get     "/admin/event-groups/frequency-options"          => "event_groups#admin_frequency_options"
+  #get     "/admin/event-groups/repeat-by-options"          => "event_groups#admin_repeat_by_options"
 
   #=============================================================================
   # AB Testing
@@ -510,29 +510,29 @@ Caboose::Engine.routes.draw do
   # Checkout  
   #=============================================================================
   
-  get  '/checkout'                 => 'checkout#index'
-  get  '/checkout/total'           => 'checkout#verify_total'  
-  post '/checkout/attach-user'     => 'checkout#attach_user'
-  post '/checkout/attach-guest'    => 'checkout#attach_guest'
-  get  '/checkout/addresses'       => 'checkout#addresses'
-  put  '/checkout/addresses'       => 'checkout#update_addresses'
-  get  '/checkout/shipping'        => 'checkout#shipping'
-  put  '/checkout/shipping'        => 'checkout#update_shipping'
-  get  '/checkout/gift-cards'      => 'checkout#gift_cards'  
-  get  '/checkout/payment'         => 'checkout#payment'
-  get  '/checkout/confirm'         => 'checkout#confirm_without_payment'
-  post '/checkout/confirm'         => 'checkout#confirm'  
-  get  '/checkout/thanks'          => 'checkout#thanks'
-  get  '/checkout/test-email'      => 'checkout#test_email'
-
-  get  '/checkout/authnet-profile-form'       => 'checkout#authnet_profile_form'          
-  get  '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
-  post '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
-  get  '/checkout/authnet-relay'              => 'checkout#authnet_relay'
-  post '/checkout/authnet-relay'              => 'checkout#authnet_relay'
-  get  '/checkout/authnet-response/:order_id' => 'checkout#authnet_response'
-  post '/checkout/authnet-response/:order_id' => 'checkout#authnet_response'      
-  get  '/checkout/empty'                      => 'checkout#empty'
+  #get  '/checkout'                 => 'checkout#index'
+  #get  '/checkout/total'           => 'checkout#verify_total'  
+  #post '/checkout/attach-user'     => 'checkout#attach_user'
+  #post '/checkout/attach-guest'    => 'checkout#attach_guest'
+  #get  '/checkout/addresses'       => 'checkout#addresses'
+  #put  '/checkout/addresses'       => 'checkout#update_addresses'
+  #get  '/checkout/shipping'        => 'checkout#shipping'
+  #put  '/checkout/shipping'        => 'checkout#update_shipping'
+  #get  '/checkout/gift-cards'      => 'checkout#gift_cards'  
+  #get  '/checkout/payment'         => 'checkout#payment'
+  #get  '/checkout/confirm'         => 'checkout#confirm_without_payment'
+  #post '/checkout/confirm'         => 'checkout#confirm'  
+  #get  '/checkout/thanks'          => 'checkout#thanks'
+  #get  '/checkout/test-email'      => 'checkout#test_email'
+  #
+  #get  '/checkout/authnet-profile-form'       => 'checkout#authnet_profile_form'          
+  #get  '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
+  #post '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
+  #get  '/checkout/authnet-relay'              => 'checkout#authnet_relay'
+  #post '/checkout/authnet-relay'              => 'checkout#authnet_relay'
+  #get  '/checkout/authnet-response/:order_id' => 'checkout#authnet_response'
+  #post '/checkout/authnet-response/:order_id' => 'checkout#authnet_response'      
+  #get  '/checkout/empty'                      => 'checkout#empty'
   
   #=============================================================================
   # Product Modifications  

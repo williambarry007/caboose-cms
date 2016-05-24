@@ -4,12 +4,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
   # Tables (in order) that were renamed in the development of the gem.
   def self.renamed_tables
     {
-      :roles_users             => :role_memberships,
-      :permissions_roles       => :role_permissions,
+      :roles_users              => :role_memberships,
+      :permissions_roles        => :role_permissions,
       #:page_block_field_values => :fields,
       #:page_block_fields       => :field_types,
-      :page_block_types        => :block_types,
-      :page_blocks             => :blocks
+      :page_block_types         => :block_types,
+      :page_blocks              => :blocks,      
+      :store_order_discounts    => :store_invoice_discounts,
+      :store_order_packages     => :store_invoice_packages,
+      :store_order_transactions => :store_invoice_transactions,
+      :store_orders             => :store_invoices
     }
   end
 
@@ -61,7 +65,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       #Caboose::Discount => [
       #  :amount
       #],
-      Caboose::Order => [
+      Caboose::Invoice => [
         :shipping_method       , 
         :shipping_method_code  ,
         :email                 ,        
@@ -272,7 +276,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Discount => [
         [ :gift_card_id , :integer  ],
-        [ :order_id     , :integer  ],                
+        [ :invoice_id     , :integer  ],                
         [ :amount       , :decimal   , { :precision => 8, :scale => 2 }]        
       ],
       Caboose::Domain => [
@@ -314,7 +318,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :status          , :string   ]                                
       ],      
       Caboose::LineItem => [
-        [ :order_id              , :integer  ],
+        [ :invoice_id              , :integer  ],
         [ :order_package_id      , :integer  ],
         [ :variant_id            , :integer  ],
         [ :parent_id             , :integer  ],                
@@ -375,8 +379,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :requires_input    , :boolean   , { :default => false }],        
         [ :input_description , :string   ]
       ],
-      Caboose::OrderTransaction => [
-        [ :order_id              , :integer  ],
+      Caboose::InvoiceTransaction => [
+        [ :invoice_id            , :integer  ],
         [ :date_processed        , :datetime ],
         [ :transaction_type      , :string   ],
         [ :amount                , :decimal   , { :precision => 8, :scale => 2 }],        
@@ -385,19 +389,19 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :response_code         , :string   ],
         [ :success               , :boolean  ]        
       ],
-      Caboose::OrderDiscount => [
-        [ :order_id              , :integer ],
+      Caboose::InvoiceDiscount => [
+        [ :invoicer_id           , :integer ],
         [ :discount_id           , :integer ]
       ],
-      Caboose::OrderPackage => [
-        [ :order_id             , :integer ],
+      Caboose::InvoicePackage => [
+        [ :invoice_id           , :integer ],
         [ :shipping_method_id   , :integer ],
         [ :shipping_package_id  , :integer ],
         [ :status               , :string  ],
         [ :tracking_number      , :string  ],
         [ :total                , :decimal  , { :precision => 8, :scale => 2 }]
       ],
-      Caboose::Order => [
+      Caboose::Invoice => [
         [ :site_id               , :integer  ],
         [ :order_number          , :integer  ],
         [ :alternate_id          , :integer  ],        

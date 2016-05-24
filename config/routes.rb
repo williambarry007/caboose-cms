@@ -1,8 +1,8 @@
 Caboose::Engine.routes.draw do
   
-  #if Caboose::use_comment_routes
-  #  eval(Caboose::CommentRoutes.controller_routes)      
-  #end
+  if Caboose::use_comment_routes
+    eval(Caboose::CommentRoutes.controller_routes)      
+  end
   
   #=============================================================================
   # Front end
@@ -31,24 +31,23 @@ Caboose::Engine.routes.draw do
   get  "/my-account/orders/:order_id/line-items/:id/download"  => "my_account_line_items#download"
   get  "/my-account/orders/:order_id/line-items/:id"           => "my_account_line_items#edit"
   get  "/my-account/orders/:order_id/line-items"               => "my_account_line_items#index"
-
-  get  "/my-account/orders/:order_id/billing-address/json"     => "billing_addresses#my_account_json"      
-  put  "/my-account/orders/:order_id/billing-address"          => "billing_addresses#my_account_update"
-  get  "/my-account/orders/:order_id/shipping-address/json"    => "shipping_addresses#my_account_json"      
-  put  "/my-account/orders/:order_id/shipping-address"         => "shipping_addresses#my_account_update"
-        
-  get  "/my-account/orders/authnet-relay"        => "my_account_orders#authnet_relay"
-  post "/my-account/orders/authnet-relay"        => "my_account_orders#authnet_relay"
-  get  "/my-account/orders/:id/authnet-response" => "my_account_orders#authnet_response"
-  post "/my-account/orders/:id/authnet-response" => "my_account_orders#authnet_response"
-  get  "/my-account/orders/:id/payment-form"     => "my_account_orders#payment_form"  
-  get  "/my-account/orders/:id/json"             => "my_account_orders#order_json"
-  get  "/my-account/orders/:id/json"             => "my_account_orders#order_json"
-  get  "/my-account/orders/:id"                  => "my_account_orders#edit"
-  get  "/my-account/orders"                      => "my_account_orders#index"
   
-  get  "/my-account" => "my_account#index"
-  put  "/my-account" => "my_account#update"
+  #get  "/my-account/orders/:order_id/billing-address/json"     => "billing_addresses#my_account_json"  
+  #put  "/my-account/orders/:order_id/billing-address"          => "billing_addresses#my_account_update"
+  #get  "/my-account/orders/:order_id/shipping-address/json"    => "shipping_addresses#my_account_json"      
+  #put  "/my-account/orders/:order_id/shipping-address"         => "shipping_addresses#my_account_update"
+        
+  #get  "/my-account/orders/authnet-relay"        => "my_account_orders#authnet_relay"
+  #post "/my-account/orders/authnet-relay"        => "my_account_orders#authnet_relay"
+  #get  "/my-account/orders/:id/authnet-response" => "my_account_orders#authnet_response"
+  #post "/my-account/orders/:id/authnet-response" => "my_account_orders#authnet_response"
+  #get  "/my-account/orders/:id/payment-form"     => "my_account_orders#payment_form"    
+  #get  "/my-account/orders/:id/json"             => "my_account_orders#order_json"
+  #get  "/my-account/orders/:id"                  => "my_account_orders#edit"
+  #get  "/my-account/orders"                      => "my_account_orders#index"
+  
+  #get  "/my-account" => "my_account#index"
+  #put  "/my-account" => "my_account#update"
   
   #=============================================================================
   # Retargeting
@@ -144,20 +143,20 @@ Caboose::Engine.routes.draw do
   # Shipping Packages
   #=============================================================================
   
-  get     "/admin/shipping-packages/options"                     => "shipping_packages#admin_options"    
-  get     "/admin/shipping-packages/json"                        => "shipping_packages#admin_json"
-  get     "/admin/shipping-packages/:id/json"                    => "shipping_packages#admin_json_single"
-  get     "/admin/shipping-packages/:id/shipping-method-options" => "shipping_packages#admin_shipping_method_options"
-  get     "/admin/shipping-packages/package-method-options"      => "shipping_packages#admin_package_method_options"
-  get     "/admin/shipping-packages/:id"                         => "shipping_packages#admin_edit"
-  get     "/admin/shipping-packages"                             => "shipping_packages#admin_index"  
-  put     "/admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_update"
-  put     "/admin/shipping-packages/:id"                         => "shipping_packages#admin_update"
-  post    "/admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_add"
-  post    "/admin/shipping-packages"                             => "shipping_packages#admin_add"
-  delete  "/admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_delete"
-  delete  "/admin/shipping-packages/:id"                         => "shipping_packages#admin_delete"
-  get     "/admin/shipping-methods/options"                      => "shipping_packages#admin_shipping_method_options"
+  #get     "/admin/shipping-packages/options"                     => "shipping_packages#admin_options"    
+  #get     "/admin/shipping-packages/json"                        => "shipping_packages#admin_json"
+  #get     "/admin/shipping-packages/:id/json"                    => "shipping_packages#admin_json_single"
+  #get     "/admin/shipping-packages/:id/shipping-method-options" => "shipping_packages#admin_shipping_method_options"
+  #get     "/admin/shipping-packages/package-method-options"      => "shipping_packages#admin_package_method_options"
+  #get     "/admin/shipping-packages/:id"                         => "shipping_packages#admin_edit"
+  #get     "/admin/shipping-packages"                             => "shipping_packages#admin_index"  
+  #put     "/admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_update"
+  #put     "/admin/shipping-packages/:id"                         => "shipping_packages#admin_update"
+  #post    "/admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_add"
+  #post    "/admin/shipping-packages"                             => "shipping_packages#admin_add"
+  #delete  "/admin/shipping-packages/bulk"                        => "shipping_packages#admin_bulk_delete"
+  #delete  "/admin/shipping-packages/:id"                         => "shipping_packages#admin_delete"
+  #get     "/admin/shipping-methods/options"                      => "shipping_packages#admin_shipping_method_options"
   
   #=============================================================================
   # 301 Redirects
@@ -710,10 +709,10 @@ Caboose::Engine.routes.draw do
   put     "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_update"
   delete  "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_delete"
   
-  get     "/admin/orders/:order_id/billing-address/json"   => "billing_addresses#admin_json"      
-  put     "/admin/orders/:order_id/billing-address"        => "billing_addresses#admin_update"
-  get     "/admin/orders/:order_id/shipping-address/json"  => "shipping_addresses#admin_json"      
-  put     "/admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"
+  #get     "/admin/orders/:order_id/billing-address/json"   => "billing_addresses#admin_json"      
+  #put     "/admin/orders/:order_id/billing-address"        => "billing_addresses#admin_update"
+  #get     "/admin/orders/:order_id/shipping-address/json"  => "shipping_addresses#admin_json"      
+  #put     "/admin/orders/:order_id/shipping-address"       => "shipping_addresses#admin_update"
   
   #=============================================================================
   # Gift cards

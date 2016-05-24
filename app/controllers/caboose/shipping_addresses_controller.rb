@@ -1,14 +1,14 @@
 module Caboose
   class ShippingAddressesController < Caboose::ApplicationController
             
-    # GET /admin/orders/:order_id/shipping-address/json
+    # @route GET /admin/orders/:order_id/shipping-address/json
     def admin_json
       return if !user_is_allowed('orders', 'edit')    
       order = Order.find(params[:order_id])      
       render :json => order.shipping_address      
     end
       
-    # PUT /admin/orders/:order_id/shipping-address
+    # @route PUT /admin/orders/:order_id/shipping-address
     def admin_update
       return if !user_is_allowed('orders', 'edit')
       
@@ -42,7 +42,7 @@ module Caboose
     
     #===========================================================================
     
-    # GET /my-account/orders/:order_id/shipping-address/json
+    # @route GET /my-account/orders/:order_id/shipping-address/json
     def my_account_json
       return if !logged_in?    
       order = Order.find(params[:order_id])      
@@ -53,7 +53,7 @@ module Caboose
       render :json => order.shipping_address      
     end
     
-    # PUT /my-account/orders/:order_id/shipping-address
+    # @route PUT /my-account/orders/:order_id/shipping-address
     def my_account_update
       return if !logged_in?
       

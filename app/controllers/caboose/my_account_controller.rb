@@ -1,13 +1,13 @@
 module Caboose
   class MyAccountController < Caboose::ApplicationController
             
-    # GET /my-account
+    # @route GET /my-account
     def index
       return if !verify_logged_in
       @user = logged_in_user      
     end
     
-    # PUT /my-account
+    # @route PUT /my-account
     def update  
       return if !logged_in?
       

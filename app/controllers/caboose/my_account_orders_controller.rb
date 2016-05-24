@@ -4,7 +4,7 @@ module Caboose
     helper :authorize_net
     protect_from_forgery :except => :authnet_relay
     
-    # GET /my-account/orders
+    # @route GET /my-account/orders
     def index
       return if !verify_logged_in
             
@@ -20,20 +20,8 @@ module Caboose
       })      
       @orders = @pager.all_items
     end
-      
-    # GET /my-account/orders/:id
-    def edit
-      return if !verify_logged_in
-      
-      @order = Order.find(params[:id])
-      if @order.customer_id != logged_in_user.id
-        @error = "The given order does not belong to you."
-        render :file => 'caboose/extras/error'
-        return
-      end
-    end
     
-    # GET /my-account/orders/:id/payment-form
+    # @route GET /my-account/orders/:id/payment-form
     def payment_form
       return if !logged_in?
       
@@ -73,7 +61,7 @@ module Caboose
       render :layout => false      
     end
     
-    # GET /my-account/orders/:id/json
+    # @route GET /my-account/orders/:id/json
     def order_json
       return if !logged_in?
       
@@ -99,7 +87,8 @@ module Caboose
       ])
     end
     
-    # POST /my-account/orders/authnet-relay
+    # @route GET  /my-account/orders/authnet-relay
+    # @route POST /my-account/orders/authnet-relay
     def authnet_relay
       Caboose.log("Authorize.net relay for my account, order #{params[:x_invoice_id]}")
       
@@ -140,8 +129,8 @@ module Caboose
       render :layout => false
     end
     
-    # GET  /my-account/orders/:id/authnet-response
-    # POST /my-account/orders/:id/authnet-response    
+    # @route GET  /my-account/orders/:id/authnet-response
+    # @route POST /my-account/orders/:id/authnet-response    
     def authnet_response
       Caboose.log("Authorize.net response for my account, order #{params[:id]}")
       
@@ -159,6 +148,18 @@ module Caboose
         end        
       end      
       render :layout => false
+    end
+    
+    # @route GET /my-account/orders/:id
+    def edit
+      return if !verify_logged_in
+      
+      @order = Order.find(params[:id])
+      if @order.customer_id != logged_in_user.id
+        @error = "The given order does not belong to you."
+        render :file => 'caboose/extras/error'
+        return
+      end
     end
             
   end

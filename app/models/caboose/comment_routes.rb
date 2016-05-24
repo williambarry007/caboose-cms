@@ -6,15 +6,26 @@ module Caboose
     end
       
     def CommentRoutes.controller_routes(controller = nil)
+      
+      controller = controller[1] if controller && controller.is_a?(Array)            
+      controller_paths = []
+      Gem.loaded_specs.each do |name, s|
+        controller_paths << s.full_gem_path        
+      end
+      Rails.application.config.paths['app/controllers'].each do |controller_path|                
+        controller_paths << Rails.root.join(controller_path)
+      end
           
-      classes = {'zzz_all_domains' => []}            
-      Rails.application.config.paths['app/controllers'].each do |controller_path|
+      classes = {'zzz_all_domains' => []}
+      controller_paths.each do |controller_path|                
         #files = Dir.glob(Rails.root.join(controller_path, '*.rb'))        
         #files = controller ? Dir.glob(Rails.root.join(controller_path, "#{controller}_controller.rb")) : Dir.glob(Rails.root.join(controller_path, '**/*.rb'))
-        files = controller ? Dir.glob(Rails.root.join(controller_path, "#{controller}_controller.rb")) : Dir.glob(Rails.root.join(controller_path, '*.rb'))        
-        for file in files    
-          f = Rails.root.join('app', 'controllers', file)
-          f2 = File.open(f, "r")
+        #files = controller ? Dir.glob(Rails.root.join(controller_path, "#{controller}_controller.rb")) : Dir.glob(Rails.root.join(controller_path, '*.rb'))        
+        #files = controller ? Dir.glob("#{controller_path}/#{controller}_controller.rb") : Dir.glob("#{controller_path}/*.rb")
+        files = controller ? Dir.glob("#{controller_path}/**/#{controller}_controller.rb") : Dir.glob("#{controller_path}/**/*_controller.rb")
+        #files = Dir.glob("#{controller_path}/**/*_controller.rb")        
+        for file in files
+          f2 = File.open(file, "r")
                   
           domains = []
           class_name = nil
@@ -38,10 +49,10 @@ module Caboose
               actions << [line.gsub('def ', ''), uris, route_priority]              
               uris = []
               route_priority = 20
-            elsif line =~ /# @route GET (.*?)/       then uris << "get    \"#{line.gsub(/# @route GET (.*?)/       , '\1')}\""          
-            elsif line =~ /# @route POST (.*?)/      then uris << "post   \"#{line.gsub(/# @route POST (.*?)/      , '\1')}\""          
-            elsif line =~ /# @route PUT (.*?)/       then uris << "put    \"#{line.gsub(/# @route PUT (.*?)/       , '\1')}\""          
-            elsif line =~ /# @route DELETE (.*?)/    then uris << "delete \"#{line.gsub(/# @route DELETE (.*?)/    , '\1')}\""
+            elsif line =~ /# @route GET (.*?)/       then uris << "get    \"#{line.gsub(/# @route GET (.*?)/       , '\1').strip}\""          
+            elsif line =~ /# @route POST (.*?)/      then uris << "post   \"#{line.gsub(/# @route POST (.*?)/      , '\1').strip}\""          
+            elsif line =~ /# @route PUT (.*?)/       then uris << "put    \"#{line.gsub(/# @route PUT (.*?)/       , '\1').strip}\""          
+            elsif line =~ /# @route DELETE (.*?)/    then uris << "delete \"#{line.gsub(/# @route DELETE (.*?)/    , '\1').strip}\""
             end
           end
           if domains.count > 0

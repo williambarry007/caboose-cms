@@ -561,8 +561,8 @@ Caboose::Engine.routes.draw do
   get     '/products/:id'      => 'products#index', :constraints => { :id => /.*/ }
   # get     '/products'          => 'products#index'
 
-  post    '/variants/find-by-options'   => 'variants#find_by_options'
-  get     '/variants/:id/display-image' => 'variants#display_image'
+  #post    '/variants/find-by-options'   => 'variants#find_by_options'
+  #get     '/variants/:id/display-image' => 'variants#display_image'
                                                                                
   # get     "/admin/products"                                 => "products#admin_index"
   # get     "/admin/products/json"                            => "products#admin_json"
@@ -577,29 +577,29 @@ Caboose::Engine.routes.draw do
   # post    "/admin/products/:id/categories"                  => "products#admin_add_to_category"
   # delete  "/admin/products/:id/categories/:category_id"     => "products#admin_remove_from_category"
 
-  get     "/admin/products/:product_id/variants"                         => "variants#admin_index"
-  get     "/admin/products/:product_id/variants/json"                    => "variants#admin_json"  
-  get     "/admin/products/:product_id/variants/option1-media"           => "variants#admin_edit_option1_media"
-  get     "/admin/products/:product_id/variants/option2-media"           => "variants#admin_edit_option2_media"
-  get     "/admin/products/:product_id/variants/option3-media"           => "variants#admin_edit_option3_media"
-  get     "/admin/products/:product_id/variants/sort-order"              => "variants#admin_edit_sort_order"
-  put     '/admin/products/:product_id/variants/option1-sort-order'      => 'variants#admin_update_option1_sort_order'
-  put     '/admin/products/:product_id/variants/option2-sort-order'      => 'variants#admin_update_option2_sort_order'
-  put     '/admin/products/:product_id/variants/option3-sort-order'      => 'variants#admin_update_option3_sort_order'      
-  put     "/admin/products/:product_id/variants/:id/attach-to-image"     => "variants#admin_attach_to_image"
-  put     "/admin/products/:product_id/variants/:id/unattach-from-image" => "variants#admin_unattach_from_image"
-  get     "/admin/products/:product_id/variants/:id/download-url"        => "variants#admin_download_url"
-  get     "/admin/products/:product_id/variants/:id/json"                => "variants#admin_json_single"
-  get     "/admin/products/:product_id/variants/:id"                     => "variants#admin_edit"  
-  put     '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_update'
-  put     "/admin/products/:product_id/variants/:id"                     => "variants#admin_update"  
-  get     "/admin/products/:product_id/variants/new"                     => "variants#admin_new"
-  post    '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_add'  
-  post    "/admin/products/:product_id/variants"                         => "variants#admin_add"    
-  delete  '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_delete'
-  delete  "/admin/products/:product_id/variants/:id"                     => "variants#admin_delete"  
-  get     "/admin/variants/status-options"                               => "variants#admin_status_options"
-  get     '/admin/variants/group'                                        => 'variants#admin_group'  
+  #get     "/admin/products/:product_id/variants"                         => "variants#admin_index"
+  #get     "/admin/products/:product_id/variants/json"                    => "variants#admin_json"  
+  #get     "/admin/products/:product_id/variants/option1-media"           => "variants#admin_edit_option1_media"
+  #get     "/admin/products/:product_id/variants/option2-media"           => "variants#admin_edit_option2_media"
+  #get     "/admin/products/:product_id/variants/option3-media"           => "variants#admin_edit_option3_media"
+  #get     "/admin/products/:product_id/variants/sort-order"              => "variants#admin_edit_sort_order"
+  #put     '/admin/products/:product_id/variants/option1-sort-order'      => 'variants#admin_update_option1_sort_order'
+  #put     '/admin/products/:product_id/variants/option2-sort-order'      => 'variants#admin_update_option2_sort_order'
+  #put     '/admin/products/:product_id/variants/option3-sort-order'      => 'variants#admin_update_option3_sort_order'      
+  #put     "/admin/products/:product_id/variants/:id/attach-to-image"     => "variants#admin_attach_to_image"
+  #put     "/admin/products/:product_id/variants/:id/unattach-from-image" => "variants#admin_unattach_from_image"
+  #get     "/admin/products/:product_id/variants/:id/download-url"        => "variants#admin_download_url"
+  #get     "/admin/products/:product_id/variants/:id/json"                => "variants#admin_json_single"
+  #get     "/admin/products/:product_id/variants/:id"                     => "variants#admin_edit"  
+  #put     '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_update'
+  #put     "/admin/products/:product_id/variants/:id"                     => "variants#admin_update"  
+  #get     "/admin/products/:product_id/variants/new"                     => "variants#admin_new"
+  #post    '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_add'  
+  #post    "/admin/products/:product_id/variants"                         => "variants#admin_add"    
+  #delete  '/admin/products/:product_id/variants/bulk'                    => 'variants#admin_bulk_delete'
+  #delete  "/admin/products/:product_id/variants/:id"                     => "variants#admin_delete"  
+  #get     "/admin/variants/status-options"                               => "variants#admin_status_options"
+  #get     '/admin/variants/group'                                        => 'variants#admin_group'  
   
   # get     "/admin/products/:id/images"                      => "products#admin_edit_images"
   # post    "/admin/products/:id/images"                      => "products#admin_add_image"

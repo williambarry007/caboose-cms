@@ -6,7 +6,7 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
     
-    # GET /admin/roles
+    # @route GET /admin/roles
     def index
       return unless user_is_allowed('roles', 'view')
       top_roles = Role.tree(@site.id)
@@ -15,19 +15,19 @@ module Caboose
       @roles = arr        
     end
     
-    # GET /admin/roles/new
+    # @route GET /admin/roles/new
     def new
       return unless user_is_allowed('roles', 'add')
       @role = Role.new
     end
     
-    # GET /admin/roles/1/edit
+    # @route GET /admin/roles/:id
     def edit
       return unless user_is_allowed('roles', 'edit')
       @role = Role.find(params[:id])
     end
     
-    # POST /admin/roles
+    # @route POST /admin/roles
     def create
       return unless user_is_allowed('roles', 'add')
       
@@ -51,7 +51,7 @@ module Caboose
       render json: resp
     end
     
-    # PUT /admin/roles/1
+    # @route PUT /admin/roles/:id
     def update
       return unless user_is_allowed('roles', 'edit')
       
@@ -96,7 +96,7 @@ module Caboose
     	render json: resp
     end
     
-    # DELETE /admin/roles/1
+    # @route DELETE /admin/roles/:id
     def destroy
       return unless user_is_allowed('roles', 'delete')
       @role = Role.find(params[:id])
@@ -104,7 +104,7 @@ module Caboose
       render json: { 'redirect' => '/admin/roles' }
     end
     
-    # POST /admin/roles/:id/permissions/:permission_id
+    # @route POST /admin/roles/:id/permissions/:permission_id
     def add_permission
       return if !user_is_allowed('roles', 'edit')
       if !RolePermission.where(:role_id => params[:id], :permission_id => params[:permission_id], ).exists?
@@ -113,14 +113,15 @@ module Caboose
       render :json => true
     end
     
-    # DELETE /admin/roles/:id/permissions/:permission_id
+    # @route DELETE /admin/roles/:id/permissions/:permission_id
     def remove_permission
       return if !user_is_allowed('roles', 'edit')
       RolePermission.where(:role_id => params[:id], :permission_id => params[:permission_id]).destroy_all        
       render :json => true
     end
     
-    # GET /admin/roles/options
+    # @route_priority 1
+    # @route GET /admin/roles/options
     def options
       return unless user_is_allowed('roles', 'view')
       @top_roles = Role.tree(@site.id)

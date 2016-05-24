@@ -194,28 +194,28 @@ Caboose::Engine.routes.draw do
   # Roles
   #=============================================================================
   
-  get     "/admin/roles"                   => "roles#index"
-  get     "/admin/roles/options"           => "roles#options"
-  get     "/admin/roles/new"               => "roles#new"
-  get     "/admin/roles/:id"               => "roles#edit"
-  put     "/admin/roles/:id"               => "roles#update"
-  post    "/admin/roles"                   => "roles#create"
-  delete  "/admin/roles/:id"               => "roles#destroy"
-  
-  post    "/admin/roles/:id/permissions/:permission_id"  => "roles#add_permission"  
-  delete  "/admin/roles/:id/permissions/:permission_id"  => "roles#remove_permission"
+  #get     "/admin/roles"                   => "roles#index"
+  #get     "/admin/roles/options"           => "roles#options"
+  #get     "/admin/roles/new"               => "roles#new"
+  #get     "/admin/roles/:id"               => "roles#edit"
+  #put     "/admin/roles/:id"               => "roles#update"
+  #post    "/admin/roles"                   => "roles#create"
+  #delete  "/admin/roles/:id"               => "roles#destroy"
+  #
+  #post    "/admin/roles/:id/permissions/:permission_id"  => "roles#add_permission"  
+  #delete  "/admin/roles/:id/permissions/:permission_id"  => "roles#remove_permission"
   
   #=============================================================================
   # Permissions
   #=============================================================================
   
-  get     "/admin/permissions"             => "permissions#index"
-  get     "/admin/permissions/options"     => "permissions#options"
-  get     "/admin/permissions/new"         => "permissions#new"
-  get     "/admin/permissions/:id"         => "permissions#edit"
-  put     "/admin/permissions/:id"         => "permissions#update"  
-  post    "/admin/permissions"             => "permissions#create"
-  delete  "/admin/permissions/:id"         => "permissions#destroy"
+  #get     "/admin/permissions"             => "permissions#index"
+  #get     "/admin/permissions/options"     => "permissions#options"
+  #get     "/admin/permissions/new"         => "permissions#new"
+  #get     "/admin/permissions/:id"         => "permissions#edit"
+  #put     "/admin/permissions/:id"         => "permissions#update"  
+  #post    "/admin/permissions"             => "permissions#create"
+  #delete  "/admin/permissions/:id"         => "permissions#destroy"
   
   #=============================================================================
   # Images

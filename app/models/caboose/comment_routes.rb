@@ -138,7 +138,7 @@ module Caboose
       file.each_line do |line|        
         line = line.strip
         arr = self.split_route(line)
-        routes_in_routes_file << arr if arr && arr[2].starts_with?(controller)                  
+        routes_in_routes_file << arr if arr && arr[2].starts_with?("#{controller}#")                  
       end
             
       routes_in_controllers = []

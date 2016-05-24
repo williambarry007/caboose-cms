@@ -8,7 +8,7 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
     
-    # POST /admin/sites/:site_id/domains
+    # @route POST /admin/sites/:site_id/domains
     def admin_add
       return if !user_is_allowed('domains', 'edit')
       
@@ -27,7 +27,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/sites/:site_id/domains/:id
+    # @route PUT /admin/sites/:site_id/domains/:id
     def admin_update
       return if !user_is_allowed('domains', 'edit')
 
@@ -55,20 +55,20 @@ module Caboose
     	render :json => resp
     end        
       
-    # DELETE /admin/sites/:site_id/domains/:id
+    # @route DELETE /admin/sites/:site_id/domains/:id
     def admin_delete
       return if !user_is_allowed('sites', 'delete')
       Domain.find(params[:id]).destroy
       render :json => { 'refresh' => "/admin/sites/#{params[:site_id]}" }
     end
 
-    # PUT /admin/sites/:site_id/domains/:id/set-primary
+    # @route PUT /admin/sites/:site_id/domains/:id/set-primary
     def admin_set_primary
       return if !user_is_allowed('domains', 'edit')
       resp = StdClass.new     
       d = Domain.find(params[:id])
       save = true
-    #  d.primary = value
+      #d.primary = value
       Domain.where(:site_id => params[:site_id]).all.each do |d2|
         d2.primary = d2.id == d.id ? true : false
         d2.save

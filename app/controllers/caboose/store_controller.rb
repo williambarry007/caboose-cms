@@ -4,49 +4,49 @@ module Caboose
   class StoreController < ApplicationController
     layout 'caboose/admin'
     
-    # GET /admin/store/json
+    # @route GET /admin/store/json
     def admin_json_single
       return if !user_is_allowed('orders', 'view')
       sc = @site.store_config
       render :json => sc      
     end
     
-    # GET /admin/store
+    # @route GET /admin/store
     def admin_edit_general
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
       @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
     end
     
-    # GET /admin/store/payment
+    # @route GET /admin/store/payment
     def admin_edit_payment
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
       @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
     end
     
-    # GET /admin/store/shipping
+    # @route GET /admin/store/shipping
     def admin_edit_shipping
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
       @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
     end
     
-    # GET /admin/store/tax
+    # @route GET /admin/store/tax
     def admin_edit_tax
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
       @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
     end
     
-    # GET /admin/store/packages
+    # @route GET /admin/store/packages
     def admin_edit_packages
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
       @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
     end
     
-    # PUT /admin/store
+    # @route PUT /admin/store
     def admin_update
       return if !user_is_allowed('sites', 'edit')
 
@@ -111,7 +111,7 @@ module Caboose
     	render :json => resp
     end        
     
-    # GET /admin/store/payment-processor-options
+    # @route GET /admin/store/payment-processor-options
     def payment_processor_options
       return if !user_is_allowed('sites', 'view')
       options = [
@@ -121,7 +121,7 @@ module Caboose
       render :json => options
     end
     
-    # GET /admin/store/length-unit-options
+    # @route GET /admin/store/length-unit-options
     def length_unit_options
       return if !user_is_allowed('sites', 'view')
       options = [
@@ -134,7 +134,7 @@ module Caboose
       render :json => options
     end
     
-    # GET /admin/store/weight-unit-options
+    # @route GET /admin/store/weight-unit-options
     def weight_unit_options
       return if !user_is_allowed('sites', 'view')
       options = [

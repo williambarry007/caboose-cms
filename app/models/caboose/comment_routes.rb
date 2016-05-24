@@ -130,17 +130,19 @@ module Caboose
       return false
     end
     
-    def CommentRoutes.compare_routes                              
-        
+    def CommentRoutes.compare_routes(controller, route_file)
+      
+      controller = controller[1] if controller && controller.is_a?(Array)        
       routes_in_routes_file = []
-      file = File.open(Rails.root.join('config', 'routes.rb'), "r")
+      file = File.open(route_file ? route_file : Rails.root.join('config', 'routes.rb'), "r")      
       file.each_line do |line|        
         line = line.strip
-        routes_in_routes_file << self.split_route(line)        
+        arr = self.split_route(line)
+        routes_in_routes_file << arr if arr && arr[2].starts_with?(controller)                  
       end
-      
+            
       routes_in_controllers = []
-      self.controller_routes.split("\n").each do |route|
+      self.controller_routes(controller).split("\n").each do |route|
         route = route.strip
         next if route.length == 0
         routes_in_controllers << self.split_route(route)
@@ -151,8 +153,8 @@ module Caboose
       # See what routes are in the controller routes but not in routes file
       routes_not_in_routes_file = []
       routes_in_controllers.each do |route|
-        next if route.nil? || route.count != 3
-        all_routes << [route[0], route[1], route[2], 'Y', self.in_routes_array(route, routes_in_routes_file) ? 'Y' : '']
+        next if route.nil? || route.count != 3        
+        all_routes << [route[0], route[1], route[2], 'Yes', self.in_routes_array(route, routes_in_routes_file) ? 'Yes' : 'No']
       end
       
       # See what routes are in the routes file but not in the controllers
@@ -160,7 +162,7 @@ module Caboose
       routes_in_routes_file.each do |route|
         next if route.nil? || route.count != 3
         if !self.in_routes_array(route, all_routes)
-          all_routes << [route[0], route[1], route[2], '', 'Y']
+          all_routes << [route[0], route[1], route[2], 'No', 'Yes']
         end        
       end
       
@@ -174,7 +176,7 @@ module Caboose
       puts "#{"Verb".ljust(lengths[0], ' ')} #{"URI".ljust(lengths[1], ' ')} #{"Action".ljust(lengths[2], ' ')} #{"In Controller".ljust(14, ' ')} #{"In Routes File".ljust(14, ' ')}"
       puts "#{"".ljust(lengths[0], '-')} #{"".ljust(lengths[1], '-')} #{"".ljust(lengths[2], '-')} #{"".ljust(14, '-')} #{"".ljust(14, '-')}"
       all_routes.each do |route|          
-        next if route[3] == 'Y' && route[4] == 'Y'        
+        #next if route[3] == 'Y' && route[4] == 'Y'        
         puts "#{route[0].ljust(lengths[0], ' ')} #{route[1].ljust(lengths[1], ' ')} #{route[2].ljust(lengths[2], ' ')} #{route[3].ljust(14, ' ')} #{route[4].ljust(14, ' ')}"
       end              
       puts "\n"

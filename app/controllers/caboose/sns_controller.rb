@@ -3,12 +3,12 @@ module Caboose
     
     skip_before_filter :verify_authenticity_token
 
-    # GET /admin/sns
+    # @route GET /admin/sns
     def admin_index      
       render :json => true
     end
 
-    # POST /admin/sns
+    # @route POST /admin/sns
     def admin_add
       body = JSON.parse(request.raw_post, {symbolize_names: true})      
       if body[:Type] && body[:Type] == "SubscriptionConfirmation"
@@ -40,18 +40,18 @@ module Caboose
       render :json => true
     end
     
-    # GET  /admin/sns/confirm
-    # POST /admin/sns/confirm
+    # @route GET  /admin/sns/confirm
+    # @route POST /admin/sns/confirm
     def admin_confirm      
       render :json => true
     end
 
-    # PUT /admin/sns/:id
+    # @route PUT /admin/sns/:id
     def admin_update
       render :json => true
     end
 
-    # DELETE /admin/sns/:id
+    # @route DELETE /admin/sns/:id
     def admin_delete                        
       render :json => true
     end

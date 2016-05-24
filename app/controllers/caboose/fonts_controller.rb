@@ -2,7 +2,7 @@ module Caboose
   class FontsController < ApplicationController
     layout 'caboose/admin'
     
-    # GET /admin/fonts
+    # @route GET /admin/fonts
     def admin_index
       @hf = Font.where(:site_id => @site.id, :name => "heading-font").last
       if !@hf then @hf = Font.create(:site_id => @site.id, :name => "heading-font", :family => "Open Sans", :variant => "600", :url => "http://fonts.gstatic.com/s/opensans/v13/MTP_ySUJH_bn48VBG8sNSi3USBnSvpkopQaUR-2r7iU.ttf") end
@@ -18,7 +18,7 @@ module Caboose
       if !@btn then @btn = Font.create(:site_id => @site.id, :name => "button-font", :family => "Open Sans", :variant => "regular", :url => "http://fonts.gstatic.com/s/opensans/v13/IgZJs4-7SA1XX_edsoXWog.ttf") end
     end
 
-    # PUT /admin/fonts
+    # @route PUT /admin/fonts
     def admin_update
       resp = StdClass.new
       family = params[:family]

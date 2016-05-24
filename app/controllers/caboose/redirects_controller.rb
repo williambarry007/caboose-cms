@@ -12,7 +12,7 @@ module Caboose
     # Admin actions
     #===========================================================================
     
-    # GET /admin/redirects
+    # @route GET /admin/redirects
     def admin_index
       return if !user_is_allowed('redirects', 'view')            
       @domain = Domain.where(:domain => request.host_with_port).first      
@@ -20,20 +20,20 @@ module Caboose
       render :layout => 'caboose/admin'      
     end
 
-    # GET /admin/redirects/new
+    # @route GET /admin/redirects/new
     def admin_new
       return unless user_is_allowed('redirects', 'add')            
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/redirects/:id
+    # @route GET /admin/redirects/:id
     def admin_edit
       return unless user_is_allowed('redirects', 'edit')
       @permanent_redirect = PermanentRedirect.find(params[:id])
       render :layout => 'caboose/admin'
     end
                 
-    # PUT /admin/redirects/priority
+    # @route PUT /admin/redirects/priority
     def admin_update_priority
       return unless user_is_allowed('redirects', 'edit')      
       @page = Page.find(params[:id])
@@ -48,7 +48,7 @@ module Caboose
       render :json => true
     end
     
-    # POST /admin/redirects
+    # @route POST /admin/redirects
     def admin_add
       return unless user_is_allowed('redirects', 'add')
 
@@ -71,7 +71,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/redirects/:id
+    # @route PUT /admin/redirects/:id
     def admin_update
       return unless user_is_allowed('redirects', 'edit')
       
@@ -92,7 +92,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/redirects/:id
+    # @route DELETE /admin/redirects/:id
     def admin_delete
       return unless user_is_allowed('redirects', 'delete')
       pr = PermanentRedirect.find(params[:id])

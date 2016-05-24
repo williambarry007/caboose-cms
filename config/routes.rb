@@ -221,44 +221,43 @@ Caboose::Engine.routes.draw do
   # Images
   #=============================================================================
 
-  get     "/admin/media/last-upload-processed" => "media#admin_last_upload_processed"
-  post    "/admin/media/pre-upload"            => "media#admin_pre_upload"
-  get     "/admin/media"                       => "media#admin_index"    
-  get     "/admin/media/new"                   => "media#admin_new"
-  get     "/admin/media/json"                  => "media#admin_json"
-  get     "/admin/media/:id/process"           => "media#admin_process"
-  get     "/admin/media/:id/finished"          => "media#admin_process_finished"
-  get     "/admin/media/:id/description"       => "media#admin_edit_description"
-  get     "/admin/media/:id"                   => "media#admin_edit"  
-  put     "/admin/media/:id"                   => "media#admin_update"
-  post    "/admin/media/:id/image"             => "media#admin_update_image"
-  #post    "/admin/media/edit-image"           => "media#admin_edit_image"  
-  post    "/admin/media"                       => "media#admin_add"  
-  delete  "/admin/media/bulk"                  => "media#admin_bulk_delete"
-  delete  "/admin/media/:id"                   => "media#admin_delete"
-  
-  
-  get     "/admin/media-categories/json"       => "media_categories#admin_json"
-  get     "/admin/media-categories/options"    => "media_categories#admin_options"
-  get     "/admin/media-categories/flat-tree"  => "media_categories#admin_flat_tree"
-  get     "/admin/media-categories/tree"       => "media_categories#admin_tree"    
-  post    "/admin/media-categories"            => "media_categories#admin_add"
-  post    "/admin/media-categories/:id/attach" => "media_categories#admin_attach"
-  put     "/admin/media-categories/:id/sort-order" => "media_categories#admin_update_sort_order"    
-  put     "/admin/media-categories/:id"        => "media_categories#admin_update"      
-  delete  "/admin/media-categories/:id"        => "media_categories#admin_delete"
+  #get     "/admin/media/last-upload-processed" => "media#admin_last_upload_processed"
+  #post    "/admin/media/pre-upload"            => "media#admin_pre_upload"
+  #get     "/admin/media"                       => "media#admin_index"    
+  #get     "/admin/media/new"                   => "media#admin_new"
+  #get     "/admin/media/json"                  => "media#admin_json"
+  #get     "/admin/media/:id/process"           => "media#admin_process"
+  #get     "/admin/media/:id/finished"          => "media#admin_process_finished"
+  #get     "/admin/media/:id/description"       => "media#admin_edit_description"
+  #get     "/admin/media/:id"                   => "media#admin_edit"  
+  #put     "/admin/media/:id"                   => "media#admin_update"
+  #post    "/admin/media/:id/image"             => "media#admin_update_image"
+  ##post    "/admin/media/edit-image"           => "media#admin_edit_image"  
+  #post    "/admin/media"                       => "media#admin_add"  
+  #delete  "/admin/media/bulk"                  => "media#admin_bulk_delete"
+  #delete  "/admin/media/:id"                   => "media#admin_delete"
+    
+  #get     "/admin/media-categories/json"       => "media_categories#admin_json"
+  #get     "/admin/media-categories/options"    => "media_categories#admin_options"
+  #get     "/admin/media-categories/flat-tree"  => "media_categories#admin_flat_tree"
+  #get     "/admin/media-categories/tree"       => "media_categories#admin_tree"    
+  #post    "/admin/media-categories"            => "media_categories#admin_add"
+  #post    "/admin/media-categories/:id/attach" => "media_categories#admin_attach"
+  #put     "/admin/media-categories/:id/sort-order" => "media_categories#admin_update_sort_order"    
+  #put     "/admin/media-categories/:id"        => "media_categories#admin_update"      
+  #delete  "/admin/media-categories/:id"        => "media_categories#admin_delete"
   
   #=============================================================================
   # Settings
   #=============================================================================
     
-  get     "/admin/settings"                => "settings#index"
-  get     "/admin/settings/options"        => "settings#options"
-  get     "/admin/settings/new"            => "settings#new"
-  get     "/admin/settings/:id"            => "settings#edit"
-  put     "/admin/settings/:id"            => "settings#update"  
-  post    "/admin/settings"                => "settings#create"
-  delete  "/admin/settings/:id"            => "settings#destroy"
+  #get     "/admin/settings"                => "settings#index"
+  #get     "/admin/settings/options"        => "settings#options"
+  #get     "/admin/settings/new"            => "settings#new"
+  #get     "/admin/settings/:id"            => "settings#edit"
+  #put     "/admin/settings/:id"            => "settings#update"  
+  #post    "/admin/settings"                => "settings#create"
+  #delete  "/admin/settings/:id"            => "settings#destroy"
   
   #=============================================================================
   # Pages

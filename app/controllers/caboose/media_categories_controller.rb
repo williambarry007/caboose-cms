@@ -2,14 +2,14 @@
 module Caboose
   class MediaCategoriesController < ApplicationController
     
-    # GET /admin/media-categories/json
+    # @route GET /admin/media-categories/json
     def admin_json
       return unless user_is_allowed('mediacategories', 'view')       
       tree = Caboose::MediaCategory.flat_tree(@site.id)
       render :json => tree
     end
     
-    # GET /admin/media-categories/flat-tree
+    # @route GET /admin/media-categories/flat-tree
     def admin_flat_tree
       return unless user_is_allowed('mediacategories', 'view')
       prefix = params[:prefix] ? params[:prefix] : '-&nbsp;&nbsp;'
@@ -17,7 +17,7 @@ module Caboose
       render :json => tree
     end
             
-    # GET /admin/media-categories/options
+    # @route GET /admin/media-categories/options
     def admin_options
       return unless user_is_allowed('mediacategories', 'view')
       prefix = params[:prefix] ? params[:prefix] : '-&nbsp;&nbsp;'
@@ -26,13 +26,13 @@ module Caboose
       render :json => options
     end
     
-    # GET /admin/media-categories/tree
+    # @route GET /admin/media-categories/tree
     def admin_tree
       return unless user_is_allowed('mediacategories', 'view')      
       render :json => Caboose::MediaCategory.tree_hash(@site.id)
     end
 
-    # PUT /admin/media-categories/:id/sort-order
+    # @route PUT /admin/media-categories/:id/sort-order
     def admin_update_sort_order
       return unless user_is_allowed('mediacategories', 'edit')     
       resp = Caboose::StdClass.new 
@@ -47,7 +47,7 @@ module Caboose
       render :json => resp
     end
 
-    # POST /admin/media-categories
+    # @route POST /admin/media-categories
     def admin_add
       return unless user_is_allowed('mediacategories', 'add')
 
@@ -68,7 +68,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/media-categories/:id
+    # @route PUT /admin/media-categories/:id
     def admin_update
       return unless user_is_allowed('mediacategories', 'edit')
       
@@ -94,7 +94,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/media-categories/:id
+    # @route DELETE /admin/media-categories/:id
     def admin_delete
       return unless user_is_allowed('mediacategories', 'delete')
       cat = MediaCategory.find(params[:id])
@@ -103,7 +103,7 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # POST /admin/media-categories/:id/attach
+    # @route POST /admin/media-categories/:id/attach
     def admin_attach
       return unless user_is_allowed('mediacategories', 'view')
       

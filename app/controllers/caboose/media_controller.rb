@@ -66,20 +66,20 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # @route GET /admin/media/:id
-    def admin_edit
-      return unless user_is_allowed('media', 'edit')
-      @media = Media.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-    
     # @route GET /admin/media/:id/description
     def admin_edit_description
       return unless user_is_allowed('media', 'edit')
       @media = Media.find(params[:id])
       render :layout => 'caboose/modal'
     end
-            
+    
+    # @route GET /admin/media/:id
+    def admin_edit
+      return unless user_is_allowed('media', 'edit')
+      @media = Media.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+                    
     # @route PUT /admin/media/:id
     def admin_update
       return unless user_is_allowed('media', 'edit')
@@ -127,21 +127,12 @@ module Caboose
     # @route DELETE /admin/media/:id
     def admin_delete
       return unless user_is_allowed('media', 'delete')
-      Media.find(params[:id]).destroy
-      ProductImage.where(:media_id => params[:id]).destroy_all
-      render :json => { :success => true }
-    end
-    
-    # @route DELETE /admin/media/bulk
-    def admin_bulk_delete
-      return unless user_is_allowed('media', 'delete')      
-      ids = params[:ids]
-      if ids
-        ids.each do |id|                
-          Media.where(:id => id).destroy_all
-          ProductImage.where(:media_id => id).destroy_all
-        end
-      end
+      
+      model_ids = params[:id] == 'bulk' ? params[:ids] : [params[:id]]             
+      model_ids.each do |media_id|
+        ProductImage.where(:media_id => media_id).destroy_all
+        Media.where(:id => media_id).destroy_all
+      end                  
       render :json => { :success => true }
     end
     

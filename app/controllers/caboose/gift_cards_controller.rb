@@ -39,72 +39,45 @@ module Caboose
     	  :models => pager.items
     	}
     end
-    
+
+    # @route GET /admin/gift-cards/new
+    def admin_new
+      return if !user_is_allowed('giftcards', 'add')      
+      render :layout => 'caboose/admin'
+    end
+
+    # @route GET /admin/gift-cards/status-options
+    def admin_status_options
+      return if !user_is_allowed('categories', 'view')
+      statuses = [      
+        GiftCard::STATUS_INACTIVE,
+        GiftCard::STATUS_ACTIVE,
+        GiftCard::STATUS_EXPIRED
+      ]        
+      options = statuses.collect{ |s| { 'text' => s, 'value' => s }}       
+      render :json => options
+    end
+
+    # @route GET /admin/gift-cards/card-type-options
+    def admin_card_type_options
+      return if !user_is_allowed('categories', 'view')
+      types = [
+        GiftCard::CARD_TYPE_AMOUNT,
+        GiftCard::CARD_TYPE_PERCENTAGE,
+        GiftCard::CARD_TYPE_NO_SHIPPING,
+        GiftCard::CARD_TYPE_NO_TAX,
+      ]        
+      options = types.collect{ |s| { 'text' => s, 'value' => s }}       
+      render :json => options            
+    end
+
     # @route GET /admin/gift-cards/:id/json
     def admin_json_single
       return if !user_is_allowed('giftcards', 'view')    
       gc = GiftCard.find(params[:id])      
       render :json => gc
     end
-    
-    # @route GET /admin/gift-cards/new
-    def admin_new
-      return if !user_is_allowed('giftcards', 'add')      
-      render :layout => 'caboose/admin'
-    end
-    
-    # @route POST /admin/gift-cards
-    def admin_add
-      return if !user_is_allowed('giftcards', 'add')
-      
-      resp = StdClass.new
-      code = params[:code].strip
-      
-      if code.length == 0
-        resp.error = "A valid code is required."
-      elsif GiftCard.where(:code => code).exists?
-        resp.error = "A gift card with that code already exists."
-      else
-        gc = GiftCard.new(
-          :site_id => @site.id,
-          :code    => code,
-          :status  => GiftCard::STATUS_INACTIVE              
-        )
-        resp.success = gc.save
-        resp.new_id = gc.id
-        resp.redirect = "/admin/gift-cards/#{gc.id}"
-      end
-      
-      render :json => resp        
-    end
-    
-    # @route POST /admin/gift-cards/bulk
-    def admin_bulk_add
-      return if !user_is_allowed('sites', 'add')
-      
-      resp = Caboose::StdClass.new
-      i = 0
-      CSV.parse(params[:csv_data].strip).each do |row|        
-        if row[0].nil? || row[0].strip.length == 0        
-          resp.error = "Code not defined on row #{i+1}."        
-        end
-        i = i + 1
-      end
-      
-      if resp.error.nil?
-        CSV.parse(params[:csv_data]).each do |row|
-          Caboose::GiftCard.create(
-            :site_id  => @site.id,
-            :code => row[0].strip,            
-            :status => GiftCard::STATUS_INACTIVE                        
-          )
-        end
-        resp.success = true
-      end
-      
-      render :json => resp
-    end
-  
+
     # @route GET /admin/gift-cards/:id
     def admin_edit
       return if !user_is_allowed('giftcards', 'edit')
@@ -112,32 +85,6 @@ module Caboose
       render :layout => 'caboose/admin'
     end
 
-    # @route PUT /admin/gift-cards/:id
-    def admin_update
-      return if !user_is_allowed('giftcards', 'edit')
-      
-      resp = Caboose::StdClass.new
-      gc = GiftCard.find(params[:id])    
-      
-      save = true    
-      params.each do |name,value|
-        case name
-          when 'site_id'         then gc.site_id         = value                 
-          when 'name'            then gc.name            = value
-          when 'code'            then gc.code            = value
-          when 'card_type'       then gc.card_type       = value
-          when 'total'           then gc.total           = value
-          when 'balance'         then gc.balance         = value
-          when 'min_order_total' then gc.min_order_total = value
-          when 'date_available'  then gc.date_available  = DateTime.strptime(value, '%m/%d/%Y')
-          when 'date_expires'    then gc.date_expires    = DateTime.strptime(value, '%m/%d/%Y')
-          when 'status'          then gc.status          = value                            
-        end
-      end          
-      resp.success = save && gc.save
-      render :json => resp
-    end
-    
     # @route PUT /admin/gift-cards/bulk
     def admin_bulk_update
       return unless user_is_allowed_to 'edit', 'sites'
@@ -165,16 +112,85 @@ module Caboose
       resp.success = true
       render :json => resp
     end
-    
-    # @route DELETE /admin/gift-cards/:id
-    def admin_delete
-      return if !user_is_allowed('giftcards', 'delete')
-      GiftCard.find(params[:id]).destroy
-      render :json => Caboose::StdClass.new({
-        :redirect => '/admin/gift-cards'
-      })
+
+    # @route PUT /admin/gift-cards/:id
+    def admin_update
+      return if !user_is_allowed('giftcards', 'edit')
+      
+      resp = Caboose::StdClass.new
+      gc = GiftCard.find(params[:id])    
+      
+      save = true    
+      params.each do |name,value|
+        case name
+          when 'site_id'         then gc.site_id         = value                 
+          when 'name'            then gc.name            = value
+          when 'code'            then gc.code            = value
+          when 'card_type'       then gc.card_type       = value
+          when 'total'           then gc.total           = value
+          when 'balance'         then gc.balance         = value
+          when 'min_order_total' then gc.min_order_total = value
+          when 'date_available'  then gc.date_available  = DateTime.strptime(value, '%m/%d/%Y')
+          when 'date_expires'    then gc.date_expires    = DateTime.strptime(value, '%m/%d/%Y')
+          when 'status'          then gc.status          = value                            
+        end
+      end          
+      resp.success = save && gc.save
+      render :json => resp
     end
-    
+
+    # @route POST /admin/gift-cards/bulk
+    def admin_bulk_add
+      return if !user_is_allowed('sites', 'add')
+      
+      resp = Caboose::StdClass.new
+      i = 0
+      CSV.parse(params[:csv_data].strip).each do |row|        
+        if row[0].nil? || row[0].strip.length == 0        
+          resp.error = "Code not defined on row #{i+1}."        
+        end
+        i = i + 1
+      end
+      
+      if resp.error.nil?
+        CSV.parse(params[:csv_data]).each do |row|
+          Caboose::GiftCard.create(
+            :site_id  => @site.id,
+            :code => row[0].strip,            
+            :status => GiftCard::STATUS_INACTIVE                        
+          )
+        end
+        resp.success = true
+      end
+      
+      render :json => resp
+    end
+
+    # @route POST /admin/gift-cards
+    def admin_add
+      return if !user_is_allowed('giftcards', 'add')
+      
+      resp = StdClass.new
+      code = params[:code].strip
+      
+      if code.length == 0
+        resp.error = "A valid code is required."
+      elsif GiftCard.where(:code => code).exists?
+        resp.error = "A gift card with that code already exists."
+      else
+        gc = GiftCard.new(
+          :site_id => @site.id,
+          :code    => code,
+          :status  => GiftCard::STATUS_INACTIVE              
+        )
+        resp.success = gc.save
+        resp.new_id = gc.id
+        resp.redirect = "/admin/gift-cards/#{gc.id}"
+      end
+      
+      render :json => resp        
+    end
+
     # @route DELETE /admin/gift-cards/:id/bulk    
     def admin_bulk_delete
       return if !user_is_allowed('sites', 'delete')
@@ -186,31 +202,15 @@ module Caboose
       resp.success = true
       render :json => resp
     end
-        
-    # @route GET /admin/gift-cards/status-options
-    def admin_status_options
-      return if !user_is_allowed('categories', 'view')
-      statuses = [      
-        GiftCard::STATUS_INACTIVE,
-        GiftCard::STATUS_ACTIVE,
-        GiftCard::STATUS_EXPIRED
-      ]        
-      options = statuses.collect{ |s| { 'text' => s, 'value' => s }}       
-      render :json => options
+
+    # @route DELETE /admin/gift-cards/:id
+    def admin_delete
+      return if !user_is_allowed('giftcards', 'delete')
+      GiftCard.find(params[:id]).destroy
+      render :json => Caboose::StdClass.new({
+        :redirect => '/admin/gift-cards'
+      })
     end
-        
-    # @route GET /admin/gift-cards/card-type-options
-    def admin_card_type_options
-      return if !user_is_allowed('categories', 'view')
-      types = [
-        GiftCard::CARD_TYPE_AMOUNT,
-        GiftCard::CARD_TYPE_PERCENTAGE,
-        GiftCard::CARD_TYPE_NO_SHIPPING,
-        GiftCard::CARD_TYPE_NO_TAX,
-      ]        
-      options = types.collect{ |s| { 'text' => s, 'value' => s }}       
-      render :json => options            
-    end
-    
+
   end
 end

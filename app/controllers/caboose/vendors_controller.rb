@@ -1,7 +1,14 @@
 module Caboose
   class VendorsController < Caboose::ApplicationController
         
-    # GET /admin/vendors
+    # @route GET /admin/vendors/:id
+    def admin_edit
+      return if !user_is_allowed('vendors', 'edit')
+      @vendor = Vendor.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+
+    # @route GET /admin/vendors
     def admin_index
       return if !user_is_allowed('vendors', 'view')
       
@@ -22,14 +29,28 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/vendors/:id
-    def admin_edit
-      return if !user_is_allowed('vendors', 'edit')
-      @vendor = Vendor.find(params[:id])
+    # @route_priority 3
+    # @route GET /admin/vendors/new
+    def admin_new
+      return if !user_is_allowed('vendors', 'add')
       render :layout => 'caboose/admin'
     end
-    
-    # PUT /admin/vendors/:id/update
+
+    # @route POST /admin/vendors/:id/image
+    def admin_update_image
+      return if !user_is_allowed('vendors', 'edit')
+      
+      vendor = Vendor.find(params[:id])       
+      vendor.image = params[:image]
+      vendor.save
+      
+      resp = StdClass.new
+      resp.success = true
+      resp.attributes = { :image => { :value => vendor.image.url(:thumb) }}
+      render :json => resp            
+    end
+
+    # @route PUT /admin/vendors/:id/update
     def admin_update
       return if !user_is_allowed('vendors', 'edit')
       vendor = Vendor.find(params[:id])
@@ -45,28 +66,8 @@ module Caboose
       
       render :json => { :success => vendor.save }
     end
-    
-    # POST /admin/vendors/:id/image
-    def admin_update_image
-      return if !user_is_allowed('vendors', 'edit')
-      
-      vendor = Vendor.find(params[:id])       
-      vendor.image = params[:image]
-      vendor.save
-      
-      resp = StdClass.new
-      resp.success = true
-      resp.attributes = { :image => { :value => vendor.image.url(:thumb) }}
-      render :json => resp            
-    end
-    
-    # GET /admin/vendors/new
-    def admin_new
-      return if !user_is_allowed('vendors', 'add')
-      render :layout => 'caboose/admin'
-    end
-    
-    # POST /admin/vendors
+
+    # @route POST /admin/vendors
     def admin_add
       return if !user_is_allowed('vendors', 'add')
       
@@ -80,7 +81,7 @@ module Caboose
       render :json => { :success => vendor.save, :redirect => "/admin/vendors/#{vendor.id}" }
     end
     
-    # DELETE /admin/vendors/:id
+    # @route DELETE /admin/vendors/:id
     def admin_delete      
       return if !user_is_allowed('vendors', 'delete')
       v = Vendor.find(params[:id])
@@ -92,12 +93,14 @@ module Caboose
       render :json => resp
     end
     
-    # GET /admin/vendors/options
+    # @route_priority 1
+    # @route GET /admin/vendors/options
     def options      
       render :json => Vendor.where(:site_id => @site.id).reorder(:name).all.collect{ |v| { :value => v.id, :text => v.name }}      
     end
     
-    # GET /admin/vendors/status-options
+    # @route_priority 2
+    # @route GET /admin/vendors/status-options
     def status_options      
       render :json => [
         { :text => 'Active'   , :value => 'Active'   },

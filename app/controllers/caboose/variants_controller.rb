@@ -1,7 +1,7 @@
 module Caboose
   class VariantsController < Caboose::ApplicationController
     
-    # POST /variants/find-by-options
+    # @route POST /variants/find-by-options
     def find_by_options
       
       # Find the variant based on the product ID and options
@@ -19,7 +19,7 @@ module Caboose
       render :json => { :variant => variant, :customizations => customizations }
     end
     
-    # GET /variants/:id/display-image
+    # @route GET /variants/:id/display-image
     def display_image
       ap "File is found"
       render :json => Variant.find(params[:id]).product_images.first
@@ -29,8 +29,8 @@ module Caboose
     # Admin actions
     #=============================================================================
     
-    # GET /admin/products/:id/variants
-    # GET /admin/products/:id/variants/:variant_id
+    # @route GET /admin/products/:product_id/variants
+    # @route GET /admin/products/:product_id/variants/:variant_id
     def admin_index   
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:product_id])
@@ -49,7 +49,7 @@ module Caboose
       render :layout => 'caboose/admin'                
     end
     
-    # GET /admin/products/:product_id/variants/json
+    # @route GET /admin/products/:product_id/variants/json
     def admin_json
       return if !user_is_allowed('products', 'view')
       
@@ -69,7 +69,7 @@ module Caboose
       }      
     end
     
-    # GET /admin/products/:product_id/variants/:id/json
+    # @route GET /admin/products/:product_id/variants/:id/json
     def admin_json_single
       return if !user_is_allowed('products', 'view')
       
@@ -77,7 +77,7 @@ module Caboose
       render :json => v      
     end
         
-    # GET /admin/products/:product_id/variants/:variant_id
+    # @route GET /admin/products/:product_id/variants/:id
     def admin_edit
       return if !user_is_allowed('variants', 'edit')    
       @variant = Variant.find(params[:id])
@@ -85,7 +85,7 @@ module Caboose
       render :layout => 'caboose/admin'            
     end
     
-    # GET /admin/producst/:product_id/variants/:id/download-url
+    # @route GET /admin/products/:product_id/variants/:id/download-url
     def admin_download_url
       return if !user_is_allowed('variants', 'edit')
       
@@ -110,7 +110,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/variants/:id
+    # @route PUT /admin/variants/:id
     def admin_update
       return if !user_is_allowed('variants', 'edit')
       
@@ -169,7 +169,7 @@ module Caboose
       render :json => resp
     end
     
-    # GET /admin/products/:id/variants/new
+    # @route GET /admin/products/:id/variants/new
     def admin_new
       return if !user_is_allowed('variants', 'add')
       @top_categories = ProductCategory.where(:parent_id => nil).reorder('name').all
@@ -178,7 +178,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
   
-    # POST /admin/products/:id/variants
+    # @route POST /admin/products/:id/variants
     def admin_add
       return if !user_is_allowed('variants', 'add')
       resp = Caboose::StdClass.new(
@@ -197,7 +197,7 @@ module Caboose
       render :json => resp
     end
   
-    # PUT /admin/variants/:id/attach-to-image
+    # @route PUT /admin/variants/:id/attach-to-image
     def admin_attach_to_image
       render :json => false if !user_is_allowed('variants', 'edit')         
       variant_id = params[:id].to_i
@@ -222,7 +222,7 @@ module Caboose
       render :json => true
     end
   
-    # PUT /admin/variants/:id/unattach-from-image
+    # @route PUT /admin/variants/:id/unattach-from-image
     def admin_unattach_from_image
       render :json => false if !user_is_allowed('variants', 'edit')
       v = Variant.find(params[:id])
@@ -232,7 +232,7 @@ module Caboose
       render :json => true
     end
   
-    # DELETE /admin/products/:product_id/variants/:id
+    # @route DELETE /admin/products/:product_id/variants/:id
     def admin_delete
       return if !user_is_allowed('variants', 'delete')
       v = Variant.find(params[:id])
@@ -243,7 +243,7 @@ module Caboose
       })
     end
     
-    # DELETE /admin/products/:product_id/variants/bulk
+    # @route DELETE /admin/products/:product_id/variants/bulk
     def admin_bulk_delete
       return if !user_is_allowed('variants', 'delete')
       
@@ -257,14 +257,14 @@ module Caboose
       render :json => resp
     end
     
-    # GET /admin/products/:product_id/variants/sort-order  
+    # @route GET /admin/products/:product_id/variants/sort-order  
     def admin_edit_sort_order
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:product_id])      
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/:product_id/variants/option1-media  
+    # @route GET /admin/products/:product_id/variants/option1-media  
     def admin_edit_option1_media
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:product_id])
@@ -272,7 +272,7 @@ module Caboose
       render :layout => 'caboose/modal'
     end
     
-    # GET /admin/products/:product_id/variants/option2-media  
+    # @route GET /admin/products/:product_id/variants/option2-media  
     def admin_edit_option2_media
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:product_id])
@@ -280,7 +280,7 @@ module Caboose
       render :layout => 'caboose/modal'
     end
     
-    # GET /admin/products/:product_id/variants/option3-media  
+    # @route GET /admin/products/:product_id/variants/option3-media  
     def admin_edit_option3_media
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:product_id])
@@ -288,7 +288,7 @@ module Caboose
       render :layout => 'caboose/modal'
     end
     
-    # PUT /admin/products/:product_id/variants/option1-sort-order
+    # @route PUT /admin/products/:product_id/variants/option1-sort-order
     def admin_update_option1_sort_order
       product_id = params[:product_id]
       params[:values].each_with_index do |value, i|
@@ -299,7 +299,7 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # PUT /admin/products/:product_id/variants/option1-sort-order
+    # @route PUT /admin/products/:product_id/variants/option1-sort-order
     def admin_update_option2_sort_order            
       product_id = params[:product_id]
       params[:values].each_with_index do |value, i|
@@ -310,7 +310,7 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # PUT /admin/products/:product_id/variants/option1-sort-order
+    # @route PUT /admin/products/:product_id/variants/option1-sort-order
     def admin_update_option3_sort_order      
       product_id = params[:product_id]
       params[:values].each_with_index do |value, i|
@@ -321,7 +321,7 @@ module Caboose
       render :json => { :success => true }
     end
   
-    # GET /admin/variants
+    # @route GET /admin/variants
     def admin_group
       return if !user_is_allowed('variants', 'edit')
       
@@ -361,7 +361,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # POST /admin/products/:product_id/variants/add
+    # @route POST /admin/products/:product_id/variants/add
     def admin_add
       
       resp = Caboose::StdClass.new
@@ -384,7 +384,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/products/:product_id/variants/bulk
+    # @route POST /admin/products/:product_id/variants/bulk
     def admin_bulk_add
       product = Product.find(params[:product_id])
       
@@ -427,7 +427,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/products/:product_id/variants/bulk
+    # @route PUT /admin/products/:product_id/variants/bulk
     def admin_bulk_update
       return unless user_is_allowed_to 'edit', 'sites'
     
@@ -508,7 +508,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/products/:product_id/variants/remove
+    # @route POST /admin/products/:product_id/variants/remove
     def admin_remove_variants
       params[:variant_ids].each do |variant_id|
         variant = Variant.find(variant_id)
@@ -526,7 +526,7 @@ module Caboose
     # Option methods
     #===========================================================================
     
-    # GET /admin/variants/status-options
+    # @route GET /admin/variants/status-options
     def admin_status_options
       arr = ['Active', 'Inactive', 'Deleted']
       options = []

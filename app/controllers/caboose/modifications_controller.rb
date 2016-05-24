@@ -1,7 +1,7 @@
 module Caboose
   class ModificationsController < Caboose::ApplicationController
     
-    # GET /admin/products/:product_id/modifications/json
+    # @route GET /admin/products/:product_id/modifications/json
     def admin_json
       return if !user_is_allowed('products', 'view')
       
@@ -9,13 +9,13 @@ module Caboose
       render :json => p.modifications.as_json(:include => :modification_values)            
     end
     
-    # GET /admin/products/:product_id/modifications/:id/json
+    # @route GET /admin/products/:product_id/modifications/:id/json
     def admin_json_single
       m = Modification.find(params[:id])
       render :json => m.as_json(:include => :modification_values)      
     end
           
-    # PUT /admin/products/:product_id/modifications/:id    
+    # @route PUT /admin/products/:product_id/modifications/:id    
     def admin_update
       return if !user_is_allowed('products', 'edit')
       
@@ -32,7 +32,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/products/:product_id/modifications
+    # @route POST /admin/products/:product_id/modifications
     def admin_add
       return if !user_is_allowed('products', 'add')
       
@@ -49,7 +49,7 @@ module Caboose
       render :json => resp    
     end
     
-    # DELETE /admin/products/:product_id/modifications/:id
+    # @route DELETE /admin/products/:product_id/modifications/:id
     def admin_delete
       return if !user_is_allowed('products', 'delete')
       m = Modification.find(params[:id]).destroy      
@@ -58,7 +58,8 @@ module Caboose
       })
     end
     
-    # PUT /admin/products/:product_id/modifications/sort-order
+    # @route_priority 1
+    # @route PUT /admin/products/:product_id/modifications/sort-order
     def admin_update_sort_order            
       params[:modification_ids].each_with_index do |mod_id, i|
         m = Modification.where(:id => mod_id).first

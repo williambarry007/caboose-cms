@@ -1,7 +1,7 @@
 module Caboose
   class ModificationValuesController < Caboose::ApplicationController
     
-    # GET /admin/products/:product_id/modifications/:mod_id/values/json
+    # @route GET /admin/products/:product_id/modifications/:mod_id/values/json
     def admin_json
       return if !user_is_allowed('products', 'view')
       
@@ -9,13 +9,13 @@ module Caboose
       render :json => m.modification_values            
     end
     
-    # GET /admin/products/:product_id/modifications/:mod_id/values/:id/json
+    # @route GET /admin/products/:product_id/modifications/:mod_id/values/:id/json
     def admin_json_single
       mv = ModificationValue.find(params[:id])
       render :json => mv      
     end
           
-    # PUT /admin/products/:product_id/modifications/:mod_id/values/:id    
+    # @route PUT /admin/products/:product_id/modifications/:mod_id/values/:id    
     def admin_update
       return if !user_is_allowed('products', 'edit')
       
@@ -45,7 +45,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/products/:product_id/modifications/:mod_id/values
+    # @route POST /admin/products/:product_id/modifications/:mod_id/values
     def admin_add
       return if !user_is_allowed('products', 'add')
       
@@ -64,7 +64,7 @@ module Caboose
       render :json => resp    
     end
     
-    # DELETE /admin/products/:product_id/modifications/:mod_id/values/:id
+    # @route DELETE /admin/products/:product_id/modifications/:mod_id/values/:id
     def admin_delete
       return if !user_is_allowed('products', 'delete')
       mv = ModificationValue.find(params[:id]).destroy      
@@ -73,7 +73,7 @@ module Caboose
       })
     end
     
-    # PUT /admin/products/:product_id/modifications/:mod_id/values/sort-order
+    # @route PUT /admin/products/:product_id/modifications/:mod_id/values/sort-order
     def admin_update_sort_order            
       params[:modification_value_ids].each_with_index do |mv_id, i|
         mv = ModificationValue.where(:id => mv_id).first

@@ -1,6 +1,7 @@
 module Caboose
   class ReviewsController < Caboose::ApplicationController  
   
+    # @route POST /reviews/add
     def add
       content = params[:content]
       product_id = params[:product_id]

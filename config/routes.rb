@@ -92,51 +92,51 @@ Caboose::Engine.routes.draw do
   # Store
   #=============================================================================  
     
-  get     "/admin/store/shipping-method-options"    => "store#shipping_method_options"
-  get     "/admin/store/payment-processor-options"  => "store#payment_processor_options"        
-  get     "/admin/store/length-unit-options"        => "store#length_unit_options"
-  get     "/admin/store/weight-unit-options"        => "store#weight_unit_options"
-  get     "/admin/store/json"                       => "store#admin_json_single"
-  get     "/admin/store/payment"                    => "store#admin_edit_payment"
-  get     "/admin/store/shipping"                   => "store#admin_edit_shipping"
-  get     "/admin/store/tax"                        => "store#admin_edit_tax"
-  get     "/admin/store/packages"                   => "store#admin_edit_packages"
-  get     "/admin/store"                            => "store#admin_edit_general"  
-  put     "/admin/store"                            => "store#admin_update"
+  #get     "/admin/store/shipping-method-options"    => "store#shipping_method_options"
+  #get     "/admin/store/payment-processor-options"  => "store#payment_processor_options"        
+  #get     "/admin/store/length-unit-options"        => "store#length_unit_options"
+  #get     "/admin/store/weight-unit-options"        => "store#weight_unit_options"
+  #get     "/admin/store/json"                       => "store#admin_json_single"
+  #get     "/admin/store/payment"                    => "store#admin_edit_payment"
+  #get     "/admin/store/shipping"                   => "store#admin_edit_shipping"
+  #get     "/admin/store/tax"                        => "store#admin_edit_tax"
+  #get     "/admin/store/packages"                   => "store#admin_edit_packages"
+  #get     "/admin/store"                            => "store#admin_edit_general"  
+  #put     "/admin/store"                            => "store#admin_update"
   
   #=============================================================================
   # SMTP
   #=============================================================================  
   
-  get     "/admin/smtp/auth-options"  => "smtp#auth_options"   
-  get     "/admin/smtp"               => "smtp#admin_edit"  
-  put     "/admin/smtp"               => "smtp#admin_update"
+  #get     "/admin/smtp/auth-options"  => "smtp#auth_options"   
+  #get     "/admin/smtp"               => "smtp#admin_edit"  
+  #put     "/admin/smtp"               => "smtp#admin_update"
     
   #=============================================================================
   # Social
   #=============================================================================  
   
-  get     "/admin/social"               => "social#admin_edit"  
-  put     "/admin/social"               => "social#admin_update"
-  get     "/admin/analytics"            => "social#analytics"
+  #get     "/admin/social"               => "social#admin_edit"  
+  #put     "/admin/social"               => "social#admin_update"
+  #get     "/admin/analytics"            => "social#analytics"
 
   #=============================================================================
   # Amazon SNS
   #=============================================================================
 
-  get    "/admin/sns/confirm" => "sns#admin_confirm"
-  post   "/admin/sns/confirm" => "sns#admin_confirm"
-  get    "/admin/sns"         => "sns#admin_index"      
-  post   "/admin/sns"         => "sns#admin_add"
-  put    "/admin/sns/:id"     => "sns#admin_update"
-  delete "/admin/sns/:id"     => "sns#admin_delete"                        
+  #get    "/admin/sns/confirm" => "sns#admin_confirm"
+  #post   "/admin/sns/confirm" => "sns#admin_confirm"
+  #get    "/admin/sns"         => "sns#admin_index"      
+  #post   "/admin/sns"         => "sns#admin_add"
+  #put    "/admin/sns/:id"     => "sns#admin_update"
+  #delete "/admin/sns/:id"     => "sns#admin_delete"                        
     
   #=============================================================================
   # Fonts
   #=============================================================================  
   
-  get     "/admin/fonts"               => "fonts#admin_index"
-  put     "/admin/fonts"               => "fonts#admin_update"
+  #get     "/admin/fonts"               => "fonts#admin_index"
+  #put     "/admin/fonts"               => "fonts#admin_update"
 
   #=============================================================================
   # Shipping Packages
@@ -161,34 +161,34 @@ Caboose::Engine.routes.draw do
   # 301 Redirects
   #=============================================================================
   
-  get     "/admin/redirects"      => "redirects#admin_index"    
-  get     "/admin/redirects/new"  => "redirects#admin_new"  
-  get     "/admin/redirects/:id"  => "redirects#admin_edit"  
-  put     "/admin/redirects/:id"  => "redirects#admin_update"  
-  post    "/admin/redirects"      => "redirects#admin_add"  
-  delete  "/admin/redirects/:id"  => "redirects#admin_delete"
+  #get     "/admin/redirects"      => "redirects#admin_index"    
+  #get     "/admin/redirects/new"  => "redirects#admin_new"  
+  #get     "/admin/redirects/:id"  => "redirects#admin_edit"  
+  #put     "/admin/redirects/:id"  => "redirects#admin_update"  
+  #post    "/admin/redirects"      => "redirects#admin_add"  
+  #delete  "/admin/redirects/:id"  => "redirects#admin_delete"
   
   #=============================================================================
   # Users
   #=============================================================================
   
-  get     "/admin/users"                     => "users#admin_index"
-  get     "/admin/users/json"                => "users#admin_json"        
-  get     "/admin/users/options"             => "users#admin_options"
-  get     "/admin/users/new"                 => "users#admin_new"
-  get     "/admin/users/import"              => "users#admin_import_form"
-  post    "/admin/users/import"              => "users#admin_import"
-  get     "/admin/users/:id/json"            => "users#admin_json_single"
-  get     "/admin/users/:id/su/:token"       => "users#admin_su_token"
-  get     "/admin/users/:id/su"              => "users#admin_su"
-  get     "/admin/users/:id/edit-password"   => "users#admin_edit_password"
-  get     "/admin/users/:id"                 => "users#admin_edit"  
-  put     "/admin/users/:id"                 => "users#admin_update"
-  post    "/admin/users"                     => "users#admin_add"
-  delete  "/admin/users/:id"                 => "users#admin_delete"
+  #get     "/admin/users"                     => "users#admin_index"
+  #get     "/admin/users/json"                => "users#admin_json"        
+  #get     "/admin/users/options"             => "users#admin_options"
+  #get     "/admin/users/new"                 => "users#admin_new"
+  #get     "/admin/users/import"              => "users#admin_import_form"
+  #post    "/admin/users/import"              => "users#admin_import"
+  #get     "/admin/users/:id/json"            => "users#admin_json_single"
+  #get     "/admin/users/:id/su/:token"       => "users#admin_su_token"
+  #get     "/admin/users/:id/su"              => "users#admin_su"
+  #get     "/admin/users/:id/edit-password"   => "users#admin_edit_password"
+  #get     "/admin/users/:id"                 => "users#admin_edit"  
+  #put     "/admin/users/:id"                 => "users#admin_update"
+  #post    "/admin/users"                     => "users#admin_add"
+  #delete  "/admin/users/:id"                 => "users#admin_delete"
   
-  post    "/admin/users/:id/roles/:role_id"  => "users#admin_add_to_role"  
-  delete  "/admin/users/:id/roles/:role_id"  => "users#admin_remove_from_role"
+  #post    "/admin/users/:id/roles/:role_id"  => "users#admin_add_to_role"  
+  #delete  "/admin/users/:id/roles/:role_id"  => "users#admin_remove_from_role"
   
   #=============================================================================
   # Roles
@@ -749,13 +749,13 @@ Caboose::Engine.routes.draw do
   # API
   #=============================================================================
   
-  get "/api/products"               => "products#api_index"
-  get "/api/instagram"              => "social#authorize_instagram"
-  delete "/api/instagram"              => "social#deauthorize_instagram"
-  get "/api/products/:id"           => "products#api_details"
-  get "/api/products/:id/variants"  => "products#api_variants"  
-  get "caboose/block-types"         => "block_types#api_block_type_list"
-  get "caboose/block-types/:name"   => "block_types#api_block_type"
+  get    "/api/products"               => "products#api_index"
+  #get    "/api/instagram"              => "social#authorize_instagram"
+  #delete "/api/instagram"              => "social#deauthorize_instagram"
+  get    "/api/products/:id"           => "products#api_details"
+  get    "/api/products/:id/variants"  => "products#api_variants"  
+  get    "caboose/block-types"         => "block_types#api_block_type_list"
+  get    "caboose/block-types/:name"   => "block_types#api_block_type"
         
   #=============================================================================
   # Catch all

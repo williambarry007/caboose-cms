@@ -4,14 +4,14 @@ module Caboose
   class SmtpController < ApplicationController
     layout 'caboose/admin'
     
-    # GET /admin/smtp
+    # @route GET /admin/smtp
     def admin_edit
       return if !user_is_allowed('smtp', 'edit')            
       @smtp_config = @site.smtp_config
       @smtp_config = SmtpConfig.create(:site_id => @site.id) if @smtp_config.nil?
     end
     
-    # PUT /admin/smtp
+    # @route PUT /admin/smtp
     def admin_update
       return if !user_is_allowed('sites', 'edit')
 
@@ -38,7 +38,7 @@ module Caboose
     	render :json => resp
     end        
     
-    # GET /admin/smtp/auth-options
+    # @route GET /admin/smtp/auth-options
     def auth_options
       return if !user_is_allowed('smtp', 'view')
       options = [

@@ -454,45 +454,45 @@ Caboose::Engine.routes.draw do
   # Google Spreadsheets
   #=============================================================================
   
-  get     "/google-spreadsheets/:spreadsheet_id/csv" => "google_spreadsheets#csv_data"
+  # get     "/google-spreadsheets/:spreadsheet_id/csv" => "google_spreadsheets#csv_data"
       
   #=============================================================================
   # Calendar
   #=============================================================================
   
-  get     "/admin/calendars"                         => "calendars#admin_index"
-  get     "/admin/calendars/:id"                     => "calendars#admin_edit"
-  put     "/admin/calendars/:id"                     => "calendars#admin_update"
-  post    "/admin/calendars"                         => "calendars#admin_add"
-  delete  "/admin/calendars"                         => "calendars#admin_delete"
+  # get     "/admin/calendars"                         => "calendars#admin_index"
+  # get     "/admin/calendars/:id"                     => "calendars#admin_edit"
+  # put     "/admin/calendars/:id"                     => "calendars#admin_update"
+  # post    "/admin/calendars"                         => "calendars#admin_add"
+  # delete  "/admin/calendars"                         => "calendars#admin_delete"
   
-  get     "/admin/calendars/:calendar_id/events"     => "events#admin_index"
-  get     "/admin/calendars/:calendar_id/events/new" => "events#admin_new"
-  get     "/admin/calendars/:calendar_id/events/:id" => "events#admin_edit"
-  put     "/admin/calendars/:calendar_id/events/:id" => "events#admin_update"
-  post    "/admin/calendars/:calendar_id/events"     => "events#admin_add"
-  delete  "/admin/calendars/:calendar_id/events/:id" => "events#admin_delete"
+  # get     "/admin/calendars/:calendar_id/events"     => "events#admin_index"
+  # get     "/admin/calendars/:calendar_id/events/new" => "events#admin_new"
+  # get     "/admin/calendars/:calendar_id/events/:id" => "events#admin_edit"
+  # put     "/admin/calendars/:calendar_id/events/:id" => "events#admin_update"
+  # post    "/admin/calendars/:calendar_id/events"     => "events#admin_add"
+  # delete  "/admin/calendars/:calendar_id/events/:id" => "events#admin_delete"
   
-  put     "/admin/calendars/:calendar_id/event-groups/:id" => "event_groups#admin_update"
-  get     "/admin/event-groups/period-options"             => "event_groups#admin_period_options"
-  get     "/admin/event-groups/frequency-options"          => "event_groups#admin_frequency_options"
-  get     "/admin/event-groups/repeat-by-options"          => "event_groups#admin_repeat_by_options"
+  # put     "/admin/calendars/:calendar_id/event-groups/:id" => "event_groups#admin_update"
+  # get     "/admin/event-groups/period-options"             => "event_groups#admin_period_options"
+  # get     "/admin/event-groups/frequency-options"          => "event_groups#admin_frequency_options"
+  # get     "/admin/event-groups/repeat-by-options"          => "event_groups#admin_repeat_by_options"
 
   #=============================================================================
   # AB Testing
   #=============================================================================
   
-  get     "/admin/ab-variants"                     => "ab_variants#admin_index"
-  get     "/admin/ab-variants/new"                 => "ab_variants#admin_new"
-  get     "/admin/ab-variants/:id"                 => "ab_variants#admin_edit"
-  put     "/admin/ab-variants/:id"                 => "ab_variants#admin_update"
-  post    "/admin/ab-variants"                     => "ab_variants#admin_create"  
-  delete  "/admin/ab-variants/:id"                 => "ab_variants#admin_delete"
+  # get     "/admin/ab-variants"                     => "ab_variants#admin_index"
+  # get     "/admin/ab-variants/new"                 => "ab_variants#admin_new"
+  # get     "/admin/ab-variants/:id"                 => "ab_variants#admin_edit"
+  # put     "/admin/ab-variants/:id"                 => "ab_variants#admin_update"
+  # post    "/admin/ab-variants"                     => "ab_variants#admin_create"  
+  # delete  "/admin/ab-variants/:id"                 => "ab_variants#admin_delete"
   
-  get     "/admin/ab-variants/:variant_id/options" => "ab_options#admin_index"    
-  put     "/admin/ab-options/:id"                  => "ab_options#admin_update"
-  post    "/admin/ab-variants/:variant_id/options" => "ab_options#admin_create"
-  delete  "/admin/ab-options/:id"                  => "ab_options#admin_delete"
+  # get     "/admin/ab-variants/:variant_id/options" => "ab_options#admin_index"    
+  # put     "/admin/ab-options/:id"                  => "ab_options#admin_update"
+  # post    "/admin/ab-variants/:variant_id/options" => "ab_options#admin_create"
+  # delete  "/admin/ab-options/:id"                  => "ab_options#admin_delete"
   
   #=============================================================================
   # Reviews  

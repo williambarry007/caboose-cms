@@ -8,7 +8,7 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end    
     
-    # GET /admin/calendars
+    # @route GET /admin/calendars
     def admin_index
       return if !user_is_allowed('calendars', 'view')
       render :file => 'caboose/extras/error_invalid_site' and return if @site.nil?
@@ -17,7 +17,7 @@ module Caboose
       render :layout => 'caboose/admin'      
     end
 
-    # GET /admin/calendars/:id
+    # @route GET /admin/calendars/:id
     def admin_edit
       return unless user_is_allowed('calendars', 'edit')
       @calendar = Calendar.find(params[:id])
@@ -28,7 +28,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
             
-    # PUT /admin/calendars/:id
+    # @route PUT /admin/calendars/:id
     def admin_update
       return unless user_is_allowed('calendars', 'edit')
       
@@ -48,7 +48,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/calendars
+    # @route POST /admin/calendars
     def admin_add
       return unless user_is_allowed('calendars', 'edit')
       
@@ -66,7 +66,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/calendars/:id
+    # @route DELETE /admin/calendars
     def admin_delete
       return unless user_is_allowed('calendars', 'delete')
       Calendar.find(params[:id]).destroy      

@@ -4,7 +4,7 @@ module Caboose
     
     helper :application
     
-    # GET /admin/calendars/:calendar_id/events/:id
+    # @route GET /admin/calendars/:calendar_id/events/:id
     def admin_edit
       return unless user_is_allowed('calendars', 'edit')
       @event = CalendarEvent.find(params[:id])
@@ -16,7 +16,8 @@ module Caboose
       render :layout => 'caboose/modal'
     end
     
-    # GET /admin/calendars/:calendar_id/events/new
+    # @route_priority 1
+    # @route GET /admin/calendars/:calendar_id/events/new
     def admin_new
       return unless user_is_allowed('calendars', 'edit')
       @calendar = Calendar.find(params[:calendar_id])
@@ -24,7 +25,7 @@ module Caboose
       render :layout => 'caboose/modal'
     end
     
-    # POST /admin/calendars/:calendar_id/events
+    # @route POST /admin/calendars/:calendar_id/events
     def admin_add
       return unless user_is_allowed('calendars', 'edit')
       
@@ -45,7 +46,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/calendars/:calendar_id/events/:id
+    # @route PUT /admin/calendars/:calendar_id/events/:id
     def admin_update
       return unless user_is_allowed('calendars', 'edit')
       
@@ -87,7 +88,7 @@ module Caboose
       render :json => resp
     end        
     
-    # DELETE /admin/calendars/:calendar_id/events/:id
+    # @route DELETE /admin/calendars/:calendar_id/events/:id
     def admin_delete
       return unless user_is_allowed('calendars', 'delete')
       CalendarEvent.find(params[:id]).destroy      

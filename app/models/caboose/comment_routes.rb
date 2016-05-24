@@ -82,7 +82,7 @@ module Caboose
           actions.each{ |action, uris| uris.each{ |uri| longest = uri if uri.length > longest.length }}
           length = longest.length + 1
           
-          # Make the route line
+          # Make the route line         
           actions.sort_by{ |arr| arr[2] }.each do |arr|
             action = arr[0]
             uris = arr[1]

@@ -31,6 +31,7 @@ module Caboose
           class_name = nil
           class_priority = 20
           route_priority = 20
+          custom_route_priority = false
           uris = []
           actions = []
           f2.each_line do |line|      
@@ -44,11 +45,12 @@ module Caboose
             elsif line =~ /# @class_route_priority \d/
               class_priority = line.gsub(/# @class_route_priority (\d*?)$/, '\1').to_i
             elsif line =~ /# @route_priority \d/
-              route_priority = line.gsub(/# @route_priority (\d*?)$/, '\1').to_i
+              custom_route_priority = line.gsub(/# @route_priority (\d*?)$/, '\1').to_i              
             elsif line.starts_with?('def ')
-              actions << [line.gsub('def ', ''), uris, route_priority]              
+              actions << [line.gsub('def ', ''), uris, custom_route_priority ? custom_route_priority : route_priority]              
               uris = []
-              route_priority = 20
+              route_priority = route_priority + 1 if !custom_route_priority
+              custom_route_priority = false              
             elsif line =~ /# @route GET (.*?)/       then uris << "get    \"#{line.gsub(/# @route GET (.*?)/       , '\1').strip}\""          
             elsif line =~ /# @route POST (.*?)/      then uris << "post   \"#{line.gsub(/# @route POST (.*?)/      , '\1').strip}\""          
             elsif line =~ /# @route PUT (.*?)/       then uris << "put    \"#{line.gsub(/# @route PUT (.*?)/       , '\1').strip}\""          

@@ -1,13 +1,13 @@
 module Caboose
   class GiftCardsController < Caboose::ApplicationController
     
-    # GET /admin/gift-cards
+    # @route GET /admin/gift-cards
     def admin_index
       return if !user_is_allowed('giftcards', 'view')      
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/gift-cards/json
+    # @route GET /admin/gift-cards/json
     def admin_json
       return if !user_is_allowed('giftcards', 'view')
       
@@ -40,20 +40,20 @@ module Caboose
     	}
     end
     
-    # GET /admin/gift-cards/:id/json
+    # @route GET /admin/gift-cards/:id/json
     def admin_json_single
       return if !user_is_allowed('giftcards', 'view')    
       gc = GiftCard.find(params[:id])      
       render :json => gc
     end
     
-    # GET /admin/gift-cards/new
+    # @route GET /admin/gift-cards/new
     def admin_new
       return if !user_is_allowed('giftcards', 'add')      
       render :layout => 'caboose/admin'
     end
     
-    # POST /admin/gift-cards
+    # @route POST /admin/gift-cards
     def admin_add
       return if !user_is_allowed('giftcards', 'add')
       
@@ -78,7 +78,7 @@ module Caboose
       render :json => resp        
     end
     
-    # POST /admin/gift-cards/bulk
+    # @route POST /admin/gift-cards/bulk
     def admin_bulk_add
       return if !user_is_allowed('sites', 'add')
       
@@ -105,14 +105,14 @@ module Caboose
       render :json => resp
     end
   
-    # GET /admin/gift-cards/:id
+    # @route GET /admin/gift-cards/:id
     def admin_edit
       return if !user_is_allowed('giftcards', 'edit')
       @gift_card = GiftCard.find(params[:id])
       render :layout => 'caboose/admin'
     end
 
-    # PUT /admin/gift-cards/:id
+    # @route PUT /admin/gift-cards/:id
     def admin_update
       return if !user_is_allowed('giftcards', 'edit')
       
@@ -138,7 +138,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/gift-cards/bulk
+    # @route PUT /admin/gift-cards/bulk
     def admin_bulk_update
       return unless user_is_allowed_to 'edit', 'sites'
     
@@ -166,7 +166,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/gift-cards/:id
+    # @route DELETE /admin/gift-cards/:id
     def admin_delete
       return if !user_is_allowed('giftcards', 'delete')
       GiftCard.find(params[:id]).destroy
@@ -175,7 +175,7 @@ module Caboose
       })
     end
     
-    # DELETE /admin/gift-cards/:id/bulk    
+    # @route DELETE /admin/gift-cards/:id/bulk    
     def admin_bulk_delete
       return if !user_is_allowed('sites', 'delete')
       
@@ -187,7 +187,7 @@ module Caboose
       render :json => resp
     end
         
-    # GET /admin/gift-cards/status-options
+    # @route GET /admin/gift-cards/status-options
     def admin_status_options
       return if !user_is_allowed('categories', 'view')
       statuses = [      
@@ -198,8 +198,8 @@ module Caboose
       options = statuses.collect{ |s| { 'text' => s, 'value' => s }}       
       render :json => options
     end
-    
-    # GET /admin/gift-cards/card-type-options
+        
+    # @route GET /admin/gift-cards/card-type-options
     def admin_card_type_options
       return if !user_is_allowed('categories', 'view')
       types = [

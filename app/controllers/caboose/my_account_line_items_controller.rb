@@ -1,7 +1,7 @@
 module Caboose
   class MyAccountLineItemsController < Caboose::ApplicationController
-            
-    # GET /my-account/orders/:order_id/line-items
+    
+    # @route GET /my-account/orders/:order_id/line-items
     def index
       return if !verify_logged_in      
       @order = Order.find(params[:order_id])
@@ -12,7 +12,8 @@ module Caboose
       end
     end
       
-    # GET /my-account/orders/:order_id/line-items/:id
+    # @route_priority 2
+    # @route GET /my-account/orders/:order_id/line-items/:id
     def edit
       return if !verify_logged_in
       
@@ -25,7 +26,8 @@ module Caboose
       end      
     end
     
-    # GET /my-account/orders/:order_id/line-items/:id/download
+    # @route_priority 1
+    # @route GET /my-account/orders/:order_id/line-items/:id/download
     def download
       return if !verify_logged_in
       

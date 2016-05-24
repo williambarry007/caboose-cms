@@ -5,7 +5,7 @@ module Caboose
     # Admin actions
     #=============================================================================
     
-    # GET /admin/post-categories
+    # @route GET /admin/post-categories
     def admin_index
       return unless user_is_allowed('post_categories', 'view')
       
@@ -16,13 +16,13 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/post-categories/new
+    # @route GET /admin/post-categories/new
     def admin_new
       return unless user_is_allowed('post_categories', 'add')
       render :layout => 'caboose/admin'
     end
     
-    # POST /admin/post-categories
+    # @route POST /admin/post-categories
     def admin_add
       return unless user_is_allowed('post_categories', 'add')
       
@@ -46,14 +46,14 @@ module Caboose
       render :json => resp
     end
       
-    # GET /admin/post-categories/:id
+    # @route GET /admin/post-categories/:id
     def admin_edit
       return unless user_is_allowed('post_categories', 'edit')    
       @category = PostCategory.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # PUT /admin/post-categories/:id
+    # @route PUT /admin/post-categories/:id
     def admin_update
       return unless user_is_allowed('post_categories', 'edit')
       
@@ -76,7 +76,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/post-categories/:id
+    # @route DELETE /admin/post-categories/:id
     def admin_delete
       return unless user_is_allowed('post_categories', 'delete')
       
@@ -92,7 +92,22 @@ module Caboose
       render :json => resp
     end
         
-    
+    # @route_priority 1
+    # @route GET /admin/post-categories/options    
+    def admin_options
+      if !user_is_allowed('post_categories', 'edit')
+        render :json => false
+        return
+      end
+      
+      top_cat = PostCategory.where("site_id = ?", @site.id).first       
+      top_cat = PostCategory.create(:site_id => @site.id, :name => 'General News')
+      arr = PostCategory.where(:site_id => @site.id).reorder(:name).all
+      
+      options = arr.collect{ |pc| { 'value' => pc.id, 'text' => pc.name }}                    
+      render :json => options 		
+    end
+
   end
 end
 

@@ -263,220 +263,213 @@ Caboose::Engine.routes.draw do
   # Pages
   #=============================================================================
   
-  get     "/pages/:id"                     => "pages#show"
-  get     "/pages/:id/redirect"            => "pages#redirect"    
-  get     "/admin/pages/sitemap-options"   => "pages#admin_sitemap_options"
-  get     "/admin/pages/robots-options"    => "pages#admin_robots_options"
-  get     "/admin/pages/format-options"    => "pages#admin_content_format_options"
-  get     "/admin/pages/new"               => "pages#admin_new"
-  get     "/admin/pages/:id/block-options" => "pages#admin_block_options"  
-  get     "/admin/pages/:id/uri"           => "pages#admin_page_uri"
-  get     "/admin/pages/:id/duplicate"     => "pages#admin_duplicate_form"
-  post    "/admin/pages/:id/duplicate"     => "pages#admin_duplicate"
-  get     "/admin/pages/:id/delete"        => "pages#admin_delete_form"  
-  get     "/admin/pages/:id/sitemap"       => "pages#admin_sitemap"  
-  get     "/admin/pages/:id/custom-fields" => "pages#admin_edit_custom_fields"
-  get     "/admin/pages/:id/permissions"   => "pages#admin_edit_permissions"
-  get     "/admin/pages/:id/css"           => "pages#admin_edit_css"
-  get     "/admin/pages/:id/js"            => "pages#admin_edit_js"
-  get     "/admin/pages/:id/seo"           => "pages#admin_edit_seo" 
-  get     "/admin/pages/:id/block-order"   => "pages#admin_edit_block_order"
-  put     "/admin/pages/:id/block-order"   => "pages#admin_update_block_order"
-  get     "/admin/pages/:id/child-order"   => "pages#admin_edit_child_sort_order"
-  put     "/admin/pages/:id/child-order"   => "pages#admin_update_child_sort_order"
-  get     "/admin/pages/:id/new-blocks"    => "pages#admin_new_blocks"
-  get     "/admin/pages/:id/content"       => "pages#admin_edit_content"
-  get     "/admin/pages/:id/layout"        => "pages#admin_edit_layout"
-  put     "/admin/pages/:id/layout"        => "pages#admin_update_layout"
-  put     "/admin/pages/:id/viewers"       => "pages#admin_update_viewers"
-  put     "/admin/pages/:id/editors"       => "pages#admin_update_editors"
-  get     "/admin/pages/:id"               => "pages#admin_edit_general"
-  put     "/admin/pages/:id/update-child-permissions" => "pages#admin_update_child_permissions"  
-  put     "/admin/pages/:id"               => "pages#admin_update"  
-  get     "/admin/pages"                   => "pages#admin_index"
-  post    "/admin/pages"                   => "pages#admin_create"  
-  delete  "/admin/pages/:id"               => "pages#admin_delete"
+  #get     "/pages/:id"                     => "pages#show"
+  #get     "/pages/:id/redirect"            => "pages#redirect"    
+  #get     "/admin/pages/sitemap-options"   => "pages#admin_sitemap_options"
+  #get     "/admin/pages/robots-options"    => "pages#admin_robots_options"
+  #get     "/admin/pages/format-options"    => "pages#admin_content_format_options"
+  #get     "/admin/pages/new"               => "pages#admin_new"
+  #get     "/admin/pages/:id/block-options" => "pages#admin_block_options"  
+  #get     "/admin/pages/:id/uri"           => "pages#admin_page_uri"
+  #get     "/admin/pages/:id/duplicate"     => "pages#admin_duplicate_form"
+  #post    "/admin/pages/:id/duplicate"     => "pages#admin_duplicate"
+  #get     "/admin/pages/:id/delete"        => "pages#admin_delete_form"  
+  #get     "/admin/pages/:id/sitemap"       => "pages#admin_sitemap"  
+  #get     "/admin/pages/:id/custom-fields" => "pages#admin_edit_custom_fields"
+  #get     "/admin/pages/:id/permissions"   => "pages#admin_edit_permissions"
+  #get     "/admin/pages/:id/css"           => "pages#admin_edit_css"
+  #get     "/admin/pages/:id/js"            => "pages#admin_edit_js"
+  #get     "/admin/pages/:id/seo"           => "pages#admin_edit_seo" 
+  #get     "/admin/pages/:id/block-order"   => "pages#admin_edit_block_order"
+  #put     "/admin/pages/:id/block-order"   => "pages#admin_update_block_order"
+  #get     "/admin/pages/:id/child-order"   => "pages#admin_edit_child_sort_order"
+  #put     "/admin/pages/:id/child-order"   => "pages#admin_update_child_sort_order"
+  #get     "/admin/pages/:id/new-blocks"    => "pages#admin_new_blocks"
+  #get     "/admin/pages/:id/content"       => "pages#admin_edit_content"
+  #get     "/admin/pages/:id/layout"        => "pages#admin_edit_layout"
+  #put     "/admin/pages/:id/layout"        => "pages#admin_update_layout"
+  #put     "/admin/pages/:id/viewers"       => "pages#admin_update_viewers"
+  #put     "/admin/pages/:id/editors"       => "pages#admin_update_editors"
+  #get     "/admin/pages/:id"               => "pages#admin_edit_general"
+  #put     "/admin/pages/:id/update-child-permissions" => "pages#admin_update_child_permissions"  
+  #put     "/admin/pages/:id"               => "pages#admin_update"  
+  #get     "/admin/pages"                   => "pages#admin_index"
+  #post    "/admin/pages"                   => "pages#admin_create"  
+  #delete  "/admin/pages/:id"               => "pages#admin_delete"
   
-  post    "/admin/page-permissions"        => "page_permissions#admin_add"  
-  delete  "/admin/page-permissions"        => "page_permissions#admin_delete"
-  delete  "/admin/page-permissions/:id"    => "page_permissions#admin_delete"  
+  #post    "/admin/page-permissions"        => "page_permissions#admin_add"  
+  #delete  "/admin/page-permissions"        => "page_permissions#admin_delete"
+  #delete  "/admin/page-permissions/:id"    => "page_permissions#admin_delete"  
     
-  get     "/admin/pages/:page_id/blocks/new"                  => "blocks#admin_new"  
-  get     "/admin/pages/:page_id/blocks/tree"                 => "blocks#admin_tree"
-  get     "/admin/pages/:page_id/blocks/render"               => "blocks#admin_render_all"
-  get     "/admin/pages/:page_id/blocks/render-second-level"  => "blocks#admin_render_second_level"
-  get     "/admin/pages/:page_id/blocks/:id/render"           => "blocks#admin_render"
-  get     "/admin/pages/:page_id/blocks/:id/tree"             => "blocks#admin_tree"
-  get     "/admin/pages/:page_id/blocks/:id/render"           => "blocks#admin_render"  
-  get     "/admin/pages/:page_id/blocks/:id/edit"             => "blocks#admin_edit"
-  get     "/admin/pages/:page_id/blocks/:id/advanced"         => "blocks#admin_edit_advanced"
-  put     "/admin/pages/:page_id/blocks/:id/move-up"          => "blocks#admin_move_up"
-  put     "/admin/pages/:page_id/blocks/:id/move-down"        => "blocks#admin_move_down"
-  get     "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_show"
-  get     "/admin/pages/:page_id/blocks"                      => "blocks#admin_index"  
-  post    "/admin/pages/:page_id/blocks"                      => "blocks#admin_create"
-  get     "/admin/pages/:page_id/blocks/:id/new"              => "blocks#admin_new"
-  post    "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_create"  
-  put     "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_update"
-  delete  "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_delete"  
-  put     "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_update"
-  post    "/admin/pages/:page_id/blocks/:id/image"            => "blocks#admin_update_image"
-  post    "/admin/pages/:page_id/blocks/:id/file"             => "blocks#admin_update_file"
+  #get     "/admin/pages/:page_id/blocks/new"                  => "blocks#admin_new"  
+  #get     "/admin/pages/:page_id/blocks/tree"                 => "blocks#admin_tree"
+  #get     "/admin/pages/:page_id/blocks/render"               => "blocks#admin_render_all"
+  #get     "/admin/pages/:page_id/blocks/render-second-level"  => "blocks#admin_render_second_level"
+  #get     "/admin/pages/:page_id/blocks/:id/render"           => "blocks#admin_render"
+  #get     "/admin/pages/:page_id/blocks/:id/tree"             => "blocks#admin_tree"
+  #get     "/admin/pages/:page_id/blocks/:id/render"           => "blocks#admin_render"  
+  #get     "/admin/pages/:page_id/blocks/:id/edit"             => "blocks#admin_edit"
+  #get     "/admin/pages/:page_id/blocks/:id/advanced"         => "blocks#admin_edit_advanced"
+  #put     "/admin/pages/:page_id/blocks/:id/move-up"          => "blocks#admin_move_up"
+  #put     "/admin/pages/:page_id/blocks/:id/move-down"        => "blocks#admin_move_down"
+  #get     "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_show"
+  #get     "/admin/pages/:page_id/blocks"                      => "blocks#admin_index"  
+  #post    "/admin/pages/:page_id/blocks"                      => "blocks#admin_create"
+  #get     "/admin/pages/:page_id/blocks/:id/new"              => "blocks#admin_new"
+  #post    "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_create"  
+  #put     "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_update"
+  #delete  "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_delete"  
+  #put     "/admin/pages/:page_id/blocks/:id"                  => "blocks#admin_update"
+  #post    "/admin/pages/:page_id/blocks/:id/image"            => "blocks#admin_update_image"
+  #post    "/admin/pages/:page_id/blocks/:id/file"             => "blocks#admin_update_file"
   
-  get     "/admin/posts/:post_id/blocks/new"                  => "blocks#admin_new"  
-  get     "/admin/posts/:post_id/blocks/tree"                 => "blocks#admin_tree"
-  get     "/admin/posts/:post_id/blocks/render"               => "blocks#admin_render_all"
-  get     "/admin/posts/:post_id/blocks/render-second-level"  => "blocks#admin_render_second_level"
-  get     "/admin/posts/:post_id/blocks/:id/render"           => "blocks#admin_render"
-  get     "/admin/posts/:post_id/blocks/:id/tree"             => "blocks#admin_tree"
-  get     "/admin/posts/:post_id/blocks/:id/render"           => "blocks#admin_render"  
-  get     "/admin/posts/:post_id/blocks/:id/edit"             => "blocks#admin_edit"  
-  get     "/admin/posts/:post_id/blocks/:id/advanced"         => "blocks#admin_edit_advanced"
-  put     "/admin/posts/:post_id/blocks/:id/move-up"          => "blocks#admin_move_up"
-  put     "/admin/posts/:post_id/blocks/:id/move-down"        => "blocks#admin_move_down"
-  get     "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_show"
-  get     "/admin/posts/:post_id/blocks"                      => "blocks#admin_index"  
-  post    "/admin/posts/:post_id/blocks"                      => "blocks#admin_create"
-  get     "/admin/posts/:post_id/blocks/:id/new"              => "blocks#admin_new"
-  post    "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_create"  
-  put     "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_update"
-  delete  "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_delete"  
-  put     "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_update"
-  post    "/admin/posts/:post_id/blocks/:id/image"            => "blocks#admin_update_image"
-  post    "/admin/posts/:post_id/blocks/:id/file"             => "blocks#admin_update_file"
+  #get     "/admin/posts/:post_id/blocks/new"                  => "blocks#admin_new"  
+  #get     "/admin/posts/:post_id/blocks/tree"                 => "blocks#admin_tree"
+  #get     "/admin/posts/:post_id/blocks/render"               => "blocks#admin_render_all"
+  #get     "/admin/posts/:post_id/blocks/render-second-level"  => "blocks#admin_render_second_level"
+  #get     "/admin/posts/:post_id/blocks/:id/render"           => "blocks#admin_render"
+  #get     "/admin/posts/:post_id/blocks/:id/tree"             => "blocks#admin_tree"
+  #get     "/admin/posts/:post_id/blocks/:id/render"           => "blocks#admin_render"  
+  #get     "/admin/posts/:post_id/blocks/:id/edit"             => "blocks#admin_edit"  
+  #get     "/admin/posts/:post_id/blocks/:id/advanced"         => "blocks#admin_edit_advanced"
+  #put     "/admin/posts/:post_id/blocks/:id/move-up"          => "blocks#admin_move_up"
+  #put     "/admin/posts/:post_id/blocks/:id/move-down"        => "blocks#admin_move_down"
+  #get     "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_show"
+  #get     "/admin/posts/:post_id/blocks"                      => "blocks#admin_index"  
+  #post    "/admin/posts/:post_id/blocks"                      => "blocks#admin_create"
+  #get     "/admin/posts/:post_id/blocks/:id/new"              => "blocks#admin_new"
+  #post    "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_create"  
+  #put     "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_update"
+  #delete  "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_delete"  
+  #put     "/admin/posts/:post_id/blocks/:id"                  => "blocks#admin_update"
+  #post    "/admin/posts/:post_id/blocks/:id/image"            => "blocks#admin_update_image"
+  #post    "/admin/posts/:post_id/blocks/:id/file"             => "blocks#admin_update_file"
   
   #=============================================================================
   # Block types
   #=============================================================================
   
-  get     "/admin/block-types/store/sources"              => "block_type_sources#admin_index"
-  get     "/admin/block-types/store/sources/new"          => "block_type_sources#admin_new"
-  get     "/admin/block-types/store/sources/options"      => "block_type_sources#admin_options"
-  get     "/admin/block-types/store/sources/:id/edit"     => "block_type_sources#admin_edit"    
-  get     "/admin/block-types/store/sources/:id/refresh"  => "block_type_sources#admin_refresh"
-  post    "/admin/block-types/store/sources"              => "block_type_sources#admin_create"
-  put     "/admin/block-types/store/sources/:id"          => "block_type_sources#admin_update"
-  delete  "/admin/block-types/store/sources/:id"          => "block_type_sources#admin_delete"
+  #get     "/admin/block-types/store/sources"              => "block_type_sources#admin_index"
+  #get     "/admin/block-types/store/sources/new"          => "block_type_sources#admin_new"
+  #get     "/admin/block-types/store/sources/options"      => "block_type_sources#admin_options"
+  #get     "/admin/block-types/store/sources/:id"           => "block_type_sources#admin_edit"    
+  #get     "/admin/block-types/store/sources/:id/refresh"  => "block_type_sources#admin_refresh"
+  #post    "/admin/block-types/store/sources"              => "block_type_sources#admin_create"
+  #put     "/admin/block-types/store/sources/:id"          => "block_type_sources#admin_update"
+  #delete  "/admin/block-types/store/sources/:id"          => "block_type_sources#admin_delete"
   
-  get     "/admin/block-types/store/:block_type_summary_id/download"  => "block_type_store#admin_download"  
-  get     "/admin/block-types/store/:block_type_summary_id"           => "block_type_store#admin_details"  
-  get     "/admin/block-types/store"                                  => "block_type_store#admin_index"
+  #get     "/admin/block-types/store/:block_type_summary_id/download"  => "block_type_store#admin_download"  
+  #get     "/admin/block-types/store/:block_type_summary_id"           => "block_type_store#admin_details"  
+  #get     "/admin/block-types/store"                                  => "block_type_store#admin_index"
             
-  get     "/admin/block-types/new"                  => "block_types#admin_new"
-  get     "/admin/block-types/json"                 => "block_types#admin_json"    
-  get     "/admin/block-types/options"              => "block_types#admin_options"
-  get     "/admin/block-types/:field-options"       => "block_types#admin_options"
-  get     "/admin/block-types/:id/options"          => "block_types#admin_options"
-  get     "/admin/block-types/:id/json"             => "block_types#admin_json_single"  
-  get     "/admin/block-types/:id/new"              => "block_types#admin_new"                  
-  get     "/admin/block-types/:id/icon"             => "block_types#admin_edit_icon"
-  get     "/admin/block-types/:id"                  => "block_types#admin_edit"            
-  put     "/admin/block-types/:id"                  => "block_types#admin_update"
-  delete  "/admin/block-types/:id"                  => "block_types#admin_delete"
-  get     "/admin/block-types"                      => "block_types#admin_index"
-  post    "/admin/block-types"                      => "block_types#admin_create"
+  #get     "/admin/block-types/new"                  => "block_types#admin_new"
+  #get     "/admin/block-types/json"                 => "block_types#admin_json"    
+  #get     "/admin/block-types/options"              => "block_types#admin_options"
+  #get     "/admin/block-types/:field-options"       => "block_types#admin_options"
+  #get     "/admin/block-types/:id/options"          => "block_types#admin_options"
+  #get     "/admin/block-types/:id/json"             => "block_types#admin_json_single"  
+  #get     "/admin/block-types/:id/new"              => "block_types#admin_new"                  
+  #get     "/admin/block-types/:id/icon"             => "block_types#admin_edit_icon"
+  #get     "/admin/block-types/:id"                  => "block_types#admin_edit"            
+  #put     "/admin/block-types/:id"                  => "block_types#admin_update"
+  #delete  "/admin/block-types/:id"                  => "block_types#admin_delete"
+  #get     "/admin/block-types"                      => "block_types#admin_index"
+  #post    "/admin/block-types"                      => "block_types#admin_create"
   
-  get     "/admin/block-type-categories/tree-options" => "block_type_categories#admin_tree_options"
+  #get     "/admin/block-type-categories/tree-options" => "block_type_categories#admin_tree_options"
       
   #=============================================================================
   # Posts
   #=============================================================================
 
-  get     "/posts"                                 => "posts#index"
-  get     "/posts/:id"                             => "posts#show"
-  get     "/posts/:year/:month/:day/:slug"         => "posts#show"
-  get     "/admin/posts/category-options"          => "posts#admin_category_options"
-  get     "/admin/posts/new"                       => "posts#admin_new"  
-  get     "/admin/posts/:id/json"                  => "posts#admin_json_single"  
-  get     "/admin/posts/:id/edit"                  => "posts#admin_edit_general"
-  get     "/admin/posts/:id/delete"                => "posts#admin_delete_form"
-  get     "/admin/posts/:id/preview"               => "posts#admin_edit_preview"
-  get     "/admin/posts/:id/content"               => "posts#admin_edit_content"
-  get     "/admin/posts/:id/layout"                => "posts#admin_edit_layout"
-  put     "/admin/posts/:id/layout"                => "posts#admin_update_layout"
-  get     "/admin/posts/:id/categories"            => "posts#admin_edit_categories"
-  get     "/admin/posts/:id/add-to-category"       => "posts#admin_add_to_category"
-  get     "/admin/posts/:id/remove-from-category"  => "posts#admin_remove_from_category"
-  get     "/admin/posts/:id/delete"                => "posts#admin_delete_form"
-  get     "/admin/posts/:id"                       => "posts#admin_edit_general"
-  put     "/admin/posts/:id"                       => "posts#admin_update"
-  post    "/admin/posts/:id/image"                 => "posts#admin_update_image"
-  get     "/admin/posts"                           => "posts#admin_index"
-  post    "/admin/posts"                           => "posts#admin_add"  
-  delete  "/admin/posts/:id"                       => "posts#admin_delete"
+  #get     "/posts"                                 => "posts#index"
+  #get     "/posts/:id"                             => "posts#show"
+  #get     "/posts/:year/:month/:day/:slug"         => "posts#show"  
+  #get     "/admin/posts/new"                       => "posts#admin_new"  
+  #get     "/admin/posts/:id/json"                  => "posts#admin_json_single"    
+  #get     "/admin/posts/:id/delete"                => "posts#admin_delete_form"
+  #get     "/admin/posts/:id/preview"               => "posts#admin_edit_preview"
+  #get     "/admin/posts/:id/content"               => "posts#admin_edit_content"
+  #get     "/admin/posts/:id/layout"                => "posts#admin_edit_layout"
+  #put     "/admin/posts/:id/layout"                => "posts#admin_update_layout"
+  #get     "/admin/posts/:id/categories"            => "posts#admin_edit_categories"
+  #put     "/admin/posts/:id/add-to-category"       => "posts#admin_add_to_category"
+  #put     "/admin/posts/:id/remove-from-category"  => "posts#admin_remove_from_category"
+  #get     "/admin/posts/:id/delete"                => "posts#admin_delete_form"
+  #get     "/admin/posts/:id"                       => "posts#admin_edit_general"
+  #put     "/admin/posts/:id"                       => "posts#admin_update"
+  #post    "/admin/posts/:id/image"                 => "posts#admin_update_image"
+  #get     "/admin/posts"                           => "posts#admin_index"
+  #post    "/admin/posts"                           => "posts#admin_add"  
+  #delete  "/admin/posts/:id"                       => "posts#admin_delete"
 
   #=============================================================================
   # Post Categories
   #=============================================================================
 
-  get     "/admin/post-categories"                         => "post-categories#admin_index"
-  get     "/admin/post-categories/new"                     => "post-categories#admin_new"
-  get     "/admin/post-categories/options"                 => "post-categories#admin_options"
-  get     '/admin/post-categories/status-options'          => 'post-categories#admin_status_options'
-  get     "/admin/post-categories/:id/sort-children"       => "post-categories#admin_sort_children"
-  put     "/admin/post-categories/:id/children/sort-order" => "post-categories#admin_update_sort_order"
-  get     "/admin/post-categories/:id/products/json"       => "post-categories#admin_category_products"  
-  get     "/admin/post-categories/:id"                     => "post-categories#admin_edit"  
-  put     "/admin/post-categories/:id"                     => "post-categories#admin_update"    
-  post    "/admin/post-categories/:id"                     => "post-categories#admin_update"  
-  post    "/admin/post-categories"                         => "post-categories#admin_add"
-  delete  "/admin/post-categories/:id"                     => "post-categories#admin_delete"
+  #get     "/admin/post-categories"                         => "post_categories#admin_index"
+  #get     "/admin/post-categories/new"                     => "post_categories#admin_new"
+  #get     "/admin/post-categories/options"                 => "post_categories#admin_options"      
+  #get     "/admin/post-categories/:id"                     => "post_categories#admin_edit"  
+  #put     "/admin/post-categories/:id"                     => "post_categories#admin_update"
+  #post    "/admin/post-categories"                         => "post_categories#admin_add"
+  #delete  "/admin/post-categories/:id"                     => "post_categories#admin_delete"
         
   #=============================================================================
   # Post Custom Fields and Values
   #=============================================================================
   
-  put    "/admin/post-custom-field-values/:id"      => "post_custom_field_values#admin_update"
-  get    "/admin/post-custom-fields/json"           => "post_custom_fields#admin_json"
-  get    "/admin/post-custom-fields/:field-options" => "post_custom_fields#admin_options"  
-  get    "/admin/post-custom-fields/:id/json"       => "post_custom_fields#admin_json_single"  
-  get    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_edit"
-  put    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_update"
-  get    "/admin/post-custom-fields"                => "post_custom_fields#admin_index"        
-  post   "/admin/post-custom-fields"                => "post_custom_fields#admin_add"
-  delete "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_delete"
+  #put    "/admin/post-custom-field-values/:id"      => "post_custom_field_values#admin_update"
+  #get    "/admin/post-custom-fields/json"           => "post_custom_fields#admin_json"
+  #get    "/admin/post-custom-fields/:field-options" => "post_custom_fields#admin_options"  
+  #get    "/admin/post-custom-fields/:id/json"       => "post_custom_fields#admin_json_single"  
+  #get    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_edit"
+  #put    "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_update"
+  #get    "/admin/post-custom-fields"                => "post_custom_fields#admin_index"        
+  #post   "/admin/post-custom-fields"                => "post_custom_fields#admin_add"
+  #delete "/admin/post-custom-fields/:id"            => "post_custom_fields#admin_delete"
   
   #=============================================================================
   # Page Custom Fields and Values
   #=============================================================================
   
-  put    "/admin/page-custom-field-values/:id"      => "page_custom_field_values#admin_update"
-  get    "/admin/page-custom-fields/json"           => "page_custom_fields#admin_json"
-  get    "/admin/page-custom-fields/:field-options" => "page_custom_fields#admin_options"  
-  get    "/admin/page-custom-fields/:id/json"       => "page_custom_fields#admin_json_single"  
-  get    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_edit"
-  put    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_update"
-  get    "/admin/page-custom-fields"                => "page_custom_fields#admin_index"        
-  post   "/admin/page-custom-fields"                => "page_custom_fields#admin_add"
-  delete "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_delete"
+  #put    "/admin/page-custom-field-values/:id"      => "page_custom_field_values#admin_update"
+  #get    "/admin/page-custom-fields/json"           => "page_custom_fields#admin_json"
+  #get    "/admin/page-custom-fields/:field-options" => "page_custom_fields#admin_options"  
+  #get    "/admin/page-custom-fields/:id/json"       => "page_custom_fields#admin_json_single"  
+  #get    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_edit"
+  #put    "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_update"
+  #get    "/admin/page-custom-fields"                => "page_custom_fields#admin_index"        
+  #post   "/admin/page-custom-fields"                => "page_custom_fields#admin_add"
+  #delete "/admin/page-custom-fields/:id"            => "page_custom_fields#admin_delete"
         
   #=============================================================================
   # Google Spreadsheets
   #=============================================================================
   
-  # get     "/google-spreadsheets/:spreadsheet_id/csv" => "google_spreadsheets#csv_data"
+  #get     "/google-spreadsheets/:spreadsheet_id/csv" => "google_spreadsheets#csv_data"
       
   #=============================================================================
   # Calendar
   #=============================================================================
   
-  # get     "/admin/calendars"                         => "calendars#admin_index"
-  # get     "/admin/calendars/:id"                     => "calendars#admin_edit"
-  # put     "/admin/calendars/:id"                     => "calendars#admin_update"
-  # post    "/admin/calendars"                         => "calendars#admin_add"
-  # delete  "/admin/calendars"                         => "calendars#admin_delete"
+  #get     "/admin/calendars"                         => "calendars#admin_index"
+  #get     "/admin/calendars/:id"                     => "calendars#admin_edit"
+  #put     "/admin/calendars/:id"                     => "calendars#admin_update"
+  #post    "/admin/calendars"                         => "calendars#admin_add"
+  #delete  "/admin/calendars/:id"                     => "calendars#admin_delete"
   
-  # get     "/admin/calendars/:calendar_id/events"     => "events#admin_index"
-  # get     "/admin/calendars/:calendar_id/events/new" => "events#admin_new"
-  # get     "/admin/calendars/:calendar_id/events/:id" => "events#admin_edit"
-  # put     "/admin/calendars/:calendar_id/events/:id" => "events#admin_update"
-  # post    "/admin/calendars/:calendar_id/events"     => "events#admin_add"
-  # delete  "/admin/calendars/:calendar_id/events/:id" => "events#admin_delete"
+  #get     "/admin/calendars/:calendar_id/events"     => "events#admin_index"
+  #get     "/admin/calendars/:calendar_id/events/new" => "events#admin_new"
+  #get     "/admin/calendars/:calendar_id/events/:id" => "events#admin_edit"
+  #put     "/admin/calendars/:calendar_id/events/:id" => "events#admin_update"
+  #post    "/admin/calendars/:calendar_id/events"     => "events#admin_add"
+  #delete  "/admin/calendars/:calendar_id/events/:id" => "events#admin_delete"
   
-  # put     "/admin/calendars/:calendar_id/event-groups/:id" => "event_groups#admin_update"
-  # get     "/admin/event-groups/period-options"             => "event_groups#admin_period_options"
-  # get     "/admin/event-groups/frequency-options"          => "event_groups#admin_frequency_options"
-  # get     "/admin/event-groups/repeat-by-options"          => "event_groups#admin_repeat_by_options"
+  #put     "/admin/calendars/:calendar_id/event-groups/:id" => "event_groups#admin_update"
+  #get     "/admin/event-groups/period-options"             => "event_groups#admin_period_options"
+  #get     "/admin/event-groups/frequency-options"          => "event_groups#admin_frequency_options"
+  #get     "/admin/event-groups/repeat-by-options"          => "event_groups#admin_repeat_by_options"
 
   #=============================================================================
   # AB Testing
@@ -517,29 +510,29 @@ Caboose::Engine.routes.draw do
   # Checkout  
   #=============================================================================
   
-  get  '/checkout'                 => 'checkout#index'
-  get  '/checkout/total'           => 'checkout#verify_total'  
-  post '/checkout/attach-user'     => 'checkout#attach_user'
-  post '/checkout/attach-guest'    => 'checkout#attach_guest'
-  get  '/checkout/addresses'       => 'checkout#addresses'
-  put  '/checkout/addresses'       => 'checkout#update_addresses'
-  get  '/checkout/shipping'        => 'checkout#shipping'
-  put  '/checkout/shipping'        => 'checkout#update_shipping'
-  get  '/checkout/gift-cards'      => 'checkout#gift_cards'  
-  get  '/checkout/payment'         => 'checkout#payment'
-  get  '/checkout/confirm'         => 'checkout#confirm_without_payment'
-  post '/checkout/confirm'         => 'checkout#confirm'  
-  get  '/checkout/thanks'          => 'checkout#thanks'
-  get  '/checkout/test-email'      => 'checkout#test_email'
-
-  get  '/checkout/authnet-profile-form'       => 'checkout#authnet_profile_form'          
-  get  '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
-  post '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
-  get  '/checkout/authnet-relay'              => 'checkout#authnet_relay'
-  post '/checkout/authnet-relay'              => 'checkout#authnet_relay'
-  get  '/checkout/authnet-response/:order_id' => 'checkout#authnet_response'
-  post '/checkout/authnet-response/:order_id' => 'checkout#authnet_response'      
-  get  '/checkout/empty'                      => 'checkout#empty'
+  #get  '/checkout'                 => 'checkout#index'
+  #get  '/checkout/total'           => 'checkout#verify_total'  
+  #post '/checkout/attach-user'     => 'checkout#attach_user'
+  #post '/checkout/attach-guest'    => 'checkout#attach_guest'
+  #get  '/checkout/addresses'       => 'checkout#addresses'
+  #put  '/checkout/addresses'       => 'checkout#update_addresses'
+  #get  '/checkout/shipping'        => 'checkout#shipping'
+  #put  '/checkout/shipping'        => 'checkout#update_shipping'
+  #get  '/checkout/gift-cards'      => 'checkout#gift_cards'  
+  #get  '/checkout/payment'         => 'checkout#payment'
+  #get  '/checkout/confirm'         => 'checkout#confirm_without_payment'
+  #post '/checkout/confirm'         => 'checkout#confirm'  
+  #get  '/checkout/thanks'          => 'checkout#thanks'
+  #get  '/checkout/test-email'      => 'checkout#test_email'
+  #
+  #get  '/checkout/authnet-profile-form'       => 'checkout#authnet_profile_form'          
+  #get  '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
+  #post '/checkout/authnet-relay/:order_id'    => 'checkout#authnet_relay'
+  #get  '/checkout/authnet-relay'              => 'checkout#authnet_relay'
+  #post '/checkout/authnet-relay'              => 'checkout#authnet_relay'
+  #get  '/checkout/authnet-response/:order_id' => 'checkout#authnet_response'
+  #post '/checkout/authnet-response/:order_id' => 'checkout#authnet_response'      
+  #get  '/checkout/empty'                      => 'checkout#empty'
   
   #=============================================================================
   # Product Modifications  

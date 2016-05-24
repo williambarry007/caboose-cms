@@ -94,7 +94,7 @@ module Caboose
       CalendarEvent.find(params[:id]).destroy      
       resp = StdClass.new({ 'redirect' => "/admin/calendars" })                  
       render :json => resp
-    end       
+    end
 		
   end
 end

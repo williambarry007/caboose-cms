@@ -2,7 +2,7 @@
 module Caboose
   class PagePermissionsController < ApplicationController
     
-    # POST /admin/page-permissions
+    # @route POST /admin/page-permissions
     def admin_add
       return unless user_is_allowed('pages', 'add')
 
@@ -19,8 +19,8 @@ module Caboose
       render :json => resp
     end
 
-    # DELETE /admin/page-permissions
-    # DELETE /admin/page-permissions/:id
+    # @route DELETE /admin/page-permissions
+    # @route DELETE /admin/page-permissions/:id
     def admin_delete
       return unless user_is_allowed('pages', 'edit')
 

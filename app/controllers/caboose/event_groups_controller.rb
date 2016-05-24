@@ -59,6 +59,28 @@ module Caboose
         { 'value' => CalendarEventGroup::REPEAT_BY_DAY_OF_WEEK  , 'text' => 'same day of the week' },        
       ]
     end
+
+    # @route GET /admin/event-groups/:field-options
+    def admin_options
+      options = []
+      case params[:field]
+        when 'period'
+          options = [
+            { 'value' => CalendarEventGroup::PERIOD_DAY   , 'text' => CalendarEventGroup::PERIOD_DAY   },
+            { 'value' => CalendarEventGroup::PERIOD_WEEK  , 'text' => CalendarEventGroup::PERIOD_WEEK  },
+            { 'value' => CalendarEventGroup::PERIOD_MONTH , 'text' => CalendarEventGroup::PERIOD_MONTH },
+            { 'value' => CalendarEventGroup::PERIOD_YEAR  , 'text' => CalendarEventGroup::PERIOD_YEAR  },
+          ]
+        when 'frequency'
+          options = (1..30).collect{ |i| { 'value' => i, 'text' => i }}
+        when 'repeat-by'
+          options = [
+            { 'value' => CalendarEventGroup::REPEAT_BY_DAY_OF_MONTH , 'text' => 'same day of the month' },
+            { 'value' => CalendarEventGroup::REPEAT_BY_DAY_OF_WEEK  , 'text' => 'same day of the week' },        
+          ]
+      end      
+      render :json => options
+    end
     
   end
 end

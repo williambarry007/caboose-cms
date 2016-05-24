@@ -67,14 +67,6 @@ module Caboose
       render :layout => 'caboose/modal'                
     end
     
-    # @route GET /admin/pages/:page_id/blocks/:id
-    # @route GET /admin/posts/:post_id/blocks/:id
-    def admin_show
-      return unless user_is_allowed('pages', 'edit')      
-      block = Block.find(params[:id])
-      render :json => block      
-    end
-    
     # @route GET /admin/pages/:page_id/blocks/tree
     # @route GET /admin/pages/:page_id/blocks/:id/tree
     # @route GET /admin/posts/:post_id/blocks/tree
@@ -226,8 +218,8 @@ module Caboose
       end
     end
     
-    # GET /admin/pages/:page_id/blocks/:id/advanced
-    # GET /admin/posts/:post_id/blocks/:id/advanced
+    # @route GET /admin/pages/:page_id/blocks/:id/advanced
+    # @route GET /admin/posts/:post_id/blocks/:id/advanced
     def admin_edit_advanced
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:page_id]) if params[:page_id]
@@ -237,10 +229,18 @@ module Caboose
       render :layout => 'caboose/modal'      
     end
     
-    # POST /admin/pages/:page_id/blocks
-    # POST /admin/pages/:page_id/blocks/:id
-    # POST /admin/posts/:post_id/blocks
-    # POST /admin/posts/:post_id/blocks/:id
+    # @route GET /admin/pages/:page_id/blocks/:id
+    # @route GET /admin/posts/:post_id/blocks/:id
+    def admin_show
+      return unless user_is_allowed('pages', 'edit')      
+      block = Block.find(params[:id])
+      render :json => block      
+    end
+    
+    # @route POST /admin/pages/:page_id/blocks
+    # @route POST /admin/pages/:page_id/blocks/:id
+    # @route POST /admin/posts/:post_id/blocks
+    # @route POST /admin/posts/:post_id/blocks/:id
     def admin_create
       return unless user_is_allowed('pages', 'add')
 
@@ -315,8 +315,8 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/pages/:page_id/blocks/:id
-    # PUT /admin/posts/:post_id/blocks/:id
+    # @route PUT /admin/pages/:page_id/blocks/:id
+    # @route PUT /admin/posts/:post_id/blocks/:id
     def admin_update
       return unless user_is_allowed('pages', 'edit')
       
@@ -376,8 +376,8 @@ module Caboose
       render :json => resp      
     end
     
-    # POST /admin/pages/:page_id/blocks/:id/image
-    # POST /admin/posts/:post_id/blocks/:id/image
+    # @route POST /admin/pages/:page_id/blocks/:id/image
+    # @route POST /admin/posts/:post_id/blocks/:id/image
     def admin_update_image
       return unless user_is_allowed('pages', 'edit')
       
@@ -398,8 +398,8 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/pages/:page_id/blocks/:id/file
-    # POST /admin/posts/:post_id/blocks/:id/file
+    # @route POST /admin/pages/:page_id/blocks/:id/file
+    # @route POST /admin/posts/:post_id/blocks/:id/file
     def admin_update_file
       return unless user_is_allowed('pages', 'edit')
       
@@ -420,8 +420,8 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/pages/:page_id/blocks/:id
-    # DELETE /admin/posts/:post_id/blocks/:id
+    # @route DELETE /admin/pages/:page_id/blocks/:id
+    # @route DELETE /admin/posts/:post_id/blocks/:id
     def admin_delete
       return unless user_is_allowed('pages', 'delete')
       
@@ -451,8 +451,8 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/pages/:page_id/blocks/:id/move-up
-    # PUT /admin/posts/:post_id/blocks/:id/move-up
+    # @route PUT /admin/pages/:page_id/blocks/:id/move-up
+    # @route PUT /admin/posts/:post_id/blocks/:id/move-up
     def admin_move_up
       return unless user_is_allowed('pages', 'delete')
       
@@ -467,8 +467,8 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/pages/:page_id/blocks/:id/move-down
-    # PUT /admin/posts/:post_id/blocks/:id/move-down
+    # @route PUT /admin/pages/:page_id/blocks/:id/move-down
+    # @route PUT /admin/posts/:post_id/blocks/:id/move-down
     def admin_move_down
       return unless user_is_allowed('pages', 'delete')
       

@@ -66,7 +66,7 @@ module Caboose
       render :json => resp
     end
     
-    # @route DELETE /admin/calendars
+    # @route DELETE /admin/calendars/:id
     def admin_delete
       return unless user_is_allowed('calendars', 'delete')
       Calendar.find(params[:id]).destroy      

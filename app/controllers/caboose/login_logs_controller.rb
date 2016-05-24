@@ -7,14 +7,14 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
     
-    # GET /admin/login-logs
+    # @route GET /admin/login-logs
     def admin_index
       return if !user_is_allowed_to 'view', 'loginlogs'
       @pager = self.login_logs_pager    
       render :layout => 'caboose/admin'    
     end
     
-    # GET /admin/login-logs/json
+    # @route GET /admin/login-logs/json
     def admin_json
       return if !user_is_allowed_to 'view', 'loginlogs'
       pager = self.login_logs_pager        
@@ -43,14 +43,14 @@ module Caboose
     	})    	
     end
     
-    # GET /admin/login-logs/:id/json
+    # @route GET /admin/login-logs/:id/json
     def admin_json_single
       return if !user_is_allowed_to 'view', 'loginlogs'
       login_log = LoginLog.find(params[:id])      
       render :json => login_log
     end
     
-    # GET /admin/login-logs/:id
+    # @route GET /admin/login-logs/:id
     def admin_edit
       return if !user_is_allowed_to 'edit', 'loginlogs'
       @login_log = LoginLog.find(params[:id])

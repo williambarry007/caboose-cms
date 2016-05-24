@@ -7,8 +7,9 @@ module Caboose
     def before_action
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
-    
-    # GET /admin/sites
+        
+    # @route_priority 9
+    # @route GET /admin/sites
     def admin_index
       return if !user_is_allowed('sites', 'view')
       if !@site.is_master
@@ -29,7 +30,8 @@ module Caboose
     	@sites = @pager.items
     end
     
-    # GET /admin/sites/new
+    # @route_priority 2
+    # @route GET /admin/sites/new
     def admin_new
       return if !user_is_allowed('sites', 'add')
       if !@site.is_master
@@ -40,7 +42,8 @@ module Caboose
       @site = Site.new
     end
     
-    # GET /admin/sites/:id
+    # @route_priority 8
+    # @route GET /admin/sites/:id
     def admin_edit
       return if !user_is_allowed('sites', 'edit')
       if !@site.is_master
@@ -52,8 +55,9 @@ module Caboose
       @site.init_users_and_roles
             
     end
-    
-    # GET /admin/sites/:id/block-types
+        
+    # @route_priority 6
+    # @route GET /admin/sites/:id/block-types
     def admin_edit_block_types
       return if !user_is_allowed('sites', 'edit')
       if !@site.is_master
@@ -63,8 +67,9 @@ module Caboose
       
       @site = Site.find(params[:id])      
     end
-    
-    # GET /admin/sites/:id/css
+        
+    # @route_priority 4
+    # @route GET /admin/sites/:id/css
     def admin_edit_css
       return if !user_is_allowed('sites', 'edit')
       if !@site.is_master
@@ -73,8 +78,9 @@ module Caboose
       end      
       @site = Site.find(params[:id])      
     end
-    
-    # GET /admin/sites/:id/js
+        
+    # @route_priority 5
+    # @route GET /admin/sites/:id/js
     def admin_edit_js
       return if !user_is_allowed('sites', 'edit')
       if !@site.is_master
@@ -83,8 +89,9 @@ module Caboose
       end      
       @site = Site.find(params[:id])      
     end
-    
-    # GET /admin/sites/:id/delete
+        
+    # @route_priority 7
+    # @route GET /admin/sites/:id/delete
     def admin_delete_form
       return if !user_is_allowed('sites', 'edit')
       if !@site.is_master
@@ -93,8 +100,9 @@ module Caboose
       end
       @site = Site.find(params[:id])      
     end
-        
-    # POST /admin/sites
+    
+    # @route_priority 10
+    # @route POST /admin/sites
     def admin_add
       return if !user_is_allowed('sites', 'add')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
@@ -114,8 +122,8 @@ module Caboose
       site.init_users_and_roles            
       render :json => resp
     end
-    
-    # PUT /admin/sites/:id
+        
+    # @route PUT /admin/sites/:id
     def admin_update
       return if !user_is_allowed('sites', 'edit')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
@@ -142,8 +150,8 @@ module Caboose
     	resp.success = save && site.save
     	render :json => resp
     end
-    
-    # POST /admin/sites/:id/logo
+        
+    # @route POST /admin/sites/:id/logo
     def admin_update_logo
       return if !user_is_allowed('sites', 'edit')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
@@ -157,8 +165,8 @@ module Caboose
       resp.attributes = { :image => { :value => site.logo.url(:thumb) }}
       render :json => resp
     end
-      
-    # DELETE /admin/sites/:id
+          
+    # @route DELETE /admin/sites/:id
     def admin_delete
       return if !user_is_allowed('sites', 'delete')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
@@ -172,7 +180,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/sites/:id/members
+    # @route POST /admin/sites/:id/members
     def admin_add_member
       return if !user_is_allowed('sites', 'edit')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
@@ -184,7 +192,7 @@ module Caboose
       render :json => true
     end
     
-    # DELETE /admin/sites/:id/members/:user_id
+    # @route DELETE /admin/sites/:id/members/:user_id
     def admin_remove_member
       return if !user_is_allowed('sites', 'edit')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
@@ -193,7 +201,8 @@ module Caboose
       render :json => true
     end
     
-    # GET /admin/sites/options
+    # @route_priority 1
+    # @route GET /admin/sites/options
     def options
       return if !user_is_allowed('sites', 'view')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
@@ -201,8 +210,9 @@ module Caboose
       options = Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }}
       render :json => options
     end
-    
-    # GET /admin/sites/:id/default-layout-options
+
+    # @route_priority 3
+    # @route GET /admin/sites/:id/default-layout-options
     def admin_default_layout_options
       return if !user_is_allowed('sites', 'view')
       cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id }

@@ -28,9 +28,9 @@ Caboose::Engine.routes.draw do
   # My Account
   #=============================================================================
     
-  get  "/my-account/orders/:order_id/line-items/:id/download"  => "my_account_line_items#download"
-  get  "/my-account/orders/:order_id/line-items/:id"           => "my_account_line_items#edit"
-  get  "/my-account/orders/:order_id/line-items"               => "my_account_line_items#index"
+  #get  "/my-account/orders/:order_id/line-items/:id/download"  => "my_account_line_items#download"
+  #get  "/my-account/orders/:order_id/line-items/:id"           => "my_account_line_items#edit"
+  #get  "/my-account/orders/:order_id/line-items"               => "my_account_line_items#index"
   
   #get  "/my-account/orders/:order_id/billing-address/json"     => "billing_addresses#my_account_json"  
   #put  "/my-account/orders/:order_id/billing-address"          => "billing_addresses#my_account_update"
@@ -53,41 +53,40 @@ Caboose::Engine.routes.draw do
   # Retargeting
   #=============================================================================
        
-  get     "/admin/sites/:site_id/retargeting"       => "retargeting#admin_edit"
-  put     "/admin/sites/:site_id/retargeting"       => "retargeting#admin_update"
+  #get     "/admin/sites/:site_id/retargeting"       => "retargeting#admin_edit"
+  #put     "/admin/sites/:site_id/retargeting"       => "retargeting#admin_update"
   
   #=============================================================================
   # Sites
   #=============================================================================  
                                
-  get     "/admin/sites/options"                    => "sites#options"            
-  get     "/admin/sites/new"                        => "sites#admin_new"
-  get     "/admin/sites/:id/default-layout-options" => "sites#admin_default_layout_options"
-  get     "/admin/sites/:id/css"                    => "sites#admin_edit_css"
-  get     "/admin/sites/:id/js"                     => "sites#admin_edit_js"
-  get     "/admin/sites/:id/block-types"            => "sites#admin_edit_block_types"
-  get     "/admin/sites/:id/delete"                 => "sites#admin_delete_form"
-  get     "/admin/sites/:id"                        => "sites#admin_edit"
-  get     "/admin/sites"                            => "sites#admin_index"
-  
-  post    "/admin/sites"                            => "sites#admin_add"
-  post    "/admin/sites/:id/logo"                   => "sites#admin_update_logo"
-  put     "/admin/sites/:id"                        => "sites#admin_update"      
-  delete  "/admin/sites/:id"                        => "sites#admin_delete"
-  post    "/admin/sites/:id/members"                => "sites#admin_add_member"
-  delete  "/admin/sites/:id/members/:user_id"       => "sites#admin_remove_member"
+  #get     "/admin/sites/options"                    => "sites#options"            
+  #get     "/admin/sites/new"                        => "sites#admin_new"
+  #get     "/admin/sites/:id/default-layout-options" => "sites#admin_default_layout_options"
+  #get     "/admin/sites/:id/css"                    => "sites#admin_edit_css"
+  #get     "/admin/sites/:id/js"                     => "sites#admin_edit_js"
+  #get     "/admin/sites/:id/block-types"            => "sites#admin_edit_block_types"
+  #get     "/admin/sites/:id/delete"                 => "sites#admin_delete_form"
+  #get     "/admin/sites/:id"                        => "sites#admin_edit"
+  #get     "/admin/sites"                            => "sites#admin_index"  
+  #post    "/admin/sites"                            => "sites#admin_add"
+  #post    "/admin/sites/:id/logo"                   => "sites#admin_update_logo"
+  #put     "/admin/sites/:id"                        => "sites#admin_update"      
+  #delete  "/admin/sites/:id"                        => "sites#admin_delete"
+  #post    "/admin/sites/:id/members"                => "sites#admin_add_member"
+  #delete  "/admin/sites/:id/members/:user_id"       => "sites#admin_remove_member"
 
-  post    "/admin/sites/:site_id/domains"           => "domains#admin_add"
-  put     "/admin/sites/:site_id/domains/:id"       => "domains#admin_update"
-  delete  "/admin/sites/:site_id/domains/:id"       => "domains#admin_delete"
-  put     "/admin/sites/:site_id/domains/:id/set-primary" => "domains#admin_set_primary"
+  #post    "/admin/sites/:site_id/domains"           => "domains#admin_add"
+  #put     "/admin/sites/:site_id/domains/:id"       => "domains#admin_update"
+  #delete  "/admin/sites/:site_id/domains/:id"       => "domains#admin_delete"
+  #put     "/admin/sites/:site_id/domains/:id/set-primary" => "domains#admin_set_primary"
         
   #=============================================================================
   # Login Logs
   #=============================================================================
     
-  get "/admin/login-logs/json"      => "login_logs#admin_json"  
-  get "/admin/login-logs"           => "login_logs#admin_index"
+  #get "/admin/login-logs/json"      => "login_logs#admin_json"  
+  #get "/admin/login-logs"           => "login_logs#admin_index"
     
   #=============================================================================
   # Store

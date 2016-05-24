@@ -1,11 +1,11 @@
 module Caboose
   class CartController < Caboose::ApplicationController
     
-    # GET /cart
+    # @route GET /cart
     def index
     end
     
-    # GET /cart/items
+    # @route GET /cart/items
     def list
       render :json => @order.as_json(
         :include => [        
@@ -32,12 +32,12 @@ module Caboose
       )
     end
     
-    # GET /cart/item-count
+    # @route GET /cart/item-count
     def item_count
       render :json => { :item_count => @order.item_count }            
     end
     
-    # POST /cart
+    # @route POST /cart
     def add      
       v = Variant.find(params[:variant_id])
       qty = params[:quantity] ? params[:quantity].to_i : 1
@@ -65,7 +65,7 @@ module Caboose
       }      
     end
     
-    # PUT /cart/:line_item_id
+    # @route PUT /cart/:line_item_id
     def update            
       resp = Caboose::StdClass.new
       li = LineItem.find(params[:line_item_id])
@@ -95,13 +95,13 @@ module Caboose
       render :json => resp                                    
     end
     
-    # DELETE /cart/:line_item_id
+    # @route DELETE /cart/:line_item_id
     def remove
       li = LineItem.find(params[:line_item_id]).destroy
       render :json => { :success => true, :item_count => @order.line_items.count }
     end
     
-    # POST /cart/gift-cards
+    # @route POST /cart/gift-cards
     def add_gift_card      
       resp = StdClass.new
       code = params[:code].strip
@@ -132,7 +132,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /cart/discounts/:discount_id
+    # @route DELETE /cart/discounts/:discount_id
     def remove_discount
       Discount.find(params[:discount_id]).destroy
       @order.calculate

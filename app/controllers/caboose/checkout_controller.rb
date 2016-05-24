@@ -12,7 +12,7 @@ module Caboose
     end
     
     # Step 1 - Login or register
-    # GET /checkout
+    # @route GET /checkout
     def index        
       if logged_in?
         if @order.customer_id.nil?
@@ -25,14 +25,14 @@ module Caboose
     end
     
     # Step 2 - Shipping and billing addresses
-    # GET /checkout/addresses
+    # @route GET /checkout/addresses
     def addresses      
       redirect_to '/checkout' if !logged_in?      
       @logged_in_user = logged_in_user      
     end
     
     # Step 3 - Shipping method
-    # GET /checkout/shipping
+    # @route GET /checkout/shipping
     def shipping
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
@@ -62,7 +62,7 @@ module Caboose
     end
     
     # Step 4 - Gift cards
-    # GET /checkout/gift-cards
+    # @route GET /checkout/gift-cards
     def gift_cards
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
@@ -72,7 +72,7 @@ module Caboose
     end
     
     # Step 5 - Payment
-    # GET /checkout/payment
+    # @route GET /checkout/payment
     def payment
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
@@ -117,11 +117,11 @@ module Caboose
     end
         
     # Step 5 - Stripe Payment Form
-    # POST /checkout/stripe-payment
+    # @route POST /checkout/stripe-payment
     #def stripe_payment
     #end
       
-    # GET /checkout/confirm
+    # @route GET /checkout/confirm
     def confirm_without_payment
       redirect_to '/checkout'           and return if !logged_in?
       redirect_to '/checkout/addresses' and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
@@ -140,7 +140,7 @@ module Caboose
       add_ga_event('Ecommerce', 'Checkout', 'Confirm Without Payment')
     end
     
-    # POST /checkout/confirm
+    # @route POST /checkout/confirm
     def confirm
       render :json => { :error => 'Not logged in.'            } and return if !logged_in?
       render :json => { :error => 'Invalid addresses.'        } and return if @order.billing_address.nil? || (@order.has_shippable_items? && @order.shipping_address.nil?)
@@ -184,7 +184,7 @@ module Caboose
       render :json => resp
     end
     
-    # GET /checkout/thanks
+    # @route GET /checkout/thanks
     def thanks
       @logged_in_user = logged_in_user
       
@@ -195,7 +195,7 @@ module Caboose
     
     #===========================================================================
         
-    # GET /checkout/total
+    # @route GET /checkout/total
     def verify_total
       total = 0.00
       if logged_in?
@@ -205,7 +205,7 @@ module Caboose
       render :json => total.to_f      
     end
     
-    # GET /checkout/address
+    # @route GET /checkout/address
     def address
       render :json => {
         :shipping_address => @order.shipping_address,
@@ -213,7 +213,7 @@ module Caboose
       }
     end
     
-    # PUT /checkout/addresses
+    # @route PUT /checkout/addresses
     def update_addresses
       
       # Grab or create addresses
@@ -260,7 +260,7 @@ module Caboose
       render :json => { :success => @order.save, :errors => @order.errors.full_messages }
     end
     
-    # POST /checkout/attach-user
+    # @route POST /checkout/attach-user
     def attach_user              
       render :json => { :success => false, :errors => ['User is not logged in'] } and return if !logged_in?
       @order.customer_id = logged_in_user.id
@@ -268,7 +268,7 @@ module Caboose
       render :json => { :success => @order.save, :errors => @order.errors.full_messages, :logged_in => logged_in? }
     end
     
-    # POST /checkout/guest
+    # @route POST /checkout/guest
     def attach_guest
       resp = Caboose::StdClass.new      
       email = params[:email]      
@@ -298,7 +298,7 @@ module Caboose
       render :json => resp            
     end
     
-    # PUT /checkout/shipping
+    # @route PUT /checkout/shipping
     def update_shipping
       op = OrderPackage.find(params[:order_package_id])
       op.shipping_method_id = params[:shipping_method_id]
@@ -309,7 +309,7 @@ module Caboose
       render :json => { :success => true }               
     end
     
-    # GET /checkout/payment
+    # @route GET /checkout/payment
     #def payment
     #  case Caboose::payment_processor
     #    when 'authorize.net'                             
@@ -327,7 +327,7 @@ module Caboose
     #  render :layout => false
     #end
         
-    # POST /checkout/authnet-relay
+    # @route POST /checkout/authnet-relay
     def authnet_relay
       Caboose.log("Authorize.net relay, order #{params[:x_invoice_id]}")
       
@@ -394,8 +394,8 @@ module Caboose
       render :layout => false
     end
     
-    # GET  /checkout/authnet-response/:order_id
-    # POST /checkout/authnet-response/:order_id    
+    # @route GET  /checkout/authnet-response/:order_id
+    # @route POST /checkout/authnet-response/:order_id    
     def authnet_response
       Caboose.log("Authorize.net response, order #{params[:order_id]}")
       
@@ -455,7 +455,7 @@ module Caboose
     #  @order.save
     #end
     
-    # GET /checkout/authorize-by-gift-card
+    # @route GET /checkout/authorize-by-gift-card
     #def authorize_by_gift_card
     #  if @order.total < @order.discounts.first.amount_current
     #    

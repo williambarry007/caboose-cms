@@ -1,20 +1,21 @@
 module Caboose
   class LineItemsController < Caboose::ApplicationController
     
-    # GET /admin/orders/:id/line-items/json
+    # @route GET /admin/orders/:id/line-items/json
+    # @route GET /admin/orders/:id/packages/json
     def admin_json
       return if !user_is_allowed('orders', 'edit')    
       order = Order.find(params[:id])
       render :json => order.line_items.as_json(:include => :order_package)
     end
     
-    # GET /admin/orders/:order_id/line-items/new
+    # @route GET /admin/orders/:order_id/line-items/new
     def admin_new
       return if !user_is_allowed('orders', 'edit')      
       render :layout => 'caboose/modal'            
     end
     
-    # POST /admin/orders/:order_id/line-items
+    # @route POST /admin/orders/:order_id/line-items
     def admin_add
       return if !user_is_allowed('orders', 'edit')      
       
@@ -32,7 +33,7 @@ module Caboose
       render :json => resp
     end
       
-    # PUT /admin/orders/:order_id/line-items/:id
+    # @route PUT /admin/orders/:order_id/line-items/:id
     def admin_update
       return if !user_is_allowed('orders', 'edit')
       
@@ -87,7 +88,7 @@ module Caboose
       render :json => resp
     end
         
-    # DELETE /admin/orders/:order_id/line-items/:id
+    # @route DELETE /admin/orders/:order_id/line-items/:id
     def admin_delete
       return if !user_is_allowed('orders', 'delete')
       li = LineItem.find(params[:id])
@@ -100,7 +101,7 @@ module Caboose
       })
     end
     
-    # GET /admin/orders/:order_id/line-items/:id/highlight
+    # @route GET /admin/orders/:order_id/line-items/:id/highlight
     def admin_highlight
       return if !user_is_allowed('orders', 'view')
       li = LineItem.find(params[:id])
@@ -108,7 +109,7 @@ module Caboose
       redirect_to "/admin/products/#{v.product_id}/variants?highlight=#{v.id}"
     end
     
-    # GET /admin/orders/line-items/status-options
+    # @route GET /admin/orders/line-items/status-options
     def admin_status_options
       arr = ['pending', 'ready to ship', 'shipped', 'backordered', 'canceled']
       options = []
@@ -121,7 +122,7 @@ module Caboose
       render :json => options
     end
     
-    # GET /admin/line-items/product-stubs
+    # @route GET /admin/orders/line-items/product-stubs
     def admin_product_stubs      
       title = params[:title].strip.downcase.split(' ')
       render :json => [] and return if title.length == 0

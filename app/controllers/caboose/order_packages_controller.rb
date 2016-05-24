@@ -1,7 +1,7 @@
 module Caboose
   class OrderPackagesController < Caboose::ApplicationController
     
-    # GET /admin/orders/:order_id/packages/json
+    # @route GET /admin/orders/:order_id/packages/json
     def admin_json      
       return if !user_is_allowed('orders', 'view')
       order = Order.find(params[:order_id])
@@ -10,7 +10,7 @@ module Caboose
       )
     end     
 
-    # POST /admin/orders/:order_id/packages
+    # @route POST /admin/orders/:order_id/packages
     def admin_add
       return if !user_is_allowed('orders', 'add')
       
@@ -35,7 +35,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/orders/:order_id/packages/:id
+    # @route PUT /admin/orders/:order_id/packages/:id
     def admin_update
       return if !user_is_allowed('orders', 'edit')
       
@@ -67,7 +67,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/orders/:order_id/line-items/:id
+    # @route PUT /admin/orders/:order_id/line-items/:id
     def admin_update_line_item
       return if !user_is_allowed('orders', 'edit')
       
@@ -106,7 +106,7 @@ module Caboose
       render :json => resp
     end 
     
-    # DELETE /admin/orders/:order_id/packages/:id
+    # @route DELETE /admin/orders/:order_id/packages/:id
     def admin_delete
       return if !user_is_allowed('orders', 'delete')
       resp = StdClass.new
@@ -120,7 +120,7 @@ module Caboose
       render :json => resp
     end
     
-    # GET /admin/orders/:order_id/packages/:id/calculate-shipping
+    # @route GET /admin/orders/:order_id/packages/:id/calculate-shipping
     def calculate_shipping
       return if !user_is_allowed('orders', 'edit')
 
@@ -145,7 +145,7 @@ module Caboose
       render :json => { :success => true, :rate => rate }            
     end
     
-    # GET /admin/orders/:order_id/packages/:id/shipping-rates
+    # @route GET /admin/orders/:order_id/packages/:id/shipping-rates
     def shipping_rates
       return if !user_is_allowed('orders', 'edit')
 

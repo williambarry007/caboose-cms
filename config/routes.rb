@@ -491,20 +491,20 @@ Caboose::Engine.routes.draw do
   # Reviews  
   #=============================================================================
   
-  post    "/reviews/add"        => "reviews#add"
+  # post    "/reviews/add"        => "reviews#add"
   
   #=============================================================================
   # Cart  
   #=============================================================================
   
-  get     '/cart'                         => 'cart#index'
-  get     '/cart/items'                   => 'cart#list'
-  get     '/cart/item-count'              => 'cart#item_count'
-  post    '/cart'                         => 'cart#add'
-  post    '/cart/gift-cards'              => 'cart#add_gift_card'
-  delete  '/cart/discounts/:discount_id'  => 'cart#remove_discount'
-  put     '/cart/:line_item_id'           => 'cart#update'
-  delete  '/cart/:line_item_id'           => 'cart#remove'
+  # get     '/cart'                         => 'cart#index'
+  # get     '/cart/items'                   => 'cart#list'
+  # get     '/cart/item-count'              => 'cart#item_count'
+  # post    '/cart'                         => 'cart#add'
+  # post    '/cart/gift-cards'              => 'cart#add_gift_card'
+  # delete  '/cart/discounts/:discount_id'  => 'cart#remove_discount'
+  # put     '/cart/:line_item_id'           => 'cart#update'
+  # delete  '/cart/:line_item_id'           => 'cart#remove'
   
   #=============================================================================
   # Checkout  
@@ -538,44 +538,44 @@ Caboose::Engine.routes.draw do
   # Product Modifications  
   #=============================================================================
   
-  get    "/admin/products/:product_id/modifications/:mod_id/values/json"        => "modification_values#admin_json"
-  get    "/admin/products/:product_id/modifications/:mod_id/values/:id/json"    => "modification_values#admin_json_single"
-  put    "/admin/products/:product_id/modifications/:mod_id/values/:id"         => "modification_values#admin_update"
-  post   "/admin/products/:product_id/modifications/:mod_id/values"             => "modification_values#admin_add"
-  delete "/admin/products/:product_id/modifications/:mod_id/values/:id"         => "modification_values#admin_delete"
-  put    "/admin/products/:product_id/modifications/:mod_id/values/sort-order"  => "modification_values#admin_update_sort_order"            
+  # get    "/admin/products/:product_id/modifications/:mod_id/values/json"        => "modification_values#admin_json"
+  # get    "/admin/products/:product_id/modifications/:mod_id/values/:id/json"    => "modification_values#admin_json_single"
+  # put    "/admin/products/:product_id/modifications/:mod_id/values/:id"         => "modification_values#admin_update"
+  # post   "/admin/products/:product_id/modifications/:mod_id/values"             => "modification_values#admin_add"
+  # delete "/admin/products/:product_id/modifications/:mod_id/values/:id"         => "modification_values#admin_delete"
+  # put    "/admin/products/:product_id/modifications/:mod_id/values/sort-order"  => "modification_values#admin_update_sort_order"            
 
-  get    "/admin/products/:product_id/modifications/json"        => "modifications#admin_json"
-  get    "/admin/products/:product_id/modifications/:id/json"    => "modifications#admin_json_single"
-  put    "/admin/products/:product_id/modifications/:id"         => "modifications#admin_update"
-  post   "/admin/products/:product_id/modifications"             => "modifications#admin_add"
-  delete "/admin/products/:product_id/modifications/:id"         => "modifications#admin_delete"
-  put    "/admin/products/:product_id/modifications/sort-order"  => "modifications#admin_update_sort_order"            
+  # get    "/admin/products/:product_id/modifications/json"        => "modifications#admin_json"
+  # get    "/admin/products/:product_id/modifications/:id/json"    => "modifications#admin_json_single"
+  # put    "/admin/products/:product_id/modifications/:id"         => "modifications#admin_update"
+  # post   "/admin/products/:product_id/modifications"             => "modifications#admin_add"
+  # delete "/admin/products/:product_id/modifications/:id"         => "modifications#admin_delete"
+  # put    "/admin/products/:product_id/modifications/sort-order"  => "modifications#admin_update_sort_order"            
 
     
   #=============================================================================
   # Products  
   #=============================================================================
     
-  get     '/products/:id/info' => 'products#info'
+  # get     '/products/:id/info' => 'products#info'
   get     '/products/:id'      => 'products#index', :constraints => { :id => /.*/ }
-  get     '/products'          => 'products#index'
+  # get     '/products'          => 'products#index'
 
   post    '/variants/find-by-options'   => 'variants#find_by_options'
   get     '/variants/:id/display-image' => 'variants#display_image'
                                                                                
-  get     "/admin/products"                                 => "products#admin_index"
-  get     "/admin/products/json"                            => "products#admin_json"
-  get     '/admin/products/sort'                            => 'products#admin_sort'  
-  put     "/admin/categories/:category_id/products/sort-order" => "products#admin_update_sort_order"  
-  put     "/admin/products/update-vendor-status/:id"        => "products#admin_update_vendor_status"
-  get     "/admin/products/new"                             => "products#admin_new"
-  get     "/admin/products/status-options"                  => "products#admin_status_options"    
-  get     "/admin/products/:id/general"                     => "products#admin_edit_general"    
-  get     "/admin/products/:id/description"                 => "products#admin_edit_description"
-  get     "/admin/products/:id/categories"                  => "products#admin_edit_categories"  
-  post    "/admin/products/:id/categories"                  => "products#admin_add_to_category"
-  delete  "/admin/products/:id/categories/:category_id"     => "products#admin_remove_from_category"
+  # get     "/admin/products"                                 => "products#admin_index"
+  # get     "/admin/products/json"                            => "products#admin_json"
+  # get     '/admin/products/sort'                            => 'products#admin_sort'  
+  # put     "/admin/categories/:category_id/products/sort-order" => "products#admin_update_sort_order"  
+  # put     "/admin/products/update-vendor-status/:id"        => "products#admin_update_vendor_status"
+  # get     "/admin/products/new"                             => "products#admin_new"
+  # get     "/admin/products/status-options"                  => "products#admin_status_options"    
+  # get     "/admin/products/:id/general"                     => "products#admin_edit_general"    
+  # get     "/admin/products/:id/description"                 => "products#admin_edit_description"
+  # get     "/admin/products/:id/categories"                  => "products#admin_edit_categories"  
+  # post    "/admin/products/:id/categories"                  => "products#admin_add_to_category"
+  # delete  "/admin/products/:id/categories/:category_id"     => "products#admin_remove_from_category"
 
   get     "/admin/products/:product_id/variants"                         => "variants#admin_index"
   get     "/admin/products/:product_id/variants/json"                    => "variants#admin_json"  
@@ -601,18 +601,18 @@ Caboose::Engine.routes.draw do
   get     "/admin/variants/status-options"                               => "variants#admin_status_options"
   get     '/admin/variants/group'                                        => 'variants#admin_group'  
   
-  get     "/admin/products/:id/images"                      => "products#admin_edit_images"
-  post    "/admin/products/:id/images"                      => "products#admin_add_image"
-  get     "/admin/products/:id/collections"                 => "products#admin_edit_collections"
-  get     "/admin/products/:id/seo"                         => "products#admin_edit_seo"
-  get     "/admin/products/:id/options"                     => "products#admin_edit_options"
-  get     "/admin/products/:id/delete"                      => "products#admin_delete_form"
-  get     "/admin/products/:id/json"                        => "products#admin_json_single"
-  get     "/admin/products/:id"                             => "products#admin_edit_general"
-  put     "/admin/products/:id"                             => "products#admin_update"
-  post    "/admin/products"                                 => "products#admin_add"
-  delete  "/admin/products/:id"                             => "products#admin_delete"
-  put     "/admin/products/:id/update-vendor"               => "products#admin_update_vendor"
+  # get     "/admin/products/:id/images"                      => "products#admin_edit_images"
+  # post    "/admin/products/:id/images"                      => "products#admin_add_image"
+  # get     "/admin/products/:id/collections"                 => "products#admin_edit_collections"
+  # get     "/admin/products/:id/seo"                         => "products#admin_edit_seo"
+  # get     "/admin/products/:id/options"                     => "products#admin_edit_options"
+  # get     "/admin/products/:id/delete"                      => "products#admin_delete_form"
+  # get     "/admin/products/:id/json"                        => "products#admin_json_single"
+  # get     "/admin/products/:id"                             => "products#admin_edit_general"
+  # put     "/admin/products/:id"                             => "products#admin_update"
+  # post    "/admin/products"                                 => "products#admin_add"
+  # delete  "/admin/products/:id"                             => "products#admin_delete"
+  # put     "/admin/products/:id/update-vendor"               => "products#admin_update_vendor"
   
   put     "/admin/product-images/sort-order"          => "product_images#admin_update_sort_order"      
   get     "/admin/product-images/:id/variant-ids"     => "product_images#admin_variant_ids"
@@ -624,14 +624,14 @@ Caboose::Engine.routes.draw do
   # Stackable groups
   #=============================================================================
   
-  get     "/admin/stackable-groups/options"   => "stackable_groups#admin_options"  
-  get     "/admin/stackable-groups/json"      => "stackable_groups#admin_json"
-  get     "/admin/stackable-groups/:id/json"  => "stackable_groups#admin_json_single"
-  get     "/admin/stackable-groups"           => "stackable_groups#admin_index"
-  put     "/admin/stackable-groups/:id"       => "stackable_groups#admin_update"
-  post    "/admin/stackable-groups"           => "stackable_groups#admin_add"
-  delete  "/admin/stackable-groups/bulk"      => "stackable_groups#admin_bulk_delete"
-  delete  "/admin/stackable-groups/:id"       => "stackable_groups#admin_delete"    
+  # get     "/admin/stackable-groups/options"   => "stackable_groups#admin_options"  
+  # get     "/admin/stackable-groups/json"      => "stackable_groups#admin_json"
+  # get     "/admin/stackable-groups/:id/json"  => "stackable_groups#admin_json_single"
+  # get     "/admin/stackable-groups"           => "stackable_groups#admin_index"
+  # put     "/admin/stackable-groups/:id"       => "stackable_groups#admin_update"
+  # post    "/admin/stackable-groups"           => "stackable_groups#admin_add"
+  # delete  "/admin/stackable-groups/bulk"      => "stackable_groups#admin_bulk_delete"
+  # delete  "/admin/stackable-groups/:id"       => "stackable_groups#admin_delete"    
 
   #=============================================================================
   # Categories
@@ -656,49 +656,49 @@ Caboose::Engine.routes.draw do
   # Orders
   #=============================================================================
   
-  get     "/admin/orders/city-report"                 => "orders#admin_city_report"
-  get     "/admin/orders/summary-report"              => "orders#admin_summary_report"
-  get     "/admin/orders/weird-test"                  => "orders#admin_weird_test"
-  get     "/admin/orders"                             => "orders#admin_index"
-  get     "/admin/orders/test-info"                   => "orders#admin_mail_test_info"
-  get     "/admin/orders/test-gmail"                  => "orders#admin_mail_test_gmail"  
-  get     "/admin/orders/status-options"              => "orders#admin_status_options"
-  get     "/admin/orders/new"                         => "orders#admin_new"
-  get     "/admin/orders/print-pending"               => "orders#admin_print_pending"  
-  get     "/admin/orders/:id/calculate-tax"           => "orders#admin_calculate_tax"
-  get     "/admin/orders/:id/calculate-handling"      => "orders#admin_calculate_handling"      
-  get     "/admin/orders/:id/send-for-authorization"  => "orders#admin_send_for_authorization"
-  get     "/admin/orders/:id/capture"                 => "orders#capture_funds"  
-  get     "/admin/orders/:id/json"                    => "orders#admin_json"
-  get     "/admin/orders/:id/print"                   => "orders#admin_print"
-  get     "/admin/orders/:id/send-to-quickbooks"      => "orders#admin_send_to_quickbooks"
-  get     "/admin/orders/:id"                         => "orders#admin_edit"        
-  put     "/admin/orders/:id"                         => "orders#admin_update"
-  delete  "/admin/orders/:id"                         => "orders#admin_delete"
-  get     '/admin/orders/:id/void'                    => 'orders#admin_void'
-  get     '/admin/orders/:id/refund'                  => 'orders#admin_refund'
-  post    '/admin/orders/:id/resend-confirmation'     => 'orders#admin_resend_confirmation'
-  post    '/admin/orders'                             => 'orders#admin_add'
+  # get     "/admin/orders/city-report"                 => "orders#admin_city_report"
+  # get     "/admin/orders/summary-report"              => "orders#admin_summary_report"
+  # get     "/admin/orders/weird-test"                  => "orders#admin_weird_test"
+  # get     "/admin/orders"                             => "orders#admin_index"
+  # get     "/admin/orders/test-info"                   => "orders#admin_mail_test_info"
+  # get     "/admin/orders/test-gmail"                  => "orders#admin_mail_test_gmail"  
+  # get     "/admin/orders/status-options"              => "orders#admin_status_options"
+  # get     "/admin/orders/new"                         => "orders#admin_new"
+  # get     "/admin/orders/print-pending"               => "orders#admin_print_pending"  
+  # get     "/admin/orders/:id/calculate-tax"           => "orders#admin_calculate_tax"
+  # get     "/admin/orders/:id/calculate-handling"      => "orders#admin_calculate_handling"      
+  # get     "/admin/orders/:id/send-for-authorization"  => "orders#admin_send_for_authorization"
+  # get     "/admin/orders/:id/capture"                 => "orders#capture_funds"  
+  # get     "/admin/orders/:id/json"                    => "orders#admin_json"
+  # get     "/admin/orders/:id/print"                   => "orders#admin_print"
+  # get     "/admin/orders/:id/send-to-quickbooks"      => "orders#admin_send_to_quickbooks"
+  # get     "/admin/orders/:id"                         => "orders#admin_edit"        
+  # put     "/admin/orders/:id"                         => "orders#admin_update"
+  # delete  "/admin/orders/:id"                         => "orders#admin_delete"
+  # get     '/admin/orders/:id/void'                    => 'orders#admin_void'
+  # get     '/admin/orders/:id/refund'                  => 'orders#admin_refund'
+  # post    '/admin/orders/:id/resend-confirmation'     => 'orders#admin_resend_confirmation'
+  # post    '/admin/orders'                             => 'orders#admin_add'
   
-  get     "/admin/orders/line-items/status-options"           => "line_items#admin_status_options"
-  get     "/admin/orders/line-items/product-stubs"            => "line_items#admin_product_stubs"
-  get     "/admin/orders/:order_id/line-items/new"            => "line_items#admin_new"
-  get     "/admin/orders/:order_id/line-items/json"           => "line_items#admin_json"  
-  post    "/admin/orders/:order_id/line-items"                => "line_items#admin_add"
-  get     "/admin/orders/:order_id/line-items/:id/highlight"  => "line_items#admin_highlight"  
-  put     "/admin/orders/:order_id/line-items/:id"            => "line_items#admin_update"  
-  delete  "/admin/orders/:order_id/line-items/:id"            => "line_items#admin_delete"
+  # get     "/admin/orders/line-items/status-options"           => "line_items#admin_status_options"
+  # get     "/admin/orders/line-items/product-stubs"            => "line_items#admin_product_stubs"
+  # get     "/admin/orders/:order_id/line-items/new"            => "line_items#admin_new"
+  # get     "/admin/orders/:order_id/line-items/json"           => "line_items#admin_json"  
+  # post    "/admin/orders/:order_id/line-items"                => "line_items#admin_add"
+  # get     "/admin/orders/:order_id/line-items/:id/highlight"  => "line_items#admin_highlight"  
+  # put     "/admin/orders/:order_id/line-items/:id"            => "line_items#admin_update"  
+  # delete  "/admin/orders/:order_id/line-items/:id"            => "line_items#admin_delete"
   
-  get     "/admin/orders/:order_id/packages/json"               => "order_packages#admin_json"
-  get     "/admin/orders/:order_id/packages/:id/calculate-shipping" => "order_packages#calculate_shipping"    
-  get     "/admin/orders/:order_id/packages/:id/shipping-rates" => "order_packages#shipping_rates"
-  put     "/admin/orders/:order_id/packages/:id"                => "order_packages#admin_update"
-  post    "/admin/orders/:order_id/packages"                    => "order_packages#admin_add"
-  delete  "/admin/orders/:order_id/packages/:id"                => "order_packages#admin_delete"    
+  # get     "/admin/orders/:order_id/packages/json"               => "order_packages#admin_json"
+  # get     "/admin/orders/:order_id/packages/:id/calculate-shipping" => "order_packages#calculate_shipping"    
+  # get     "/admin/orders/:order_id/packages/:id/shipping-rates" => "order_packages#shipping_rates"
+  # put     "/admin/orders/:order_id/packages/:id"                => "order_packages#admin_update"
+  # post    "/admin/orders/:order_id/packages"                    => "order_packages#admin_add"
+  # delete  "/admin/orders/:order_id/packages/:id"                => "order_packages#admin_delete"    
     
-  get     "/admin/orders/:order_id/packages/json"     => "line_items#admin_json"  
-  put     "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_update"
-  delete  "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_delete"
+  # get     "/admin/orders/:order_id/packages/json"     => "line_items#admin_json"  
+  # put     "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_update"
+  # delete  "/admin/orders/:order_id/line-items/:id"    => "line_items#admin_delete"
   
   #get     "/admin/orders/:order_id/billing-address/json"   => "billing_addresses#admin_json"      
   #put     "/admin/orders/:order_id/billing-address"        => "billing_addresses#admin_update"
@@ -741,11 +741,11 @@ Caboose::Engine.routes.draw do
   # API
   #=============================================================================
   
-  get    "/api/products"               => "products#api_index"
+  # get    "/api/products"               => "products#api_index"
   #get    "/api/instagram"              => "social#authorize_instagram"
   #delete "/api/instagram"              => "social#deauthorize_instagram"
-  get    "/api/products/:id"           => "products#api_details"
-  get    "/api/products/:id/variants"  => "products#api_variants"  
+  # get    "/api/products/:id"           => "products#api_details"
+  # get    "/api/products/:id/variants"  => "products#api_variants"  
   get    "caboose/block-types"         => "block_types#api_block_type_list"
   get    "caboose/block-types/:name"   => "block_types#api_block_type"
         

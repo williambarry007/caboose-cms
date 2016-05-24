@@ -1,7 +1,7 @@
 module Caboose
   class OrdersController < Caboose::ApplicationController
     
-    # GET /admin/orders/weird-test
+    # @route GET /admin/orders/weird-test
     def admin_weird_test
       Caboose.log("Before the admin_weird_test")
       x = Order.new
@@ -9,7 +9,7 @@ module Caboose
       render :json => x      
     end
     
-    # GET /admin/orders
+    # @route GET /admin/orders
     def admin_index
       return if !user_is_allowed('orders', 'view')
       
@@ -35,13 +35,13 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/orders/new
+    # @route GET /admin/orders/new
     def admin_new
       return if !user_is_allowed('orders', 'add')      
       render :layout => 'caboose/admin'
     end
     
-    # POST /admin/orders
+    # @route POST /admin/orders
     def admin_add
       return if !user_is_allowed('orders', 'add')
       order = Order.create(
@@ -53,7 +53,8 @@ module Caboose
       render :json => { :sucess => true, :redirect => "/admin/orders/#{order.id}" }
     end
       
-    # GET /admin/orders/:id
+    # @route_priority 50
+    # @route GET /admin/orders/:id
     def admin_edit
       return if !user_is_allowed('orders', 'edit')
       @order = Order.where(:id => params[:id]).first
@@ -65,7 +66,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/orders/:id/calculate-tax
+    # @route GET /admin/orders/:id/calculate-tax
     def admin_calculate_tax
       return if !user_is_allowed('orders', 'edit')
       order = Order.find(params[:id])
@@ -75,7 +76,7 @@ module Caboose
       render :json => { :success => true }      
     end
     
-    # GET /admin/orders/:id/calculate-handling
+    # @route GET /admin/orders/:id/calculate-handling
     def admin_calculate_handling
       return if !user_is_allowed('orders', 'edit')
       order = Order.find(params[:id])
@@ -85,7 +86,7 @@ module Caboose
       render :json => { :success => true }      
     end
 
-    # GET /admin/orders/:id/capture
+    # @route GET /admin/orders/:id/capture
     def capture_funds
       return if !user_is_allowed('orders', 'edit')
            
@@ -98,7 +99,7 @@ module Caboose
       render :json => resp
     end
     
-    # GET /admin/orders/:id/void
+    # @route GET /admin/orders/:id/void
     def admin_void
       return if !user_is_allowed('orders', 'edit')
             
@@ -108,7 +109,7 @@ module Caboose
       render :json => resp
     end
   
-    # GET /admin/orders/:id/refund
+    # @route GET /admin/orders/:id/refund
     def admin_refund
       return if !user_is_allowed('orders', 'edit')
     
@@ -118,7 +119,7 @@ module Caboose
       render :json => resp            
     end
     
-    # POST /admin/orders/:id/resend-confirmation
+    # @route POST /admin/orders/:id/resend-confirmation
     def admin_resend_confirmation
       if Order.find(params[:id]).resend_confirmation
         render :json => { success: "Confirmation re-sent successfully." }
@@ -127,7 +128,7 @@ module Caboose
       end
     end
     
-    # GET /admin/orders/:id/json
+    # @route GET /admin/orders/:id/json
     def admin_json
       return if !user_is_allowed('orders', 'edit')    
       order = Order.find(params[:id])
@@ -147,7 +148,7 @@ module Caboose
       ])
     end
   
-    # GET /admin/orders/:id/print.pdf
+    # @route GET /admin/orders/:id/print
     def admin_print
       return if !user_is_allowed('orders', 'edit')           
       
@@ -156,7 +157,7 @@ module Caboose
       send_data pdf.to_pdf, :filename => "order_#{pdf.order.id}.pdf", :type => "application/pdf", :disposition => "inline"   
     end
     
-    # GET /admin/orders/print-pending
+    # @route GET /admin/orders/print-pending
     def admin_print_pending
       return if !user_is_allowed('orders', 'edit')    
       
@@ -168,7 +169,7 @@ module Caboose
       send_data pdf.to_pdf, :filename => "pending_orders.pdf", :type => "application/pdf", :disposition => "inline"            
     end
       
-    # PUT /admin/orders/:id
+    # @route PUT /admin/orders/:id
     def admin_update
       return if !user_is_allowed('orders', 'edit')
       
@@ -205,7 +206,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/orders/:id
+    # @route DELETE /admin/orders/:id
     def admin_delete
       return if !user_is_allowed('orders', 'delete')
       Order.find(params[:id]).destroy
@@ -214,7 +215,7 @@ module Caboose
       })
     end
 
-    # GET /admin/orders/:id/send-for-authorization
+    # @route GET /admin/orders/:id/send-for-authorization
     def admin_send_for_authorization
       return if !user_is_allowed('orders', 'edit')
       order = Order.find(params[:id])
@@ -222,7 +223,7 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # GET /admin/orders/city-report
+    # @route GET /admin/orders/city-report
     def admin_city_report
       return if !user_is_allowed('orders', 'view')
 
@@ -233,7 +234,7 @@ module Caboose
       render :layout => 'caboose/admin'    
     end
     
-    # GET /admin/orders/summary-report
+    # @route GET /admin/orders/summary-report
     def admin_summary_report
       return if !user_is_allowed('orders', 'view')
 
@@ -244,7 +245,7 @@ module Caboose
       render :layout => 'caboose/admin'    
     end
 
-    # GET /admin/orders/status-options
+    # @route GET /admin/orders/status-options
     def admin_status_options
       return if !user_is_allowed('orders', 'view')
       statuses = [
@@ -258,19 +259,19 @@ module Caboose
       render :json => options    
     end
     
-    # GET /admin/orders/test-info
+    # @route GET /admin/orders/test-info
     def admin_mail_test_info
       TestMailer.test_info.deliver
       render :text => "Sent email to info@tuskwearcollection.com on #{DateTime.now.strftime("%F %T")}"
     end
     
-    # GET /admin/orders/test-gmail
+    # @route GET /admin/orders/test-gmail
     def admin_mail_test_gmail
       TestMailer.test_gmail.deliver
       render :text => "Sent email to william@nine.is on #{DateTime.now.strftime("%F %T")}"
     end
     
-    # GET /admin/orders/google-feed
+    # @route GET /admin/orders/google-feed
     def admin_google_feed
       d2 = DateTime.now
       d1 = DateTime.now

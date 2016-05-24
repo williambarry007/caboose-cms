@@ -29,8 +29,7 @@ module Caboose
     # Admin actions
     #=============================================================================
     
-    # @route GET /admin/products/:product_id/variants
-    # @route GET /admin/products/:product_id/variants/:variant_id
+    # @route GET /admin/products/:product_id/variants    
     def admin_index   
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:product_id])
@@ -76,14 +75,6 @@ module Caboose
       v = Variant.find(params[:id])      
       render :json => v      
     end
-        
-    # @route GET /admin/products/:product_id/variants/:id
-    def admin_edit
-      return if !user_is_allowed('variants', 'edit')    
-      @variant = Variant.find(params[:id])
-      @product = @variant.product
-      render :layout => 'caboose/admin'            
-    end
     
     # @route GET /admin/products/:product_id/variants/:id/download-url
     def admin_download_url
@@ -110,7 +101,55 @@ module Caboose
       render :json => resp
     end
     
-    # @route PUT /admin/variants/:id
+    # @route GET /admin/products/:product_id/variants/new
+    def admin_new
+      return if !user_is_allowed('variants', 'add')
+      @top_categories = ProductCategory.where(:parent_id => nil).reorder('name').all
+      @product_id = params[:product_id] 
+      @variant = Variant.new
+      render :layout => 'caboose/admin'
+    end
+    
+    # @route GET /admin/products/:product_id/variants/sort-order  
+    def admin_edit_sort_order
+      return if !user_is_allowed('products', 'edit')    
+      @product = Product.find(params[:product_id])      
+      render :layout => 'caboose/admin'
+    end
+    
+    # @route GET /admin/products/:product_id/variants/option1-media  
+    def admin_edit_option1_media
+      return if !user_is_allowed('products', 'edit')    
+      @product = Product.find(params[:product_id])
+      @variants = Variant.where(:product_id => @product.id, :option1 => params[:option_value]).reorder(:option1_sort_order).all      
+      render :layout => 'caboose/modal'
+    end
+    
+    # @route GET /admin/products/:product_id/variants/option2-media  
+    def admin_edit_option2_media
+      return if !user_is_allowed('products', 'edit')    
+      @product = Product.find(params[:product_id])
+      @variants = Variant.where(:product_id => @product.id, :option2 => params[:option_value]).reorder(:option2_sort_order).all      
+      render :layout => 'caboose/modal'
+    end
+    
+    # @route GET /admin/products/:product_id/variants/option3-media  
+    def admin_edit_option3_media
+      return if !user_is_allowed('products', 'edit')    
+      @product = Product.find(params[:product_id])
+      @variants = Variant.where(:product_id => @product.id, :option3 => params[:option_value]).reorder(:option3_sort_order).all      
+      render :layout => 'caboose/modal'
+    end
+    
+    # @route GET /admin/products/:product_id/variants/:id
+    def admin_edit
+      return if !user_is_allowed('variants', 'edit')    
+      @variant = Variant.find(params[:id])
+      @product = @variant.product
+      render :layout => 'caboose/admin'            
+    end
+    
+    # @route PUT /admin/products/:product_id/variants/:id
     def admin_update
       return if !user_is_allowed('variants', 'edit')
       
@@ -168,36 +207,8 @@ module Caboose
       resp.success = save && v.save
       render :json => resp
     end
-    
-    # @route GET /admin/products/:id/variants/new
-    def admin_new
-      return if !user_is_allowed('variants', 'add')
-      @top_categories = ProductCategory.where(:parent_id => nil).reorder('name').all
-      @product_id = params[:id] 
-      @variant = Variant.new
-      render :layout => 'caboose/admin'
-    end
   
-    # @route POST /admin/products/:id/variants
-    def admin_add
-      return if !user_is_allowed('variants', 'add')
-      resp = Caboose::StdClass.new(
-        :error   => nil,
-        :refresh => nil
-      )
-    
-      p = Product.find(params[:id])
-      v = Variant.new(:product_id => p.id)
-      v.option1 = p.default1
-      v.option2 = p.default2
-      v.option3 = p.default3
-      v.status  = 'Active'
-      v.save
-      resp.refresh = true
-      render :json => resp
-    end
-  
-    # @route PUT /admin/variants/:id/attach-to-image
+    # @route PUT /admin/products/:product_id/variants/:id/attach-to-image
     def admin_attach_to_image
       render :json => false if !user_is_allowed('variants', 'edit')         
       variant_id = params[:id].to_i
@@ -222,7 +233,7 @@ module Caboose
       render :json => true
     end
   
-    # @route PUT /admin/variants/:id/unattach-from-image
+    # @route PUT /admin/products/:product_id/variants/:id/unattach-from-image
     def admin_unattach_from_image
       render :json => false if !user_is_allowed('variants', 'edit')
       v = Variant.find(params[:id])
@@ -255,38 +266,7 @@ module Caboose
       end
       resp.success = true
       render :json => resp
-    end
-    
-    # @route GET /admin/products/:product_id/variants/sort-order  
-    def admin_edit_sort_order
-      return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:product_id])      
-      render :layout => 'caboose/admin'
-    end
-    
-    # @route GET /admin/products/:product_id/variants/option1-media  
-    def admin_edit_option1_media
-      return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:product_id])
-      @variants = Variant.where(:product_id => @product.id, :option1 => params[:option_value]).reorder(:option1_sort_order).all      
-      render :layout => 'caboose/modal'
-    end
-    
-    # @route GET /admin/products/:product_id/variants/option2-media  
-    def admin_edit_option2_media
-      return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:product_id])
-      @variants = Variant.where(:product_id => @product.id, :option2 => params[:option_value]).reorder(:option2_sort_order).all      
-      render :layout => 'caboose/modal'
-    end
-    
-    # @route GET /admin/products/:product_id/variants/option3-media  
-    def admin_edit_option3_media
-      return if !user_is_allowed('products', 'edit')    
-      @product = Product.find(params[:product_id])
-      @variants = Variant.where(:product_id => @product.id, :option3 => params[:option_value]).reorder(:option3_sort_order).all      
-      render :layout => 'caboose/modal'
-    end
+    end    
     
     # @route PUT /admin/products/:product_id/variants/option1-sort-order
     def admin_update_option1_sort_order
@@ -299,7 +279,7 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # @route PUT /admin/products/:product_id/variants/option1-sort-order
+    # @route PUT /admin/products/:product_id/variants/option2-sort-order
     def admin_update_option2_sort_order            
       product_id = params[:product_id]
       params[:values].each_with_index do |value, i|
@@ -310,7 +290,7 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # @route PUT /admin/products/:product_id/variants/option1-sort-order
+    # @route PUT /admin/products/:product_id/variants/option3-sort-order
     def admin_update_option3_sort_order      
       product_id = params[:product_id]
       params[:values].each_with_index do |value, i|
@@ -321,7 +301,7 @@ module Caboose
       render :json => { :success => true }
     end
   
-    # @route GET /admin/variants
+    # @route GET /admin/variants/group
     def admin_group
       return if !user_is_allowed('variants', 'edit')
       
@@ -361,9 +341,8 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # @route POST /admin/products/:product_id/variants/add
-    def admin_add
-      
+    # @route POST /admin/products/:product_id/variants
+    def admin_add      
       resp = Caboose::StdClass.new
       p = Caboose::Product.find(params[:product_id])
       

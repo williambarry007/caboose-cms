@@ -8,12 +8,22 @@ end
 
 module Caboose
   class ProductsController < Caboose::ApplicationController
-        
-    # TODO: The first route below needs :constraints => { :id => /.*/ }
-    # @route GET /products/:id
+       
+    # @route GET /products/:id/info
+    def info
+      p = Product.find(params[:id])
+      render :json => { 
+        :product => p,
+        :option1_values => p.option1_values_with_media(true),
+        :option2_values => p.option2_values_with_media(true),
+        :option3_values => p.option3_values_with_media(true)
+      }
+    end
+    
     # @route GET /products
-     def index
-      
+    # @route GET /products/:id
+    # @route_constraints { :id => /.*/ }        
+    def index      
       # If id exists, is an integer and a product exists with the specified id then get the product
       if params[:id]        
         if params[:id] == 'sales'
@@ -125,18 +135,7 @@ module Caboose
     end
     
     def show      
-    end
-    
-    # @route GET /products/:id/info
-    def info
-      p = Product.find(params[:id])
-      render :json => { 
-        :product => p,
-        :option1_values => p.option1_values_with_media(true),
-        :option2_values => p.option2_values_with_media(true),
-        :option3_values => p.option3_values_with_media(true)
-      }
-    end
+    end        
     
     #=============================================================================
     # Admin actions

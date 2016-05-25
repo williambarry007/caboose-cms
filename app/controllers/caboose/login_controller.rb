@@ -2,7 +2,7 @@ module Caboose
   class LoginController < Caboose::ApplicationController
     #layout 'caboose/modal'
     
-    # GET /login
+    # @route GET /login
     def index
       if params[:logout]
         logout_user
@@ -15,7 +15,7 @@ module Caboose
       render :layout => Caboose::login_layout
     end
     
-    # POST /login
+    # @route POST /login
     def login      
       resp = StdClass.new('error' => '', 'redirect' => '')
       return_url = params[:return_url].nil? ? "/" : params[:return_url]
@@ -47,7 +47,7 @@ module Caboose
       render :json => resp      
     end
     
-    # GET /login/forgot-password
+    # @route GET /login/forgot-password
     def forgot_password_form
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       @modal = params[:modal].nil? ? false : params[:modal]
@@ -55,7 +55,7 @@ module Caboose
       render :layout => Caboose::login_layout
     end
         
-    # POST /login/forgot-password
+    # @route POST /login/forgot-password
     def send_reset_email
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       redirect_to @return_url if logged_in?
@@ -89,7 +89,7 @@ module Caboose
 		  render :json => resp
 		end
 	
-		# GET /login/reset-password/:reset_id
+		# @route GET /login/reset-password/:reset_id
 		def reset_password_form
 		  @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       redirect_to @return_url if logged_in?
@@ -99,7 +99,7 @@ module Caboose
       render :layout => Caboose::login_layout
     end
     
-    # POST /login/reset-password
+    # @route POST /login/reset-password
     def reset_password
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       redirect_to @return_url if logged_in?

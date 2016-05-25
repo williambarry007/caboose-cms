@@ -12,11 +12,5 @@ module Caboose
       @return_url = params[:return_url].nil? ? '/admin/pages' : params[:return_url]
     end
     
-    # @route GET /station
-    def station
-      @user = logged_in_user
-      render :layout => 'caboose/station'
-    end
-    
   end
 end

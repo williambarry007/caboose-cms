@@ -93,7 +93,7 @@ module Caboose
 		def reset_password_form
 		  @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       redirect_to @return_url if logged_in?
-            
+      return
       @reset_id = params[:reset_id]      
       @user = Caboose::User.user_for_reset_id(@reset_id)
       render :layout => Caboose::login_layout

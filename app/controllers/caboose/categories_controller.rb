@@ -95,6 +95,7 @@ module Caboose
           when 'slug'    then cat.slug   = value
           when 'status'  then cat.status = value
           when 'image'   then cat.image  = value
+          when 'parent_id' then cat.parent_id = value
         end
       end
       

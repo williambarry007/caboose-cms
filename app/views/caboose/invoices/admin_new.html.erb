@@ -1,0 +1,27 @@
+<h1>New Manual Invoice</h1>
+
+<p>This will create a new invoice that you can populate and then send to the customer for payment.</p>
+
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/invoices';" />
+<input type='button' value='Create Order' onclick='create_invoice();' />
+</p>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+function create_invoice()
+{
+  $('#message').empty().append("<p class='loading'>Creating invoice...</p>");  
+  $.ajax({
+    url: '/admin/invoices',
+    type: 'post',    
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;      
+    }
+  });
+}
+
+</script>
+<% end %>

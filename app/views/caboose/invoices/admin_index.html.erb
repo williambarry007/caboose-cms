@@ -1,4 +1,4 @@
-<h1>Orders</h1>
+<h1>Invoices</h1>
 
 <style type='text/css'>
 #search_form_wrapper { margin-bottom: 10px; position: absolute; top:0; right: 0; }
@@ -6,14 +6,14 @@
 
 <p>
   <a class="caboose-btn" href='#' onclick="$('#search_form').toggle(400, function() { modal.autosize(); });">Show/hide search form</a>
-  <a class="caboose-btn" href='/admin/orders/new'>New Manual Order</a>
-  <a class="caboose-btn" href='/admin/orders/print-pending' target='_blank'>Print Pending Orders</a>
-  <a class="caboose-btn" href='/admin/orders/summary-report' target='_blank'>Summary Report</a>
-  <a class="caboose-btn" href='/admin/orders/city-report' target='_blank'>City Report</a>
+  <a class="caboose-btn" href='/admin/invoices/new'>New Manual Invoice</a>
+  <a class="caboose-btn" href='/admin/invoices/print-pending' target='_blank'>Print Pending Invoices</a>
+  <a class="caboose-btn" href='/admin/invoices/summary-report' target='_blank'>Summary Report</a>
+  <a class="caboose-btn" href='/admin/invoices/city-report' target='_blank'>City Report</a>
 </p>
-<form action='/admin/orders' method='get' id='search_form' style='display: none;'>
-  <p><input type='text' name='id'           placeholder='Order ID'     value="<%= @pager.params['id']           %>" style='width: 100px;' /></p>
-  <p><input type='text' name='order_number' placeholder='Order Number' value="<%= @pager.params['order_number'] %>" style='width: 100px;' /></p>
+<form action='/admin/invoices' method='get' id='search_form' style='display: none;'>
+  <p><input type='text' name='id'           placeholder='Invoice ID'     value="<%= @pager.params['id']           %>" style='width: 100px;' /></p>
+  <p><input type='text' name='invoice_number' placeholder='Invoice Number' value="<%= @pager.params['invoice_number'] %>" style='width: 100px;' /></p>
   <p><select name='customer_id'>
       <optgroup label='Status' style='width: 100px'>
         <option value=''>-- All customers --</option>        
@@ -35,16 +35,16 @@
     </select></p>  
   <p>
     <input type='submit' value='Search' />
-    <input type='button' value='Clear' onclick="window.location='/admin/orders';" />
+    <input type='button' value='Clear' onclick="window.location='/admin/invoices';" />
   </p>
 </form>
 
-<% if @orders.count > 0 %>
-  <table class='data' id='orders_table'>
+<% if @invoices.count > 0 %>
+  <table class='data' id='invoices_table'>
     <tr>
       <%= raw @pager.sortable_table_headings({
   				'id'              => 'ID',
-  				'order_number'    => 'Order Number',
+  				'invoice_number'    => 'Invoice Number',
   				'customer_id'     => 'Customer',
   				'date_created'    => 'Date Created',  				
   				'total'           => 'Total',
@@ -52,30 +52,30 @@
   			})
   		%>
     </tr>
-  <% @orders.each do |order| %>
-    <tr onclick="window.location='/admin/orders/<%= order.id %>';">
-      <td><%= raw order.id %></td>
-      <td><%= raw order.order_number %></td>
+  <% @invoices.each do |invoice| %>
+    <tr onclick="window.location='/admin/invoices/<%= invoice.id %>';">
+      <td><%= raw invoice.id %></td>
+      <td><%= raw invoice.invoice_number %></td>
       <td>
-        <% if order.customer.nil? %>
+        <% if invoice.customer.nil? %>
           Unknown
         <% else %>
-          <% if order.customer.first_name && order.customer.first_name.strip.length > 0 %>
-            <%= order.customer.first_name %> <%= order.customer.last_name %>
+          <% if invoice.customer.first_name && invoice.customer.first_name.strip.length > 0 %>
+            <%= invoice.customer.first_name %> <%= invoice.customer.last_name %>
           <% else %>
-            <%= order.customer.email %>            
+            <%= invoice.customer.email %>            
           <% end %>
         <% end %>
       </td>
-      <td><%= raw order.date_created %></td>
-      <td align='right'><%= number_to_currency(order.total) %></td>
-      <td><%= raw order.status %></td>      
+      <td><%= raw invoice.date_created %></td>
+      <td align='right'><%= number_to_currency(invoice.total) %></td>
+      <td><%= raw invoice.status %></td>      
     </tr>
   <% end %>
   </table>
   <p><%= raw @pager.generate %></p>
 <% else %>
-  <p>There are no orders right now.</p>
+  <p>There are no invoices right now.</p>
 <% end %>
 
 <% content_for :caboose_js do %>

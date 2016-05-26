@@ -1,15 +1,15 @@
-<p><img src='<%= @order.site.logo.url(:thumb) %>' /></p>
+<p><img src='<%= @invoice.site.logo.url(:thumb) %>' /></p>
 
-<!-- <h1>Thank you for your order!</h1> -->
+<!-- <h1>Thank you for your invoice!</h1> -->
 <h1>New Order Received</h1>
 
-<h4><a href="<%= @order.site.store_config.authnet_relay_domain %>/admin/orders/<%= @order.id %>" target="_blank" title="View Order">View Order</a></h4>
+<h4><a href="<%= @invoice.site.store_config.authnet_relay_domain %>/admin/invoices/<%= @invoice.id %>" target="_blank" title="View Order">View Order</a></h4>
 
 <h2>Order Details</h2>
 
-<p>Order #<%= @order.order_number %></p>
+<p>Order #<%= @invoice.invoice_number %></p>
 
-<table border='1' style='border-collapse: collapse;'>
+<table binvoice='1' style='binvoice-collapse: collapse;'>
   <tr>
     <th>Package</th>
     <th>Line Item</th>
@@ -17,7 +17,7 @@
     <th>Quantity</th>
     <th>Subtotal</th>
   </tr>
-  <% @order.order_packages.each do |op| %>
+  <% @invoice.invoice_packages.each do |op| %>
     <% op.line_items.each_with_index do |li, i| %>
       <% v = li.variant %>
       <% p = v.product %>
@@ -46,15 +46,15 @@
       </tr>
     <% end %>
   <% end %>  
-  <% @order.line_items.each do |li| %>
-    <% next if li.order_package_id %>
+  <% @invoice.line_items.each do |li| %>
+    <% next if li.invoice_package_id %>
     <% v = li.variant %>
     <% p = v.product %>
     <tr>
       <td>
         <% if v.downloadable %>
           <p>This item is downloadable.</p>          
-          <p><a href='<%= @order.site.store_config.authnet_relay_domain %>/my-account/orders/<%= @order.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>        
+          <p><a href='<%= @invoice.site.store_config.authnet_relay_domain %>/my-account/invoices/<%= @invoice.id %>/line-items/<%= li.id %>/download' target="_blank">Download</a></li>        
         <% else %>
           Not assigned to a package
         <% end %>
@@ -75,25 +75,25 @@
       <td align='right'><%= number_to_currency(li.subtotal) %></td>
     </tr>  
   <% end %>
-  <tr><td colspan="4" align='right'>Subtotal:               </td><td align='right'><%= number_to_currency(@order.subtotal) %></td></tr>
-  <tr><td colspan="4" align='right'>Tax:                    </td><td align='right'><%= number_to_currency(@order.tax)      %></td></tr>
-  <tr><td colspan="4" align='right'>Shipping and Handling:  </td><td align='right'><%= number_to_currency(@order.shipping + @order.handling) %></td></tr>
-  <% if @order.gift_wrap && @order.gift_wrap > 0 %>  
-    <tr><td colspan="4" align='right'>Gift wrap:            </td><td align='right'><%= number_to_currency(@order.gift_wrap) %></td></tr>
+  <tr><td colspan="4" align='right'>Subtotal:               </td><td align='right'><%= number_to_currency(@invoice.subtotal) %></td></tr>
+  <tr><td colspan="4" align='right'>Tax:                    </td><td align='right'><%= number_to_currency(@invoice.tax)      %></td></tr>
+  <tr><td colspan="4" align='right'>Shipping and Handling:  </td><td align='right'><%= number_to_currency(@invoice.shipping + @invoice.handling) %></td></tr>
+  <% if @invoice.gift_wrap && @invoice.gift_wrap > 0 %>  
+    <tr><td colspan="4" align='right'>Gift wrap:            </td><td align='right'><%= number_to_currency(@invoice.gift_wrap) %></td></tr>
   <% end %>
-  <% if @order.discounts %>
-    <% @order.discounts.each do |d| %>
+  <% if @invoice.discounts %>
+    <% @invoice.discounts.each do |d| %>
       <tr><td colspan="4" align='right'>"<%= d.gift_card.code %>" gift card: </td><td align='right'><%= number_to_currency(d.amount) %></td></tr>
     <% end %>
   <% end %>
-  <% if @order.custom_discount %>
-    <tr><td colspan="4" align='right'>Discount: </td><td align='right'><%= number_to_currency(@order.custom_discount) %></td></tr>
+  <% if @invoice.custom_discount %>
+    <tr><td colspan="4" align='right'>Discount: </td><td align='right'><%= number_to_currency(@invoice.custom_discount) %></td></tr>
   <% end %>      
-  <tr><td colspan="4" align='right'>Total:     </td><td align='right'><%= number_to_currency(@order.total) %></td></tr>
+  <tr><td colspan="4" align='right'>Total:     </td><td align='right'><%= number_to_currency(@invoice.total) %></td></tr>
 </table>
 
-<% if @order.shipping_address %>
-  <% sa = @order.shipping_address %>
+<% if @invoice.shipping_address %>
+  <% sa = @invoice.shipping_address %>
   <h2>Shipping Address</h2>
   <p>
     <%= sa.first_name %> <%= sa.last_name %><br />
@@ -103,8 +103,8 @@
   </p>
 <% end %>
 
-<% if @order.billing_address %>
-  <% ba = @order.billing_address %>
+<% if @invoice.billing_address %>
+  <% ba = @invoice.billing_address %>
   <h2>Billing Address</h2>
   <p>
     <%= ba.first_name %> <%= ba.last_name %><br />

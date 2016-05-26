@@ -1,21 +1,21 @@
 module Caboose
-  class OrdersController < Caboose::ApplicationController
+  class InvoicesController < Caboose::ApplicationController
      
-    # GET /admin/orders/summary-report
+    # GET /admin/invoices/summary-report
     def admin_summary_report
-      return if !user_is_allowed('orders', 'view')
+      return if !user_is_allowed('invoices', 'view')
       
       q = ["select 
           concat(date_part('year', date_authorized), '-', date_part('month', date_authorized), '-', date_part('day', date_authorized)),
           count(*), 
           sum(total)
-        from store_orders
+        from store_invoices
         where site_id = ?
         and (financial_status = ? or financial_status = ?)
         and date_authorized >= ?
         and date_authorized < ?
         group by concat(date_part('year', date_authorized), '-', date_part('month', date_authorized), '-', date_part('day', date_authorized))
-        order by concat(date_part('year', date_authorized), '-', date_part('month', date_authorized), '-', date_part('day', date_authorized))",
+        invoice by concat(date_part('year', date_authorized), '-', date_part('month', date_authorized), '-', date_part('day', date_authorized))",
         @site.id, 'authorized', 'captured', @d1, @d2]
       rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, q))
       return rows.collect { |row|
@@ -34,30 +34,28 @@ module Caboose
       @pager = Caboose::PageBarGenerator.new(params, {
         'site_id'              => @site.id,
         'customer_id'          => '', 
-        'status'               => Order::STATUS_PENDING,
+        'status'               => Invoice::STATUS_PENDING,
         'shipping_method_code' => '',
         'id'                   => ''
       }, {
-        'model'          => 'Caboose::Order',
+        'model'          => 'Caboose::Invoice',
         'sort'           => 'id',
         'desc'           => 1,
-        'base_url'       => '/admin/orders',
+        'base_url'       => '/admin/invoices',
         'use_url_params' => false
       })
       
-      @orders    = @pager.items
+      @invoices  = @pager.items
       @customers = Caboose::User.reorder('last_name, first_name').all
       
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/orders/new
+    # GET /admin/invoices/new
     def admin_new
-      return if !user_is_allowed('orders', 'add')      
+      return if !user_is_allowed('invoices', 'add')      
       render :layout => 'caboose/admin'
     end
-    
-    
     
   end
 end

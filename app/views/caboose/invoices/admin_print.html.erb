@@ -1,13 +1,13 @@
 <%
-sa = @order.shipping_address
+sa = @invoice.shipping_address
 shipping_address = sa.address1
 shipping_address << "<br />#{sa.address2}" if sa.address2 && sa.address2.length > 0
 shipping_address << "<br />#{sa.city}, #{sa.state} #{sa.zip}"
 %>
 <p align='center'><img src='https://dmwwflw4i3miv.cloudfront.net/logo.png' /></p>
 
-<h1>Order #<%= @order.order_number %></h1>
-<p>Order ID: <%= @order.id %></p>
+<h1>Invoice #<%= @invoice.invoice_number %></h1>
+<p>Invoice ID: <%= @invoice.id %></p>
 
 <table class='data'>
 <tr>
@@ -17,16 +17,16 @@ shipping_address << "<br />#{sa.city}, #{sa.state} #{sa.zip}"
 </tr>
 <tr>
   <td valign='top'>
-    <%= "#{@order.customer.first_name} #{@order.customer.last_name}" %><br />
-    <a href='mailto:<%= "#{@order.customer.email}" %>'><%= "#{@order.customer.email}" %></a><br />
-    <%= @order.customer.phone %>
+    <%= "#{@invoice.customer.first_name} #{@invoice.customer.last_name}" %><br />
+    <a href='mailto:<%= "#{@invoice.customer.email}" %>'><%= "#{@invoice.customer.email}" %></a><br />
+    <%= @invoice.customer.phone %>
   </td>
   <td valign='top'>
-    <%= "#{@order.shipping_address.name}" %><br />
+    <%= "#{@invoice.shipping_address.name}" %><br />
     <%= raw shipping_address %>
   </td>
   <td valign='top'>
-    <%= @order.financial_status %>    
+    <%= @invoice.financial_status %>    
   </td>
 </tr>
 </table><br />
@@ -39,7 +39,7 @@ shipping_address << "<br />#{sa.city}, #{sa.state} #{sa.zip}"
   <th>Quantity</th>
   <th>Subtotal</th>
 </tr>
-<% @order.line_items.each do |li| %>
+<% @invoice.line_items.each do |li| %>
   <tr>
     <td>
       <%= li.variant.product.title %><br />
@@ -52,12 +52,12 @@ shipping_address << "<br />#{sa.city}, #{sa.state} #{sa.zip}"
     <td align='right'><%= number_to_currency(li.subtotal) %></td>
   </tr>
 <% end %>
-<tr><td colspan='4' align='right'>Subtotal  </td><td align='right'><%= number_to_currency(@order.subtotal ) %></td></tr>
-<tr><td colspan='4' align='right'>Tax       </td><td align='right'><%= number_to_currency(@order.tax      ) %></td></tr>
-<tr><td colspan='4' align='right'><%= @order.shipping_method %> Shipping  </td><td align='right'><%= number_to_currency(@order.shipping ) %></td></tr>
-<tr><td colspan='4' align='right'>Handling  </td><td align='right'><%= number_to_currency(@order.handling ) %></td></tr>
-<tr><td colspan='4' align='right'>Discount  </td><td align='right'><%= number_to_currency(@order.discount ) %></td></tr>
-<tr><td colspan='4' align='right'>Total     </td><td align='right'><%= number_to_currency(@order.total    ) %></td></tr>
+<tr><td colspan='4' align='right'>Subtotal  </td><td align='right'><%= number_to_currency(@invoice.subtotal ) %></td></tr>
+<tr><td colspan='4' align='right'>Tax       </td><td align='right'><%= number_to_currency(@invoice.tax      ) %></td></tr>
+<tr><td colspan='4' align='right'><%= @invoice.shipping_method %> Shipping  </td><td align='right'><%= number_to_currency(@invoice.shipping ) %></td></tr>
+<tr><td colspan='4' align='right'>Handling  </td><td align='right'><%= number_to_currency(@invoice.handling ) %></td></tr>
+<tr><td colspan='4' align='right'>Discount  </td><td align='right'><%= number_to_currency(@invoice.discount ) %></td></tr>
+<tr><td colspan='4' align='right'>Total     </td><td align='right'><%= number_to_currency(@invoice.total    ) %></td></tr>
 </table>
 
 <% content_for :caboose_js do %>

@@ -22,9 +22,9 @@ end
 day_count = @rows.count
 %>
 
-<h1>Order Summary Report</h1>
+<h1>Invoice Summary Report</h1>
 
-<form action='/admin/orders/summary-report' method='get' id='search_form'>
+<form action='/admin/invoices/summary-report' method='get' id='search_form'>
   <p>
      <input type='text' id='d1' name='d1' value='<%= @d1.strftime('%Y-%m-%d') %>' /> -
      <input type='text' id='d2' name='d2' value='<%= @d2.strftime('%Y-%m-%d') %>' />
@@ -68,7 +68,7 @@ function drawChart()
     
   var counts_chart = new google.visualization.ColumnChart(document.getElementById('counts_chart'));
   counts_chart.draw(counts, {        
-    title: 'Daily Order Counts',
+    title: 'Daily Invoice Counts',
     width:  1200,
     height: 800,
     hAxis: { label: 'Date' },
@@ -85,7 +85,7 @@ function drawChart()
     
   var totals_chart = new google.visualization.ColumnChart(document.getElementById('totals_chart'));
   totals_chart.draw(totals, {        
-    title: 'Daily Order Totals',
+    title: 'Daily Invoice Totals',
     width:  1200,
     height: 800,
     hAxis: { label: 'Date' },

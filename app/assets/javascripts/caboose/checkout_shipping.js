@@ -18,7 +18,7 @@ Caboose.Store.Modules.CheckoutShipping = (function() {
       url: '/checkout/shipping',
       type: 'put',      
       data: { 
-        order_package_id:   $(event.target).data('order_package_id'),
+        invoice_package_id: $(event.target).data('invoice_package_id'),
         shipping_method_id: $(event.target).data('shipping_method_id'),
         total:              $(event.target).data('total')
       },

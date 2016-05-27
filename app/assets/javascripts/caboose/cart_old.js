@@ -41,7 +41,7 @@ Caboose.Store.Modules.Cart = (function() {
   
   self.render = function() {
     $.get('/cart/items', function(response) {
-      self.$cart.empty().html(self.templates.line_items({ order: response.order }));
+      self.$cart.empty().html(self.templates.line_items({ invoice: response.invoice }));
       self.$cart.removeClass('loading');
     });
   };
@@ -143,7 +143,7 @@ Caboose.Store.Modules.Cart = (function() {
         success: function(response) {
           if (response.success) {
             $line_item.find('.price').empty().text('$' + response.line_item.price);
-            if (self.$cart.find('.subtotal').length) self.$cart.find('.subtotal').empty().text('$' + response.order_subtotal);
+            if (self.$cart.find('.subtotal').length) self.$cart.find('.subtotal').empty().text('$' + response.invoice_subtotal);
           } else {
             alert(response.errors[0]);
           }

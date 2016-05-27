@@ -57,7 +57,7 @@ Caboose.Store.Modules.CheckoutPayment = (function() {
         url: '/checkout/total',
         type: 'get',
         success: function(x) {
-          if (parseFloat(x) != CABOOSE_ORDER_TOTAL)                      
+          if (parseFloat(x) != CABOOSE_INVOICE_TOTAL)                      
             total_is_correct = false;           
         },
         async: false                  

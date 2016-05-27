@@ -1,10 +1,10 @@
 
-var MyAccountOrderController = function(params) { this.init(params); }
+var MyAccountInvoiceController = function(params) { this.init(params); }
 
-MyAccountOrderController.prototype = {
+MyAccountInvoiceController.prototype = {
   
-  order_id: false,
-  order: false,
+  invoice_id: false,
+  invoice: false,
   authenticity_token: false,
   
   init: function(params)
@@ -20,20 +20,20 @@ MyAccountOrderController.prototype = {
   refresh: function(after)
   {
     var that = this;
-    that.refresh_order(function() {
-      $('#order_table').html("<p class='loading'>Getting order...</p>");
+    that.refresh_invoice(function() {
+      $('#invoice_table').html("<p class='loading'>Getting invoice...</p>");
       that.print();
       if (after) after();
     });    
   },
   
-  refresh_order: function(after)
+  refresh_invoice: function(after)
   {
     var that = this;
     $.ajax({
-      url: '/my-account/orders/' + that.order_id + '/json',
-      success: function(order) {                 
-        that.order = order;
+      url: '/my-account/invoices/' + that.invoice_id + '/json',
+      success: function(invoice) {                 
+        that.invoice = invoice;
         if (after) after(); 
       }
     });
@@ -41,12 +41,12 @@ MyAccountOrderController.prototype = {
 
 /******************************************************************************/
       
-  line_items_for_order_package: function(order_package_id)
+  line_items_for_invoice_package: function(invoice_package_id)
   {
     var that = this;
     var line_items = [];
-    $.each(that.order.line_items, function(i, li) {
-      if (li.order_package_id == order_package_id)
+    $.each(that.invoice.line_items, function(i, li) {
+      if (li.invoice_package_id == invoice_package_id)
         line_items.push(li);
     });
     return line_items;
@@ -56,13 +56,13 @@ MyAccountOrderController.prototype = {
   {    
     var that = this;
 
-    if (that.order.line_items && that.order.line_items.length > 0)
+    if (that.invoice.line_items && that.invoice.line_items.length > 0)
     {      
       var count_packaged     = 0;
       var count_unpackaged   = 0;
       var count_downloadable = 0;
-      $.each(that.order.line_items, function(i, li) {  
-        if (li.order_package_id)
+      $.each(that.invoice.line_items, function(i, li) {  
+        if (li.invoice_package_id)
           count_packaged++;
         else if (li.variant.downloadable == true)
           count_downloadable++;
@@ -73,18 +73,18 @@ MyAccountOrderController.prototype = {
       var table = that.overview_table();
       $('#overview_table').empty().append(table).append($('<br />'));
       
-      table = $('<table/>').addClass('order').css('width', '100%');
+      table = $('<table/>').addClass('invoice').css('width', '100%');
       if (count_packaged     > 0) that.packaged_line_items_table(table);
       if (count_unpackaged   > 0) that.unpackaged_line_items_table(table);
       if (count_downloadable > 0) that.downloadable_line_items_table(table);    
       that.summary_table(table);
-      $('#order_table').empty().append(table);
+      $('#invoice_table').empty().append(table);
     }
     else
     {
       $('#overview_table').empty();
-      $('#order_table').empty();
-      $('#message').empty().html("This order is empty.");
+      $('#invoice_table').empty();
+      $('#message').empty().html("This invoice is empty.");
     }                  
   },
   
@@ -92,25 +92,25 @@ MyAccountOrderController.prototype = {
   {
     var that = this;        
     
-    var fstatus = $('<div/>').append($('<p/>').html(capitalize_first_letter(that.order.financial_status)));    
-    if (that.order.financial_status == 'pending')        
+    var fstatus = $('<div/>').append($('<p/>').html(capitalize_first_letter(that.invoice.financial_status)));    
+    if (that.invoice.financial_status == 'pending')        
     {      
       fstatus.append($('<p/>').append($('<input/>').attr('type', 'button').addClass('btn').val('Pay now').click(function(e) { e.preventDefault(); that.payment_form(); })));            
     }            
 
-    var table = $('<table/>').addClass('order');
+    var table = $('<table/>').addClass('invoice');
     table.append($('<tr/>')  
       .append($('<th/>').html('Customer'))
       .append($('<th/>').html('Shipping Address'))
       .append($('<th/>').html('Billing Address'))
-      .append($('<th/>').html('Order Status'))
+      .append($('<th/>').html('Status'))
       .append($('<th/>').html('Payment Status'))      
     );    
     table.append($('<tr/>')      
       .append($('<td/>').attr('valign', 'top').attr('id', 'customer'         ).append(that.noneditable_customer()))
       .append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(that.noneditable_shipping_address()))      
       .append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
-      .append($('<td/>').attr('valign', 'top').attr('align', 'center').append($('<p/>').html(capitalize_first_letter(that.order.status))))
+      .append($('<td/>').attr('valign', 'top').attr('align', 'center').append($('<p/>').html(capitalize_first_letter(that.invoice.status))))
       .append($('<td/>').attr('valign', 'top').attr('id', 'financial_status' ).attr('align', 'center').append(fstatus))      
     );
     return table;  
@@ -119,7 +119,7 @@ MyAccountOrderController.prototype = {
   noneditable_customer: function()
   {
     var that = this;
-    c = that.order.customer;    
+    c = that.invoice.customer;    
     str = '';
     if (c)                                                                  
     {
@@ -138,7 +138,7 @@ MyAccountOrderController.prototype = {
     var div = $('<div/>');
     if (that.has_shippable_items())
     {
-      var sa = that.order.shipping_address;
+      var sa = that.invoice.shipping_address;
       str = '';                  
       str += (sa.first_name ? sa.first_name : '[Empty first name]') + ' ';
       str += (sa.last_name  ? sa.last_name  : '[Empty last name]');
@@ -149,12 +149,12 @@ MyAccountOrderController.prototype = {
       div.append($('<div/>').attr('id', 'shipping_address').append(str));
       div.append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
         var a = $(this);
-        that.refresh_order(function() { that.edit_shipping_address(); });
+        that.refresh_invoice(function() { that.edit_shipping_address(); });
       }));      
     }
     else
     {
-      div.append("This order does not require shipping.");
+      div.append("This invoice does not require shipping.");
     }    
     return div;    
   },
@@ -162,7 +162,7 @@ MyAccountOrderController.prototype = {
   edit_shipping_address: function()
   {
     var that = this;
-    var sa = that.order.shipping_address;
+    var sa = that.invoice.shipping_address;
     var table = $('<table/>').addClass('shipping_address')
       .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
         .append($('<td/>').append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_first_name')))
@@ -183,13 +183,13 @@ MyAccountOrderController.prototype = {
       .append(table)
       .append($('<a/>').attr('href', '#').html('Finished').click(function(e) {
         var a = $(this);
-        that.refresh_order(function() { $('#shipping_address').empty().append(that.noneditable_shipping_address()); });
+        that.refresh_invoice(function() { $('#shipping_address').empty().append(that.noneditable_shipping_address()); });
       }));
             
     new ModelBinder({
       name: 'ShippingAddress',
       id: sa.id,
-      update_url: '/my-account/orders/' + that.order.id + '/shipping-address',
+      update_url: '/my-account/invoices/' + that.invoice.id + '/shipping-address',
       authenticity_token: that.authenticity_token,
       attributes: [        
         { name: 'first_name'  , nice_name: 'First Name' , type: 'text'  , value: sa.first_name , width: 150, fixed_placeholder: false },
@@ -207,7 +207,7 @@ MyAccountOrderController.prototype = {
   {
     var that = this;
     
-    var sa = that.order.billing_address;
+    var sa = that.invoice.billing_address;
     if (!sa) sa = {};
     var str = '';
     str += (sa.first_name ? sa.first_name : '[Empty first name]') + ' ';
@@ -221,7 +221,7 @@ MyAccountOrderController.prototype = {
       .append("<br />")
       .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
         var a = $(this);
-        that.refresh_order(function() { that.edit_billing_address(); });
+        that.refresh_invoice(function() { that.edit_billing_address(); });
       }));
     return div;    
   },
@@ -229,7 +229,7 @@ MyAccountOrderController.prototype = {
   edit_billing_address: function()
   {
     var that = this;
-    var sa = that.order.billing_address;
+    var sa = that.invoice.billing_address;
     if (!sa) sa = { id: 1 };
     var table = $('<table/>').addClass('billing_address')
       .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
@@ -251,13 +251,13 @@ MyAccountOrderController.prototype = {
       .append(table)
       .append($('<a/>').attr('href', '#').html('Finished').click(function(e) {
         var a = $(this);
-        that.refresh_order(function() { $('#billing_address').empty().append(that.noneditable_billing_address()); });
+        that.refresh_invoice(function() { $('#billing_address').empty().append(that.noneditable_billing_address()); });
       }));      
             
     new ModelBinder({
       name: 'BillingAddress',
       id: sa.id,
-      update_url: '/my-account/orders/' + that.order.id + '/billing-address',
+      update_url: '/my-account/invoices/' + that.invoice.id + '/billing-address',
       authenticity_token: that.authenticity_token,
       attributes: [        
         { name: 'first_name'  , nice_name: 'First Name' , type: 'text'  , value: sa.first_name , width: 150, fixed_placeholder: false },
@@ -275,8 +275,8 @@ MyAccountOrderController.prototype = {
   packaged_line_items_table: function(table)
   {
     var that = this;           
-    $.each(that.order.order_packages, function(i, op) {
-      var line_items = that.line_items_for_order_package(op.id);      
+    $.each(that.invoice.invoice_packages, function(i, op) {
+      var line_items = that.line_items_for_invoice_package(op.id);      
       if (line_items && line_items.length > 0)
       {        
         table.append($('<tr/>').append($('<th/>').attr('colspan', '5').addClass('package_header').html("Package " + (i+1) + ": " + op.shipping_method.service_name + "<br />" + op.status)));
@@ -304,8 +304,8 @@ MyAccountOrderController.prototype = {
   unpackaged_line_items_table: function(table)
   {
     var that = this;           
-    $.each(that.order.order_packages, function(i, op) {
-      var line_items = that.line_items_for_order_package(op.id);      
+    $.each(that.invoice.invoice_packages, function(i, op) {
+      var line_items = that.line_items_for_invoice_package(op.id);      
       if (line_items && line_items.length > 0)
       {        
         table.append($('<tr/>').append($('<th/>').attr('colspan', '5').addClass('package_header').html("Unpackaged Items")));
@@ -332,8 +332,8 @@ MyAccountOrderController.prototype = {
   downloadable_line_items_table: function(table)
   {
     var that = this;           
-    $.each(that.order.order_packages, function(i, op) {
-      var line_items = that.line_items_for_order_package(op.id);      
+    $.each(that.invoice.invoice_packages, function(i, op) {
+      var line_items = that.line_items_for_invoice_package(op.id);      
       if (line_items && line_items.length > 0)
       {        
         table.append($('<tr/>').append($('<th/>').attr('colspan', '5').addClass('package_header').html("Downloadable Items")));
@@ -387,32 +387,32 @@ MyAccountOrderController.prototype = {
     } 
     if (li.variant.downloadable)
     {
-      div.append($('<p/>').append($('<a/>').attr('href', '/my-account/orders/' + that.order.id + '/line-items/' + li.id + '/download').html('Download')));
+      div.append($('<p/>').append($('<a/>').attr('href', '/my-account/invoices/' + that.invoice.id + '/line-items/' + li.id + '/download').html('Download')));
     }
     
     return div;    
   },
       
-  // Show the order summary
+  // Show the invoice summary
   summary_table: function(table)
   {    
     var that = this;
     table.append($('<tr/>').append($('<th/>').attr('colspan', '5').addClass('totals_header').html('Totals')));        
-    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Subtotal' )).append($('<td/>').attr('align', 'right').attr('id', 'subtotal').html(curr(that.order.subtotal ))));
-    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Tax'      )).append($('<td/>').attr('align', 'right').attr('id', 'tax'     ).html(curr(that.order.tax      ))));
-    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Shipping' )).append($('<td/>').attr('align', 'right').attr('id', 'shipping').html(curr(that.order.shipping ))));
-    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Handling' )).append($('<td/>').attr('align', 'right').attr('id', 'handling').html(curr(that.order.handling ))));
-    if (that.order.discounts)
+    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Subtotal' )).append($('<td/>').attr('align', 'right').attr('id', 'subtotal').html(curr(that.invoice.subtotal ))));
+    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Tax'      )).append($('<td/>').attr('align', 'right').attr('id', 'tax'     ).html(curr(that.invoice.tax      ))));
+    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Shipping' )).append($('<td/>').attr('align', 'right').attr('id', 'shipping').html(curr(that.invoice.shipping ))));
+    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Handling' )).append($('<td/>').attr('align', 'right').attr('id', 'handling').html(curr(that.invoice.handling ))));
+    if (that.invoice.discounts)
     {
-      $.each(that.order.discounts, function(i, d) {
+      $.each(that.invoice.discounts, function(i, d) {
         table.append($('<tr/>').addClass('totals_row')
           .append($('<td/>').attr('colspan', '4').attr('align', 'right').append(' "' + d.gift_card.code + '" Discount'))
           .append($('<td/>').attr('align', 'right').html(curr(d.amount)))
         );
       });
     }    
-    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Discount')).append($('<td/>').attr('align', 'right').attr('id', 'custom_discount').html(curr(that.order.custom_discount))));
-    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Total'   )).append($('<td/>').attr('align', 'right').attr('id', 'total'          ).html(curr(that.order.total))));            
+    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Discount')).append($('<td/>').attr('align', 'right').attr('id', 'custom_discount').html(curr(that.invoice.custom_discount))));
+    table.append($('<tr/>').addClass('totals_row').append($('<td/>').attr('colspan', '4').attr('align', 'right').html('Total'   )).append($('<td/>').attr('align', 'right').attr('id', 'total'          ).html(curr(that.invoice.total))));            
   },
 
   /****************************************************************************/
@@ -430,7 +430,7 @@ MyAccountOrderController.prototype = {
     
     $('#payment_message').empty().html("<p class='loading'>Getting payment form...</p>");
     $.ajax({
-      url: '/my-account/orders/' + that.order.id + '/payment-form',
+      url: '/my-account/invoices/' + that.invoice.id + '/payment-form',
       type: 'get',
       success: function(html) {        
         form.empty().append(html);
@@ -468,7 +468,7 @@ MyAccountOrderController.prototype = {
   {
     var that = this;
     var needs_shipping = false;
-    $.each(that.order.line_items, function(i, li) {      
+    $.each(that.invoice.line_items, function(i, li) {      
       if (li.variant.downloadable == false)
         needs_shipping = true;
     });

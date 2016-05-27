@@ -58,7 +58,7 @@ Caboose.Store.Modules.Checkout = (function() {
   
   self.fetch = function(callback) {
     $.get('/cart/items', function(response) {
-      self.order = response.order
+      self.invoice = response.invoice
       
       if (self.step == 2) {
         $.get('/checkout/shipping', function(response) {
@@ -138,7 +138,7 @@ Caboose.Store.Modules.Checkout = (function() {
   self.continueHandler = function(event) {
     $form = self.$address.find('form');
     
-    if (!self.order.email && !self.order.customer_id) {
+    if (!self.invoice.email && !self.invoice.customer_id) {
       alert('Please sign in, register or choose to continue as a guest');
       return false;
     }
@@ -168,7 +168,7 @@ Caboose.Store.Modules.Checkout = (function() {
       data: { shipping_method_code: event.target.value },
       success: function(response) {
         if (response.success) {
-          self.order = response.order;
+          self.invoice = response.invoice;
           self.selectedRate = response.selected_rate;
           self.render();
         }
@@ -191,7 +191,7 @@ Caboose.Store.Modules.Checkout = (function() {
   self.paymentSubmitHandler = function(event) {
     event.preventDefault();
     
-    if (!self.order.shipping_method_code) {
+    if (!self.invoice.shipping_method_code) {
       alert('Please choose a shipping method');
     } else {
       self.$checkout.off('submit', '#checkout-payment form#payment').addClass('loading');
@@ -244,7 +244,7 @@ Caboose.Store.Modules.Checkout = (function() {
   self.renderLineItems = function(callback) {
     self.$lineItems = self.$checkout.find('#checkout-line-items');
     if (!self.$lineItems.length) return false;
-    self.$lineItems.empty().html(self.templates.lineItems({ order: self.order }));
+    self.$lineItems.empty().html(self.templates.lineItems({ invoice: self.invoice }));
     if (callback) callback();
   };
   
@@ -253,7 +253,7 @@ Caboose.Store.Modules.Checkout = (function() {
     if (self.loggedIn) self.$login.remove();
     if (self.loggedIn || !self.$login.length) return false;
     self.$login.html(self.templates.login());
-    //if (!self.order.email) self.$login.find('button[data-login-action="signin"]').click();
+    //if (!self.invoice.email) self.$login.find('button[data-login-action="signin"]').click();
     if (callback) callback();
   };
   
@@ -262,8 +262,8 @@ Caboose.Store.Modules.Checkout = (function() {
     if (!self.$address.length) return false;
     
     self.$address.empty().html(self.templates.address({
-      shippingAddress: self.order.shipping_address,
-      billingAddress: self.order.billing_address,
+      shippingAddress: self.invoice.shipping_address,
+      billingAddress: self.invoice.billing_address,
       states: window.States
     }));
     

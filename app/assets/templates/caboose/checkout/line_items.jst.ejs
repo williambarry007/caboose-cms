@@ -1,7 +1,7 @@
 <p class="wrapper">Your Cart:</p>
 
 <ul>
-  <% _.each(order.line_items, function(lineItem) { %>
+  <% _.each(invoice.line_items, function(lineItem) { %>
     <li data-id="<%= lineItem.id %>">
       <div class="wrapper">
         <aside>
@@ -17,15 +17,15 @@
 </ul>
 
 
-<p class="wrapper subtotal"><span>Subtotal:</span> <span>$<%= ((parseFloat(order.subtotal) * 100) / 100).toFixed(2) %></span></p>
+<p class="wrapper subtotal"><span>Subtotal:</span> <span>$<%= ((parseFloat(invoice.subtotal) * 100) / 100).toFixed(2) %></span></p>
 
-<% if (order.shipping > 0) { %>
-  <p class="wrapper shipping"><span>Shipping & Handling:</span> <span>$<%= (((parseFloat(order.shipping) + parseFloat(order.handling)) * 100) / 100).toFixed(2) %></span></p>
+<% if (invoice.shipping > 0) { %>
+  <p class="wrapper shipping"><span>Shipping & Handling:</span> <span>$<%= (((parseFloat(invoice.shipping) + parseFloat(invoice.handling)) * 100) / 100).toFixed(2) %></span></p>
 <% } %>
 
-<% if (order.tax > 0 && order.billing_address.state == 'AL') { %>
-  <p class="wrapper tax"><span>Tax <small>(if in Alabama)</small>:</span> <span>$<%= parseFloat(Math.round(order.tax * 100) / 100).toFixed(2) %></span></p>
+<% if (invoice.tax > 0 && invoice.billing_address.state == 'AL') { %>
+  <p class="wrapper tax"><span>Tax <small>(if in Alabama)</small>:</span> <span>$<%= parseFloat(Math.round(invoice.tax * 100) / 100).toFixed(2) %></span></p>
 <% } %>
 
-<p class="wrapper total"><span>Total:</span> <span>$<%= parseFloat(Math.round(order.total * 100) / 100).toFixed(2) %></span></p>
+<p class="wrapper total"><span>Total:</span> <span>$<%= parseFloat(Math.round(invoice.total * 100) / 100).toFixed(2) %></span></p>
 

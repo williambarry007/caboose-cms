@@ -86,11 +86,11 @@ namespace :caboose do
     Caboose::CommentRoutes.compare_routes(args[:arg1], args[:arg2])
   end
   
-  desc "Calculate order profits"  
-  task :calculate_order_profits => :environment do        
-    Caboose::Order.where("status = ? or status = ? or status = ?", Caboose::Order::STATUS_PENDING, Caboose::Order::STATUS_READY_TO_SHIP, Caboose::Order::STATUS_SHIPPED).reorder(:id).all.each do |order|
-      order.update_column(:cost   , order.calculate_cost   )
-      order.update_column(:profit , order.calculate_profit )
+  desc "Calculate invoice profits"  
+  task :calculate_invoice_profits => :environment do        
+    Caboose::Invoice.where("status = ? or status = ? or status = ?", Caboose::Invoice::STATUS_PENDING, Caboose::Invoice::STATUS_READY_TO_SHIP, Caboose::Invoice::STATUS_SHIPPED).reinvoice(:id).all.each do |invoice|
+      invoice.update_column(:cost   , invoice.calculate_cost   )
+      invoice.update_column(:profit , invoice.calculate_profit )
     end                    
   end
   
@@ -309,16 +309,16 @@ namespace :caboose do
     end
   end
   
-  desc "Set order numbers"
-  task :set_order_numbers => :environment do
+  desc "Set invoice numbers"
+  task :set_invoice_numbers => :environment do
     
     Caboose::Site.all.each do |site|
       next if !site.use_store
-      i = site.store_config.starting_order_number
-      Caboose::Order.where("order_number is null and status <> 'cart'").reorder(:id).all.each do |o|
-        o.order_number = i
-        o.save
-        i = i + 1
+      n = site.store_config.starting_invoice_number
+      Caboose::Invoice.where("invoice_number is null and status <> 'cart'").reorder(:id).all.each do |inv|
+        i.invoice_number = n
+        i.save
+        n = n + 1
       end
     end
   end

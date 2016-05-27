@@ -3,13 +3,13 @@ sc = @store_config
 %>
 <%= render :partial => 'caboose/store/admin_header' %>
 
-<p>If calculating order packages automatically, all shippable variants must have dimensions and weights populated. Otherwise, a custom order packages function is required.</p>
+<p>If calculating invoice packages automatically, all shippable variants must have dimensions and weights populated. Otherwise, a custom invoice packages function is required.</p>
 <p><div id='storeconfig_<%= sc.id %>_auto_calculate_packages'  ></div></p>
 <div id='custom_packages_container' <% if sc.auto_calculate_packages %>style='display: none;'<% end %>>
-  <h3>Custom Order Packages Function</h3>
-  <p><code>def custom_order_packages_function(order) {</code></p>
+  <h3>Custom Invoice Packages Function</h3>
+  <p><code>def custom_invoice_packages_function(invoice) {</code></p>
   <p><div id='storeconfig_<%= sc.id %>_custom_packages_function' ></div></p>
-  <p><code># This function does not return anything, but creates the Caboose::OrderPackage objects for the given order<br />}</code></p>
+  <p><code># This function does not return anything, but creates the Caboose::InvoicePackage objects for the given invoice<br />}</code></p>
 </div>
 
 <%= render :partial => 'caboose/store/admin_footer' %>

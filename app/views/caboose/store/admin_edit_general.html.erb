@@ -8,7 +8,7 @@ sc = @store_config
 <p><div id='storeconfig_<%= sc.id %>_shipping_email'           ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_handling_percentage'      ></div></p>
 <p><div id='storeconfig_<%= sc.id %>_download_url_expires_in'  ></div></p>
-<p><div id='storeconfig_<%= sc.id %>_starting_order_number'    ></div></p>
+<p><div id='storeconfig_<%= sc.id %>_starting_invoice_number'  ></div></p>
 
 <h3 style="margin-bottom:5px;">Dimension Units</h3>
 <div id='storeconfig_<%= sc.id %>_length_unit'              ></div>
@@ -47,7 +47,7 @@ $(document).ready(function() {
       { name: 'length_unit'              , nice_name: 'Length'                            , type: 'select'   , value: <%= raw Caboose.json(sc.length_unit                ) %>, width: 400 , options_url: '/admin/store/length-unit-options' },
       { name: 'weight_unit'              , nice_name: 'Weight'                            , type: 'select'   , value: <%= raw Caboose.json(sc.weight_unit                ) %>, width: 400 , options_url: '/admin/store/weight-unit-options' },      
       { name: 'download_url_expires_in'  , nice_name: 'Download URL Expires In (minutes)' , type: 'text'     , value: <%= raw Caboose.json(sc.download_url_expires_in    ) %>, width: 400 },
-      { name: 'starting_order_number'    , nice_name: 'Starting Order Number'             , type: 'text'     , value: <%= raw Caboose.json(sc.starting_order_number      ) %>, width: 400 },
+      { name: 'starting_invoice_number'    , nice_name: 'Starting Invoice Number'             , type: 'text'     , value: <%= raw Caboose.json(sc.starting_invoice_number      ) %>, width: 400 },
       { name: 'download_instructions' , nice_name: 'Download Instructions'          , type: 'textarea' , value: <%= raw Caboose.json(sc.download_instructions   ) %>, width: 800, height: 200, fixed_placeholder: false }                                         
     ]    
   });

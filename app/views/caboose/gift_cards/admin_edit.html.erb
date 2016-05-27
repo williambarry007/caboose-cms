@@ -4,15 +4,15 @@ gc = @gift_card
 
 <h1>Edit Gift Card</h1>
 
-<p><div id='giftcard_<%= gc.id %>_name'             ></div></p>
-<p><div id='giftcard_<%= gc.id %>_code'             ></div></p>
-<p><div id='giftcard_<%= gc.id %>_card_type'        ></div></p>
-<p><div id='giftcard_<%= gc.id %>_total'            ></div></p>
-<p><div id='giftcard_<%= gc.id %>_balance'          ></div></p>
-<p><div id='giftcard_<%= gc.id %>_min_order_total'  ></div></p>
-<p><div id='giftcard_<%= gc.id %>_date_available'   ></div></p>
-<p><div id='giftcard_<%= gc.id %>_date_expires'     ></div></p>
-<p><div id='giftcard_<%= gc.id %>_status'           ></div></p>     
+<p><div id='giftcard_<%= gc.id %>_name'               ></div></p>
+<p><div id='giftcard_<%= gc.id %>_code'               ></div></p>
+<p><div id='giftcard_<%= gc.id %>_card_type'          ></div></p>
+<p><div id='giftcard_<%= gc.id %>_total'              ></div></p>
+<p><div id='giftcard_<%= gc.id %>_balance'            ></div></p>
+<p><div id='giftcard_<%= gc.id %>_min_invoice_total'  ></div></p>
+<p><div id='giftcard_<%= gc.id %>_date_available'     ></div></p>
+<p><div id='giftcard_<%= gc.id %>_date_expires'       ></div></p>
+<p><div id='giftcard_<%= gc.id %>_status'             ></div></p>     
 <div id='message'></div>
 
 <h2>Usage</h2>
@@ -24,7 +24,7 @@ gc = @gift_card
     </tr>
     <% gc.discounts.each do |d| %>
       <tr>
-        <td><a href='/admin/orders/<%= d.order_id %>'><%= d.order_id %></a></td>
+        <td><a href='/admin/invoices/<%= d.invoice_id %>'><%= d.invoice_id %></a></td>
         <td><%= number_to_currency(d.amount) %></td>
       </tr>
     <% end %>
@@ -49,15 +49,15 @@ $(document).ready(function() {
     update_url: '/admin/gift-cards/<%= gc.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [      
-      { name: 'name'               , nice_name: 'Name'                , type: 'text'   , value: <%= raw Caboose.json(gc.name                             ) %>, width: 400, align: 'left'  },
-      { name: 'code'               , nice_name: 'Code'                , type: 'text'   , value: <%= raw Caboose.json(gc.code                             ) %>, width: 400, align: 'left'  },
-      { name: 'card_type'          , nice_name: 'Type'                , type: 'select' , value: <%= raw Caboose.json(gc.card_type                        ) %>, width: 400, align: 'left'  , options_url: '/admin/gift-cards/card-type-options' },
-      { name: 'total'              , nice_name: 'Total'               , type: 'text'   , value: <%= raw Caboose.json(sprintf('%.2f', gc.total           )) %>, width: 400, align: 'right' },
-      { name: 'balance'            , nice_name: 'Balance'             , type: 'text'   , value: <%= raw Caboose.json(sprintf('%.2f', gc.balance         )) %>, width: 400, align: 'right' },
-      { name: 'min_order_total'    , nice_name: 'Minimum Order Total' , type: 'text'   , value: <%= raw Caboose.json(sprintf('%.2f', gc.min_order_total )) %>, width: 400, align: 'right' },
-      { name: 'date_available'     , nice_name: 'Date Available'      , type: 'date'   , value: <%= raw Caboose.json(gc.date_available ? gc.date_available.strftime('%m/%d/%Y') : '') %>, width: 400, align: 'left'  },
-      { name: 'date_expires'       , nice_name: 'Date Expires'        , type: 'date'   , value: <%= raw Caboose.json(gc.date_expires   ? gc.date_expires.strftime('%m/%d/%Y')   : '') %>, width: 400, align: 'left'  },
-      { name: 'status'             , nice_name: 'Status'              , type: 'select' , value: <%= raw Caboose.json(gc.status                           ) %>, width: 400, align: 'left'  , options_url: '/admin/gift-cards/status-options' }      
+      { name: 'name'               , nice_name: 'Name'                  , type: 'text'   , value: <%= raw Caboose.json(gc.name                               ) %>, width: 400, align: 'left'  },
+      { name: 'code'               , nice_name: 'Code'                  , type: 'text'   , value: <%= raw Caboose.json(gc.code                               ) %>, width: 400, align: 'left'  },
+      { name: 'card_type'          , nice_name: 'Type'                  , type: 'select' , value: <%= raw Caboose.json(gc.card_type                          ) %>, width: 400, align: 'left'  , options_url: '/admin/gift-cards/card-type-options' },
+      { name: 'total'              , nice_name: 'Total'                 , type: 'text'   , value: <%= raw Caboose.json(sprintf('%.2f', gc.total             )) %>, width: 400, align: 'right' },
+      { name: 'balance'            , nice_name: 'Balance'               , type: 'text'   , value: <%= raw Caboose.json(sprintf('%.2f', gc.balance           )) %>, width: 400, align: 'right' },
+      { name: 'min_invoice_total'  , nice_name: 'Minimum Invoice Total' , type: 'text'   , value: <%= raw Caboose.json(sprintf('%.2f', gc.min_invoice_total )) %>, width: 400, align: 'right' },
+      { name: 'date_available'     , nice_name: 'Date Available'        , type: 'date'   , value: <%= raw Caboose.json(gc.date_available ? gc.date_available.strftime('%m/%d/%Y') : '') %>, width: 400, align: 'left'  },
+      { name: 'date_expires'       , nice_name: 'Date Expires'          , type: 'date'   , value: <%= raw Caboose.json(gc.date_expires   ? gc.date_expires.strftime('%m/%d/%Y')   : '') %>, width: 400, align: 'left'  },
+      { name: 'status'             , nice_name: 'Status'                , type: 'select' , value: <%= raw Caboose.json(gc.status                             ) %>, width: 400, align: 'left'  , options_url: '/admin/gift-cards/status-options' }      
     ]    
   });       
 });

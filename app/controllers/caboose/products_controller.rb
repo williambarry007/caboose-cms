@@ -48,7 +48,7 @@ module Caboose
           
           @category       = @product.categories.first
           @review         = Review.new
-          @reviews        = Review.where(:product_id => @product.id).limit(10).order("id DESC") || nil
+          @reviews        = Review.where(:product_id => @product.id).limit(10).reorder("id DESC") || nil
           @logged_in_user = logged_in_user
           
           add_ga_event('Products', 'View', "Product #{@product.id}")

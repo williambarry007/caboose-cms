@@ -137,7 +137,7 @@ namespace :caboose do
 
   desc "Migrate product images to media"
   task :migate_product_images_to_media => :environment do
-    Caboose::ProductImage.where("image_file_name is not null AND media_id IS NULL").order("id DESC").all.each do |product_image|
+    Caboose::ProductImage.where("image_file_name is not null AND media_id IS NULL").reorder("id DESC").all.each do |product_image|
       next if product_image.product.nil?
       puts "Saving media for Product Image " + product_image.id.to_s
       m = nil

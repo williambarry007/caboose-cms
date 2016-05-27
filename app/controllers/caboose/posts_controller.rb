@@ -5,7 +5,7 @@ module Caboose
      
     # @route GET /posts
     def index
-    	@posts = Post.where(:published => true).limit(5).order('created_at DESC')
+    	@posts = Post.where(:published => true).limit(5).reorder('created_at DESC')
     end
     
     # @route GET /posts/:id

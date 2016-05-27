@@ -333,10 +333,10 @@ module Caboose
       @variants = products.collect { |product| product.variants }.flatten
       
       # Grab all categories; except for all and uncategorized      
-      @categories = Category.where('site_id = ? and parent_id IS NOT NULL AND name IS NOT NULL', @site.id).order(:url)
+      @categories = Category.where('site_id = ? and parent_id IS NOT NULL AND name IS NOT NULL', @site.id).reorder(:url)
       
       # Grab all vendors      
-      @vendors = Vendor.where('site_id = ? and name IS NOT NULL', @site.id).order(:name)
+      @vendors = Vendor.where('site_id = ? and name IS NOT NULL', @site.id).reorder(:name)
       
       render :layout => 'caboose/admin'
     end

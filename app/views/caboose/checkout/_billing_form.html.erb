@@ -1,9 +1,9 @@
-<% if @order.discounts.any? && @order.total < @order.discounts.first.amount_current %>
+<% if @invoice.discounts.any? && @invoice.total < @invoice.discounts.first.amount_current %>
   <p style="margin: 24px 0 0">Gift Card covers purchase.</p>
   <button onclick="window.location='/checkout/discount'" style="margin: 12px 0 0">&lt; Back</button>
   <button onclick="window.location='/checkout/authorize-by-gift-card'" style="margin: 12px 0 0">Continue &gt;</button>
 <% else %>
-  <input id="billing-amount" type="hidden" value="<%= @order.total %>" />
+  <input id="billing-amount" type="hidden" value="<%= @invoice.total %>" />
 
   <form id="billing-form" action="<%= @form_url %>" method="post" target="payment-request">
   	<input name="billing-cc-exp" type="hidden" value="01<%= DateTime.now.year.to_s[2..4] %>" />
@@ -41,7 +41,7 @@
   	<input type="submit" value="Continue >" />
   </form>
 
-  <p><a href="/checkout/discount"><%= if @order.discounts.any? then 'Update Gift Card' else 'Add Gift Card' end %></a></p>
+  <p><a href="/checkout/discount"><%= if @invoice.discounts.any? then 'Update Gift Card' else 'Add Gift Card' end %></a></p>
 
   <iframe style="display: none" id="payment-request" name="payment-request"></iframe>
 <% end %>

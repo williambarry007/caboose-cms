@@ -12,21 +12,21 @@ module Caboose
       return if !user_is_allowed('giftcards', 'view')
       
       pager = PageBarGenerator.new(params, {
-          'site_id'             => @site.id,          
-          'name'                => '',
-          'code'                => '',      
-          'card_type'           => '',
-          'total_lte'           => '',
-          'total_gte'           => '',
-          'balance_lte'         => '',
-          'balance_gte'         => '',
-          'min_order_total_lte' => '',
-          'min_order_total_gte' => '',
-          'date_available_lte'  => '',
-          'date_available_gte'  => '',
-          'date_expires_lte'    => '',
-          'date_expires_gte'    => '',
-          'status'              => ''
+          'site_id'               => @site.id,          
+          'name'                  => '',
+          'code'                  => '',      
+          'card_type'             => '',
+          'total_lte'             => '',
+          'total_gte'             => '',
+          'balance_lte'           => '',
+          'balance_gte'           => '',
+          'min_invoice_total_lte' => '',
+          'min_invoice_total_gte' => '',
+          'date_available_lte'    => '',
+          'date_available_gte'    => '',
+          'date_expires_lte'      => '',
+          'date_expires_gte'      => '',
+          'status'                => ''
     		},{
     		  'model'          => 'Caboose::GiftCard',
     	    'sort'			     => 'code',
@@ -85,57 +85,31 @@ module Caboose
       render :layout => 'caboose/admin'
     end
 
-    # @route PUT /admin/gift-cards/bulk
-    def admin_bulk_update
+    # @route PUT /admin/gift-cards/:id
+    def admin_update
       return unless user_is_allowed_to 'edit', 'sites'
     
       resp = Caboose::StdClass.new    
-      gift_cards = params[:model_ids].collect{ |gc_id| GiftCard.find(gc_id) }
+      gift_cards = params[:id] == 'bulk' ? params[:model_ids].collect{ |gc_id| GiftCard.find(gc_id) } : [GiftCard.find(params[:id])]
     
       save = true
       params.each do |k,v|
         case k
-          when 'site_id'         then gift_cards.each{ |gc| gc.site_id         = v }                 
-          when 'name'            then gift_cards.each{ |gc| gc.name            = v }
-          when 'code'            then gift_cards.each{ |gc| gc.code            = v }
-          when 'card_type'       then gift_cards.each{ |gc| gc.card_type       = v }
-          when 'total'           then gift_cards.each{ |gc| gc.total           = v }
-          when 'balance'         then gift_cards.each{ |gc| gc.balance         = v }
-          when 'min_order_total' then gift_cards.each{ |gc| gc.min_order_total = v }            
-          when 'date_available'  then gift_cards.each{ |gc| gc.date_available  = DateTime.strptime(v, '%m/%d/%Y') }
-          when 'date_expires'    then gift_cards.each{ |gc| gc.date_expires    = DateTime.strptime(v, '%m/%d/%Y') }
-          when 'status'          then gift_cards.each{ |gc| gc.status          = v }                      
+          when 'site_id'           then gift_cards.each{ |gc| gc.site_id           = v }                 
+          when 'name'              then gift_cards.each{ |gc| gc.name              = v }
+          when 'code'              then gift_cards.each{ |gc| gc.code              = v }
+          when 'card_type'         then gift_cards.each{ |gc| gc.card_type         = v }
+          when 'total'             then gift_cards.each{ |gc| gc.total             = v }
+          when 'balance'           then gift_cards.each{ |gc| gc.balance           = v }
+          when 'min_invoice_total' then gift_cards.each{ |gc| gc.min_invoice_total = v }            
+          when 'date_available'    then gift_cards.each{ |gc| gc.date_available    = DateTime.strptime(v, '%m/%d/%Y') }
+          when 'date_expires'      then gift_cards.each{ |gc| gc.date_expires      = DateTime.strptime(v, '%m/%d/%Y') }
+          when 'status'            then gift_cards.each{ |gc| gc.status            = v }                      
         end        
       end
       gift_cards.each{ |gc| gc.save }
     
       resp.success = true
-      render :json => resp
-    end
-
-    # @route PUT /admin/gift-cards/:id
-    def admin_update
-      return if !user_is_allowed('giftcards', 'edit')
-      
-      resp = Caboose::StdClass.new
-      gc = GiftCard.find(params[:id])    
-      
-      save = true    
-      params.each do |name,value|
-        case name
-          when 'site_id'         then gc.site_id         = value                 
-          when 'name'            then gc.name            = value
-          when 'code'            then gc.code            = value
-          when 'card_type'       then gc.card_type       = value
-          when 'total'           then gc.total           = value
-          when 'balance'         then gc.balance         = value
-          when 'min_order_total' then gc.min_order_total = value
-          when 'date_available'  then gc.date_available  = DateTime.strptime(value, '%m/%d/%Y')
-          when 'date_expires'    then gc.date_expires    = DateTime.strptime(value, '%m/%d/%Y')
-          when 'status'          then gc.status          = value                            
-        end
-      end          
-      resp.success = save && gc.save
       render :json => resp
     end
 

@@ -48,7 +48,7 @@ module Caboose
     #    v.save
     #  end
     #        
-    #  # Reinvoice the items in the order by volume            
+    #  # Reorder the items in the invoice by volume            
     #  h = {}
     #  invoice.line_items.each do |li|
     #    (1..li.quantity).each do |i|        

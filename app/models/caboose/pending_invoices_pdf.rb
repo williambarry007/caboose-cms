@@ -2,26 +2,26 @@ require 'prawn'
 require 'prawn/table'
 
 module Caboose
-  class PendingOrdersPdf < Prawn::Document
+  class PendingInvoicesPdf < Prawn::Document
     
-    attr_accessor :orders, :card_type, :card_number, :print_card_details
+    attr_accessor :invoices, :card_type, :card_number, :print_card_details
     
     def to_pdf
       
       # Get the type of card and last four digits
 
-      orders.each_with_index do |o,index|
+      invoices.each_with_index do |o,index|
         get_card_details(o)
         font_size 9
         move_down 10
-        order_info(o)
+        invoice_info(o)
         move_down 15
-        order_table(o)
+        invoice_table(o)
         move_down 15
         customer_info(o)
         move_down 15
         payment_info(o)
-        if index + 1 < orders.count then start_new_page end
+        if index + 1 < invoices.count then start_new_page end
       end
       
       render
@@ -36,10 +36,10 @@ module Caboose
       return str
     end
     
-    def get_card_details(order)
+    def get_card_details(invoice)
       return if self.print_card_details && self.print_card_details == false                  
-      sc = order.site.store_config
-      ot = order.order_transactions.where(:transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
+      sc = invoice.site.store_config
+      ot = invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       return if ot.nil?        
       case sc.pp_name
         when 'authorize.net'
@@ -53,22 +53,22 @@ module Caboose
       end
     end
 
-    def order_info(order)
-      order_info = "Order Number: #{order.order_number}\n"
-      order_info << "Order Date: #{order.date_created ? order.date_created.strftime('%d %b %Y %H:%M:%S %p') : ''}\n"
-      order_info << "Status: #{order.status.capitalize}\n"
+    def invoice_info(invoice)
+      invoice_info = "Invoice Number: #{invoice.invoice_number}\n"
+      invoice_info << "Invoice Date: #{invoice.date_created ? invoice.date_created.strftime('%d %b %Y %H:%M:%S %p') : ''}\n"
+      invoice_info << "Status: #{invoice.status.capitalize}\n"
       tbl = []
       tbl << [
-        { :content => order_info }
+        { :content => invoice_info }
       ]
       move_down 4
       table tbl, :position => 7, :width => 530
     end
 
     
-    def customer_info(order)
-      c = order.customer
-      ba = order.billing_address
+    def customer_info(invoice)
+      c = invoice.customer
+      ba = invoice.billing_address
       billed_to = []
       if ba
         ba_address = "#{ba.address1}" + (ba.address2.blank? ? '' : "\n#{ba.address2}") + "\n#{ba.city}, #{ba.state} #{ba.zip}"
@@ -83,7 +83,7 @@ module Caboose
         billed_to << [{ :content => "Phone"   , :border_width => 0 }]
       end
               
-      sa = order.shipping_address
+      sa = invoice.shipping_address
       shipped_to = []
       if sa
         sa_address = "#{sa.address1}" + (sa.address2.blank? ? '' : "\n#{sa.address2}") + "\n#{sa.city}, #{sa.state} #{sa.zip}"
@@ -112,9 +112,9 @@ module Caboose
       
     end
     
-    def order_table(order)
+    def invoice_table(invoice)
       
-      hide_prices = order.hide_prices_for_any_line_item?
+      hide_prices = invoice.hide_prices_for_any_line_item?
       
       tbl = []
       tbl << [
@@ -128,9 +128,9 @@ module Caboose
         tbl[0] << { :content => "Amount"     , :align => :right , :valign => :bottom }
       end
       
-      #order.calculate
+      #invoice.calculate
       
-      order.order_packages.all.each do |pk|
+      invoice.invoice_packages.all.each do |pk|
 
         carrier = pk.shipping_method.carrier
         service = pk.shipping_method.service_name
@@ -173,7 +173,7 @@ module Caboose
         end
       end
 
-      unassigned = order.line_items.where("order_package_id IS NULL OR order_package_id = ?",-1)
+      unassigned = invoice.line_items.where("invoice_package_id IS NULL OR invoice_package_id = ?",-1)
       unassigned.each_with_index do |li, index|
         options = ''
         if li.variant.product.option1 && li.variant.option1 then options += li.variant.product.option1 + ": " + li.variant.option1 + "\n" end
@@ -210,13 +210,13 @@ module Caboose
         end
         tbl << arr
       end
-      order.calculate
+      invoice.calculate
       if !hide_prices
-        tbl << [{ :content => "Subtotal"                       , :colspan => 6, :align => :right                       }, { :content => "$"     + sprintf("%.2f", order.subtotal                        ) , :align => :right }]
-        tbl << [{ :content => "Discount"                       , :colspan => 6, :align => :right                       }, { :content => "(-) $" + sprintf("%.2f", order.discount ? order.discount : 0.0 ) , :align => :right }]
-        tbl << [{ :content => "Shipping and Handling Charges"  , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.shipping_and_handling           ) , :align => :right }]    
-        tbl << [{ :content => "Sales Tax"                      , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", order.tax ? order.tax : 0.0           ) , :align => :right }]
-        tbl << [{ :content => "Grand Total"                    , :colspan => 6, :align => :right, :font_style => :bold }, { :content => "$"     + sprintf("%.2f", order.total                           ) , :align => :right, :font_style => :bold }]
+        tbl << [{ :content => "Subtotal"                       , :colspan => 6, :align => :right                       }, { :content => "$"     + sprintf("%.2f", invoice.subtotal                        ) , :align => :right }]
+        tbl << [{ :content => "Discount"                       , :colspan => 6, :align => :right                       }, { :content => "(-) $" + sprintf("%.2f", invoice.discount ? invoice.discount : 0.0 ) , :align => :right }]
+        tbl << [{ :content => "Shipping and Handling Charges"  , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", invoice.shipping_and_handling           ) , :align => :right }]    
+        tbl << [{ :content => "Sales Tax"                      , :colspan => 6, :align => :right                       }, { :content => "(+) $" + sprintf("%.2f", invoice.tax ? invoice.tax : 0.0           ) , :align => :right }]
+        tbl << [{ :content => "Grand Total"                    , :colspan => 6, :align => :right, :font_style => :bold }, { :content => "$"     + sprintf("%.2f", invoice.total                           ) , :align => :right, :font_style => :bold }]
       end
       
       table tbl , :position => 7, :width => 530
@@ -231,9 +231,9 @@ module Caboose
       return str        
     end
 
-    def payment_info(order)
+    def payment_info(invoice)
 
-      trans = order.order_transactions.where(:transaction_type => OrderTransaction::TYPE_AUTHORIZE, :success => true).first
+      trans = invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       tbl = []
       tbl2 = []
       tbl3 = []

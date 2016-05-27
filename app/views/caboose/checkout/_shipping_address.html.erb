@@ -1,4 +1,4 @@
-<% @shipping_address ||= @order.shipping_address %>
+<% @shipping_address ||= @invoice.shipping_address %>
 
 <address>
 	<%= "#{@shipping_address.first_name} #{@shipping_address.last_name}" %><br />

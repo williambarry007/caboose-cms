@@ -87,7 +87,7 @@ module Caboose
       return nil         
     end
            
-    #def self.form_url(order=nil)
+    #def self.form_url(invoice=nil)
     #  #if Rails.env == 'development'
     #  'https://test.authorize.net/gateway/transact.dll'
     #  #else
@@ -95,48 +95,48 @@ module Caboose
     #  #end
     #end
     #
-    #def self.authorize(order, params)
-    #  order.update_attribute(:transaction_id, params[:x_trans_id]) if params[:x_trans_id]
+    #def self.authorize(invoice, params)
+    #  invoice.update_attribute(:transaction_id, params[:x_trans_id]) if params[:x_trans_id]
     #  return params[:x_response_code] == '1'
     #end
     #
-    #def self.void(order)
+    #def self.void(invoice)
     #  response = AuthorizeNet::SIM::Transaction.new(
     #    CabooseStore::authorize_net_login_id,
     #    CabooseStore::authorize_net_transaction_key,
-    #    order.total,
+    #    invoice.total,
     #    :transaction_type => 'VOID',
-    #    :transaction_id => order.transaction_id
+    #    :transaction_id => invoice.transaction_id
     #  )
     #  
     #  ap response
     #end
     #
-    #def self.capture(order)
+    #def self.capture(invoice)
     #  response = AuthorizeNet::SIM::Transaction.new(
     #    CabooseStore::authorize_net_login_id,
     #    CabooseStore::authorize_net_transaction_key,
-    #    order.total,
+    #    invoice.total,
     #    :transaction_type => 'CAPTURE_ONLY',
-    #    :transaction_id => order.transaction_id
+    #    :transaction_id => invoice.transaction_id
     #  )
     #  
     #  ap response
     #end
     #
-    #def self.refund(order)
+    #def self.refund(invoice)
     #  response = AuthorizeNet::SIM::Transaction.new(
     #    CabooseStore::authorize_net_login_id,
     #    CabooseStore::authorize_net_transaction_key,
-    #    order.total,
+    #    invoice.total,
     #    :transaction_type => 'CREDIT',
-    #    :transaction_id => order.transaction_id
+    #    :transaction_id => invoice.transaction_id
     #  )
     #  
     #  ap response
     #end
         
-    def self.sync_order_transactions(site_id, d1, d2)
+    def self.sync_invoice_transactions(site_id, d1, d2)
               
       site = Site.find(site_id)
       sc = site.store_config
@@ -149,7 +149,7 @@ module Caboose
       batches = resp.batch_list
       batch_ids = batches.collect{ |batch| batch.id }
                   
-      orders = {}
+      invoices = {}
       
       # Settled transactions
       batch_ids.each do |batch_id|              
@@ -159,9 +159,9 @@ module Caboose
         
         transactions = resp.transactions
         transactions.each do |t|
-          order_id = t.order.invoice_num
-          orders[order_id] = [] if orders[order_id].nil?
-          orders[order_id] << t
+          invoice_id = t.invoice.invoice_num
+          invoices[invoice_id] = [] if invoices[invoice_id].nil?
+          invoices[invoice_id] << t
         end
       end
       
@@ -171,41 +171,41 @@ module Caboose
       if resp.success?        
         transactions = resp.transactions
         transactions.each do |t|           
-          order_id = t.order.invoice_num
-          orders[order_id] = [] if orders[order_id].nil?
-          orders[order_id] << t
+          invoice_id = t.invoice.invoice_num
+          invoices[invoice_id] = [] if invoices[invoice_id].nil?
+          invoices[invoice_id] << t
         end
       end
 
       # Verify all the transactions exist locally
-      orders.each do |order_id, transactions|                        
+      invoices.each do |invoice_id, transactions|                        
         transactions.each do |t|
-          self.verify_order_transaction_exists(t)                                                                
+          self.verify_invoice_transaction_exists(t)                                                                
         end                                
       end
       
-      # Update the financial_status and status of all affected orders
-      orders.each do |order_id, transactions|      
-        order = Order.where(:id => order_id).first
-        next if order.nil?
-        order.determine_statuses
+      # Update the financial_status and status of all affected invoices
+      invoices.each do |invoice_id, transactions|      
+        invoice = Invoice.where(:id => invoice_id).first
+        next if invoice.nil?
+        invoice.determine_statuses
       end                
     end
     
-    def self.verify_order_transaction_exists(t)
+    def self.verify_invoice_transaction_exists(t)
       
-      order_id = t.order.invoice_num
-      ttype = OrderTransaction.type_from_authnet_status(t.status)
+      invoice_id = t.invoice.invoice_num
+      ttype = InvoiceTransaction.type_from_authnet_status(t.status)
       
-      ot = OrderTransaction.where(:order_id => order_id, :transaction_id => t.id, :transaction_type => ttype).first
+      ot = InvoiceTransaction.where(:invoice_id => invoice_id, :transaction_id => t.id, :transaction_type => ttype).first
       if ot   
-        puts "Found order transaction for #{t.id}."
+        puts "Found invoice transaction for #{t.id}."
         return
       end
                 
-      puts "Creating order transaction for #{t.id}..."      
-      ot = OrderTransaction.create(                      
-        :order_id         => order_id,
+      puts "Creating invoice transaction for #{t.id}..."      
+      ot = InvoiceTransaction.create(                      
+        :invoice_id         => invoice_id,
         :transaction_id   => t.id,
         :transaction_type => ttype,
         :amount           => t.settle_amount,        

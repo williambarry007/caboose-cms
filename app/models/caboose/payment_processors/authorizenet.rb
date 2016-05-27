@@ -3,7 +3,7 @@ class Caboose::PaymentProcessors::Authorizenet < Caboose::PaymentProcessors::Bas
   def self.api(root, body, test=false)
   end
   
-  def self.form_url(order=nil)
+  def self.form_url(invoice=nil)
     if Rails.env == 'development'
       'https://test.authorize.net/gateway/transact.dll'
     else
@@ -11,37 +11,37 @@ class Caboose::PaymentProcessors::Authorizenet < Caboose::PaymentProcessors::Bas
     end
   end
   
-  def self.authorize(order, params)
-    order.update_attribute(:transaction_id, params[:x_trans_id]) if params[:x_trans_id]
+  def self.authorize(invoice, params)
+    invoice.update_attribute(:transaction_id, params[:x_trans_id]) if params[:x_trans_id]
     return params[:x_response_code] == '1'
   end
   
-  def self.void(order)
-    sc = order.site.store_config
+  def self.void(invoice)
+    sc = invoice.site.store_config
     response = AuthorizeNet::SIM::Transaction.new(
-      sc.authnet_api_login_id, sc.authnet_api_transaction_key, order.total,
+      sc.authnet_api_login_id, sc.authnet_api_transaction_key, invoice.total,
       :transaction_type => 'VOID',
-      :transaction_id => order.transaction_id
+      :transaction_id => invoice.transaction_id
     )    
     #ap response
   end
   
-  def self.capture(order)
-    sc = order.site.store_config
+  def self.capture(invoice)
+    sc = invoice.site.store_config
     response = AuthorizeNet::SIM::Transaction.new(
-      sc.authnet_api_login_id, sc.authnet_api_transaction_key, order.total,
+      sc.authnet_api_login_id, sc.authnet_api_transaction_key, invoice.total,
       :transaction_type => 'CAPTURE_ONLY',
-      :transaction_id => order.transaction_id
+      :transaction_id => invoice.transaction_id
     )    
     #ap response
   end
   
-  def self.refund(order)
-    sc = order.site.store_config
+  def self.refund(invoice)
+    sc = invoice.site.store_config
     response = AuthorizeNet::SIM::Transaction.new(
-      sc.authnet_api_login_id, sc.authnet_api_transaction_key, order.total,
+      sc.authnet_api_login_id, sc.authnet_api_transaction_key, invoice.total,
       :transaction_type => 'CREDIT',
-      :transaction_id => order.transaction_id
+      :transaction_id => invoice.transaction_id
     )    
     #ap response
   end

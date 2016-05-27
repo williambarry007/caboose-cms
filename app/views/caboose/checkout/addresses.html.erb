@@ -1,12 +1,12 @@
 <%
-sa = @order.shipping_address
-ba = @order.billing_address
+sa = @invoice.shipping_address
+ba = @invoice.billing_address
 if sa.nil?
-  q = ["status <> ? and id < ? and customer_id = ?", 'cart', @order.id, @order.customer_id]
-  if Caboose::Order.where(q).exists?    
-    last_order = Caboose::Order.where(q).first
-    sa = last_order.shipping_address
-    ba = last_order.billing_address      
+  q = ["status <> ? and id < ? and customer_id = ?", 'cart', @invoice.id, @invoice.customer_id]
+  if Caboose::Invoice.where(q).exists?    
+    last_invoice = Caboose::Invoice.where(q).first
+    sa = last_invoice.shipping_address
+    ba = last_invoice.billing_address      
   end
 end
 %>
@@ -18,7 +18,7 @@ end
     <form action="/checkout/addresses" method="put" id='address_form'>
       <section id="checkout-address">  
         <div class="wrapper">
-          <% if @order.has_shippable_items? %>
+          <% if @invoice.has_shippable_items? %>
             <section>
               <fieldset id="shipping">
                 <h3>Shipping Address</h3>

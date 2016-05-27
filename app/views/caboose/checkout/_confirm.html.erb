@@ -8,7 +8,7 @@
             <th>Unit Price</th>
             <th>Subtotal</th>
           </tr>
-          <% @order.line_items.each do |li| %>
+          <% @invoice.line_items.each do |li| %>
             <tr data-id="<%= li.id %>">
               <td valign='top'>
                 <% if li.variant.product_images.count > 0 %>              
@@ -21,18 +21,18 @@
               <td valign='top' align='right' class='subtotal'   style='text-align: right;'><%= number_to_currency(li.subtotal   , :precision => 2) %></td>
             </tr>        
           <% end %>                  
-          <tr><td colspan='3' align='right' style='text-align: right;'>Subtotal:            </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.subtotal, :precision => 2)                   %></td></tr>            
-          <tr><td colspan='3' align='right' style='text-align: right;'>Shipping & Handling: </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.shipping + @order.handling, :precision => 2) %></td></tr>
-          <% if @order.tax > 0 && @order.billing_address.state == 'AL' %>
-            <tr><td colspan='3' align='right' style='text-align: right;'>Tax <small>(if in Alabama)</small>: </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.tax, :precision => 2) %></td></tr>
+          <tr><td colspan='3' align='right' style='text-align: right;'>Subtotal:            </td><td align='right' style='text-align: right;'><%= number_to_currency(@invoice.subtotal, :precision => 2)                   %></td></tr>            
+          <tr><td colspan='3' align='right' style='text-align: right;'>Shipping & Handling: </td><td align='right' style='text-align: right;'><%= number_to_currency(@invoice.shipping + @invoice.handling, :precision => 2) %></td></tr>
+          <% if @invoice.tax > 0 && @invoice.billing_address.state == 'AL' %>
+            <tr><td colspan='3' align='right' style='text-align: right;'>Tax <small>(if in Alabama)</small>: </td><td align='right' style='text-align: right;'><%= number_to_currency(@invoice.tax, :precision => 2) %></td></tr>
           <% end %>      
-          <tr><td colspan='3' align='right' style='text-align: right;'>Total:               </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.total, :precision => 2) %></td></tr>
+          <tr><td colspan='3' align='right' style='text-align: right;'>Total:               </td><td align='right' style='text-align: right;'><%= number_to_currency(@invoice.total, :precision => 2) %></td></tr>
         </table>
         <p><a href='#' id='redeem_gift_card'>Redeem gift card</a></p>
         <div id='gift_card_redemption_form'></div>
       </section><br />
       <section id='shipping_address'>
-        <% sa = @order.shipping_address %>        
+        <% sa = @invoice.shipping_address %>        
         <address>
           <%= "#{sa.first_name} #{sa.last_name}" %><br />
           <%= sa.address1 %><br />
@@ -42,7 +42,7 @@
         <p><a href="/checkout/addresses">Edit shipping address</a></p>
       </section>
       <section id='billing_address'>        
-        <% ba = @order.billing_address %>        
+        <% ba = @invoice.billing_address %>        
         <address>
           <%= "#{ba.first_name} #{ba.last_name}" %><br />
           <%= ba.address1 %><br />
@@ -52,7 +52,7 @@
         <p><a href="/checkout/addresses">Edit billing address</a></p>
       </section>
       <section id='shipping_method'>
-        <p><%= @order.shipping_carrier %> <%= @order.shipping_service_name %> - <%= number_to_currency(@order.shipping) %></p>
+        <p><%= @invoice.shipping_carrier %> <%= @invoice.shipping_service_name %> - <%= number_to_currency(@invoice.shipping) %></p>
         <p><a href="/checkout/shipping">Edit shipping method</a></p>
       </section>
       <section id='payment_method'>

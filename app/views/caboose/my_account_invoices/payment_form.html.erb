@@ -1,7 +1,7 @@
 <%
-store_config = @order.site.store_config
+store_config = @invoice.site.store_config
 
-ba = @order.billing_address
+ba = @invoice.billing_address
 valid_address = ba && 
   ba.first_name.strip.length > 0 && 
   ba.last_name.strip.length  > 0 &&
@@ -15,14 +15,14 @@ valid_address = ba &&
   <% if store_config.pp_name == 'authorize.net' %>      
     <form id="payment" target="relay" action="https://secure.authorize.net/gateway/transact.dll" method="post">
       <%= sim_fields(@sim_transaction) %>
-      <input type="hidden" id="x_invoice_num" name="x_invoice_num" value="<%= @order.id %>" />
-      <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw store_config.authnet_relay_domain %>/my-account/orders/<%= @order.id %>/authnet-response" />        
-      <input type="hidden" id="x_first_name"  name="x_first_name"  value="<%= raw @order.billing_address.first_name %>" />
-      <input type="hidden" id="x_last_name"   name="x_last_name"   value="<%= raw @order.billing_address.last_name  %>" />       
-      <input type="hidden" id="x_address"     name="x_address"     value="<%= raw @order.billing_address.address1   %>" />      
-      <input type="hidden" id="x_city"        name="x_city"        value="<%= raw @order.billing_address.city       %>" />
-      <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @order.billing_address.state      %>" />
-      <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @order.billing_address.zip        %>" />
+      <input type="hidden" id="x_invoice_num" name="x_invoice_num" value="<%= @invoice.id %>" />
+      <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw store_config.authnet_relay_domain %>/my-account/invoices/<%= @invoice.id %>/authnet-response" />        
+      <input type="hidden" id="x_first_name"  name="x_first_name"  value="<%= raw @invoice.billing_address.first_name %>" />
+      <input type="hidden" id="x_last_name"   name="x_last_name"   value="<%= raw @invoice.billing_address.last_name  %>" />       
+      <input type="hidden" id="x_address"     name="x_address"     value="<%= raw @invoice.billing_address.address1   %>" />      
+      <input type="hidden" id="x_city"        name="x_city"        value="<%= raw @invoice.billing_address.city       %>" />
+      <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @invoice.billing_address.state      %>" />
+      <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @invoice.billing_address.zip        %>" />
               
       <div class="field" id="credit-card">
         <span class="field-text">Credit Card Payment</span>

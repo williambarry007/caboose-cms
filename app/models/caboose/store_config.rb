@@ -56,10 +56,10 @@ module Caboose
     PAYMENT_PROCESSOR_AUTHORIZENET = 'authorize.net'
     PAYMENT_PROCESSOR_STRIPE = 'stripe'
       
-    def next_order_number
-      x = Order.where("order_number is not null").reorder("order_number desc").limit(1).first
-      return x.order_number + 1 if x
-      return self.starting_order_number      
+    def next_invoice_number
+      x = Invoice.where("invoice_number is not null").reorder("invoice_number desc").limit(1).first
+      return x.invoice_number + 1 if x
+      return self.starting_invoice_number      
     end
         
   end

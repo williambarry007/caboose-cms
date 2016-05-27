@@ -65,7 +65,7 @@ module Caboose
         v.save
       end
             
-      # Reinvoice the items in the order by volume
+      # Reorder the items in the invoice by volume
       line_items = invoice.line_items.sort_by{ |li| li.quantity * (li.variant.volume ? li.variant.volume : 0.00) * -1 }
                       
       # Get all the packages we're going to use      

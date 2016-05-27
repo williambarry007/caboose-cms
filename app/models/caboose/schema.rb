@@ -22,11 +22,15 @@ class Caboose::Schema < Caboose::Utilities::Schema
       #Caboose::Field     => { :page_block_id        => :block_id,
       #                        :page_block_field_id  => :field_type_id },
       #Caboose::FieldType => { :page_block_type_id   => :block_type_id },
-      Caboose::Block     => { :page_block_type_id   => :block_type_id },
-      Caboose::RetargetingConfig => { 
-        :conversion_id   => :google_conversion_id,
-        :labels_function => :google_labels_function
-      }
+      Caboose::Block              => { :page_block_type_id => :block_type_id },
+      Caboose::Discount           => { :order_id => :invoice_id },
+      Caboose::GiftCard           => { :min_order_total => :min_invoice_total },
+      Caboose::Invoice            => { :order_number => :invoice_number },
+      Caboose::InvoiceDiscount    => { :order_id => :invoice_id },
+      Caboose::InvoicePackage     => { :order_id => :invoice_id },        
+      Caboose::InvoiceTransaction => { :order_id => :invoice_id },
+      Caboose::LineItem           => { :order_id => :invoice_id, :order_package_id  => :invoice_package_id },
+      Caboose::RetargetingConfig  => { :conversion_id   => :google_conversion_id, :labels_function => :google_labels_function }      
     }
   end
 
@@ -276,7 +280,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Discount => [
         [ :gift_card_id , :integer  ],
-        [ :invoice_id     , :integer  ],                
+        [ :invoice_id   , :integer  ],                
         [ :amount       , :decimal   , { :precision => 8, :scale => 2 }]        
       ],
       Caboose::Domain => [
@@ -306,20 +310,20 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :sort_order         , :integer ]
       ],
       Caboose::GiftCard => [
-        [ :site_id         , :integer  ],        
-        [ :name            , :string   ],
-        [ :code            , :string   ],
-        [ :card_type       , :string   ],
-        [ :total           , :decimal   , { :precision => 8, :scale => 2 }],
-        [ :balance         , :decimal   , { :precision => 8, :scale => 2 }],
-        [ :min_order_total , :decimal   , { :precision => 8, :scale => 2 }],        
-        [ :date_available  , :datetime ],
-        [ :date_expires    , :datetime ],
-        [ :status          , :string   ]                                
+        [ :site_id           , :integer  ],        
+        [ :name              , :string   ],
+        [ :code              , :string   ],
+        [ :card_type         , :string   ],
+        [ :total             , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :balance           , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :min_invoice_total , :decimal   , { :precision => 8, :scale => 2 }],        
+        [ :date_available    , :datetime ],
+        [ :date_expires      , :datetime ],
+        [ :status            , :string   ]                                
       ],      
       Caboose::LineItem => [
-        [ :invoice_id              , :integer  ],
-        [ :order_package_id      , :integer  ],
+        [ :invoice_id            , :integer  ],
+        [ :invoice_package_id    , :integer  ],
         [ :variant_id            , :integer  ],
         [ :parent_id             , :integer  ],                
         [ :status                , :string   ],        
@@ -390,7 +394,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :success               , :boolean  ]        
       ],
       Caboose::InvoiceDiscount => [
-        [ :invoicer_id           , :integer ],
+        [ :invoice_id            , :integer ],
         [ :discount_id           , :integer ]
       ],
       Caboose::InvoicePackage => [
@@ -403,7 +407,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Invoice => [
         [ :site_id               , :integer  ],
-        [ :order_number          , :integer  ],
+        [ :invoice_number        , :integer  ],
         [ :alternate_id          , :integer  ],        
         [ :subtotal              , :decimal  , { :precision => 8, :scale => 2 }],
         [ :tax                   , :decimal  , { :precision => 8, :scale => 2 }],
@@ -434,7 +438,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :include_receipt       , :boolean  , { :default => true }]
         
         #[ :email                 , :string   ],
-        #[ :order_number          , :string   ],
+        #[ :invoice_number        , :string   ],
         #[ :payment_id            , :integer  ],
         #[ :gateway_id            , :integer  ],
         #[ :date_authorized       , :datetime ],

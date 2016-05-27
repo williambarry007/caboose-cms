@@ -1,11 +1,11 @@
 <form id="discounts">
   <label for="gift-card" style="margin: 0 0 12px">Gift Card Number:</label>
-  <input id="gift-card" name="gift_card_number" type="text" placeholder="<%= @order.discounts.first.code if @order.discounts.any? %>" maxlength="8" />
+  <input id="gift-card" name="gift_card_number" type="text" placeholder="<%= @invoice.discounts.first.code if @invoice.discounts.any? %>" maxlength="8" />
   <div id="message"></div>
   
   <input id="back" type="button" value="< Back" onclick="window.location='/checkout/shipping'" />
-  <input id="next" type="submit" value="<%= if @order.discounts.any? then 'Update' else 'Add' end %>" />
-  <input id="skip" type="button" value="<%= if @order.discounts.any? then 'Continue >' else 'Skip >' end %>" onclick="window.location='/checkout/billing'" />
+  <input id="next" type="submit" value="<%= if @invoice.discounts.any? then 'Update' else 'Add' end %>" />
+  <input id="skip" type="button" value="<%= if @invoice.discounts.any? then 'Continue >' else 'Skip >' end %>" onclick="window.location='/checkout/billing'" />
 </form>
 
 <% content_for :caboose_js do %>

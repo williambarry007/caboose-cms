@@ -1,20 +1,20 @@
 module Caboose
   class ShippingAddressesController < Caboose::ApplicationController
             
-    # @route GET /admin/orders/:order_id/shipping-address/json
+    # @route GET /admin/invoices/:invoice_id/shipping-address/json
     def admin_json
-      return if !user_is_allowed('orders', 'edit')    
-      order = Order.find(params[:order_id])      
-      render :json => order.shipping_address      
+      return if !user_is_allowed('invoices', 'edit')    
+      invoice = Invoice.find(params[:invoice_id])      
+      render :json => invoice.shipping_address      
     end
       
-    # @route PUT /admin/orders/:order_id/shipping-address
+    # @route PUT /admin/invoices/:invoice_id/shipping-address
     def admin_update
-      return if !user_is_allowed('orders', 'edit')
+      return if !user_is_allowed('invoices', 'edit')
       
       resp = Caboose::StdClass.new({'attributes' => {}})
-      order = Order.find(params[:order_id])    
-      sa = order.shipping_address
+      invoice = Invoice.find(params[:invoice_id])    
+      sa = invoice.shipping_address
       
       save = true    
       params.each do |name, value|
@@ -42,29 +42,29 @@ module Caboose
     
     #===========================================================================
     
-    # @route GET /my-account/orders/:order_id/shipping-address/json
+    # @route GET /my-account/invoices/:invoice_id/shipping-address/json
     def my_account_json
       return if !logged_in?    
-      order = Order.find(params[:order_id])      
-      if order.customer_id != logged_in_user.id        
-        render :json => { :error => "The given order does not belong to you." } 
+      invoice = Invoice.find(params[:invoice_id])      
+      if invoice.customer_id != logged_in_user.id        
+        render :json => { :error => "The given invoice does not belong to you." } 
         return
       end
-      render :json => order.shipping_address      
+      render :json => invoice.shipping_address      
     end
     
-    # @route PUT /my-account/orders/:order_id/shipping-address
+    # @route PUT /my-account/invoices/:invoice_id/shipping-address
     def my_account_update
       return if !logged_in?
       
       resp = Caboose::StdClass.new
-      order = Order.find(params[:order_id])
-      if order.customer_id != logged_in_user.id        
-        render :json => { :error => "The given order does not belong to you." } 
+      invoice = Invoice.find(params[:invoice_id])
+      if invoice.customer_id != logged_in_user.id        
+        render :json => { :error => "The given invoice does not belong to you." } 
         return
       end
 
-      sa = order.shipping_address      
+      sa = invoice.shipping_address      
       save = true    
       params.each do |name, value|
         case name          

@@ -7,14 +7,14 @@ store_config = @site.store_config
     <% if store_config.pp_name == 'authorize.net' %>        
       <form id="payment" target="relay" action="https://secure.authorize.net/gateway/transact.dll" method="post">
         <%= sim_fields(@sim_transaction) %>
-        <input type="hidden" id="x_invoice_num" name="x_invoice_num" value="<%= @order.id %>" />
-        <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw store_config.authnet_relay_domain %>/checkout/authnet-response/<%= @order.id %>" />        
-        <input type="hidden" id="x_first_name"  name="x_first_name"  value="<%= raw @order.billing_address.first_name %>" />
-        <input type="hidden" id="x_last_name"   name="x_last_name"   value="<%= raw @order.billing_address.last_name  %>" />       
-        <input type="hidden" id="x_address"     name="x_address"     value="<%= raw @order.billing_address.address1   %>" />      
-        <input type="hidden" id="x_city"        name="x_city"        value="<%= raw @order.billing_address.city       %>" />
-        <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @order.billing_address.state      %>" />
-        <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @order.billing_address.zip        %>" />
+        <input type="hidden" id="x_invoice_num" name="x_invoice_num" value="<%= @invoice.id %>" />
+        <input type="hidden" id="x_description" name="x_after_relay" value="<%= raw store_config.authnet_relay_domain %>/checkout/authnet-response/<%= @invoice.id %>" />        
+        <input type="hidden" id="x_first_name"  name="x_first_name"  value="<%= raw @invoice.billing_address.first_name %>" />
+        <input type="hidden" id="x_last_name"   name="x_last_name"   value="<%= raw @invoice.billing_address.last_name  %>" />       
+        <input type="hidden" id="x_address"     name="x_address"     value="<%= raw @invoice.billing_address.address1   %>" />      
+        <input type="hidden" id="x_city"        name="x_city"        value="<%= raw @invoice.billing_address.city       %>" />
+        <input type="hidden" id="x_state"       name="x_state"       value="<%= raw @invoice.billing_address.state      %>" />
+        <input type="hidden" id="x_zip"         name="x_zip"         value="<%= raw @invoice.billing_address.zip        %>" />
                 
         <div class="field" id="credit-card">
           <span class="field-text">Credit Card</span>
@@ -63,10 +63,10 @@ store_config = @site.store_config
     <% end %>
   </section>
   <section id='checkout-confirm'>
-    <% if @order.has_shippable_items? %>
+    <% if @invoice.has_shippable_items? %>
       <section id='shipping_address'>
         <h3>Shipping Address</h3>
-        <% sa = @order.shipping_address %>        
+        <% sa = @invoice.shipping_address %>        
         <address>
           <%= "#{sa.first_name} #{sa.last_name}" %><br />
           <%= sa.address1 %><br />
@@ -78,7 +78,7 @@ store_config = @site.store_config
     <% end %>
     <section id='billing_address'>        
       <h3>Billing Address</h3>
-      <% ba = @order.billing_address %>        
+      <% ba = @invoice.billing_address %>        
       <address>
         <%= "#{ba.first_name} #{ba.last_name}" %><br />
         <%= ba.address1 %><br />
@@ -87,10 +87,10 @@ store_config = @site.store_config
       </address>
       <p><a href="/checkout/addresses">Edit</a></p>
     </section>
-    <% if @order.has_shippable_items? %>
+    <% if @invoice.has_shippable_items? %>
       <section id='shipping_method'>
         <h3>Shipping</h3>
-        <% @order.order_packages.all.each do |op| %>        
+        <% @invoice.invoice_packages.all.each do |op| %>        
           <p><%= op.shipping_method.service_name %> - <%= number_to_currency(op.total) %></p>
         <% end %>
         <p><a href="/checkout/shipping">Edit</a></p>
@@ -124,13 +124,13 @@ store_config = @site.store_config
 var SHOW_RELAY = <%= @show_relay ? 'true' : 'false' %>;
 
 var cart = false;
-var CABOOSE_ORDER_TOTAL = 0.0;
+var CABOOSE_INVOICE_TOTAL = 0.0;
 $(document).ready(function() {
   cart = new Cart({
     allow_edit_line_items: false,
     allow_edit_gift_cards: false
   });
-  CABOOSE_ORDER_TOTAL = parseFloat(<%= raw Caboose.json(@order.total); %>);
+  CABOOSE_INVOICE_TOTAL = parseFloat(<%= raw Caboose.json(@invoice.total); %>);
 });
 
 </script>

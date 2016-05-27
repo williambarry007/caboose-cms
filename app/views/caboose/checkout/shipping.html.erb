@@ -6,11 +6,11 @@
   <% elsif @rates.count == 1 %>
     <p>Please select which shipping method you'd like to use.</p>
     <p>
-    <% op = @rates[0][:order_package] %>
+    <% op = @rates[0][:invoice_package] %>
     <% @rates[0][:rates].each do |rate| %>
       <% sm = rate[:shipping_method] %>
       <a href='#' class='shipping_rate btn'
-        data-order_package_id="<%= op.id %>"
+        data-invoice_package_id="<%= op.id %>"
         data-shipping_method_id="<%= sm.id %>"
         data-total="<%= rate[:total_price] %>"
         ><%= number_to_currency(rate[:total_price], :precision => 2) %><br /><%= sm.service_name %>
@@ -25,7 +25,7 @@
         <th>Shipping Options</th>
       </tr>
       <% @rates.each_with_index do |package_rates, i| %>
-        <% op = package_rates[:order_package] %>
+        <% op = package_rates[:invoice_package] %>
         <% sp = op.shipping_package %>          
         <tr>                    
           <td valign='top'>
@@ -35,7 +35,7 @@
             <% package_rates[:rates].each do |rate| %>
               <% sm = rate[:shipping_method] %>
               <a href='#' class='shipping_rate btn'
-                data-order_package_id="<%= op.id %>"
+                data-invoice_package_id="<%= op.id %>"
                 data-shipping_method_id="<%= sm.id %>"
                 data-total="<%= rate[:total_price] %>"
                 ><%= number_to_currency(rate[:total_price], :precision => 2) %><br /><%= sm.service_name %>

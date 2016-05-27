@@ -25,7 +25,7 @@ function show_products()
 {
   var title = $('#product_title').val();
   $.ajax({
-    url: '/admin/orders/line-items/product-stubs',
+    url: '/admin/invoices/line-items/product-stubs',
     type: 'get',
     data: { title: title },
     success: function(products) {

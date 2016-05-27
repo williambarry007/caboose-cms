@@ -101,7 +101,7 @@ module Caboose
     end
     
     def most_popular_variant
-      self.variants.where('price > ? AND status != ?', 0, 'Deleted').order('price ASC').first
+      self.variants.where('price > ? AND status != ?', 0, 'Deleted').reorder('price ASC').first
     end
     
     def first_tiny_image_url

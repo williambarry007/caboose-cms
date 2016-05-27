@@ -6,7 +6,7 @@ module Caboose
     
     # @route GET /admin/store/json
     def admin_json_single
-      return if !user_is_allowed('orders', 'view')
+      return if !user_is_allowed('invoices', 'view')
       sc = @site.store_config
       render :json => sc      
     end
@@ -103,7 +103,7 @@ module Caboose
           when 'weight_unit'                 then sc.weight_unit                 = value
           when 'download_instructions'       then sc.download_instructions       = value
           when 'download_url_expires_in'     then sc.download_url_expires_in     = value            
-          when 'starting_order_number'       then sc.starting_order_number       = value                
+          when 'starting_invoice_number'     then sc.starting_invoice_number     = value                
     	  end
     	end
     	

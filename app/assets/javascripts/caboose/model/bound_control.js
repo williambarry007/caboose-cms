@@ -13,9 +13,40 @@ BoundControl = Class.extend({
   cancel: function() {},      // Cancels the edit
   error:  function(str) {},     // Shows an error
 
+  //show_loader: function() {
+  //  var w = $('#'+this.el).outerWidth();
+  //  var h = 40; //$('#'+this.el).outerHeight();
+  //  var this2 = this;
+  //  
+  //  if (!$('#'+this.el+'_check').length)
+  //  {      
+  //    $('#'+this.el+'_container').prepend($('<div/>')
+  //      .attr('id', this.el + '_check')
+  //      .addClass('mb_bound_input_check')
+  //      .css('position', 'absolute')
+  //      .css('top', 0)
+  //      .css('right', w-h-1)
+  //      .css('width', h+2)
+  //      .css('overflow', 'hidden')
+  //      .append($('<a/>')
+  //        .addClass('loading')
+  //        .html('&#10003;')
+  //        .css('width', h)
+  //        .css('margin-left', h)
+  //        .attr('href', '#')
+  //        .click(function(event) { event.preventDefault(); })
+  //      )
+  //    );
+  //  }    
+  //  $('#'+this.el+'_check a')
+  //    .addClass('mb_loading')
+  //    .css('margin-left', h);
+  //  $('#'+this.el+'_check a').animate({ 'margin-left': 0 }, 300); 
+  //},
+  
   show_loader: function() {
     var w = $('#'+this.el).outerWidth();
-    var h = 40; //$('#'+this.el).outerHeight();
+    var h = $('#'+this.el).outerHeight();    
     var this2 = this;
     
     if (!$('#'+this.el+'_check').length)
@@ -25,30 +56,31 @@ BoundControl = Class.extend({
         .addClass('mb_bound_input_check')
         .css('position', 'absolute')
         .css('top', 0)
-        .css('left', w-h-1)
-        .css('width', h+2)
+        .css('right', 0-h)
+        .css('width', h)
         .css('overflow', 'hidden')
+        .css('border', '0')
         .append($('<a/>')
           .addClass('loading')
           .html('&#10003;')
           .css('width', h)
-          .css('margin-left', h)
+          .css('height', h)
+          .css('text-decoration', 'none')
+          .css('border', '0')
           .attr('href', '#')
           .click(function(event) { event.preventDefault(); })
         )
       );
     }    
-    $('#'+this.el+'_check a')
-      .addClass('mb_loading')
-      .css('margin-left', h);
-    $('#'+this.el+'_check a').animate({ 'margin-left': 0 }, 300); 
+    $('#'+this.el+'_check a').addClass('loading');
+    $('#'+this.el+'_check').animate({ 'right': -1 }, 300); 
   },
   
   hide_loader: function() {
     this.hide_check();
   },
   
-  show_check: function(duration) {
+  show_check: function(duration) {        
     $('#'+this.el+'_check a').removeClass('loading');
     if (duration)
     {
@@ -57,12 +89,22 @@ BoundControl = Class.extend({
     }
   },
   
+  //hide_check: function() {
+  //  var w = $('#'+this.el).outerWidth();
+  //  var h = 40;
+  //  
+  //  var this2 = this;
+  //  $('#'+this.el+'_check a').animate({ 'margin-left': h }, 300, function() { 
+  //    $('#'+this2.check).remove(); 
+  //  });
+  //},
+  
   hide_check: function() {
-    var h = $('#'+this.el).outerHeight();
-    var this2 = this;
-    $('#'+this.el+'_check a').animate({ 'margin-left': h }, 300, function() { 
-      $('#'+this2.check).remove(); 
+    var that = this;    
+    var h = $('#'+this.el).outerHeight();        
+    $('#'+that.el+'_check').animate({ 'right': 0-h }, 300, function() { 
+      $('#'+that.el+'_check').remove(); 
     });
-  }
+  },
   
 });

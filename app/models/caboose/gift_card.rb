@@ -43,7 +43,7 @@ module Caboose
       return false if self.min_invoice_total && invoice.total < self.min_invoice_total
       return true
     end
-    
+
   end
 end
 

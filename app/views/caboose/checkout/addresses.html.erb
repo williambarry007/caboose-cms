@@ -29,7 +29,7 @@ end
                 <label><span>Address 2  </span> <input name="shipping[address2]"   type="text" value="<%= sa ? sa.address2   : "" %>" /></label>
                 <label><span>City       </span> <input name="shipping[city]"       type="text" value="<%= sa ? sa.city       : "" %>" /></label>        
                 <label><span>State      </span> <select name="shipping[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= sa && sa.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>        
-                <label><span>Zip        </span> <input name="shipping[zip]"       type="text"  value="<%= sa ? sa.zip        : "" %>" /></label>
+                <label><span>Zip        </span> <input name="shipping[zip]"       type="text"  value="<%= sa ? sa.zip        : "" %>" pattern="[0-9]*" inputmode="numeric" /></label>
                 <label><input name="use_as_billing" type="checkbox" value="false" /> Use as billing address</label>
               </fieldset>
             </section>
@@ -44,7 +44,7 @@ end
               <label><span>Address 2  </span> <input name="billing[address2]"   type="text" value="<%= ba ? ba.address2   : "" %>" /></label>
               <label><span>City       </span> <input name="billing[city]"       type="text" value="<%= ba ? ba.city       : "" %>" /></label>
               <label><span>State      </span> <select name="billing[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= ba && ba.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>                
-              <label><span>Zip        </span> <input name="billing[zip]"        type="text" value="<%= ba ? ba.zip        : "" %>" /></label>
+              <label><span>Zip        </span> <input name="billing[zip]"        type="text" value="<%= ba ? ba.zip        : "" %>" pattern="[0-9]*" inputmode="numeric" /></label>
             </fieldset>
           </section>        
         </div>            

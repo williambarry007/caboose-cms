@@ -1,5 +1,5 @@
 
-BoundSelect = BoundControl.extend({
+BoundSelectSimple = BoundControl.extend({
 
   //el: false,
   //model: false,
@@ -73,8 +73,8 @@ BoundSelect = BoundControl.extend({
             caboose_modal_close_handler = function(new_id) {              
               this2.attribute.populate_options(function() {
                 var select2 = $('#' + this2.el + '_select');
-                select2.empty();                
-                if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html(this2.attribute.empty_text ? this2.attribute.empty_text : '-- Empty --'));
+                select2.empty();
+                if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html('-- Empty --'));
                 if (this2.attribute.quick_add_url)      select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
                 $.each(this2.attribute.options, function(i, option) {
                   var opt = $('<option/>').val(option.value).html(option.text);
@@ -116,8 +116,9 @@ BoundSelect = BoundControl.extend({
           value: this2.attribute.value,
           text: this2.attribute.text
         });
-      }
-      if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html(this2.attribute.empty_text ? this2.attribute.empty_text : '-- Empty --'));
+      }      
+      if (this2.attribute.show_empty_option)      
+        select.append($('<option/>').val('').html('-- Empty --'));
       if (this2.attribute.quick_add_url)      
         select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
       $.each(this2.attribute.options, function(i, option) {

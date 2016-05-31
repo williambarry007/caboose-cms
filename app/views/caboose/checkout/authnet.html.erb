@@ -1,0 +1,34 @@
+<iframe style='width: 450px; height: 475px; border: 0;' id='authnet_iframe' name='authnet_iframe'>
+  <p class='loading'>Loading...</p>    
+</iframe>
+
+<%
+if @logged_in_user.authnet_payment_id 
+#if false 
+%>
+  <form method="post" action="https://secure.authorize.net/profile/editPayment" id="authnet_form" target='authnet_iframe'>    
+    <input type="hidden" name="token" value="<%= raw @token %>" />  
+    <input type="hidden" name="PaymentProfileId" value="<%= raw @logged_in_user.authnet_payment_id %>" />
+  </form>
+<% else %>
+  <form method="post" action="https://secure.authorize.net/profile/manage" id="authnet_form" target='authnet_iframe'>    
+    <input type="hidden" name="token" value="<%= raw @token %>" />      
+  </form>
+<% end %>
+
+<%= content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var modal = false;
+$(document).ready(function() { 
+  modal = new CabooseModal(435, 465);
+  $('#authnet_form').submit();    
+});
+
+function authnet_response_handler()
+{
+  parent.location.reload(true);  
+}
+
+</script>
+<% end %>

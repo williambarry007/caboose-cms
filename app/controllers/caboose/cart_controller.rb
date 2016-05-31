@@ -73,7 +73,20 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
-          when 'quantity'    then 
+          when 'quantity'    then
+            if value.to_i != li.quantity
+              op = li.invoice_package
+              if op
+                op.shipping_method_id = nil
+                op.total = nil
+                op.save
+              end
+              if li.invoice
+                li.invoice.shipping = 0.00
+                li.invoice.save
+                li.invoice.calculate        
+              end
+            end
             li.quantity = value.to_i
             if li.quantity == 0
               li.destroy
@@ -96,8 +109,19 @@ module Caboose
     end
     
     # @route DELETE /cart/:line_item_id
-    def remove
-      li = LineItem.find(params[:line_item_id]).destroy
+    def remove                  
+      li = LineItem.find(params[:line_item_id]).destroy      
+      op = li.invoice_package
+      if op
+        op.shipping_method_id = nil
+        op.total = nil
+        op.save                
+      end
+      if li.invoice
+        li.invoice.shipping = 0.00
+        li.invoice.save
+        li.invoice.calculate        
+      end
       render :json => { :success => true, :item_count => @invoice.line_items.count }
     end
     
@@ -115,16 +139,11 @@ module Caboose
       elsif gc.min_invoice_total && @invoice.total < gc.min_invoice_total             then resp.error = "Your invoice must be at least $#{sprintf('%.2f',gc.min_invoice_total)} to use this gift card." 
       elsif Discount.where(:invoice_id => @invoice.id, :gift_card_id => gc.id).exists? then resp.error = "That gift card has already been applied to this invoice."
       else
-        # Determine how much the discount will be
-        d = Discount.new(:invoice_id => @invoice.id, :gift_card_id => gc.id, :amount => 0.0)        
-        case gc.card_type
-          when GiftCard::CARD_TYPE_AMOUNT      then d.amount = (@invoice.total >= gc.balance ? gc.balance : @invoice.total)
-          when GiftCard::CARD_TYPE_PERCENTAGE  then d.amount = @invoice.subtotal * gc.total
-          when GiftCard::CARD_TYPE_NO_SHIPPING then d.amount = @invoice.shipping
-          when GiftCard::CARD_TYPE_NO_TAX      then d.amount = @invoice.tax
-        end
-        d.save
-        @invoice.calculate
+        # Create the discount and recalculate the invoice
+        d = Discount.create(:invoice_id => @invoice.id, :gift_card_id => gc.id, :amount => 0.0)
+        d.calculate_amount                
+        @invoice.calculate  
+        
         resp.success = true
         resp.invoice_total = @invoice.total
         GA.delay.event(@site.id, 'giftcard', 'add', "Giftcard #{gc.id}")

@@ -53,8 +53,8 @@ module Caboose
     LENGTH_UNIT_METRIC   = 'cm'
     LENGTH_UNIT_IMPERIAL = 'in'
     
-    PAYMENT_PROCESSOR_AUTHORIZENET = 'authorize.net'
-    PAYMENT_PROCESSOR_STRIPE = 'stripe'
+    PAYMENT_PROCESSOR_AUTHNET = 'authnet'
+    PAYMENT_PROCESSOR_STRIPE  = 'stripe'
       
     def next_invoice_number
       x = Invoice.where("invoice_number is not null").reorder("invoice_number desc").limit(1).first

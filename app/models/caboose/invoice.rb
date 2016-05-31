@@ -138,16 +138,21 @@ module Caboose
       PaymentProcessor.void(self)
     end
     
-    def calculate
+    def calculate        
       self.update_column(:subtotal  , self.calculate_subtotal  )
       self.update_column(:tax       , self.calculate_tax       )
       self.update_column(:shipping  , self.calculate_shipping  )
       self.update_column(:handling  , self.calculate_handling  )
       self.update_column(:gift_wrap , self.calculate_gift_wrap )
-      self.update_column(:discount  , self.calculate_discount  )
+      
+      # Calculate the total without the discounts first       
+      self.discounts.each{ |d| d.update_column(:amount, 0.0) } if self.discounts      
       self.update_column(:total     , self.calculate_total     )
+      
+      self.update_column(:discount  , self.calculate_discount  )
+      self.update_column(:total     , self.calculate_total     )      
       self.update_column(:cost      , self.calculate_cost      )
-      self.update_column(:profit    , self.calculate_profit    )
+      self.update_column(:profit    , self.calculate_profit    )              
     end
     
     def calculate_subtotal
@@ -184,10 +189,13 @@ module Caboose
       return x
     end
     
-    def calculate_discount             
+    def calculate_discount              
       x = 0.0
-      if self.discounts && self.discounts.count > 0
-        self.discounts.each{ |d| x = x + d.amount }
+      if self.discounts && self.discounts.count > 0                              
+        self.discounts.each do |d|
+          d.calculate_amount                    
+          x = x + d.amount
+        end
       end
       x = x + self.custom_discount if self.custom_discount
       return x

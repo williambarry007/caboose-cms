@@ -24,14 +24,14 @@
         </div>      
         <div class="constrain" id='register_form_container'>  
           <form action="/register" method="post" id='register_form'></p>
-            <p><input name="first_name" type="text"     placeholder="First Name" /></p>
-            <p><input name="last_name"  type="text"     placeholder="Last Name"  /></p>
-            <p><input name="email"      type="text"     placeholder="Email"      /></p>
-            <p><input name="phone"      type="text"     placeholder="Phone"      /></p>
+            <p><input name="first_name" type="text"     placeholder="First Name" autocomplete="given-name" /></p>
+            <p><input name="last_name"  type="text"     placeholder="Last Name"  autocomplete="family-name" /></p>
+            <p><input name="email"      type="text"     placeholder="Email"      autocomplete="email" autocapitalize="off" /></p>            
             <label class="small">Password:</label>
             <p><input name="pass1"      type="password"    /></p>
             <label class="small">Confirm Password:</label>
             <p><input name="pass2"      type="password"  /></p>
+            <p><input name="phone"      type="text"     placeholder="Phone"      autocomplete="tel" pattern="[0-9]*" inputmode="numeric" /></p>
             <p><input name='newsletter' id='newsletter' type='checkbox' value='1' /> <label for='newsletter'>Send me updates on new products and special deals</label></p> 
             <p><input type="submit" value="Continue" /></p>
           </form>

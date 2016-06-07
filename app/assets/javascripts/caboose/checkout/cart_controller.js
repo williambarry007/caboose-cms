@@ -11,18 +11,35 @@ CartController.prototype = {
     for (var i in params)
       that[i] = params[i];    
   },
+  
+  update_totals: function()
+  {
+    var that = this;
+    var x = parseFloat(that.cc.invoice.shipping) + parseFloat(that.cc.invoice.handling);
+            
+    $('#totals_subtotal').html('$' + parseFloat(that.cc.invoice.subtotal).toFixed(2));    
+    $('#totals_tax').html('$' + parseFloat(that.cc.invoice.tax).toFixed(2));
+    $('#totals_shipping').html('$' + x.toFixed(2));    
+    $('#totals_gift_wrap').html('$' + parseFloat(that.cc.invoice.gift_wrap).toFixed(2));      
+    $('#totals_custom_discount').html('$' + parseFloat(that.cc.invoice.custom_discount).toFixed(2));    
+    $('#totals_total').html('$' + parseFloat(that.cc.invoice.total).toFixed(2));
+    
+    $.each(that.cc.invoice.discounts, function(i, d) {                        
+      $('#totals_discount_' + i).html('-$' + parseFloat(d.amount).toFixed(2));                
+    });                                
+  },
     
   print: function(confirm)
   {
     var that = this;
-    if (!that.cc.order || !that.cc.order.line_items || that.cc.order.line_items.length == 0)
+    if (!that.cc.invoice || !that.cc.invoice.line_items || that.cc.invoice.line_items.length == 0)
     {
       $('#cart').html("<p class='note'>You don't have any items in your shopping cart.  <a href='/products'>Continue shopping.</a></p>");
       return;
     }
 
     var tbody = $('<tbody/>');                      
-    $.each(that.cc.order.order_packages, function(j, op) {      
+    $.each(that.cc.invoice.invoice_packages, function(j, op) {      
       that.cart_line_items(tbody, op, j, confirm);      
     });
     that.cart_line_items(tbody, false);    
@@ -32,7 +49,7 @@ CartController.prototype = {
     // Make anything editable that needs to be
     if (!confirm)
     {
-      $.each(that.cc.order.line_items, function(i, li) {
+      $.each(that.cc.invoice.line_items, function(i, li) {
         var p = li.variant.product;
         var attribs = [];        
         attribs.push({ name: 'quantity', nice_name: 'Qty', type: 'text', value: li.quantity, width: 50, fixed_placeholder: false, after_update: function() { that.cc.refresh_cart(); }});
@@ -54,7 +71,7 @@ CartController.prototype = {
       });            
     }
     
-    $.each(that.cc.order.order_packages, function(i, op) {
+    $.each(that.cc.invoice.invoice_packages, function(i, op) {
       if (confirm)
         op.shipping_method_controller.print();
       else
@@ -67,19 +84,19 @@ CartController.prototype = {
     var that = this;
     
     line_items = [];              
-    $.each(that.cc.order.line_items, function(i, li) {
-      if ((op && li.order_package_id == op.id) || (!op && !li.order_package_id))          
+    $.each(that.cc.invoice.line_items, function(i, li) {
+      if ((op && li.invoice_package_id == op.id) || (!op && !li.invoice_package_id))          
         line_items[line_items.length] = li;
     });
     
     if (line_items.length > 0)
     {      
       tbody
-        .append($('<tr/>').addClass('order_package_header')
+        .append($('<tr/>').addClass('invoice_package_header')
           .append($('<td/>')            
             .attr('colspan', '4')
             .append('<h3>Package ' + (j+1) + '</h3>')
-            .append($('<div/>').attr('id', 'order_package_' + op.id + '_shipping_method'))
+            .append($('<div/>').attr('id', 'invoice_package_' + op.id + '_shipping_method'))
           )
         )
         .append($('<tr/>')
@@ -136,7 +153,7 @@ CartController.prototype = {
       
       var tr = $('<tr/>').data('id', li.id);
       //if (i == 0)     
-      //  tr.append($('<td/>').attr('valign', 'top').attr('rowspan', line_items.length).attr('id', 'order_package_' + op.id + '_shipping_method'));
+      //  tr.append($('<td/>').attr('valign', 'top').attr('rowspan', line_items.length).attr('id', 'invoice_package_' + op.id + '_shipping_method'));
       
       tr.append(item)                                                                        
         .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(li.unit_price).toFixed(2)))
@@ -151,36 +168,36 @@ CartController.prototype = {
     var that = this;
     
     tbody.append($('<tr/>')
-      .append($('<th/>').addClass('order_totals_header').attr('colspan', '4').html('<h3>Order Totals</h3>')));
+      .append($('<th/>').addClass('invoice_totals_header').attr('colspan', '4').html('<h3>Invoice Totals</h3>')));
     tbody.append($('<tr/>')        
       .append($('<td/>').css('text-align', 'right').attr('colspan', 3).html('Subtotal'))
-      .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.cc.order.subtotal).toFixed(2)))
+      .append($('<td/>').css('text-align', 'right').attr('id', 'totals_subtotal').html('$' + parseFloat(that.cc.invoice.subtotal).toFixed(2)))
     );
     if (that.cc.show_tax)
     {
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 3).html('Tax'))
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.cc.order.tax).toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').attr('id', 'totals_tax').html('$' + parseFloat(that.cc.invoice.tax).toFixed(2)))
       );
     }
     if (that.cc.show_shipping)
     {
-      var x = parseFloat(that.cc.order.shipping) + parseFloat(that.cc.order.handling);
+      var x = parseFloat(that.cc.invoice.shipping) + parseFloat(that.cc.invoice.handling);
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 3).html('Shipping &amp; Handling'))
-        .append($('<td/>').css('text-align', 'right').html('$' + x.toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').attr('id', 'totals_shipping').html('$' + x.toFixed(2)))
       );
     }
-    if (that.cc.show_gift_wrap && that.cc.order.gift_wrap > 0)
+    if (that.cc.show_gift_wrap && that.cc.invoice.gift_wrap > 0)
     {
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 3).html('Gift Wrapping'))
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.cc.order.gift_wrap).toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').attr('id', 'totals_gift_wrap').html('$' + parseFloat(that.cc.invoice.gift_wrap).toFixed(2)))
       );
     }    
-    if (that.cc.show_discounts && that.cc.order.discounts.length > 0)
+    if (that.cc.show_discounts && that.cc.invoice.discounts.length > 0)
     {
-      $.each(that.cc.order.discounts, function(i, d) {
+      $.each(that.cc.invoice.discounts, function(i, d) {
           
         var gctd = $('<td/>').css('text-align', 'right').attr('colspan', 3);
         if (!confirm)
@@ -189,14 +206,14 @@ CartController.prototype = {
             
         tbody.append($('<tr/>')        
           .append(gctd)
-          .append($('<td/>').css('text-align', 'right').html('-$' + parseFloat(d.amount).toFixed(2)))
+          .append($('<td/>').css('text-align', 'right').attr('id', 'totals_discount_' + i).html('-$' + parseFloat(d.amount).toFixed(2)))
         );          
       });
-      if (that.cc.order.custom_discount && that.cc.order.custom_discount > 0)
+      if (that.cc.invoice.custom_discount && that.cc.invoice.custom_discount > 0)
       {
         tbody.append($('<tr/>')
           .append($('<td/>').css('text-align', 'right').attr('colspan', 3).html('Discount'))
-          .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.cc.order.custom_discount).toFixed(2)))
+          .append($('<td/>').css('text-align', 'right').attr('id', 'totals_custom_discount').html('$' + parseFloat(that.cc.invoice.custom_discount).toFixed(2)))
         );
       }
     }
@@ -204,7 +221,7 @@ CartController.prototype = {
     {
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 3).html('Total'))
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.cc.order.total).toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').attr('id', 'totals_total').html('$' + parseFloat(that.cc.invoice.total).toFixed(2)))
       );            
     }
   },

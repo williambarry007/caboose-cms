@@ -40,7 +40,7 @@ module Caboose
       :handling_percentage,
       :auto_calculate_packages,
       :auto_calculate_shipping,
-      :auto_calculate_tax,
+      :auto_calculate_tax,      
       :custom_packages_function,   
       :custom_shipping_function,   
       :custom_tax_function,                  

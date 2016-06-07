@@ -4,7 +4,7 @@ var ShippingMethodController = function(params) { this.init(params); };
 ShippingMethodController.prototype = {
 
   cc: false, // CheckoutController
-  order_package_id: false,
+  invoice_package_id: false,
     
   init: function(params)
   {
@@ -18,8 +18,8 @@ ShippingMethodController.prototype = {
     var that = this;
     var div = $('<div/>');
     
-    var sa = that.cc.order.shipping_address;
-    var op = that.cc.order_package_for_id(that.order_package_id);
+    var sa = that.cc.invoice.shipping_address;
+    var op = that.cc.invoice_package_for_id(that.invoice_package_id);
     console.log(op);
     var sm = op && op.shipping_method ? op.shipping_method : false;     
     
@@ -45,16 +45,16 @@ ShippingMethodController.prototype = {
       div.append($('<p/>').append(sm.service_name + ' - $' + op.total))      
     }
             
-    $('#order_package_' + that.order_package_id + '_shipping_method').empty().append(div);
+    $('#invoice_package_' + that.invoice_package_id + '_shipping_method').empty().append(div);
   },
   
   edit: function()
   {
     var that = this;
     var div = $('<div/>').append($('<p/>').addClass('loading').html("Getting rates..."));
-    var op = that.cc.order_package_for_id(that.order_package_id);
+    var op = that.cc.invoice_package_for_id(that.invoice_package_id);
     
-    $('#order_package_' + that.order_package_id + '_shipping_method').empty().append(div);
+    $('#invoice_package_' + that.invoice_package_id + '_shipping_method').empty().append(div);
       
     var all_rates = false;
     $.ajax({
@@ -75,10 +75,10 @@ ShippingMethodController.prototype = {
     }
     else
     {
-      select = $('<select/>').attr('id', 'order_package_' + that.order_package_id + '_shipping_method_id');
-      select.append($('<option/>').val('').html('-- Shipping method --'));
-      $.each(all_rates, function(i, h) {       
-        if (h.order_package.id == that.order_package_id)
+      select = $('<select/>').attr('id', 'invoice_package_' + that.invoice_package_id + '_shipping_method_id');
+      select.append($('<option/>').val('').html('-- Shipping method --'));            
+      $.each(all_rates, function(i, h) {                
+        if (h.invoice_package.id == that.invoice_package_id)
         {
           $.each(h.rates, function(j, h2) {
             var sm = h2.shipping_method;          
@@ -95,8 +95,8 @@ ShippingMethodController.prototype = {
     }
     div = $('<div/>')
       .append($('<p/>').append(select))
-      .append($('<div/>').attr('id', 'order_package_' + that.order_package_id + '_message'));                
-    $('#order_package_' + that.order_package_id + '_shipping_method').empty().append(div);
+      .append($('<div/>').attr('id', 'invoice_package_' + that.invoice_package_id + '_message'));                
+    $('#invoice_package_' + that.invoice_package_id + '_shipping_method').empty().append(div);
   },
   
   update: function(shipping_method_id, total)
@@ -108,13 +108,13 @@ ShippingMethodController.prototype = {
       url: '/checkout/shipping',
       type: 'put',
       data: {
-        order_package_id: that.order_package_id,
+        invoice_package_id: that.invoice_package_id,
         shipping_method_id: shipping_method_id,
         total: total
       },
       success: function(resp) {
-        if (resp.error) $('#order_package_' + that.order_package_id + '_message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) that.cc.refresh_and_print();        
+        if (resp.error) $('#invoice_package_' + that.invoice_package_id + '_message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) that.cc.refresh_totals();        
       }
     });        
   }  

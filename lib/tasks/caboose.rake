@@ -3,6 +3,32 @@ require 'aws-sdk'
 
 namespace :caboose do
   
+  desc "Refresh invoice transactions"
+  task :refresh_invoice_transactions => :environment do
+    inv = Caboose::Invoice.reorder("id desc").first
+    inv.refresh_invoice_transactions        
+  end
+  
+  desc "Change orders to invoices in custom functions"
+  task :order_to_invoices => :environment do
+    Caboose::StoreConfig.all.each do |sc|      
+      sc.custom_packages_function = order_to_invoices_in_string(sc.custom_packages_function ) if sc.custom_packages_function && sc.custom_packages_function.strip.length > 0       
+      sc.custom_shipping_function = order_to_invoices_in_string(sc.custom_shipping_function ) if sc.custom_shipping_function && sc.custom_shipping_function.strip.length > 0
+      sc.custom_tax_function      = order_to_invoices_in_string(sc.custom_tax_function      ) if sc.custom_tax_function      && sc.custom_tax_function.strip.length      > 0
+      sc.starting_invoice_number  = sc.starting_order_number if sc.starting_order_number
+      sc.save
+    end    
+  end
+  
+  def order_to_invoices_in_string(str)
+    str = str.gsub('Order', 'Invoice')
+    str = str.gsub('order', 'invoice')
+    str = str.gsub('Binvoice', 'Border')
+    str = str.gsub('binvoice', 'border')
+    str = str.gsub('reinvoice', 'reorder')
+    return str
+  end
+  
   desc "Check ruby syntax in all ruby files"
   task :check_syntax => :environment do    
     puts "Checking syntax in all ruby files...\n\n"

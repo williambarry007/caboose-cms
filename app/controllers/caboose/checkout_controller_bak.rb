@@ -1,7 +1,7 @@
 require 'authorize_net'
   
 module Caboose
-  class CheckoutController < Caboose::ApplicationController
+  class TheCheckoutController < Caboose::ApplicationController
     
     helper :authorize_net
     before_filter :ensure_line_items, :only => [:step_one, :step_two]

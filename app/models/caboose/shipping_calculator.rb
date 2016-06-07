@@ -4,13 +4,32 @@ require 'active_shipping'
 module Caboose
   class ShippingCalculator
         
-    def self.custom_rates(store_config, invoice)          
-      return eval(store_config.custom_shipping_function)    
+    def self.custom_rates(store_config, invoice)
+      begin
+        return eval(store_config.custom_shipping_function)
+      rescue              
+        return invoice.invoice_packages.collect{ |ip| { :invoice_package => ip, :rates => [] }}      
+      end
     end
     
     def self.rates(invoice)
       
       return [] if invoice.site.nil? || invoice.site.store_config.nil?
+      
+      # Verify that all the invoice packages are already associated with a shipping package
+      #all_exist = true
+      #invoice.invoice_packages.each do |ip|
+      #  if ip.shipping_package_id.nil?
+      #    all_exist = false
+      #    break
+      #  end
+      #end
+      #if !all_exist
+      #  LineItem.where(:invoice_id => invoice.id).update_all(:invoice_package_id => nil)
+      #  InvoicePackage.where(:invoice_id => invoice.id).destroy_all          
+      #  invoice.InvoicePackage.create_for_invoice(invoice)
+      #end
+      
       sc = invoice.site.store_config
       if !sc.auto_calculate_shipping        
         rates = self.custom_rates(sc, invoice)

@@ -17,7 +17,7 @@ ShippingAddressController.prototype = {
   {
     var that = this;
     that.being_edited = false;
-    var sa = that.cc.order.shipping_address;    
+    var sa = that.cc.invoice.shipping_address;    
     
     var div = $('<div/>').append($('<h3/>').html('Shipping Address'));
     
@@ -44,7 +44,7 @@ ShippingAddressController.prototype = {
   edit: function()
   {
     var that = this;
-    var sa = that.cc.order.shipping_address;
+    var sa = that.cc.invoice.shipping_address;
     if (!sa.id) sa.id = 1;
     
     var div = $('<div/>')          
@@ -80,7 +80,7 @@ ShippingAddressController.prototype = {
   ready: function()
   {
     var that = this;
-    if (that.cc.is_empty_address(that.cc.order.shipping_address)) return false;
+    if (that.cc.is_empty_address(that.cc.invoice.shipping_address)) return false;
     return true;        
   }
 };

@@ -10,7 +10,7 @@ module Caboose
       redirect_to '/checkout/empty' if @invoice.line_items.empty?
     end
         
-    # route GET /checkout/json
+    # @route GET /checkout/json
     def invoice_json            
       render :json => @invoice.as_json(
         :include => [                          
@@ -37,7 +37,7 @@ module Caboose
       )      
     end
     
-    # route GET /checkout/stripe/json
+    # @route GET /checkout/stripe/json
     def stripe_json
       sc = @site.store_config
       u = logged_in_user
@@ -54,7 +54,7 @@ module Caboose
     #===========================================================================
     
     # Step 1 - Login or register
-    # route GET /checkout
+    # @route GET /checkout
     def index            
       if logged_in?
         if @invoice.customer_id.nil?
@@ -64,52 +64,54 @@ module Caboose
         #redirect_to '/checkout/addresses'
         #return
         
-        # See if any there are any empty invoice packages          
-        @invoice.invoice_packages.each do |op|
-          count = 0
-          @invoice.line_items.each do |li|
-            count = count + 1 if li.invoice_package_id == op.id
-          end
-          op.destroy if count == 0
-        end
+        @invoice.verify_invoice_packages
         
-        # See if any line items aren't associated with an invoice package
-        line_items_attached = true
-        @invoice.line_items.each do |li|
-          line_items_attached = false if li.invoice_package_id.nil?
-        end
-          
-        ops = @invoice.invoice_packages
-        if ops.count == 0 || !line_items_attached
-          @invoice.calculate
-          LineItem.where(:invoice_id => @invoice.id).update_all(:invoice_package_id => nil)
-          InvoicePackage.where(:invoice_id => @invoice.id).destroy_all          
-          InvoicePackage.create_for_invoice(@invoice)
-        end
+        # See if any there are any empty invoice packages          
+        #@invoice.invoice_packages.each do |op|
+        #  count = 0
+        #  @invoice.line_items.each do |li|
+        #    count = count + 1 if li.invoice_package_id == op.id
+        #  end
+        #  op.destroy if count == 0
+        #end
+        #
+        ## See if any line items aren't associated with an invoice package
+        #line_items_attached = true
+        #@invoice.line_items.each do |li|
+        #  line_items_attached = false if li.invoice_package_id.nil?
+        #end
+        #  
+        #ops = @invoice.invoice_packages
+        #if ops.count == 0 || !line_items_attached
+        #  @invoice.calculate
+        #  LineItem.where(:invoice_id => @invoice.id).update_all(:invoice_package_id => nil)
+        #  InvoicePackage.where(:invoice_id => @invoice.id).destroy_all          
+        #  InvoicePackage.create_for_invoice(@invoice)
+        #end
       
         #render :file => "caboose/checkout/checkout_#{@site.store_config.pp_name}"
-        render :file => "caboose/checkout/checkout"
+        render :file => "caboose/checkout/checkout"                                                                                                                      
       end
     end
     
     # Step 3 - Shipping method
-    # route GET /checkout/shipping/json
+    # @route GET /checkout/shipping/json
     def shipping_json
       render :json => { :error => 'Not logged in.'          } and return if !logged_in?
       render :json => { :error => 'No shippable items.'     } and return if !@invoice.has_shippable_items?
       render :json => { :error => 'Empty shipping address.' } and return if @invoice.shipping_address.nil?      
       
-      @invoice.calculate            
-      ops = @invoice.invoice_packages
+      @invoice.calculate
       
-      if params[:recalculate_invoice_packages] || ops.count == 0
-        # Remove any invoice packages      
-        LineItem.where(:invoice_id => @invoice.id).update_all(:invoice_package_id => nil)
-        InvoicePackage.where(:invoice_id => @invoice.id).destroy_all      
-          
-        # Calculate what shipping packages we'll need            
-        InvoicePackage.create_for_invoice(@invoice)
-      end
+      #ops = @invoice.invoice_packages      
+      #if params[:recalculate_invoice_packages] || ops.count == 0
+      #  # Remove any invoice packages      
+      #  LineItem.where(:invoice_id => @invoice.id).update_all(:invoice_package_id => nil)
+      #  InvoicePackage.where(:invoice_id => @invoice.id).destroy_all      
+      #    
+      #  # Calculate what shipping packages we'll need            
+      #  InvoicePackage.create_for_invoice(@invoice)
+      #end
 
       # Now get the rates for those packages            
       rates = ShippingCalculator.rates(@invoice)      
@@ -117,7 +119,7 @@ module Caboose
     end        
         
     # Step 5 - Update Stripe Details
-    # route PUT /checkout/stripe-details
+    # @route PUT /checkout/stripe-details
     def update_stripe_details
       render :json => false and return if !logged_in?
       
@@ -158,7 +160,7 @@ module Caboose
       }      
     end
     
-    # route POST /checkout/confirm
+    # @route POST /checkout/confirm
     def confirm
       render :json => { :error => 'Not logged in.'            } and return if !logged_in?
       #render :json => { :error => 'Invalid billing address.'  } and return if @invoice.billing_address.nil?
@@ -192,16 +194,16 @@ module Caboose
                 :customer => logged_in_user.stripe_customer_id,
                 :capture => false,
                 :metadata => { :invoice_id => @invoice.id },
-                :statement_descriptor => "#{@site.name.length > (14 - @invoice.id.to_s.length) ? @site.name[0,22 - @invoice.id.to_s.length] : @site.name} Invoice ##{@invoice.id}"
+                :statement_descriptor => "Invoice ##{@invoice.id}"
               )
             rescue Exception => ex
               render :json => { :error => ex.message }
               return
             end
             ot = Caboose::InvoiceTransaction.create(
-              :invoice_id         => @invoice.id,
+              :invoice_id       => @invoice.id,
               :transaction_id   => c.id,
-              :transaction_type => c.captured ? Caboose::InvoiceTransaction::TYPE_AUTHORIZE : Caboose::InvoiceTransaction::TYPE_AUTHCAP,     
+              :transaction_type => c.captured ? Caboose::InvoiceTransaction::TYPE_AUTHCAP : Caboose::InvoiceTransaction::TYPE_AUTHORIZE,     
               :amount           => c.amount/100.0,              
               :date_processed   => DateTime.now.utc,              
               :success          => c.status == 'succeeded'
@@ -250,24 +252,24 @@ module Caboose
       render :json => resp
     end
     
-    # route GET /checkout/thanks
+    # @route GET /checkout/thanks
     def thanks
       @logged_in_user = logged_in_user
       
       # Find the last invoice for the user
-      @last_invoice = Invoice.where(:customer_id => @logged_in_user.id).invoice("id desc").limit(1).first            
+      @last_invoice = Invoice.where(:customer_id => @logged_in_user.id).reorder("id desc").limit(1).first            
       add_ga_event('Ecommerce', 'Checkout', 'Payment', (@last_invoice.total*100).to_i)
     end
     
-    #===========================================================================
+    #===========================================================================    
     
-    # route GET /checkout/state-options
+    # @route GET /checkout/state-options
     def state_options                            
       options = Caboose::States.all.collect { |abbr, state| { 'value' => abbr, 'text' => abbr }}
       render :json => options
     end
         
-    # route GET /checkout/total
+    # @route GET /checkout/total
     def verify_total
       total = 0.00
       if logged_in?
@@ -277,7 +279,7 @@ module Caboose
       render :json => total.to_f      
     end
     
-    # route GET /checkout/address
+    # @route GET /checkout/address
     def address
       render :json => {
         :shipping_address => @invoice.shipping_address,
@@ -285,7 +287,7 @@ module Caboose
       }
     end
             
-    # route PUT /checkout/addresses
+    # @route PUT /checkout/addresses
     def update_addresses
       
       # Grab or create addresses
@@ -332,7 +334,7 @@ module Caboose
       render :json => { :success => @invoice.save, :errors => @invoice.errors.full_messages }
     end
     
-    # route PUT /checkout/shipping-address
+    # @route PUT /checkout/shipping-address
     def update_shipping_address      
       resp = Caboose::StdClass.new
             
@@ -374,8 +376,7 @@ module Caboose
       end      
       if recalc_shipping
         @invoice.invoice_packages.each do |op|          
-          op.shipping_method_id = nil
-          op.shipping_package_id = nil               
+          op.shipping_method_id = nil                         
           op.total = nil
           op.save
         end
@@ -385,7 +386,7 @@ module Caboose
       render :json => resp            
     end
     
-    # route PUT /checkout/billing-address
+    # @route PUT /checkout/billing-address
     def update_billing_address
       
       # Grab or create addresses
@@ -409,7 +410,7 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # route POST /checkout/attach-user
+    # @route POST /checkout/attach-user
     def attach_user              
       render :json => { :success => false, :errors => ['User is not logged in'] } and return if !logged_in?
       @invoice.customer_id = logged_in_user.id
@@ -417,7 +418,7 @@ module Caboose
       render :json => { :success => @invoice.save, :errors => @invoice.errors.full_messages, :logged_in => logged_in? }
     end
     
-    # route POST /checkout/guest
+    # @route POST /checkout/guest
     def attach_guest
       resp = Caboose::StdClass.new      
       email = params[:email]      
@@ -447,7 +448,7 @@ module Caboose
       render :json => resp            
     end
     
-    # route PUT /checkout/shipping
+    # @route PUT /checkout/shipping
     def update_shipping
       op = InvoicePackage.find(params[:invoice_package_id])
       op.shipping_method_id = params[:shipping_method_id]

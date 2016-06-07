@@ -16,7 +16,7 @@ BillingAddressController.prototype = {
   print: function()
   {
     var that = this;
-    var ba = that.cc.order.billing_address;
+    var ba = that.cc.invoice.billing_address;
           
     var div = $('<div/>').append($('<h3/>').html('Billing Address'));
     
@@ -43,7 +43,7 @@ BillingAddressController.prototype = {
   edit: function()
   {
     var that = this;
-    var ba = that.cc.order.billing_address;
+    var ba = that.cc.invoice.billing_address;
     if (!ba.id) ba.id = 1;
     
     var div = $('<div/>')          
@@ -79,7 +79,7 @@ BillingAddressController.prototype = {
   ready: function()
   {
     var that = this;
-    if (that.cc.is_empty_address(that.cc.order.billing_address)) return false;
+    if (that.cc.is_empty_address(that.cc.invoice.billing_address)) return false;
     return true;        
   }
 };

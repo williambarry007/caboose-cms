@@ -126,8 +126,24 @@ module Caboose
       self.financial_status == 'authorized'
     end
     
-    def capture
-      PaymentProcessor.capture(self)
+    def capture                  
+    #  ot = Caboose::InvoiceTransaction.where(:invoice_id => self.id, :success => true).first      
+    #  sc = self.site.store_config        
+    #  case sc.pp_name          
+    #    when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+    #      Stripe.api_key = sc.stripe_secret_key.strip
+    #      begin
+    #        c = Stripe::Charge.retrieve(ot.transaction_id)
+    #      rescue Exception => ex
+    #        Caboose.log("Error retrieving charge\n#{ex.message}")
+    #        self.financial_status = Invoice::FINANCIAL_STATUS_PENDING              
+    #      end          
+    #      if c.refunded    then self.financial_status = Invoice::FINANCIAL_STATUS_REFUNDED
+    #      elsif c.captured then self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
+    #      else                  self.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED
+    #      end                                    
+    #  end      
+    #  self.save    
     end
     
     def refund
@@ -494,6 +510,168 @@ module Caboose
     def amount_not_paid
       amount = self.vendor_transactions.where(:success => true).all.collect{ |vt| vt.amount }.sum
       return self.total - amount
+    end
+    
+    #===========================================================================
+    
+    def verify_invoice_packages
+      
+      Caboose.log("Verifying invoice packages....")
+      
+      # See if any there are any empty invoice packages          
+      self.invoice_packages.each do |ip|
+        count = 0
+        self.line_items.each do |li|
+          count = count + 1 if li.invoice_package_id == ip.id
+        end
+        ip.destroy if count == 0
+      end
+      
+      # See if any line items aren't associated with an invoice package
+      line_items_attached = true      
+      self.line_items.each do |li|
+        line_items_attached = false if li.invoice_package_id.nil?
+      end
+      shipping_packages_attached = true
+      self.invoice_packages.each do |ip|    
+        shipping_packages_attached = false if ip.shipping_package_id.nil?                          
+      end
+      ips = self.invoice_packages
+      if ips.count == 0 || !line_items_attached || !shipping_packages_attached        
+        self.calculate
+        LineItem.where(:invoice_id => self.id).update_all(:invoice_package_id => nil)
+        InvoicePackage.where(:invoice_id => self.id).destroy_all          
+        self.create_invoice_packages
+      end
+                  
+    end
+    
+    # Calculates the shipping packages required for all the items in the invoice
+    def create_invoice_packages
+      
+      Caboose.log("Creating invoice packages...")
+      
+      store_config = self.site.store_config            
+      if !store_config.auto_calculate_packages                        
+        InvoicePackage.custom_invoice_packages(store_config, self)
+        return
+      end
+                  
+      # Make sure all the line items in the invoice have a quantity of 1
+      extra_line_items = []
+      self.line_items.each do |li|        
+        if li.quantity > 1          
+          (1..li.quantity).each{ |i|            
+            extra_line_items << li.copy 
+          }
+          li.quantity = 1
+          li.save
+        end        
+      end
+      extra_line_items.each do |li|         
+        li.quantity = 1                        
+        li.save 
+      end 
+      
+      # Make sure all the items in the invoice have attributes set
+      self.line_items.each do |li|              
+        v = li.variant
+        next if v.downloadable
+        Caboose.log("Error: variant #{v.id} has a zero weight") and return false if v.weight.nil? || v.weight == 0
+        next if v.volume && v.volume > 0
+        Caboose.log("Error: variant #{v.id} has a zero length") and return false if v.length.nil? || v.length == 0
+        Caboose.log("Error: variant #{v.id} has a zero width" ) and return false if v.width.nil?  || v.width  == 0
+        Caboose.log("Error: variant #{v.id} has a zero height") and return false if v.height.nil? || v.height == 0        
+        v.volume = v.length * v.width * v.height
+        v.save
+      end
+            
+      # Reorder the items in the invoice by volume
+      line_items = self.line_items.sort_by{ |li| li.quantity * (li.variant.volume ? li.variant.volume : 0.00) * -1 }
+                      
+      # Get all the packages we're going to use      
+      all_packages = ShippingPackage.where(:site_id => self.site_id).reorder(:flat_rate_price).all      
+      
+      # Now go through each variant and fit it in a new or existing package            
+      line_items.each do |li|        
+        next if li.variant.downloadable
+        
+        # See if the item will fit in any of the existing packages
+        it_fits = false
+        self.invoice_packages.all.each do |op|
+          it_fits = op.fits(li)
+          if it_fits            
+            li.invoice_package_id = op.id
+            li.save            
+            break
+          end
+        end        
+        next if it_fits
+        
+        # Otherwise find the cheapest package the item will fit into
+        it_fits = false
+        all_packages.each do |sp|
+          it_fits = sp.fits(li.variant)          
+          if it_fits            
+            op = InvoicePackage.create(:invoice_id => self.id, :shipping_package_id => sp.id)
+            li.invoice_package_id = op.id
+            li.save                          
+            break
+          end
+        end
+        next if it_fits
+        
+        Caboose.log("Error: line item #{li.id} (#{li.variant.product.title}) does not fit into any package.")               
+      end      
+    end
+    
+    def refresh_transactions  
+      InvoiceTransaction.where(:invoice_id => self.id).destroy_all        
+      sc = self.site.store_config
+      case sc.pp_name          
+        when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+          
+          Stripe.api_key = sc.stripe_secret_key.strip
+          charges = Stripe::Charge.list(:limit => 100, :customer => self.customer.stripe_customer_id)
+          
+          self.financial_status = Invoice::FINANCIAL_STATUS_PENDING                      
+          charges.each do |c|            
+            invoice_id = c.metadata && c.metadata['invoice_id'] ? c.metadata['invoice_id'].to_i : nil
+            Caboose.log(invoice_id)
+            next if invoice_id.nil? || invoice_id != self.id
+            
+            if c.refunded                               then self.financial_status = Invoice::FINANCIAL_STATUS_REFUNDED
+            elsif c.status == 'succeeded' && c.captured then self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
+            elsif c.status == 'succeeded'               then self.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED            
+            end                                    
+            
+            InvoiceTransaction.create(
+              :invoice_id => self.id,
+              :transaction_id => c.id,
+              :transaction_type => c.captured ? InvoiceTransaction::TYPE_AUTHCAP : InvoiceTransaction::TYPE_AUTHORIZE, 
+              :amount => c.amount / 100,              
+              :date_processed => DateTime.strptime(c.created.to_s, '%s'),              
+              :success => c.status == 'succeeded'
+            )      
+            #puts "--------------------------------------------------------------"
+            #puts c.inspect
+            #puts "--------------------------------------------------------------"
+            if c.balance_transaction
+              bt = Stripe::BalanceTransaction.retrieve(c.balance_transaction)
+              InvoiceTransaction.create(
+                :invoice_id => self.id,
+                :transaction_id => bt.id,
+                :transaction_type => InvoiceTransaction::TYPE_CAPTURE, 
+                :amount => bt.amount / 100,                
+                :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
+                :success => bt.status == 'succeeded' || bt.status == 'pending'
+              )              
+              #puts "--------------------------------------------------------------"
+              #puts bt.inspect
+              #puts "--------------------------------------------------------------"
+            end                          
+          end                                    
+      end
     end
     
   end

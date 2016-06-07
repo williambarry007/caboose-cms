@@ -28,80 +28,23 @@ module Caboose
     end
     
     # Calculates the shipping packages required for all the items in the invoice
-    def self.create_for_invoice(invoice)
+    def calculate_shipping_package
       
       store_config = invoice.site.store_config            
       if !store_config.auto_calculate_packages                        
-        self.custom_invoice_packages(store_config, invoice)
-        return
+        return self.custom_shipping_package(store_config, self)        
       end
-                  
-      # Make sure all the line items in the invoice have a quantity of 1
-      extra_line_items = []
-      invoice.line_items.each do |li|        
-        if li.quantity > 1          
-          (1..li.quantity).each{ |i|            
-            extra_line_items << li.copy 
-          }
-          li.quantity = 1
-          li.save
-        end        
-      end
-      extra_line_items.each do |li|         
-        li.quantity = 1                        
-        li.save 
-      end 
       
-      # Make sure all the items in the invoice have attributes set
-      invoice.line_items.each do |li|              
-        v = li.variant
-        next if v.downloadable
-        Caboose.log("Error: variant #{v.id} has a zero weight") and return false if v.weight.nil? || v.weight == 0
-        next if v.volume && v.volume > 0
-        Caboose.log("Error: variant #{v.id} has a zero length") and return false if v.length.nil? || v.length == 0
-        Caboose.log("Error: variant #{v.id} has a zero width" ) and return false if v.width.nil?  || v.width  == 0
-        Caboose.log("Error: variant #{v.id} has a zero height") and return false if v.height.nil? || v.height == 0        
-        v.volume = v.length * v.width * v.height
-        v.save
-      end
-            
-      # Reorder the items in the invoice by volume
-      line_items = invoice.line_items.sort_by{ |li| li.quantity * (li.variant.volume ? li.variant.volume : 0.00) * -1 }
-                      
-      # Get all the packages we're going to use      
-      all_packages = ShippingPackage.where(:site_id => invoice.site_id).reorder(:flat_rate_price).all      
-      
-      # Now go through each variant and fit it in a new or existing package            
-      line_items.each do |li|        
-        next if li.variant.downloadable
-        
-        # See if the item will fit in any of the existing packages
-        it_fits = false
-        invoice.invoice_packages.all.each do |op|
-          it_fits = op.fits(li)
-          if it_fits            
-            li.invoice_package_id = op.id
-            li.save            
-            break
-          end
-        end        
-        next if it_fits
-        
-        # Otherwise find the cheapest package the item will fit into
-        it_fits = false
-        all_packages.each do |sp|
-          it_fits = sp.fits(li.variant)          
-          if it_fits            
-            op = InvoicePackage.create(:invoice_id => invoice.id, :shipping_package_id => sp.id)
-            li.invoice_package_id = op.id
-            li.save                          
-            break
-          end
-        end
-        next if it_fits
-        
-        Caboose.log("Error: line item #{li.id} (#{li.variant.product.title}) does not fit into any package.")               
-      end      
+      variants = self.line_items.sort_by{ |li| li.quantity * (li.variant.volume ? li.variant.volume : 0.00) * -1 }.collect{ |li| li.variant.downloadable ? nil : li.variant }.reject{ |v| v.nil? }      
+      ShippingPackage.where(:site_id => self.invoice.site_id).reorder(:flat_rate_price).all.each do |sp|
+        if sp.fits(variants)
+          self.shipping_package_id = sp.id
+          self.save
+          return true          
+        end 
+      end                    
+      Caboose.log("Error: line item #{li.id} (#{li.variant.product.title}) does not fit into any package.")
+      return false
     end
     
     def fits(line_item = nil)

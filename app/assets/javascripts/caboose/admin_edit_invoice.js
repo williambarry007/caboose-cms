@@ -255,28 +255,7 @@ InvoiceController.prototype = {
   {
     var that = this;        
     
-    var fstatus = $('<div/>').append(that.invoice.financial_status);
-    if (that.invoice.invoice_transactions.length > 0)        
-    {
-      var transactions_table = $('<table/>').addClass('data');
-      $.each(that.invoice.invoice_transactions, function(i, ot) {
-        var d = new Date(ot.date_processed);
-        var h = d.getHours();
-        var ampm = 'am';
-        if (h >= 12) ampm = 'pm';
-        if (h > 12) h = h - 12;                  
-        d = '' + (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getYear() + '<br/>' + h + ':' + d.getMinutes() + ' ' + ampm;
-        transactions_table.append($('<tr/>')
-          .append($('<td/>').html(d   ))        
-          .append($('<td/>').html(ot.transaction_type ))
-          .append($('<td/>').html(curr(ot.amount)     ))
-          .append($('<td/>').html(ot.transaction_id   ))                
-          .append($('<td/>').html(ot.success ? 'Success' : 'Fail'))
-        );                    
-      });
-      fstatus.append(transactions_table);
-    }            
-
+    var transactions = that.transactions_table();                
     var table = $('<table/>').addClass('data');
     table.append($('<tr/>')  
       .append($('<th/>').html('Customer'))
@@ -299,9 +278,57 @@ InvoiceController.prototype = {
       .append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(that.noneditable_shipping_address()))      
       .append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
       .append($('<td/>').attr('valign', 'top').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_status')))
-      .append($('<td/>').attr('valign', 'top').attr('align', 'center').append(fstatus))      
+      .append($('<td/>').attr('valign', 'top').attr('id', 'transactions').attr('align', 'center').append(transactions))      
     );
     return table;  
+  },
+  
+  transactions_table: function()
+  {    
+    var that = this;
+    var div = $('<div/>')
+      .append($('<span/>').attr('id', 'financial_status').append(that.invoice.financial_status)).append(' ')
+      .append($('<a/>').attr('href', '#').html('refresh').click(function(e) { e.preventDefault(); that.refresh_transactions(); }));    
+    if (that.invoice.invoice_transactions.length > 0)        
+    {
+      var transactions_table = $('<table/>').addClass('data');
+      $.each(that.invoice.invoice_transactions, function(i, ot) {
+        var d = new Date(ot.date_processed);
+        var h = d.getHours();
+        var ampm = 'am';
+        if (h >= 12) ampm = 'pm';
+        if (h > 12) h = h - 12;                  
+        d = '' + (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getYear() + '<br/>' + h + ':' + d.getMinutes() + ' ' + ampm;
+        transactions_table.append($('<tr/>')
+          .append($('<td/>').html(d   ))        
+          .append($('<td/>').html(ot.transaction_type ))
+          .append($('<td/>').html(curr(ot.amount)     ))
+          .append($('<td/>').html(ot.transaction_id   ))                
+          .append($('<td/>').html(ot.success ? 'Success' : 'Fail'))
+        );                    
+      });
+      div.append(transactions_table);
+    }
+    return div;    
+  },
+    
+  refresh_transactions: function()
+  {
+    var that = this;
+    $('#transactions').html("<p class='loading'>Refreshing transactions...</p>");
+    $.ajax({
+      url: '/admin/invoices/' + that.invoice.id + '/refresh-transactions',
+      type: 'get',
+      success: function(resp) {
+        if (resp.error) $('#financial_status').html("Error: " + resp.error);
+        else
+        {
+          that.invoice.financial_status = resp.financial_status;
+          that.invoice.invoice_transactions = resp.invoice_transactions;
+          $('#transactions').empty().append(that.transactions_table());          
+        }
+      }
+    });          
   },
   
   noneditable_customer: function(return_element)

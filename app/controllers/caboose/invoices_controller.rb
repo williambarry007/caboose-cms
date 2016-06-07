@@ -35,6 +35,20 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
+    # @route GET /admin/invoices/:id/refresh-transactions
+    def refresh_transactions      
+      return if !user_is_allowed('invoices', 'add')
+      
+      resp = Caboose::StdClass.new
+                  
+      invoice = Invoice.find(params[:id])
+      invoice.refresh_transactions            
+      resp.financial_status = invoice.financial_status
+      resp.invoice_transactions = invoice.invoice_transactions.reorder(:date_processed).all
+      
+      render :json => resp
+    end
+    
     # @route GET /admin/invoices/new
     def admin_new
       return if !user_is_allowed('invoices', 'add')      

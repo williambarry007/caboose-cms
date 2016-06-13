@@ -5,8 +5,8 @@ namespace :caboose do
   
   desc "Refresh invoice transactions"
   task :refresh_invoice_transactions => :environment do
-    inv = Caboose::Invoice.reorder("id desc").first
-    inv.refresh_invoice_transactions        
+    inv = Caboose::Invoice.where(:status => 'pending').reorder("id desc").first
+    inv.refresh_transactions        
   end
   
   desc "Change orders to invoices in custom functions"

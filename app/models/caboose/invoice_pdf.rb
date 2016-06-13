@@ -82,12 +82,12 @@ module Caboose
 
       # #{self.card_type} ending in #{self.card_number
       ba = invoice.billing_address
-      ba_address = "#{ba.address1}" + (ba.address2.blank? ? '' : "\n#{ba.address2}") + "\n#{ba.city}, #{ba.state} #{ba.zip}"
+      ba_address = ba ? "#{ba.address1}" + (ba.address2.blank? ? '' : "\n#{ba.address2}") + "\n#{ba.city}, #{ba.state} #{ba.zip}" : ''
       billed_to = [
-        [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => "#{ba.first_name} #{ba.last_name}" , :border_width => 0, :width => 200 }],
-        [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => ba_address                         , :border_width => 0, :width => 200 }],
-        [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }],
-        [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
+        [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => ba ? "#{ba.first_name} #{ba.last_name}" : '' , :border_width => 0, :width => 200 }],
+        [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => ba ? ba_address                         : '' , :border_width => 0, :width => 200 }],
+        [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                                 , :border_width => 0, :width => 200 }],
+        [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}"           , :border_width => 0, :width => 200 }]
       ]
       
       sa = invoice.shipping_address

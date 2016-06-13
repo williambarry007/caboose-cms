@@ -48,6 +48,10 @@ InvoiceController.prototype = {
       url: '/admin/invoices/' + that.invoice_id + '/json',
       success: function(invoice) {                 
         that.invoice = invoice;
+        $.each(that.invoice.invoice_transactions, function(i, t) {          
+          t.amount          = parseFloat(t.amount);          
+          t.amount_refunded = t.amount_refunded == null || isNaN(t.amount_refunded) ? 0.00 : parseFloat(t.amount_refunded);                    
+        });
         that.refresh_numbers();
         if (after) after();                      
       }
@@ -281,54 +285,6 @@ InvoiceController.prototype = {
       .append($('<td/>').attr('valign', 'top').attr('id', 'transactions').attr('align', 'center').append(transactions))      
     );
     return table;  
-  },
-  
-  transactions_table: function()
-  {    
-    var that = this;
-    var div = $('<div/>')
-      .append($('<span/>').attr('id', 'financial_status').append(that.invoice.financial_status)).append(' ')
-      .append($('<a/>').attr('href', '#').html('refresh').click(function(e) { e.preventDefault(); that.refresh_transactions(); }));    
-    if (that.invoice.invoice_transactions.length > 0)        
-    {
-      var transactions_table = $('<table/>').addClass('data');
-      $.each(that.invoice.invoice_transactions, function(i, ot) {
-        var d = new Date(ot.date_processed);
-        var h = d.getHours();
-        var ampm = 'am';
-        if (h >= 12) ampm = 'pm';
-        if (h > 12) h = h - 12;                  
-        d = '' + (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getYear() + '<br/>' + h + ':' + d.getMinutes() + ' ' + ampm;
-        transactions_table.append($('<tr/>')
-          .append($('<td/>').html(d   ))        
-          .append($('<td/>').html(ot.transaction_type ))
-          .append($('<td/>').html(curr(ot.amount)     ))
-          .append($('<td/>').html(ot.transaction_id   ))                
-          .append($('<td/>').html(ot.success ? 'Success' : 'Fail'))
-        );                    
-      });
-      div.append(transactions_table);
-    }
-    return div;    
-  },
-    
-  refresh_transactions: function()
-  {
-    var that = this;
-    $('#transactions').html("<p class='loading'>Refreshing transactions...</p>");
-    $.ajax({
-      url: '/admin/invoices/' + that.invoice.id + '/refresh-transactions',
-      type: 'get',
-      success: function(resp) {
-        if (resp.error) $('#financial_status').html("Error: " + resp.error);
-        else
-        {
-          that.invoice.financial_status = resp.financial_status;
-          that.invoice.invoice_transactions = resp.invoice_transactions;
-          $('#transactions').empty().append(that.transactions_table());          
-        }
-      }
-    });          
   },
   
   noneditable_customer: function(return_element)
@@ -776,22 +732,8 @@ InvoiceController.prototype = {
     var that = this;
     var p = $('<p/>');
     p.append($('<input/>').attr('type', 'button').val('< Back').click(function() { window.location = '/admin/invoices'; })).append(' ');
-    if (that.invoice.total > 0)
-    {
-      switch (that.invoice.financial_status)
-      {
-        case 'pending':
-          p.append($('<input/>').attr('type', 'button').val('Send for Authorization').click(function() { that.send_for_authorization(); })).append(' ');
-          break;
-        case 'authorized':    
-          p.append($('<input/>').attr('type', 'button').val('Capture Funds').click(function() { that.capture_funds(); })).append(' ');
-          p.append($('<input/>').attr('type', 'button').val('Void'         ).click(function() { that.void_invoice();    })).append(' ');
-          break;
-        case 'captured':           
-          p.append($('<input/>').attr('type', 'button').val('Refund'       ).click(function() { that.refund(); })).append(' ');
-          break;
-      }
-    }
+    if (that.invoice.total > 0 && that.invoice.financial_status == 'pending')    
+      p.append($('<input/>').attr('type', 'button').val('Send for Authorization').click(function() { that.send_for_authorization(); })).append(' ');        
     //p.append($('<input/>').attr('type', 'button').val('Resend Confirmation' ).click(function() { that.resend_confirmation(); })).append(' ');
     p.append($('<input/>').attr('type', 'button').val('Add Item'            ).click(function() { that.add_variant();         })).append(' ');
     p.append($('<input/>').attr('type', 'button').val('Print Invoice'         ).click(function() { that.print_invoice();         })).append(' ');
@@ -869,26 +811,165 @@ InvoiceController.prototype = {
     });
   },
   
-  capture_funds: function(confirm)
+  /*****************************************************************************
+  /* Transactions
+  *****************************************************************************/
+  
+  refresh_transactions: function()
+  {
+    var that = this;
+    $('#transactions_message').html("<p class='loading'>Refreshing transactions...</p>");
+    $.ajax({
+      url: '/admin/invoices/' + that.invoice.id + '/refresh-transactions',
+      type: 'get',
+      success: function(resp) {
+        if (resp.error) $('#financial_status').html("Error: " + resp.error);
+        else
+        {
+          that.invoice.financial_status = resp.financial_status;
+          that.invoice.invoice_transactions = resp.invoice_transactions;
+          $('#transactions').empty().append(that.transactions_table());          
+        }
+      }
+    });          
+  },
+
+  transactions_table: function()
+  {    
+    var that = this;
+    var div = $('<div/>')
+      .append($('<span/>').attr('id', 'financial_status').append(that.invoice.financial_status)).append(' ')
+      .append($('<a/>').attr('href', '#').html('refresh').click(function(e) { e.preventDefault(); that.refresh_transactions(); }))
+      .append($('<div/>').attr('id', 'transactions_message'));
+    if (that.invoice.invoice_transactions.length > 0)        
+    {
+      var transactions_table = $('<table/>').addClass('data');
+      $.each(that.invoice.invoice_transactions, function(i, t) {
+        if (t.parent_id == null)
+        {                               
+          var link = $('<div/>').append($('<div/>').append(t.transaction_type));          
+          if (!t.captured) link.append($('<a/>').attr('href', '#').html('Capture' ).data('transaction_id', t.id).click(function(e) { e.preventDefault(); that.capture_transaction($(this).data('transaction_id')); })).append(' ');
+          if (!t.refunded) link.append($('<a/>').attr('href', '#').html('Refund'  ).data('transaction_id', t.id).click(function(e) { e.preventDefault(); that.refund_transaction($(this).data('transaction_id'));  }));
+                        
+          transactions_table.append($('<tr/>')
+            .append($('<td/>').append($('<a/>').attr('href', '#').data('transaction_id', t.id).html(formatted_date(t.date_processed)).click(function(e) { e.preventDefault(); $('#trans_row_' + $(this).data('transaction_id')).slideToggle(); })))
+            .append($('<td/>').append(link))
+            .append($('<td/>').html(curr(t.amount)     ))
+            //.append($('<td/>').html(t.transaction_id   ))                
+            .append($('<td/>').html(t.success ? 'Success' : 'Fail'))            
+          );
+          transactions_table.append($('<tr/>').append($('<td/>').attr('colspan', '4').css('padding', '0').append($('<div/>').attr('id', 'trans_row_' + t.id).css('display', 'none').css('padding', '4px 8px').html(t.transaction_id))))
+          $.each(that.invoice.invoice_transactions, function(j, t2) {
+            if (t2.parent_id == t.id)
+            {            
+              transactions_table.append($('<tr/>')                
+                .append($('<td/>').append($('<a/>').attr('href', '#').data('transaction_id', t2.id).html(formatted_date(t2.date_processed)).click(function(e) { e.preventDefault(); $('#trans_row_' + $(this).data('transaction_id')).slideToggle(); })))
+                .append($('<td/>').html(t2.transaction_type ))
+                .append($('<td/>').html(curr(t2.amount)     ))
+                //.append($('<td/>').html(t2.transaction_id   ))                
+                .append($('<td/>').html(t2.success ? 'Success' : 'Fail'))              
+              );              
+              transactions_table.append($('<tr/>').append($('<td/>').attr('colspan', '4').css('padding', '0').append($('<div/>').attr('id', 'trans_row_' + t2.id).css('display', 'none').css('padding', '4px 8px').html(t2.transaction_id))))
+            }
+          });
+        }
+      });
+      div.append(transactions_table);
+    }
+    return div;    
+  },
+  
+  //capture_funds: function(confirm)
+  //{
+  //  var that = this;    
+  //  if (!confirm)
+  //  {    
+  //    var p = $('<p/>').addClass('note confirm')
+  //      .append("Are you sure you want to charge $" + parseFloat(that.invoice.total).toFixed(2) + " to the customer? ")
+  //      .append($('<input/>').attr('type','button').val('Yes').click(function() { that.capture_funds(true); }))
+  //      .append(' ')
+  //      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+  //    $('#message').empty().append(p);
+  //    return;
+  //  }
+  //  $('#message').html("<p class='loading'>Capturing funds...</p>");
+  //  $.ajax({
+  //    url: '/admin/invoices/' + that.invoice.id + '/capture',
+  //    success: function(resp) {
+  //      if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
+  //      if (resp.success) { $('#message').empty(); that.refresh(); }
+  //      if (resp.refresh) { $('#message').empty(); that.refresh(); }
+  //    }
+  //  });
+  //},
+  
+  capture_transaction: function(transaction_id, confirm)
   {
     var that = this;    
+    var t = that.transaction_with_id(transaction_id);          
     if (!confirm)
     {    
       var p = $('<p/>').addClass('note confirm')
-        .append("Are you sure you want to charge $" + parseFloat(that.invoice.total).toFixed(2) + " to the customer? ")
-        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.capture_funds(true); }))
+        .append("Are you sure you want to charge $" + parseFloat(t.amount).toFixed(2) + " to the customer?<br />")
+        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.capture_transaction(transaction_id, true); }))
         .append(' ')
-        .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
-      $('#message').empty().append(p);
+        .append($('<input/>').attr('type','button').val('No').click(function() { $('#transactions_message').empty(); }));
+      $('#transactions_message').empty().append(p);
       return;
     }
-    $('#message').html("<p class='loading'>Capturing funds...</p>");
+    $('#transactions_message').html("<p class='loading'>Capturing funds...</p>");
     $.ajax({
-      url: '/admin/invoices/' + that.invoice.id + '/capture',
+      url: '/admin/invoices/' + that.invoice.id + '/transactions/' + transaction_id + '/capture',
       success: function(resp) {
         if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) { $('#message').empty(); that.refresh(); }
-        if (resp.refresh) { $('#message').empty(); that.refresh(); }
+        if (resp.success) { $('#message').empty(); that.refresh_transactions(); }
+        if (resp.refresh) { $('#message').empty(); that.refresh_transactions(); }
+      }
+    });
+  },
+  
+  refund_transaction: function(transaction_id, amount, confirm)
+  {
+    var that = this;    
+    var t = that.transaction_with_id(transaction_id);
+    var amount_available_to_refund = parseFloat(t.amount) - parseFloat(t.amount_refunded);
+    
+    if (!amount)
+    {
+      var p = $('<p/>').addClass('note confirm')
+        .append("Refund amount: $")
+        .append($('<input/>').attr('type','text').attr('id', 'refund_amount').val(amount_available_to_refund.toFixed(2)).css('width', '60px').css('text-align', 'right')).append($('<br/>'))
+        .append($('<input/>').attr('type','button').val('Continue').click(function() { that.refund_transaction(transaction_id, parseFloat($('#refund_amount').val())); })).append(' ')
+        .append($('<input/>').attr('type','button').val('Cancel').click(function() { $('#transactions_message').empty(); }));
+      $('#transactions_message').empty().append(p);
+      return;
+    }
+    if (amount > amount_available_to_refund)
+    {
+      var p = $('<p/>').addClass('note error')
+        .append("You can only refund a maximum of $" + amount_available_to_refund.toFixed(2) + ". ").append($('<br/>'))        
+        .append($('<input/>').attr('type','button').val('Back'   ).click(function() { that.refund_transaction(transaction_id); })).append(' ')
+        .append($('<input/>').attr('type','button').val('Cancel' ).click(function() { $('#transactions_message').empty(); }));
+      $('#transactions_message').empty().append(p);
+      return;
+    }
+    if (!confirm)
+    {    
+      var x = parseFloat(t.amount) - parseFloat(t.amount_refunded);
+      var p = $('<p/>').addClass('note confirm')
+        .append("Are you sure you want to refund $" + amount.toFixed(2) + " to the customer? ").append($('<br/>'))
+        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.refund_transaction(transaction_id, amount, true); })).append(' ')
+        .append($('<input/>').attr('type','button').val('No' ).click(function() { $('#transactions_message').empty(); }));
+      $('#transactions_message').empty().append(p);
+      return;
+    }
+    $('#transactions_message').html("<p class='loading'>Refunding...</p>");
+    $.ajax({
+      url: '/admin/invoices/' + that.invoice.id + '/transactions/' + transaction_id + '/refund',
+      data: { amount: amount },
+      success: function(resp) {
+        if (resp.error)   $('#transactions_message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) { $('#transactions_message').empty(); that.refresh_transactions(); }        
       }
     });
   },
@@ -973,7 +1054,7 @@ InvoiceController.prototype = {
     if (!length) length = 5000;
     $('#message').empty().append(str);
     setTimeout(function() { $('#message').slideUp(function() { $('#message').empty().show(); }); }, length);
-  }
+  },
   
   //resend_confirmation: function(invoice_id)
   //{
@@ -1012,4 +1093,35 @@ InvoiceController.prototype = {
   //  });
   //},
   
+  transaction_with_id: function(transaction_id)
+  {
+    var that = this;    
+    var t = false;    
+    $.each(that.invoice.invoice_transactions, function(i, t2) {      
+      if (t2.id == transaction_id)
+      {
+        t = t2;
+        return false;
+      }
+    });
+    return t;
+  }      
 };
+
+function formatted_date(str)
+{
+  the_date = new Date(str);
+  var h = the_date.getHours();    
+  var i = the_date.getMinutes();  if (i < 10) i = '0' + i;
+  
+  var ampm = 'am';
+  if (h >= 12) ampm = 'pm';
+  if (h > 12) h = h - 12;
+  if (h < 10) h = '0' + h;
+  
+  var m = the_date.getMonth()+1; if (m < 10) m = '0' + m;
+  var d = the_date.getDate();    if (d < 10) d = '0' + d;
+  var y = the_date.getFullYear();
+    
+  return '' + m + '/' + d + '/' + y + '<br/>' + h + ':' + i + ' ' + ampm;
+}

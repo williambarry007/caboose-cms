@@ -386,13 +386,17 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::InvoiceTransaction => [
         [ :invoice_id            , :integer  ],
+        [ :parent_id             , :integer  ],
         [ :date_processed        , :datetime ],
         [ :transaction_type      , :string   ],
-        [ :amount                , :decimal   , { :precision => 8, :scale => 2 }],        
+        [ :amount                , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :amount_refunded       , :decimal   , { :precision => 8, :scale => 2 }],
         [ :transaction_id        , :string   ],
         [ :auth_code             , :string   ],
         [ :response_code         , :string   ],
-        [ :success               , :boolean  ]        
+        [ :success               , :boolean  ],
+        [ :captured              , :boolean   , { :default => false }],
+        [ :refunded              , :boolean   , { :default => false }]
       ],
       Caboose::InvoiceDiscount => [
         [ :invoice_id            , :integer ],
@@ -436,7 +440,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :landing_page_ref      , :string   ],
         [ :auth_amount           , :decimal  , { :precision => 8, :scale => 2 }],
         [ :gift_message          , :text     ],
-        [ :include_receipt       , :boolean  , { :default => true }]
+        [ :include_receipt       , :boolean  , { :default => true }]        
         
         #[ :email                 , :string   ],
         #[ :invoice_number        , :string   ],

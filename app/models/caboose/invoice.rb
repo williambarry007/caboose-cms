@@ -126,33 +126,13 @@ module Caboose
       self.financial_status == 'authorized'
     end
     
-    def capture                  
-    #  ot = Caboose::InvoiceTransaction.where(:invoice_id => self.id, :success => true).first      
-    #  sc = self.site.store_config        
-    #  case sc.pp_name          
-    #    when StoreConfig::PAYMENT_PROCESSOR_STRIPE
-    #      Stripe.api_key = sc.stripe_secret_key.strip
-    #      begin
-    #        c = Stripe::Charge.retrieve(ot.transaction_id)
-    #      rescue Exception => ex
-    #        Caboose.log("Error retrieving charge\n#{ex.message}")
-    #        self.financial_status = Invoice::FINANCIAL_STATUS_PENDING              
-    #      end          
-    #      if c.refunded    then self.financial_status = Invoice::FINANCIAL_STATUS_REFUNDED
-    #      elsif c.captured then self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
-    #      else                  self.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED
-    #      end                                    
-    #  end      
-    #  self.save    
-    end
-    
-    def refund
-      PaymentProcessor.refund(self)
-    end
-    
-    def void
-      PaymentProcessor.void(self)
-    end
+    #def refund
+    #  PaymentProcessor.refund(self)
+    #end
+    #
+    #def void
+    #  PaymentProcessor.void(self)
+    #end
     
     def calculate        
       self.update_column(:subtotal  , self.calculate_subtotal  )
@@ -290,53 +270,78 @@ module Caboose
     def capture_funds
       
       resp = StdClass.new      
-      t = InvoiceTransaction.where(:invoice_id => self.id, :transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
+      it = InvoiceTransaction.where(:invoice_id => self.id, :success => true).first
             
       if self.financial_status == Invoice::FINANCIAL_STATUS_CAPTURED
         resp.error = "Funds for this invoice have already been captured."    
-      elsif self.total > t.amount
+      elsif self.total > it.amount
         resp.error = "The invoice total exceeds the authorized amount."
-      elsif t.nil?
+      elsif it.nil?
         resp.error = "This invoice doesn't seem to be authorized."
       else
                         
-        sc = self.site.store_config
-        ot = Caboose::InvoiceTransaction.new(
-          :invoice_id => self.id,
-          :date_processed => DateTime.now.utc,
-          :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
-          :amount => self.total
-        )
-        
+        sc = self.site.store_config                
         case sc.pp_name
-          when 'authorize.net'
-            transaction = AuthorizeNet::AIM::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
-            response = transaction.prior_auth_capture(t.transaction_id, self.total)
-            
-            ot.success        = response.response_code && response.response_code == '1'            
-            ot.transaction_id = response.transaction_id
-            ot.auth_code      = response.authorization_code
-            ot.response_code  = response.response_code            
-            ot.save
-            
-            if ot.success
-              self.date_captured = DateTime.now.utc
-              self.save              
+          
+          #when 'authorize.net'
+          #  transaction = AuthorizeNet::AIM::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
+          #  response = transaction.prior_auth_capture(t.transaction_id, self.total)
+          #  
+          #  ot = Caboose::InvoiceTransaction.create(
+          #    :invoice_id       => self.id,
+          #    :date_processed   => DateTime.now.utc,
+          #    :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
+          #    :amount           => self.total,        
+          #    :success          => response.response_code && response.response_code == '1',            
+          #    :transaction_id   => response.transaction_id,
+          #    :auth_code        => response.authorization_code,
+          #    :response_code    => response.response_code
+          #  )
+          #  if ot.success
+          #    self.date_captured = DateTime.now.utc
+          #    self.save              
+          #  end                                    
+          #  self.update_attribute(:financial_status, Invoice::FINANCIAL_STATUS_CAPTURED)
+          #  resp.success = 'Captured funds successfully'
+                                    
+          when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+                                          
+            it = Caboose::InvoiceTransaction.where(:invoice_id => self.id, :success => true).first
+            if it.nil?
+              resp.error = "Error capturing funds for invoice #{self.id}. No previous successful authorization for this invoice exists."
+              return false
+            else                        
+              Stripe.api_key = sc.stripe_secret_key.strip
+              bt = nil
+              begin
+                c = Stripe::Charge.retrieve(it.transaction_id)
+                c = c.capture
+                bt = Stripe::BalanceTransaction.retrieve(c.balance_transaction)
+              rescue Exception => ex
+                resp.error = "Error during capture process\n#{ex.message}"                
+              end
+              
+              if resp.error.nil?
+                InvoiceTransaction.create(
+                  :invoice_id => self.id,
+                  :transaction_id => bt.id,
+                  :transaction_type => InvoiceTransaction::TYPE_CAPTURE, 
+                  :amount => bt.amount / 100,                
+                  :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
+                  :success => bt.status == 'succeeded' || bt.status == 'pending'
+                )
+                if bt.status == 'succeeded' || bt.status == 'pending'
+                  self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
+                  self.save
+                  resp.success = true
+                else
+                  resp.error = "Error capturing funds."
+                end
+              end
             end
-                                    
-            self.update_attribute(:financial_status, Invoice::FINANCIAL_STATUS_CAPTURED)
-            resp.success = 'Captured funds successfully'
-                                    
-          when 'stripe'
-            # TODO: Implement capture funds for stripe
-            
-          when 'payscape'
-            # TODO: Implement capture funds for payscape
-
-        end
-        
-      end
-      
+          
+        end        
+      end      
       return resp
     end
         
@@ -396,78 +401,64 @@ module Caboose
       return resp      
     end        
       
-    #def refund
-    #      
-    #  resp = StdClass.new
-    #  t = InvoiceTransaction.where(:invoice_id => self.id, :transaction_type => InvoiceTransaction::TYPE_CAPTURE, :success => true).first
-    #      
-    #  if self.financial_status != Invoice::FINANCIAL_STATUS_CAPTURED
-    #    resp.error = "This invoice hasn't been captured yet, you will need to void instead"
-    #  else
-    #    
-    #    sc = self.site.store_config
-    #    case sc.pp_name
-    #      when 'authorize.net'
-    #      
-    #    if PaymentProcessor.refund(invoice)
-    #      invoice.update_attributes(
-    #        :financial_status => Invoice::FINANCIAL_STATUS_REFUNDED,
-    #        :status => Invoice::STATUS_CANCELED
-    #      )
-    #      
-    #      response.success = 'Invoice refunded successfully'
-    #    else
-    #      response.error = 'Error refunding invoice'
-    #    end
-    #    
-    #    #if invoice.calculate_net < (invoice.amount_discounted || 0) || PaymentProcessor.refund(invoice)
-    #    #  invoice.financial_status = 'refunded'
-    #    #  invoice.status = 'refunded'
-    #    #  invoice.save
-    #    #  
-    #    #  if invoice.discounts.any?
-    #    #    discount = invoice.discounts.first
-    #    #    amount_to_refund = invoice.calculate_net < invoice.amount_discounted ? invoice.calculate_net : invoice.amount_discounted
-    #    #    discount.update_attribute(:amount_current, amount_to_refund + discount.amount_current)
-    #    #  end
-    #    #  
-    #    #  response.success = "Invoice refunded successfully"
-    #    #else
-    #    #  response.error = "Error refunding invoice."
-    #    #end
-    #  end
-    #
-    #  render json: response
-    #  
-    #  # return if !user_is_allowed('invoices', 'edit')
-    #  #     
-    #  # response = Caboose::StdClass.new({
-    #  #   'refresh' => nil,
-    #  #   'error' => nil,
-    #  #   'success' => nil
-    #  # })
-    #  #     
-    #  # invoice = Invoice.find(params[:id])
-    #  #     
-    #  # if invoice.financial_status != 'captured'
-    #  #   response.error = "This invoice hasn't been captured yet, you will need to void instead"
-    #  # else
-    #  #   if PaymentProcessor.refund(invoice)
-    #  #     invoice.financial_status = 'refunded'
-    #  #     invoice.status = 'refunded'
-    #  #     invoice.save
-    #  #     
-    #  #     # Add the variant quantities invoiceed back
-    #  #     invoice.cancel
-    #  #     
-    #  #     response.success = "Invoice refunded successfully"
-    #  #   else
-    #  #     response.error = "Error refunding invoice."
-    #  #   end
-    #  # end
-    #  #     
-    #  # render :json => response
-    #end
+    # Refund an order
+    def refund(amount = nil)
+      
+      resp = StdClass.new      
+      it = InvoiceTransaction.where(:invoice_id => self.id, :success => true).first
+      amount = self.total - self.amount_refunded if amount.nil?
+            
+      if self.financial_status == Invoice::FINANCIAL_STATUS_REFUNDED
+        resp.error = "Funds for this invoice have already been refunded."    
+      elsif amount > self.amount_refunded
+        resp.error = "The amount to refund exceeds the amount available to refund."
+      elsif it.nil?
+        resp.error = "This invoice doesn't seem to be authorized."
+      else
+                        
+        sc = self.site.store_config                
+        case sc.pp_name
+                                    
+          when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+                                          
+            it = Caboose::InvoiceTransaction.where(:invoice_id => self.id, :success => true).first
+            if it.nil?
+              resp.error = "Error capturing funds for invoice #{self.id}. No previous successful authorization for this invoice exists."
+              return false
+            else                        
+              Stripe.api_key = sc.stripe_secret_key.strip
+              bt = nil
+              begin
+                c = Stripe::Charge.retrieve(it.transaction_id)
+                c = c.capture
+                bt = Stripe::BalanceTransaction.retrieve(c.balance_transaction)
+              rescue Exception => ex
+                resp.error = "Error during capture process\n#{ex.message}"                
+              end
+              
+              if resp.error.nil?
+                InvoiceTransaction.create(
+                  :invoice_id => self.id,
+                  :transaction_id => bt.id,
+                  :transaction_type => InvoiceTransaction::TYPE_CAPTURE, 
+                  :amount => bt.amount / 100,                
+                  :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
+                  :success => bt.status == 'succeeded' || bt.status == 'pending'
+                )
+                if bt.status == 'succeeded' || bt.status == 'pending'
+                  self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
+                  self.save
+                  resp.success = true
+                else
+                  resp.error = "Error capturing funds."
+                end
+              end
+            end
+          
+        end        
+      end      
+      return resp
+    end
     
     def send_payment_authorization_email
       InvoicesMailer.configure_for_site(self.site_id).customer_payment_authorization(self).deliver
@@ -636,41 +627,59 @@ module Caboose
           
           self.financial_status = Invoice::FINANCIAL_STATUS_PENDING                      
           charges.each do |c|            
-            invoice_id = c.metadata && c.metadata['invoice_id'] ? c.metadata['invoice_id'].to_i : nil
-            Caboose.log(invoice_id)
+            invoice_id = c.metadata && c.metadata['invoice_id'] ? c.metadata['invoice_id'].to_i : nil            
             next if invoice_id.nil? || invoice_id != self.id
             
             if c.refunded                               then self.financial_status = Invoice::FINANCIAL_STATUS_REFUNDED
             elsif c.status == 'succeeded' && c.captured then self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
             elsif c.status == 'succeeded'               then self.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED            
             end                                    
-            
-            InvoiceTransaction.create(
+                        
+            auth_trans = InvoiceTransaction.create(
               :invoice_id => self.id,
               :transaction_id => c.id,
               :transaction_type => c.captured ? InvoiceTransaction::TYPE_AUTHCAP : InvoiceTransaction::TYPE_AUTHORIZE, 
-              :amount => c.amount / 100,              
+              :amount => c.amount / 100.0,
+              :amount_refunded => c.amount_refunded,
               :date_processed => DateTime.strptime(c.created.to_s, '%s'),              
-              :success => c.status == 'succeeded'
-            )      
-            #puts "--------------------------------------------------------------"
-            #puts c.inspect
-            #puts "--------------------------------------------------------------"
+              :success => c.status == 'succeeded',
+              :captured => c.captured,
+              :refunded => c.refunded              
+            )
             if c.balance_transaction
               bt = Stripe::BalanceTransaction.retrieve(c.balance_transaction)
-              InvoiceTransaction.create(
+              capture_trans = InvoiceTransaction.create(
                 :invoice_id => self.id,
+                :parent_id => auth_trans.id, 
                 :transaction_id => bt.id,
                 :transaction_type => InvoiceTransaction::TYPE_CAPTURE, 
-                :amount => bt.amount / 100,                
+                :amount => bt.amount / 100.0,                
                 :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
                 :success => bt.status == 'succeeded' || bt.status == 'pending'
-              )              
-              #puts "--------------------------------------------------------------"
-              #puts bt.inspect
-              #puts "--------------------------------------------------------------"
-            end                          
-          end                                    
+              )                            
+            end
+            if c.refunds && c.refunds['total_count'] > 0
+              total = 0
+              c.refunds['data'].each do |r|
+                total = total + r.amount
+                InvoiceTransaction.create(
+                  :invoice_id => self.id,
+                  :parent_id => auth_trans.id,
+                  :transaction_id => r.id,
+                  :transaction_type => InvoiceTransaction::TYPE_REFUND, 
+                  :amount => r.amount / 100.0,                
+                  :date_processed => DateTime.strptime(r.created.to_s, '%s'),
+                  :success => r.status == 'succeeded' || r.status == 'pending'
+                )
+              end
+              total = total.to_f / 100
+              if total >= auth_trans.amount
+                auth_trans.refunded = true
+                auth_trans.save
+              end
+            end
+          end
+          self.save
       end
     end
     

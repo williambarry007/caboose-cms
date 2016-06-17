@@ -15,7 +15,7 @@ namespace :caboose do
       sc.custom_packages_function = order_to_invoices_in_string(sc.custom_packages_function ) if sc.custom_packages_function && sc.custom_packages_function.strip.length > 0       
       sc.custom_shipping_function = order_to_invoices_in_string(sc.custom_shipping_function ) if sc.custom_shipping_function && sc.custom_shipping_function.strip.length > 0
       sc.custom_tax_function      = order_to_invoices_in_string(sc.custom_tax_function      ) if sc.custom_tax_function      && sc.custom_tax_function.strip.length      > 0
-      sc.starting_invoice_number  = sc.starting_order_number if sc.starting_order_number
+      #sc.starting_invoice_number  = sc.starting_order_number if sc.starting_order_number
       sc.save
     end    
   end

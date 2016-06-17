@@ -392,6 +392,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :parent_id             , :integer  ],
         [ :date_processed        , :datetime ],
         [ :transaction_type      , :string   ],
+        [ :payment_processor     , :string   ],
         [ :amount                , :decimal   , { :precision => 8, :scale => 2 }],
         [ :amount_refunded       , :decimal   , { :precision => 8, :scale => 2 }],
         [ :transaction_id        , :string   ],

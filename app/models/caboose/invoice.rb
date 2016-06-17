@@ -306,14 +306,15 @@ module Caboose
           #  response = transaction.prior_auth_capture(t.transaction_id, self.total)
           #  
           #  ot = Caboose::InvoiceTransaction.create(
-          #    :invoice_id       => self.id,
-          #    :date_processed   => DateTime.now.utc,
-          #    :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
-          #    :amount           => self.total,        
-          #    :success          => response.response_code && response.response_code == '1',            
-          #    :transaction_id   => response.transaction_id,
-          #    :auth_code        => response.authorization_code,
-          #    :response_code    => response.response_code
+          #    :invoice_id        => self.id,
+          #    :date_processed    => DateTime.now.utc,
+          #    :transaction_type  => InvoiceTransaction::TYPE_CAPTURE,
+          #    :payment_processor => sc.pp_name,
+          #    :amount            => self.total,        
+          #    :success           => response.response_code && response.response_code == '1',            
+          #    :transaction_id    => response.transaction_id,
+          #    :auth_code         => response.authorization_code,
+          #    :response_code     => response.response_code
           #  )
           #  if ot.success
           #    self.date_captured = DateTime.now.utc
@@ -343,7 +344,8 @@ module Caboose
                 InvoiceTransaction.create(
                   :invoice_id => self.id,
                   :transaction_id => bt.id,
-                  :transaction_type => InvoiceTransaction::TYPE_CAPTURE, 
+                  :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
+                  :payment_processor => sc.pp_name,
                   :amount => bt.amount / 100,                
                   :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
                   :success => bt.status == 'succeeded' || bt.status == 'pending'
@@ -380,6 +382,7 @@ module Caboose
           :invoice_id => self.id,
           :date_processed => DateTime.now.utc,
           :transaction_type => InvoiceTransaction::TYPE_VOID,
+          :payment_processor => sc.pp_name,
           :amount => self.total
         )
         
@@ -458,7 +461,8 @@ module Caboose
                 InvoiceTransaction.create(
                   :invoice_id => self.id,
                   :transaction_id => bt.id,
-                  :transaction_type => InvoiceTransaction::TYPE_CAPTURE, 
+                  :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
+                  :payment_processor => sc.pp_name,
                   :amount => bt.amount / 100,                
                   :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
                   :success => bt.status == 'succeeded' || bt.status == 'pending'
@@ -656,7 +660,8 @@ module Caboose
             auth_trans = InvoiceTransaction.create(
               :invoice_id => self.id,
               :transaction_id => c.id,
-              :transaction_type => c.captured ? InvoiceTransaction::TYPE_AUTHCAP : InvoiceTransaction::TYPE_AUTHORIZE, 
+              :transaction_type => c.captured ? InvoiceTransaction::TYPE_AUTHCAP : InvoiceTransaction::TYPE_AUTHORIZE,
+              :payment_processor => sc.pp_name,
               :amount => c.amount / 100.0,
               :amount_refunded => c.amount_refunded,
               :date_processed => DateTime.strptime(c.created.to_s, '%s'),              
@@ -670,7 +675,8 @@ module Caboose
                 :invoice_id => self.id,
                 :parent_id => auth_trans.id, 
                 :transaction_id => bt.id,
-                :transaction_type => InvoiceTransaction::TYPE_CAPTURE, 
+                :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
+                :payment_processor => sc.pp_name,
                 :amount => bt.amount / 100.0,                
                 :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
                 :success => bt.status == 'succeeded' || bt.status == 'pending'
@@ -684,7 +690,8 @@ module Caboose
                   :invoice_id => self.id,
                   :parent_id => auth_trans.id,
                   :transaction_id => r.id,
-                  :transaction_type => InvoiceTransaction::TYPE_REFUND, 
+                  :transaction_type => InvoiceTransaction::TYPE_REFUND,
+                  :payment_processor => sc.pp_name,
                   :amount => r.amount / 100.0,                
                   :date_processed => DateTime.strptime(r.created.to_s, '%s'),
                   :success => r.status == 'succeeded' || r.status == 'pending'

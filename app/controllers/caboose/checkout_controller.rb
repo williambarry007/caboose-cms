@@ -203,12 +203,13 @@ module Caboose
               return
             end
             ot = Caboose::InvoiceTransaction.create(
-              :invoice_id       => @invoice.id,
-              :transaction_id   => c.id,
-              :transaction_type => c.captured ? Caboose::InvoiceTransaction::TYPE_AUTHCAP : Caboose::InvoiceTransaction::TYPE_AUTHORIZE,     
-              :amount           => c.amount/100.0,              
-              :date_processed   => DateTime.now.utc,              
-              :success          => c.status == 'succeeded'
+              :invoice_id        => @invoice.id,
+              :transaction_id    => c.id,
+              :transaction_type  => c.captured ? Caboose::InvoiceTransaction::TYPE_AUTHCAP : Caboose::InvoiceTransaction::TYPE_AUTHORIZE,
+              :payment_processor => sc.pp_name,
+              :amount            => c.amount/100.0,              
+              :date_processed    => DateTime.now.utc,              
+              :success           => c.status == 'succeeded'
             )                        
         end
         

@@ -108,7 +108,8 @@ namespace :caboose do
   end
   
   desc "Compare routes in controllers with routes in the routes file"
-  task :compare_routes, [:arg1, :arg2] => :environment do |t, args|    
+  task :compare_routes, [:arg1, :arg2] => :environment do |t, args|
+    # controller, route_file
     Caboose::CommentRoutes.compare_routes(args[:arg1], args[:arg2])
   end
   

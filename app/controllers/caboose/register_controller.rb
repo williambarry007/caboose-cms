@@ -2,7 +2,7 @@ module Caboose
   class RegisterController < Caboose::ApplicationController
     #layout 'caboose/modal'
     
-    # GET /register
+    # @route GET /register
     def index
       @return_url = params[:return_url].nil? ? "/" : params[:return_url];
       @modal = params[:modal].nil? ? false : params[:modal]
@@ -10,7 +10,7 @@ module Caboose
       render :layout => Caboose::register_layout 
     end
     
-    # POST /register
+    # @route POST /register
     def register
       
       resp = StdClass.new('error' => '', 'redirect' => '')

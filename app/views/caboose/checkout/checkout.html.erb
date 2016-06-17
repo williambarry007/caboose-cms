@@ -1,0 +1,100 @@
+<%
+store_config = @site.store_config
+%>
+<div id="checkout"></div>
+
+<%= content_for :caboose_js do %>
+<%= javascript_include_tag 'https://js.stripe.com/v2/' %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/cart' %>
+<%= javascript_include_tag 'caboose/united_states' %>
+<%= javascript_include_tag 'caboose/jquery.payment' %>
+
+<%= javascript_include_tag 'caboose/checkout/cart_controller' %>
+<%= javascript_include_tag 'caboose/checkout/gift_cards_controller' %>
+<%= javascript_include_tag 'caboose/checkout/shipping_address_controller' %>
+<%= javascript_include_tag 'caboose/checkout/shipping_method_controller' %>
+<%= javascript_include_tag "caboose/checkout/#{store_config.pp_name}_payment_method_controller" %>
+<%= javascript_include_tag 'caboose/checkout/checkout_controller' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {      
+  var checkout_controller = new CheckoutController({
+    authenticity_token: '<%= raw form_authenticity_token %>',
+    pp_name: <%= raw Caboose.json(store_config.pp_name) %>
+  });   
+});
+
+</script>
+<% end %>
+<%= content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/cart' %>
+<%= stylesheet_link_tag 'caboose/checkout' %>
+<style type='text/css'>
+
+#checkout h3 { font-size: 14pt; font-weight: bold; text-align: left; }
+
+#shipping_address_container { width: 100%; }
+#payment_method_container   { width: 100%; margin-bottom: 20px; }
+#shipping_method_container  { width: 100%; }
+
+tr.invoice_package_header td { border: 0 !important; height: 60px; padding-bottom: 10px !important; }
+tr.invoice_package_header td h3 { float: left; height: 37px; margin: 0 !important; padding: 6px 10px 0 0 !important; }
+tr.invoice_package_header td div { float: left; }
+tr.invoice_package_header td select { border: #b9b9b9 1px solid; height: 37px !important; font-size: 1em; margin-top: -10px !important; }
+tr.invoice_package_header td p { padding-top: 10px; }
+
+tr.invoice_totals_header td { border: 0; }
+
+#message { clear: both; }
+
+#checkout input[type="submit"], #checkout input[type="button"] { background: #000; border: medium none; color: #fff; padding: 9px 11px; }
+
+.stripe_form { width: 100%; }
+.stripe_form .card_number_container { position: relative; width: 100%; }                                 .stripe_form .card_number_container input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 1px; }
+.stripe_form .card_exp_container    { position: relative; width: 50% !important; float: left; }          .stripe_form .card_exp_container    input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 1px; }
+.stripe_form .card_cvc_container    { position: relative; width: 50%; float: left; }                     .stripe_form .card_cvc_container    input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 0px; }
+.stripe_form .card_name_container   { position: relative; width: 50%; float: left; }                     .stripe_form .card_name_container   input { padding-left: 10px; height: 37px !important; font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 0px 1px 1px; }
+.stripe_form .card_zip_container    { position: relative; width: 50%; float: left; margin-bottom: 4px; } .stripe_form .card_zip_container    input { padding-left: 10px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 1px 0px; }
+
+.stripe_form .card_number_container .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+.stripe_form .card_exp_container    .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+.stripe_form .card_cvc_container    .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+
+.stripe_form .note { width: 100%; margin-bottom: 10px !important; text-align: center; }
+.stripe_form .payment_controls { clear: left; margin-top: 4px !important; }
+
+
+#cart { clear: left; padding-top: 20px; }
+#cart td img { float: left; margin-right: 4px; }
+
+/*
+#checkout input.first_name { display: block; width: 150px !important; float: left; }
+#checkout input.last_name  { display: block; width: 150px !important; }
+#checkout input.company    { display: block; width: 300px !important; clear:left; }
+#checkout input.address1   { display: block; width: 300px !important; }
+#checkout input.address2   { display: block; width: 300px !important; }
+#checkout input.city       { display: block; width: 150px !important; float: left; }
+#checkout select.state     { display: block; width:  75px !important; height: 36px !important; font-size: 1em; float: left; }          
+#checkout input.zip        { display: block; width:  75px !important; }
+*/
+
+.mb_container.first_name { display: block; width:  50% !important; float: left; } .mb_container.first_name input  { width: 100% !important; border-color: #b9b9b9; border-right: none; border-bottom: none; }  
+.mb_container.last_name  { display: block; width:  50% !important; }              .mb_container.last_name  input  { width: 100% !important; border-color: #b9b9b9;                     border-bottom: none; }  
+.mb_container.company    { display: block; width: 100% !important; clear:left; }  .mb_container.company    input  { width: 100% !important; border-color: #b9b9b9;                     border-bottom: none; }  
+.mb_container.address1   { display: block; width: 100% !important; }              .mb_container.address1   input  { width: 100% !important; border-color: #b9b9b9;                     border-bottom: none; }  
+.mb_container.address2   { display: block; width: 100% !important; }              .mb_container.address2   input  { width: 100% !important; border-color: #b9b9b9;                     border-bottom: none; }  
+.mb_container.city       { display: block; width:  50% !important; float: left; } .mb_container.city       input  { width: 100% !important; border-color: #b9b9b9; border-right: none; }
+.mb_container.state      { display: block; width:  25% !important; float: left; } .mb_container.state      select { width: 100% !important; border-color: #b9b9b9; border-right: none; border-left: 1px; border-bottom: 1px; border-top: 1px; height: 36px !important; font-size: 1em; }
+                                                                                  .mb_container.state      input  { width: 100% !important; border-color: #b9b9b9; border-right: none; }
+.mb_container.zip        { display: block; width:  25% !important; }              .mb_container.zip        input  { width: 100% !important; border-color: #b9b9b9; }
+
+#gift_cards_container p { float: right; margin-bottom: 0 !important; }
+#gift_cards_container input[type="text"]   { margin-top: 0px !important; margin-right: 10px !important; display: block; float: right; }
+#gift_cards_container input[type="submit"] { margin-top: 0px !important; display: block; float: right; }
+#gift_cards_container #gift_card_message { padding-top: 0 !important; margin-right: 10px !important; margin-top: 0 !important; float: right; }
+#gift_cards_container #gift_card_message p { margin-top: 3px !important; }
+#gift_cards_container #gift_card_spacer { clear: both; }
+
+</style>
+<% end %>

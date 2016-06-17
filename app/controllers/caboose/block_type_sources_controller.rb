@@ -5,20 +5,20 @@ module Caboose
     # Admin actions
     #===========================================================================
     
-    # @route GET /admin/block-type-sources
+    # @route GET /admin/block-types/store/sources
     def admin_index
       return if !user_is_allowed('blocktypesources', 'view')
       @block_type_sources = BlockTypeSource.reorder("priority, name").all
       render :layout => 'caboose/admin'      
     end
     
-    # @route GET /admin/block-type-sources/new    
+    # @route GET /admin/block-types/store/sources/new    
     def admin_new
       return unless user_is_allowed('blocktypesources', 'add')
       render :layout => 'caboose/admin'
     end
     
-    # @route GET /admin/block-type-sources/:id/refresh
+    # @route GET /admin/block-types/store/sources/:id/refresh
     def admin_refresh      
       return unless user_is_allowed('blocktypesources', 'edit')
       
@@ -33,7 +33,7 @@ module Caboose
       render :json => resp      
     end
     
-    # @route GET /admin/block-type-sources/options
+    # @route GET /admin/block-types/store/sources/options
     def admin_options
       return unless user_is_allowed('blocktypesources', 'edit')      
       options = BlockType.reorder(:name).all.collect do |bts| 
@@ -42,14 +42,14 @@ module Caboose
       render :json => options
     end
     
-    # @route GET /admin/block-type-sources/:id
+    # @route GET /admin/block-types/store/sources/:id
     def admin_edit
       return unless user_is_allowed('blocktypesources', 'edit')      
       @block_type_source = BlockTypeSource.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # @route POST /admin/block-type-sources
+    # @route POST /admin/block-types/store/sources
     def admin_create
       return unless user_is_allowed('blocktypesources', 'add')
 
@@ -68,7 +68,7 @@ module Caboose
       render :json => resp
     end
     
-    # @route PUT /admin/block-type-sources/:id
+    # @route PUT /admin/block-types/store/sources/:id
     def admin_update
       return unless user_is_allowed('blocktypesources', 'edit')
       
@@ -90,7 +90,7 @@ module Caboose
       render :json => resp
     end
     
-    # @route DELETE /admin/block-type-sources/:id
+    # @route DELETE /admin/block-types/store/sources/:id
     def admin_delete
       return unless user_is_allowed('blocktypesources', 'delete')                  
       BlockTypeSource.find(params[:id]).destroy            

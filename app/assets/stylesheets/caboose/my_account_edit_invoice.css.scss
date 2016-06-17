@@ -1,0 +1,119 @@
+
+table.invoice { 
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  th { margin: 0; padding: 10px; border: #000 0px solid; font-weight: bold; text-align: center; }
+  td { 
+    margin: 0; 
+    padding: 10px; 
+    border: #000 1px solid; 
+    vertical-align: top; 
+    img { float: left; margin-right: 10px; }
+    .package_header { font-weight: bold; text-align: center; border: 0; }
+    .totals_header { font-weight: bold; text-align: center; border: 0; }
+    .line_item_unit_price { text-align: right; }
+    .line_item_quantity { text-align: right; }
+    .line_item_subtotal { text-align: right; }
+  }
+  tr.totals_row td { text-align: right; }
+}
+
+table.shipping_address td,
+table.billing_address td {
+  padding: 0 !important; 
+  margin: 0 !important; 
+  border: 0 !important; 
+}
+
+p { margin-bottom: 10px; }
+
+#payment_form {
+  margin: 0 0 20px 0;
+  padding: 0;
+  background: #EFEFEF;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid #d8d8d8;
+  
+  h2 { margin: 0; padding: 20px; }
+  
+  .field {
+    border-bottom: 1px solid #d8d8d8;
+    width: 100%;
+    padding: 10px 2%;
+    &::after {
+      content: "."; 
+      visibility: hidden; 
+      display: block; 
+      height: 0; 
+      clear: both;
+    }
+    &:last-of-type { border-bottom: 0; }
+    .field-text {
+      float: left;
+      font-size: 14px;
+      color: #000;
+      line-height: 31px;
+    }
+    &#credit-card { 
+      background: #fff; 
+      -webkit-border-top-left-radius: 5px;
+      -webkit-border-top-right-radius: 5px;
+      -moz-border-radius-topleft: 5px;
+      -moz-border-radius-topright: 5px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      .icons {
+        float: right;
+        width: 120px;
+        position: relative;
+        top: 5px;
+      }
+    }
+    &#card-number {
+      .field-text {
+        width: 20%;
+      }
+      input[type="text"] {
+        background: transparent;
+        font-size: 15px;
+        border-width: 0;
+        outline-width: 0;
+        height: auto;
+      }
+      .icons {
+        width: 20px;
+        float: right;
+        position: relative;
+        top: 7px;
+      }
+    }
+    &#expiry {
+      padding: 15px 2% 5px 2%;
+      .field-text {
+        width: 20%;
+        position: relative;
+        bottom: 3px;
+      }
+      select {
+        &#month {
+          width: 20%;
+          min-width: 100px;
+        }
+        &#year {
+          width: 20%;
+          min-width: 100px;
+        }
+      }
+    }
+  }
+  iframe { display: none }
+
+  #payment_confirm {
+    margin: 20px;
+        
+  }    
+}

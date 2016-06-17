@@ -29,7 +29,7 @@ user_ids = [] if user_ids.nil?
     <th>Forward to URI</th>
     <th>Delete</th>
   </tr>
-  <% @site.domains.order(:id).all.each do |d| %>
+  <% @site.domains.reorder(:id).all.each do |d| %>
   <tr>
     <td><%= d.domain %></td>
     <td align='center'><input type='radio'    name='primary_domain' <%= d.primary? ? "checked='true'" : '' %> onclick="set_primary_domain(<%= s.id %>, <%= d.id %>);" /></td>

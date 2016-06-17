@@ -3,7 +3,7 @@ Cart = function(params) { this.init(params); };
 
 Cart.prototype = {
   
-  order: false,  
+  invoice: false,  
   allow_edit_line_items: true,
   allow_edit_gift_cards: true,
   show_total: true,
@@ -27,7 +27,7 @@ Cart.prototype = {
     $.ajax({
       url: '/cart/items',
       success: function(resp) {
-        that.order = resp;
+        that.invoice = resp;
         $('#message').empty();
         that.print();
       }        
@@ -37,7 +37,7 @@ Cart.prototype = {
   print: function()
   {
     var that = this;
-    if (!this.order || !this.order.line_items || this.order.line_items.length == 0)
+    if (!this.invoice || !this.invoice.line_items || this.invoice.line_items.length == 0)
     {
       $('#cart').html("<p class='note'>You don't have any items in your shopping cart.  <a href='/products'>Continue shopping.</a></p>");
       return;
@@ -51,7 +51,7 @@ Cart.prototype = {
         .append($('<th/>').html('Subtotal'))
       );
                 
-    $.each(this.order.line_items, function(i, li) {      
+    $.each(this.invoice.line_items, function(i, li) {      
       var v = li.variant;
       var p = v.product;      
       var img = v.product_images && v.product_images.length > 0 ? v.product_images[0] : (p.product_images && p.product_images.length > 0 ? p.product_images[0] : false);            
@@ -114,33 +114,33 @@ Cart.prototype = {
     });
     tbody.append($('<tr/>')        
       .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Subtotal'))
-      .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.subtotal).toFixed(2)))
+      .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.invoice.subtotal).toFixed(2)))
     );
     if (that.show_tax)
     {
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Tax'))
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.tax).toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.invoice.tax).toFixed(2)))
       );
     }
     if (that.show_shipping)
     {
-      var x = parseFloat(that.order.shipping) + parseFloat(that.order.handling);
+      var x = parseFloat(that.invoice.shipping) + parseFloat(that.invoice.handling);
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Shipping &amp; Handling'))
         .append($('<td/>').css('text-align', 'right').html('$' + x.toFixed(2)))
       );
     }
-    if (that.show_gift_wrap && that.order.gift_wrap > 0)
+    if (that.show_gift_wrap && that.invoice.gift_wrap > 0)
     {
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Gift Wrapping'))
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.gift_wrap).toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.invoice.gift_wrap).toFixed(2)))
       );
     }    
-    if (that.show_discounts && that.order.discounts.length > 0)
+    if (that.show_discounts && that.invoice.discounts.length > 0)
     {
-      $.each(that.order.discounts, function(i, d) {
+      $.each(that.invoice.discounts, function(i, d) {
           
         var gctd = $('<td/>').css('text-align', 'right').attr('colspan', 4);
         if (that.allow_edit_gift_cards)
@@ -152,11 +152,11 @@ Cart.prototype = {
           .append($('<td/>').css('text-align', 'right').html('-$' + parseFloat(d.amount).toFixed(2)))
         );          
       });
-      if (that.order.custom_discount && that.order.custom_discount > 0)
+      if (that.invoice.custom_discount && that.invoice.custom_discount > 0)
       {
         tbody.append($('<tr/>')
           .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Discount'))
-          .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.custom_discount).toFixed(2)))
+          .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.invoice.custom_discount).toFixed(2)))
         );
       }
     }
@@ -164,7 +164,7 @@ Cart.prototype = {
     {
       tbody.append($('<tr/>')        
         .append($('<td/>').css('text-align', 'right').attr('colspan', 4).html('Total'))
-        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.order.total).toFixed(2)))
+        .append($('<td/>').css('text-align', 'right').html('$' + parseFloat(that.invoice.total).toFixed(2)))
       );            
     }            
     $('#cart').empty().append($('<table/>').append(tbody));
@@ -172,7 +172,7 @@ Cart.prototype = {
     // Make anything editable that needs to be
     if (that.allow_edit_line_items)
     {
-      $.each(this.order.line_items, function(i, li) {
+      $.each(this.invoice.line_items, function(i, li) {
         var p = li.variant.product;
         var attribs = [];        
         attribs.push({ name: 'quantity', nice_name: 'Qty', type: 'text', value: li.quantity, width: 50, fixed_placeholder: false, after_update: function() { that.refresh(); } });

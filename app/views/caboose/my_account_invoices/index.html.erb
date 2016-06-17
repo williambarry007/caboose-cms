@@ -1,0 +1,36 @@
+
+<h1>Order History</h1>
+
+<% if @invoices.count > 0 %>
+  <table class='invoices'>
+    <tr>
+      <th>Date</th>
+      <th>Order Number</th>
+      <th>Total</th>
+      <th>Status</th>
+    </tr>
+    <% @invoices.each do |invoice| %>
+      <tr onclick="window.location='/my-account/invoices/<%= invoice.id %>';">
+        <td><%= invoice.date_created ? invoice.date_created.strftime('%m/%d/%Y') : '' %></td>
+        <td><%= invoice.invoice_number %></td>
+        <td><%= number_to_currency(invoice.total) %></td>
+        <td><%= invoice.status.capitalize %></td>
+      </tr>
+    <% end %>
+  </table>
+<% else %>
+  <p>You don't have any invoices yet.<p>
+<% end %>
+
+<p><input type='button' value='< Back to My Account' class='btn' onclick="window.location='/my-account';" /></p>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+table.invoices { border-collapse: collapse; margin-bottom: 20px; }
+table.invoices th { margin: 0; padding: 10px; border: #000 0px solid; font-weight: bold; text-align: center; }
+table.invoices td { margin: 0; padding: 10px; border: #000 1px solid; }
+table.invoices tr:hover td { background: #ccc; cursor: pointer; cursor: hand; }
+
+</style>
+<% end %>

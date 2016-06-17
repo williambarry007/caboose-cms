@@ -18,8 +18,6 @@ module Caboose
     has_many :reviews, :class_name => 'Caboose::Review'
     has_many :product_category_sorts, :class_name => 'Caboose::ProductCategorySort'
     
-    #default_scope order('store_products.sort_order')
-    
     attr_accessible :id      ,
       :site_id               ,
       :alternate_id          ,
@@ -74,7 +72,7 @@ module Caboose
     end
     
     def self.by_title
-      order('title')
+      reorder('title')
     end
     
     #
@@ -101,7 +99,7 @@ module Caboose
     end
     
     def most_popular_variant
-      self.variants.where('price > ? AND status != ?', 0, 'Deleted').order('price ASC').first
+      self.variants.where('price > ? AND status != ?', 0, 'Deleted').reorder('price ASC').first
     end
     
     def first_tiny_image_url

@@ -1,12 +1,12 @@
 <%
-sa = @order.shipping_address
-ba = @order.billing_address
+sa = @invoice.shipping_address
+ba = @invoice.billing_address
 if sa.nil?
-  q = ["status <> ? and id < ? and customer_id = ?", 'cart', @order.id, @order.customer_id]
-  if Caboose::Order.where(q).exists?    
-    last_order = Caboose::Order.where(q).first
-    sa = last_order.shipping_address
-    ba = last_order.billing_address      
+  q = ["status <> ? and id < ? and customer_id = ?", 'cart', @invoice.id, @invoice.customer_id]
+  if Caboose::Invoice.where(q).exists?    
+    last_invoice = Caboose::Invoice.where(q).first
+    sa = last_invoice.shipping_address
+    ba = last_invoice.billing_address      
   end
 end
 %>
@@ -18,7 +18,7 @@ end
     <form action="/checkout/addresses" method="put" id='address_form'>
       <section id="checkout-address">  
         <div class="wrapper">
-          <% if @order.has_shippable_items? %>
+          <% if @invoice.has_shippable_items? %>
             <section>
               <fieldset id="shipping">
                 <h3>Shipping Address</h3>
@@ -29,7 +29,7 @@ end
                 <label><span>Address 2  </span> <input name="shipping[address2]"   type="text" value="<%= sa ? sa.address2   : "" %>" /></label>
                 <label><span>City       </span> <input name="shipping[city]"       type="text" value="<%= sa ? sa.city       : "" %>" /></label>        
                 <label><span>State      </span> <select name="shipping[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= sa && sa.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>        
-                <label><span>Zip        </span> <input name="shipping[zip]"       type="text"  value="<%= sa ? sa.zip        : "" %>" /></label>
+                <label><span>Zip        </span> <input name="shipping[zip]"       type="text"  value="<%= sa ? sa.zip        : "" %>" pattern="[0-9]*" inputmode="numeric" /></label>
                 <label><input name="use_as_billing" type="checkbox" value="false" /> Use as billing address</label>
               </fieldset>
             </section>
@@ -44,7 +44,7 @@ end
               <label><span>Address 2  </span> <input name="billing[address2]"   type="text" value="<%= ba ? ba.address2   : "" %>" /></label>
               <label><span>City       </span> <input name="billing[city]"       type="text" value="<%= ba ? ba.city       : "" %>" /></label>
               <label><span>State      </span> <select name="billing[state]"><% Caboose::States.all.each do |abbr, state| %><option value="<%= abbr %>" <%= ba && ba.state == abbr ? 'selected' : "" %>><%= state %></option><% end %></select></label>                
-              <label><span>Zip        </span> <input name="billing[zip]"        type="text" value="<%= ba ? ba.zip        : "" %>" /></label>
+              <label><span>Zip        </span> <input name="billing[zip]"        type="text" value="<%= ba ? ba.zip        : "" %>" pattern="[0-9]*" inputmode="numeric" /></label>
             </fieldset>
           </section>        
         </div>            

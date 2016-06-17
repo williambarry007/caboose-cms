@@ -3,14 +3,14 @@ module Caboose
     self.table_name = 'store_line_items'
     
     belongs_to :variant
-    belongs_to :order
-    belongs_to :order_package, :class_name => 'OrderPackage'
+    belongs_to :invoice
+    belongs_to :invoice_package, :class_name => 'InvoicePackage'
     belongs_to :parent, :class_name => 'LineItem', :foreign_key => 'parent_id'
     has_many :children, :class_name => 'LineItem', :foreign_key => 'parent_id'
     
     attr_accessible :id      ,
-      :order_id              ,
-      :order_package_id      ,
+      :invoice_id            ,
+      :invoice_package_id    ,
       :variant_id            ,
       :unit_price            ,
       :quantity              ,
@@ -24,8 +24,11 @@ module Caboose
       :include_gift_message  ,
       :gift_message          ,
       :gift_wrap             ,
-      :hide_prices
-    
+      :hide_prices           ,
+      :user_subscription_id  ,            
+      :date_starts           ,
+      :date_ends             
+
     #
     # Scopes
     #
@@ -54,7 +57,7 @@ module Caboose
     #
     
     before_save :update_subtotal
-    after_save { self.order.calculate }    
+    after_save { self.invoice.calculate }    
     after_initialize :check_nil_fields
     
     def check_nil_fields      
@@ -101,7 +104,7 @@ module Caboose
         :unit_price      => self.unit_price      ,
         :subtotal        => self.subtotal        ,
         :notes           => self.notes           ,
-        :order_id        => self.order_id        ,
+        :invoice_id        => self.invoice_id        ,
         :status          => self.status          ,        
         :custom1         => self.custom1         ,
         :custom2         => self.custom2         ,

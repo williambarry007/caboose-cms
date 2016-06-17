@@ -6,9 +6,15 @@ module Caboose
     
     def before_action
       @page = Page.page_with_uri(request.host_with_port, '/admin')      
-    end    
+    end
+    
+    # @route GET /pages/:id/redirect
+    def redirect
+      @page = Page.find(params[:id])
+      redirect_to "/#{@page.uri}"
+    end
 
-    # GET /pages/:id
+    # @route GET /pages/:id
     def show
       
       # Find the page with an exact URI match 
@@ -127,17 +133,11 @@ module Caboose
 
     end
     
-    # GET /pages/1/redirect
-    def redirect
-      @page = Page.find(params[:id])
-      redirect_to "/#{@page.uri}"
-    end
-    
     #===========================================================================
     # Admin actions
     #===========================================================================
     
-    # GET /admin/pages
+    # @route GET /admin/pages
     def admin_index
       return if !user_is_allowed('pages', 'view')            
       @domain = Domain.where(:domain => request.host_with_port).first
@@ -148,7 +148,7 @@ module Caboose
       render :layout => 'caboose/admin'      
     end
 
-    # GET /admin/pages/new
+    # @route GET /admin/pages/new
     def admin_new
       return unless user_is_allowed('pages', 'add')
       @parent_id = params[:parent_id] ? params[:parent_id] : Page.where(:site_id => @site.id, :parent_id => -1).first.id
@@ -156,15 +156,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/:id/edit
-    def admin_edit_general
-      return if !user_is_allowed('pages', 'edit')
-      #return if !Page.is_allowed(logged_in_user, params[:id], 'edit')            
-      @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # GET /admin/page/:id/custom-fields
+    # @route GET /admin/pages/:id/custom-fields
     def admin_edit_custom_fields
       return if !user_is_allowed('pages', 'edit')    
       @page = Page.find(params[:id])
@@ -172,14 +164,14 @@ module Caboose
       render :layout => 'caboose/modal'
     end
     
-    # GET /admin/pages/:id/permissions
+    # @route GET /admin/pages/:id/permissions
     def admin_edit_permissions
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # PUT /admin/pages/:id/update-child-permissions
+    # @route PUT /admin/pages/:id/update-child-permissions
     def admin_update_child_permissions
       return unless user_is_allowed('pages', 'edit')      
       page = Page.find(params[:id])
@@ -189,7 +181,7 @@ module Caboose
       render :json => { :success => true }
     end
                
-    # GET /admin/pages/:id/content
+    # @route GET /admin/pages/:id/content
     def admin_edit_content
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
@@ -200,14 +192,14 @@ module Caboose
       @editing = true
     end
     
-    # GET /admin/pages/:id/layout
+    # @route GET /admin/pages/:id/layout
     def admin_edit_layout
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # PUT /admin/pages/:id/layout
+    # @route PUT /admin/pages/:id/layout
     def admin_update_layout
       return unless user_is_allowed('pages', 'edit')      
       bt = BlockType.find(params[:block_type_id])
@@ -219,14 +211,14 @@ module Caboose
       render :json => resp
     end
     
-    # GET /admin/pages/:id/block-order
+    # @route GET /admin/pages/:id/block-order
     def admin_edit_block_order
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # PUT /admin/pages/:id/block-order
+    # @route PUT /admin/pages/:id/block-order
     def admin_update_block_order
       return unless user_is_allowed('pages', 'edit')
       block_ids = params[:block_ids]      
@@ -238,42 +230,42 @@ module Caboose
       render :json => true
     end
     
-    # GET /admin/pages/:id/new-blocks
+    # @route GET /admin/pages/:id/new-blocks
     def admin_new_blocks
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end        
     
-    # GET /admin/pages/:id/css
+    # @route GET /admin/pages/:id/css
     def admin_edit_css
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/:id/js
+    # @route GET /admin/pages/:id/js
     def admin_edit_js
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/:id/seo
+    # @route GET /admin/pages/:id/seo
     def admin_edit_seo
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/pages/:id/child-order
+    # @route GET /admin/pages/:id/child-order
     def admin_edit_child_sort_order
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # PUT /admin/pages/:id/child-order
+    # @route PUT /admin/pages/:id/child-order
     def admin_update_child_sort_order
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
@@ -288,7 +280,67 @@ module Caboose
       render :json => true
     end
     
-    # POST /admin/pages
+    # @route GET /admin/pages/:id/duplicate
+    def admin_duplicate_form
+      return unless user_is_allowed('pages', 'add')
+      @page = Page.find(params[:id])      
+      render :layout => 'caboose/admin'      
+    end
+    
+    # @route POST /admin/pages/:id/duplicate
+    def admin_duplicate
+      return unless user_is_allowed('pages', 'add')
+      
+      resp = Caboose::StdClass.new
+      
+      p = Page.where(:id => params[:id]).first      
+      site_id              = params[:site_id]
+      parent_id            = params[:parent_id]
+      block_type_id        = params[:block_type_id]
+      child_block_type_id  = params[:child_block_type_id]
+      duplicate_children   = params[:duplicate_children] ? true : false
+      
+      if p.nil?            then resp.error = "Invalid page"
+      elsif site_id.nil?   then resp.error = "Invalid site"
+      elsif parent_id.nil? then resp.error = "Invalid parent"
+      else
+        resp.new_id = p.duplicate(site_id, parent_id, duplicate_children, block_type_id, child_block_type_id)
+        resp.success = true
+      end
+      
+      render :json => resp
+    end
+      
+    # @route GET /admin/pages/:id/delete
+    def admin_delete_form
+      return unless user_is_allowed('pages', 'delete')
+      @page = Page.find(params[:id])      
+      render :layout => 'caboose/admin'      
+    end
+    
+    # @route GET /admin/pages/:id/uri
+    def admin_page_uri
+      return unless user_is_allowed('pages', 'view')
+      p = Page.find(params[:id])
+      render :json => { 'uri' => p.uri }
+		end
+    
+    # @route GET /admin/pages/:id/sitemap
+    def admin_sitemap
+      return unless user_is_allowed('pages', 'delete')
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+
+    # @route GET /admin/pages/:id
+    def admin_edit_general
+      return if !user_is_allowed('pages', 'edit')
+      #return if !Page.is_allowed(logged_in_user, params[:id], 'edit')            
+      @page = Page.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # @route POST /admin/pages
     def admin_create
       return unless user_is_allowed('pages', 'add')
 
@@ -351,7 +403,7 @@ module Caboose
       render json: resp
     end
     
-    # PUT /admin/pages/:id
+    # @route PUT /admin/pages/:id
     def admin_update
       return unless user_is_allowed('pages', 'edit')
       
@@ -473,45 +525,7 @@ module Caboose
       render json: resp
     end
     
-    # GET /admin/pages/:page_id/duplicate
-    def admin_duplicate_form
-      return unless user_is_allowed('pages', 'add')
-      @page = Page.find(params[:id])      
-      render :layout => 'caboose/admin'      
-    end
-    
-    # POST /admin/pages/:page_id/duplicate
-    def admin_duplicate
-      return unless user_is_allowed('pages', 'add')
-      
-      resp = Caboose::StdClass.new
-      
-      p = Page.where(:id => params[:id]).first      
-      site_id              = params[:site_id]
-      parent_id            = params[:parent_id]
-      block_type_id        = params[:block_type_id]
-      child_block_type_id  = params[:child_block_type_id]
-      duplicate_children   = params[:duplicate_children] ? true : false
-      
-      if p.nil?            then resp.error = "Invalid page"
-      elsif site_id.nil?   then resp.error = "Invalid site"
-      elsif parent_id.nil? then resp.error = "Invalid parent"
-      else
-        resp.new_id = p.duplicate(site_id, parent_id, duplicate_children, block_type_id, child_block_type_id)
-        resp.success = true
-      end
-      
-      render :json => resp
-    end
-      
-    # GET /admin/pages/:page_id/delete
-    def admin_delete_form
-      return unless user_is_allowed('pages', 'delete')
-      @page = Page.find(params[:id])      
-      render :layout => 'caboose/admin'      
-    end
-    
-    # DELETE /admin/pages/1
+    # @route DELETE /admin/pages/:id
     def admin_delete
       return unless user_is_allowed('pages', 'delete')
       p = Page.find(params[:id])
@@ -522,27 +536,52 @@ module Caboose
       })
       render json: resp
     end
-    
-    # GET /admin/pages/:page_id/sitemap
-    def admin_sitemap
-      return unless user_is_allowed('pages', 'delete')
-      @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-
-    # GET /admin/pages/sitemap-options
-    def admin_sitemap_options
-      parent_id = params[:parent_id]
-      p = nil
-      if params[:site_id] && @site.is_master && user_is_allowed('admin', 'admin') 
-        p = parent_id ? Page.find(parent_id) : Page.index_page(params[:site_id].to_i)
-      else
-        p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
+        
+    # @route GET /admin/pages/:field-options
+    # @route GET /admin/pages/:id/:field-options    
+    def admin_options
+      if !user_is_allowed('pages', 'edit')
+        render :json => false
+        return
       end
-      options = []
-      if p
-        sitemap_helper(p, options)
-     	end
+      
+      case params[:field]
+        when nil
+        
+        when 'sitemap'
+          parent_id = params[:parent_id]
+          p = nil
+          if params[:site_id] && @site.is_master && user_is_allowed('admin', 'admin') 
+            p = parent_id ? Page.find(parent_id) : Page.index_page(params[:site_id].to_i)
+          else
+            p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
+          end
+          options = []
+          if p
+            sitemap_helper(p, options)
+     	    end
+     	  when 'robots'
+     	    options = [
+            { 'value' => 'index'      , 'text' => 'index'     },
+            { 'value' => 'noindex'    , 'text' => 'noindex'   },
+            { 'value' => 'follow'     , 'text' => 'follow'    },
+            { 'value' => 'nofollow'   , 'text' => 'nofollow'  },
+            { 'value' => 'nosnippet'  , 'text' => 'nosnippet' },
+            { 'value' => 'noodp'      , 'text' => 'noodp'     },
+            { 'value' => 'noarchive'  , 'text' => 'noarchive' }
+          ]
+        when 'format'
+          options = [
+            { 'value' => 'html', 'text' => 'html' },
+            { 'value' => 'text', 'text' => 'text' },
+            { 'value' => 'ruby', 'text' => 'ruby' }
+          ]
+        when 'block'
+          options = []
+          Block.where("parent_id is null and page_id = ?", params[:id]).reorder(:sort_order).all.each do |b|
+            admin_block_options_helper(options, b, "") 
+          end
+      end              
       render :json => options 		
     end
 
@@ -552,48 +591,6 @@ module Caboose
         sitemap_helper(kid, options, prefix + ' - ')
       end
     end
-
-    # GET /admin/pages/robots-options
-    def admin_robots_options
-      options = [
-        { 'value' => 'index'      , 'text' => 'index'     },
-        { 'value' => 'noindex'    , 'text' => 'noindex'   },
-        { 'value' => 'follow'     , 'text' => 'follow'    },
-        { 'value' => 'nofollow'   , 'text' => 'nofollow'  },
-        { 'value' => 'nosnippet'  , 'text' => 'nosnippet' },
-        { 'value' => 'noodp'      , 'text' => 'noodp'     },
-        { 'value' => 'noarchive'  , 'text' => 'noarchive' }
-      ]
-      render json: options 		
-    end
-
-    # GET /admin/pages/format-options
-    def admin_content_format_options
-      options = [
-        { 'value' => 'html', 'text' => 'html' },
-        { 'value' => 'text', 'text' => 'text' },
-        { 'value' => 'ruby', 'text' => 'ruby' }
-      ]
-      render json: options 		
-    end
-    
-    # GET /admin/pages/:id/uri
-    def admin_page_uri
-      return unless user_is_allowed('pages', 'view')
-      p = Page.find(params[:id])
-      render :json => { 'uri' => p.uri }
-		end
-		
-		# GET /admin/pages/:id/block-options        
-    def admin_block_options
-      return unless user_is_allowed('pages', 'edit')      
-      
-      options = []
-      Block.where("parent_id is null and page_id = ?", params[:id]).reorder(:sort_order).all.each do |b|
-        admin_block_options_helper(options, b, "") 
-      end      
-      render :json => options
-    end        
       
     def admin_block_options_helper(options, b, prefix)
       options << { 'value' => b.id, 'text' => "#{prefix}#{b.title}" }      

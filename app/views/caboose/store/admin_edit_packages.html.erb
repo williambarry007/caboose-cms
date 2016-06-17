@@ -3,13 +3,13 @@ sc = @store_config
 %>
 <%= render :partial => 'caboose/store/admin_header' %>
 
-<p>If calculating order packages automatically, all shippable variants must have dimensions and weights populated. Otherwise, a custom order packages function is required.</p>
+<p>If calculating invoice packages automatically, all shippable variants must have dimensions and weights populated. Otherwise, a custom invoice packages function is required.</p>
 <p><div id='storeconfig_<%= sc.id %>_auto_calculate_packages'  ></div></p>
 <div id='custom_packages_container' <% if sc.auto_calculate_packages %>style='display: none;'<% end %>>
-  <h3>Custom Order Packages Function</h3>
-  <p><code>def custom_order_packages_function(order) {</code></p>
+  <h3>Custom Invoice Packages Function</h3>
+  <p><code>def custom_invoice_packages_function(invoice) {</code></p>
   <p><div id='storeconfig_<%= sc.id %>_custom_packages_function' ></div></p>
-  <p><code># This function does not return anything, but creates the Caboose::OrderPackage objects for the given order<br />}</code></p>
+  <p><code># This function creates the Caboose::InvoicePackage objects for the given invoice.<br /># It also returns true or false depending on whether or not the packages were created successfully.<br />}</code></p>    
 </div>
 
 <%= render :partial => 'caboose/store/admin_footer' %>
@@ -25,8 +25,8 @@ $(document).ready(function() {
     update_url: '/admin/store',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'auto_calculate_packages'  , nice_name: 'Automatically Calculate Packages'  , type: 'checkbox' , value: <%= raw Caboose.json(sc.auto_calculate_packages ? 1 : 0 ) %>, width: 400 , after_update: function() { toggleCustomPackages(this.value); }},
-      { name: 'custom_packages_function' , nice_name: 'Custom Packages Function'          , type: 'textarea' , value: <%= raw Caboose.json(sc.custom_packages_function   ) %>, width: 800, height: 200, fixed_placeholder: false }      
+      { name: 'auto_calculate_packages'  , nice_name: 'Automatically Calculate Packages'  , type: 'checkbox' , value: <%= raw Caboose.json(sc.auto_calculate_packages ? 1 : 0  ) %>, width: 400 , after_update: function() { toggleCustomPackages(this.value); }},
+      { name: 'custom_packages_function' , nice_name: 'Custom Invoice Packages Function'  , type: 'textarea' , value: <%= raw Caboose.json(sc.custom_packages_function         ) %>, width: 800, height: 200, fixed_placeholder: false },            
     ]    
   });
                                                                                                                                                                                     

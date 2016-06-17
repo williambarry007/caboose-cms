@@ -1,6 +1,6 @@
 <h3>Shopping Cart</h3>
 
-<% if (!order.line_items.length) { %>
+<% if (!invoice.line_items.length) { %>
   <p>Your cart is currently empty. <a href="/products">Click here</a> to continue shopping.</p>
 <% } else { %>
   <ul>
@@ -9,7 +9,7 @@
       <header>Price</header>
     </li>
     
-    <% _.each(order.line_items, function(lineItem) { %>
+    <% _.each(invoice.line_items, function(lineItem) { %>
       <li data-id="<%= lineItem.id %>">
         <section>
           <% if (lineItem.variant.images.length > 0) { %>
@@ -34,7 +34,7 @@
     <li>
       <footer>
         <a href="/checkout" class="btn blue">Checkout</a>
-        <h4>Subtotal: <span class="subtotal">$<%= parseFloat(Math.round(order.subtotal * 100) / 100).toFixed(2) %></span></h4>
+        <h4>Subtotal: <span class="subtotal">$<%= parseFloat(Math.round(invoice.subtotal * 100) / 100).toFixed(2) %></span></h4>
       </footer>
     </li>
   </ul>

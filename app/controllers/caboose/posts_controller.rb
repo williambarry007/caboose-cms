@@ -3,22 +3,13 @@ module Caboose
     
     helper :application
      
-    # GET /posts
+    # @route GET /posts
     def index
-    	@posts = Post.where(:published => true).limit(5).order('created_at DESC')
+    	@posts = Post.where(:published => true).limit(5).reorder('created_at DESC')
     end
     
-    ## GET /posts/:id
-    #def detail
-    #	@post = Post.find_by_id(params[:id])
-    #	unless @post.present?
-    #		flash[:notice] = 'The posts post you tried to access does not exist.'
-    #		redirect_to action: :index
-    #	end
-    #end
-    
-    # GET /posts/:id
-    # GET /posts/:year/:month/:day/:slug
+    # @route GET /posts/:id
+    # @route GET /posts/:year/:month/:day/:slug
     def show
       
       # Make sure we're not under construction or on a forwarded domain
@@ -41,7 +32,7 @@ module Caboose
     # Admin actions
     #=============================================================================
     
-    # GET /admin/posts
+    # @route GET /admin/posts
     def admin_index
       return if !user_is_allowed('posts', 'view')
         
@@ -58,29 +49,21 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/posts/:id/json
+    # @route GET /admin/posts/:id/json
     def admin_json_single
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])
       render :json => @post
     end
-  
-    # GET /admin/posts/:id/edit
-    def admin_edit_general
-      return if !user_is_allowed('posts', 'edit')    
-      @post = Post.find(params[:id])
-      @post.verify_custom_field_values_exist
-      render :layout => 'caboose/admin'
-    end
     
-    # GET /admin/posts/:id/preview
+    # @route GET /admin/posts/:id/preview
     def admin_edit_preview
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])      
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/posts/:id/content
+    # @route GET /admin/posts/:id/content
     def admin_edit_content
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])
@@ -96,7 +79,7 @@ module Caboose
       @editing = true
     end
     
-    # GET /admin/posts/:id/categories
+    # @route GET /admin/posts/:id/categories
     def admin_edit_categories
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])
@@ -108,14 +91,29 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/posts/:id/layout
+    # @route GET /admin/posts/:id/layout
     def admin_edit_layout
       return unless user_is_allowed('posts', 'edit')      
       @post = Post.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # PUT /admin/posts/:id/layout
+    # @route GET /admin/posts/:id/delete
+    def admin_delete_form
+      return if !user_is_allowed('posts', 'delete')
+      @post = Post.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+    
+    # @route GET /admin/posts/:id
+    def admin_edit_general
+      return if !user_is_allowed('posts', 'edit')    
+      @post = Post.find(params[:id])
+      @post.verify_custom_field_values_exist
+      render :layout => 'caboose/admin'
+    end
+    
+    # @route PUT /admin/posts/:id/layout
     def admin_update_layout
       return unless user_is_allowed('posts', 'edit')      
       bt = BlockType.find(params[:block_type_id])
@@ -127,7 +125,7 @@ module Caboose
       render :json => resp
     end
   
-    # POST /admin/posts/:id
+    # @route PUT /admin/posts/:id
     def admin_update      
       return if !user_is_allowed('posts', 'edit')
       
@@ -155,10 +153,10 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/posts/:id/image
+    # @route POST /admin/posts/:id/image
     def admin_update_image
       return if !user_is_allowed('posts', 'edit')
-      
+                 
       resp = Caboose::StdClass.new
       post = Post.find(params[:id])
       post.image = params[:image]            
@@ -168,14 +166,15 @@ module Caboose
       render :text => resp.to_json
     end
     
-    # GET /admin/posts/new
+    # @route_priority 1
+    # @route GET /admin/posts/new
     def admin_new
       return if !user_is_allowed('posts', 'new')  
       @new_post = Post.new  
       render :layout => 'caboose/admin'
     end
   
-    # POST /admin/posts
+    # @route POST /admin/posts
     def admin_add
       return if !user_is_allowed('posts', 'add')
   
@@ -200,7 +199,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/posts/:id/add-to-category
+    # @route PUT /admin/posts/:id/add-to-category
     def admin_add_to_category
       return if !user_is_allowed('posts', 'edit')
       
@@ -214,7 +213,7 @@ module Caboose
       render :json => true      
     end
     
-    # PUT /admin/posts/:id/remove-from-category
+    # @route PUT /admin/posts/:id/remove-from-category
     def admin_remove_from_category
       return if !user_is_allowed('posts', 'edit')
       
@@ -228,14 +227,7 @@ module Caboose
       render :json => true      
     end
     
-    # GET /admin/posts/:id/delete
-    def admin_delete_form
-      return if !user_is_allowed('posts', 'delete')
-      @post = Post.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # DELETE /admin/posts/:id
+    # @route DELETE /admin/posts/:id
     def admin_delete
       return if !user_is_allowed('posts', 'edit')
       

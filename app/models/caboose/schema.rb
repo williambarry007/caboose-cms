@@ -4,12 +4,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
   # Tables (in order) that were renamed in the development of the gem.
   def self.renamed_tables
     {
-      :roles_users             => :role_memberships,
-      :permissions_roles       => :role_permissions,
+      :roles_users              => :role_memberships,
+      :permissions_roles        => :role_permissions,
       #:page_block_field_values => :fields,
       #:page_block_fields       => :field_types,
-      :page_block_types        => :block_types,
-      :page_blocks             => :blocks
+      :page_block_types         => :block_types,
+      :page_blocks              => :blocks,      
+      :store_order_discounts    => :store_invoice_discounts,
+      :store_order_packages     => :store_invoice_packages,
+      :store_order_transactions => :store_invoice_transactions,
+      :store_orders             => :store_invoices
     }
   end
 
@@ -18,11 +22,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
       #Caboose::Field     => { :page_block_id        => :block_id,
       #                        :page_block_field_id  => :field_type_id },
       #Caboose::FieldType => { :page_block_type_id   => :block_type_id },
-      Caboose::Block     => { :page_block_type_id   => :block_type_id },
-      Caboose::RetargetingConfig => { 
-        :conversion_id   => :google_conversion_id,
-        :labels_function => :google_labels_function
-      }
+      Caboose::Block              => { :page_block_type_id => :block_type_id },
+      Caboose::Discount           => { :order_id => :invoice_id },
+      Caboose::GiftCard           => { :min_order_total => :min_invoice_total },
+      Caboose::Invoice            => { :order_number => :invoice_number },
+      Caboose::InvoiceDiscount    => { :order_id => :invoice_id },
+      Caboose::InvoicePackage     => { :order_id => :invoice_id },        
+      Caboose::InvoiceTransaction => { :order_id => :invoice_id },
+      Caboose::LineItem           => { :order_id => :invoice_id, :order_package_id  => :invoice_package_id },
+      Caboose::RetargetingConfig  => { :conversion_id   => :google_conversion_id, :labels_function => :google_labels_function },
+      Caboose::StoreConfig        => { :starting_order_number => :starting_invoice_number }
     }
   end
 
@@ -61,7 +70,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       #Caboose::Discount => [
       #  :amount
       #],
-      Caboose::Order => [
+      Caboose::Invoice => [
         :shipping_method       , 
         :shipping_method_code  ,
         :email                 ,        
@@ -272,7 +281,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Discount => [
         [ :gift_card_id , :integer  ],
-        [ :order_id     , :integer  ],                
+        [ :invoice_id   , :integer  ],                
         [ :amount       , :decimal   , { :precision => 8, :scale => 2 }]        
       ],
       Caboose::Domain => [
@@ -302,20 +311,20 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :sort_order         , :integer ]
       ],
       Caboose::GiftCard => [
-        [ :site_id         , :integer  ],        
-        [ :name            , :string   ],
-        [ :code            , :string   ],
-        [ :card_type       , :string   ],
-        [ :total           , :decimal   , { :precision => 8, :scale => 2 }],
-        [ :balance         , :decimal   , { :precision => 8, :scale => 2 }],
-        [ :min_order_total , :decimal   , { :precision => 8, :scale => 2 }],        
-        [ :date_available  , :datetime ],
-        [ :date_expires    , :datetime ],
-        [ :status          , :string   ]                                
+        [ :site_id           , :integer  ],        
+        [ :name              , :string   ],
+        [ :code              , :string   ],
+        [ :card_type         , :string   ],
+        [ :total             , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :balance           , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :min_invoice_total , :decimal   , { :precision => 8, :scale => 2 }],        
+        [ :date_available    , :datetime ],
+        [ :date_expires      , :datetime ],
+        [ :status            , :string   ]                                
       ],      
       Caboose::LineItem => [
-        [ :order_id              , :integer  ],
-        [ :order_package_id      , :integer  ],
+        [ :invoice_id            , :integer  ],
+        [ :invoice_package_id    , :integer  ],
         [ :variant_id            , :integer  ],
         [ :parent_id             , :integer  ],                
         [ :status                , :string   ],        
@@ -330,7 +339,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :include_gift_message  , :boolean   , { :default => false }],
         [ :gift_message          , :text     ],
         [ :gift_wrap             , :boolean   , { :default => false }],
-        [ :hide_prices           , :boolean   , { :default => false }]
+        [ :hide_prices           , :boolean   , { :default => false }],
+        [ :user_subscription_id  , :integer  ],            
+        [ :date_starts           , :date     ],
+        [ :date_ends             , :date     ]
       ],
       Caboose::LineItemModification => [                          
         [ :line_item_id           , :integer ],
@@ -375,31 +387,35 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :requires_input    , :boolean   , { :default => false }],        
         [ :input_description , :string   ]
       ],
-      Caboose::OrderTransaction => [
-        [ :order_id              , :integer  ],
+      Caboose::InvoiceTransaction => [
+        [ :invoice_id            , :integer  ],
+        [ :parent_id             , :integer  ],
         [ :date_processed        , :datetime ],
         [ :transaction_type      , :string   ],
-        [ :amount                , :decimal   , { :precision => 8, :scale => 2 }],        
+        [ :amount                , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :amount_refunded       , :decimal   , { :precision => 8, :scale => 2 }],
         [ :transaction_id        , :string   ],
         [ :auth_code             , :string   ],
         [ :response_code         , :string   ],
-        [ :success               , :boolean  ]        
+        [ :success               , :boolean  ],
+        [ :captured              , :boolean   , { :default => false }],
+        [ :refunded              , :boolean   , { :default => false }]
       ],
-      Caboose::OrderDiscount => [
-        [ :order_id              , :integer ],
+      Caboose::InvoiceDiscount => [
+        [ :invoice_id            , :integer ],
         [ :discount_id           , :integer ]
       ],
-      Caboose::OrderPackage => [
-        [ :order_id             , :integer ],
+      Caboose::InvoicePackage => [
+        [ :invoice_id           , :integer ],
         [ :shipping_method_id   , :integer ],
         [ :shipping_package_id  , :integer ],
         [ :status               , :string  ],
         [ :tracking_number      , :string  ],
         [ :total                , :decimal  , { :precision => 8, :scale => 2 }]
       ],
-      Caboose::Order => [
+      Caboose::Invoice => [
         [ :site_id               , :integer  ],
-        [ :order_number          , :integer  ],
+        [ :invoice_number        , :integer  ],
         [ :alternate_id          , :integer  ],        
         [ :subtotal              , :decimal  , { :precision => 8, :scale => 2 }],
         [ :tax                   , :decimal  , { :precision => 8, :scale => 2 }],
@@ -418,19 +434,21 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :billing_address_id    , :integer  ],
         [ :notes                 , :text     ],
         [ :status                , :string   ],
+        [ :payment_terms         , :string   ],
         [ :date_created          , :datetime ],
         [ :date_authorized       , :datetime ],
         [ :date_captured         , :datetime ],
         [ :date_shipped          , :datetime ],
+        [ :date_due              , :date     ],
         [ :referring_site        , :text     ],
         [ :landing_page          , :string   ],
         [ :landing_page_ref      , :string   ],
         [ :auth_amount           , :decimal  , { :precision => 8, :scale => 2 }],
         [ :gift_message          , :text     ],
         [ :include_receipt       , :boolean  , { :default => true }]
-        
+                
         #[ :email                 , :string   ],
-        #[ :order_number          , :string   ],
+        #[ :invoice_number        , :string   ],
         #[ :payment_id            , :integer  ],
         #[ :gateway_id            , :integer  ],
         #[ :date_authorized       , :datetime ],
@@ -703,7 +721,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :user_name            , :string ],
         [ :password             , :string ],
         [ :authentication       , :string ], # :plain, :login, :cram_md5.
-        [ :enable_starttls_auto , :boolean , { :default => true }]
+        [ :enable_starttls_auto , :boolean , { :default => true }],
+        [ :from_address         , :string ]
       ],
       Caboose::SocialConfig => [
         [ :site_id              , :integer ],
@@ -732,81 +751,110 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :max_height     , :decimal ]
       ],
       Caboose::StoreConfig => [
-        [ :site_id                     , :integer ],     
-        [ :pp_name                     , :string  ],
-        [ :pp_testing                  , :boolean , { :default => true }],        
-        #[ :pp_username                 , :string  ],
-        #[ :pp_password                 , :string  ],                
-        #[ :pp_relay_domain             , :string  ],                
-        [ :authnet_api_login_id        , :string  ], # pp_username
-        [ :authnet_api_transaction_key , :string  ], # pp_password
-        [ :authnet_relay_domain        , :string  ], # pp_relay_domain
-        [ :stripe_secret_key           , :string  ],
-        [ :stripe_publishable_key      , :string  ],
-        [ :ups_username                , :string  ],
-        [ :ups_password                , :string  ],
-        [ :ups_key                     , :string  ],
-        [ :ups_origin_account          , :string  ],
-        [ :usps_username               , :string  ],
-        [ :usps_secret_key             , :string  ],
-        [ :usps_publishable_key        , :string  ],                
-        [ :fedex_username              , :string  ],
-        [ :fedex_password              , :string  ],
-        [ :fedex_key                   , :string  ],
-        [ :fedex_account               , :string  ],
-        [ :ups_min                     , :decimal  , { :precision => 8, :scale => 2 }],
-        [ :ups_max                     , :decimal  , { :precision => 8, :scale => 2 }],
-        [ :usps_min                    , :decimal  , { :precision => 8, :scale => 2 }],
-        [ :usps_max                    , :decimal  , { :precision => 8, :scale => 2 }],
-        [ :fedex_min                   , :decimal  , { :precision => 8, :scale => 2 }],                
-        [ :fedex_max                   , :decimal  , { :precision => 8, :scale => 2 }],
-        [ :taxcloud_api_id             , :string  ],
-        [ :taxcloud_api_key            , :string  ],                
-        [ :origin_address1             , :string  ],
-        [ :origin_address2             , :string  ],
-        [ :origin_state                , :string  ],
-        [ :origin_city                 , :string  ],
-        [ :origin_zip                  , :string  ],
-        [ :origin_country              , :string  ],
-        [ :fulfillment_email           , :string  ],
-        [ :shipping_email              , :string  ],
-        [ :handling_percentage         , :string  ],                
-        [ :auto_calculate_packages     , :boolean  , { :default => true }],
-        [ :auto_calculate_shipping     , :boolean  , { :default => true }],
-        [ :auto_calculate_tax          , :boolean  , { :default => true }],
-        [ :custom_packages_function    , :text    ],   
-        [ :custom_shipping_function    , :text    ],   
-        [ :custom_tax_function         , :text    ],
-        [ :download_instructions       , :text    ],
-        [ :length_unit                 , :string   , { :default => 'in' }],
-        [ :weight_unit                 , :string   , { :default => 'oz' }],
-        [ :download_url_expires_in     , :string   , { :default => 5    }],
-        [ :starting_order_number       , :integer  , { :default => 1000 }]
-      ],      
+        [ :site_id                           , :integer ],     
+        [ :pp_name                           , :string  ],
+        [ :pp_testing                        , :boolean , { :default => true }],        
+        #[ :pp_username                      , :string  ],
+        #[ :pp_password                      , :string  ],                
+        #[ :pp_relay_domain                  , :string  ],                
+        [ :authnet_api_login_id              , :string  ], # pp_username
+        [ :authnet_api_transaction_key       , :string  ], # pp_password
+        [ :authnet_relay_domain              , :string  ], # pp_relay_domain
+        [ :stripe_secret_key                 , :string  ],
+        [ :stripe_publishable_key            , :string  ],
+        [ :ups_username                      , :string  ],
+        [ :ups_password                      , :string  ],
+        [ :ups_key                           , :string  ],
+        [ :ups_origin_account                , :string  ],
+        [ :usps_username                     , :string  ],
+        [ :usps_secret_key                   , :string  ],
+        [ :usps_publishable_key              , :string  ],                
+        [ :fedex_username                    , :string  ],
+        [ :fedex_password                    , :string  ],
+        [ :fedex_key                         , :string  ],
+        [ :fedex_account                     , :string  ],
+        [ :ups_min                           , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :ups_max                           , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :usps_min                          , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :usps_max                          , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :fedex_min                         , :decimal  , { :precision => 8, :scale => 2 }],                
+        [ :fedex_max                         , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :taxcloud_api_id                   , :string  ],
+        [ :taxcloud_api_key                  , :string  ],                
+        [ :origin_address1                   , :string  ],
+        [ :origin_address2                   , :string  ],
+        [ :origin_state                      , :string  ],
+        [ :origin_city                       , :string  ],
+        [ :origin_zip                        , :string  ],
+        [ :origin_country                    , :string  ],
+        [ :fulfillment_email                 , :string  ],
+        [ :shipping_email                    , :string  ],
+        [ :handling_percentage               , :string  ],                
+        [ :auto_calculate_packages           , :boolean  , { :default => true }],
+        [ :auto_calculate_shipping           , :boolean  , { :default => true }],
+        [ :auto_calculate_tax                , :boolean  , { :default => true }],        
+        [ :custom_packages_function          , :text    ],   
+        [ :custom_shipping_function          , :text    ],   
+        [ :custom_tax_function               , :text    ],
+        [ :download_instructions             , :text    ],
+        [ :length_unit                       , :string   , { :default => 'in'  }],
+        [ :weight_unit                       , :string   , { :default => 'oz'  }],
+        [ :download_url_expires_in           , :string   , { :default => 5     }],
+        [ :starting_invoice_number           , :integer  , { :default => 1000  }],
+        [ :default_payment_terms             , :string   , { :default => 'pia' }]
+      ],  
+      Caboose::Subscription => [
+        [ :site_id             , :integer ],
+        [ :name                , :string  ],
+        [ :description         , :text    ],
+        [ :variant_id          , :integer ],
+        [ :interval            , :string  ],
+        [ :prorate             , :boolean  , { :default => false }],
+        [ :prorate_method      , :string  ],        
+        [ :prorate_flat_amount , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :prorate_function    , :text    ],
+        [ :start_on_day        , :boolean  , { :default => false }],
+        [ :start_day           , :integer ],
+        [ :start_month         , :integer ]       
+      ],
       Caboose::User => [
-        [ :site_id              , :integer    ],
-        [ :first_name           , :string     ],
-        [ :last_name            , :string     ],
-        [ :username             , :string     ],
-        [ :email                , :string     ],
-        [ :address              , :string     ],
-        [ :address2             , :string     ],
-        [ :city                 , :string     ],
-        [ :state                , :string     ],
-        [ :zip                  , :string     ],
-        [ :phone                , :string     ],
-        [ :fax                  , :string     ],        
-        [ :timezone             , :string      , { :default => 'Central Time (US & Canada)' }],        
-        [ :password             , :string     ],
-        [ :password_reset_id    , :string     ],
-        [ :password_reset_sent  , :datetime   ],
-        [ :token                , :string     ],
-        [ :date_created         , :datetime   ],
-        [ :image                , :attachment ],
-        [ :is_guest             , :boolean     , { :default => false }],
-        [ :customer_profile_id  , :string     ],
-        [ :payment_profile_id   , :string     ],
-        [ :locked               , :boolean     , { :default => false }]
+        [ :site_id                      , :integer    ],
+        [ :first_name                   , :string     ],
+        [ :last_name                    , :string     ],
+        [ :username                     , :string     ],
+        [ :email                        , :string     ],
+        [ :address                      , :string     ],
+        [ :address2                     , :string     ],
+        [ :city                         , :string     ],
+        [ :state                        , :string     ],
+        [ :zip                          , :string     ],
+        [ :phone                        , :string     ],
+        [ :fax                          , :string     ],        
+        [ :timezone                     , :string      , { :default => 'Central Time (US & Canada)' }],        
+        [ :password                     , :string     ],
+        [ :password_reset_id            , :string     ],
+        [ :password_reset_sent          , :datetime   ],
+        [ :token                        , :string     ],
+        [ :date_created                 , :datetime   ],
+        [ :image                        , :attachment ],
+        [ :is_guest                     , :boolean     , { :default => false }],
+        [ :customer_profile_id          , :string     ],
+        [ :payment_profile_id           , :string     ],
+        [ :locked                       , :boolean     , { :default => false }],
+        [ :authnet_customer_profile_id  , :string     ],
+        [ :authnet_payment_profile_id   , :string     ],
+        [ :valid_authnet_payment_id     , :boolean     , { :default => false }],
+        [ :stripe_customer_id           , :string     ],
+        [ :card_last4                   , :string     ],
+        [ :card_brand                   , :string     ],  
+        [ :card_exp_month               , :integer    ],
+        [ :card_exp_year                , :integer    ]
+      ],
+      Caboose::UserSubscription => [
+        [ :subscription_id  , :integer ],
+        [ :user_id          , :integer ],
+        [ :date_started     , :date    ],
+        [ :status           , :string  ]
       ],
       Caboose::Variant => [
         [ :product_id                    , :integer  ],

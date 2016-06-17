@@ -9,7 +9,7 @@ sc = @store_config
 <p><div id='storeconfig_<%= sc.id %>_taxcloud_api_key'         ></div></p>
 <div id='custom_tax_container' <% if sc.auto_calculate_tax %>style='display: none;'<% end %>>
   <h3>Custom Tax Function</h3>
-  <p><code>def custom_tax_function(order) {</code></p>
+  <p><code>def custom_tax_function(invoice) {</code></p>
   <p><div id='storeconfig_<%= sc.id %>_custom_tax_function'      ></div></p>
   <p><code># return 0.00<br />}</code></p>
 </div>

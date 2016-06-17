@@ -4,18 +4,18 @@ module Caboose
   class SocialController < ApplicationController
     layout 'caboose/admin'
 
+    # @route GET /admin/analytics
     def analytics
-
     end
     
-    # GET /admin/social
+    # @route GET /admin/social
     def admin_edit
       return if !user_is_allowed('social', 'edit')            
       @social_config = @site.social_config
       @social_config = SocialConfig.create(:site_id => @site.id) if @social_config.nil?
     end
     
-    # PUT /admin/social
+    # @route PUT /admin/social
     def admin_update
       return if !user_is_allowed('sites', 'edit')
 
@@ -46,8 +46,7 @@ module Caboose
     	render :json => resp
     end
 
-
-    # GET /api/instagram
+    # @route GET /api/instagram
     def authorize_instagram
       code = params[:code]
       site_id = params[:state]
@@ -81,7 +80,7 @@ module Caboose
       end      
     end
 
-    # DELETE /api/instagram
+    # @route DELETE /api/instagram
     def deauthorize_instagram
       resp = StdClass.new     
       site_id = params[:site_id]

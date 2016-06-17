@@ -5,7 +5,7 @@ module Caboose
         
     belongs_to :site    
     has_many :discounts
-    has_many :orders, :through => :discounts    
+    has_many :invoices, :through => :discounts    
     attr_accessible :id,
       :site_id,      
       :name,  # The name of this discount            
@@ -13,7 +13,7 @@ module Caboose
       :card_type,
       :total,
       :balance,
-      :min_order_total, # The minimum order total required to be able to use the card
+      :min_invoice_total, # The minimum invoice total required to be able to use the card
       :date_available,
       :date_expires,
       :status            
@@ -30,20 +30,20 @@ module Caboose
     after_initialize :check_nil_fields
     
     def check_nil_fields
-      self.total           = 0.00 if self.total.nil?
-      self.balance         = 0.00 if self.balance.nil?          
-      self.min_order_total = 0.00 if self.min_order_total.nil?  
+      self.total             = 0.00 if self.total.nil?
+      self.balance           = 0.00 if self.balance.nil?          
+      self.min_invoice_total = 0.00 if self.min_invoice_total.nil?  
     end
 
-    def valid_for_order?(order)
+    def valid_for_invoice?(invoice)
       return false if self.status != GiftCard::STATUS_ACTIVE
       return false if self.date_available && DateTime.now.utc < self.date_available
       return false if self.date_expires && DateTime.now.utc > self.date_expires
       return false if self.card_type == GiftCard::CARD_TYPE_AMOUNT && self.balance <= 0      
-      return false if self.min_order_total && order.total < self.min_order_total
+      return false if self.min_invoice_total && invoice.total < self.min_invoice_total
       return true
     end
-    
+
   end
 end
 

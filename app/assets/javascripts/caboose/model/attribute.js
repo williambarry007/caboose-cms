@@ -29,6 +29,7 @@ Attribute.prototype = {
   hour_increment: 1,
   show_check_all: true,
   show_empty_option: false,
+  empty_option_text: false,
   quick_add_url: false,
   quick_add_text: 'Add New',  
   
@@ -37,9 +38,9 @@ Attribute.prototype = {
   options: false,
   s3: false,
   
-  save: function(after) {          
-    //if (this.before_update) this.before_update();    
+  save: function(after) {                  
     var this2 = this;
+    //if (this.before_update) this.before_update(this2);
     $.ajax({
       url: this.update_url,
       type: 'put',

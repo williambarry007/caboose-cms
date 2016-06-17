@@ -6,7 +6,7 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
     
-    # GET /admin/settings
+    # @route GET /admin/settings
     def index
       return if !user_is_allowed('settings', 'view')
       
@@ -24,19 +24,19 @@ module Caboose
     	@settings = @gen.items    	
     end
   
-    # GET /admin/settings/new
+    # @route GET /admin/settings/new
     def new
       return if !user_is_allowed('settings', 'add')
       @setting = Setting.new
     end
   
-    # GET /admin/settings/1/edit
+    # @route GET /admin/settings/:id
     def edit
       return if !user_is_allowed('settings', 'edit')
       @setting = Setting.find(params[:id])
     end
   
-    # POST /admin/settings
+    # @route POST /admin/settings
     def create
       return if !user_is_allowed('settings', 'add')
       
@@ -58,7 +58,7 @@ module Caboose
       render json: resp
     end
   
-    # PUT /admin/settings/1
+    # @route PUT /admin/settings/:id
     def update
       return if !user_is_allowed('settings', 'edit')
 
@@ -77,7 +77,7 @@ module Caboose
     	render :json => resp
     end
   
-    # DELETE /admin/settings/1
+    # @route DELETE /admin/settings/:id
     def destroy
       return if !user_is_allowed('settings', 'delete')
       setting = Setting.find(params[:id])
@@ -89,12 +89,14 @@ module Caboose
       render json: resp
     end
     
-    # GET /admin/settings/options
+    # @route_priority 1
+    # @route GET /admin/settings/options
     def options
       return if !user_is_allowed('settings', 'view')
       settings = Setting.reorder('name').all
       options = settings.collect { |s| { 'value' => s.id, 'text' => s.name }}
       render json: options
     end
+    
   end
 end

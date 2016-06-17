@@ -3,6 +3,32 @@ require 'aws-sdk'
 
 namespace :caboose do
   
+  desc "Refresh invoice transactions"
+  task :refresh_invoice_transactions => :environment do
+    inv = Caboose::Invoice.where(:status => 'pending').reorder("id desc").first
+    inv.refresh_transactions        
+  end
+  
+  desc "Change orders to invoices in custom functions"
+  task :order_to_invoices => :environment do
+    Caboose::StoreConfig.all.each do |sc|      
+      sc.custom_packages_function = order_to_invoices_in_string(sc.custom_packages_function ) if sc.custom_packages_function && sc.custom_packages_function.strip.length > 0       
+      sc.custom_shipping_function = order_to_invoices_in_string(sc.custom_shipping_function ) if sc.custom_shipping_function && sc.custom_shipping_function.strip.length > 0
+      sc.custom_tax_function      = order_to_invoices_in_string(sc.custom_tax_function      ) if sc.custom_tax_function      && sc.custom_tax_function.strip.length      > 0
+      sc.starting_invoice_number  = sc.starting_order_number if sc.starting_order_number
+      sc.save
+    end    
+  end
+  
+  def order_to_invoices_in_string(str)
+    str = str.gsub('Order', 'Invoice')
+    str = str.gsub('order', 'invoice')
+    str = str.gsub('Binvoice', 'Border')
+    str = str.gsub('binvoice', 'border')
+    str = str.gsub('reinvoice', 'reorder')
+    return str
+  end
+  
   desc "Check ruby syntax in all ruby files"
   task :check_syntax => :environment do    
     puts "Checking syntax in all ruby files...\n\n"
@@ -82,15 +108,15 @@ namespace :caboose do
   end
   
   desc "Compare routes in controllers with routes in the routes file"
-  task :compare_routes => :environment do    
-    puts Caboose::CommentRoutes.compare_routes
+  task :compare_routes, [:arg1, :arg2] => :environment do |t, args|    
+    Caboose::CommentRoutes.compare_routes(args[:arg1], args[:arg2])
   end
   
-  desc "Calculate order profits"  
-  task :calculate_order_profits => :environment do        
-    Caboose::Order.where("status = ? or status = ? or status = ?", Caboose::Order::STATUS_PENDING, Caboose::Order::STATUS_READY_TO_SHIP, Caboose::Order::STATUS_SHIPPED).reorder(:id).all.each do |order|
-      order.update_column(:cost   , order.calculate_cost   )
-      order.update_column(:profit , order.calculate_profit )
+  desc "Calculate invoice profits"  
+  task :calculate_invoice_profits => :environment do        
+    Caboose::Invoice.where("status = ? or status = ? or status = ?", Caboose::Invoice::STATUS_PENDING, Caboose::Invoice::STATUS_READY_TO_SHIP, Caboose::Invoice::STATUS_SHIPPED).reinvoice(:id).all.each do |invoice|
+      invoice.update_column(:cost   , invoice.calculate_cost   )
+      invoice.update_column(:profit , invoice.calculate_profit )
     end                    
   end
   
@@ -137,7 +163,7 @@ namespace :caboose do
 
   desc "Migrate product images to media"
   task :migate_product_images_to_media => :environment do
-    Caboose::ProductImage.where("image_file_name is not null AND media_id IS NULL").order("id DESC").all.each do |product_image|
+    Caboose::ProductImage.where("image_file_name is not null AND media_id IS NULL").reorder("id DESC").all.each do |product_image|
       next if product_image.product.nil?
       puts "Saving media for Product Image " + product_image.id.to_s
       m = nil
@@ -309,16 +335,16 @@ namespace :caboose do
     end
   end
   
-  desc "Set order numbers"
-  task :set_order_numbers => :environment do
+  desc "Set invoice numbers"
+  task :set_invoice_numbers => :environment do
     
     Caboose::Site.all.each do |site|
       next if !site.use_store
-      i = site.store_config.starting_order_number
-      Caboose::Order.where("order_number is null and status <> 'cart'").reorder(:id).all.each do |o|
-        o.order_number = i
-        o.save
-        i = i + 1
+      n = site.store_config.starting_invoice_number
+      Caboose::Invoice.where("invoice_number is null and status <> 'cart'").reorder(:id).all.each do |inv|
+        i.invoice_number = n
+        i.save
+        n = n + 1
       end
     end
   end

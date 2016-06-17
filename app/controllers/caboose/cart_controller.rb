@@ -1,13 +1,13 @@
 module Caboose
   class CartController < Caboose::ApplicationController
     
-    # GET /cart
+    # @route GET /cart
     def index
     end
     
-    # GET /cart/items
+    # @route GET /cart/items
     def list
-      render :json => @order.as_json(
+      render :json => @invoice.as_json(
         :include => [        
           { 
             :line_items => { 
@@ -22,34 +22,34 @@ module Caboose
               }
             }
           },
-          { :order_packages => { :include => [:shipping_package, :shipping_method] }},
+          { :invoice_packages => { :include => [:shipping_package, :shipping_method] }},
           :customer,
           :shipping_address,
           :billing_address,
-          :order_transactions,
+          :invoice_transactions,
           { :discounts => { :include => :gift_card }}
         ]        
       )
     end
     
-    # GET /cart/item-count
+    # @route GET /cart/item-count
     def item_count
-      render :json => { :item_count => @order.item_count }            
+      render :json => { :item_count => @invoice.item_count }            
     end
     
-    # POST /cart
+    # @route POST /cart
     def add      
       v = Variant.find(params[:variant_id])
       qty = params[:quantity] ? params[:quantity].to_i : 1
       
-      if @order.line_items.exists?(:variant_id => v.id)
-        li = @order.line_items.find_by_variant_id(v.id)
+      if @invoice.line_items.exists?(:variant_id => v.id)
+        li = @invoice.line_items.find_by_variant_id(v.id)
         li.quantity += qty
         li.subtotal = li.unit_price * li.quantity
       else
         unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)
         li = LineItem.new(
-          :order_id   => @order.id,
+          :invoice_id   => @invoice.id,
           :variant_id => v.id,
           :quantity   => qty,
           :unit_price => unit_price,
@@ -61,11 +61,11 @@ module Caboose
       render :json => { 
         :success => li.save, 
         :errors => li.errors.full_messages,
-        :item_count => @order.item_count 
+        :item_count => @invoice.item_count 
       }      
     end
     
-    # PUT /cart/:line_item_id
+    # @route PUT /cart/:line_item_id
     def update            
       resp = Caboose::StdClass.new
       li = LineItem.find(params[:line_item_id])
@@ -73,14 +73,27 @@ module Caboose
       save = true    
       params.each do |name,value|
         case name
-          when 'quantity'    then 
+          when 'quantity'    then
+            if value.to_i != li.quantity
+              op = li.invoice_package
+              if op
+                op.shipping_method_id = nil
+                op.total = nil
+                op.save
+              end
+              if li.invoice
+                li.invoice.shipping = 0.00
+                li.invoice.save
+                li.invoice.calculate        
+              end
+            end
             li.quantity = value.to_i
             if li.quantity == 0
               li.destroy
             else            
               li.subtotal = li.unit_price * li.quantity
               li.save
-              li.order.calculate
+              li.invoice.calculate
             end
           when 'is_gift'               then li.is_gift              = value
           when 'include_gift_message'  then li.include_gift_message = value
@@ -90,18 +103,29 @@ module Caboose
         end
       end
       li.save
-      li.order.calculate
+      li.invoice.calculate
       resp.success = true
       render :json => resp                                    
     end
     
-    # DELETE /cart/:line_item_id
-    def remove
-      li = LineItem.find(params[:line_item_id]).destroy
-      render :json => { :success => true, :item_count => @order.line_items.count }
+    # @route DELETE /cart/:line_item_id
+    def remove                  
+      li = LineItem.find(params[:line_item_id]).destroy      
+      op = li.invoice_package
+      if op
+        op.shipping_method_id = nil
+        op.total = nil
+        op.save                
+      end
+      if li.invoice
+        li.invoice.shipping = 0.00
+        li.invoice.save
+        li.invoice.calculate        
+      end
+      render :json => { :success => true, :item_count => @invoice.line_items.count }
     end
     
-    # POST /cart/gift-cards
+    # @route POST /cart/gift-cards
     def add_gift_card      
       resp = StdClass.new
       code = params[:code].strip
@@ -112,30 +136,25 @@ module Caboose
       elsif gc.date_available && DateTime.now.utc < gc.date_available           then resp.error = "That gift card is not active yet."         
       elsif gc.date_expires && DateTime.now.utc > gc.date_expires               then resp.error = "That gift card is expired."
       elsif gc.card_type == GiftCard::CARD_TYPE_AMOUNT && gc.balance <= 0       then resp.error = "That gift card has a zero balance." 
-      elsif gc.min_order_total && @order.total < gc.min_order_total             then resp.error = "Your order must be at least $#{sprintf('%.2f',gc.min_order_total)} to use this gift card." 
-      elsif Discount.where(:order_id => @order.id, :gift_card_id => gc.id).exists? then resp.error = "That gift card has already been applied to this order."
+      elsif gc.min_invoice_total && @invoice.total < gc.min_invoice_total             then resp.error = "Your invoice must be at least $#{sprintf('%.2f',gc.min_invoice_total)} to use this gift card." 
+      elsif Discount.where(:invoice_id => @invoice.id, :gift_card_id => gc.id).exists? then resp.error = "That gift card has already been applied to this invoice."
       else
-        # Determine how much the discount will be
-        d = Discount.new(:order_id => @order.id, :gift_card_id => gc.id, :amount => 0.0)        
-        case gc.card_type
-          when GiftCard::CARD_TYPE_AMOUNT      then d.amount = (@order.total >= gc.balance ? gc.balance : @order.total)
-          when GiftCard::CARD_TYPE_PERCENTAGE  then d.amount = @order.subtotal * gc.total
-          when GiftCard::CARD_TYPE_NO_SHIPPING then d.amount = @order.shipping
-          when GiftCard::CARD_TYPE_NO_TAX      then d.amount = @order.tax
-        end
-        d.save
-        @order.calculate
+        # Create the discount and recalculate the invoice
+        d = Discount.create(:invoice_id => @invoice.id, :gift_card_id => gc.id, :amount => 0.0)
+        d.calculate_amount                
+        @invoice.calculate  
+        
         resp.success = true
-        resp.order_total = @order.total
+        resp.invoice_total = @invoice.total
         GA.delay.event(@site.id, 'giftcard', 'add', "Giftcard #{gc.id}")
       end
       render :json => resp
     end
     
-    # DELETE /cart/discounts/:discount_id
+    # @route DELETE /cart/discounts/:discount_id
     def remove_discount
       Discount.find(params[:discount_id]).destroy
-      @order.calculate
+      @invoice.calculate
       render :json => { :success => true }
     end
   end

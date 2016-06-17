@@ -1,6 +1,7 @@
 module Caboose
   class LogoutController < ApplicationController
-    # GET /logout
+    
+    # @route GET /logout
     def index
       Caboose.plugin_hook('before_logout')
       
@@ -9,5 +10,6 @@ module Caboose
       login_user(elo)      
       redirect_to params[:return_url] ? params[:return_url] : "/"    
     end
+    
   end
 end

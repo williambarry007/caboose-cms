@@ -7,13 +7,13 @@ sc = @store_config
 <p><div id='storeconfig_<%= sc.id %>_auto_calculate_shipping'  ></div></p>
 <div id='custom_shipping_container' <% if sc.auto_calculate_shipping %>style='display: none;'<% end %>>
   <h3>Custom Shipping Rates Function</h3>
-  <p><code>def custom_shipping_rates_function(order) {</code></p>
+  <p><code>def custom_shipping_rates_function(invoice) {</code></p>
   <p><div id='storeconfig_<%= sc.id %>_custom_shipping_function' ></div></p>
   <p><code>
   # Returns an empty array by default.<br />
-  # Return an array of order packages and their rates<br />
+  # Return an array of invoice packages and their rates<br />
   # return [{<br />
-  # &nbsp;&nbsp;:order_package => Caboose::OrderPackage.new,<br /> 
+  # &nbsp;&nbsp;:invoice_package => Caboose::InvoicePackage.new,<br /> 
   # &nbsp;&nbsp;:rates => [{ <br />
   # &nbsp;&nbsp;&nbsp;&nbsp;:shipping_method => Caboose::ShippingMethod.new,<br />
   # &nbsp;&nbsp;&nbsp;&nbsp;:total_price => 3.50 <br />

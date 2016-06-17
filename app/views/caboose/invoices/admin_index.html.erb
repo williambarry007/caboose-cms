@@ -1,0 +1,88 @@
+<h1>Invoices</h1>
+
+<style type='text/css'>
+#search_form_wrapper { margin-bottom: 10px; position: absolute; top:0; right: 0; }
+</style>
+
+<p>
+  <a class="caboose-btn" href='#' onclick="$('#search_form').toggle(400, function() { modal.autosize(); });">Show/hide search form</a>
+  <a class="caboose-btn" href='/admin/invoices/new'>New Manual Invoice</a>
+  <a class="caboose-btn" href='/admin/invoices/print-pending' target='_blank'>Print Pending Invoices</a>
+  <a class="caboose-btn" href='/admin/invoices/summary-report' target='_blank'>Summary Report</a>
+  <a class="caboose-btn" href='/admin/invoices/city-report' target='_blank'>City Report</a>
+</p>
+<form action='/admin/invoices' method='get' id='search_form' style='display: none;'>
+  <p><input type='text' name='id'           placeholder='Invoice ID'     value="<%= @pager.params['id']           %>" style='width: 100px;' /></p>
+  <p><input type='text' name='invoice_number' placeholder='Invoice Number' value="<%= @pager.params['invoice_number'] %>" style='width: 100px;' /></p>
+  <p><select name='customer_id'>
+      <optgroup label='Status' style='width: 100px'>
+        <option value=''>-- All customers --</option>        
+        <% @customers.each do |c| %>
+          <option value='<%= c.id %>'<%= @pager.params['customer_id'] == c.id ? " selected='true'" : '' %>>
+            <%= c.first_name.blank? && c.last_name.blank? ? c.username : "#{c.last_name}, #{c.first_name}" %>
+          </option>
+        <% end %>
+      </optgroup>
+    </select></p>
+  <p><select name='status'>
+      <optgroup label='Status'>
+        <option value=''>-- All statuses --</option>
+        <% statuses = ['cart', 'pending', 'ready to ship', 'shipped', 'canceled', 'backordered'] %>
+        <% statuses.each do |status| %>
+          <option value='<%= status %>'<%= @pager.params['status'] == status ? " selected='true'" : '' %>><%= status.capitalize %></option>
+        <% end %>
+      </optgroup>
+    </select></p>  
+  <p>
+    <input type='submit' value='Search' />
+    <input type='button' value='Clear' onclick="window.location='/admin/invoices';" />
+  </p>
+</form>
+
+<% if @invoices.count > 0 %>
+  <table class='data' id='invoices_table'>
+    <tr>
+      <%= raw @pager.sortable_table_headings({
+  				'id'              => 'ID',
+  				'invoice_number'    => 'Invoice Number',
+  				'customer_id'     => 'Customer',
+  				'date_created'    => 'Date Created',  				
+  				'total'           => 'Total',
+  				'status'          => 'Status'  				
+  			})
+  		%>
+    </tr>
+  <% @invoices.each do |invoice| %>
+    <tr onclick="window.location='/admin/invoices/<%= invoice.id %>';">
+      <td><%= raw invoice.id %></td>
+      <td><%= raw invoice.invoice_number %></td>
+      <td>
+        <% if invoice.customer.nil? %>
+          Unknown
+        <% else %>
+          <% if invoice.customer.first_name && invoice.customer.first_name.strip.length > 0 %>
+            <%= invoice.customer.first_name %> <%= invoice.customer.last_name %>
+          <% else %>
+            <%= invoice.customer.email %>            
+          <% end %>
+        <% end %>
+      </td>
+      <td><%= raw invoice.date_created %></td>
+      <td align='right'><%= number_to_currency(invoice.total) %></td>
+      <td><%= raw invoice.status %></td>      
+    </tr>
+  <% end %>
+  </table>
+  <p><%= raw @pager.generate %></p>
+<% else %>
+  <p>There are no invoices right now.</p>
+<% end %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+var modal = false;
+$(window).load(function() { 
+  modal = new CabooseModal('95%');
+});
+</script>
+<% end %>

@@ -13,13 +13,12 @@ BoundText = BoundControl.extend({
     for (var thing in params)
       this[thing] = params[thing];
     
-    this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;    
-    $('#'+this.el).wrap($('<div/>')
-      .attr('id', this.el + '_container')
-      .addClass('mb_container')
-      .css('position', 'relative')
-    );
-    $('#'+this.el+'_container').empty();
+    this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;
+    var wrapper = $('<div/>').attr('id', this.el + '_container').addClass('mb_container').css('position', 'relative');
+    if (this.attribute.wrapper_class)
+      wrapper.addClass(this.attribute.wrapper_class);        
+    $('#'+this.el).wrap(wrapper);      
+    $('#'+this.el+'_container').empty();    
     $('#'+this.el+'_container').append($('<input/>')
       .attr('id', this.el)
       .attr('type', 'text')
@@ -76,7 +75,7 @@ BoundText = BoundControl.extend({
       }
       else
       {
-        this2.show_check(500);
+        this2.show_check(500);        
         $('#'+this2.el).val(this2.attribute.value);
         $('#'+this2.el).removeClass('mb_dirty');
 

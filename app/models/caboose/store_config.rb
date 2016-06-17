@@ -40,7 +40,7 @@ module Caboose
       :handling_percentage,
       :auto_calculate_packages,
       :auto_calculate_shipping,
-      :auto_calculate_tax,
+      :auto_calculate_tax,      
       :custom_packages_function,   
       :custom_shipping_function,   
       :custom_tax_function,                  
@@ -53,13 +53,13 @@ module Caboose
     LENGTH_UNIT_METRIC   = 'cm'
     LENGTH_UNIT_IMPERIAL = 'in'
     
-    PAYMENT_PROCESSOR_AUTHORIZENET = 'authorize.net'
-    PAYMENT_PROCESSOR_STRIPE = 'stripe'
+    PAYMENT_PROCESSOR_AUTHNET = 'authnet'
+    PAYMENT_PROCESSOR_STRIPE  = 'stripe'
       
-    def next_order_number
-      x = Order.where("order_number is not null").reorder("order_number desc").limit(1).first
-      return x.order_number + 1 if x
-      return self.starting_order_number      
+    def next_invoice_number
+      x = Invoice.where("invoice_number is not null").reorder("invoice_number desc").limit(1).first
+      return x.invoice_number + 1 if x
+      return self.starting_invoice_number      
     end
         
   end

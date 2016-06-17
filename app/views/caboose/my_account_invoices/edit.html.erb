@@ -1,0 +1,35 @@
+<%
+store_config = @invoice.site.store_config
+%>
+<h1>Invoice #<%= @invoice.invoice_number %></h1>
+
+<div id='overview_table'></div>
+<% if @invoice.financial_status == Caboose::Invoice::FINANCIAL_STATUS_PENDING %>  
+  <div id='payment_form'></div>
+  <div id='payment_message'></div>
+  <iframe id="relay" name="relay" style='<% if @show_relay %>display: block; width: 800px; height: 400px; border: #000 1px solid;<% else %>display: none;<% end %>'></iframe>  
+<% end %>
+<div id='invoice_table'></div>
+<div id='message'></div>
+
+<p><input type='button' value='< Back' class='btn' onclick="window.location='/my-account/invoices';" /></p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/my_account_edit_invoice' %>
+<script type='text/javascript'>
+
+var controller = false;
+$(document).ready(function() {
+  controller = new MyAccountInvoiceController({ 
+    invoice_id: <%= raw Caboose.json(@invoice.id) %>,
+    authenticity_token: <%= raw Caboose.json(form_authenticity_token) %>
+  });
+});
+
+</script>
+<% end %>
+
+<% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/my_account_edit_invoice' %>
+<% end %>

@@ -1,13 +1,13 @@
 module Caboose
   class StackableGroupsController < Caboose::ApplicationController  
 
-    # GET /admin/stackable-groups
+    # @route GET /admin/stackable-groups
     def admin_index
       return if !user_is_allowed('products', 'view')      
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/stackable-groups/json
+    # @route GET /admin/stackable-groups/json
     def admin_json
       return if !user_is_allowed('products', 'view')
       
@@ -27,13 +27,13 @@ module Caboose
       }      
     end        
     
-    # GET /admin/stackable-groups/:id/json
+    # @route GET /admin/stackable-groups/:id/json
     def admin_json_single
       sg = StackableGroup.find(params[:id])
       render :json => sg      
     end    
       
-    # PUT /admin/stackable-groups/:id
+    # @route PUT /admin/stackable-groups/:id
     def admin_update
       return if !user_is_allowed('products', 'edit')
       
@@ -56,7 +56,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/stackable-groups
+    # @route POST /admin/stackable-groups
     def admin_add
       return if !user_is_allowed('products', 'add')
       
@@ -75,14 +75,15 @@ module Caboose
       render :json => resp    
     end
     
-    # DELETE /admin/stackable-groups/:id
+    # @route DELETE /admin/stackable-groups/:id
     def admin_delete
       return if !user_is_allowed('products', 'delete')
       StackableGroup.find(params[:id]).destroy      
       render :json => true      
     end
     
-    # DELETE /admin/stackable-groups/bulk
+    # @route_priority 1
+    # @route DELETE /admin/stackable-groups/bulk
     def admin_bulk_delete
       return if !user_is_allowed('products', 'delete')
       params[:model_ids].each do |sg_id|
@@ -92,7 +93,8 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # GET /admin/stackable-groups/options
+    # @route_priority 2
+    # @route GET /admin/stackable-groups/options
     def admin_options      
       options = StackableGroup.reorder(:name).all.collect do |sg|
         {

@@ -1,17 +1,28 @@
 module Caboose
+  
   PageBarGenerator.class_eval do
     def all_records
       return model_with_includes.where(where)
     end
   end
-end
-
-module Caboose
+  
   class ProductsController < Caboose::ApplicationController
-        
-    # GET /products || GET /products/:id
-    def index
-      
+       
+    # @route GET /products/:id/info
+    def info
+      p = Product.find(params[:id])
+      render :json => { 
+        :product => p,
+        :option1_values => p.option1_values_with_media(true),
+        :option2_values => p.option2_values_with_media(true),
+        :option3_values => p.option3_values_with_media(true)
+      }
+    end
+    
+    # @route GET /products
+    # @route GET /products/:id
+    # @route_constraints { :id => /.*/ }        
+    def index      
       # If id exists, is an integer and a product exists with the specified id then get the product
       if params[:id]        
         if params[:id] == 'sales'
@@ -36,7 +47,7 @@ module Caboose
           
           @category       = @product.categories.first
           @review         = Review.new
-          @reviews        = Review.where(:product_id => @product.id).limit(10).order("id DESC") || nil
+          @reviews        = Review.where(:product_id => @product.id).limit(10).reorder("id DESC") || nil
           @logged_in_user = logged_in_user
           
           add_ga_event('Products', 'View', "Product #{@product.id}")
@@ -123,31 +134,20 @@ module Caboose
     end
     
     def show      
-    end
-    
-    # GET /product/info
-    def info
-      p = Product.find(params[:id])
-      render :json => { 
-        :product => p,
-        :option1_values => p.option1_values_with_media(true),
-        :option2_values => p.option2_values_with_media(true),
-        :option3_values => p.option3_values_with_media(true)
-      }
-    end
+    end        
     
     #=============================================================================
     # Admin actions
     #=============================================================================
     
-    # GET /admin/products/update-vendor-status/:id
+    # @route PUT /admin/products/update-vendor-status/:id
     def admin_update_vendor_status
       vendor = Vendor.find(params[:id])
       vendor.status = params[:status]
       render :json => vendor.save
     end
     
-    # GET /admin/products
+    # @route GET /admin/products
     def admin_index
       return if !user_is_allowed('products', 'view')
       
@@ -208,7 +208,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/json
+    # @route GET /admin/products/json
     def admin_json
       return if !user_is_allowed('products', 'view')
       
@@ -243,34 +243,34 @@ module Caboose
       }      
     end
     
-    # GET /admin/products/:id/json
+    # @route GET /admin/products/:id/json
     def admin_json_single
       p = Product.find(params[:id])
       render :json => p      
     end
     
-    # GET /admin/products/:id/general
+    # @route GET /admin/products/:id
     def admin_edit_general
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/:id/description
+    # @route GET /admin/products/:id/description
     def admin_edit_description   
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/:id/options
+    # @route GET /admin/products/:id/options
     def admin_edit_options
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:id])
       render :layout => 'caboose/admin'          
     end
     
-    # GET /admin/products/:id/categories
+    # @route GET /admin/products/:id/categories
     def admin_edit_categories
       return if !user_is_allowed('products', 'edit')
       @product = Product.find(params[:id])
@@ -279,7 +279,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/:id/images
+    # @route GET /admin/products/:id/images
     def admin_edit_images    
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:id])  
@@ -308,7 +308,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # POST /admin/products/:id/images
+    # @route POST /admin/products/:id/images
     def admin_add_image
       return if !user_is_allowed('products', 'edit')
       product_id = params[:id]
@@ -327,28 +327,28 @@ module Caboose
       end
     end
     
-    # GET /admin/products/:id/collections
+    # @route GET /admin/products/:id/collections
     def admin_edit_collections
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:id])
       render :layout => 'caboose/admin'
     end    
     
-    # GET /admin/products/:id/seo
+    # @route GET /admin/products/:id/seo
     def admin_edit_seo
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/products/:id/delete
+    # @route GET /admin/products/:id/delete
     def admin_delete_form
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:id])
       render :layout => 'caboose/admin'
     end
       
-    # PUT /admin/products/:id
+    # @route PUT /admin/products/:id
     def admin_update
       return if !user_is_allowed('products', 'edit')
       
@@ -419,13 +419,14 @@ module Caboose
       render :json => resp
     end
     
-    # GET /admin/products/new
+    # @route_priority 1
+    # @route GET /admin/products/new
     def admin_new
       return if !user_is_allowed('products', 'add')
       render :layout => 'caboose/admin'
     end
     
-    # POST /admin/products
+    # @route POST /admin/products
     def admin_add
       return if !user_is_allowed('products', 'add')
       
@@ -446,7 +447,7 @@ module Caboose
       render :json => resp    
     end
     
-    # DELETE /admin/products/:id
+    # @route DELETE /admin/products/:id
     def admin_delete
       return if !user_is_allowed('products', 'delete')
       p = Product.find(params[:id])
@@ -457,27 +458,31 @@ module Caboose
       })
     end
     
-    # GET /products/status-options
+    # @route_priority 3
+    # @route GET /admin/products/status-options
     def admin_status_options
       arr = ['Active', 'Inactive', 'Deleted']      
       render :json => arr.collect{ |status| { :value => status, :text => status }}
     end
     
-    # GET /products/stackable-group-options
+    # @route GET /products/stackable-group-options
     def admin_stackable_group_options
       arr = ['Active', 'Inactive', 'Deleted']
       render :json => arr.collect{ |status| { :value => status, :text => status }}      
     end
     
-    # GET /admin/products/combine
+    # @route_priority 2
+    # @route GET /admin/products/combine
     def admin_combine_select_products
     end
     
-    # GET /admin/products/combine-step2
+    # @route_priority 4
+    # @route GET /admin/products/combine-step2
     def admin_combine_assign_title
     end
     
-    # POST /admin/products/combine
+    # @route_priority 5
+    # @route POST /admin/products/combine
     def admin_combine
       product_ids = params[:product_ids]
       
@@ -500,7 +505,8 @@ module Caboose
       end
     end
     
-    # GET /admin/products/sort
+    # @route_priority 6
+    # @route GET /admin/products/sort
     def admin_sort
       #@products   = Product.active
       #@vendors    = Vendor.active
@@ -508,7 +514,7 @@ module Caboose
       render :layout => 'caboose/admin'
     end
     
-    # PUT /admin/categories/:category_id/products/sort-order
+    # @route PUT /admin/categories/:category_id/products/sort-order
     def admin_update_sort_order
       cat_id = params[:category_id]      
       params[:product_ids].each_with_index do |product_id, i|
@@ -523,18 +529,18 @@ module Caboose
     # API actions
     #=============================================================================
     
-    # GET /api/products
+    # @route GET /api/products
     def api_index
       render :json => Product.where(:status => 'Active')
     end
     
-    # GET /api/products/:id
+    # @route GET /api/products/:id
     def api_details
       p = Product.where(:id => params[:id]).first
       render :json => p ? p : { :error => 'Invalid product ID' }
     end
     
-    # GET /api/products/:id/variants
+    # @route GET /api/products/:id/variants
     def api_variants
       p = Product.where(:id => params[:id]).first
       render :json => p ? p.variants : { :error => 'Invalid product ID' }

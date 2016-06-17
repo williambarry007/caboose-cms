@@ -64,26 +64,27 @@ module Caboose
     # Initialize the cart in the session
     def init_cart            
       # Check if the cart ID is defined and that it exists in the database
-      create_new_order = false
+      create_new_invoice = false
       if session[:cart_id]
-        @order = Caboose::Order.where(:id => session[:cart_id]).first
-        create_new_order = true if @order.nil? || @order.status != 'cart'                    
+        @invoice = Caboose::Invoice.where(:id => session[:cart_id]).first
+        create_new_invoice = true if @invoice.nil? || @invoice.status != 'cart'                    
       else                        
-        create_new_order = true                         
+        create_new_invoice = true                         
       end
 
-      if create_new_order # Create an order to associate with the session        
-        @order = Caboose::Order.new        
-        @order.site_id          = @site ? @site.id : nil
-        @order.status           = Caboose::Order::STATUS_CART
-        @order.financial_status = Caboose::Order::STATUS_PENDING
-        @order.date_created     = DateTime.now
-        @order.referring_site   = request.env['HTTP_REFERER']
-        @order.landing_page     = request.fullpath
-        @order.landing_page_ref = params[:ref] || nil
-        @order.save
+      if create_new_invoice # Create an invoice to associate with the session        
+        @invoice = Caboose::Invoice.new        
+        @invoice.site_id          = @site ? @site.id : nil
+        @invoice.status           = Caboose::Invoice::STATUS_CART
+        @invoice.financial_status = Caboose::Invoice::STATUS_PENDING
+        @invoice.date_created     = DateTime.now
+        @invoice.referring_site   = request.env['HTTP_REFERER']
+        @invoice.landing_page     = request.fullpath
+        @invoice.landing_page_ref = params[:ref] || nil
+        @invoice.payment_terms    = @site.store_config.default_payment_terms
+        @invoice.save
         # Save the cart ID in the session
-        session[:cart_id] = @order.id
+        session[:cart_id] = @invoice.id
       end                  
     end
     

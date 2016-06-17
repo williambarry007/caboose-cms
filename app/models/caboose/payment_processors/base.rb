@@ -2,7 +2,7 @@ class Caboose::PaymentProcessors::Base
   
   # Gets a transaction object that obfuscates transaction info.  
   # Included in this info is the relay URL, which should be set to /checkout/payment-relay.  
-  def get_authorize_transaction(order)
+  def get_authorize_transaction(invoice)
     return {}
   end
     
@@ -31,9 +31,9 @@ class Caboose::PaymentProcessors::Base
     return ""
   end
   
-  # Captures funds for the given order.
+  # Captures funds for the given invoice.
   # Returns true or false indicating the success of the transaction.
-  def capture(order)
+  def capture(invoice)
     return false
   end
 end

@@ -118,5 +118,11 @@ class Caboose::User < ActiveRecord::Base
       end
     end
   end
+  
+  def card_is_expired?
+    return true if self.stripe_customer_id.nil?
+    d = Date.new(self.card_exp_year, self.card_exp_month, 1)
+    return d <= Date.today
+  end
 
 end

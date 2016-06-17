@@ -2,14 +2,14 @@ module Caboose
   class AbOptionsController < ApplicationController
     layout 'caboose/admin'
 
-    # @route GET /admin/ab_variants/:variant_id/options
+    # @route GET /admin/ab-variants/:variant_id/options
     def admin_index
       return unless user_is_allowed_to 'view', 'ab_variants'
       v = AbVariant.find(params[:variant_id])
       render :json => v.ab_options
     end
 
-    # @route POST admin/ab-variants/:variant_id/options'
+    # @route POST /admin/ab-variants/:variant_id/options'
     def admin_create
       return unless user_is_allowed_to 'edit','ab_variants'
       
@@ -26,7 +26,7 @@ module Caboose
       render :json => resp
     end
 
-    # @route PUT /admin/ab_options/:id
+    # @route PUT /admin/ab-options/:id
     def admin_update
       return unless user_is_allowed_to 'edit', 'ab_variants'
 
@@ -46,7 +46,7 @@ module Caboose
       render :json => resp
     end
 
-    # @route DELETE /admin/ab_options/:id
+    # @route DELETE /admin/ab-options/:id
     def admin_delete
       return unless user_is_allowed_to 'delete', 'ab_variants'      
       AbOption.find(params[:id]).destroy                  

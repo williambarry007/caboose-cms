@@ -1,0 +1,49 @@
+
+<h1>City Report</h1>
+
+<form action='/admin/invoices/city-report' method='get' id='search_form'>
+  <p>
+     <input type='text' id='d1' name='d1' value='<%= @d1.strftime('%Y-%m-%d') %>' /> -
+     <input type='text' id='d2' name='d2' value='<%= @d2.strftime('%Y-%m-%d') %>' />
+     <input type='submit' value='Change Date Range' />
+   </p>
+</form>
+
+<table class='data'>
+  <tr>
+    <th>City     </th>
+    <th>State    </th>
+    <th>Count    </th>
+    <th>Subtotal </th>
+    <th>Tax      </th>
+    <th>Shipping </th>
+    <th>Handling </th>
+    <th>Discount </th>
+    <th>Total    </th>    
+  </tr>
+  <% @rows.each do |row| %>
+    <tr>
+      <td><%= row.city  %></td>
+      <td><%= row.state %></td>
+      <td align='right'><%= row.count %></td>
+      <td align='right'>$<%= sprintf('%.2f', row.subtotal ) %></td>
+      <td align='right'>$<%= sprintf('%.2f', row.tax      ) %></td>
+      <td align='right'>$<%= sprintf('%.2f', row.shipping ) %></td>
+      <td align='right'>$<%= sprintf('%.2f', row.handling ) %></td>
+      <td align='right'>$<%= sprintf('%.2f', row.discount ) %></td>
+      <td align='right'>$<%= sprintf('%.2f', row.total    ) %></td>      
+    </tr>
+  <% end %>
+</table>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %> 
+<script type='text/javascript'> 
+
+$(document).ready(function() {
+  $('#d1').datepicker({ dateFormat: 'yy-mm-dd' });
+  $('#d2').datepicker({ dateFormat: 'yy-mm-dd' });
+});
+
+</script>
+<% end %>

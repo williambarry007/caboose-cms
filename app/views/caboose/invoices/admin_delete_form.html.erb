@@ -1,0 +1,18 @@
+<%= render :partial => 'invoices/admin_header' %>
+
+<div id='message'>
+<p><input type='button' value='Delete this invoice' onclick='delete_invoice(<%= @invoice.id %>);' /></p>
+</div>
+
+<%= render :partial => 'invoices/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type='text/javascript'>
+
+var modal = false;
+$(window).load(function() {
+  modal = new CabooseModal(800);
+});
+
+</script>
+<% end %>

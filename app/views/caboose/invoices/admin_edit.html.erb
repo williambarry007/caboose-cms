@@ -1,0 +1,57 @@
+
+<input type='hidden' name='invoice_id'    id='invoice_id'     value='<%= @invoice.id %>' />
+
+<h1>Edit Invoice #<%= @invoice.id %></h1>
+
+<div id='overview_table'></div>
+<div id='invoice_table'></div>
+<div id='message'></div>
+<div id='controls'></div>
+
+<!--
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/invoices';" />
+<% if @invoice.financial_status == Caboose::Invoice::FINANCIAL_STATUS_AUTHORIZED && @invoice.total > 0.00 %>
+  <input type='button' value='Capture Funds' onclick="controller.capture_funds();" />
+  <input type='button' value='Void'          onclick="controller.void_invoice();" />
+<% end %>
+<% if @invoice.financial_status == Caboose::Invoice::FINANCIAL_STATUS_CAPTURED && @invoice.total > 0.00 %>
+  <input type='button' value='Refund' onclick="refund_invoice(<%= @invoice.id %>);" />
+<% end %>
+<input type='button' value='Resend Confirmation' onclick="resend_confirmation(<%= @invoice.id %>)" />
+<input type='button' value='Add Item'            onclick="controller.add_variant();" />
+<input type='button' value='Print Invoice'         onclick="controller.print_invoice(<%= @invoice.id %>);" />
+
+<% str = Caboose.plugin_hook('admin_edit_invoice_buttons', "", @invoice) %>
+<% if str %><%= raw str %><% end %>
+</p>
+-->
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/admin_edit_invoice' %>
+<script type='text/javascript'>
+
+var controller = false;
+$(document).ready(function() {
+  controller = new InvoiceController({ 
+    invoice_id: <%= raw Caboose.json(@invoice.id) %>,
+    authenticity_token: <%= raw Caboose.json(form_authenticity_token) %>
+  });
+});
+
+</script>
+<% end %>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+table.shipping_address td,
+table.billing_address td {
+  padding: 0 !important; 
+  margin: 0 !important; 
+  border: 0 !important; 
+}
+
+</style>
+<% end %>

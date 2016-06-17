@@ -6,7 +6,7 @@
     <th>Unit Price</th>
     <th>Subtotal</th>
   </tr>
-  <% @order.line_items.each do |li| %>
+  <% @invoice.line_items.each do |li| %>
     <tr data-id="<%= li.id %>">
       <td valign='top'>
         <% if li.variant.product_images.count > 0 %>              
@@ -21,18 +21,18 @@
       <td valign='top' align='right' class='subtotal'   style='text-align: right;'><%= number_to_currency(li.subtotal   , :precision => 2) %></td>
     </tr>        
   <% end %>                  
-  <tr><td colspan='4' align='right' style='text-align: right;'>Subtotal:            </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.subtotal                   , :precision => 2) %></td></tr>            
-  <tr><td colspan='4' align='right' style='text-align: right;'>Shipping & Handling: </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.shipping + @order.handling , :precision => 2) %></td></tr>  
-  <tr><td colspan='4' align='right' style='text-align: right;'>Tax:                 </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.tax                        , :precision => 2) %></td></tr>
-  <% if @order.discounts && @order.discounts.count > 0 %>
-    <% @order.discounts.each do |d| %>
+  <tr><td colspan='4' align='right' style='text-align: right;'>Subtotal:            </td><td align='right' style='text-align: right;'><%= number_to_currency(@invoice.subtotal                   , :precision => 2) %></td></tr>            
+  <tr><td colspan='4' align='right' style='text-align: right;'>Shipping & Handling: </td><td align='right' style='text-align: right;'><%= number_to_currency(@invoice.shipping + @invoice.handling , :precision => 2) %></td></tr>  
+  <tr><td colspan='4' align='right' style='text-align: right;'>Tax:                 </td><td align='right' style='text-align: right;'><%= number_to_currency(@invoice.tax                        , :precision => 2) %></td></tr>
+  <% if @invoice.discounts && @invoice.discounts.count > 0 %>
+    <% @invoice.discounts.each do |d| %>
       <tr>
         <td colspan='4' align='right' style='text-align: right;'>Gift card (<%= d.gift_card.code %>):</td>
         <td align='right' style='text-align: right;'><%= number_to_currency(d.amount, :precision => 2) %></td>
       </tr>    
     <% end %>
   <% end %>
-  <tr><td colspan='4' align='right' style='text-align: right;'>Total:               </td><td align='right' style='text-align: right;'><%= number_to_currency(@order.total                      , :precision => 2) %></td></tr>
+  <tr><td colspan='4' align='right' style='text-align: right;'>Total:               </td><td align='right' style='text-align: right;'><%= number_to_currency(@invoice.total                      , :precision => 2) %></td></tr>
 </table>
 
 <% content_for :caboose_css do %>

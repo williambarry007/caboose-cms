@@ -6,7 +6,7 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
     
-    # GET /admin/permissions
+    # @route GET /admin/permissions
     def index
       return if !user_is_allowed('permissions', 'view')
       
@@ -21,19 +21,19 @@ module Caboose
     	@permissions = @gen.items    	
     end
   
-    # GET /admin/permissions/new
+    # @route GET /admin/permissions/new
     def new
       return if !user_is_allowed('permissions', 'add')
       @permission = Permission.new
     end
   
-    # GET /admin/permissions/1/edit
+    # @route GET /admin/permissions/:id
     def edit
       return if !user_is_allowed('permissions', 'edit')
       @permission = Permission.find(params[:id])
     end
   
-    # POST /admin/permissions
+    # @route POST /admin/permissions
     def create
       return if !user_is_allowed('permissions', 'add')
       
@@ -57,7 +57,7 @@ module Caboose
       render json: resp
     end
   
-    # PUT /admin/permissions/1
+    # @route PUT /admin/permissions/:id
     def update
       return if !user_is_allowed('permissions', 'edit')
 
@@ -78,7 +78,7 @@ module Caboose
     	render json: resp
     end
   
-    # DELETE /admin/permissions/1
+    # @route DELETE /admin/permissions/:id
     def destroy
       return if !user_is_allowed('permissions', 'delete')
       perm = Permission.find(params[:id])
@@ -90,7 +90,8 @@ module Caboose
       render json: resp
     end
     
-    # GET /admin/permissions/options
+    # @route_priority 1
+    # @route GET /admin/permissions/options
     def options
       return if !user_is_allowed('permissions', 'view')
       perms = Permission.reorder('resource, action').all

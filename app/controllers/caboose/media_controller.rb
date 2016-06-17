@@ -8,7 +8,7 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end    
     
-    # GET /admin/media
+    # @route GET /admin/media
     def admin_index
       return if !user_is_allowed('media', 'view')
       render :file => 'caboose/extras/error_invalid_site' and return if @site.nil?
@@ -40,7 +40,7 @@ module Caboose
       render :layout => 'caboose/admin'      
     end
     
-    # GET /admin/media/json
+    # @route GET /admin/media/json
     def admin_json
       return if !user_is_allowed('media', 'view')
       render :json => false and return if @site.nil?
@@ -49,7 +49,7 @@ module Caboose
       render :json => cat.api_hash
     end
     
-    # GET /admin/media/last-upload-processed
+    # @route GET /admin/media/last-upload-processed
     def admin_last_upload_processed
       return if !user_is_allowed('media', 'view')
       render :json => false and return if @site.nil?
@@ -59,28 +59,28 @@ module Caboose
       render :json => { :last_upload_processed => s.value }
     end
 
-    # GET /admin/media/new
+    # @route GET /admin/media/new
     def admin_new
       return unless user_is_allowed('media', 'add')
       @media_category_id = params[:media_category_id]             
       render :layout => 'caboose/admin'
     end
     
-    # GET /admin/media/:id
-    def admin_edit
-      return unless user_is_allowed('media', 'edit')
-      @media = Media.find(params[:id])
-      render :layout => 'caboose/admin'
-    end
-    
-    # GET /admin/media/:id/description
+    # @route GET /admin/media/:id/description
     def admin_edit_description
       return unless user_is_allowed('media', 'edit')
       @media = Media.find(params[:id])
       render :layout => 'caboose/modal'
     end
-            
-    # PUT /admin/media/:id
+    
+    # @route GET /admin/media/:id
+    def admin_edit
+      return unless user_is_allowed('media', 'edit')
+      @media = Media.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+                    
+    # @route PUT /admin/media/:id
     def admin_update
       return unless user_is_allowed('media', 'edit')
       
@@ -104,23 +104,7 @@ module Caboose
       render :json => resp
     end
 
-    # POST /admin/media/edit-image
-    #def admin_edit_image
-    #  new_url = params[:new_url]
-    #  media_id = params[:media_id]
-    #  resp = StdClass.new({'attributes' => {}})
-    #  if !new_url.blank? && !media_id.blank?
-    #    m = Media.find(media_id.gsub("image-",""))
-    #    m.image = new_url
-    #    m.save
-    #    resp.success = "Saved image!"
-    #  else
-    #    resp.error = "Couldn't save image"
-    #  end
-    #  render :json => resp
-    #end
-    
-    # POST /admin/media/:id/image
+    # @route POST /admin/media/:id/image
     def admin_update_image
       return unless user_is_allowed('media', 'edit')
       
@@ -140,28 +124,19 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/media/:id
+    # @route DELETE /admin/media/:id
     def admin_delete
       return unless user_is_allowed('media', 'delete')
-      Media.find(params[:id]).destroy
-      ProductImage.where(:media_id => params[:id]).destroy_all
+      
+      model_ids = params[:id] == 'bulk' ? params[:ids] : [params[:id]]             
+      model_ids.each do |media_id|
+        ProductImage.where(:media_id => media_id).destroy_all
+        Media.where(:id => media_id).destroy_all
+      end                  
       render :json => { :success => true }
     end
     
-    # DELETE /admin/media/bulk
-    def admin_bulk_delete
-      return unless user_is_allowed('media', 'delete')      
-      ids = params[:ids]
-      if ids
-        ids.each do |id|                
-          Media.where(:id => id).destroy_all
-          ProductImage.where(:media_id => id).destroy_all
-        end
-      end
-      render :json => { :success => true }
-    end
-    
-    # POST /admin/media/pre-upload
+    # @route POST /admin/media/pre-upload
     def admin_pre_upload
       return unless user_is_allowed('media', 'view')
       media_category_id = params[:media_category_id]

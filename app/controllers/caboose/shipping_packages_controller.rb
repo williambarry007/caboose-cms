@@ -8,12 +8,12 @@ module Caboose
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
   
-    # GET /admin/shipping-packages
+    # @route GET /admin/shipping-packages
     def admin_index
       return if !user_is_allowed('sites', 'view')            
     end
     
-    # GET /admin/shipping-packages/json
+    # @route GET /admin/shipping-packages/json
     def admin_json
       return if !user_is_allowed('sites', 'view')
       
@@ -32,26 +32,26 @@ module Caboose
     	}    	      	  
     end
     
-    # GET /admin/shipping-packages/new
+    # @route GET /admin/shipping-packages/new
     def admin_new
       return if !user_is_allowed('sites', 'add')
       @shipping_package = ShippingPackage.new      
     end
     
-    # GET /admin/shipping-packages/:id
-    def admin_edit
-      return if !user_is_allowed('sites', 'edit')
-      @shipping_package = ShippingPackage.find(params[:id])      
-    end
-    
-    # GET /admin/shipping-packages/:id/json
+    # @route GET /admin/shipping-packages/:id/json
     def admin_json_single
       return if !user_is_allowed('sites', 'edit')
       sp = ShippingPackage.find(params[:id])
       render :json => sp.as_json(:include => :shipping_methods)
     end
+    
+    # @route GET /admin/shipping-packages/:id
+    def admin_edit
+      return if !user_is_allowed('sites', 'edit')
+      @shipping_package = ShippingPackage.find(params[:id])      
+    end
         
-    # POST /admin/shipping-packages
+    # @route POST /admin/shipping-packages
     def admin_add
       return if !user_is_allowed('sites', 'add')
       
@@ -84,7 +84,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/shipping-packages/bulk
+    # @route POST /admin/shipping-packages/bulk
     def admin_bulk_add
       return if !user_is_allowed('sites', 'add')
       
@@ -123,7 +123,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/shipping-packages/:id
+    # @route PUT /admin/shipping-packages/:id
     def admin_update
       return if !user_is_allowed('sites', 'edit')
 
@@ -154,7 +154,7 @@ module Caboose
     	render :json => resp
     end    
 
-    # PUT /admin/:shipping-packages/bulk
+    # @route PUT /admin/:shipping-packages/bulk
     def admin_bulk_update
       return unless user_is_allowed_to 'edit', 'sites'
     
@@ -186,7 +186,7 @@ module Caboose
       render :json => resp
     end    
       
-    # DELETE /admin/shipping-packages/:id
+    # @route DELETE /admin/shipping-packages/:id
     def admin_delete
       return if !user_is_allowed('sites', 'delete')
       sp = ShippingPackage.find(params[:id])
@@ -196,7 +196,7 @@ module Caboose
       render :json => resp
     end
     
-    # DELETE /admin/shipping-packages/:id/bulk    
+    # @route DELETE /admin/shipping-packages/:id/bulk    
     def admin_bulk_delete
       return if !user_is_allowed('sites', 'delete')
       
@@ -209,15 +209,17 @@ module Caboose
       render :json => resp
     end
             
-    # GET /admin/shipping-packages/options
+    # @route_priority 1
+    # @route GET /admin/shipping-packages/options
     def options
       return if !user_is_allowed('sites', 'view')
       options = ShippingPackage.where(:site_id => @site.id).reorder('service_name').all.collect { |sp| { 'value' => sp.id, 'text' => sp.service_name }}
       render :json => options
     end
-    
-    # GET /admin/shipping-methods/options
-    # GET /admin/shipping-packages/:id/shipping-method-options
+        
+    # @route_priority 3
+    # @route GET /admin/shipping-methods/options
+    # @route GET /admin/shipping-packages/:id/shipping-method-options
     def admin_shipping_method_options
       options = nil
       if params[:id]
@@ -229,7 +231,8 @@ module Caboose
       render :json => options              
     end
     
-    # GET /admin/shipping-packages/package-method-options
+    # @route_priority 2
+    # @route GET /admin/shipping-packages/package-method-options
     def admin_package_method_options      
       return if !user_is_allowed('sites', 'view')
       options = []

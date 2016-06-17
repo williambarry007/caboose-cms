@@ -18,12 +18,11 @@ BoundSelect = BoundControl.extend({
     this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;
     this.message = this.el + '_message';
     this.placeholder = this.el + '_placeholder';
-         
-    $('#'+this.el).wrap($('<div/>')
-      .attr('id', this.el + '_container')
-      .addClass('mb_container')
-      .css('position', 'relative')
-    );
+    
+    var wrapper = $('<div/>').attr('id', this.el + '_container').addClass('mb_container').css('position', 'relative');
+    if (this.attribute.wrapper_class)
+      wrapper.addClass(this.attribute.wrapper_class);        
+    $('#'+this.el).wrap(wrapper);                
     $('#'+this.el+'_container').empty();
     if (this.attribute.fixed_placeholder == true)
     {
@@ -74,8 +73,8 @@ BoundSelect = BoundControl.extend({
             caboose_modal_close_handler = function(new_id) {              
               this2.attribute.populate_options(function() {
                 var select2 = $('#' + this2.el + '_select');
-                select2.empty();
-                if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html('-- Empty --'));
+                select2.empty();                
+                if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html(this2.attribute.empty_text ? this2.attribute.empty_text : '-- Empty --'));
                 if (this2.attribute.quick_add_url)      select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
                 $.each(this2.attribute.options, function(i, option) {
                   var opt = $('<option/>').val(option.value).html(option.text);
@@ -117,9 +116,8 @@ BoundSelect = BoundControl.extend({
           value: this2.attribute.value,
           text: this2.attribute.text
         });
-      }      
-      if (this2.attribute.show_empty_option)      
-        select.append($('<option/>').val('').html('-- Empty --'));
+      }
+      if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html(this2.attribute.empty_text ? this2.attribute.empty_text : '-- Empty --'));
       if (this2.attribute.quick_add_url)      
         select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
       $.each(this2.attribute.options, function(i, option) {

@@ -18,12 +18,13 @@ module Caboose
     # Admin actions
     #===========================================================================
     
-    # GET /admin/users
+    # @route_priority 100
+    # @route GET /admin/users
     def admin_index
       return if !user_is_allowed('users', 'view')            
     end
     
-    # GET /admin/users/json
+    # @route GET /admin/users/json
     def admin_json
       return if !user_is_allowed('users', 'view')
       
@@ -46,20 +47,25 @@ module Caboose
     	}
     end
         
-    # GET /admin/users/:id/json
+    # @route GET /admin/users/:id/json
     def admin_json_single
       return if !user_is_allowed('users', 'view')    
       u = User.find(params[:id])      
       render :json => u.as_json(:include => :roles)
     end
     
-    # GET /admin/users/new
+    # @route GET /admin/users/new
     def admin_new
       return if !user_is_allowed('users', 'add')
       @newuser = User.new
     end
     
-    # GET /admin/users/:id
+    # @route GET /admin/users/import
+    def admin_import_form
+      return if !user_is_allowed('users', 'edit')      
+    end
+    
+    # @route GET /admin/users/:id
     def admin_edit
       return if !user_is_allowed('users', 'edit')
       @edituser = User.find(params[:id])    
@@ -67,23 +73,18 @@ module Caboose
       @roles = Role.roles_with_user(@edituser.id)
     end
     
-    # GET /admin/users/:id/edit-password
+    # @route GET /admin/users/:id/edit-password
     def admin_edit_password
       return if !user_is_allowed('users', 'edit')
       @edituser = User.find(params[:id])
     end
-    
-    # GET /admin/users/import
-    def admin_import_form
-      return if !user_is_allowed('users', 'edit')      
-    end
-    
+            
     def random_string(length)
       o = [('a'..'z'),('A'..'Z'),('0'..'9')].map { |i| i.to_a }.flatten
       return (0...length).map { o[rand(o.length)] }.join
     end
           
-    # POST /admin/users/import
+    # @route POST /admin/users/import
     def admin_import
       return if !user_is_allowed('users', 'add')
       
@@ -147,7 +148,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/users
+    # @route POST /admin/users
     def admin_add
       return if !user_is_allowed('users', 'add')
       
@@ -172,7 +173,7 @@ module Caboose
       render :json => resp
     end
     
-    # PUT /admin/users/:id
+    # @route PUT /admin/users/:id
     def admin_update
       return if !user_is_allowed('users', 'edit')
 
@@ -219,13 +220,13 @@ module Caboose
     	render json: resp
     end
     
-    # POST /admin/users/:id/update-pic
+    # @route POST /admin/users/:id/update-pic
     def admin_update_pic
       @edituser = User.find(params[:id])
       @new_value = "Testing"
     end
       
-    # DELETE /admin/users/:id
+    # @route DELETE /admin/users/:id
     def admin_delete
       return if !user_is_allowed('users', 'delete')
       user = User.find(params[:id])
@@ -237,7 +238,7 @@ module Caboose
       render :json => resp
     end
     
-    # POST /admin/users/:id/roles/:role_id
+    # @route POST /admin/users/:id/roles/:role_id
     def admin_add_to_role
       return if !user_is_allowed('users', 'edit')
       if !RoleMembership.where(:user_id => params[:id], :role_id => params[:role_id]).exists?
@@ -246,14 +247,15 @@ module Caboose
       render :json => true
     end
     
-    # DELETE /admin/users/:id/roles/:role_id
+    # @route DELETE /admin/users/:id/roles/:role_id
     def admin_remove_from_role
       return if !user_is_allowed('users', 'edit')
       RoleMembership.where(:user_id => params[:id], :role_id => params[:role_id]).destroy_all        
       render :json => true
     end
     
-    # GET /admin/users/options
+    # @route_priority 1
+    # @route GET /admin/users/options
     def admin_options
       return if !user_is_allowed('users', 'view')
       @users = User.where(:site_id => @site.id).reorder('last_name, first_name').all
@@ -261,7 +263,8 @@ module Caboose
       render json: options
     end
     
-    # GET /admin/users/:id/su
+    # @route_priority 1
+    # @route GET /admin/users/:id/su
     def admin_su
       return if !user_is_allowed('users', 'sudo')
       user = User.find(params[:id])
@@ -281,7 +284,7 @@ module Caboose
       redirect_to "http://#{d.site.primary_domain.domain}/admin/users/#{params[:id]}/su/#{user.token}"                    
     end
     
-    # GET /admin/users/:id/su/:token
+    # @route GET /admin/users/:id/su/:token
     def admin_su_token
       return if params[:token].nil?
       user = User.find(params[:id])

@@ -65,7 +65,7 @@ module Caboose
     #STATUS_PAID_BY_CHECK  = 'Paid By Check'
     #STATUS_CANCELED       = 'Canceled'
     #STATUS_WAIVED         = 'Waived'
-
+             
     FINANCIAL_STATUS_PENDING    = 'pending'
     FINANCIAL_STATUS_AUTHORIZED = 'authorized'
     FINANCIAL_STATUS_CAPTURED   = 'captured'

@@ -178,10 +178,12 @@ module Caboose
           return
         end
       end
-            
-      ot = nil
-      error = false
-      if @invoice.total > 0
+
+      error = false      
+      requires_payment = @invoice.line_items.count > 0 && @invoice.total > 0 && @invoice.payment_terms == Invoice::PAYMENT_TERMS_PIA       
+      if requires_payment
+      
+        ot = nil
         case sc.pp_name
           when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
                                     
@@ -207,22 +209,20 @@ module Caboose
               :amount           => c.amount/100.0,              
               :date_processed   => DateTime.now.utc,              
               :success          => c.status == 'succeeded'
-            )            
+            )                        
         end
-      elsif @invoice.line_items.count > 0
-        # Then the invoice didn't require payment
         
+        if !ot.success
+          render :json => { :error => error }
+          return        
+        else        
+          @invoice.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED                                                   
+          @invoice.take_gift_card_funds
+        end
       end
-
-      if @invoice.total > 0 && ot && !ot.success
-        render :json => { :error => error }
-        return
-      end
-                    
-      @invoice.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED if @invoice.total > 0
+      
       @invoice.status = Invoice::STATUS_PENDING
-      @invoice.invoice_number = @site.store_config.next_invoice_number                           
-      @invoice.take_gift_card_funds
+      @invoice.invoice_number = @site.store_config.next_invoice_number
       
       # Send out emails
       begin

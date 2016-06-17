@@ -259,17 +259,32 @@ module Caboose
       render :layout => 'caboose/admin'    
     end
 
-    # @route GET /admin/invoices/status-options
-    def admin_status_options
+    # @route GET /admin/invoices/:field-options    
+    def admin_options
       return if !user_is_allowed('invoices', 'view')
-      statuses = [
-        Invoice::STATUS_CART, 
-        Invoice::STATUS_PENDING, 
-        Invoice::STATUS_READY_TO_SHIP, 
-        Invoice::STATUS_SHIPPED, 
-        Invoice::STATUS_CANCELED
-      ]
-      options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}       
+      
+      options = []
+      case params[:field]
+        when 'status'
+          statuses = [
+            Invoice::STATUS_CART, 
+            Invoice::STATUS_PENDING, 
+            Invoice::STATUS_READY_TO_SHIP, 
+            Invoice::STATUS_SHIPPED, 
+            Invoice::STATUS_CANCELED
+          ]
+          options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}              
+        when 'payment-terms'
+          options = [
+            { 'value' => Invoice::PAYMENT_TERMS_PIA   , 'text' => 'Pay In Advance' },
+            { 'value' => Invoice::PAYMENT_TERMS_NET7  , 'text' => 'Net 7'          },
+            { 'value' => Invoice::PAYMENT_TERMS_NET10 , 'text' => 'Net 10'         },
+            { 'value' => Invoice::PAYMENT_TERMS_NET30 , 'text' => 'Net 30'         },
+            { 'value' => Invoice::PAYMENT_TERMS_NET60 , 'text' => 'Net 60'         },
+            { 'value' => Invoice::PAYMENT_TERMS_NET90 , 'text' => 'Net 90'         },
+            { 'value' => Invoice::PAYMENT_TERMS_EOM   , 'text' => 'End of Month'   }            
+          ]
+      end          
       render :json => options    
     end
     

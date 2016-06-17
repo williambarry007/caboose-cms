@@ -81,6 +81,7 @@ module Caboose
         @invoice.referring_site   = request.env['HTTP_REFERER']
         @invoice.landing_page     = request.fullpath
         @invoice.landing_page_ref = params[:ref] || nil
+        @invoice.payment_terms    = @site.store_config.default_payment_terms
         @invoice.save
         # Save the cart ID in the session
         session[:cart_id] = @invoice.id

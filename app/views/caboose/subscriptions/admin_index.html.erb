@@ -1,0 +1,45 @@
+<%
+sc = @site.store_config
+%>
+
+<h1>Subscriptions</h1>
+<div id='subscriptions'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {  
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'subscriptions',
+    base_url: '/admin/subscriptions',
+    allow_bulk_edit: true,
+    allow_bulk_delete: true,
+    allow_duplicate: false,
+    allow_advanced_edit: true,
+    fields: [      
+      { show: true, bulk_edit: true, name: 'name'                , nice_name: 'Name'                , sort: 'name'                , type: 'text'     , value: function(s) { return s.name                }, width: 75, align: 'left' },
+      { show: true, bulk_edit: true, name: 'description'         , nice_name: 'Description'         , sort: 'description'         , type: 'text'     , value: function(s) { return s.description         }, width: 75, align: 'left' },
+      { show: true, bulk_edit: true, name: 'variant_id'          , nice_name: 'Variant ID'          , sort: 'variant_id'          , type: 'text'     , value: function(s) { return s.variant_id          }, width: 75, align: 'left' },
+      { show: true, bulk_edit: true, name: 'interval'            , nice_name: 'Interval'            , sort: 'interval'            , type: 'select'   , value: function(s) { return s.interval            }, width: 75, align: 'left'  , options_url: '/admin/subscriptions/interval-options' },
+      { show: true, bulk_edit: true, name: 'prorate'             , nice_name: 'Prorate'             , sort: 'prorate'             , type: 'checkbox' , value: function(s) { return s.prorate             }, width: 75, align: 'left' },
+      { show: true, bulk_edit: true, name: 'prorate_method'      , nice_name: 'Prorate method'      , sort: 'prorate_method'      , type: 'select'   , value: function(s) { return s.prorate_method      }, width: 75, align: 'left'  , options_url: '/admin/subscriptions/prorate-method-options' },
+      { show: true, bulk_edit: true, name: 'prorate_flat_amount' , nice_name: 'Prorate flat amount' , sort: 'prorate_flat_amount' , type: 'text'     , value: function(s) { return s.prorate_flat_amount }, width: 75, align: 'left' },
+      { show: true, bulk_edit: true, name: 'start_on_day'        , nice_name: 'Start on day'        , sort: 'start_on_day'        , type: 'checkbox' , value: function(s) { return s.start_on_day        }, width: 75, align: 'left' },
+      { show: true, bulk_edit: true, name: 'start_day'           , nice_name: 'Start day'           , sort: 'start_day'           , type: 'select'   , value: function(s) { return s.start_day           }, width: 75, align: 'left'  , options_url: '/admin/subscriptions/start-day-options' },
+      { show: true, bulk_edit: true, name: 'start_month'         , nice_name: 'Start month'         , sort: 'start_month'         , type: 'select'   , value: function(s) { return s.start_month         }, width: 75, align: 'left'  , options_url: '/admin/subscriptions/start-month-options' }                        
+    ],
+    new_model_text: 'New Subscription',
+    no_models_text: 'There are no subscriptions right now.',
+    new_model_fields: [
+      { name: 'name', nice_name: 'Name', type: 'text', width: 400 }      
+    ],
+    bulk_import_fields: ['name'],
+    bulk_import_url: '/admin/subscriptions/bulk'
+  });        
+});
+
+</script>
+<% end %>

@@ -103,7 +103,8 @@ module Caboose
           when 'weight_unit'                      then sc.weight_unit                      = value
           when 'download_instructions'            then sc.download_instructions            = value
           when 'download_url_expires_in'          then sc.download_url_expires_in          = value            
-          when 'starting_invoice_number'          then sc.starting_invoice_number          = value                
+          when 'starting_invoice_number'          then sc.starting_invoice_number          = value
+          when 'default_payment_terms'            then sc.default_payment_terms            = value
     	  end
     	end
     	
@@ -111,40 +112,45 @@ module Caboose
     	render :json => resp
     end        
     
-    # @route GET /admin/store/payment-processor-options
-    def payment_processor_options
+    # @route GET /admin/store/:field-options    
+    def admin_options
       return if !user_is_allowed('sites', 'view')
-      options = [
-        { 'value' => 'authorize.net'  , 'text' => 'Authorize.net' },
-        { 'value' => 'stripe'         , 'text' => 'Stripe' }        
-      ]
+      
+      options = []
+      case params[:field]
+        when 'payment-processor'            
+          options = [
+            { 'value' => 'authorize.net'  , 'text' => 'Authorize.net' },
+            { 'value' => 'stripe'         , 'text' => 'Stripe' }        
+          ]
+        when 'length-unit'
+          options = [
+            { 'value' => 'in' , 'text' => 'Inches (in)'     },
+            { 'value' => 'ft' , 'text' => 'Feet (ft)'       },
+            { 'value' => 'mm' , 'text' => 'Millimeter (mm)' },
+            { 'value' => 'cm' , 'text' => 'Centimeter (cm)' },
+            { 'value' => 'm'  , 'text' => 'Meter (m)'       }
+          ]
+        when 'weight-unit'
+          options = [
+            { 'value' => 'oz' , 'text' => 'Ounces (oz)'    },
+            { 'value' => 'lb' , 'text' => 'Pounds (lb)'    },
+            { 'value' => 'g'  , 'text' => 'Grams (g)'      },
+            { 'value' => 'kg' , 'text' => 'Kilograms (kg)' }
+          ]
+        when 'default-payment-terms'
+          options = [
+            { 'value' => Invoice::PAYMENT_TERMS_PIA   , 'text' => 'Pay In Advance' },
+            { 'value' => Invoice::PAYMENT_TERMS_NET7  , 'text' => 'Net 7'          },
+            { 'value' => Invoice::PAYMENT_TERMS_NET10 , 'text' => 'Net 10'         },
+            { 'value' => Invoice::PAYMENT_TERMS_NET30 , 'text' => 'Net 30'         },
+            { 'value' => Invoice::PAYMENT_TERMS_NET60 , 'text' => 'Net 60'         },
+            { 'value' => Invoice::PAYMENT_TERMS_NET90 , 'text' => 'Net 90'         },
+            { 'value' => Invoice::PAYMENT_TERMS_EOM   , 'text' => 'End of Month'   }            
+          ]
+      end
       render :json => options
     end
-    
-    # @route GET /admin/store/length-unit-options
-    def length_unit_options
-      return if !user_is_allowed('sites', 'view')
-      options = [
-        { 'value' => 'in' , 'text' => 'Inches (in)'     },
-        { 'value' => 'ft' , 'text' => 'Feet (ft)'       },
-        { 'value' => 'mm' , 'text' => 'Millimeter (mm)' },
-        { 'value' => 'cm' , 'text' => 'Centimeter (cm)' },
-        { 'value' => 'm'  , 'text' => 'Meter (m)'       }
-      ]
-      render :json => options
-    end
-    
-    # @route GET /admin/store/weight-unit-options
-    def weight_unit_options
-      return if !user_is_allowed('sites', 'view')
-      options = [
-        { 'value' => 'oz' , 'text' => 'Ounces (oz)'    },
-        { 'value' => 'lb' , 'text' => 'Pounds (lb)'    },
-        { 'value' => 'g'  , 'text' => 'Grams (g)'      },
-        { 'value' => 'kg' , 'text' => 'Kilograms (kg)' }
-      ]
-      render :json => options
-    end
-        
+                
   end
 end

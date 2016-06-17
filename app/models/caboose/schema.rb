@@ -339,7 +339,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :include_gift_message  , :boolean   , { :default => false }],
         [ :gift_message          , :text     ],
         [ :gift_wrap             , :boolean   , { :default => false }],
-        [ :hide_prices           , :boolean   , { :default => false }]
+        [ :hide_prices           , :boolean   , { :default => false }],
+        [ :user_subscription_id  , :integer  ],            
+        [ :date_starts           , :date     ],
+        [ :date_ends             , :date     ]
       ],
       Caboose::LineItemModification => [                          
         [ :line_item_id           , :integer ],
@@ -431,17 +434,19 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :billing_address_id    , :integer  ],
         [ :notes                 , :text     ],
         [ :status                , :string   ],
+        [ :payment_terms         , :string   ],
         [ :date_created          , :datetime ],
         [ :date_authorized       , :datetime ],
         [ :date_captured         , :datetime ],
         [ :date_shipped          , :datetime ],
+        [ :date_due              , :date     ],
         [ :referring_site        , :text     ],
         [ :landing_page          , :string   ],
         [ :landing_page_ref      , :string   ],
         [ :auth_amount           , :decimal  , { :precision => 8, :scale => 2 }],
         [ :gift_message          , :text     ],
-        [ :include_receipt       , :boolean  , { :default => true }]        
-        
+        [ :include_receipt       , :boolean  , { :default => true }]
+                
         #[ :email                 , :string   ],
         #[ :invoice_number        , :string   ],
         #[ :payment_id            , :integer  ],
@@ -792,11 +797,26 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :custom_shipping_function          , :text    ],   
         [ :custom_tax_function               , :text    ],
         [ :download_instructions             , :text    ],
-        [ :length_unit                       , :string   , { :default => 'in' }],
-        [ :weight_unit                       , :string   , { :default => 'oz' }],
-        [ :download_url_expires_in           , :string   , { :default => 5    }],
-        [ :starting_invoice_number           , :integer  , { :default => 1000 }]
-      ],      
+        [ :length_unit                       , :string   , { :default => 'in'  }],
+        [ :weight_unit                       , :string   , { :default => 'oz'  }],
+        [ :download_url_expires_in           , :string   , { :default => 5     }],
+        [ :starting_invoice_number           , :integer  , { :default => 1000  }],
+        [ :default_payment_terms             , :string   , { :default => 'pia' }]
+      ],  
+      Caboose::Subscription => [
+        [ :site_id             , :integer ],
+        [ :name                , :string  ],
+        [ :description         , :text    ],
+        [ :variant_id          , :integer ],
+        [ :interval            , :string  ],
+        [ :prorate             , :boolean  , { :default => false }],
+        [ :prorate_method      , :string  ],        
+        [ :prorate_flat_amount , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :prorate_function    , :text    ],
+        [ :start_on_day        , :boolean  , { :default => false }],
+        [ :start_day           , :integer ],
+        [ :start_month         , :integer ]       
+      ],
       Caboose::User => [
         [ :site_id                      , :integer    ],
         [ :first_name                   , :string     ],
@@ -829,6 +849,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :card_brand                   , :string     ],  
         [ :card_exp_month               , :integer    ],
         [ :card_exp_year                , :integer    ]
+      ],
+      Caboose::UserSubscription => [
+        [ :subscription_id  , :integer ],
+        [ :user_id          , :integer ],
+        [ :date_started     , :date    ],
+        [ :status           , :string  ]
       ],
       Caboose::Variant => [
         [ :product_id                    , :integer  ],

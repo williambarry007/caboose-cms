@@ -17,28 +17,38 @@ module Caboose
     has_many :invoice_transactions
     
     attr_accessible :id,
-      :site_id,
-      :alternate_id,
-      :invoice_number,      
-      :subtotal,
-      :tax,            
-      :shipping,
-      :handling,
-      :gift_wrap,
-      :custom_discount,
-      :discount,      
-      :total,
-      :customer_id,      
-      :shipping_address_id,
-      :billing_address_id,
-      :status,      
-      :financial_status,
-      :referring_site,
-      :landing_page,
-      :landing_page_ref,                        
-      :auth_amount,
-      :date_created,
-      :notes
+      :site_id               ,
+      :invoice_number        ,
+      :alternate_id          ,
+      :subtotal              ,
+      :tax                   ,
+      :tax_rate              ,
+      :shipping              ,
+      :handling              ,
+      :gift_wrap             ,
+      :custom_discount       ,
+      :discount              ,
+      :total                 ,
+      :cost                  ,
+      :profit                ,
+      :customer_id           ,
+      :financial_status      ,
+      :shipping_address_id   ,
+      :billing_address_id    ,
+      :notes                 ,
+      :status                ,
+      :payment_terms         ,
+      :date_created          ,
+      :date_authorized       ,
+      :date_captured         ,
+      :date_shipped          ,
+      :date_due              ,
+      :referring_site        ,
+      :landing_page          ,
+      :landing_page_ref      ,
+      :auth_amount           ,
+      :gift_message          ,
+      :include_receipt               
           
     STATUS_CART          = 'cart'
     STATUS_PENDING       = 'pending'    
@@ -62,6 +72,14 @@ module Caboose
     FINANCIAL_STATUS_REFUNDED   = 'refunded'
     FINANCIAL_STATUS_VOIDED     = 'voided'
     
+    PAYMENT_TERMS_PIA   = 'pia'
+    PAYMENT_TERMS_NET7  = 'net7'
+    PAYMENT_TERMS_NET10 = 'net10'
+    PAYMENT_TERMS_NET30 = 'net30'
+    PAYMENT_TERMS_NET60 = 'net60'
+    PAYMENT_TERMS_NET90 = 'net90'
+    PAYMENT_TERMS_EOM   = 'eom'
+        
     #
     # Scopes
     #    

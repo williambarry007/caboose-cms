@@ -105,10 +105,11 @@ InvoiceController.prototype = {
       update_url: '/admin/invoices/' + that.invoice.id,
       authenticity_token: that.authenticity_token,
       attributes: [
-        { name: 'status'         , nice_name: 'Status'   , type: 'select', value: that.invoice.status                , width: 100, fixed_placeholder: false, options_url: '/admin/invoices/status-options' },
-        { name: 'tax'            , nice_name: 'Tax'      , type: 'text'  , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'handling'       , nice_name: 'Handling' , type: 'text'  , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'custom_discount', nice_name: 'Discount' , type: 'text'  , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }}
+        { name: 'status'         , nice_name: 'Status'        , type: 'select', value: that.invoice.status                , width: 100, fixed_placeholder: false, options_url: '/admin/invoices/status-options' },
+        { name: 'payment_terms'  , nice_name: 'Terms'         , type: 'select', value: that.invoice.payment_terms         , width: 200, fixed_placeholder: true , options_url: '/admin/invoices/payment-terms-options' },
+        { name: 'tax'            , nice_name: 'Tax'           , type: 'text'  , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'handling'       , nice_name: 'Handling'      , type: 'text'  , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'custom_discount', nice_name: 'Discount'      , type: 'text'  , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }}
       ]
     });        
   },
@@ -282,7 +283,10 @@ InvoiceController.prototype = {
       .append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(that.noneditable_shipping_address()))      
       .append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
       .append($('<td/>').attr('valign', 'top').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_status')))
-      .append($('<td/>').attr('valign', 'top').attr('id', 'transactions').attr('align', 'center').append(transactions))      
+      .append($('<td/>').attr('valign', 'top')
+        .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_payment_terms'))
+        .append($('<div/>').attr('id', 'transactions').attr('align', 'center').append(transactions))
+      )      
     );
     return table;  
   },

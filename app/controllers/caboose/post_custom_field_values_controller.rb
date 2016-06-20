@@ -1,7 +1,7 @@
 module Caboose
   class PostCustomFieldValuesController < ApplicationController
                 
-    # PUT /admin/post-custom-field-values/:id
+    # @route PUT /admin/post-custom-field-values/:id
     def admin_update      
       return if !user_is_allowed('postcustomfieldvalues', 'edit')
       

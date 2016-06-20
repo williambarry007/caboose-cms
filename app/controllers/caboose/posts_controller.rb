@@ -200,7 +200,7 @@ module Caboose
       render :json => resp
     end
     
-    # @route PUT /admin/posts/:id/add-to-category
+    # @route GET /admin/posts/:id/add-to-category
     def admin_add_to_category
       return if !user_is_allowed('posts', 'edit')
       
@@ -214,7 +214,7 @@ module Caboose
       render :json => true      
     end
     
-    # @route PUT /admin/posts/:id/remove-from-category
+    # @route GET /admin/posts/:id/remove-from-category
     def admin_remove_from_category
       return if !user_is_allowed('posts', 'edit')
       

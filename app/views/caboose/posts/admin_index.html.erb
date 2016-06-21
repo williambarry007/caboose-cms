@@ -14,7 +14,7 @@
   		%>
     </tr>
     <% @posts.each do |p| %>
-      <tr onclick="window.location='/admin/posts/<%= p.id %>/edit';">
+      <tr onclick="window.location='/admin/posts/<%= p.id %>';">
         <td><%= raw p.id %></td>
         <td><%= p.published ? "Yes" : "No" %></td>
         <td><%= raw p.title %></td>

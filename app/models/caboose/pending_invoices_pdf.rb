@@ -37,12 +37,19 @@ module Caboose
     end
     
     def get_card_details(invoice)
-      return if self.print_card_details && self.print_card_details == false                  
+      return if self.print_card_details && self.print_card_details == false
+      
+      if invoice.customer.card_brand
+        self.card_type   = invoice.customer.card_brand
+        self.card_number = invoice.customer.card_last4
+        return
+      end
+      
       sc = invoice.site.store_config
       ot = invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       return if ot.nil?        
-      case sc.pp_name
-        when 'authorize.net'
+      case ot.payment_processor
+        when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
           t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
           resp = t.get_transaction_details(ot.transaction_id)
           t2 = resp.transaction
@@ -50,6 +57,9 @@ module Caboose
             self.card_type = t2.payment_method.card_type.upcase
             self.card_number = t2.payment_method.card_number.gsub('X', '')
           end
+        when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+          self.card_type   = invoice.customer.card_brand
+          self.card_number = invoice.customer.card_last4
       end
     end
 

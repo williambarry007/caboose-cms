@@ -1,3 +1,4 @@
+
 module Caboose
   class InvoiceTransaction < ActiveRecord::Base
     self.table_name  = 'store_invoice_transactions'
@@ -7,9 +8,10 @@ module Caboose
     belongs_to :parent, :class_name => 'Caboose::InvoiceTransaction', :foreign_key => :parent_id
     attr_accessible :id,    
       :invoice_id,
-      :parent_id,
+      :parent_id,      
       :transaction_id,
       :transaction_type,
+      :payment_processor,
       :amount,
       :amount_refunded,
       :auth_code,
@@ -74,7 +76,8 @@ module Caboose
               :invoice_id => self.invoice_id,
               :parent_id => self.id,
               :transaction_id => bt.id,
-              :transaction_type => InvoiceTransaction::TYPE_CAPTURE, 
+              :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
+              :payment_processor => sc.pp_name,
               :amount => bt.amount / 100.0,                
               :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
               :success => bt.status == 'succeeded' || bt.status == 'pending'
@@ -126,7 +129,8 @@ module Caboose
                 :invoice_id => self.invoice_id,
                 :parent_id => self.id,
                 :transaction_id => r.id,
-                :transaction_type => InvoiceTransaction::TYPE_REFUND, 
+                :transaction_type => InvoiceTransaction::TYPE_REFUND,
+                :payment_processor => sc.pp_name,
                 :amount => r.amount / 100.0,
                 :date_processed => DateTime.strptime(r.created.to_s, '%s'),
                 :success => r.status == 'succeeded' || r.status == 'pending'

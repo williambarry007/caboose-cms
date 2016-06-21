@@ -23,7 +23,7 @@ CheckoutController.prototype = {
   shipping_method_controller: false,  
   payment_method_controller: false,
   cart_controller: false,
-    
+
   // Cart options
   allow_edit_line_items: true,
   allow_edit_gift_cards: true,
@@ -41,7 +41,7 @@ CheckoutController.prototype = {
       that[i] = params[i];
         
     that.gift_cards_controller       = new GiftCardsController({           cc: that });
-    that.shipping_address_controller = new ShippingAddressController({     cc: that });
+    that.shipping_address_controller = new ShippingAddressController({     cc: that });    
     if (that.pp_name == 'stripe')       that.payment_method_controller = new StripePaymentMethodController({ cc: that });
     //else if (that.pp_name == 'authnet') that.payment_method_controller = new AuthnetPaymentMethodController({ cc: that });
     else alert("Payment process \"" + that.pp_name + "\" is not supported.");
@@ -133,16 +133,18 @@ CheckoutController.prototype = {
     if (confirm)
     {      
       that.gift_cards_controller.print();
-      that.shipping_address_controller.print();    
-      that.payment_method_controller.print();      
+      that.shipping_address_controller.print();
+      if (that.invoice.payment_terms == 'pia')
+        that.payment_method_controller.print();      
       that.cart_controller.print(confirm);
       that.print_confirm_message();
     }
     else
     {
       that.gift_cards_controller.edit();
-      that.shipping_address_controller.edit();    
-      that.payment_method_controller.print();                
+      that.shipping_address_controller.edit();
+      if (that.invoice.payment_terms == 'pia')
+        that.payment_method_controller.print();                
       that.cart_controller.print();      
       that.print_ready_message();
     }
@@ -153,7 +155,7 @@ CheckoutController.prototype = {
     var that = this;
     var ready = true;
     if (!that.shipping_address_controller.ready()) ready = false;            
-    if (!that.payment_method_controller.ready())   ready = false;
+    if (that.invoice.payment_terms == 'pia' && !that.payment_method_controller.ready()) ready = false;
 
     if (ready)
     {
@@ -172,7 +174,7 @@ CheckoutController.prototype = {
     var that = this;
     var ready = true;
     if (!that.shipping_address_controller.ready()) ready = false;            
-    if (!that.payment_method_controller.ready())   ready = false;
+    if (that.invoice.payment_terms == 'pia' && !that.payment_method_controller.ready()) ready = false;
 
     if (!ready)
     {
@@ -253,4 +255,15 @@ CheckoutController.prototype = {
     });
     return li;
   },
+  
+  all_downloadable: function()
+  {
+    var that = this;
+    var all = true;
+    $.each(that.invoice.line_items, function(i, li) {      
+      if (!li.variant.downloadable || li.variant.downloadable == false)
+        all = false;
+    });
+    return all;
+  }
 };

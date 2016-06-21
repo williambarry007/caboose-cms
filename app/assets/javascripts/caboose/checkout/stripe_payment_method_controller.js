@@ -133,9 +133,10 @@ StripePaymentMethodController.prototype = {
           data: { token: resp.id, card: resp.card },
           success: function(resp2) {
             if (resp2.success)
-            {
-              that.customer_id = resp.customer_id;
-              that.print();
+            {              
+              that.customer_id = resp2.customer_id;
+              that.print();              
+              that.cc.print_ready_message();
             }
             if (resp2.error) $('#payment_message').html("<p class='note error'>" + resp2.error + "</p>");
           }
@@ -146,7 +147,7 @@ StripePaymentMethodController.prototype = {
   
   ready: function()
   {
-    var that = this;
+    var that = this;    
     if (!that.customer_id ) return false;
     if (!that.card_brand  ) return false;
     if (!that.card_last4  ) return false;

@@ -106,6 +106,7 @@ module Caboose
     end
     
     # @route GET /admin/posts/:id
+    # @route GET /admin/posts/:id/edit
     def admin_edit_general
       return if !user_is_allowed('posts', 'edit')    
       @post = Post.find(params[:id])
@@ -193,13 +194,13 @@ module Caboose
       else
         post.save        
         post.set_slug_and_uri(post.title)                
-        resp.redirect = "/admin/posts/#{post.id}/edit"
+        resp.redirect = "/admin/posts/#{post.id}"
       end
       
       render :json => resp
     end
     
-    # @route PUT /admin/posts/:id/add-to-category
+    # @route GET /admin/posts/:id/add-to-category
     def admin_add_to_category
       return if !user_is_allowed('posts', 'edit')
       
@@ -213,7 +214,7 @@ module Caboose
       render :json => true      
     end
     
-    # @route PUT /admin/posts/:id/remove-from-category
+    # @route GET /admin/posts/:id/remove-from-category
     def admin_remove_from_category
       return if !user_is_allowed('posts', 'edit')
       

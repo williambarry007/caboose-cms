@@ -9,8 +9,8 @@ module Caboose
     has_many :children, :class_name => 'LineItem', :foreign_key => 'parent_id'
     
     attr_accessible :id      ,
-      :invoice_id              ,
-      :invoice_package_id      ,
+      :invoice_id            ,
+      :invoice_package_id    ,
       :variant_id            ,
       :unit_price            ,
       :quantity              ,
@@ -24,8 +24,11 @@ module Caboose
       :include_gift_message  ,
       :gift_message          ,
       :gift_wrap             ,
-      :hide_prices
-    
+      :hide_prices           ,
+      :user_subscription_id  ,            
+      :date_starts           ,
+      :date_ends             
+
     #
     # Scopes
     #

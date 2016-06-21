@@ -255,4 +255,15 @@ CheckoutController.prototype = {
     });
     return li;
   },
+  
+  all_downloadable: function()
+  {
+    var that = this;
+    var all = true;
+    $.each(that.invoice.line_items, function(i, li) {      
+      if (!li.variant.downloadable || li.variant.downloadable == false)
+        all = false;
+    });
+    return all;
+  }
 };

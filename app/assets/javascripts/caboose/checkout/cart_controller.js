@@ -90,21 +90,37 @@ CartController.prototype = {
     });
     
     if (line_items.length > 0)
-    {      
-      tbody
-        .append($('<tr/>').addClass('invoice_package_header')
-          .append($('<td/>')            
-            .attr('colspan', '4')
-            .append('<h3>Package ' + (j+1) + '</h3>')
+    {
+      // See if all the items in the package are downloadable
+      var all_downloadable = true;
+      $.each(line_items, function(i, li) {
+        if (!li.variant.downloadable || li.variant.downloadable == false)
+          all_downloadable = false;
+      });
+      
+      if (all_downloadable)
+      {
+        tbody.append($('<tr/>').addClass('invoice_package_header')
+          .append($('<td/>').attr('colspan', '4')
+            .append('<h3>Downloadable Items</h3>')
+          )
+        );
+      }
+      else
+      {            
+        tbody.append($('<tr/>').addClass('invoice_package_header')
+          .append($('<td/>').attr('colspan', '4')
+            .append('<h3>Package ' + j+1 + '</h3>')
             .append($('<div/>').attr('id', 'invoice_package_' + op.id + '_shipping_method'))
           )
-        )
-        .append($('<tr/>')
-          .append($('<th/>').html('Item'))        
-          .append($('<th/>').html('Price'))
-          .append($('<th/>').html('Quantity'))        
-          .append($('<th/>').html('Subtotal'))
         );
+      }
+      tbody.append($('<tr/>')
+        .append($('<th/>').html('Item'))        
+        .append($('<th/>').html('Price'))
+        .append($('<th/>').html('Quantity'))        
+        .append($('<th/>').html('Subtotal'))
+      );      
     }
     
     $.each(line_items, function(i, li) {      

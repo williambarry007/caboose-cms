@@ -16,6 +16,13 @@ ShippingAddressController.prototype = {
   print: function()
   {
     var that = this;
+    
+    if (that.cc.all_downloadable())
+    {
+      $('#shipping_address_container').empty().append(div);
+      return;
+    }
+    
     that.being_edited = false;
     var sa = that.cc.invoice.shipping_address;    
     
@@ -44,6 +51,13 @@ ShippingAddressController.prototype = {
   edit: function()
   {
     var that = this;
+    
+    if (that.cc.all_downloadable())
+    {
+      $('#shipping_address_container').empty().append(div);
+      return;
+    }
+    
     var sa = that.cc.invoice.shipping_address;
     if (!sa.id) sa.id = 1;
     
@@ -80,6 +94,7 @@ ShippingAddressController.prototype = {
   ready: function()
   {
     var that = this;
+    if (that.cc.all_downloadable()) return true;        
     if (that.cc.is_empty_address(that.cc.invoice.shipping_address)) return false;
     return true;        
   }

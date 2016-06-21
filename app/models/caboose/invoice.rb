@@ -160,11 +160,14 @@ module Caboose
       self.update_column(:gift_wrap , self.calculate_gift_wrap )
       
       # Calculate the total without the discounts first       
-      self.discounts.each{ |d| d.update_column(:amount, 0.0) } if self.discounts      
+      self.discounts.each{ |d| d.update_column(:amount, 0.0) } if self.discounts
+      self.update_column(:discount  , 0.00)
       self.update_column(:total     , self.calculate_total     )
-      
+            
+      # Now calculate the discounts and re-calculate the total
       self.update_column(:discount  , self.calculate_discount  )
       self.update_column(:total     , self.calculate_total     )      
+      
       self.update_column(:cost      , self.calculate_cost      )
       self.update_column(:profit    , self.calculate_profit    )              
     end

@@ -62,10 +62,13 @@ CheckoutController.prototype = {
     that.refresh(function() { that.cart_controller.update_totals(); });
   },
   
-  refresh_cart: function()
+  refresh_cart: function(after)
   {
     var that = this;
-    that.refresh(function() { that.cart_controller.print(); });
+    that.refresh(function() { 
+      that.cart_controller.print();
+      if (after) after();
+    });
   },
       
   refresh: function(after)

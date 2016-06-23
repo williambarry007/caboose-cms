@@ -44,21 +44,36 @@ StripePaymentMethodController.prototype = {
       return;
     }    
     var msg = that.card_brand && that.card_last4 ? that.card_brand + ' ending in ' + that.card_last4 : 'You have no card on file.';    
-    var div = $('<div/>')
-      .append($('<h3/>').html('Payment Method'))
-      .append($('<p/>')
+    var div = $('<div/>').append($('<h3/>').html('Payment Method'));
+    
+    if (that.cc.invoice.total > 0.00)
+    {
+      var msg = that.card_brand && that.card_last4 ? that.card_brand + ' ending in ' + that.card_last4 : 'You have no card on file.';    
+      div.append($('<p/>')
         .append(msg).append(' ')
-        .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
-          e.preventDefault();
-          that.edit();        
-        })
+        .append($('<a/>').attr('href', '#').html('Edit').click(function(e) { e.preventDefault(); that.edit(); })
+      ));
+    }
+    else
+    {          
+      div.append($('<p/>')
+        .append("No payment is required at this time. ")
+        .append($('<a/>').attr('href', '#').html('Edit').click(function(e) { e.preventDefault(); that.edit(); })
       ));      
+    }    
     $('#'+that.container).empty().append(div);    
   },
 
   edit: function()
   {
     var that = this;
+    
+    if (that.cc.invoice.total <= 0.00)
+    {
+      that.print();
+      return;
+    }
+    
     var form = $('<form/>')
       .attr('action', '')
       .attr('method', 'post')
@@ -147,7 +162,8 @@ StripePaymentMethodController.prototype = {
   
   ready: function()
   {
-    var that = this;    
+    var that = this;
+    if (that.cc.invoice.total <= 0.00) return true;
     if (!that.customer_id ) return false;
     if (!that.card_brand  ) return false;
     if (!that.card_last4  ) return false;

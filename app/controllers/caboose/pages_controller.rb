@@ -537,7 +537,8 @@ module Caboose
       render json: resp
     end
         
-    # @route GET /admin/pages/:field-options
+    # @route_priority 1
+    # @route GET /admin/pages/:field-options    
     # @route GET /admin/pages/:id/:field-options    
     def admin_options
       if !user_is_allowed('pages', 'edit')

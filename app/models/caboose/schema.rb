@@ -900,7 +900,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :option3_sort_order            , :integer   , { :default => 0 }],
         [ :sort_order                    , :integer   , { :default => 0 }],
         [ :downloadable                  , :boolean   , { :default => false }],
-        [ :download_path                 , :string   ]
+        [ :download_path                 , :string   ],
+        [ :is_bundle                     , :boolean   , { :default => false }]
+      ],
+      Caboose::VariantChild => [
+        [ :parent_id    , :integer ],
+        [ :variant_id   , :integer ]                
       ],
       Caboose::Vendor => [
         [ :site_id      , :integer    ],

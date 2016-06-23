@@ -16,10 +16,12 @@ module Caboose
     belongs_to :option1_media, :class_name => 'Caboose::Media'
     belongs_to :option2_media, :class_name => 'Caboose::Media'
     belongs_to :option3_media, :class_name => 'Caboose::Media'
+    has_many :variant_childen, :class_name => 'Caboose::Variant'
     
     attr_accessible :id,
       :alternate_id,
       :product_id,
+      :sku,
       :barcode,            # Returns the barcode value of the variant.
       :cost,               # Cost of goods (don't show to customer)
       :price,              # Variant’s price.
@@ -37,6 +39,7 @@ module Caboose
       :length,             # Length of variant in inches
       :width,              # Width of variant in inches
       :height,             # Height of variant in inches
+      :volume,
       :option1,            # Returns the value of option1 for given variant
       :option2,            # If a product has a second option defined, then returns the value of this variant's option2.
       :option3,            # If a product has a third option defined, then returns the value of this variant's option3.
@@ -45,10 +48,12 @@ module Caboose
       :option3_color,
       :option1_media_id,      
       :option2_media_id,      
-      :option3_media_id,            
+      :option3_media_id,
+      :option1_sort_order,
+      :option2_sort_order,
+      :option3_sort_order,
       :requires_shipping,  # Returns true if the variant is shippable or false if it is a service or a digital good.    
-      :taxable,            # Returns true if the variant is taxable or false if it is not.
-      :sku,
+      :taxable,            # Returns true if the variant is taxable or false if it is not.      
       :available,
       :cylinder,
       :shipping_unit_value,
@@ -56,7 +61,11 @@ module Caboose
       :flat_rate_shipping_single,
       :flat_rate_shipping_combined,
       :flat_rate_shipping_method_id,
-      :flat_rate_shipping_package_id
+      :flat_rate_shipping_package_id,
+      :sort_order,      
+      :downloadable,
+      :download_path,
+      :is_bundle
     
     after_initialize do |v|
       v.price       = 0.00 if v.price.nil?

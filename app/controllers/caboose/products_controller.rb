@@ -250,6 +250,7 @@ module Caboose
     end
     
     # @route GET /admin/products/:id
+    # @route GET /admin/products/:id/general
     def admin_edit_general
       return if !user_is_allowed('products', 'edit')    
       @product = Product.find(params[:id])

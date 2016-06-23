@@ -47,7 +47,9 @@ GiftCardsController.prototype = {
         if (resp.error) $('#gift_card_message').html("<p class='note error'>" + resp.error + "</p>");
         if (resp.success)
         {          
+          that.cc.invoice.total = parseFloat(resp.invoice_total);
           that.cc.refresh_cart();
+          that.cc.payment_method_controller.print();                      
           $('#gift_card_code').val('');
           $('#gift_card_message').empty();
         }

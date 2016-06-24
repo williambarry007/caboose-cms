@@ -75,7 +75,7 @@ module Caboose
       v = Variant.find(params[:id])      
       render :json => v      
     end
-    
+            
     # @route GET /admin/products/:product_id/variants/:id/download-url
     def admin_download_url
       return if !user_is_allowed('variants', 'edit')
@@ -169,6 +169,7 @@ module Caboose
           when 'allow_backorder'               then v.allow_backorder               = value
           when 'clearance'                     then v.clearance                     = value
           when 'clearance_price'               then v.clearance_price               = value
+          when 'is_bundle'                     then v.is_bundle                     = value
           when 'status'                        then v.status                        = value
           when 'weight'                        then v.weight                        = value
           when 'length'                        then v.length                        = value

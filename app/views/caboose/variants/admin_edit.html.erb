@@ -8,9 +8,9 @@ v = @variant
   <tr>
     <td valign='top'>
 <h2>Options</h2>
-<% if p.option1 %><div id='variant_<%= v.id %>_option1'></div><% end %>
-<% if p.option2 %><div id='variant_<%= v.id %>_option2'></div><% end %>
-<% if p.option3 %><div id='variant_<%= v.id %>_option3'></div><% end %>
+<% if p.option1 && p.option1.strip.length > 0 %><div id='variant_<%= v.id %>_option1'></div><% end %>
+<% if p.option2 && p.option2.strip.length > 0 %><div id='variant_<%= v.id %>_option2'></div><% end %>
+<% if p.option3 && p.option3.strip.length > 0 %><div id='variant_<%= v.id %>_option3'></div><% end %>
 <div id='variant_<%= v.id %>_status'             ></div>
 <div id='variant_<%= v.id %>_allow_backorder'    ></div>
 <div id='variant_<%= v.id %>_taxable'            ></div>
@@ -50,8 +50,13 @@ v = @variant
 <div id='variant_<%= v.id %>_flat_rate_shipping_package_method_id'></div>      
     </td>
   </tr>
-</table>
+</table>  
 <div id='variant_<%= v.id %>_download_path'      ></div>
+
+<h2>Bundling</h2>
+<div id='variant_<%= v.id %>_is_bundle'></div>
+<div id='variant_children'></div>
+
 <div id='message'></div>
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/products/<%= p.id %>/variants';" />
@@ -105,7 +110,50 @@ $(document).ready(function() {
       { name: 'flat_rate_shipping_package_method_id' , nice_name: 'Package method'                   , type: 'select'   , align: 'right' , width: 250, options_url: '/admin/shipping-packages/package-method-options',   
         value: <%= raw Caboose.json("#{v.flat_rate_shipping_package_id}_#{v.flat_rate_shipping_method_id}") %>,
         text:  <%= raw Caboose.json(v.flat_rate_shipping_package && v.flat_rate_shipping_method ? "#{v.flat_rate_shipping_package.name} - #{v.flat_rate_shipping_method.service_name}" : '') %>         
-      }      
+      },
+      { name: 'is_bundle'                            , nice_name: 'Is Bundle'                       , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.is_bundle                     ) %> }
+    ]
+  });
+  m = new ModelBinder({
+    name: 'Variant',
+    id: <%= v.id %>,
+    update_url: '/admin/products/<%= v.product_id %>/variants/<%= v.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      <% if p.option1 %>{ name: 'option1'            , nice_name: <%= raw Caboose.json(p.option1) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option1                      ) %> },<% end %>
+      <% if p.option2 %>{ name: 'option2'            , nice_name: <%= raw Caboose.json(p.option2) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option2                      ) %> },<% end %>
+      <% if p.option3 %>{ name: 'option3'            , nice_name: <%= raw Caboose.json(p.option3) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option3                      ) %> },<% end %>
+      { name: 'alternate_id'                         , nice_name: 'Alternate ID'                     , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.alternate_id                 ) %> },      
+      { name: 'sku'                                  , nice_name: 'SKU'                              , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.sku                          ) %> },                         
+      { name: 'barcode'                              , nice_name: 'Barcode'                          , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.barcode                      ) %> },
+      { name: 'cost'                                 , nice_name: 'Cost of Goods'                    , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(sprintf("%.2f", v.cost)        ) %> },
+      { name: 'price'                                , nice_name: 'Price'                            , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(sprintf("%.2f", v.price)       ) %> },
+      { name: 'sale_price'                           , nice_name: 'Sale price'                       , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.sale_price                   ) %> },
+      { name: 'date_sale_starts'                     , nice_name: 'Sale starts'                      , type: 'datetime' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.date_sale_starts ? v.date_sale_starts.in_time_zone(@logged_in_user.timezone).strftime('%m/%d/%Y %I:%M %P') : '') %> },      
+      { name: 'date_sale_ends'                       , nice_name: 'Sale ends'                        , type: 'datetime' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.date_sale_ends   ? v.date_sale_ends.in_time_zone(@logged_in_user.timezone).strftime('%m/%d/%Y %I:%M %P')   : '') %> },
+      { name: 'clearance'                            , nice_name: 'On Clearance'                     , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.clearance                    ) %> },
+      { name: 'clearance_price'                      , nice_name: 'Clearance price'                  , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.clearance_price              ) %> },      
+      { name: 'quantity_in_stock'                    , nice_name: 'Quantity'                         , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.quantity_in_stock            ) %> }, 
+      { name: 'ignore_quantity'                      , nice_name: 'Ignore Quantity'                  , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.ignore_quantity              ) %> },
+      { name: 'weight'                               , nice_name: 'Weight (<%= sc.weight_unit %>)'   , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.weight                       ) %> }, 
+      { name: 'length'                               , nice_name: 'Length (<%= sc.length_unit %>)'   , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.length                       ) %> }, 
+      { name: 'width'                                , nice_name: 'Width (<%= sc.length_unit %>)'    , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.width                        ) %> }, 
+      { name: 'height'                               , nice_name: 'Height (<%= sc.length_unit %>)'   , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.height                       ) %> }, 
+      { name: 'cylinder'                             , nice_name: 'Cylinder'                         , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.cylinder                     ) %> }, 
+      { name: 'requires_shipping'                    , nice_name: 'Requires shipping'                , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.requires_shipping            ) %> }, 
+      { name: 'taxable'                              , nice_name: 'Taxable'                          , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.taxable                      ) %> },            
+      { name: 'allow_backorder'                      , nice_name: 'Allow backorder'                  , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.allow_backorder              ) %> }, 
+      { name: 'status'                               , nice_name: 'Status'                           , type: 'select'   , align: 'right' , width: 250, value: <%= raw Caboose.json(v.status                       ) %>, options_url: '/admin/variants/status-options' },
+      { name: 'downloadable'                         , nice_name: 'Downloadable'                     , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.downloadable                 ) %> },
+      { name: 'download_path'                        , nice_name: 'Download path'                    , type: 'text'     , align: 'right' , width: 800, value: <%= raw Caboose.json(v.download_path                ) %> },
+      { name: 'flat_rate_shipping'                   , nice_name: 'Use flat rate shipping'           , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.flat_rate_shipping           ) %> },
+      { name: 'flat_rate_shipping_single'            , nice_name: 'Amount (single)'                  , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.flat_rate_shipping_single    ) %> },
+      { name: 'flat_rate_shipping_combined'          , nice_name: 'Amount (combined)'                , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.flat_rate_shipping_combined  ) %> },
+      { name: 'flat_rate_shipping_package_method_id' , nice_name: 'Package method'                   , type: 'select'   , align: 'right' , width: 250, options_url: '/admin/shipping-packages/package-method-options',   
+        value: <%= raw Caboose.json("#{v.flat_rate_shipping_package_id}_#{v.flat_rate_shipping_method_id}") %>,
+        text:  <%= raw Caboose.json(v.flat_rate_shipping_package && v.flat_rate_shipping_method ? "#{v.flat_rate_shipping_package.name} - #{v.flat_rate_shipping_method.service_name}" : '') %>         
+      },
+      { name: 'is_bundle'                            , nice_name: 'Is Bundle'                       , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.is_bundle                     ) %> }
     ]
   });
 });

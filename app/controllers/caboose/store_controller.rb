@@ -8,7 +8,7 @@ module Caboose
     def admin_json_single
       return if !user_is_allowed('invoices', 'view')
       sc = @site.store_config
-      render :json => sc      
+      render :json => sc
     end
     
     # @route GET /admin/store

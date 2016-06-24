@@ -905,7 +905,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::VariantChild => [
         [ :parent_id    , :integer ],
-        [ :variant_id   , :integer ]                
+        [ :variant_id   , :integer ],
+        [ :quantity     , :integer ]
       ],
       Caboose::Vendor => [
         [ :site_id      , :integer    ],

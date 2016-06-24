@@ -6,7 +6,8 @@ module Caboose
     belongs_to :variant, :class_name => 'Caboose::Variant'    
     attr_accessible :id,
       :parent_id,
-      :variant_id
+      :variant_id,
+      :quantity
 
   end
 end

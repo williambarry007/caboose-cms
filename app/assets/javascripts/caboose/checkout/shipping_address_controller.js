@@ -78,15 +78,15 @@ ShippingAddressController.prototype = {
       id: sa.id,
       update_url: '/checkout/shipping-address',
       authenticity_token: that.cc.authenticity_token,
-      attributes: [      
+      attributes: [                                                                                                  
         { name: 'first_name'  , wrapper_class: 'first_name' , nice_name: 'First Name'  , type: 'text'     , value: sa.first_name , width:  '50%' , fixed_placeholder: false }, 
         { name: 'last_name'   , wrapper_class: 'last_name'  , nice_name: 'Last Name'   , type: 'text'     , value: sa.last_name  , width:  '50%' , fixed_placeholder: false }, 
         { name: 'company'     , wrapper_class: 'company'    , nice_name: 'Company'     , type: 'text'     , value: sa.company    , width: '100%' , fixed_placeholder: false }, 
-        { name: 'address1'    , wrapper_class: 'address1'   , nice_name: 'Address 1'   , type: 'text'     , value: sa.address1   , width: '100%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(); }}, 
-        { name: 'address2'    , wrapper_class: 'address2'   , nice_name: 'Address 2'   , type: 'text'     , value: sa.address2   , width: '100%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(); }}, 
-        { name: 'city'        , wrapper_class: 'city'       , nice_name: 'City'        , type: 'text'     , value: sa.city       , width:  '25%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(); }},
-        { name: 'zip'         , wrapper_class: 'zip'        , nice_name: 'Zip'         , type: 'text'     , value: sa.zip        , width:  '25%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(); }},
-        { name: 'state'       , wrapper_class: 'state'      , nice_name: 'State'       , type: 'select'   , value: sa.state      , width:  '25%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(); }, options_url: '/checkout/state-options', show_empty_option: true, empty_text: '-- State --' }                  
+        { name: 'address1'    , wrapper_class: 'address1'   , nice_name: 'Address 1'   , type: 'text'     , value: sa.address1   , width: '100%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(function() { that.cc.print_ready_message(); }); }}, 
+        { name: 'address2'    , wrapper_class: 'address2'   , nice_name: 'Address 2'   , type: 'text'     , value: sa.address2   , width: '100%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(function() { that.cc.print_ready_message(); }); }}, 
+        { name: 'city'        , wrapper_class: 'city'       , nice_name: 'City'        , type: 'text'     , value: sa.city       , width:  '25%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(function() { that.cc.print_ready_message(); }); }},
+        { name: 'zip'         , wrapper_class: 'zip'        , nice_name: 'Zip'         , type: 'text'     , value: sa.zip        , width:  '25%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(function() { that.cc.print_ready_message(); }); }},
+        { name: 'state'       , wrapper_class: 'state'      , nice_name: 'State'       , type: 'select'   , value: sa.state      , width:  '25%' , fixed_placeholder: false , before_update: function() { this.value_old = this.value_clean; }, after_update: function()  { if (this.value != this.value_old) that.cc.refresh_cart(function() { that.cc.print_ready_message(); }); }, options_url: '/checkout/state-options', show_empty_option: true, empty_text: '-- State --' }                  
       ]            
     });            
   },
@@ -94,8 +94,17 @@ ShippingAddressController.prototype = {
   ready: function()
   {
     var that = this;
-    if (that.cc.all_downloadable()) return true;        
+    if (that.cc.all_downloadable()) return true;
     if (that.cc.is_empty_address(that.cc.invoice.shipping_address)) return false;
+    
+    var sa = that.cc.invoice.shipping_address;    
+    if (!sa.first_name || sa.first_name.length == 0) return false;
+    if (!sa.last_name  || sa.last_name.length  == 0) return false;
+    if (!sa.address1   || sa.address1.length   == 0) return false;
+    if (!sa.city       || sa.city.length       == 0) return false;
+    if (!sa.state      || sa.state.length      == 0) return false;
+    if (!sa.zip        || sa.zip.length        == 0) return false;
+
     return true;        
   }
 };

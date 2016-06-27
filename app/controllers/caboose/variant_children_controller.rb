@@ -21,7 +21,7 @@ module Caboose
       })
       render :json => {
         :pager => pager,
-        :models => pager.items.as_json(:include => :product)
+        :models => pager.items.as_json(:include => { :variant => { :methods => :full_title }})
       }      
     end
     
@@ -30,7 +30,7 @@ module Caboose
       return if !user_is_allowed('products', 'view')
       
       vc = VariantChild.find(params[:id])      
-      render :json => vc.as_json(:include => :product)      
+      render :json => vc.as_json(:include => { :variant => { :methods => :full_title }})      
     end
     
     # @route POST /admin/products/:product_id/variants/:parent_id/children
@@ -50,8 +50,8 @@ module Caboose
     def admin_update
       return if !user_is_allowed('variants', 'edit')
       
-      resp = Caboose::StdClass.new({'attributes' => {}})
-      vcs = params[:id] == 'bulk' ? params[:model_ids].collect{ |model_id| VariantChild.find(model_id) } ? [VariantChild.find(params[:id])]    
+      resp = Caboose::StdClass.new
+      vcs = params[:id] == 'bulk' ? params[:model_ids].collect{ |model_id| VariantChild.find(model_id) } : [VariantChild.find(params[:id])]    
                 
       params.each do |name,value|
         case name        
@@ -68,7 +68,7 @@ module Caboose
     # @route DELETE /admin/products/:product_id/variants/:variant_id/children/:id
     def admin_delete
       return if !user_is_allowed('variants', 'delete')      
-      vc_ids = params[:id] == 'bulk' ? params[:model_ids] } ? [params[:id]]
+      vc_ids = params[:id] == 'bulk' ? params[:model_ids] : [params[:id]]
       vc_ids.each do |vc_id|
         VariantChild.where(:id => vc_id).destroy_all
       end

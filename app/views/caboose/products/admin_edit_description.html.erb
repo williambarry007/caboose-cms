@@ -12,6 +12,12 @@ p = @product
 <script type='text/javascript'>
 
 $(document).ready(function() {
+    
+  add_to_crumbtrail('/admin', 'Admin');
+  add_to_crumbtrail('/admin/products', 'Products');  
+  add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);
+  add_to_crumbtrail('/admin/products/<%= p.id %>/description', 'Description');
+  
   m = new ModelBinder({
     name: 'Product',
     id: <%= p.id %>,

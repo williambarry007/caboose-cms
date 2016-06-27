@@ -123,6 +123,11 @@ module Caboose
       return self.options.join(' / ')
     end
     
+    def full_title
+      return self.product.title if self.options.count == 0
+      return "#{self.product.title} - #{self.title}"
+    end
+    
     def options
       arr = []
       arr << self.option1 if self.option1 && self.option1.strip.length > 0

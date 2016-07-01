@@ -65,7 +65,7 @@ module Caboose
       query = ["select P.id, P.title from store_category_memberships CM
         left join store_products P on P.id = CM.product_id
         where CM.category_id = ? AND P.status = 'Active'
-        order by CM.sort_order, P.title", params[:id]]             
+        order by CM.sort_order, P.title", params[:category_id]]             
       rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))
       arr = rows.collect{ |row| { :id => row[0], :title => row[1] }}
       render :json => arr

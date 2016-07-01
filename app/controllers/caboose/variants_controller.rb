@@ -148,65 +148,6 @@ module Caboose
       @product = @variant.product
       render :layout => 'caboose/admin'            
     end
-    
-    # @route PUT /admin/products/:product_id/variants/:id
-    def admin_update
-      return if !user_is_allowed('variants', 'edit')
-      
-      resp = Caboose::StdClass.new({'attributes' => {}})
-      v = Variant.find(params[:id])    
-      
-      save = true    
-      params.each do |name,value|
-        case name        
-          when 'alternate_id'                  then v.alternate_id                  = value
-          when 'sku'                           then v.sku                           = value
-          when 'barcode'                       then v.barcode                       = value
-          when 'cost'                          then v.cost                          = value
-          when 'price'                         then v.price                         = value                      
-          when 'quantity_in_stock'             then v.quantity_in_stock             = value
-          when 'ignore_quantity'               then v.ignore_quantity               = value
-          when 'allow_backorder'               then v.allow_backorder               = value
-          when 'clearance'                     then v.clearance                     = value
-          when 'clearance_price'               then v.clearance_price               = value
-          when 'status'                        then v.status                        = value
-          when 'weight'                        then v.weight                        = value
-          when 'length'                        then v.length                        = value
-          when 'width'                         then v.width                         = value
-          when 'height'                        then v.height                        = value
-          when 'option1'                       then v.option1                       = value
-          when 'option2'                       then v.option2                       = value
-          when 'option3'                       then v.option3                       = value
-          when 'requires_shipping'             then v.requires_shipping             = value
-          when 'taxable'                       then v.taxable                       = value
-          when 'flat_rate_shipping'            then v.flat_rate_shipping            = value
-          when 'flat_rate_shipping_single'     then v.flat_rate_shipping_single     = value
-          when 'flat_rate_shipping_combined'   then v.flat_rate_shipping_combined   = value
-          when 'flat_rate_shipping_package_id' then v.flat_rate_shipping_package_id = value
-          when 'flat_rate_shipping_method_id'  then v.flat_rate_shipping_method_id  = value
-          when 'flat_rate_shipping_package_method_id' then
-            arr = value.split('_')
-            v.flat_rate_shipping_package_id = arr[0].to_i
-            v.flat_rate_shipping_method_id  = arr[1].to_i
-          when 'downloadable'                then v.downloadable                = value
-          when 'download_path'               then v.download_path               = value
-            
-          when 'sale_price'
-            v.sale_price = value            
-            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale            
-          when 'date_sale_starts'
-            v.date_sale_starts = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
-            v.product.delay(:run_at => v.date_sale_starts).update_on_sale
-            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale
-          when 'date_sale_ends'
-            v.date_sale_ends = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
-            v.product.delay(:run_at => v.date_sale_ends).update_on_sale  
-            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale
-        end
-      end
-      resp.success = save && v.save
-      render :json => resp
-    end
   
     # @route PUT /admin/products/:product_id/variants/:id/attach-to-image
     def admin_attach_to_image
@@ -299,6 +240,65 @@ module Caboose
         end
       end            
       render :json => { :success => true }
+    end
+    
+    # @route PUT /admin/products/:product_id/variants/:id
+    def admin_update
+      return if !user_is_allowed('variants', 'edit')
+      
+      resp = Caboose::StdClass.new({'attributes' => {}})
+      v = Variant.find(params[:id])    
+      
+      save = true    
+      params.each do |name,value|
+        case name        
+          when 'alternate_id'                  then v.alternate_id                  = value
+          when 'sku'                           then v.sku                           = value
+          when 'barcode'                       then v.barcode                       = value
+          when 'cost'                          then v.cost                          = value
+          when 'price'                         then v.price                         = value                      
+          when 'quantity_in_stock'             then v.quantity_in_stock             = value
+          when 'ignore_quantity'               then v.ignore_quantity               = value
+          when 'allow_backorder'               then v.allow_backorder               = value
+          when 'clearance'                     then v.clearance                     = value
+          when 'clearance_price'               then v.clearance_price               = value
+          when 'status'                        then v.status                        = value
+          when 'weight'                        then v.weight                        = value
+          when 'length'                        then v.length                        = value
+          when 'width'                         then v.width                         = value
+          when 'height'                        then v.height                        = value
+          when 'option1'                       then v.option1                       = value
+          when 'option2'                       then v.option2                       = value
+          when 'option3'                       then v.option3                       = value
+          when 'requires_shipping'             then v.requires_shipping             = value
+          when 'taxable'                       then v.taxable                       = value
+          when 'flat_rate_shipping'            then v.flat_rate_shipping            = value
+          when 'flat_rate_shipping_single'     then v.flat_rate_shipping_single     = value
+          when 'flat_rate_shipping_combined'   then v.flat_rate_shipping_combined   = value
+          when 'flat_rate_shipping_package_id' then v.flat_rate_shipping_package_id = value
+          when 'flat_rate_shipping_method_id'  then v.flat_rate_shipping_method_id  = value
+          when 'flat_rate_shipping_package_method_id' then
+            arr = value.split('_')
+            v.flat_rate_shipping_package_id = arr[0].to_i
+            v.flat_rate_shipping_method_id  = arr[1].to_i
+          when 'downloadable'                then v.downloadable                = value
+          when 'download_path'               then v.download_path               = value
+            
+          when 'sale_price'
+            v.sale_price = value            
+            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale            
+          when 'date_sale_starts'
+            v.date_sale_starts = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
+            v.product.delay(:run_at => v.date_sale_starts).update_on_sale
+            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale
+          when 'date_sale_ends'
+            v.date_sale_ends = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
+            v.product.delay(:run_at => v.date_sale_ends).update_on_sale  
+            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale
+        end
+      end
+      resp.success = save && v.save
+      render :json => resp
     end
   
     # @route GET /admin/variants/group

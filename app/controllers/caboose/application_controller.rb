@@ -187,17 +187,25 @@ module Caboose
     # on the given resource.
     # Redirects to login if not logged in.
     # Redirects to error page with message if not allowed.
-    def user_is_allowed(resource, action)
-      if (!logged_in?)
-        redirect_to "/login?return_url=" + URI.encode(request.fullpath)
+    def user_is_allowed(resource, action, json = false)
+      if !logged_in?
+        if json
+          render :json => false
+        else
+          redirect_to "/login?return_url=" + URI.encode(request.fullpath)
+        end
         return false
       end
       
       @user = logged_in_user
-      if (!@user.is_allowed(resource, action))
-        @error = "You don't have permission to " + action + " " + resource
-        @return_url = request.fullpath
-        render :template => "caboose/extras/error"
+      if !@user.is_allowed(resource, action)        
+        if json
+          render :json => false
+        else
+          @error = "You don't have permission to " + action + " " + resource
+          @return_url = request.fullpath
+          render :template => "caboose/extras/error"
+        end
         return false
       end
       
@@ -213,17 +221,25 @@ module Caboose
     # useful for creating super-readable code, for example:
     #   > return unless user_is_allowed_to 'edit', 'pages'
     # Even your mom could read that code.
-    def user_is_allowed_to(action, resource)
+    def user_is_allowed_to(action, resource, json = false)
       unless logged_in?
-        redirect_to "/login?return_url=" + URI.encode(request.fullpath)
+        if json
+          render :json => { :error => 'Not logged in.' }
+        else
+          redirect_to "/login?return_url=" + URI.encode(request.fullpath)
+        end
         return false
       end
 
       @user = logged_in_user
       unless @user.is_allowed(resource, action)
-        @error = "You don't have permission to #{action} #{resource}"
-        @return_url = request.fullpath
-        render :template => "caboose/extras/error"
+        if json
+          render :json => { :error => "You don't have permission." }
+        else          
+          @error = "You don't have permission to #{action} #{resource}"
+          @return_url = request.fullpath
+          render :template => "caboose/extras/error"
+        end
         return false
       end
       return true

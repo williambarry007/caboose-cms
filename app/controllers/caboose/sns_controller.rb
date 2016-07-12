@@ -30,7 +30,7 @@ module Caboose
                                                                       
                 m = Media.where(:media_category_id => media_category_id, :original_name => original_name, :name => name).first
                 m = Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :processed => false) if m.nil?                
-                m.process
+                m.delay.process
       
               end
             end                  

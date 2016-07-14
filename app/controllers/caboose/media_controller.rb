@@ -95,7 +95,7 @@ module Caboose
           when 'sort_order'   then m.sort_order   = value
           when 'image_url'    then
             m.processed = false
-            m.delay.download_image_from_url(value)
+            m.delay(:queue => 'caboose_media').download_image_from_url(value)
         end
       end
       

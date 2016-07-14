@@ -249,17 +249,17 @@ namespace :caboose do
   desc "Reprocess media images"
   task :reprocess_media_images => :environment do    
     Caboose::Media.where("image_file_name is not null").reorder(:id).all.each do |m|
-      m.delay.reprocess_image            
+      m.delay(:queue => 'caboose_media').reprocess_image            
     end
   end
   
   desc "Migrate block images and files to media"
   task :migrate_block_assets_to_media => :environment do
     Caboose::Block.where("image_file_name is not null and media_id is null").reorder(:id).all.each do |b|                
-      b.delay.migrate_media
+      b.delay(:queue => 'caboose_media').migrate_media
     end  
     Caboose::Block.where("file_file_name is not null and media_id is null").reorder(:id).all.each do |b|
-      b.delay.migrate_media
+      b.delay(:queue => 'caboose_media').migrate_media
     end
     Caboose::BlockType.where(:id => 19).update_all('name' => 'image2')    
     Caboose::Block.where(:block_type_id => 19).update_all('name' => 'image2')
@@ -267,12 +267,12 @@ namespace :caboose do
         
   desc "Update expired caches and cache pages that aren't cached"
   task :cache_pages => :environment do    
-    Caboose::PageCacher.delay.refresh    
+    Caboose::PageCacher.delay(:queue => 'caboose_cache').refresh    
   end
   
   desc "Cache all pages"
   task :cache_all_pages => :environment do    
-    Caboose::PageCacher.delay.cache_all    
+    Caboose::PageCacher.delay(:queue => 'caboose_cache').cache_all    
   end
   
   desc "Run rspec tests on Caboose"

@@ -286,15 +286,15 @@ module Caboose
             
           when 'sale_price'
             v.sale_price = value            
-            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale            
+            v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale            
           when 'date_sale_starts'
             v.date_sale_starts = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
-            v.product.delay(:run_at => v.date_sale_starts).update_on_sale
-            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale
+            v.product.delay(:run_at => v.date_sale_starts, :queue => 'caboose_store').update_on_sale
+            v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale
           when 'date_sale_ends'
             v.date_sale_ends = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
-            v.product.delay(:run_at => v.date_sale_ends).update_on_sale  
-            v.product.delay(:run_at => 3.seconds.from_now).update_on_sale
+            v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale  
+            v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale
         end
       end
       resp.success = save && v.save
@@ -444,38 +444,38 @@ module Caboose
           when 'sale_price'
             variants.each_with_index do |v, i|              
               v.sale_price = value            
-              v.product.delay(:run_at => 3.seconds.from_now).update_on_sale if i == 0
+              v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale if i == 0
             end
           when 'date_sale_starts'
             variants.each_with_index do |v, i|
               v.date_sale_starts = ModelBinder.update_date(v.date_sale_starts, value, @logged_in_user.timezone)
               if i == 0
-                v.product.delay(:run_at => v.date_sale_starts).update_on_sale
-                v.product.delay(:run_at => 3.seconds.from_now).update_on_sale                
+                v.product.delay(:run_at => v.date_sale_starts, :queue => 'caboose_store').update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
               end                                
             end
           when 'time_sale_starts'
             variants.each_with_index do |v, i|
               v.date_sale_starts = ModelBinder.update_time(v.date_sale_starts, value, @logged_in_user.timezone)                                    
               if i == 0
-                v.product.delay(:run_at => v.date_sale_starts).update_on_sale
-                v.product.delay(:run_at => 3.seconds.from_now).update_on_sale                
+                v.product.delay(:run_at => v.date_sale_starts, :queue => 'caboose_store').update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
               end
             end            
           when 'date_sale_ends'
             variants.each_with_index do |v, i|
               v.date_sale_ends = ModelBinder.update_date(v.date_sale_ends, value, @logged_in_user.timezone)            
               if i == 0
-                v.product.delay(:run_at => v.date_sale_ends).update_on_sale
-                v.product.delay(:run_at => 3.seconds.from_now).update_on_sale                
+                v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
               end
             end            
           when 'time_sale_ends'
             variants.each_with_index do |v, i|
               v.date_sale_ends = ModelBinder.update_time(v.date_sale_ends, value, @logged_in_user.timezone)                                    
               if i == 0
-                v.product.delay(:run_at => v.date_sale_ends).update_on_sale
-                v.product.delay(:run_at => 3.seconds.from_now).update_on_sale                
+                v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
               end
             end
             

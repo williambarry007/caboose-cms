@@ -365,9 +365,9 @@ module Caboose
         if pc
           pc.refresh = true
           pc.save
-          PageCacher.delay.refresh
+          PageCacher.delay(:queue => 'caboose_cache').refresh
         else
-          PageCacher.delay.cache(b.page_id)
+          PageCacher.delay(:queue => 'caboose_cache').cache(b.page_id)
         end
       end
                 

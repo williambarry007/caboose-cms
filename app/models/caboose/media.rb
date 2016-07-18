@@ -183,8 +183,8 @@ class Caboose::Media < ActiveRecord::Base
       :file_updated_at    => self.file_updated_at    ,      
       :processed          => false
     )
-    m.delay.download_image_from_url(self.image.url(:original)) if self.image
-    m.delay.download_file_from_url(self.file.url) if self.file
+    m.delay(:queue => 'caboose_media').download_image_from_url(self.image.url(:original)) if self.image
+    m.delay(:queue => 'caboose_media').download_file_from_url(self.file.url) if self.file
     return m
   end
       

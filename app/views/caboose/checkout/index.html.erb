@@ -20,6 +20,7 @@
             <label class="small">Password:</label>
             <p><input name="password" type="password" /></p>
             <p><input type="submit" value="Continue" /></p>
+            <p><a href='#' id='forgot_password'>Forgot your password?</a></p>
           </form>
         </div>      
         <div class="constrain" id='register_form_container'>  
@@ -50,6 +51,14 @@
                                     
 <%= content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/checkout_login_register' %>
+<script type='text/javascript'>
+$(document).ready(function() {
+  $('#forgot_password').click(function(e) {
+    e.preventDefault();
+    caboose_modal_url("/login/forgot-password?return_url=/checkout");      
+  });    
+});
+</script>
 <% end %>
 <%= content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/message_boxes' %>

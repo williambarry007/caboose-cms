@@ -233,7 +233,7 @@ module Caboose
     def admin_send_for_authorization
       return if !user_is_allowed('invoices', 'edit')
       invoice = Invoice.find(params[:id])
-      invoice.delay.send_payment_authorization_email      
+      invoice.delay(:queue => 'caboose_store').send_payment_authorization_email      
       render :json => { :success => true }
     end
     

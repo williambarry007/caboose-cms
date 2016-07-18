@@ -7,7 +7,35 @@ module Caboose
   end
   
   class ProductsController < Caboose::ApplicationController
-       
+           
+    # @route GET /admin/products/stubs
+    def admin_stubs      
+      title = params[:title].strip.downcase.split(' ')
+      render :json => [] and return if title.length == 0
+      
+      where = ["site_id = ?"]      
+      vars = [@site.id]
+      title.each do |str|
+        where << 'lower(title) like ?'
+        vars << "%#{str}%"
+      end      
+      where = where.join(' and ')
+      query = ["select id, title, option1, option2, option3 from store_products where #{where} order by title limit 20"]
+      vars.each{ |v| query << v }
+      
+      rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))
+      arr = rows.collect do |row|
+        has_options = row[2] || row[3] || row[4] ? true : false
+        variant_id = nil
+        if !has_options
+          v = Variant.where(:product_id => row[0].to_i, :status => 'Active').first
+          variant_id = v.id if v
+        end          
+        { :id => row[0], :title => row[1], :variant_id => variant_id }
+      end        
+      render :json => arr
+    end
+    
     # @route GET /products/:id/info
     def info
       p = Product.find(params[:id])

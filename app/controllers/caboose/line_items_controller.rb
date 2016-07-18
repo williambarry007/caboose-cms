@@ -134,7 +134,7 @@ module Caboose
         vars << "%#{str}%"
       end      
       where = where.join(' and ')
-      query = ["select id, title, option1, option2, option3 from store_products where #{where} invoice by title limit 20"]
+      query = ["select id, title, option1, option2, option3 from store_products where #{where} order by title limit 20"]
       vars.each{ |v| query << v }
       
       rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))

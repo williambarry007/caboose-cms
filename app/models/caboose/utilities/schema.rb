@@ -75,9 +75,10 @@ class Caboose::Utilities::Schema
           end
           
         # Column exists, but not with the correct data type, try to change it
-        else                    
-          c.execute("alter table #{tbl} alter column #{col[0]} type #{col[1]} using cast(#{col[0]} as #{col[1]})")
-    
+        else
+          dct = col[1] == 'string' || col[1] == :string ? 'text' : col[1]
+          c.execute("alter table #{tbl} alter column #{col[0]} type #{dct} using cast(#{col[0]} as #{dct})")
+          
         end        
         if col[0].to_s == model.primary_key
           c.execute("alter table #{tbl} add primary key (\"#{col[0].to_s}\")")

@@ -242,6 +242,87 @@ module Caboose
       render :json => { :success => true }
     end
     
+    # @route PUT /admin/products/:product_id/variants/bulk
+    def admin_bulk_update
+      return unless user_is_allowed_to 'edit', 'sites'
+    
+      resp = Caboose::StdClass.new    
+      variants = params[:model_ids].collect{ |variant_id| Variant.find(variant_id) }      
+    
+      save = true
+      params.each do |k,value|
+        case k
+          when 'alternate_id'       then variants.each { |v| v.alternate_id       = value }
+          when 'sku'                then variants.each { |v| v.sku                = value }
+          when 'barcode'            then variants.each { |v| v.barcode            = value }
+          when 'price'              then variants.each { |v| v.price              = value }
+          when 'quantity_in_stock'  then variants.each { |v| v.quantity_in_stock  = value }
+          when 'ignore_quantity'    then variants.each { |v| v.ignore_quantity    = value }
+          when 'allow_backorder'    then variants.each { |v| v.allow_backorder    = value }
+          when 'clearance'          then variants.each { |v| v.clearance          = value }
+          when 'clearance_price'    then variants.each { |v| v.clearance_price    = value }
+          when 'status'             then variants.each { |v| v.status             = value }
+          when 'weight'             then variants.each { |v| v.weight             = value }
+          when 'length'             then variants.each { |v| v.length             = value }
+          when 'width'              then variants.each { |v| v.width              = value }
+          when 'height'             then variants.each { |v| v.height             = value }
+          when 'option1'            then variants.each { |v| v.option1            = value }
+          when 'option2'            then variants.each { |v| v.option2            = value }
+          when 'option3'            then variants.each { |v| v.option3            = value }
+          when 'option1_media_id'   then variants.each { |v| v.option1_media_id   = value }
+          when 'option2_media_id'   then variants.each { |v| v.option2_media_id   = value }
+          when 'option3_media_id'   then variants.each { |v| v.option3_media_id   = value }
+          when 'requires_shipping'  then variants.each { |v| v.requires_shipping  = value }
+          when 'taxable'            then variants.each { |v| v.taxable            = value }
+          when 'downloadable'       then variants.each { |v| v.downloadable       = value }
+          when 'download_path'      then variants.each { |v| v.download_path      = value }
+
+          when 'sale_price'
+            variants.each_with_index do |v, i|              
+              v.sale_price = value            
+              v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale if i == 0
+            end
+          when 'date_sale_starts'
+            variants.each_with_index do |v, i|
+              v.date_sale_starts = ModelBinder.update_date(v.date_sale_starts, value, @logged_in_user.timezone)
+              if i == 0
+                v.product.delay(:run_at => v.date_sale_starts, :queue => 'caboose_store').update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
+              end                                
+            end
+          when 'time_sale_starts'
+            variants.each_with_index do |v, i|
+              v.date_sale_starts = ModelBinder.update_time(v.date_sale_starts, value, @logged_in_user.timezone)                                    
+              if i == 0
+                v.product.delay(:run_at => v.date_sale_starts, :queue => 'caboose_store').update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
+              end
+            end            
+          when 'date_sale_ends'
+            variants.each_with_index do |v, i|
+              v.date_sale_ends = ModelBinder.update_date(v.date_sale_ends, value, @logged_in_user.timezone)            
+              if i == 0
+                v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
+              end
+            end            
+          when 'time_sale_ends'
+            variants.each_with_index do |v, i|
+              v.date_sale_ends = ModelBinder.update_time(v.date_sale_ends, value, @logged_in_user.timezone)                                    
+              if i == 0
+                v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale
+                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
+              end
+            end
+            
+        end        
+      end
+      variants.each{ |v| v.save }
+    
+      resp.success = true
+      render :json => resp
+    end
+    
     # @route PUT /admin/products/:product_id/variants/:id
     def admin_update
       return if !user_is_allowed('variants', 'edit')
@@ -403,87 +484,6 @@ module Caboose
         resp.success = true
       end
       
-      render :json => resp
-    end
-    
-    # @route PUT /admin/products/:product_id/variants/bulk
-    def admin_bulk_update
-      return unless user_is_allowed_to 'edit', 'sites'
-    
-      resp = Caboose::StdClass.new    
-      variants = params[:model_ids].collect{ |variant_id| Variant.find(variant_id) }      
-    
-      save = true
-      params.each do |k,value|
-        case k
-          when 'alternate_id'       then variants.each { |v| v.alternate_id       = value }
-          when 'sku'                then variants.each { |v| v.sku                = value }
-          when 'barcode'            then variants.each { |v| v.barcode            = value }
-          when 'price'              then variants.each { |v| v.price              = value }
-          when 'quantity_in_stock'  then variants.each { |v| v.quantity_in_stock  = value }
-          when 'ignore_quantity'    then variants.each { |v| v.ignore_quantity    = value }
-          when 'allow_backorder'    then variants.each { |v| v.allow_backorder    = value }
-          when 'clearance'          then variants.each { |v| v.clearance          = value }
-          when 'clearance_price'    then variants.each { |v| v.clearance_price    = value }
-          when 'status'             then variants.each { |v| v.status             = value }
-          when 'weight'             then variants.each { |v| v.weight             = value }
-          when 'length'             then variants.each { |v| v.length             = value }
-          when 'width'              then variants.each { |v| v.width              = value }
-          when 'height'             then variants.each { |v| v.height             = value }
-          when 'option1'            then variants.each { |v| v.option1            = value }
-          when 'option2'            then variants.each { |v| v.option2            = value }
-          when 'option3'            then variants.each { |v| v.option3            = value }
-          when 'option1_media_id'   then variants.each { |v| v.option1_media_id   = value }
-          when 'option2_media_id'   then variants.each { |v| v.option2_media_id   = value }
-          when 'option3_media_id'   then variants.each { |v| v.option3_media_id   = value }
-          when 'requires_shipping'  then variants.each { |v| v.requires_shipping  = value }
-          when 'taxable'            then variants.each { |v| v.taxable            = value }
-          when 'downloadable'       then variants.each { |v| v.downloadable       = value }
-          when 'download_path'      then variants.each { |v| v.download_path      = value }
-
-          when 'sale_price'
-            variants.each_with_index do |v, i|              
-              v.sale_price = value            
-              v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale if i == 0
-            end
-          when 'date_sale_starts'
-            variants.each_with_index do |v, i|
-              v.date_sale_starts = ModelBinder.update_date(v.date_sale_starts, value, @logged_in_user.timezone)
-              if i == 0
-                v.product.delay(:run_at => v.date_sale_starts, :queue => 'caboose_store').update_on_sale
-                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
-              end                                
-            end
-          when 'time_sale_starts'
-            variants.each_with_index do |v, i|
-              v.date_sale_starts = ModelBinder.update_time(v.date_sale_starts, value, @logged_in_user.timezone)                                    
-              if i == 0
-                v.product.delay(:run_at => v.date_sale_starts, :queue => 'caboose_store').update_on_sale
-                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
-              end
-            end            
-          when 'date_sale_ends'
-            variants.each_with_index do |v, i|
-              v.date_sale_ends = ModelBinder.update_date(v.date_sale_ends, value, @logged_in_user.timezone)            
-              if i == 0
-                v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale
-                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
-              end
-            end            
-          when 'time_sale_ends'
-            variants.each_with_index do |v, i|
-              v.date_sale_ends = ModelBinder.update_time(v.date_sale_ends, value, @logged_in_user.timezone)                                    
-              if i == 0
-                v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale
-                v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale                
-              end
-            end
-            
-        end        
-      end
-      variants.each{ |v| v.save }
-    
-      resp.success = true
       render :json => resp
     end
     

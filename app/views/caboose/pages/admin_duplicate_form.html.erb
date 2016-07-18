@@ -58,6 +58,7 @@ function duplicate_page(site, parent, block_type, duplicate_children, child_bloc
       duplicate_page(site, { id: so.val(), title: so.html() }); 
     });
     select.append($('<option/>').html("-- Select a parent page --"));
+    select.append($('<option/>').val('-1').html("-- Set as new home page --"));
     $.each(pages, function(i, p) { select.append($('<option/>').val(p.value).html(p.text)); });
     $('#message').empty().append($('<p/>').addClass('note')
       <% if @logged_in_user.is_super_admin? %>.append("You are duplicating this page into the \"" + site.name + "\" site.<br />")<% end %>

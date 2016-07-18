@@ -394,31 +394,42 @@ class Caboose::Page < ActiveRecord::Base
   end
   
   def duplicate(site_id, parent_id, duplicate_children = false, block_type_id = nil, child_block_type_id = nil)
-    p = Caboose::Page.create(
-      :site_id              => site_id                   ,  
-      :parent_id            => parent_id                 , 
-      :title                => self.title                , 
-      :menu_title           => self.menu_title           , 
-      :slug                 => self.slug                 , 
-      :alias                => self.alias                , 
-      :uri                  => self.uri                  , 
-      :redirect_url         => self.redirect_url         , 
-      :hide                 => self.hide                 , 
-      :content_format       => self.content_format       , 
-      :custom_css           => self.custom_css           , 
-      :custom_js            => self.custom_js            , 
-      :linked_resources     => self.linked_resources     , 
-      :layout               => self.layout               , 
-      :sort_order           => self.sort_order           , 
-      :custom_sort_children => self.custom_sort_children , 
-      :seo_title            => self.seo_title            , 
-      :meta_keywords        => self.meta_keywords        , 
-      :meta_description     => self.meta_description     , 
-      :meta_robots          => self.meta_robots          , 
-      :canonical_url        => self.canonical_url        , 
-      :fb_description       => self.fb_description       , 
-      :gp_description       => self.gp_description       
-    )
+    
+    if parent_id.to_i == -1
+      p = Caboose::Page.index_page(site_id)
+      p.children.destroy_all        
+      #if self.site_id != site_id
+      #  self.page_tags.destroy_all    
+      #  self.page_custom_field_values.destroy_all          
+      #  self.page_permissions.destroy_all      
+      #  self.block.destroy
+      #end
+    else
+      p = Caboose::Page.create(:site_id => site_id, :parent_id => parent_id)
+    end
+
+    p.title                = self.title                 
+    p.menu_title           = self.menu_title            
+    p.slug                 = self.slug                  
+    p.alias                = self.alias                 
+    p.uri                  = self.uri                   
+    p.redirect_url         = self.redirect_url          
+    p.hide                 = self.hide                  
+    p.content_format       = self.content_format        
+    p.custom_css           = self.custom_css            
+    p.custom_js            = self.custom_js             
+    p.linked_resources     = self.linked_resources      
+    p.layout               = self.layout                
+    p.sort_order           = self.sort_order            
+    p.custom_sort_children = self.custom_sort_children  
+    p.seo_title            = self.seo_title             
+    p.meta_keywords        = self.meta_keywords         
+    p.meta_description     = self.meta_description      
+    p.meta_robots          = self.meta_robots           
+    p.canonical_url        = self.canonical_url         
+    p.fb_description       = self.fb_description        
+    p.gp_description       = self.gp_description       
+    p.save
     
     self.page_tags.each{ |tag| Caboose::PageTag.create(:page_id => p.id, :tag => tag.tag) }
     

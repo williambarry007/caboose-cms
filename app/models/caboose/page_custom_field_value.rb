@@ -14,7 +14,7 @@ class Caboose::PageCustomFieldValue < ActiveRecord::Base
   def duplicate(page_id, page_custom_field_id)
     v = Caboose::PageCustomFieldValue.create(
       :page_id              => page_id,
-      :page_custom_field_id => pag_custom_field_id,
+      :page_custom_field_id => page_custom_field_id,
       :key                  => self.key,
       :value                => self.value,
       :sort_order           => self.sort_order

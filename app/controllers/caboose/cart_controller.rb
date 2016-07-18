@@ -57,7 +57,7 @@ module Caboose
           :status     => 'pending'
         )
       end
-      GA.delay.event(@site.id, 'cart', 'add', "Product #{v.product.id}, Variant #{v.id}")
+      GA.delay(:queue => 'caboose_store').event(@site.id, 'cart', 'add', "Product #{v.product.id}, Variant #{v.id}")
       render :json => { 
         :success => li.save, 
         :errors => li.errors.full_messages,
@@ -146,7 +146,7 @@ module Caboose
         
         resp.success = true
         resp.invoice_total = @invoice.total
-        GA.delay.event(@site.id, 'giftcard', 'add', "Giftcard #{gc.id}")
+        GA.delay(:queue => 'caboose_store').event(@site.id, 'giftcard', 'add', "Giftcard #{gc.id}")
       end
       render :json => resp
     end

@@ -133,7 +133,7 @@ module Caboose
       # Trigger the page cache to be updated      
       query = ["update page_cache set refresh = true where page_id in (select distinct(page_id) from blocks where block_type_id = ?)", bt.id]
       ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))      
-      PageCacher.delay.refresh
+      PageCacher.delay(:queue => 'caboose_cache').refresh
     
       resp.success = save && bt.save
       render :json => resp
@@ -162,7 +162,7 @@ module Caboose
           if params[:id]          
             bt = BlockType.find(params[:id])            
             options = []
-            if bt.options_function
+            if bt.options_function && bt.options_function.length > 0
               options = bt.render_options
             elsif bt.options
               options = bt.options.strip.split("\n").collect { |line| { 'value' => line, 'text' => line }}

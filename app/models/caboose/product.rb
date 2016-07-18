@@ -218,7 +218,7 @@ module Caboose
     
     def Product.update_on_sale            
       Product.reorder(:id).all.each do |p|
-        p.delay.update_on_sale 
+        p.delay(:queue => 'caboose_store').update_on_sale 
       end
     end
 

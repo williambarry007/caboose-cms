@@ -205,7 +205,7 @@ module Caboose
     # @route GET /admin/sites/options
     def options
       return if !user_is_allowed('sites', 'view')
-      render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
+      render :json => { :error => "You are not allowed to manage sites." } and return if !logged_in_user.is_super_admin?
       
       options = Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }}
       render :json => options

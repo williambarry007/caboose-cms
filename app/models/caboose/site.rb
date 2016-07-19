@@ -44,6 +44,18 @@ class Caboose::Site < ActiveRecord::Base
     return c      
   end
   
+  def product_default
+    pd = Caboose::ProductDefault.where(:site_id => self.id).first
+    pd = Caboose::ProductDefault.create(:site_id => self.id) if pd.nil?
+    return pd    
+  end
+  
+  def variant_default
+    vd = Caboose::VariantDefault.where(:site_id => self.id).first
+    vd = Caboose::VariantDefault.create(:site_id => self.id) if vd.nil?
+    return vd
+  end
+  
   def self.id_for_domain(domain)
     d = Caboose::Domain.where(:domain => domain).first
     return nil if d.nil?

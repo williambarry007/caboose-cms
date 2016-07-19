@@ -1,3 +1,4 @@
+<div id='crumbtrail'></div>
 <h1>Products</h1>
 
 <p style="margin: 12px 0">
@@ -32,6 +33,10 @@ function tiny_product_image(p) {
 
 $(document).ready(function() {
   var that = this;
+  
+  add_to_crumbtrail('/admin', 'Admin');
+  add_to_crumbtrail('/admin/products', 'Products');
+  
   var table = new IndexTable({    
     form_authenticity_token: '<%= form_authenticity_token %>',
     container: 'products',

@@ -19,6 +19,12 @@ label span.prefix { display: inline-block; margin: 0 8px; }
 
 var mb = false;
 $(document).ready(function() {
+    
+  add_to_crumbtrail('/admin', 'Admin');
+  add_to_crumbtrail('/admin/products', 'Products');  
+  add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);
+  add_to_crumbtrail('/admin/products/<%= p.id %>/categories', 'Categories');
+  
   mb = new ModelBinder({
     name: 'Product',
     id: <%= p.id %>,

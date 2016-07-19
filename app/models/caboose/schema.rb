@@ -604,7 +604,18 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :allow_gift_wrap       , :boolean   , { :default => false }],
         [ :gift_wrap_price       , :decimal   , { :precision => 8, :scale => 2 }],
         [ :media_category_id     , :integer   ]
-      ],         
+      ],
+      Caboose::ProductDefault => [
+        [ :site_id               , :integer   ],
+        [ :vendor_id             , :integer   ],
+        [ :option1               , :string    ],
+        [ :option2               , :string    ],
+        [ :option3               , :string    ],
+        [ :status                , :string    ],                
+        [ :on_sale               , :boolean    , { :default => false }],
+        [ :allow_gift_wrap       , :boolean    , { :default => false }],
+        [ :gift_wrap_price       , :decimal    , { :precision => 8, :scale => 2 }]        
+      ],
       Caboose::ProductImage => [
         [ :product_id            , :integer  ],
         [ :alternate_id          , :string   ],
@@ -802,7 +813,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :weight_unit                       , :string   , { :default => 'oz'  }],
         [ :download_url_expires_in           , :string   , { :default => 5     }],
         [ :starting_invoice_number           , :integer  , { :default => 1000  }],
-        [ :default_payment_terms             , :string   , { :default => 'pia' }]
+        [ :default_payment_terms             , :string   , { :default => 'pia' }],
+        [ :default_vendor_id                 , :integer ],
+        [ :default_product_status            , :string  ],
+        [ :default_taxable                   , :boolean ]                      
       ],  
       Caboose::Subscription => [
         [ :site_id             , :integer ],
@@ -900,7 +914,39 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :option3_sort_order            , :integer   , { :default => 0 }],
         [ :sort_order                    , :integer   , { :default => 0 }],
         [ :downloadable                  , :boolean   , { :default => false }],
-        [ :download_path                 , :string   ]
+        [ :download_path                 , :string   ],
+        [ :is_bundle                     , :boolean   , { :default => false }]
+      ],
+      Caboose::VariantChild => [
+        [ :parent_id    , :integer ],
+        [ :variant_id   , :integer ],
+        [ :quantity     , :integer ]
+      ],
+      Caboose::VariantDefault => [
+        [ :site_id                       , :integer  ],        
+        [ :cost                          , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :price                         , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],        
+        [ :available                     , :boolean   , { :default => true  }],
+        [ :quantity_in_stock             , :integer   , { :default => 0     }],        
+        [ :ignore_quantity               , :boolean   , { :default => false }],
+        [ :allow_backorder               , :boolean   , { :default => false }],
+        [ :weight                        , :decimal  ],
+        [ :length                        , :decimal  ],
+        [ :width                         , :decimal  ],
+        [ :height                        , :decimal  ],
+        [ :volume                        , :decimal  ],
+        [ :cylinder                      , :boolean   , { :default => false }],        
+        [ :requires_shipping             , :boolean   , { :default => true  }],
+        [ :taxable                       , :boolean   , { :default => true  }],        
+        [ :shipping_unit_value           , :numeric  ],
+        [ :flat_rate_shipping            , :boolean   , { :default => false }],
+        [ :flat_rate_shipping_package_id , :integer  ],
+        [ :flat_rate_shipping_method_id  , :integer  ],
+        [ :flat_rate_shipping_single     , :decimal   , { :precision => 8, :scale => 2, :default => 0.0 }],
+        [ :flat_rate_shipping_combined   , :decimal   , { :precision => 8, :scale => 2, :default => 0.0 }],      
+        [ :status                        , :string   ],        
+        [ :downloadable                  , :boolean   , { :default => false }],        
+        [ :is_bundle                     , :boolean   , { :default => false }]
       ],
       Caboose::Vendor => [
         [ :site_id      , :integer    ],

@@ -75,7 +75,7 @@ module Caboose
       v = Variant.find(params[:id])      
       render :json => v      
     end
-    
+            
     # @route GET /admin/products/:product_id/variants/:id/download-url
     def admin_download_url
       return if !user_is_allowed('variants', 'edit')
@@ -148,7 +148,7 @@ module Caboose
       @product = @variant.product
       render :layout => 'caboose/admin'            
     end
-  
+    
     # @route PUT /admin/products/:product_id/variants/:id/attach-to-image
     def admin_attach_to_image
       render :json => false if !user_is_allowed('variants', 'edit')         
@@ -353,6 +353,7 @@ module Caboose
           when 'option3'                       then v.option3                       = value
           when 'requires_shipping'             then v.requires_shipping             = value
           when 'taxable'                       then v.taxable                       = value
+          when 'is_bundle'                     then v.is_bundle                     = value
           when 'flat_rate_shipping'            then v.flat_rate_shipping            = value
           when 'flat_rate_shipping_single'     then v.flat_rate_shipping_single     = value
           when 'flat_rate_shipping_combined'   then v.flat_rate_shipping_combined   = value
@@ -376,6 +377,7 @@ module Caboose
             v.date_sale_ends = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
             v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale  
             v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale
+          
         end
       end
       resp.success = save && v.save
@@ -427,6 +429,9 @@ module Caboose
       resp = Caboose::StdClass.new
       p = Caboose::Product.find(params[:product_id])
       
+      pd = @site.product_default
+      vd = @site.variant_default
+      
       v = Caboose::Variant.where(:alternate_id => params[:alternate_id]).first
       v = Caboose::Variant.new(:product_id => p.id) if v.nil?
       
@@ -434,10 +439,26 @@ module Caboose
       v.alternate_id      = params[:alternate_id].strip
       v.quantity_in_stock = params[:quantity_in_stock].strip.to_i
       v.price             = '%.2f' % params[:price].strip.to_f
-      v.option1 = params[:option1] if p.option1
-      v.option2 = params[:option2] if p.option2
-      v.option3 = params[:option3] if p.option3
-      v.status = 'Active'      
+      v.option1           = params[:option1] if p.option1
+      v.option2           = params[:option2] if p.option2
+      v.option3           = params[:option3] if p.option3            
+            
+      v.cost              = vd.cost
+      v.available         = vd.available
+      v.ignore_quantity   = vd.ignore_quantity              
+      v.allow_backorder   = vd.allow_backorder              
+      v.weight            = vd.weight                       
+      v.length            = vd.length                       
+      v.width             = vd.width                        
+      v.height            = vd.height                       
+      v.volume            = vd.volume                       
+      v.cylinder          = vd.cylinder                     
+      v.requires_shipping = vd.requires_shipping            
+      v.taxable           = vd.taxable                                  
+      v.status            = vd.status                       
+      v.downloadable      = vd.downloadable                 
+      v.is_bundle         = vd.is_bundle                    
+      
       v.save
       
       resp.success = true      

@@ -7,7 +7,35 @@ module Caboose
   end
   
   class ProductsController < Caboose::ApplicationController
-       
+           
+    # @route GET /admin/products/stubs
+    def admin_stubs      
+      title = params[:title].strip.downcase.split(' ')
+      render :json => [] and return if title.length == 0
+      
+      where = ["site_id = ?"]      
+      vars = [@site.id]
+      title.each do |str|
+        where << 'lower(title) like ?'
+        vars << "%#{str}%"
+      end      
+      where = where.join(' and ')
+      query = ["select id, title, option1, option2, option3 from store_products where #{where} order by title limit 20"]
+      vars.each{ |v| query << v }
+      
+      rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))
+      arr = rows.collect do |row|
+        has_options = row[2] || row[3] || row[4] ? true : false
+        variant_id = nil
+        if !has_options
+          v = Variant.where(:product_id => row[0].to_i, :status => 'Active').first
+          variant_id = v.id if v
+        end          
+        { :id => row[0], :title => row[1], :variant_id => variant_id }
+      end        
+      render :json => arr
+    end
+    
     # @route GET /products/:id/info
     def info
       p = Product.find(params[:id])
@@ -433,15 +461,26 @@ module Caboose
       
       resp = Caboose::StdClass.new
       name = params[:name]
+      pd = @site.product_default
       
       if name.length == 0
         resp.error = "The title cannot be empty."
-      else
+      else                
         p = Product.new(:site_id => @site.id, :title => name)
         mc = MediaCategory.where(:site_id => @site.id).where("parent_id IS NULL").exists? ? MediaCategory.where(:site_id => @site.id).where("parent_id IS NULL").last : MediaCategory.create(:name => "Media", :site_id => @site.id)
         pc = MediaCategory.where(:name => "Products", :site_id => @site.id).exists? ? MediaCategory.where(:name => "Products", :site_id => @site.id).last : MediaCategory.create(:name => "Products", :site_id => @site.id, :parent_id => mc.id)
         c = MediaCategory.create(:site_id => @site.id, :name => name, :parent_id => pc.id)
         p.media_category_id = c.id
+                        
+        p.vendor_id       = pd.vendor_id      
+        p.option1         = pd.option1        
+        p.option2         = pd.option2        
+        p.option3         = pd.option3
+        p.status          = pd.status
+        p.on_sale         = pd.on_sale
+        p.allow_gift_wrap = pd.allow_gift_wrap
+        p.gift_wrap_price = pd.gift_wrap_price
+        
         p.save
         resp.redirect = "/admin/products/#{p.id}/general"
       end

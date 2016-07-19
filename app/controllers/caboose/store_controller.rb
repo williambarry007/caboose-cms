@@ -3,47 +3,66 @@ require 'csv'
 module Caboose
   class StoreController < ApplicationController
     layout 'caboose/admin'
-    
+                  
     # @route GET /admin/store/json
     def admin_json_single
       return if !user_is_allowed('invoices', 'view')
       sc = @site.store_config
-      render :json => sc      
+      render :json => sc
     end
     
     # @route GET /admin/store
     def admin_edit_general
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
-      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?
+      @product_default = @site.product_default
+      @variant_default = @site.variant_default            
+    end
+    
+    # @route GET /admin/store/defaults
+    def admin_edit_defaults
+      return if !user_is_allowed('sites', 'edit')
+      @store_config = @site.store_config
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?
+      @product_default = @site.product_default
+      @variant_default = @site.variant_default            
     end
     
     # @route GET /admin/store/payment
     def admin_edit_payment
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
-      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?
+      @product_default = @site.product_default
+      @variant_default = @site.variant_default
     end
     
     # @route GET /admin/store/shipping
     def admin_edit_shipping
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
-      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?
+      @product_default = @site.product_default
+      @variant_default = @site.variant_default
     end
     
     # @route GET /admin/store/tax
     def admin_edit_tax
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
-      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?
+      @product_default = @site.product_default
+      @variant_default = @site.variant_default
     end
     
     # @route GET /admin/store/packages
     def admin_edit_packages
       return if !user_is_allowed('sites', 'edit')
       @store_config = @site.store_config
-      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?      
+      @store_config = StoreConfig.create(:site_id => @site.id) if @store_config.nil?
+      @product_default = @site.product_default
+      @variant_default = @site.variant_default
     end
     
     # @route PUT /admin/store
@@ -53,6 +72,8 @@ module Caboose
       resp = StdClass.new     
       sc = @site.store_config
       sc = StoreConfig.create(:site_id => @site.id) if sc.nil?
+      pd = @site.product_default
+      vd = @site.variant_default
           
       save = true
       params.each do |name,value|
@@ -105,10 +126,45 @@ module Caboose
           when 'download_url_expires_in'          then sc.download_url_expires_in          = value            
           when 'starting_invoice_number'          then sc.starting_invoice_number          = value
           when 'default_payment_terms'            then sc.default_payment_terms            = value
+                                
+          when 'product_vendor_id'                      then pd.vendor_id                      = value   
+          when 'product_option1'                        then pd.option1                        = value
+          when 'product_option2'                        then pd.option2                        = value
+          when 'product_option3'                        then pd.option3                        = value
+          when 'product_status'                         then pd.status                         = value
+          when 'product_on_sale'                        then pd.on_sale                        = value
+          when 'product_allow_gift_wrap'                then pd.allow_gift_wrap                = value
+          when 'product_gift_wrap_price'                then pd.gift_wrap_price                = value
+            
+          when 'variant_site_id'                        then vd.site_id                        = value                    
+          when 'variant_cost'                           then vd.cost                           = value
+          when 'variant_price'                          then vd.price                          = value
+          when 'variant_available'                      then vd.available                      = value
+          when 'variant_quantity_in_stock'              then vd.quantity_in_stock              = value
+          when 'variant_ignore_quantity'                then vd.ignore_quantity                = value
+          when 'variant_allow_backorder'                then vd.allow_backorder                = value
+          when 'variant_weight'                         then vd.weight                         = value
+          when 'variant_length'                         then vd.length                         = value
+          when 'variant_width'                          then vd.width                          = value
+          when 'variant_height'                         then vd.height                         = value
+          when 'variant_volume'                         then vd.volume                         = value
+          when 'variant_cylinder'                       then vd.cylinder                       = value
+          when 'variant_requires_shipping'              then vd.requires_shipping              = value
+          when 'variant_taxable'                        then vd.taxable                        = value
+          when 'variant_shipping_unit_value'            then vd.shipping_unit_value            = value
+          when 'variant_flat_rate_shipping'             then vd.flat_rate_shipping             = value
+          when 'variant_flat_rate_shipping_package_id'  then vd.flat_rate_shipping_package_id  = value
+          when 'variant_flat_rate_shipping_method_id'   then vd.flat_rate_shipping_method_id   = value
+          when 'variant_flat_rate_shipping_single'      then vd.flat_rate_shipping_single      = value
+          when 'variant_flat_rate_shipping_combined'    then vd.flat_rate_shipping_combined    = value
+          when 'variant_status'                         then vd.status                         = value
+          when 'variant_downloadable'                   then vd.downloadable                   = value
+          when 'variant_is_bundle'                      then vd.is_bundle                      = value
+      
     	  end
     	end
     	
-    	resp.success = save && sc.save
+    	resp.success = save && sc.save && pd.save && vd.save
     	render :json => resp
     end        
     

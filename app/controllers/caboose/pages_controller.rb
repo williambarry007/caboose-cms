@@ -552,7 +552,7 @@ module Caboose
         when 'sitemap'
           parent_id = params[:parent_id]
           p = nil
-          if params[:site_id] && @site.is_master && user_is_allowed('admin', 'admin') 
+          if params[:site_id] && logged_in_user.is_super_admin? 
             p = parent_id ? Page.find(parent_id) : Page.index_page(params[:site_id].to_i)
           else
             p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)

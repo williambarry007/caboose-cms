@@ -57,7 +57,9 @@ module Caboose
           :status     => 'pending'
         )
       end
+
       GA.delay(:queue => 'caboose_store').event(@site.id, 'cart', 'add', "Product #{v.product.id}, Variant #{v.id}")
+
       render :json => { 
         :success => li.save, 
         :errors => li.errors.full_messages,

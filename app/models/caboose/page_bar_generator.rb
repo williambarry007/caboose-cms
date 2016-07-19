@@ -403,7 +403,7 @@ module Caboose
   	  @options['additional_where'].each { |x| sql << x }
   	  sql_str = sql.join(' and ')
   	  sql = [sql_str]  	   	  
-  	  values.each { |v| sql << v }  	  
+  	  values.each { |v| sql << v }
   	  return sql        	  
     end
     

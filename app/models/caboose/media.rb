@@ -27,7 +27,7 @@ class Caboose::Media < ActiveRecord::Base
     :sort_order,
     :processed,
     :image_content_type,
-    :file_content_type,    
+    :file_content_type,
     :image_file_name,
     :image_file_size,
     :image_updated_at,

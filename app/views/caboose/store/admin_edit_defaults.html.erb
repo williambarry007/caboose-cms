@@ -1,0 +1,90 @@
+<%
+sc = @store_config
+pd = @product_default
+vd = @variant_default
+%>
+<%= render :partial => 'caboose/store/admin_header' %>
+
+<h2>Product Defaults</h2>
+<div id='productdefault_<%= pd.id %>_product_vendor_id'         ></div>   
+<div id='productdefault_<%= pd.id %>_product_option1'           ></div>
+<div id='productdefault_<%= pd.id %>_product_option2'           ></div>
+<div id='productdefault_<%= pd.id %>_product_option3'           ></div>
+<div id='productdefault_<%= pd.id %>_product_status'            ></div>
+<div id='productdefault_<%= pd.id %>_product_on_sale'           ></div>
+<div id='productdefault_<%= pd.id %>_product_allow_gift_wrap'   ></div>
+<div id='productdefault_<%= pd.id %>_product_gift_wrap_price'   ></div>
+
+<h2>Variant Defaults</h2>
+<div id='variantdefault_<%= vd.id %>_variant_cost'              ></div>
+<div id='variantdefault_<%= vd.id %>_variant_price'             ></div>
+<div id='variantdefault_<%= vd.id %>_variant_available'         ></div>
+<div id='variantdefault_<%= vd.id %>_variant_quantity_in_stock' ></div>
+<div id='variantdefault_<%= vd.id %>_variant_ignore_quantity'   ></div>
+<div id='variantdefault_<%= vd.id %>_variant_allow_backorder'   ></div>
+<div id='variantdefault_<%= vd.id %>_variant_weight'            ></div>
+<div id='variantdefault_<%= vd.id %>_variant_length'            ></div>
+<div id='variantdefault_<%= vd.id %>_variant_width'             ></div>
+<div id='variantdefault_<%= vd.id %>_variant_height'            ></div>
+<div id='variantdefault_<%= vd.id %>_variant_volume'            ></div>
+<div id='variantdefault_<%= vd.id %>_variant_cylinder'          ></div>
+<div id='variantdefault_<%= vd.id %>_variant_requires_shipping' ></div>
+<div id='variantdefault_<%= vd.id %>_variant_taxable'           ></div>            
+<div id='variantdefault_<%= vd.id %>_variant_status'            ></div>
+<div id='variantdefault_<%= vd.id %>_variant_downloadable'      ></div>
+<div id='variantdefault_<%= vd.id %>_variant_is_bundle'         ></div>
+
+<%= render :partial => 'caboose/store/admin_footer' %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  new ModelBinder({
+    name: 'ProductDefault',
+    id: <%= pd.id %>,
+    update_url: '/admin/store',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [      
+      { name: 'product_vendor_id'         , nice_name: 'Vendor'              , type: 'select'   , value: <%= raw Caboose.json(pd.vendor_id              ) %>, width: 400, options_url: '/admin/vendors/options' },
+      { name: 'product_option1'           , nice_name: 'Option 1'            , type: 'text'     , value: <%= raw Caboose.json(pd.option1                ) %>, width: 400 },
+      { name: 'product_option2'           , nice_name: 'Option 2'            , type: 'text'     , value: <%= raw Caboose.json(pd.option2                ) %>, width: 400 },
+      { name: 'product_option3'           , nice_name: 'Option 3'            , type: 'text'     , value: <%= raw Caboose.json(pd.option3                ) %>, width: 400 },      
+      { name: 'product_status'            , nice_name: 'Status'              , type: 'select'   , value: <%= raw Caboose.json(pd.status                 ) %>, width: 400, options_url: '/admin/products/status-options' },
+      { name: 'product_on_sale'           , nice_name: 'On Sale'             , type: 'checkbox' , value: <%= raw Caboose.json(pd.on_sale                ) %>, width: 400 },
+      { name: 'product_allow_gift_wrap'   , nice_name: 'Allow gift wrap'     , type: 'checkbox' , value: <%= raw Caboose.json(pd.allow_gift_wrap        ) %>, width: 400 },
+      { name: 'product_gift_wrap_price'   , nice_name: 'Gift wrap price'     , type: 'text'     , value: <%= raw Caboose.json(pd.gift_wrap_price        ) %>, width: 400 }
+    ]    
+  });  
+  new ModelBinder({
+    name: 'VariantDefault',
+    id: <%= vd.id %>,
+    update_url: '/admin/store',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'variant_cost'              , nice_name: 'Cost'                , type: 'text'     , value: <%= raw Caboose.json(vd.cost                   ) %>, width: 400 },
+      { name: 'variant_price'             , nice_name: 'Price'               , type: 'text'     , value: <%= raw Caboose.json(vd.price                  ) %>, width: 400 },
+      { name: 'variant_available'         , nice_name: 'Available'           , type: 'checkbox' , value: <%= raw Caboose.json(vd.available              ) %>, width: 400 },
+      { name: 'variant_quantity_in_stock' , nice_name: 'Quantity in Stock'   , type: 'text'     , value: <%= raw Caboose.json(vd.quantity_in_stock      ) %>, width: 400 },
+      { name: 'variant_ignore_quantity'   , nice_name: 'Ignore quantity'     , type: 'checkbox' , value: <%= raw Caboose.json(vd.ignore_quantity        ) %>, width: 400 },
+      { name: 'variant_allow_backorder'   , nice_name: 'Allow backorder'     , type: 'checkbox' , value: <%= raw Caboose.json(vd.allow_backorder        ) %>, width: 400 },
+      { name: 'variant_weight'            , nice_name: 'Weight'              , type: 'text'     , value: <%= raw Caboose.json(vd.weight                 ) %>, width: 400 },
+      { name: 'variant_length'            , nice_name: 'Length'              , type: 'text'     , value: <%= raw Caboose.json(vd.length                 ) %>, width: 400 },
+      { name: 'variant_width'             , nice_name: 'Width'               , type: 'text'     , value: <%= raw Caboose.json(vd.width                  ) %>, width: 400 },
+      { name: 'variant_height'            , nice_name: 'Height'              , type: 'text'     , value: <%= raw Caboose.json(vd.height                 ) %>, width: 400 },
+      { name: 'variant_volume'            , nice_name: 'Volume'              , type: 'text'     , value: <%= raw Caboose.json(vd.volume                 ) %>, width: 400 },
+      { name: 'variant_cylinder'          , nice_name: 'Cylinder'            , type: 'checkbox' , value: <%= raw Caboose.json(vd.cylinder               ) %>, width: 400 },
+      { name: 'variant_requires_shipping' , nice_name: 'Requires shipping'   , type: 'checkbox' , value: <%= raw Caboose.json(vd.requires_shipping      ) %>, width: 400 },
+      { name: 'variant_taxable'           , nice_name: 'Taxable'             , type: 'checkbox' , value: <%= raw Caboose.json(vd.taxable                ) %>, width: 400 },            
+      { name: 'variant_status'            , nice_name: 'Status'              , type: 'select'   , value: <%= raw Caboose.json(vd.status                 ) %>, width: 400 },
+      { name: 'variant_status'            , nice_name: 'Status'              , type: 'select'   , value: <%= raw Caboose.json(vd.status                 ) %>, width: 400  , options_url: '/admin/variants/status-options' },
+      { name: 'variant_downloadable'      , nice_name: 'Downloadable'        , type: 'checkbox' , value: <%= raw Caboose.json(vd.downloadable           ) %>, width: 400 },
+      { name: 'variant_is_bundle'         , nice_name: 'Is bundle'           , type: 'checkbox' , value: <%= raw Caboose.json(vd.is_bundle              ) %>, width: 400 }                                                      
+    ]    
+  });
+                                                                                                                                                                                    
+});
+
+</script>
+<% end %>

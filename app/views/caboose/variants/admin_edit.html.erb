@@ -117,7 +117,7 @@ $(document).ready(function() {
         value: <%= raw Caboose.json("#{v.flat_rate_shipping_package_id}_#{v.flat_rate_shipping_method_id}") %>,
         text:  <%= raw Caboose.json(v.flat_rate_shipping_package && v.flat_rate_shipping_method ? "#{v.flat_rate_shipping_package.name} - #{v.flat_rate_shipping_method.service_name}" : '') %>         
       },
-      { name: 'is_bundle'                            , nice_name: 'Is Bundle'                       , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.is_bundle                     ) %> , 
+      { name: 'is_bundle'                            , nice_name: 'Is Bundle'                       , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.is_bundle ? 1 : 0             ) %> , 
         after_update: function() {
           if ($('#variant_<%= v.id %>_is_bundle').is(':checked'))
             vcc.print();

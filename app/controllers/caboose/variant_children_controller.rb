@@ -37,12 +37,17 @@ module Caboose
     def admin_add      
       resp = Caboose::StdClass.new
 
-      VariantChild.create(
-        :parent_id  => params[:parent_id],
-        :variant_id => params[:variant_id],
-        :quantity   => params[:quantity] ? params[:quantity] : 1
-      )
-      resp.success = true      
+      if params[:parent_id] == params[:variant_id]
+        resp.error = "Can't add the same variant as a child."
+      else
+        vc = VariantChild.create(
+          :parent_id  => params[:parent_id],
+          :variant_id => params[:variant_id],
+          :quantity   => params[:quantity] ? params[:quantity] : 1
+        )
+        resp.new_id = vc.id
+        resp.success = true
+      end
       render :json => resp
     end
 
@@ -55,9 +60,9 @@ module Caboose
                 
       params.each do |name,value|
         case name        
-          when 'parent_id'  then vcs.each{ |vc| vc.alternate_id = value }
-          when 'variant_id' then vcs.each{ |vc| vc.sku          = value }
-          when 'quantity'   then vcs.each{ |vc| vc.barcode      = value }          
+          when 'parent_id'  then vcs.each{ |vc| vc.parent_id   = value }
+          when 'variant_id' then vcs.each{ |vc| vc.variant_id  = value }
+          when 'quantity'   then vcs.each{ |vc| vc.quantity    = value }          
         end
       end
       vcs.each{ |vc| vc.save }

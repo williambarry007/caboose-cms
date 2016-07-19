@@ -461,15 +461,26 @@ module Caboose
       
       resp = Caboose::StdClass.new
       name = params[:name]
+      pd = @site.product_default
       
       if name.length == 0
         resp.error = "The title cannot be empty."
-      else
+      else                
         p = Product.new(:site_id => @site.id, :title => name)
         mc = MediaCategory.where(:site_id => @site.id).where("parent_id IS NULL").exists? ? MediaCategory.where(:site_id => @site.id).where("parent_id IS NULL").last : MediaCategory.create(:name => "Media", :site_id => @site.id)
         pc = MediaCategory.where(:name => "Products", :site_id => @site.id).exists? ? MediaCategory.where(:name => "Products", :site_id => @site.id).last : MediaCategory.create(:name => "Products", :site_id => @site.id, :parent_id => mc.id)
         c = MediaCategory.create(:site_id => @site.id, :name => name, :parent_id => pc.id)
         p.media_category_id = c.id
+                        
+        p.vendor_id       = pd.vendor_id      
+        p.option1         = pd.option1        
+        p.option2         = pd.option2        
+        p.option3         = pd.option3
+        p.status          = pd.status
+        p.on_sale         = pd.on_sale
+        p.allow_gift_wrap = pd.allow_gift_wrap
+        p.gift_wrap_price = pd.gift_wrap_price
+        
         p.save
         resp.redirect = "/admin/products/#{p.id}/general"
       end

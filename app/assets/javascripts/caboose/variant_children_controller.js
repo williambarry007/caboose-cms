@@ -59,10 +59,17 @@ VariantChildrenController.prototype = {
   {
     var that = this;
     $('#'+that.container).show();
+    
+    $('#'+that.container).empty()
+      .append($('<div/>').attr('id', 'new_vc_container')
+        .append($('<p/>')
+          .append($('<a/>').attr('href', '#').append('Add Variant to Bundle').click(function(e) { e.preventDefault(); that.add_variant_child(); }))
+        )
+      );
         
     if (!that.variant_children || that.variant_children.length == 0)
     {
-      $('#'+that.container).empty()
+      $('#'+that.container)
         .append($('<div/>').attr('id', 'vc_message'))
         .append($('<p/>')
           .append("This variant doesn't have any child variants.")          
@@ -71,21 +78,38 @@ VariantChildrenController.prototype = {
     else
     {    
       var div = $('<div/>');
-      var tbody = $('<tbody/>');
+      var tbody = $('<tbody/>')
+        .append($('<tr/>')
+          .append($('<th/>').append('Item'))        
+          .append($('<th/>').append('Qty'))
+          .append($('<th/>').append('&nbsp;'))
+        );
       $.each(that.variant_children, function(i, vc) {
-        tbody.append($('<tr/>')
-          .append($('<td/>').append(vc.variant.full_title))        
-          .append($('<td/>').append(vc.quantity))
-        );        
+        if (vc.variant)
+        {
+          tbody.append($('<tr/>')
+            .append($('<td/>').append(vc.variant.full_title))        
+            .append($('<td/>').append($('<div/>').attr('id', 'variantchild_' + vc.id + '_quantity')))
+            .append($('<td/>').attr('id', 'vc_' + vc.id + '_message').append($('<a/>').attr('href', '#').append('Remove').data('vc_id', vc.id).click(function(e) { e.preventDefault(); that.delete_variant_child($(this).data('vc_id')); })))
+          );
+        }
       }); 
-      div.append($('<table/>').addClass('data').append(tbody));
-      $('#'+that.container).empty().append(div);        
-    }
-    $('#'+that.container)
-      .append($('<div/>').attr('id', 'new_vc_container')        
-        .append($('<a/>').attr('href', '#').append('Add Variant to Bundle').click(function(e) { e.preventDefault(); that.add_variant_child(); }))
-      );    
+      div.append($('<table/>').addClass('data').append(tbody)).append($('<br/>'));
+      $('#'+that.container).append(div);        
+    }        
     $('#'+that.container).show();
+    
+    $.each(that.variant_children, function(i, vc) {
+      new ModelBinder({
+        name: 'VariantChild',
+        id: vc.id,
+        update_url: '/admin/products/' + that.product_id + '/variants/' + that.variant_id + '/children/' + vc.id,
+        authenticity_token: '<%= form_authenticity_token %>',
+        attributes: [          
+          { name: 'quantity', nice_name: 'Qty', type: 'text', align: 'right', width: 60, value: vc.quantity, fixed_placeholder: false }                
+        ]
+      });
+    });    
   },
   
   add_variant_child: function(variant_id)
@@ -94,20 +118,35 @@ VariantChildrenController.prototype = {
     if (!variant_id)
     {      
       $('#new_vc_container').empty()
-        .append($('<div/>').addClass('note warning')
-          .append($('<div/>').attr('id', 'new_vc_message'))
+        .append($('<div/>').addClass('note warning')          
           .append($('<p/>').append($('<input/>').attr('type', 'text').attr('placeholder', 'Product Name').keyup(function() { that.show_products($(this).val()); })))
           .append($('<div/>').attr('id', 'products'))
+          .append($('<div/>').attr('id', 'new_vc_message'))
+          .append($('<p/>').append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { that.print(); })))
         );        
       return;
     }
-    $('#new_vc_container').html("<p class='loading'>Adding variant...</p>");
+    $('#new_vc_message').html("<p class='loading'>Adding variant...</p>");
     $.ajax({
       url: '/admin/products/' + that.product_id + '/variants/' + that.variant_id + '/children',
       type: 'post',
       data: { variant_id: variant_id },
       success: function(resp) {
-        if (resp.error) $('#new_vc_container').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.error) $('#new_vc_message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) that.refresh_and_print();        
+      }
+    });    
+  },
+  
+  delete_variant_child: function(vc_id)
+  {
+    var that = this;    
+    $('#vc_' + vc_id + '_message').html("<p class='loading_small'>...</p>");
+    $.ajax({
+      url: '/admin/products/' + that.product_id + '/variants/' + that.variant_id + '/children/' + vc_id,
+      type: 'delete',      
+      success: function(resp) {
+        if (resp.error) $('#vc_' + vc_id + '_message').html("<p class='note error'>" + resp.error + "</p>");
         if (resp.success) that.refresh_and_print();        
       }
     });    

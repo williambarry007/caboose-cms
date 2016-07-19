@@ -14,6 +14,7 @@ MyAccountInvoiceController.prototype = {
     
     var that = this;
     $('#payment_form').hide();
+    
     $(document).ready(function() { that.refresh(); });
   },
   
@@ -21,9 +22,13 @@ MyAccountInvoiceController.prototype = {
   {
     var that = this;
     that.refresh_invoice(function() {
+      if (that.invoice.financial_status == 'pending')    
+        that.payment_method_controller = new MyAccountPaymentMethodController({ ic: that });
+    
       $('#invoice_table').html("<p class='loading'>Getting invoice...</p>");
       that.print();
-      if (after) after();
+            
+      if (after) after();            
     });    
   },
   
@@ -79,6 +84,9 @@ MyAccountInvoiceController.prototype = {
       if (count_downloadable > 0) that.downloadable_line_items_table(table);    
       that.summary_table(table);
       $('#invoice_table').empty().append(table);
+      
+      if (that.invoice.financial_status == 'pending')        
+        that.payment_method_controller.print();
     }
     else
     {
@@ -95,21 +103,22 @@ MyAccountInvoiceController.prototype = {
     var fstatus = $('<div/>').append($('<p/>').html(capitalize_first_letter(that.invoice.financial_status)));    
     if (that.invoice.financial_status == 'pending')        
     {      
-      fstatus.append($('<p/>').append($('<input/>').attr('type', 'button').addClass('btn').val('Pay now').click(function(e) { e.preventDefault(); that.payment_form(); })));            
+      fstatus.append($('<div/>').attr('id', 'payment_method_container'));
+      //fstatus.append($('<p/>').append($('<input/>').attr('type', 'button').addClass('btn').val('Pay now').click(function(e) { e.preventDefault(); that.payment_form(); })));            
     }            
 
     var table = $('<table/>').addClass('invoice');
     table.append($('<tr/>')  
       .append($('<th/>').html('Customer'))
       .append($('<th/>').html('Shipping Address'))
-      .append($('<th/>').html('Billing Address'))
+      //.append($('<th/>').html('Billing Address'))
       .append($('<th/>').html('Status'))
       .append($('<th/>').html('Payment Status'))      
     );    
     table.append($('<tr/>')      
       .append($('<td/>').attr('valign', 'top').attr('id', 'customer'         ).append(that.noneditable_customer()))
       .append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(that.noneditable_shipping_address()))      
-      .append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
+      //.append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
       .append($('<td/>').attr('valign', 'top').attr('align', 'center').append($('<p/>').html(capitalize_first_letter(that.invoice.status))))
       .append($('<td/>').attr('valign', 'top').attr('id', 'financial_status' ).attr('align', 'center').append(fstatus))      
     );

@@ -15,8 +15,11 @@ store_config = @invoice.site.store_config
 <p><input type='button' value='< Back' class='btn' onclick="window.location='/my-account/invoices';" /></p>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag 'https://js.stripe.com/v2/' %>
+<%= javascript_include_tag 'caboose/jquery.payment' %>
 <%= javascript_include_tag 'caboose/model/all' %>
 <%= javascript_include_tag 'caboose/my_account_edit_invoice' %>
+<%= javascript_include_tag 'caboose/my_account_payment_method_controller' %>
 <script type='text/javascript'>
 
 var controller = false;
@@ -32,4 +35,20 @@ $(document).ready(function() {
 
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/my_account_edit_invoice' %>
+<style type='text/css'>
+.stripe_form { width: 100%; }
+.stripe_form .card_number_container { position: relative; width: 100%; }                                 .stripe_form .card_number_container input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 1px; }
+.stripe_form .card_exp_container    { position: relative; width: 50% !important; float: left; }          .stripe_form .card_exp_container    input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 1px; }
+.stripe_form .card_cvc_container    { position: relative; width: 50%; float: left; }                     .stripe_form .card_cvc_container    input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 0px; }
+.stripe_form .card_name_container   { position: relative; width: 50%; float: left; }                     .stripe_form .card_name_container   input { padding-left: 10px; height: 37px !important; font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 0px 1px 1px; }
+.stripe_form .card_zip_container    { position: relative; width: 50%; float: left; margin-bottom: 4px; } .stripe_form .card_zip_container    input { padding-left: 10px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 1px 0px; }
+
+.stripe_form .card_number_container .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+.stripe_form .card_exp_container    .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+.stripe_form .card_cvc_container    .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
+
+.stripe_form .note { width: 100%; margin-bottom: 10px !important; text-align: center; }
+.stripe_form .payment_controls { clear: left; margin-top: 4px !important; }
+
+</style>
 <% end %>

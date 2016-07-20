@@ -56,7 +56,87 @@ module Caboose
           
         when 'stripe'
           # TODO: Implement manual invoice payment for stripe
+          sc = @site.store_config
           
+          # Make sure all the variants still exist      
+          @invoice.line_items.each do |li|
+            v = Variant.where(:id => li.variant_id).first
+            if v.nil? || v.status == 'Deleted'
+              render :json => { :error => 'One or more of the products you are purchasing are no longer available.' }
+              return
+            end
+          end
+
+          error = false      
+          requires_payment = @invoice.line_items.count > 0 && @invoice.total > 0
+          if requires_payment
+            ot = nil
+
+            Stripe.api_key = sc.stripe_secret_key.strip
+            begin
+              c = Stripe::Charge.create(
+                :amount => (@invoice.total * 100).to_i,
+                :currency => 'usd',
+                :customer => logged_in_user.stripe_customer_id,
+                :capture => false,
+                :metadata => { :invoice_id => @invoice.id },
+                :statement_descriptor => "Invoice ##{@invoice.id}"
+              )
+            rescue Exception => ex
+              render :json => { :error => ex.message }
+              return
+            end
+            ot = Caboose::InvoiceTransaction.create(
+              :invoice_id        => @invoice.id,
+              :transaction_id    => c.id,
+              :transaction_type  => c.captured ? Caboose::InvoiceTransaction::TYPE_AUTHCAP : Caboose::InvoiceTransaction::TYPE_AUTHORIZE,
+              :payment_processor => sc.pp_name,
+              :amount            => c.amount/100.0,              
+              :date_processed    => DateTime.now.utc,              
+              :success           => c.status == 'succeeded'
+            )                        
+            
+            if !ot.success
+              render :json => { :error => error }
+              return        
+            else        
+              @invoice.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED                                                   
+              @invoice.take_gift_card_funds
+            end
+          end
+          
+          @invoice.status = Invoice::STATUS_PENDING
+          @invoice.invoice_number = @site.store_config.next_invoice_number
+          
+          # Send out emails
+          # begin
+          #   InvoicesMailer.configure_for_site(@site.id).customer_new_invoice(@invoice).deliver
+          #   InvoicesMailer.configure_for_site(@site.id).fulfillment_new_invoice(@invoice).deliver
+          # rescue
+          #   puts "=================================================================="
+          #   puts "Error sending out invoice confirmation emails for invoice ID #{@invoice.id}"
+          #   puts "=================================================================="
+          # end
+          
+          # Emit invoice event      
+          Caboose.plugin_hook('invoice_authorized', @invoice) if @invoice.total > 0 
+          
+          # Save the invoice
+          @invoice.save
+          
+          # Decrement quantities of variants
+          @invoice.decrement_quantities
+          
+          # Clear the cart and re-initialize                    
+          # session[:cart_id] = nil
+          # init_cart
+          
+          # TODO: render a success message
+          render :json => {
+            :success => true,
+            :message => "Thank you for your payment! Please allow up to 48 hours for your payment to be processed."
+          }
+          return
       end      
       render :layout => false      
     end

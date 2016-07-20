@@ -111,14 +111,14 @@ MyAccountInvoiceController.prototype = {
     table.append($('<tr/>')  
       .append($('<th/>').html('Customer'))
       .append($('<th/>').html('Shipping Address'))
-      //.append($('<th/>').html('Billing Address'))
+      // .append($('<th/>').html('Billing Address'))
       .append($('<th/>').html('Status'))
       .append($('<th/>').html('Payment Status'))      
     );    
     table.append($('<tr/>')      
       .append($('<td/>').attr('valign', 'top').attr('id', 'customer'         ).append(that.noneditable_customer()))
       .append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(that.noneditable_shipping_address()))      
-      //.append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
+      // .append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
       .append($('<td/>').attr('valign', 'top').attr('align', 'center').append($('<p/>').html(capitalize_first_letter(that.invoice.status))))
       .append($('<td/>').attr('valign', 'top').attr('id', 'financial_status' ).attr('align', 'center').append(fstatus))      
     );
@@ -428,29 +428,39 @@ MyAccountInvoiceController.prototype = {
   
   payment_form: function()
   {
-    var that = this;
-    var form = $('#payment_form');
+    var that    = this;
+    var form    = $('#payment_form');
+    var message = $('#payment_message')
     if (form.is(':visible'))
     {      
       form.slideUp(function() { form.empty(); });
-      $('#payment_message').empty();
+      message.empty();
       return; 
     }
     
-    $('#payment_message').empty().html("<p class='loading'>Getting payment form...</p>");
+    message.empty().html("<p class='loading'>Processing payment...</p>");
     $.ajax({
       url: '/my-account/invoices/' + that.invoice.id + '/payment-form',
       type: 'get',
-      success: function(html) {        
-        form.empty().append(html);
-        form.slideDown();
-        $('#payment_message').empty();
-        $('#payment_confirm').click(function(e) {                                                                   
-          $('#expiration').val($('#month').val() + $('#year').val());    
-          $('#payment_message').empty().html("<p class='loading'>Processing payment...</p>");
-          $('#payment_form').slideUp();
-          $('#payment').submit();            
-        });                
+      success: function(resp) {        
+        if (resp.success == true)
+        {
+          message.empty().html("<p class='note success'>" + resp.message + "</p>");
+          setTimeout(function() { message.empty() }, 5000);
+          that.refresh();
+        }
+        else {
+          message.empty().html("<p class='note error'>" + resp.error + "</p>");
+        }
+
+        // form.empty().append(html);
+        // form.slideDown();
+        // $('#payment_confirm').click(function(e) {                                                                   
+        //   $('#expiration').val($('#month').val() + $('#year').val());    
+        //   $('#payment_message').empty().html("<p class='loading'>Processing payment...</p>");
+        //   $('#payment_form').slideUp();
+        //   $('#payment').submit();            
+        // });                
       }
     });                  
   },

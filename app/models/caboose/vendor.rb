@@ -19,7 +19,8 @@ module Caboose
       :alternate_id,
       :name, 
       :status,
-      :sort_order
+      :sort_order,
+      :email
     after_save :clear_filters
 
     def self.active

@@ -952,9 +952,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :site_id      , :integer    ],
         [ :alternate_id , :string     ],
         [ :name         , :string     ],
+        [ :email        , :string     ],
         [ :status       , :string     , { :default => 'Active' }],
         [ :featured     , :boolean    , { :default => false    }],
-        [ :image        , :attachment ]
+        [ :image        , :attachment ]        
       ]
     }
 

@@ -516,6 +516,9 @@ module Caboose
         
         v.save
         
+        resp.new_id = p.id
+        resp.new_variant_id = v.id
+        resp.success = true
         resp.redirect = "/admin/products/#{p.id}/general"
       end
       render :json => resp    

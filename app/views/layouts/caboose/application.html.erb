@@ -96,6 +96,10 @@
   css = yield(:css)
   css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
   css.gsub!("<link href='//" , "<link href='#{protocol}")
+  if protocol == 'https://' 
+    css.gsub!("<link href=\"http://", "<link href=\"https://")
+    css.gsub!("<link href='http://" , "<link href='https://")
+  end
   
   js = yield(:js)
   if @site.use_retargeting

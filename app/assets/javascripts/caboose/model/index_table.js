@@ -89,6 +89,8 @@ IndexTable.prototype = {
   custom_row_controls: false,
   after_print: false,
   table_class: 'data',
+  allow_export: false,
+  export_url: false,
           
   //============================================================================
   // End of parameters
@@ -287,6 +289,7 @@ IndexTable.prototype = {
       if (this.allow_bulk_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import'    ).val('Import'                ).click(function(e) { that.bulk_import();        })).append(' ');
       if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'      ).val('Duplicate'             ).click(function(e) { that.duplicate();          })).append(' ');
       if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete'    ).val('Delete'                ).click(function(e) { that.bulk_delete();        })).append(' ');
+      if (this.allow_export      ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_export'         ).val('Export'                ).click(function(e) { that.csv_export();         })).append(' ');
                           
       var c = $('#' + that.container);
       c.empty();        
@@ -687,6 +690,18 @@ IndexTable.prototype = {
         if (resp.success) { that.hide_message(); that.refresh(); }
       }
     });    
+  },
+  
+  csv_export: function()
+  {
+    var that = this;
+    var p = this.pager_params();                  
+  	var qs = [];
+  	$.each(p, function(k,v) {  	  
+  	  if (k != '[object Object]') qs.push('' + k + '=' + encodeURIComponent(v)); 
+  	});
+  	var url = that.export_url ? that.export_url : that.base_url + '/export.csv';
+  	window.location = url + '?' + qs.join('&');    
   },
   
   pager_div: function(summary)

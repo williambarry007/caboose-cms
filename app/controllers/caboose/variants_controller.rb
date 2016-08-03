@@ -141,6 +141,7 @@ module Caboose
       render :layout => 'caboose/modal'
     end
     
+    # @route GET /admin/variants/:id
     # @route GET /admin/products/:product_id/variants/:id
     def admin_edit
       return if !user_is_allowed('variants', 'edit')    

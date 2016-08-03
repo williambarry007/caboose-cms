@@ -37,7 +37,7 @@ class Caboose::BlockType < ActiveRecord::Base
     return "#{parent.full_name}_#{name}"
   end
   
-  def render_options(empty_text = nil)    
+  def render_options(site_id)    
     return eval(self.options_function)    
   end
   

@@ -64,7 +64,7 @@ module Caboose
         :success => li.save, 
         :errors => li.errors.full_messages,
         :item_count => @invoice.item_count 
-      }
+      }      
     end
     
     # @route PUT /cart/:line_item_id
@@ -117,7 +117,7 @@ module Caboose
       if op
         op.shipping_method_id = nil
         op.total = nil
-        op.save
+        op.save                
       end
       if li.invoice
         li.invoice.shipping = 0.00

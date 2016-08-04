@@ -96,11 +96,14 @@ module Caboose
     # @route DELETE /admin/invoices/:invoice_id/line-items/:id
     def admin_delete
       return if !user_is_allowed('invoices', 'delete')
-      li = LineItem.find(params[:id])
-      invoice = li.invoice
+      li = LineItem.find(params[:id])      
       li.destroy
-      invoice.calculate_total
-      invoice.save                  
+      
+      invoice = Invoice.find(params[:invoice_id])
+      invoice.subtotal = invoice.calculate_subtotal      
+      invoice.total    = invoice.calculate_total
+      invoice.save
+      
       render :json => Caboose::StdClass.new({
         :redirect => '/admin/invoices'
       })

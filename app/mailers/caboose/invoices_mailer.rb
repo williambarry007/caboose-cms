@@ -47,7 +47,13 @@ module Caboose
     # Sends an email to the customer telling them they need to authorize payment on an invoice 
     def customer_payment_authorization(invoice)      
       @invoice = invoice
-      mail(:to => invoice.customer.email, :subject => "Order #{@invoice.invoice_number} ready for payment")
+      mail(:to => invoice.customer.email, :subject => "Invoice #{@invoice.invoice_number} ready for payment")
+    end
+    
+    # Sends an email to the customer telling them they need to authorize payment on an invoice 
+    def customer_receipt(invoice)      
+      @invoice = invoice
+      mail(:to => invoice.customer.email, :subject => "Invoice #{@invoice.invoice_number} receipt")
     end
   end
 end

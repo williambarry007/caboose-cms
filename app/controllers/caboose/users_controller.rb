@@ -269,19 +269,24 @@ module Caboose
       return if !user_is_allowed('users', 'sudo')
       user = User.find(params[:id])
                                   
-      # See if we're on the default domain               
-      d = Caboose::Domain.where(:domain => request.host_with_port).first      
-            
-      if d.primary == true
-        logout_user
-        login_user(user, false) # Login the new user      
-        redirect_to "/"
-      end
-               
-      # Set a random token for the user
-      user.token = (0...20).map { ('a'..'z').to_a[rand(26)] }.join
-      user.save
-      redirect_to "http://#{d.site.primary_domain.domain}/admin/users/#{params[:id]}/su/#{user.token}"                    
+      ## See if we're on the default domain               
+      #d = Caboose::Domain.where(:domain => request.host_with_port).first      
+      #      
+      #if d.primary == true
+      #  logout_user
+      #  login_user(user, false) # Login the new user      
+      #  redirect_to "/"
+      #end
+      #         
+      ## Set a random token for the user
+      #user.token = (0...20).map { ('a'..'z').to_a[rand(26)] }.join
+      #user.save
+      #      
+      #redirect_to "http://#{d.site.primary_domain.domain}/admin/users/#{params[:id]}/su/#{user.token}"
+                                          
+      logout_user
+      login_user(user, false) # Login the new user      
+      redirect_to "/"                           
     end
     
     # @route GET /admin/users/:id/su/:token

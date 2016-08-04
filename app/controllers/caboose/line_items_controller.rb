@@ -46,21 +46,26 @@ module Caboose
         case name
           when 'invoice_id'         then li.invoice_id          = value
           when 'invoice_package_id' then li.invoice_package_id  = value
-          when 'variant_id'       then li.variant_id        = value
-          when 'parent_id'        then li.parent_id         = value          
-          #when 'unit_price'       then li.unit_price        = value
-          #when 'subtotal'         then li.subtotal          = value
-          when 'notes'            then li.notes             = value
-          when 'custom1'          then li.custom1           = value
-          when 'custom2'          then li.custom2           = value
-          when 'custom3'          then li.custom3           = value
+          when 'variant_id'         then li.variant_id          = value
+          when 'parent_id'          then li.parent_id           = value                    
+          #when 'subtotal'          then li.subtotal            = value
+          when 'notes'              then li.notes               = value
+          when 'custom1'            then li.custom1             = value
+          when 'custom2'            then li.custom2             = value
+          when 'custom3'            then li.custom3             = value
+          when 'unit_price'
+            Caboose.log("li.unit_price = #{li.unit_price}")
+            li.unit_price = value
+            li.save
+            Caboose.log("li.unit_price = #{li.unit_price}")
+            li.subtotal = li.unit_price * li.quantity
+            li.save
+            li.invoice.subtotal = li.invoice.calculate_subtotal
+            li.invoice.total = li.invoice.calculate_total
           when 'quantity'
             li.quantity = value
-            li.subtotal = li.unit_price * li.quantity
-            
-            li.save
-            
-            
+            li.subtotal = li.unit_price * li.quantity            
+            li.save                        
             li.invoice.subtotal = li.invoice.calculate_subtotal
             li.invoice.total = li.invoice.calculate_total
             

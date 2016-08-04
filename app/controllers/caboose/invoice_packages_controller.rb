@@ -67,44 +67,44 @@ module Caboose
       render :json => resp
     end
     
-    # @route PUT /admin/invoices/:invoice_id/line-items/:id
-    def admin_update_line_item
-      return if !user_is_allowed('invoices', 'edit')
-      
-      resp = Caboose::StdClass.new({'attributes' => {}})
-      li = LineItem.find(params[:id])    
-      
-      save = true
-      send_status_email = false    
-      params.each do |name,value|
-        case name
-          when 'quantity'
-            li.quantity = value
-            li.save
-                      	  
-            # Recalculate everything
-            r = ShippingCalculator.rate(li.invoice, li.invoice.shipping_method_code)
-            li.invoice.shipping = r['negotiated_rate'] / 100
-            li.invoice.handling = (r['negotiated_rate'] / 100) * 0.05
-            li.invoice.tax = TaxCalculator.tax(li.invoice)            
-            li.invoice.calculate_total
-            li.invoice.save
-            
-          when 'tracking_number'
-            li.tracking_number = value
-            send_status_email = true
-          when 'status'
-            li.status = value
-            resp.attributes['status'] = {'text' => value}
-            send_status_email = true
-        end
-      end
-      if send_status_email       
-        InvoicesMailer.configure_for_site(@site.id).customer_status_updated(li.invoice).deliver
-      end
-      resp.success = save && li.save
-      render :json => resp
-    end 
+    # @ route PUT /admin/invoices/:invoice_id/line-items/:id
+    #def admin_update_line_item
+    #  return if !user_is_allowed('invoices', 'edit')
+    #  
+    #  resp = Caboose::StdClass.new({'attributes' => {}})
+    #  li = LineItem.find(params[:id])    
+    #  
+    #  save = true
+    #  send_status_email = false    
+    #  params.each do |name,value|
+    #    case name
+    #      when 'quantity'
+    #        li.quantity = value
+    #        li.save
+    #                  	  
+    #        # Recalculate everything
+    #        r = ShippingCalculator.rate(li.invoice, li.invoice.shipping_method_code)
+    #        li.invoice.shipping = r['negotiated_rate'] / 100
+    #        li.invoice.handling = (r['negotiated_rate'] / 100) * 0.05
+    #        li.invoice.tax = TaxCalculator.tax(li.invoice)            
+    #        li.invoice.calculate_total
+    #        li.invoice.save
+    #        
+    #      when 'tracking_number'
+    #        li.tracking_number = value
+    #        send_status_email = true
+    #      when 'status'
+    #        li.status = value
+    #        resp.attributes['status'] = {'text' => value}
+    #        send_status_email = true
+    #    end
+    #  end
+    #  if send_status_email       
+    #    InvoicesMailer.configure_for_site(@site.id).customer_status_updated(li.invoice).deliver
+    #  end
+    #  resp.success = save && li.save
+    #  render :json => resp
+    #end 
     
     # @route DELETE /admin/invoices/:invoice_id/packages/:id
     def admin_delete

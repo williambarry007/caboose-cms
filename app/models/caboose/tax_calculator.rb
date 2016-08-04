@@ -4,7 +4,7 @@ module Caboose
   class TaxCalculator
     
     def self.custom_tax(store_config, invoice)          
-      return eval(store_config.custom_tax_function)    
+      return store_config.custom_tax_function && store_config.custom_tax_function.strip.length > 0 ? eval(store_config.custom_tax_function) : 0.00    
     end
     
     def self.tax(invoice)

@@ -189,26 +189,27 @@ module Caboose
       
       resp = Caboose::StdClass.new({'attributes' => {}})
       invoice = Invoice.find(params[:id])    
-      
+            
       save = true    
-      params.each do |name,value|
+      params.each do |name,value|        
         case name
-          when 'tax'             then 
+          when 'tax' 
             invoice.tax = value
             invoice.total = invoice.calculate_total          
-          when 'handling'        then
+          when 'handling'
             invoice.handling = value
             invoice.total = invoice.calculate_total
-          when 'custom_discount' then 
+          when 'custom_discount' 
             invoice.custom_discount = value
             invoice.discount = invoice.calculate_discount
             invoice.total = invoice.calculate_total
-          when 'status'          then
+          when 'status'
             invoice.status = value
-            if value == 'Shipped'
-              invoice.date_shipped = DateTime.now.utc
-            end            
-          when 'customer_id'     then invoice.customer_id     = value            
+            invoice.date_shipped = DateTime.now.utc if value == 'Shipped'                          
+          when 'financial_status'            
+            invoice.financial_status = value
+          when 'customer_id'
+            invoice.customer_id = value            
         end
       end
 
@@ -216,7 +217,7 @@ module Caboose
       #invoice.calculate_total
       #resp.attributes['total'] = { 'value' => invoice.total }
       
-      resp.success = save && invoice.save
+      resp.success = save && invoice.save      
       render :json => resp
     end
     
@@ -234,6 +235,14 @@ module Caboose
       return if !user_is_allowed('invoices', 'edit')
       invoice = Invoice.find(params[:id])
       invoice.delay(:queue => 'caboose_store').send_payment_authorization_email      
+      render :json => { :success => true }
+    end
+    
+    # @route GET /admin/invoices/:id/send-receipt
+    def admin_send_for_authorization
+      return if !user_is_allowed('invoices', 'edit')
+      invoice = Invoice.find(params[:id])
+      invoice.delay(:queue => 'caboose_store').send_receipt_email      
       render :json => { :success => true }
     end
     
@@ -273,7 +282,18 @@ module Caboose
             Invoice::STATUS_SHIPPED, 
             Invoice::STATUS_CANCELED
           ]
-          options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}              
+          options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}
+        when 'financial-status'
+          statuses = [
+            Invoice::FINANCIAL_STATUS_PENDING             ,
+            Invoice::FINANCIAL_STATUS_AUTHORIZED          ,
+            Invoice::FINANCIAL_STATUS_CAPTURED            ,
+            Invoice::FINANCIAL_STATUS_REFUNDED            ,
+            Invoice::FINANCIAL_STATUS_VOIDED              ,
+            Invoice::FINANCIAL_STATUS_PAID_BY_CHECK       ,
+            Invoice::FINANCIAL_STATUS_PAID_BY_OTHER_MEANS                
+          ]
+          options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}
         when 'payment-terms'
           options = [
             { 'value' => Invoice::PAYMENT_TERMS_PIA   , 'text' => 'Pay In Advance' },

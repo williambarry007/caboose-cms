@@ -79,7 +79,7 @@ InvoiceController.prototype = {
         update_url: '/admin/invoices/' + op.invoice_id + '/packages/' + op.id,
         authenticity_token: that.authenticity_token,
         attributes: [                      
-          { name: 'status'          , nice_name: 'Status'          , type: 'select' , value: op.status                                            , width: 300, fixed_placeholder: true , options_url: '/admin/invoices/line-items/status-options' },
+          { name: 'status'          , nice_name: 'Status'          , type: 'select' , value: op.status                                            , width: 300, fixed_placeholder: true , options_url: '/admin/invoices/line-items/status-options' },          
           { name: 'package_method'  , nice_name: 'Package/Method'  , type: 'select' , value: op.shipping_package_id + '_' + op.shipping_method_id , width: 300, fixed_placeholder: false, options_url: '/admin/shipping-packages/package-method-options' },
           { name: 'tracking_number' , nice_name: 'Tracking Number' , type: 'text'   , value: op.tracking_number                                   , width: 300, fixed_placeholder: true, align: 'right' },
           { name: 'total'           , nice_name: 'Shipping Total'  , type: 'text'   , value: curr(op.total)                                       , width: 300, fixed_placeholder: true, align: 'right' , after_update: function() { that.refresh_invoice(); }}
@@ -93,9 +93,10 @@ InvoiceController.prototype = {
         update_url: '/admin/invoices/' + li.invoice_id + '/line-items/' + li.id,
         authenticity_token: that.authenticity_token,
         attributes: [
-          { name: 'status'          , nice_name: 'Status'           , type: 'select'  , align: 'left' , value: li.status          , text: li.status, width: 150, fixed_placeholder: false, options_url: '/admin/invoices/line-items/status-options' },
-          { name: 'tracking_number' , nice_name: 'Tracking Number'  , type: 'text'    , align: 'left' , value: li.tracking_number , width: 200, fixed_placeholder: false },
-          { name: 'quantity'        , nice_name: 'Quantity'         , type: 'text'    , align: 'right', value: li.quantity        , width:  75, fixed_placeholder: false, after_update: function() { that.refresh_invoice(); } }
+          { name: 'status'          , nice_name: 'Status'           , type: 'select'  , align: 'left' , value: li.status           , text: li.status, width: 150, fixed_placeholder: false, options_url: '/admin/invoices/line-items/status-options' },
+          { name: 'tracking_number' , nice_name: 'Tracking Number'  , type: 'text'    , align: 'left' , value: li.tracking_number  , width: 200, fixed_placeholder: false },
+          { name: 'unit_price'      , nice_name: 'Unit Price'       , type: 'text'    , align: 'right', value: curr(li.unit_price) , width:  75, fixed_placeholder: false, after_update: function() { that.refresh_invoice(); } },
+          { name: 'quantity'        , nice_name: 'Quantity'         , type: 'text'    , align: 'right', value: li.quantity         , width:  75, fixed_placeholder: false, after_update: function() { that.refresh_invoice(); } }
         ]
       });
     });    
@@ -105,11 +106,12 @@ InvoiceController.prototype = {
       update_url: '/admin/invoices/' + that.invoice.id,
       authenticity_token: that.authenticity_token,
       attributes: [
-        { name: 'status'         , nice_name: 'Status'        , type: 'select', value: that.invoice.status                , width: 100, fixed_placeholder: false, options_url: '/admin/invoices/status-options' },
-        { name: 'payment_terms'  , nice_name: 'Terms'         , type: 'select', value: that.invoice.payment_terms         , width: 200, fixed_placeholder: true , options_url: '/admin/invoices/payment-terms-options' },
-        { name: 'tax'            , nice_name: 'Tax'           , type: 'text'  , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'handling'       , nice_name: 'Handling'      , type: 'text'  , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'custom_discount', nice_name: 'Discount'      , type: 'text'  , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }}
+        { name: 'status'           , nice_name: 'Status'        , type: 'select', value: that.invoice.status                , width: 100, fixed_placeholder: false, options_url: '/admin/invoices/status-options' },
+        { name: 'financial_status' , nice_name: 'Status'        , type: 'select', value: that.invoice.financial_status      , width: 100, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/financial-status-options' },
+        { name: 'payment_terms'    , nice_name: 'Terms'         , type: 'select', value: that.invoice.payment_terms         , width: 200, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/payment-terms-options' },
+        { name: 'tax'              , nice_name: 'Tax'           , type: 'text'  , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'handling'         , nice_name: 'Handling'      , type: 'text'  , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'custom_discount'  , nice_name: 'Discount'      , type: 'text'  , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }}
       ]
     });        
   },
@@ -227,7 +229,13 @@ InvoiceController.prototype = {
   {
     var that = this;
     window.open('/admin/invoices/' + that.invoice.id + '/print');
-  },  
+  },
+  
+  print_invoice: function()
+  {
+    var that = this;
+    window.open('/admin/invoices/' + that.invoice.id + '/print');
+  },
     
   line_items_for_invoice_package: function(invoice_package_id)
   {
@@ -267,7 +275,7 @@ InvoiceController.prototype = {
       .append($('<th/>').html('Shipping Address'))
       .append($('<th/>').html('Billing Address'))
       .append($('<th/>').html('Invoice Status'))
-      .append($('<th/>').html('Payment Status'))      
+      .append($('<th/>').html('Payment'))      
     );    
     table.append($('<tr/>')      
       .append($('<td/>').attr('valign', 'top')
@@ -285,6 +293,8 @@ InvoiceController.prototype = {
       .append($('<td/>').attr('valign', 'top').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_status')))
       .append($('<td/>').attr('valign', 'top')
         .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_payment_terms'))
+        .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_payment_terms'))
+        .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_financial_status'))
         .append($('<div/>').attr('id', 'transactions').attr('align', 'center').append(transactions))
       )      
     );
@@ -494,7 +504,8 @@ InvoiceController.prototype = {
             .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
           );
           tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
-          tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
+          //tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
+          tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_unit_price')));
           tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
           tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));        
           table.append(tr);
@@ -680,7 +691,8 @@ InvoiceController.prototype = {
         .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
       );            
       tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
-      tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
+      //tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
+      tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_unit_price')));
       tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
       tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));
       table.append(tr);
@@ -737,10 +749,11 @@ InvoiceController.prototype = {
     var p = $('<p/>');
     p.append($('<input/>').attr('type', 'button').val('< Back').click(function() { window.location = '/admin/invoices'; })).append(' ');
     if (that.invoice.total > 0 && that.invoice.financial_status == 'pending')    
-      p.append($('<input/>').attr('type', 'button').val('Send for Authorization').click(function() { that.send_for_authorization(); })).append(' ');        
-    //p.append($('<input/>').attr('type', 'button').val('Resend Confirmation' ).click(function() { that.resend_confirmation(); })).append(' ');
-    p.append($('<input/>').attr('type', 'button').val('Add Item'            ).click(function() { that.add_variant();         })).append(' ');
-    p.append($('<input/>').attr('type', 'button').val('Print Invoice'         ).click(function() { that.print_invoice();         })).append(' ');
+      p.append($('<input/>').attr('type', 'button').val('Send for Payment').click(function() { that.send_for_authorization(); })).append(' ');        
+    if (that.invoice.total > 0 && (that.invoice.financial_status == 'captured' || that.invoice.financial_status == 'paid by check' || that.invoice.financial_status == 'paid by other means'))    
+      p.append($('<input/>').attr('type', 'button').val('Send Receipt to Customer' ).click(function() { that.send_receipt();   })).append(' ');
+    p.append($('<input/>').attr('type', 'button').val('Add Item'                 ).click(function() { that.add_variant();     })).append(' ');
+    p.append($('<input/>').attr('type', 'button').val('Print Invoice'            ).click(function() { that.print_invoice();   })).append(' ');
     $('#controls').empty().append(p);
   },
 
@@ -842,8 +855,8 @@ InvoiceController.prototype = {
   {    
     var that = this;
     var div = $('<div/>')
-      .append($('<span/>').attr('id', 'financial_status').append(that.invoice.financial_status)).append(' ')
-      .append($('<a/>').attr('href', '#').html('refresh').click(function(e) { e.preventDefault(); that.refresh_transactions(); }))
+      //.append($('<span/>').attr('id', 'financial_status').append(that.invoice.financial_status)).append(' ')
+      .append($('<a/>').attr('href', '#').html('refresh transactions').click(function(e) { e.preventDefault(); that.refresh_transactions(); }))
       .append($('<div/>').attr('id', 'transactions_message'));
     if (that.invoice.invoice_transactions.length > 0)        
     {
@@ -997,6 +1010,29 @@ InvoiceController.prototype = {
       success: function(resp) {
         if (resp.error)   { that.flash_error(resp.error); }
         if (resp.success) { that.refresh(function() { that.flash_success("An email has been sent successfully to the customer."); }); }        
+      }
+    });
+  },
+  
+  send_receipt: function(confirm)
+  {
+    var that = this;    
+    if (!confirm)
+    {    
+      var p = $('<p/>').addClass('note confirm')
+        .append("Are you sure you want to send a receipt to the customer? ")
+        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.send_receipt(true); }))
+        .append(' ')                
+        .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+      $('#message').empty().append(p);
+      return;
+    }
+    $('#message').html("<p class='loading'>Sending receipt...</p>");
+    $.ajax({
+      url: '/admin/invoices/' + that.invoice.id + '/send-receipt',
+      success: function(resp) {
+        if (resp.error)   { that.flash_error(resp.error); }
+        if (resp.success) { that.refresh(function() { that.flash_success("A receipt email has been sent successfully to the customer."); }); }        
       }
     });
   },

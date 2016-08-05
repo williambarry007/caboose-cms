@@ -303,30 +303,34 @@ MyAccountInvoiceController.prototype = {
   // Show all the packages and the line items in each package
   unpackaged_line_items_table: function(table)
   {
-    var that = this;           
-    $.each(that.invoice.invoice_packages, function(i, op) {
-      var line_items = that.line_items_for_invoice_package(op.id);      
-      if (line_items && line_items.length > 0)
-      {        
-        table.append($('<tr/>').append($('<th/>').attr('colspan', '5').addClass('package_header').html("Unpackaged Items")));
-        table.append($('<tr/>')                
-          .append($('<th/>').html('Item'))
-          .append($('<th/>').html('Status'))    
-          .append($('<th/>').html('Unit Price'))
-          .append($('<th/>').html('Quantity'))
-          .append($('<th/>').html('Subtotal'))
-        );                          
-        $.each(line_items, function(j, li) {          
-          var tr = $('<tr/>');                                 
-          tr.append($('<td/>').addClass('line_item_details'   ).append(that.line_item_details(li)));
-          tr.append($('<td/>').addClass('line_item_status'    ).attr('align', 'center').html(li.status));      
-          tr.append($('<td/>').addClass('line_item_unit_price').attr('align', 'right' ).html(curr(li.unit_price)));    
-          tr.append($('<td/>').addClass('line_item_quantity'  ).attr('align', 'right' ).html(li.quantity));
-          tr.append($('<td/>').addClass('line_item_subtotal'  ).attr('align', 'right' ).html(curr(li.subtotal)));        
-          table.append(tr);
-        });      
-      }
+    var that = this;
+    
+    var count = 0;
+    var line_items = [];
+    $.each(that.invoice.line_items, function(i, li) {
+      line_items.push(li);      
     });
+    
+    if (line_items.length > 0)
+    {    
+      table.append($('<tr/>').append($('<th/>').attr('colspan', '5').addClass('package_header').html("Unpackaged Items")));
+      table.append($('<tr/>')                
+        .append($('<th/>').html('Item'))
+        .append($('<th/>').html('Status'))    
+        .append($('<th/>').html('Unit Price'))
+        .append($('<th/>').html('Quantity'))
+        .append($('<th/>').html('Subtotal'))
+      );                          
+      $.each(line_items, function(j, li) {          
+        var tr = $('<tr/>');                                 
+        tr.append($('<td/>').addClass('line_item_details'   ).append(that.line_item_details(li)));
+        tr.append($('<td/>').addClass('line_item_status'    ).attr('align', 'center').html(li.status));      
+        tr.append($('<td/>').addClass('line_item_unit_price').attr('align', 'right' ).html(curr(li.unit_price)));    
+        tr.append($('<td/>').addClass('line_item_quantity'  ).attr('align', 'right' ).html(li.quantity));
+        tr.append($('<td/>').addClass('line_item_subtotal'  ).attr('align', 'right' ).html(curr(li.subtotal)));        
+        table.append(tr);
+      });          
+    }
   },
    
   downloadable_line_items_table: function(table)

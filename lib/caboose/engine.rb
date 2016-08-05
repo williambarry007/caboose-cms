@@ -83,7 +83,8 @@ module Caboose
         'caboose/*.gif',        
         
         # Javascript
-        'caboose/*.js',        
+        'caboose/*.js',      
+        'caboose/checkout/*.js',
         'caboose/model/*.js',        
         'jquery.js',
         'jquery_ujs.js',

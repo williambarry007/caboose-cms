@@ -36,12 +36,12 @@ module Caboose
       
       if @product.variants.nil? || @product.variants.count == 0
         v = Variant.new
+        v.product_id = @product.id
         v.option1 = @product.default1 if @product.option1
         v.option2 = @product.default2 if @product.option2
         v.option3 = @product.default3 if @product.option3
         v.status  = 'Active'
-        @product.variants = [v]
-        @product.save
+        v.save        
       end
       @variant = params[:variant_id] ? Variant.find(params[:variant_id]) : @product.variants[0]
       @highlight_variant_id = params[:highlight] ? params[:highlight].to_i : nil
@@ -141,6 +141,7 @@ module Caboose
       render :layout => 'caboose/modal'
     end
     
+    # @route GET /admin/variants/:id
     # @route GET /admin/products/:product_id/variants/:id
     def admin_edit
       return if !user_is_allowed('variants', 'edit')    

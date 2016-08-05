@@ -10,8 +10,8 @@ module Caboose
            
     # @route GET /admin/products/stubs
     def admin_stubs      
-      title = params[:title].strip.downcase.split(' ')
-      render :json => [] and return if title.length == 0
+      title = params[:title] ? params[:title].strip.downcase.split(' ') : nil
+      render :json => [] and return if title.nil? || title.length == 0
       
       where = ["site_id = ?"]      
       vars = [@site.id]
@@ -462,6 +462,7 @@ module Caboose
       resp = Caboose::StdClass.new
       name = params[:name]
       pd = @site.product_default
+      vd = @site.variant_default
       
       if name.length == 0
         resp.error = "The title cannot be empty."
@@ -482,6 +483,42 @@ module Caboose
         p.gift_wrap_price = pd.gift_wrap_price
         
         p.save
+        
+        v = Variant.new
+        v.product_id = p.id 
+        v.option1    = p.default1 if p.option1
+        v.option2    = p.default2 if p.option2
+        v.option3    = p.default3 if p.option3
+        
+        v.cost                           = vd.cost                         
+        v.price                          = vd.price                              
+        v.available                      = vd.available                    
+        v.quantity_in_stock              = vd.quantity_in_stock            
+        v.ignore_quantity                = vd.ignore_quantity              
+        v.allow_backorder                = vd.allow_backorder              
+        v.weight                         = vd.weight                       
+        v.length                         = vd.length                       
+        v.width                          = vd.width                        
+        v.height                         = vd.height                       
+        v.volume                         = vd.volume                       
+        v.cylinder                       = vd.cylinder                     
+        v.requires_shipping              = vd.requires_shipping            
+        v.taxable                        = vd.taxable                      
+        v.shipping_unit_value            = vd.shipping_unit_value          
+        v.flat_rate_shipping             = vd.flat_rate_shipping           
+        v.flat_rate_shipping_package_id  = vd.flat_rate_shipping_package_id
+        v.flat_rate_shipping_method_id   = vd.flat_rate_shipping_method_id 
+        v.flat_rate_shipping_single      = vd.flat_rate_shipping_single    
+        v.flat_rate_shipping_combined    = vd.flat_rate_shipping_combined     
+        v.status                         = vd.status                       
+        v.downloadable                   = vd.downloadable                 
+        v.is_bundle                      = vd.is_bundle
+        
+        v.save
+        
+        resp.new_id = p.id
+        resp.new_variant_id = v.id
+        resp.success = true
         resp.redirect = "/admin/products/#{p.id}/general"
       end
       render :json => resp    

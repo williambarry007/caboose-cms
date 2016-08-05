@@ -96,8 +96,18 @@
   css = yield(:css)
   css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
   css.gsub!("<link href='//" , "<link href='#{protocol}")
+  if protocol == 'https://' 
+    css.gsub!("<link href=\"http://", "<link href=\"https://")
+    css.gsub!("<link href='http://" , "<link href='https://")
+  end
   
   js = yield(:js)
+  js.gsub!("<script src=\"//", "<script src=\"#{protocol}")
+  js.gsub!("<script src='//" , "<script src='#{protocol}")
+  if protocol == 'https://' 
+    js.gsub!("<script src=\"http://", "<script src=\"https://")
+    js.gsub!("<script src='http://" , "<script src='https://")
+  end
   if @site.use_retargeting
     js << b.partial('retargeting', options)
   end

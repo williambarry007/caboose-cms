@@ -308,11 +308,39 @@ namespace :caboose do
     caboose_correct_sequences    
   end
 
-  desc "Resets the admin password to 'caboose'"
-  task :reset_admin_pass => :environment do  
-    admin_user = Caboose::User.where(username: 'admin').first
+  desc "Resets the admin password to 'caboose'"  
+  task :reset_admin_pass, [:site_name] => :environment do |t, args|  
+    site = Caboose::Site.where(:name => args.first).first
+    if site.nil?
+      puts "Error: can't find a site with that name."
+      return
+    end    
+    admin_user = Caboose::User.where(:username => 'admin', :site_id => site.id).first
+    if admin_user.nil?
+      puts "Error: can't find admin user for site #{site.name}."
+      return
+    end
     admin_user.password = Digest::SHA1.hexdigest(Caboose::salt + 'caboose')
     admin_user.save    
+    puts "Password reset successfully for the admin user for site #{site.name}."
+  end
+  
+  desc "Verify store products have a default variant"
+  task :verify_variants_exist => :environment do    
+    query = ["select id from store_products where id not in (select distinct product_id from store_variants) order by site_id, status"]    
+    rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))    
+    return if rows.nil? || rows.count == 0
+    
+    rows.each do |row|
+      p = Caboose::Product.find(row[0])
+      v = Caboose::Variant.new
+      v.product_id = p.id 
+      v.option1 = p.default1 if p.option1
+      v.option2 = p.default2 if p.option2
+      v.option3 = p.default3 if p.option3
+      v.status  = 'Active'
+      v.save
+    end    
   end
                  
   desc "Clears sessions older than the length specified in the caboose config from the sessions table"

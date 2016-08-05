@@ -66,12 +66,14 @@ module Caboose
     #STATUS_CANCELED       = 'Canceled'
     #STATUS_WAIVED         = 'Waived'
              
-    FINANCIAL_STATUS_PENDING    = 'pending'
-    FINANCIAL_STATUS_AUTHORIZED = 'authorized'
-    FINANCIAL_STATUS_CAPTURED   = 'captured'
-    FINANCIAL_STATUS_REFUNDED   = 'refunded'
-    FINANCIAL_STATUS_VOIDED     = 'voided'
-    
+    FINANCIAL_STATUS_PENDING             = 'pending'
+    FINANCIAL_STATUS_AUTHORIZED          = 'authorized'
+    FINANCIAL_STATUS_CAPTURED            = 'captured'
+    FINANCIAL_STATUS_REFUNDED            = 'refunded'
+    FINANCIAL_STATUS_VOIDED              = 'voided'
+    FINANCIAL_STATUS_PAID_BY_CHECK       = 'paid by check'
+    FINANCIAL_STATUS_PAID_BY_OTHER_MEANS = 'paid by other means'
+        
     PAYMENT_TERMS_PIA   = 'pia'
     PAYMENT_TERMS_NET7  = 'net7'
     PAYMENT_TERMS_NET10 = 'net10'
@@ -104,7 +106,7 @@ module Caboose
     }
     
     validates :financial_status, :inclusion => {
-      :in      => ['pending', 'authorized', 'captured', 'refunded', 'voided'],
+      :in      => ['pending', 'authorized', 'captured', 'refunded', 'voided', 'paid by check', 'paid by other means'],
       :message => "%{value} is not a valid financial status. Must be 'authorized', 'captured', 'refunded' or 'voided'"
     }
     
@@ -489,6 +491,10 @@ module Caboose
       InvoicesMailer.configure_for_site(self.site_id).customer_payment_authorization(self).deliver
     end
     
+    def send_receipt_email
+      InvoicesMailer.configure_for_site(self.site_id).customer_receipt(self).deliver
+    end
+    
     def determine_statuses
       
       auth    = false
@@ -647,67 +653,69 @@ module Caboose
       case sc.pp_name          
         when StoreConfig::PAYMENT_PROCESSOR_STRIPE
           
-          Stripe.api_key = sc.stripe_secret_key.strip
-          charges = Stripe::Charge.list(:limit => 100, :customer => self.customer.stripe_customer_id)
-          
-          self.financial_status = Invoice::FINANCIAL_STATUS_PENDING                      
-          charges.each do |c|            
-            invoice_id = c.metadata && c.metadata['invoice_id'] ? c.metadata['invoice_id'].to_i : nil            
-            next if invoice_id.nil? || invoice_id != self.id
+          if sc.stripe_secret_key && sc.stripe_secret_key.strip.length > 0            
+            Stripe.api_key = sc.stripe_secret_key.strip
+            charges = Stripe::Charge.list(:limit => 100, :customer => self.customer.stripe_customer_id)
             
-            if c.refunded                               then self.financial_status = Invoice::FINANCIAL_STATUS_REFUNDED
-            elsif c.status == 'succeeded' && c.captured then self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
-            elsif c.status == 'succeeded'               then self.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED            
-            end                                    
-                        
-            auth_trans = InvoiceTransaction.create(
-              :invoice_id => self.id,
-              :transaction_id => c.id,
-              :transaction_type => c.captured ? InvoiceTransaction::TYPE_AUTHCAP : InvoiceTransaction::TYPE_AUTHORIZE,
-              :payment_processor => sc.pp_name,
-              :amount => c.amount / 100.0,
-              :amount_refunded => c.amount_refunded,
-              :date_processed => DateTime.strptime(c.created.to_s, '%s'),              
-              :success => c.status == 'succeeded',
-              :captured => c.captured,
-              :refunded => c.refunded              
-            )
-            if c.balance_transaction
-              bt = Stripe::BalanceTransaction.retrieve(c.balance_transaction)
-              capture_trans = InvoiceTransaction.create(
+            self.financial_status = Invoice::FINANCIAL_STATUS_PENDING                      
+            charges.each do |c|            
+              invoice_id = c.metadata && c.metadata['invoice_id'] ? c.metadata['invoice_id'].to_i : nil            
+              next if invoice_id.nil? || invoice_id != self.id
+              
+              if c.refunded                               then self.financial_status = Invoice::FINANCIAL_STATUS_REFUNDED
+              elsif c.status == 'succeeded' && c.captured then self.financial_status = Invoice::FINANCIAL_STATUS_CAPTURED
+              elsif c.status == 'succeeded'               then self.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED            
+              end                                    
+                          
+              auth_trans = InvoiceTransaction.create(
                 :invoice_id => self.id,
-                :parent_id => auth_trans.id, 
-                :transaction_id => bt.id,
-                :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
+                :transaction_id => c.id,
+                :transaction_type => c.captured ? InvoiceTransaction::TYPE_AUTHCAP : InvoiceTransaction::TYPE_AUTHORIZE,
                 :payment_processor => sc.pp_name,
-                :amount => bt.amount / 100.0,                
-                :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
-                :success => bt.status == 'succeeded' || bt.status == 'pending'
-              )                            
-            end
-            if c.refunds && c.refunds['total_count'] > 0
-              total = 0
-              c.refunds['data'].each do |r|
-                total = total + r.amount
-                InvoiceTransaction.create(
+                :amount => c.amount / 100.0,
+                :amount_refunded => c.amount_refunded,
+                :date_processed => DateTime.strptime(c.created.to_s, '%s'),              
+                :success => c.status == 'succeeded',
+                :captured => c.captured,
+                :refunded => c.refunded              
+              )
+              if c.balance_transaction
+                bt = Stripe::BalanceTransaction.retrieve(c.balance_transaction)
+                capture_trans = InvoiceTransaction.create(
                   :invoice_id => self.id,
-                  :parent_id => auth_trans.id,
-                  :transaction_id => r.id,
-                  :transaction_type => InvoiceTransaction::TYPE_REFUND,
+                  :parent_id => auth_trans.id, 
+                  :transaction_id => bt.id,
+                  :transaction_type => InvoiceTransaction::TYPE_CAPTURE,
                   :payment_processor => sc.pp_name,
-                  :amount => r.amount / 100.0,                
-                  :date_processed => DateTime.strptime(r.created.to_s, '%s'),
-                  :success => r.status == 'succeeded' || r.status == 'pending'
-                )
+                  :amount => bt.amount / 100.0,                
+                  :date_processed => DateTime.strptime(bt.created.to_s, '%s'),
+                  :success => bt.status == 'succeeded' || bt.status == 'pending'
+                )                            
               end
-              total = total.to_f / 100
-              if total >= auth_trans.amount
-                auth_trans.refunded = true
-                auth_trans.save
+              if c.refunds && c.refunds['total_count'] > 0
+                total = 0
+                c.refunds['data'].each do |r|
+                  total = total + r.amount
+                  InvoiceTransaction.create(
+                    :invoice_id => self.id,
+                    :parent_id => auth_trans.id,
+                    :transaction_id => r.id,
+                    :transaction_type => InvoiceTransaction::TYPE_REFUND,
+                    :payment_processor => sc.pp_name,
+                    :amount => r.amount / 100.0,                
+                    :date_processed => DateTime.strptime(r.created.to_s, '%s'),
+                    :success => r.status == 'succeeded' || r.status == 'pending'
+                  )
+                end
+                total = total.to_f / 100
+                if total >= auth_trans.amount
+                  auth_trans.refunded = true
+                  auth_trans.save
+                end
               end
             end
+            self.save
           end
-          self.save
       end
     end
     

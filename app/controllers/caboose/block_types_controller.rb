@@ -163,7 +163,7 @@ module Caboose
             bt = BlockType.find(params[:id])            
             options = []
             if bt.options_function && bt.options_function.length > 0
-              options = bt.render_options
+              options = bt.render_options(@site.id)
             elsif bt.options
               options = bt.options.strip.split("\n").collect { |line| { 'value' => line, 'text' => line }}
             end

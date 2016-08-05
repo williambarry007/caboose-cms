@@ -90,7 +90,7 @@ IndexTable.prototype = {
   after_print: false,
   table_class: 'data',
   allow_export: false,
-  export_url: false,
+  export_urls: false,
           
   //============================================================================
   // End of parameters
@@ -700,8 +700,24 @@ IndexTable.prototype = {
   	$.each(p, function(k,v) {  	  
   	  if (k != '[object Object]') qs.push('' + k + '=' + encodeURIComponent(v)); 
   	});
-  	var url = that.export_url ? that.export_url : that.base_url + '/export.csv';
-  	window.location = url + '?' + qs.join('&');    
+  	//var url = that.export_url ? that.export_url : that.base_url + '/export.csv';
+  	
+  	var urls = that.export_urls ? that.export_urls : { "Export": that.base_url + '/export.csv' };
+  	
+  	if (urls.length == 1)
+  	  window.location = url + '?' + qs.join('&');
+  	else
+  	{
+  	  var div = $('<div/>').addClass('note')
+  	    .append($('<p/>').append('Which export would you like to run?'));
+  	  var p = $('<p/>');
+  	  $.each(urls, function(name, url) {     
+        p.append($('<input/>').attr('type', 'button').val(name).click(function(e) { window.location = url + '?' + qs.join('&'); })).append(' ');
+      });               
+      div.append(p);
+      div.append($('<p/>').append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { that.hide_message(); })));        
+      that.show_message(div);        
+  	}    
   },
   
   pager_div: function(summary)

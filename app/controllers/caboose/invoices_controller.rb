@@ -279,7 +279,8 @@ module Caboose
             Invoice::STATUS_CART, 
             Invoice::STATUS_PENDING, 
             Invoice::STATUS_READY_TO_SHIP, 
-            Invoice::STATUS_SHIPPED, 
+            Invoice::STATUS_SHIPPED,
+            Invoice::STATUS_PAID, 
             Invoice::STATUS_CANCELED
           ]
           options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}

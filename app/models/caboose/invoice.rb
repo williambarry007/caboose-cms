@@ -55,6 +55,7 @@ module Caboose
     STATUS_CANCELED      = 'canceled'
     STATUS_READY_TO_SHIP = 'ready to ship'
     STATUS_SHIPPED       = 'shipped'    
+    STATUS_PAID          = 'paid'
     STATUS_TESTING       = 'testing'
     
     # New
@@ -89,6 +90,7 @@ module Caboose
     scope :pending    , where('status = ?', 'pending')    
     scope :canceled   , where('status = ?', 'canceled')
     scope :shipped    , where('status = ?', 'shipped')
+    scope :paid       , where('status = ?', 'paid')
     scope :test       , where('status = ?', 'testing')
     
     scope :authorized , where('financial_status = ?', 'authorized')
@@ -101,7 +103,7 @@ module Caboose
     #
     
     validates :status, :inclusion => {
-      :in      => ['cart', 'pending', 'canceled', 'ready to ship', 'shipped', 'testing'],
+      :in      => ['cart', 'pending', 'canceled', 'ready to ship', 'shipped', 'paid', 'testing'],
       :message => "%{value} is not a valid status. Must be either 'pending' or 'shipped'"
     }
     

@@ -425,6 +425,51 @@ MyAccountInvoiceController.prototype = {
   },
 
   /****************************************************************************/
+
+  confirm_invoice: function()
+  {
+    var that    = this;
+    var cust    = that.invoice.customer;
+    var form    = $('#payment_form');
+    var message = $('#payment_message');
+
+    if (form.is(':visible'))
+    {
+      form.slideUp(function() { form.empty(); });
+      message.empty();
+      return; 
+    }
+
+    form.append($('<h4/>').append("Confirm payment"));
+    form.append($('<p/>').html("A payment of $" + curr(that.invoice.total) + " will be charged to your " + cust.card_brand + ' ending in ' + cust.card_last4 + "."));
+
+    form.append($('<input/>').attr('type', 'button').addClass('btn').val('Pay Now').click(function(e)
+      {
+        e.preventDefault();
+        message.empty().html("<p class='loading'>Processing payment...</p>");
+        
+        $.ajax({
+          url: '/my-account/confirm',
+          type: 'post',
+          data: { id: that.invoice.id},
+          success: function(resp) {
+            if (resp.success == true)
+            {
+              form.slideUp(function() { form.empty(); });
+              message.empty().html("<p class='note success'>" + resp.message + "</p>");
+              setTimeout(function() { message.empty() }, 5000);
+              that.refresh();
+            }
+            else {
+              message.empty().html("<p class='note error'>" + resp.error + "</p>");
+            }
+          }
+        });
+      }
+    ));
+
+    form.slideDown();
+  },
   
   payment_form: function()
   {

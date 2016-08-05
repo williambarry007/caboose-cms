@@ -48,12 +48,11 @@ MyAccountPaymentMethodController.prototype = {
     var div = $('<div/>');
     
     if (that.ic.invoice.financial_status == 'pending')
-      div.append($('<p/>').append($('<input/>').attr('type', 'button').addClass('btn').val('Pay now').click(function(e) { e.preventDefault(); that.ic.payment_form(); })));
+      div.append($('<p/>').append($('<input/>').attr('type', 'button').addClass('btn').val('Confirm').click(function(e) { e.preventDefault(); that.ic.refresh_invoice( function() { that.ic.confirm_invoice(); }); })));
             
     if (that.ic.invoice.total > 0.00)
     {
       var msg = that.card_brand && that.card_last4 ? that.card_brand + ' ending in ' + that.card_last4 : 'You have no card on file.';
-      console.log(msg);
       div.append($('<p/>')
         .append(msg).append(' ')
         .append($('<a/>').attr('href', '#').html('Edit').click(function(e) { e.preventDefault(); that.edit(); })

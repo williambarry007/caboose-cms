@@ -119,14 +119,14 @@ module Caboose
       @invoice.invoice_number = @site.store_config.next_invoice_number
       
       # Send out emails
-      # begin
-      #   InvoicesMailer.configure_for_site(@site.id).customer_new_invoice(@invoice).deliver
-      #   InvoicesMailer.configure_for_site(@site.id).fulfillment_new_invoice(@invoice).deliver
-      # rescue
-      #   puts "=================================================================="
-      #   puts "Error sending out invoice confirmation emails for invoice ID #{@invoice.id}"
-      #   puts "=================================================================="
-      # end
+      begin
+        InvoicesMailer.configure_for_site(@site.id).customer_new_invoice(@invoice).deliver
+        InvoicesMailer.configure_for_site(@site.id).fulfillment_new_invoice(@invoice).deliver
+      rescue
+        puts "=================================================================="
+        puts "Error sending out invoice confirmation emails for invoice ID #{@invoice.id}"
+        puts "=================================================================="
+      end
 
       # Save the invoice
       @invoice.save

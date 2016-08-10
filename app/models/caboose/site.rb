@@ -19,7 +19,29 @@ class Caboose::Site < ActiveRecord::Base
       :large => '600x800>'
     }
   do_not_validate_attachment_file_type :logo
-  attr_accessible :id, :name, :description, :under_construction_html
+  attr_accessible :id        ,         
+    :name                    ,
+    :description             ,
+    :under_construction_html ,
+    :use_store               ,
+    :use_fonts               ,
+    :logo                    ,
+    :is_master               ,
+    :allow_self_registration ,
+    :analytics_id            ,
+    :use_retargeting         ,
+    :date_js_updated         ,
+    :date_css_updated        ,
+    :default_layout_id       ,
+    :login_fail_lock_count
+            
+  before_save :validate_presence_of_store_config
+  
+  def validate_presence_of_store_config
+    if self.use_store && !Caboose::StoreConfig.where(:site_id => self.id).exists?
+      Caboose::StoreConfig.create(:site_id => self.id)
+    end
+  end
   
   def default_layout    
     return Caboose::BlockType.where(:id => self.default_layout_id).first if self.default_layout_id

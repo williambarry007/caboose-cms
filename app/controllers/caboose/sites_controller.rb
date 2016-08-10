@@ -7,8 +7,7 @@ module Caboose
     def before_action
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
-        
-    # @route_priority 9
+            
     # @route GET /admin/sites
     def admin_index
       return if !user_is_allowed('sites', 'view')
@@ -30,7 +29,35 @@ module Caboose
     	@sites = @pager.items
     end
     
-    # @route_priority 2
+    # @route GET /admin/sites/json
+    def admin_json
+      return if !user_is_allowed('sites', 'view')
+      h = {        
+        'name'              => '',
+        'description'       => '',
+        'name_like'         => '',
+        'description_like'  => '',
+      }      
+      pager = Caboose::Pager.new(params, h, {      
+        'model' => 'Caboose::Site',
+        'sort'  => 'name',
+        'desc'  => 'false',
+        'base_url' => "/admin/sites",
+        'items_per_page' => 1000        
+      })      
+      render :json => {
+        :pager => pager,
+        :models => pager.items.as_json(:include => :domains)
+      }
+    end
+    
+    # @route GET /admin/sites/:id/json
+    def admin_json_single
+      return if !user_is_allowed('sites', 'view')
+      site = Site.find(params[:id])
+      render :json => site.as_json(:include => :domains)      
+    end
+    
     # @route GET /admin/sites/new
     def admin_new
       return if !user_is_allowed('sites', 'add')
@@ -41,8 +68,50 @@ module Caboose
       
       @site = Site.new
     end
+        
     
-    # @route_priority 8
+            
+    # @route GET /admin/sites/:id/block-types
+    def admin_edit_block_types
+      return if !user_is_allowed('sites', 'edit')
+      if !@site.is_master
+        @error = "You are not allowed to manage sites."
+        render :file => 'caboose/extras/error' and return
+      end
+      
+      @site = Site.find(params[:id])      
+    end
+            
+    # @route GET /admin/sites/:id/css
+    def admin_edit_css
+      return if !user_is_allowed('sites', 'edit')
+      if !@site.is_master
+        @error = "You are not allowed to manage sites."
+        render :file => 'caboose/extras/error' and return
+      end      
+      @site = Site.find(params[:id])      
+    end
+            
+    # @route GET /admin/sites/:id/js
+    def admin_edit_js
+      return if !user_is_allowed('sites', 'edit')
+      if !@site.is_master
+        @error = "You are not allowed to manage sites."
+        render :file => 'caboose/extras/error' and return
+      end      
+      @site = Site.find(params[:id])      
+    end
+            
+    # @route GET /admin/sites/:id/delete
+    def admin_delete_form
+      return if !user_is_allowed('sites', 'edit')
+      if !@site.is_master
+        @error = "You are not allowed to manage sites."
+        render :file => 'caboose/extras/error' and return
+      end
+      @site = Site.find(params[:id])      
+    end
+    
     # @route GET /admin/sites/:id
     def admin_edit
       return if !user_is_allowed('sites', 'edit')
@@ -56,52 +125,6 @@ module Caboose
             
     end
         
-    # @route_priority 6
-    # @route GET /admin/sites/:id/block-types
-    def admin_edit_block_types
-      return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
-        render :file => 'caboose/extras/error' and return
-      end
-      
-      @site = Site.find(params[:id])      
-    end
-        
-    # @route_priority 4
-    # @route GET /admin/sites/:id/css
-    def admin_edit_css
-      return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
-        render :file => 'caboose/extras/error' and return
-      end      
-      @site = Site.find(params[:id])      
-    end
-        
-    # @route_priority 5
-    # @route GET /admin/sites/:id/js
-    def admin_edit_js
-      return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
-        render :file => 'caboose/extras/error' and return
-      end      
-      @site = Site.find(params[:id])      
-    end
-        
-    # @route_priority 7
-    # @route GET /admin/sites/:id/delete
-    def admin_delete_form
-      return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
-        render :file => 'caboose/extras/error' and return
-      end
-      @site = Site.find(params[:id])      
-    end
-    
-    # @route_priority 10
     # @route POST /admin/sites
     def admin_add
       return if !user_is_allowed('sites', 'add')
@@ -203,25 +226,23 @@ module Caboose
     
     # @route_priority 1
     # @route GET /admin/sites/options
+    # @route GET /admin/sites/:field-options
+    # @route GET /admin/sites/:id/:field-options    
     def options
       return if !user_is_allowed('sites', 'view')
-      render :json => { :error => "You are not allowed to manage sites." } and return if !logged_in_user.is_super_admin?
       
-      options = Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }}
+      case params[:field]
+        when nil
+          options = logged_in_user.is_super_admin? ? Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }} : []
+        when 'default-layout'
+          cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id }
+          block_types = Caboose::BlockType.includes(:block_type_site_memberships).where("block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, params[:id]).reorder(:description).all
+          options = block_types.collect do |bt|
+            { 'value' => bt.id, 'text' => bt.description } 
+          end
+      end
       render :json => options
     end
 
-    # @route_priority 3
-    # @route GET /admin/sites/:id/default-layout-options
-    def admin_default_layout_options
-      return if !user_is_allowed('sites', 'view')
-      cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id }
-      block_types = Caboose::BlockType.includes(:block_type_site_memberships).where("block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, params[:id]).reorder(:description).all
-      options = block_types.collect do |bt|
-        { 'value' => bt.id, 'text' => bt.description } 
-      end      
-      render :json => options
-    end
-    
   end
 end

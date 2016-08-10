@@ -39,6 +39,9 @@ $(document).ready(function() {
       { name: 'options_function'               , sort: 'options_function'               , show: false , bulk_edit: false, nice_name: 'Options Function'               , type: 'textarea'          , value: function(bt) { return bt.options_function;                             }, width: 400, height: 100 },
       { name: 'options'                        , sort: 'options'                        , show: false , bulk_edit: false, nice_name: 'Options'                        , type: 'textarea'          , value: function(bt) { return bt.options;                                      }, width: 400, height: 100 }            
     ],
+    search_fields: [
+      { name: 'name_like', nice_name: 'Name', type: 'text', width: 400 }      
+    ],
     new_model_text: 'New Block Type',
     new_model_fields: [
       { name: 'name', nice_name: 'Name', type: 'text', width: 400 }                      

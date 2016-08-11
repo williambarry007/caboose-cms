@@ -28,6 +28,7 @@ module Caboose
           f2 = File.open(file, "r")
                   
           domains = []
+          domains_constrainer = false
           module_name = nil
           class_name = nil
           class_priority = 20
@@ -44,9 +45,14 @@ module Caboose
               class_name = line.gsub(/^(.*?)class (.*?)Controller(.*?)$/, '\2').gsub(/([A-Z])/, '_\1').downcase
               class_name[0] = '' if class_name[0] == '_'
               class_name = "#{module_name}::#{class_name}" if module_name
-            elsif line =~ /# @route_domain (.*?)$/            
-              domain = line.gsub(/# @route_domain (.*?)$/, '\1')
-              domains << domain if !domains.include?(domain)
+            elsif line =~ /# @route_domain (.*?)$/
+              # Ignore if we have a domain constrainer
+              if domains.is_a?(Array)
+                domain = line.gsub(/# @route_domain (.*?)$/, '\1')
+                domains << domain if !domains.include?(domain)
+              end
+            elsif line =~ /# @route_domain_constrainer (.*?)$/
+              domains = line.gsub(/# @route_domain_constrainer (.*?)$/, '\1')              
             elsif line =~ /# @route_constraints (.*?)$/            
               constraints = line.gsub(/# @route_constraints (.*?)$/, '\1')
               uris.last[1] = constraints if uris.length > 0
@@ -67,7 +73,7 @@ module Caboose
             elsif line =~ /# @route DELETE (.*?)/    then uris << ["delete \"#{line.gsub(/# @route DELETE (.*?)/    , '\1').strip}\"", nil]              
             end
           end
-          ds = domains.count > 0 ? domains.sort.join(' ') : 'zzz_all_domains' 
+          ds = domains.is_a?(Array) ? (domains.count > 0 ? domains.sort.join(' ') : 'zzz_all_domains') : "CONSTRAIN #{domains}" 
           classes[ds] = [] if classes[ds].nil?
           classes[ds] << [class_name, actions, class_priority]
         end
@@ -76,9 +82,14 @@ module Caboose
       routes = []
       classes.sort_by{ |domain, domain_classes| domain }.to_h.each do |domain, domain_classes|
                         
-        if domain != 'zzz_all_domains'
-          domains = domain.split(' ').collect{ |d| "'#{d}'" }.join(', ')
-          routes << "constraints Caboose::DomainConstraint.new([#{domains}]) do"
+        if domain != 'zzz_all_domains'                      
+          if domain.starts_with?('CONSTRAIN ')
+            constrainer = domain.gsub('CONSTRAIN ', '')
+            routes << "constraints #{constrainer}.new do"
+          else
+            domains = domain.split(' ').collect{ |d| "'#{d}'" }.join(', ')
+            routes << "constraints Caboose::DomainConstraint.new([#{domains}]) do"                      
+          end            
         end
         domain_classes.sort_by{ |arr| arr[2] }.each do |carr|
         

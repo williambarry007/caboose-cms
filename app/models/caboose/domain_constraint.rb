@@ -1,5 +1,5 @@
 class Caboose::DomainConstraint
-  def initialize(domains)    
+  def initialize(domains)
     @domains = domains.is_a?(Array) ? domains.flatten : [domains].flatten
   end
 

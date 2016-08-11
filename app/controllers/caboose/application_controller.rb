@@ -8,7 +8,7 @@ module Caboose
     
     @find_page = true    
     
-    def before_before_action           
+    def before_before_action
       
       # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params

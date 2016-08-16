@@ -1,5 +1,5 @@
 <%
-store_config = @invoice.site.store_config
+store_config = @invoice.site.store_config if @invoice
 u = @logged_in_user
 %>
 <div id='my_account'>
@@ -10,7 +10,7 @@ u = @logged_in_user
   <p><div id='user_<%= @user.id %>_phone'      ></div></p>
   <div id='message2'></div>
 
-  <% if @site.use_store %>
+  <% if @site.use_store && store_config %>
     <h2>Billing</h2>
     <p id='card_details'>
       <% if u.card_brand && u.card_last4 %>You have a <%= u.card_brand %> ending in <%= u.card_last4 %> on file.<% else %>You have no card on file.<% end %>
@@ -29,7 +29,7 @@ u = @logged_in_user
 
   <p>
     <input type='button' value='Reset Password' class='btn' onclick="reset_user_password();" />
-    <% if @site.use_store %>    
+    <% if @site.use_store && store_config %>    
       <input type='button' value='Invoice History' class='btn' onclick="window.location='/my-account/invoices';" />
     <% end %>
   </p>
@@ -62,7 +62,7 @@ $(document).ready(function() {
     }
   });
   
-  <% if @site.use_store %>
+  <% if @site.use_store && store_config %>
     $('#stripe_form').submit(function(e) {
       e.preventDefault();
       update_card();
@@ -76,7 +76,7 @@ $(document).ready(function() {
   <% end %>
 });
 
-<% if @site.use_store %>
+<% if @site.use_store && store_config %>
 function toggle_stripe_form()
 {
   if ($('#stripe_form').is(':visible'))

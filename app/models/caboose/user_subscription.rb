@@ -28,10 +28,10 @@ module Caboose
       s = self.subscription
       d = nil
       if s.interval == Subscription::INTERVAL_YEARLY        
-        d = Date(self.date_started.year, s.start_month, s.start_day)
+        d = Date.parse(self.date_started.year, s.start_month, s.start_day)
         d = d + 1.year if d < self.date_started        
       elsif s.interval == Subscription::INTERVAL_MONTHLY        
-        d = Date(self.date_started.year, self.date_started.month, s.start_day)
+        d = Date.parse(self.date_started.year, self.date_started.month, s.start_day)
         d = d + 1.month if d < self.date_started                
       end
       self.date_started_full = d
@@ -57,7 +57,7 @@ module Caboose
       unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)
       
       # Special case if the subscription starts on specific day
-      if self.subscription.start_on_day && Date.today > self.date_started_full
+      if self.subscription.start_on_day && (Date.today > self.date_started_full)
         li = self.line_items.where("date_starts = ? date_ends = ?", self.date_started, self.date_started_full - 1.day).first
         if li.nil?
           prorated_unit_price = unit_price + 0.00          

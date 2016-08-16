@@ -869,6 +869,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :subscription_id  , :integer ],
         [ :user_id          , :integer ],
         [ :date_started     , :date    ],
+        [ :date_started_full, :date    ],
         [ :status           , :string  ]
       ],
       Caboose::Variant => [

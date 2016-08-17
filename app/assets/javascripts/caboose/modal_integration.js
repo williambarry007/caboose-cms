@@ -50,8 +50,7 @@ $(document).ready(function() {
 
 function caboose_modal(el)
 {
-  var options = { 
-    iframe: true, 
+  var options = {      
     initialWidth: 400, 
     initialHeight: 200, 
     innerWidth: 400, 

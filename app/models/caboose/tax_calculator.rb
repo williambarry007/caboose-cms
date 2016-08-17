@@ -8,12 +8,13 @@ module Caboose
     end
     
     def self.tax(invoice)
+      sc = invoice.site.store_config                                                      
+      return self.custom_tax(sc, invoice) if !sc.auto_calculate_tax   
+
       return 0.00 if !invoice.shipping_address
       return 0.00 if !invoice.has_taxable_items?
       return 0.00 if !invoice.has_shippable_items?
 
-      sc = invoice.site.store_config                                                      
-      return self.custom_tax(sc, invoice) if !sc.auto_calculate_tax      
       return invoice.subtotal * invoice.tax_rate if invoice.tax_rate # See if the tax rate has already been calculated
 
       t = self.transaction(invoice)

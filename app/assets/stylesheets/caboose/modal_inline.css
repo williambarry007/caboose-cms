@@ -1,0 +1,17 @@
+
+#the_modal {
+  box-sizing: content-box; /* border-box */  
+}
+
+#modal_content p { margin-bottom: 10px; }
+
+#modal_content .mb_container input { border: #ccc 1px solid; }
+                                                          
+#modal_content div.mb_container div.mb_placeholder { top: 9px; }
+#modal_content div.mb_container div.mb_placeholder span { font-size: 16px; }
+                                                         
+#modal_content div.mb_container select { border: #ccc 1px solid; height: 36px; }
+#modal_content div.mb_container select option { font-size: 16px; }
+
+#modal_content div.mb_container input[type=checkbox] { top: 12px; }
+

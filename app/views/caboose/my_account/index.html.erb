@@ -2,37 +2,73 @@
 store_config = @invoice.site.store_config if @invoice
 u = @logged_in_user
 %>
-<div id='my_account'>
-  <h1>My Account</h1>
-  <p><div id='user_<%= @user.id %>_first_name' ></div></p>
-  <p><div id='user_<%= @user.id %>_last_name'  ></div></p>
-  <p><div id='user_<%= @user.id %>_email'      ></div></p>
-  <p><div id='user_<%= @user.id %>_phone'      ></div></p>
-  <div id='message2'></div>
 
-  <% if @site.use_store && store_config %>
-    <h2>Billing</h2>
-    <p id='card_details'>
-      <% if u.card_brand && u.card_last4 %>You have a <%= u.card_brand %> ending in <%= u.card_last4 %> on file.<% else %>You have no card on file.<% end %>
-      <a href='#' onclick="toggle_stripe_form();" />edit</a>
-    </p>
-    <form action='' method='post' id='stripe_form' class='stripe_form'>               
-      <div class='card_number_container'><input id='card_number' type='tel'  autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='off' placeholder='Card number'                                                  /><div class='svg icon' style='width:30px;height:30px'><svg version="1.1" viewBox="0 0 30 30" width="30" height="30" focusable="false"><g fill-rule="evenodd"><path d="M2.00585866,0 C0.898053512,0 0,0.900176167 0,1.99201702 L0,9.00798298 C0,10.1081436 0.897060126,11 2.00585866,11 L11.9941413,11 C13.1019465,11 14,10.0998238 14,9.00798298 L14,1.99201702 C14,0.891856397 13.1029399,0 11.9941413,0 L2.00585866,0 Z M2.00247329,1 C1.44882258,1 1,1.4463114 1,1.99754465 L1,9.00245535 C1,9.55338405 1.45576096,10 2.00247329,10 L11.9975267,10 C12.5511774,10 13,9.5536886 13,9.00245535 L13,1.99754465 C13,1.44661595 12.544239,1 11.9975267,1 L2.00247329,1 Z M1,3 L1,5 L13,5 L13,3 L1,3 Z M11,8 L11,9 L12,9 L12,8 L11,8 Z M9,8 L9,9 L10,9 L10,8 L9,8 Z M9,8" style="fill:#3b6faa" transform="translate(8,10)"></g></svg></div></div>
-      <div class='card_exp_container'   ><input id='card_exp'    type='tel'  autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='off' placeholder='MM / YY'      x-autocompletetype='off' autocompletetype'=off' /><div class='svg icon' style='width:30px;height:30px'><svg version="1.1" viewBox="0 0 30 30" width="30" height="30" focusable="false"><g fill-rule="evenodd"><path d="M2.0085302,1 C0.899249601,1 0,1.90017617 0,2.99201702 L0,10.007983 C0,11.1081436 0.901950359,12 2.0085302,12 L9.9914698,12 C11.1007504,12 12,11.0998238 12,10.007983 L12,2.99201702 C12,1.8918564 11.0980496,1 9.9914698,1 L2.0085302,1 Z M1.99539757,4 C1.44565467,4 1,4.43788135 1,5.00292933 L1,9.99707067 C1,10.5509732 1.4556644,11 1.99539757,11 L10.0046024,11 C10.5543453,11 11,10.5621186 11,9.99707067 L11,5.00292933 C11,4.44902676 10.5443356,4 10.0046024,4 L1.99539757,4 Z M3,1 L3,2 L4,2 L4,1 L3,1 Z M8,1 L8,2 L9,2 L9,1 L8,1 Z M3,0 L3,1 L4,1 L4,0 L3,0 Z M8,0 L8,1 L9,1 L9,0 L8,0 Z M8,0" style="fill:#3b6faa" transform="translate(8,9)"></g></svg></div></div>
-      <div class='card_cvc_container'   ><input id='card_cvc'    type='tel'  autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='off' placeholder='CVC'          maxlength='4'                                   /><div class='svg icon' style='width:30px;height:30px'><svg version="1.1" viewBox="0 0 30 30" width="30" height="30" focusable="false"><g fill-rule="evenodd"><path d="M8.8,4 C8.8,1.79086089 7.76640339,4.18628304e-07 5.5,0 C3.23359661,-4.1480896e-07 2.2,1.79086089 2.2,4 L3.2,4 C3.2,2.34314567 3.81102123,0.999999681 5.5,1 C7.18897877,1.00000032 7.80000001,2.34314567 7.80000001,4 L8.8,4 Z M1.99201702,4 C0.891856397,4 0,4.88670635 0,5.99810135 L0,10.0018986 C0,11.1054196 0.900176167,12 1.99201702,12 L9.00798298,12 C10.1081436,12 11,11.1132936 11,10.0018986 L11,5.99810135 C11,4.89458045 10.0998238,4 9.00798298,4 L1.99201702,4 Z M1.99754465,5 C1.44661595,5 1,5.45097518 1,5.99077797 L1,10.009222 C1,10.5564136 1.4463114,11 1.99754465,11 L9.00245535,11 C9.55338405,11 10,10.5490248 10,10.009222 L10,5.99077797 C10,5.44358641 9.5536886,5 9.00245535,5 L1.99754465,5 Z M1.99754465,5" style="fill:#3b6faa" transform="translate(9,9)"></g></svg></div></div>
-      <div class='card_name_container'  ><input id='card_name'   type='text' autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='on'  placeholder='Name on card' /></div>
-      <div class='card_zip_container'   ><input id='card_zip'    type='tel'  autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='on'  placeholder='Zip code'     /></div>
-      <div id='message'></div>  
-      <p class='payment_controls'><input type='submit' class='btn' id='save_payment_btn'   value='Save' /></p>
-    </form>
-  <% end %>
-
-  <p>
-    <input type='button' value='Reset Password' class='btn' onclick="reset_user_password();" />
-    <% if @site.use_store && store_config %>    
-      <input type='button' value='Invoice History' class='btn' onclick="window.location='/my-account/invoices';" />
+<div id="caboose-my-account">
+  <h2>My Account</h2>
+  <div class="grid-row">
+    <div class="<% if @site.use_store %>unit1of2 left<% else %>unit1of1<% end %>">
+      <div class="card-form-wrapper address">
+        <h4 class="title">Account Information</h4>
+        <div class="input-holder"><div id='user_<%= @user.id %>_first_name' ></div></div>
+        <div class="input-holder"><div id='user_<%= @user.id %>_last_name'  ></div></div>
+        <div class="input-holder"><div id='user_<%= @user.id %>_email'      ></div></div>
+        <div class="input-holder"><div id='user_<%= @user.id %>_phone'      ></div></div>
+        <div id='message2'></div>
+        <p class="buttons">
+          <a href="#" title='Reset Password' class='btn' id="reset-password-link">Reset Password</a>
+          <% if @site.use_store && store_config %>    
+            <a href="/my-account/invoices" title='Invoice History' class='btn'>Invoice History</a>
+          <% end %>
+        </p>
+      </div>
+    </div>
+    <% if @site.use_store && store_config %>
+      <div class="unit1of2 right">
+        <div class="card-form-wrapper">
+          <h4 class="title">Billing</h4>
+           <p id='card_details'>
+            <% if u.card_brand && u.card_last4 %>
+              You have a <%= u.card_brand %> ending in <%= u.card_last4 %> on file.
+            <% else %>
+              You have no card on file.
+            <% end %>
+            <a href='#' class='edit-card' id="toggle-stripe-form" />edit</a>
+          </p>
+          <form action='' method='post' id='stripe_form' class='stripe_form form'>
+            <div id="card-wrapper"></div>
+            <div class="row clearfix">
+              <div class="field">
+                <label for="number">Card Number</label>
+                <input id='card_number' type='tel'  autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='off' />
+              </div>
+            </div>
+            <div class="row clearfix">
+              <div class="field">
+                <label for="card_name">Name</label>
+                <input id='card_name'   type='text' autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='on'  placeholder='Name on card' value="<%= @user.first_name %> <%= @user.last_name %>" />
+              </div>
+            </div>
+            <div class="row clearfix">
+              <div class="field col-3">
+                <label for="card_exp">Expiry</label>
+                <input id='card_exp'    type='tel'  autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='off' placeholder='MM / YYYY'      x-autocompletetype='off' autocompletetype='off'  />
+              </div>
+              <div class="field col-3">
+                <label for="cvc">CVC</label>
+                <input id='card_cvc'    type='tel'  autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='off' maxlength='4' />
+              </div>
+              <div class="field col-3">
+                <label for="card_zip">ZIP</label>
+                <input id='card_zip'    type='tel'  autocomplete='off' autocorrect='off' spellcheck='off' autocapitalize='on'    />
+              </div>
+            </div>
+            <p class='payment_controls'><a href="#" type='submit' class='btn' id='save_payment_btn'>Save</a></p>
+          </form>
+          <div id='message'></div>  
+        </div>
+      </div>
     <% end %>
-  </p>
+  </div>
 </div>
 
 <% content_for :caboose_js do %>
@@ -40,6 +76,7 @@ u = @logged_in_user
 <%= javascript_include_tag 'caboose/model/all' %>
 <%= javascript_include_tag 'caboose/united_states' %>
 <%= javascript_include_tag 'caboose/jquery.payment' %>
+<%= javascript_include_tag 'caboose/card' %>
 <script type='text/javascript'>
 
 $(document).ready(function() {
@@ -61,28 +98,69 @@ $(document).ready(function() {
       $('#user_<%= @user.id %>_phone'     ).css('width', '400px');    
     }
   });
+
+  $("#reset-password-link").click(function(event) {
+    event.preventDefault();
+    reset_user_password();
+  });
   
   <% if @site.use_store && store_config %>
-    $('#stripe_form').submit(function(e) {
+    $('#save_payment_btn').click(function(e) {
       e.preventDefault();
       update_card();
       return false;
     });
-      
-    $('#stripe_form .card_number_container input').payment('formatCardNumber');
-    $('#stripe_form .card_exp_container    input').payment('formatCardExpiry');
-    $('#stripe_form .card_cvc_container    input').payment('formatCardCVC');  
-    $('#stripe_form').hide();
+    $("#toggle-stripe-form").click(function(event) {
+      event.preventDefault();
+      toggle_stripe_form();
+    });
+    $('#card_exp').payment('formatCardExpiry');
+    $('#card_cvc').payment('formatCardCVC');  
   <% end %>
 });
 
 <% if @site.use_store && store_config %>
+
+function show_card() {
+  var card = new Card({
+    form: '#stripe_form',
+    container: '#card-wrapper',
+    formSelectors: {
+        numberInput: 'input#card_number',
+        expiryInput: 'input#card_exp',
+        cvcInput: 'input#card_cvc',
+        nameInput: 'input#card_name'
+    },
+    width: 250,
+    formatting: true,
+    messages: {
+        validDate: 'valid\ndate',
+        monthYear: 'mm/yyyy',
+    },
+    <% if !@user.card_last4.blank? %>
+      placeholders: {
+        number: '**** **** **** <%= @user.card_last4 %>',
+        name: '<%= @user.first_name %> <%= @user.last_name %>',
+        expiry: '<%= @user.card_exp_month %>/<%= @user.card_exp_year %>'
+      }
+    <% end %>
+  });
+  <% if !@user.card_brand.blank? %>
+    $(".jp-card").addClass("jp-card-<%= @user.card_brand.gsub('American Express','amex').downcase %>").addClass("jp-card-identified");
+  <% end %>
+}
+
 function toggle_stripe_form()
 {
-  if ($('#stripe_form').is(':visible'))
+  if ($('#stripe_form').is(':visible')) {
     $('#stripe_form').hide();
-  else
-    $('#stripe_form').show();      
+    $("#card-wrapper").hide();
+  }
+  else {
+    $('#stripe_form').show();
+    $("#card-wrapper").show();
+    show_card();
+  }
 }
 
 function update_card()
@@ -103,14 +181,14 @@ function update_card()
   if (!$.payment.validateCardCVC(info.cvc))       error = "Invalid CVC.";
   if (error) { $('#message').html("<p class='note error'>" + error + "</p>"); return; }
       
-  $('#save_payment_btn').attr('disabled', 'true').val('Saving card...');    
+  $('#save_payment_btn').addClass('disabled').text('Saving card...');    
   Stripe.setPublishableKey(<%= raw Caboose.json(store_config.stripe_publishable_key) %>);    
   Stripe.card.createToken(info, function(status, resp) {
     if (resp.error)
     {
-      $('#save_payment_btn').attr('disabled', 'false').val('Save Payment Method');    
+      $('#save_payment_btn').removeClass('disabled').text('Save');    
       $('#message').html("<p class='note error'>" + resp.error.message + "</p>");
-    }      
+    }
     else
     {                                      
       $.ajax({
@@ -131,20 +209,20 @@ function reset_user_password(pass1, pass2)
 {
   if (!pass1)
   {
-    var p = $('<p/>').addClass('note warning')
+    var p = $('<p/>').addClass('note warning reset-password')
       .append("Please enter your password:<br /><br />")
       .append($('<input/>').attr('type', 'password').attr('id', 'pass1').css('width', '200px')).append(' ')
-      .append($('<input/>').attr('type', 'button').val('Continue').click(function(e) { reset_user_password($('#pass1').val()); }))
+      .append($('<a/>').attr('class','btn alternate').attr('href','#').text('Continue').click(function(e) { reset_user_password($('#pass1').val()); }))
       .append("<br /><br />Passwords must be 8 characters long.");
     $('#message2').empty().append(p);
     return;    
   }
   if (!pass2)
   {
-    var p = $('<p/>').addClass('note warning')
+    var p = $('<p/>').addClass('note warning reset-password')
       .append("Please enter it again to confirm:<br /><br />")
       .append($('<input/>').attr('type', 'password').attr('id', 'pass2').css('width', '200px')).append(' ')
-      .append($('<input/>').attr('type', 'button').val('Continue').click(function(e) { reset_user_password(pass1, $('#pass2').val()); }))
+      .append($('<a/>').attr('href', '#').addClass('btn alternate').text('Continue').click(function(e) { reset_user_password(pass1, $('#pass2').val()); }))
       .append("<br /><br />Passwords must be 8 characters long.");      
     $('#message2').empty().append(p);
     return;    
@@ -171,21 +249,4 @@ function reset_user_password(pass1, pass2)
 <% end %>
 <%= content_for :caboose_css do %>
 <%= stylesheet_link_tag "caboose/my_account", :media => "all" %>
-<style type='text/css'>
-
-.stripe_form { width: 100%; }
-.stripe_form .card_number_container { position: relative; width: 100%; }                                 .stripe_form .card_number_container input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 1px; }
-.stripe_form .card_exp_container    { position: relative; width: 50% !important; float: left; }          .stripe_form .card_exp_container    input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 1px; }
-.stripe_form .card_cvc_container    { position: relative; width: 50%; float: left; }                     .stripe_form .card_cvc_container    input { padding-left: 30px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 0px 0px; }
-.stripe_form .card_name_container   { position: relative; width: 50%; float: left; }                     .stripe_form .card_name_container   input { padding-left: 10px; height: 37px !important; font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 0px 1px 1px; }
-.stripe_form .card_zip_container    { position: relative; width: 50%; float: left; margin-bottom: 4px; } .stripe_form .card_zip_container    input { padding-left: 10px; height: 37px;            font-size: 15px; width: 100%; border-color: #b9b9b9; border-style: solid; border-width: 1px 1px 1px 0px; }
-
-.stripe_form .card_number_container .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
-.stripe_form .card_exp_container    .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
-.stripe_form .card_cvc_container    .icon { position: absolute; top: 3px; left: 1px; transform-origin: 50% 50% 0; pointer-events: none; }
-
-.stripe_form .note { width: 100%; margin-bottom: 10px !important; text-align: center; }
-.stripe_form .payment_controls { clear: left; margin-top: 4px !important; }
-
-</style>
 <% end %>

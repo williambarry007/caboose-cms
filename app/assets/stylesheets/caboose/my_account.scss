@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+$font-card:          	normal 1em "Open Sans", sans-serif;
+$color-main: 					#5f5f5f;
+$color-light: 				#ececec;
+
+@mixin small() { @media all and (max-width: 800px) { @content }}
+@mixin big()   { @media all and (min-width: 800px) { @content }}
+
+#caboose-my-account {
+	padding: 30px 2% 50px 2%;
+	& > h2 {
+		text-align: center;
+		font-size: 1.5em;
+		margin-bottom: 30px;
+		color: #3c3c3c;
+	}
+	& > .grid-row {
+		max-width: 900px;
+		margin: 0 auto;
+		.unit1of2 {
+			@include big {
+				width: 49%;
+			}
+			&.right {
+				@include big {
+					float: right;
+				}
+			}
+		}
+		#card-wrapper {
+			height: 200px;
+		}
+		#stripe_form {
+			display: none;
+		}
+		.card-form-wrapper {
+			background: $color-light;
+			border-radius: 12px;
+			padding: 12px 4% 24px 4%;
+			border: 1px solid $color-main;
+			max-width: 400px;
+			margin: 0 auto;
+			text-align: center;
+			font: $font-card;
+			.title {
+				font-size: 1.1em;
+				text-align: center;
+				margin-bottom: 17px;
+				color: #3c3c3c;
+			}
+			#card_details {
+				.edit-card {
+					color: #4c94ff;
+    			text-decoration: none;
+    			margin-left: 4px;
+    			&:hover {
+    				color: #c24cff;
+    			}
+				}
+			}
+			.jp-card .jp-card-front .jp-card-lower .jp-card-number {
+				font-size: 22px;
+			}
+			.jp-card .jp-card-front .jp-card-lower .jp-card-name {
+				font-size: 16px;
+			}
+			.jp-card .jp-card-front .jp-card-lower {
+				left: 8%;
+				width: 84%;
+			}
+			&.address {
+				@include small {
+					margin-bottom: 40px;
+				}
+				.title {
+					margin-bottom: 20px;
+				}
+				.input-holder {
+					margin-bottom: 10px;
+					input {
+						&.mb_dirty {
+							background: #fff799 !important
+						}
+					}
+					.mb_bound_input_check {
+						a {
+							color: #fff;
+							background: #6fb96f;
+							font-size: 21px;
+							text-decoration: none;
+						}
+					}
+					.mb_placeholder {
+						top: 7px;
+						left: 7px;
+						span {
+							font-size: 16px;
+						}
+					}
+				}
+			}
+			.buttons {
+				margin-top: 20px;
+				.btn {
+					font-size: 15px;
+					margin-right: 5px;
+					margin-bottom: 5px;
+					&:last-of-type {
+						margin-right: 0;
+					}
+				}
+			}
+		}
+		form {
+			width: 90%;
+			margin: 0 auto;
+			text-align: left;
+			.row {
+				margin-bottom: 10px;
+			}
+			.field {
+				&.col-2 {
+					width: 50%;
+					float: left;
+					&:first-of-type {
+						padding-right: 1.5%;
+					}
+					&:last-of-type {
+						padding-left: 1.5%;
+					}
+				}
+				&.col-3 {
+					width: 33.33333%;
+					float: left;
+					&:nth-of-type(1) { padding-right: 1.5%; }
+					&:nth-of-type(2) { padding-right: 0.75%; padding-left: 0.75%; }
+					&:nth-of-type(3) { padding-left: 1.5%; }
+				}
+			}
+			.payment_controls {
+				text-align: right;
+				margin-top: 10px;
+				.btn {
+					font-size: 15px;
+					&.disabled {
+						cursor: default;
+						background: gray;
+					}
+				}
+			}
+		}
+		label {
+			display: block;
+			font-size: 12px;
+			margin-bottom: 2px;
+		}
+		input {
+			background-color: #fff !important;
+			display: block;
+			width: 100% !important;
+			font: $font-card;
+			line-height: 1em;
+			padding: 6px 6px 6px 6px;
+			border: 1px solid #dadada;
+			border-radius: 3px;
+			color: #2d2d2d;
+			&.placeholder_js {
+				color: #adadad;
+			}
+		}
+	}
+	.reset-password {
+		.btn.alternate {
+			margin-top: 10px;
+		}
+	}
+}

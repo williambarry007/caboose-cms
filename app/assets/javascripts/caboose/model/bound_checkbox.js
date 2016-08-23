@@ -26,11 +26,11 @@ BoundCheckbox = BoundControl.extend({
     );
     $('#'+this.el+'_container').empty();
     if (this.attribute.fixed_placeholder)
-    {
+    {            
       $('#'+this.el+'_container').append($('<div/>')
         .attr('id', this.placeholder)
         .addClass('mb_placeholder')
-        .append($('<span/>').html(this.attribute.nice_name + ': '))
+        .append($('<span/>').html(this.attribute.nice_name + (this.attribute.nice_name[this.attribute.nice_name.length-1] == '?' ? '' : ':') + ' '))
       );
     }
     var cb = $('<input/>')
@@ -48,10 +48,8 @@ BoundCheckbox = BoundControl.extend({
       $('#'+this.el).css('left', Math.floor($('#'+this.el+'_container').outerWidth()/2))
     else // left
     {
-      //alert(this.placeholder);
-      //alert($('#'+this.placeholder).html());
-      //alert($('#'+this.placeholder).outerWidth());
-      $('#'+this.el).css('left', $('#'+this.placeholder).outerWidth(true) + 10);
+      this.set_placeholder_padding();
+      //$('#'+this.el).css('left', $('#'+this.placeholder).outerWidth(true) + 10);
     }
     
     $('#'+this.el+'_container').append($('<input/>')
@@ -63,6 +61,15 @@ BoundCheckbox = BoundControl.extend({
     );
     if (this.attribute.width)
       $('#'+this.el+'_background').css('width' , this.attribute.width);
+  },
+  
+  set_placeholder_padding: function() {
+    var that = this;
+    var w = $('#'+that.placeholder).outerWidth(true);
+    if (w > 0)
+      $('#'+that.el).css('left', w + 10);                
+    else            
+      setTimeout(function() { that.set_placeholder_padding(); }, 200);                    
   },
   
   view: function() {

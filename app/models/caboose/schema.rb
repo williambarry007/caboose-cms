@@ -180,6 +180,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :render_function                 , :text    ],
         [ :use_render_function             , :boolean , { :default => false }],
         [ :use_render_function_for_layout  , :boolean , { :default => false }],
+        [ :use_js_for_modal                , :boolean , { :default => false }],
         [ :allow_child_blocks              , :boolean , { :default => false }],
         [ :default_child_block_type_id     , :integer ],
         [ :field_type                      , :string  ],

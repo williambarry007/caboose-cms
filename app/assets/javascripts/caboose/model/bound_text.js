@@ -10,6 +10,7 @@ BoundText = BoundControl.extend({
   save_attempts: 0,
  
   init: function(params) {
+    var that = this;
     for (var thing in params)
       this[thing] = params[thing];
     
@@ -35,8 +36,11 @@ BoundText = BoundControl.extend({
     if (this.attribute.width)  $('#'+this.el).css('width' , this.attribute.width);    
     if (this.attribute.fixed_placeholder && this.attribute.align != 'right')
     {
-      var w = $('#'+this.el+'_placeholder').outerWidth();
-      $('#'+this.el).attr('placeholder', 'empty').css('padding-left', '+=' + w).css('width', '-=' + w);      
+      that.set_placeholder_padding();
+      //setTimeout(function() {
+      //  var w = $('#'+that.el+'_placeholder').outerWidth();
+      //  $('#'+that.el).attr('placeholder', 'empty').css('padding-left', '+=' + w);//.css('width', '-=' + w);
+      //  }, 200);            
     }
         
     var this2 = this;
@@ -56,6 +60,15 @@ BoundText = BoundControl.extend({
         this2.save();
       }      
     });
+  },
+  
+  set_placeholder_padding: function() {
+    var that = this;
+    var w = $('#'+that.el+'_placeholder').outerWidth();    
+    if (w > 0)
+      $('#'+that.el).css('padding-left', '+=' + w);
+    else    
+      setTimeout(function() { that.set_placeholder_padding(); }, 200);                    
   },
   
   save: function() {

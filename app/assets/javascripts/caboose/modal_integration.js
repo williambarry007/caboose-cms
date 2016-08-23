@@ -45,8 +45,28 @@ $(document).ready(function() {
   //caboose_modal('caboose_login');
   //caboose_modal('caboose_register');
   //caboose_modal('caboose_station');    
-  $('a.caboose_modal').each(function(i, a) { caboose_modal($(a)); });  
+  $('a.caboose_modal').each(function(i, a) { caboose_modal_iframe($(a)); });  
 });
+
+function caboose_modal_iframe(el)
+{
+  var options = {
+    iframe: true,
+    initialWidth: 400, 
+    initialHeight: 200, 
+    innerWidth: 400, 
+    innerHeight: 200, 
+    scrolling: false, 
+    transition: 'fade', 
+    closeButton: false, 
+    onComplete: caboose_fix_colorbox, 
+    opacity: 0.50 
+  };  
+  if (typeof(el) == 'string')
+    $('#'+el).colorbox(options);
+  else
+    el.colorbox(options);  
+}
 
 function caboose_modal(el)
 {

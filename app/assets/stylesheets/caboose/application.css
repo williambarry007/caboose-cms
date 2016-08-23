@@ -25,4 +25,5 @@
 #cboxMiddleRight,
 #cboxTopCenter,
 #cboxBottomCenter,
-#cboxClose { background: #111 !important; }
+#cboxClose { background: #111; }
+#cboxWrapper { border-radius: 7px !important; }

@@ -10,11 +10,10 @@ BoundSelect = BoundControl.extend({
   placeholder: false,
  
   init: function(params) {
-    //console.log('control.model.id = ' + this.model.id);
+    var that = this;
     for (var thing in params)
       this[thing] = params[thing];
-    //console.log('control.model.id = ' + this.model.id);
-    
+        
     this.el = this.el ? this.el : this.model.name.toLowerCase() + '_' + this.model.id + '_' + this.attribute.name;
     this.message = this.el + '_message';
     this.placeholder = this.el + '_placeholder';
@@ -48,10 +47,11 @@ BoundSelect = BoundControl.extend({
     
     if (this.attribute.fixed_placeholder)
     {
-      var w = $('#'+this.placeholder).outerWidth();
-      $('#'+this.el)
-        .css('padding-left', '+=' + w)
-        .css('width', '-=' + w);
+      that.set_placeholder_padding();
+      //setTimeout(function() {
+      //  var w = $('#'+that.placeholder).outerWidth(true);        
+      //  $('#'+that.el).css('padding-left', '+=' + w);//.css('width', '-=' + w);
+      //  }, 200);
     }
     
     //this.update_options();
@@ -135,6 +135,15 @@ BoundSelect = BoundControl.extend({
       $('#'+this2.el+'_container').append(select);
       $('#'+this2.el+'_select').css('width', $('#'+this2.el).outerWidth());            
     });
+  },
+  
+  set_placeholder_padding: function() {
+    var that = this;        
+    var w = $('#'+that.placeholder).outerWidth(true);
+    if (w > 0)
+      $('#'+that.el).css('padding-left', '+=' + w);
+    else            
+      setTimeout(function() { that.set_placeholder_padding(); }, 200);                    
   },
              
   //update_options: function() {    

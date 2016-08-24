@@ -84,6 +84,7 @@ module Caboose
         
         # Javascript
         'caboose/*.js',      
+        'caboose/block_modal_controllers/*.js',
         'caboose/checkout/*.js',
         'caboose/model/*.js',        
         'jquery.js',

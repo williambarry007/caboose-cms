@@ -48,10 +48,13 @@ PageContentController.prototype = {
     var that = this;
     var b = that.block_with_id(block_id);
     var modal_controller = '';    
-    if (b.use_js_for_modal == true) { $.each(b.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); }); }
-    else if (b.field_type == 'image') { modal_controller = 'Media'; }
-    else                              { modal_controller = 'Block'; }
-    that.modal = eval("new Modal" + modal_controller + "Controller({ " +
+    if (b.block_type.use_js_for_modal == true) { 
+      $.each(b.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); }); 
+    }
+    else if (b.block_type.field_type == 'image')    { modal_controller = 'Media';    }
+    else if (b.block_type.field_type == 'richtext') { modal_controller = 'Richtext'; }
+    else                                            { modal_controller = 'Block';    }
+    that.modal = eval("new " + modal_controller + "ModalController({ " +
       "  page_id: " + that.page_id + ", " +
       "  block_id: " + block_id + ", " + 
       "  authenticity_token: '" + that.authenticity_token + "', " + 
@@ -63,9 +66,10 @@ PageContentController.prototype = {
   
   new_block: function(parent_id, before_block_id, after_block_id)
   {
-    var that = this;    
+    var that = this;        
+    console.log(parent_id);
     //caboose_modal_url('/admin/pages/' + this.page_id + '/blocks/' + parent_id + '/new');
-    that.modal = new ModalController({ 
+    that.modal = new BlockModalController({ 
       page_id: that.page_id,
       block_id: parent_id,
       authenticity_token: that.authenticity_token,
@@ -228,7 +232,7 @@ PageContentController.prototype = {
           .click(function(e) { 
             e.preventDefault(); e.stopPropagation();
             //caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + parent_id + '/new?before_id=' + b.id);
-            that.new_block({ before_id: b.id });
+            that.new_block(parent_id, b.id);
           })
         )
         .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
@@ -245,7 +249,7 @@ PageContentController.prototype = {
             .click(function(e) { 
               e.preventDefault(); e.stopPropagation();
               //caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + parent_id + '/new?after_id=' + b.id);
-              that.new_block({ after_id: b.id });
+              that.new_block(parent_id, null, b.id);
             })
           )
           .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
@@ -266,9 +270,9 @@ PageContentController.prototype = {
     {
       var count = b.children.length;
       $.each(b.children, function(i, b2) {        
-        if (b2.field_type == 'block')
+        if (b2.block_type.field_type == 'block')
           show_mouseover = false;
-        that.set_clickable_helper(b2, b.id, b.allow_child_blocks, i == (count-1));
+        that.set_clickable_helper(b2, b.id, b.block_type.allow_child_blocks, i == (count-1));
       });            
     }
     //if (b.allow_child_blocks)

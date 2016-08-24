@@ -1,5 +1,5 @@
 
-var ModalMediaController = ModalController.extend({
+var MediaModalController = DefaultBlockModalController.extend({
     
   media_id: false,
   top_cat_id: false,
@@ -23,6 +23,20 @@ var ModalMediaController = ModalController.extend({
       'plupload/jquery.ui.plupload/jquery.ui.plupload.js',
       'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css'
     ];   
+  },
+  
+  refresh: function(callback)
+  {
+    var that = this;
+    that.refresh_block(function() {        
+      that.refresh_categories(function() {                         
+        that.refresh_media(function() {
+          that.refresh_policy(function() {
+            that.print();
+          });
+        });
+      });
+    })
   },
 
   refresh_categories: function(after) 
@@ -74,31 +88,12 @@ var ModalMediaController = ModalController.extend({
     });
   },
   
-  print: function()
+  print_content: function()
   {
     var that = this;    
-    if (!that.block)
-    {
-      var div = $('<div/>')
-        .append($('<div/>').attr('id', 'top_controls'))        
-        .append($('<div/>').attr('id', 'media'      ))                  
-        .append($('<div/>').attr('id', 'controls')
-          .append($('<p/>').css('clear', 'both')
-            .append($('<input/>').attr('type', 'button').val('Close'        ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
-          )
-        );        
-      that.modal(div, 800);
-      that.refresh(function() {
-        that.refresh_categories(function() {                         
-          that.refresh_media(function() {
-            that.refresh_policy(function() {
-              that.print();
-            });
-          });
-        });
-      })
-      return;
-    }
+    $('#modal_content').empty()    
+      .append($('<div/>').attr('id', 'top_controls' ))        
+      .append($('<div/>').attr('id', 'media'        ));    
     that.print_top_controls();    
     that.print_media();
     that.autosize();
@@ -214,9 +209,13 @@ var ModalMediaController = ModalController.extend({
       .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_description'       )))
       .append($('<h2/>').append('Image URLs'))
       .append(image_urls);
-    $('#controls').empty()
+    $('#modal_controls').empty()
       .append($('<p/>').css('clear', 'both')
-        .append($('<input/>').attr('type', 'button').val('< Back'            ).click(function(e) { that.print_top_controls(); that.print_media();        }))
+        .append($('<input/>').attr('type', 'button').val('< Back'            ).click(function(e) { 
+          that.print_top_controls();
+          that.print_media();
+          that.print_controls();
+        }))
         .append($('<input/>').attr('type', 'button').val('Select this Image' ).click(function(e) { that.select_media(media_id)                           }))        
         .append($('<input/>').attr('type', 'button').val('Close'             ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
       );
@@ -240,17 +239,17 @@ var ModalMediaController = ModalController.extend({
     $('#image_urls input.url'       ).css('width', '270px').css('border', '#ccc 1px solid');
     $('#image_urls button').css('width', '60px');
     
-    c = new Clipboard('.clippy');
-    c.on('success', function(e) {
-      console.info('Action:', e.action);
-      console.info('Text:', e.text);
-      console.info('Trigger:', e.trigger);
-      e.clearSelection();
-    });
-    c.on('error', function(e) {
-      console.error('Action:', e.action);
-      console.error('Trigger:', e.trigger);
-    });
+    //c = new Clipboard('.clippy');
+    //c.on('success', function(e) {
+    //  console.info('Action:', e.action);
+    //  console.info('Text:', e.text);
+    //  console.info('Trigger:', e.trigger);
+    //  e.clearSelection();
+    //});
+    //c.on('error', function(e) {
+    //  console.error('Action:', e.action);
+    //  console.error('Trigger:', e.trigger);
+    //});
            
     that.autosize();
   },

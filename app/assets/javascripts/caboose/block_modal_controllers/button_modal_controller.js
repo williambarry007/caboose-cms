@@ -1,5 +1,5 @@
 
-var ModalButtonController = ModalController.extend({
+var ButtonModalController = DefaultBlockModalController.extend({
   
   print: function()
   {

@@ -82,18 +82,18 @@ module Caboose
           'id'                 => b.id,
           'parent_id'          => b.parent_id,
           'page_id'            => b.page_id,          
-          'post_id'            => b.post_id,
-          'block_type'         => bt,
-          'block_type_id'      => bt.id,
-          'children'           => admin_tree_helper(b), 
-          'field_type'         => bt.field_type,
-          'allow_child_blocks' => bt.allow_child_blocks,
-          'use_js_for_modal'   => bt.use_js_for_modal,
-          'name'               => b.name ? b.name : bt.name,
+          'post_id'            => b.post_id,          
+          'name'               => b.name,
           'value'              => b.value,
           'constrain'          => b.constrain,
           'full_width'         => b.full_width,
+          'block_type'         => bt,
+          'children'           => admin_tree_helper(b),
           'crumbtrail'         => self.crumbtrail(b)          
+          #'block_type_id'      => bt.id,           
+          #'field_type'         => bt.field_type,
+          #'allow_child_blocks' => bt.allow_child_blocks,
+          #'use_js_for_modal'   => bt.use_js_for_modal,                              
         }
       else
         q = params[:page_id] ? ["parent_id is null and page_id = ?", params[:page_id]] : ["parent_id is null and post_id = ?", params[:post_id]] 
@@ -103,17 +103,17 @@ module Caboose
             'id'                 => b.id,
             'parent_id'          => b.parent_id,
             'page_id'            => b.page_id,            
-            'post_id'            => b.post_id,
-            'block_type'         => bt,
-            'block_type_id'      => bt.id,
-            'children'           => admin_tree_helper(b), 
-            'field_type'         => bt.field_type,
-            'allow_child_blocks' => bt.allow_child_blocks,
-            'use_js_for_modal'   => bt.use_js_for_modal,
-            'name'               => b.name ? b.name : bt.name,
+            'post_id'            => b.post_id,                        
+            'name'               => b.name, 
             'value'              => b.value,
             'constrain'          => b.constrain,
-            'full_width'         => b.full_width
+            'full_width'         => b.full_width,
+            'block_type'         => bt,
+            'children'           => admin_tree_helper(b)            
+            #'block_type_id'      => bt.id,
+            #'field_type'         => bt.field_type,
+            #'allow_child_blocks' => bt.allow_child_blocks,
+            #'use_js_for_modal'   => bt.use_js_for_modal,                                    
           }
         end        
       end
@@ -143,16 +143,16 @@ module Caboose
           'parent_id'          => b2.parent_id,
           'page_id'            => b2.page_id,
           'post_id'            => b2.post_id,
-          'block_type'         => bt,
-          'block_type_id'      => bt.id,
-          'children'           => admin_tree_helper(b2),
-          'field_type'         => bt.field_type,
-          'allow_child_blocks' => bt.allow_child_blocks,
-          'use_js_for_modal'   => bt.use_js_for_modal,
-          'name'               => b2.name ? b2.name : bt.name,
+          'name'               => b2.name,
           'value'              => b2.value,
           'constrain'          => b2.constrain,
-          'full_width'         => b2.full_width
+          'full_width'         => b2.full_width,
+          'block_type'         => bt,
+          'children'           => admin_tree_helper(b2)          
+          #'block_type_id'      => bt.id,          
+          #'field_type'         => bt.field_type,
+          #'allow_child_blocks' => bt.allow_child_blocks,
+          #'use_js_for_modal'   => bt.use_js_for_modal,          
         }
       end
       return arr
@@ -306,10 +306,7 @@ module Caboose
     def admin_create
       return unless user_is_allowed('pages', 'add')
 
-      resp = Caboose::StdClass.new({
-          'error' => nil,
-          'redirect' => nil
-      })
+      resp = Caboose::StdClass.new
 
       b = Block.new      
       if params[:page_id]
@@ -369,11 +366,9 @@ module Caboose
 
       # Send back the response
       #resp.block = b
-      if params[:page_id]
-        resp.redirect = "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
-      else
-        resp.redirect = "/admin/posts/#{b.post_id}/blocks/#{b.id}/edit"
-      end        
+      resp.success = true
+      resp.new_id = b.id
+      resp.redirect = params[:page_id] ? "/admin/pages/#{b.page_id}/blocks/#{b.id}" : "/admin/posts/#{b.post_id}/blocks/#{b.id}"              
       render :json => resp
     end
     

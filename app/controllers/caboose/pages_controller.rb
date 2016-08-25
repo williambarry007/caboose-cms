@@ -435,7 +435,7 @@ module Caboose
             resp.attributes['parent_id'] = { 'text' => page.parent.title }
           end
 
-        when 'custom_css', 'custom_js'
+        when 'custom_css', 'custom_css_files', 'custom_js', 'custom_js_files'
           value.strip!
           page[name.to_sym] = value
 

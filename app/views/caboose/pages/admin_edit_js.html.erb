@@ -1,6 +1,10 @@
 
 <%= render :partial => 'caboose/pages/admin_header' %>
 
+<h2>Custom Javascript URLs</h2>
+<p>One URL per line</p>
+<p><div id='page_<%= @page.id %>_custom_js_files'></div></p>
+<h2>Custom Javascript</h2>
 <p><div id='page_<%= @page.id %>_custom_js'></div></p>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
@@ -19,7 +23,8 @@ $(document).ready(function() {
     update_url: '/admin/pages/<%= @page.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'custom_js', nice_name: 'Custom Javascript', type: 'textarea', value: <%= raw Caboose.json(@page.custom_js) %>, width: 800, height: 400 }             
+      { name: 'custom_js_files', nice_name: 'Custom Javascript URLs' , type: 'textarea', value: <%= raw Caboose.json(@page.custom_js_files ) %>, width: 800, height: 200, fixed_placeholder: false },
+      { name: 'custom_js'      , nice_name: 'Custom Javascript'      , type: 'textarea', value: <%= raw Caboose.json(@page.custom_js       ) %>, width: 800, height: 400, fixed_placeholder: false }             
     ]
   });
 });

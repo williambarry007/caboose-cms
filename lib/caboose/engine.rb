@@ -114,7 +114,7 @@ module Caboose
         'jquery-ui.css',                
         '*/css/application.css', # Site CSS
         
-        # PLUpload        
+        # PLUpload 
         'plupload/i18n/*.js',
         'plupload/jquery.plupload.queue/css/*.css',
         'plupload/jquery.plupload.queue/img/*.gif',

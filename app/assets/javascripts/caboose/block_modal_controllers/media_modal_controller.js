@@ -319,10 +319,9 @@ var MediaModalController = DefaultBlockModalController.extend({
           },   
           FileUploaded: function(ip, file)
           {
-            that.refresh_media(function() { that.refresh_categories(function() { that.print_media(); }); });            
+            that.refresh_media(function() { that.print_media(); });            
           },          
-          UploadComplete: function(up, files) {
-            that.refresh_media(function() { that.refresh_categories(function() { that.print(); }); });
+          UploadComplete: function(up, files) {            
             if (that.uploader)
             {
               $("#the_uploader").slideUp(400, function() {
@@ -330,6 +329,7 @@ var MediaModalController = DefaultBlockModalController.extend({
                 that.uploader = false;                
               });
             }
+            that.refresh_media(function() { that.print_media(); });            
           }
         }
       });

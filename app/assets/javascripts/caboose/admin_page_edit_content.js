@@ -67,7 +67,7 @@ PageContentController.prototype = {
   new_block: function(parent_id, before_block_id, after_block_id)
   {
     var that = this;        
-    console.log(parent_id);
+    //console.log(parent_id);
     //caboose_modal_url('/admin/pages/' + this.page_id + '/blocks/' + parent_id + '/new');
     that.modal = new BlockModalController({ 
       page_id: that.page_id,

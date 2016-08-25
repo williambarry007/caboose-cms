@@ -16,7 +16,7 @@ var DefaultBlockModalController = ModalController.extend({
       that[i] = params[i];    
     that.include_assets();
     if (that.new_block_on_init == true)
-      that.add_block();
+      that.refresh_block(function() { that.add_block(); });
     else
       that.print();    
   },

@@ -171,8 +171,6 @@ var BlockModalController = DefaultBlockModalController.extend({
   add_block: function(block_type_id)
   {
     var that = this;
-    
-    console.log(that);
          	       
 	  that.include_inline_css(
 	    "@font-face {\n" +
@@ -191,7 +189,12 @@ var BlockModalController = DefaultBlockModalController.extend({
       'caboose/admin_new_block.css'
     ]);
     
-    if (!block_type_id)
+    if (!block_type_id && that.block.block_type.default_child_block_type_id)
+    {
+      that.add_block(that.block.block_type.default_child_block_type_id);
+      return;
+    }      
+    else if (!block_type_id)
     {
       that.new_block_types = false;
       $.ajax({

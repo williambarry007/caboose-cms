@@ -71,8 +71,6 @@ var RichtextModalController = DefaultBlockModalController.extend({
     var that = this;
     if (force || that.parent_controller.tinymce_initialized == undefined)      
     {
-      console.log("Initializing tinymce...");
-      
       tinymce.init({
         selector: 'textarea.tinymce',
         width: '800px',

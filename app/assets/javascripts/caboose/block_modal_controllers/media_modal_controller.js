@@ -104,14 +104,15 @@ var MediaModalController = DefaultBlockModalController.extend({
   {
     var that = this;
     
-    var select = $('<select/>').attr('id', 'categories').change(function(e) {             
-      that.select_category($(this).val()); 
-    });   
-    that.print_categories_helper(that.top_category, select, '');
+    //var select = $('<select/>').attr('id', 'categories').change(function(e) {             
+    //  that.select_category($(this).val()); 
+    //});   
+    //that.print_categories_helper(that.top_category, select, '');
     
     var div = $('<div/>').attr('id', 'top_controls')
       .append($('<p/>')
-        .append(select).append(' | ')
+        //.append(select).append(' | ')
+        .append($('<select/>').attr('id', 'categories')).append(' | ')        
         .append($('<a/>').attr('href', '#').html('New Category'                                                 ).click(function(e) { e.preventDefault(); that.add_category();     })).append(' | ')              
         .append($('<a/>').attr('href', '#').html('Upload to this Category'                                      ).click(function(e) { e.preventDefault(); that.toggle_uploader();  })).append(' | ')
         .append($('<a/>').attr('href', '#').html(that.file_view == 'thumbnail' ? 'List View' : 'Thumbnail View' ).click(function(e) { e.preventDefault(); that.toggle_file_view(); }))
@@ -119,7 +120,18 @@ var MediaModalController = DefaultBlockModalController.extend({
       .append($('<div/>').attr('id', 'new_cat_message'))              
       .append($('<div/>').attr('id', 'uploader'   ).append($('<div/>').attr('id', 'the_uploader')));     
             
-    $('#top_controls').replaceWith(div);              
+    $('#top_controls').replaceWith(div);
+    that.print_categories();
+  },
+  
+  print_categories: function()
+  {
+    var that = this;
+    var select = $('<select/>').attr('id', 'categories').change(function(e) {             
+      that.select_category($(this).val()); 
+    });   
+    that.print_categories_helper(that.top_category, select, '');
+    $('#categories').replaceWith(select);
   },
   
   print_categories_helper: function(cat, select, prefix) 
@@ -303,11 +315,11 @@ var MediaModalController = DefaultBlockModalController.extend({
               success: function(resp) {},
               async: false          
             });
-            that.refresh_media(function() { that.refresh_categories(function() { that.print(); }); });
+            that.refresh_media(function() { that.refresh_categories(function() { that.print_categories(); that.print_media(); }); });
           },   
           FileUploaded: function(ip, file)
           {
-            that.refresh_media(function() { that.refresh_categories(function() { that.print(); }); });            
+            that.refresh_media(function() { that.refresh_categories(function() { that.print_media(); }); });            
           },          
           UploadComplete: function(up, files) {
             that.refresh_media(function() { that.refresh_categories(function() { that.print(); }); });

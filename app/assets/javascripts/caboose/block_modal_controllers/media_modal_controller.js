@@ -19,8 +19,9 @@ var MediaModalController = DefaultBlockModalController.extend({
   assets_to_include: function()
   {
     return [      
-      'plupload/plupload.full.min.js', 
-      'plupload/jquery.ui.plupload/jquery.ui.plupload.js',
+      //'plupload/plupload.full.min.js', 
+      //'plupload/jquery.ui.plupload/jquery.ui.plupload.js',
+      'plupload/plupload_with_jquery.min.js',
       'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css'
     ];   
   },

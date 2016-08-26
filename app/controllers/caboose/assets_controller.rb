@@ -1,6 +1,11 @@
 module Caboose
   class AssetsController < Caboose::ApplicationController
     layout 'caboose/admin'
+    
+    # @route GET /admin/assets/ace
+    def admin_ace
+      return if !user_is_allowed('assets', 'edit')      
+    end
             
     # @route GET /admin/assets
     def admin_index
@@ -44,20 +49,31 @@ module Caboose
       h[path[i]] = i == (path.count - 1) ? true : {} if h[path[i]].nil?
       self.verify_path_exists(path, h[path[i]], i+1)
     end
-          
-    #
-    # benttree/images/icons/apple-touch-icon.png
-    #
-    # {
-    #   :bentree => {
-    #     :images => {
-    #       :icons => {
-    #         'apple-touch-icon.png' => true
-    #       }
-    #     }
-    #   }
-    # }
-    #
+    
+    # @route PUT /admin/assets
+    #def admin_update
+    #  return if !user_is_allowed('assets', 'edit')
+    #  
+    #  resp = Caboose::StdClass.new      
+    #  path = params[:path]
+    #  value = parasm[:value]
+    #  
+    #  
+    #  config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]                      
+    #  AWS.config({ :access_key_id => config['access_key_id'], :secret_access_key => config['secret_access_key'] })
+    #  bucket = AWS::S3::Bucket.new(config['bucket'])                      
+    #  obj = bucket.objects[path]
+    #  
+    #  if obj.nil?
+    #    resp.error = "Can't find file."
+    #  #elsif !obj.write(value)
+    #  #  resp.error = "Can't write to file."
+    #  else
+    #    resp.success = true
+    #  end
+    #  
+    #  render :json => resp      
+    #end
 
   end
 end

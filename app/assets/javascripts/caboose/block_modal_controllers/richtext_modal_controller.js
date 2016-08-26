@@ -4,6 +4,7 @@ var RichtextModalController = DefaultBlockModalController.extend({
   tinymce_initialized: false,
   modal_width: 820,
   modal_height: 500,
+  trapFocus: false,
 
   assets_to_include: function()
   {
@@ -83,10 +84,9 @@ var RichtextModalController = DefaultBlockModalController.extend({
         setup: function(editor) {
           var control = ModelBinder.tinymce_control(editor.id);     
           editor.on('keyup', function(e) { control.tinymce_change(editor); });
-        }
+        }        
       });
       that.parent_controller.tinymce_initialized = true;
-    }    
-  }
-  
+    }
+  }  
 });

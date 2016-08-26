@@ -105,23 +105,39 @@ var AssetsController = Class.extend({
     var h = $(window).outerHeight() - 200; 
     $('#editor').empty()
       .append($('<p/>')
-        .append($('<input/>').attr('type', 'button').val('Save'   ).click(function(e) { that.save_file();     })).append(' ')
+        .append($('<input/>').attr('type', 'button').val('Save'   ).data('path', path).click(function(e) { that.save_file($(this).data('path')); })).append(' ')
         .append($('<input/>').attr('type', 'button').val('Cancel' ).click(function(e) { $('#editor').empty(); }))
       )
-      .append($('<textarea/>').attr('id', 'the_editor')
-        .css('width', '' + w + 'px')
-        .css('height', '' + h + 'px')        
-        .append(str)
-      );
+      .append($('<div/>').attr('id', 'the_editor').append(str));
+      //.append($('<textarea/>').attr('id', 'the_editor')
+      //  .css('width', '' + w + 'px')
+      //  .css('height', '' + h + 'px')        
+      //  .append(str)
+      //);
+        
+    //var editor = ace.edit("the_editor");
+    //editor.setTheme("ace/theme/monokai");
+    //editor.getSession().setMode("ace/mode/javascript");
+  },
+  
+  save_file: function(path)
+  {
+    $('#editor').html("<p class='note error'>Saving file...</p>");
+    $.ajax({
+      url: '/admin/assets' + path,      
+      type: 'put',
+      data: { 
+        path: path, 
+        value: $('#the_editor').val() 
+      },
+      success: function(resp) {
+        if (resp.error  ) $('#editor').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) $('#editor').html("<p class='note success'>The file was saved successfully.</p>");              
+      }                    
+    });    
   }
     
 });
-
-function sort_by_name(a, b){
-  var aName = a.name.toLowerCase();
-  var bName = b.name.toLowerCase(); 
-  return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
-}
 
 function sorted_hash(h)
 {

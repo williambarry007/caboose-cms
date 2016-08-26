@@ -5,15 +5,15 @@ var ModalController = Class.extend({
   modal_height: false,
   modal_element: false,  
   parent_controller: false,
-
+  
   modal: function(el, width, height, callback)
   {
     var that = this;
     if (!width) width = that.modal_width ? that.modal_width : 400;
     if (!height) height = that.modal_height ? that.modal_height : $(el).outerHeight(true);
     that.modal_element = el;    
-    el.attr('id', 'the_modal').addClass('modal').css('width', '' + width + 'px');      
-    $.colorbox({
+    el.attr('id', 'the_modal').addClass('modal').css('width', '' + width + 'px');
+    var options = {
       html: el,           
       initialWidth: width, 
       //initialHeight: height, 
@@ -27,8 +27,11 @@ var ModalController = Class.extend({
         for (var i in arr) $('#cbox' + arr[i]).css('background-color', '#fff !important');        
         $("#cboxClose").hide();
         if (callback) callback();        
-      }       
-    });
+      }
+    };
+    if (that.trapFocus === false)
+      options['trapFocus'] = false;    
+    $.colorbox(options);
   },
   
   last_size: 0,

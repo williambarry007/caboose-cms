@@ -73,16 +73,18 @@ module Caboose
     def admin_json
       return if !user_is_allowed('media', 'view')
       render :json => false and return if @site.nil?
-      #id = params[:media_category_id]        
-      #cat = id ? MediaCategory.find(id) : MediaCategory.top_category(@site.id)      
-      #render :json => cat.api_hash
-      
+            
       arr = Media.where(:media_category_id => params[:media_category_id]).reorder(:sort_order).all
-      render :json => arr.collect{ |m| m.api_hash }
-      
-      #cat = id ? MediaCategory.find(id) : MediaCategory.top_category(@site.id)      
-      #render :json => cat.api_hash
-      
+      render :json => arr.collect{ |m| m.api_hash }                  
+    end
+    
+    # @route GET /admin/media/:id/json
+    def admin_json_single
+      return if !user_is_allowed('media', 'view')
+      render :json => false and return if @site.nil?
+            
+      m = Media.where(:id => params[:id]).first
+      render :json => m.api_hash      
     end
     
     # @route GET /admin/media/last-upload-processed

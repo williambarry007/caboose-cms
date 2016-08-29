@@ -115,7 +115,7 @@ var BlockModalController = ModalController.extend({
       }
     }
     $('#modal_content').replaceWith(div);
-    that.render_blocks();
+    that.render_child_blocks();
     that.autosize();
   },
   
@@ -193,16 +193,16 @@ var BlockModalController = ModalController.extend({
   Block Rendering
   *****************************************************************************/
 
-  render_blocks: function()
+  render_child_blocks: function()
   {
     var that = this;    
     if (that.block.block_type.field_type != 'block' && that.block.children.length == 0)
       return;
     
-    $.each(that.block.children, function(i, b) { that.render_block(b); });        
+    $.each(that.block.children, function(i, b) { that.render_child_block(b); });        
   },
   
-  render_block: function(b)
+  render_child_block: function(b)
   {
     var that = this;    
     if (that.complex_field_types.indexOf(b.block_type.field_type) > -1)

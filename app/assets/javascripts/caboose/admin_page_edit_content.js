@@ -260,8 +260,9 @@ PageContentController.prototype = {
         );
       }
     }
-            
-    $('#block_' + b.id).attr('onclick','').unbind('click');    
+    
+    $('#block_' + b.id + ' *').attr('onclick', '').unbind('click');
+    $('#block_' + b.id).attr('onclick','').unbind('click');
     $('#block_' + b.id).click(function(e) {
       e.preventDefault();
       e.stopPropagation();

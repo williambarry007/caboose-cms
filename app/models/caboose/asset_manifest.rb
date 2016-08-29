@@ -1,6 +1,8 @@
 module Caboose
   class AssetManifest
     
+    #@@bucket = nil
+    #
     #def AssetManifest.bucket
     #  if @@bucket.nil?        
     #    config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]                      
@@ -19,9 +21,17 @@ module Caboose
     #  return { :error => "Can't write to file." } if !file.write(str)
     #  
     #  # Compile the file
-    #  str_compiled = Uglifier.compile(str)
+    #  str_compiled = ''
+    #  begin
+    #    str_compiled = Uglifier.compile(str)
+    #  rescue Exception => e
+    #    return { :error => e.message }
+    #  end
     #  
-    #  # Compute the digest for the compiled file            
+    #  # Compute the digest for the compiled file
+    #  # Note: digest must be generated with environment set to 'production' (sprockets changes digests per environment) 
+    #  digest = Rails.application.assets.file_digest('/Users/william/Sites/caboosecms.com/sites/benttree/images/icons/loading.gif')
+    #  digest = Rails.application.assets.digest.hexdigest(str_compiled)      
     #  digest = Digest::SHA2.hexdigest(str_compiled)
     #  
     #  # See if the digest file for the compiled file exists
@@ -33,17 +43,23 @@ module Caboose
     #  
     #  # See if the digest is in the manifest
     #  manifest = self.bucket.objects['assets/manifest.yml']
-    #  changed = false
+    #  exists = false
+    #  changed = false      
     #  new_lines = []
     #  manifest.read.split("\n").each do|line|
-    #    if line.starts_with?("#{path}: ") && line != "#{path}: #{digest_path}"
+    #    if line.starts_with?("#{path}: ")
+    #      exists = true
+    #      changed = true if line != "#{path}: #{digest_path}"            
     #      new_lines << "#{path}: #{digest_path}"
-    #      changed = true
     #    else
     #      new_lines << line
     #    end
     #  end
-    #  
+    #  if !exists
+    #    new_lines << "#{path}: #{digest_path}"
+    #    changed = true
+    #  end
+    #
     #  # If the digest has changed, update the manifest and set the app asset digests
     #  if changed
     #    manifest.write(new_lines.join("\n"))        

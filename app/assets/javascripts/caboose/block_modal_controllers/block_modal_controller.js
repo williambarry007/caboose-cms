@@ -1,7 +1,76 @@
 
-var BlockModalController = DefaultBlockModalController.extend({
+var BlockModalController = ModalController.extend({
   
-  block_types: false,    
+  page_id: false,
+  block_id: false,
+  block: false,
+  block_types: false,
+  authenticity_token: false,
+  new_block_on_init: false,
+  assets_path: false,
+  block_types: false,
+  complex_field_types: ['block', 'richtext', 'image', 'file'],
+    
+  init: function(params) 
+  {    
+    var that = this;    
+    for (var i in params)
+      that[i] = params[i];    
+    that.include_assets();
+    if (that.new_block_on_init == true)
+      that.refresh_block(function() { that.add_block(); });
+    else
+      that.print();    
+  },
+  
+  refresh: function(callback)
+  {    
+    var that = this;
+    that.refresh_block(function() {
+      if (callback) callback();
+    });                  
+  },
+  
+  refresh_block: function(callback)
+  {    
+    var that = this
+    $.ajax({
+      url: '/admin/pages/' + that.page_id + '/blocks/' + that.block_id + '/tree',
+      type: 'get',
+      success: function(arr) {
+        that.block = arr[0];
+        if (callback) callback();
+      }        
+    });
+  },
+
+  /*****************************************************************************
+  Printing
+  *****************************************************************************/
+  
+  print: function()
+  {    
+    var that = this;    
+    if (!that.block)
+    {          
+      var div = $('<div/>')
+        .append($('<div/>').attr('id', 'modal_crumbtrail' ))
+        .append($('<div/>').attr('id', 'modal_content'    ))
+        .append($('<div/>').attr('id', 'modal_message'    ))
+        .append($('<div/>').attr('id', 'modal_controls'   ));
+      that.modal(div, 800);
+      that.refresh(function() { that.print(); });      
+      return;
+    }
+    
+    that.print_content();
+    that.print_crumbtrail();
+    that.print_controls();    
+    that.autosize();    
+  },
+  
+  add_child_link_text: false,
+  child_block_header_text: false,  
   
   print_content: function()
   {
@@ -13,30 +82,113 @@ var BlockModalController = DefaultBlockModalController.extend({
     {
       if (that.block.children.length > 0)
       {        
-        var complex_field_types = ['block', 'richtext', 'image', 'file'];
+        var separate_children = that.block.block_type.allow_child_blocks && that.block.block_type.default_child_block_type_id;
+        var separate_child_id = separate_children ? that.block.block_type.default_child_block_type_id : false;
+    
         $.each(that.block.children, function(i, b) {
-          var div_id = 'block_' + b.id + (complex_field_types.indexOf(b.block_type.field_type) == -1 ? '_value' : '');
+          if (separate_children && b.block_type.id == separate_child_id) return;                    
+          var div_id = 'block_' + b.id + (that.complex_field_types.indexOf(b.block_type.field_type) == -1 ? '_value' : '');
           div.append($('<div/>').css('margin-bottom', '10px').append($('<div/>').attr('id', div_id)));                                
         });
+        if (separate_children)
+        {
+          if (that.child_block_header_text) div.append($('<h2/>').append(that.child_block_header_text));                    
+          $.each(that.block.children, function(i, b) {
+            if (b.block_type.id == separate_child_id)
+            {
+              var div_id = 'block_' + b.id + (that.complex_field_types.indexOf(b.block_type.field_type) == -1 ? '_value' : '');
+              div.append($('<div/>').css('margin-bottom', '10px').append($('<div/>').attr('id', div_id)));
+            }             
+          });
+        }    
       }              
       else
       {
         div.append($('<p/>').append("This block doesn't have any content yet."));
       }
       if (that.block.block_type.allow_child_blocks)
-      {
-        div.append($('<p/>').css('clear', 'both').append($('<a/>').attr('href', '#').html("Add a child block!").click(function(e) {
+      {        
+        div.append($('<p/>').css('clear', 'both').append($('<a/>').attr('href', '#').html(that.add_child_link_text ? that.add_child_link_text : "Add a child block!").click(function(e) {
           e.preventDefault();
           that.add_block();
-        })));            
+        })));                            
       }
     }
     $('#modal_content').replaceWith(div);
-    that.render_blocks();    
-    that.set_editable();
+    that.render_blocks();
     that.autosize();
   },
+  
+  print_controls: function()
+  {    
+    var that = this;
+    var p = $('<p/>').css('clear', 'both')
+      .append($('<input/>').attr('type', 'button').addClass('btn').val('Close').click(function() { that.close(); that.parent_controller.render_blocks(); })).append(' ');
+    if (!that.block.name)                        
+    {
+      p.append($('<input/>').attr('type', 'button').addClass('btn').val('Delete Block').click(function() { that.delete_block(); })).append(' '); 
+    }
+    p.append($('<input/>').attr('type', 'button').addClass('btn').val('Move Up'   ).click(function() { that.move_up();         })).append(' ');
+    p.append($('<input/>').attr('type', 'button').addClass('btn').val('Move Down' ).click(function() { that.move_down();       })).append(' ');    
+    p.append($('<input/>').attr('type', 'button').addClass('btn').val('Advanced'  ).attr('id', 'btn_advanced').click(function() { that.print_advanced();  }));
+    $('#modal_controls').empty().append(p);    
+  },
+  
+  before_crumbtrail_click: false,
+  print_crumbtrail: function()
+  {    
+    var that = this;
+    var crumbs = $('<h2/>').css('margin-top', '0').css('padding-top', '0');
+    $.each(that.block.crumbtrail, function(i, h) {
+      if (i > 0) crumbs.append(' > ');
+      crumbs.append($('<a/>').attr('href', '#').html(h['text']).data('block_id', h['block_id']).click(function(e) { 
+        e.preventDefault();
+        if (that.before_crumbtrail_click) that.before_crumbtrail_click();
+        that.parent_controller.edit_block(parseInt($(this).data('block_id')));
+      }));
+    }); 
+    $('#modal_crumbtrail').empty().append(crumbs);        
+  },
+  
+  before_print_advanced: false,
+  print_advanced: function()
+  {
+    var that = this;        
+    if (that.before_print_advanced) that.before_print_advanced();
     
+    var b = that.block;    
+    $('#modal_content').empty()      
+      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_block_type_id' )))
+      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_parent_id'     )))
+      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_constrain'     )))
+      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_full_width'    )))      
+    $('#modal_controls').empty()
+      .append($('<p/>')
+        .append($('<input/>').attr('type', 'button').addClass('btn').val('Close').click(function() { 
+          that.close();
+          that.parent_controller.render_blocks(); 
+        })).append(' ')                              
+        .append($('<input/>').attr('type', 'button').addClass('btn').val('Back' ).click(function() { 
+          that.print_content();
+          that.print_controls();          
+        }))
+      );
+              
+    var m = new ModelBinder({
+      name: 'Block',
+      id: b.id,
+      update_url: that.block_url(b),      
+      authenticity_token: that.authenticity_token,
+      attributes: [
+        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, options_url: '/admin/block-types/options'                      , after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
+        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, options_url: '/admin/pages/' + that.page_id + '/block-options' , after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
+        { name: 'constrain'     , nice_name: 'Constrain'  , type: 'checkbox' , value: b.constrain     ? 1 : 0 ,                                        width: 400, fixed_placeholder: true,                                                                  after_update: function() { that.parent_controller.render_blocks(); that.block.constrain     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
+        { name: 'full_width'    , nice_name: 'Full Width' , type: 'checkbox' , value: b.full_width    ? 1 : 0 ,                                        width: 400, fixed_placeholder: true,                                                                  after_update: function() { that.parent_controller.render_blocks(); that.block.full_width    = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }}
+      ]
+    });
+    that.autosize();
+  },
+  
   /*****************************************************************************
   Block Rendering
   *****************************************************************************/
@@ -47,33 +199,86 @@ var BlockModalController = DefaultBlockModalController.extend({
     if (that.block.block_type.field_type != 'block' && that.block.children.length == 0)
       return;
     
-    $.each(that.block.children, function(i, b) {      
-      var ft = b.block_type.field_type;      
-      if (ft == 'block' || ft == 'richtext' || ft == 'image' || ft == 'file')
+    $.each(that.block.children, function(i, b) { that.render_block(b); });        
+  },
+  
+  render_block: function(b)
+  {
+    var that = this;    
+    if (that.complex_field_types.indexOf(b.block_type.field_type) > -1)
+    {
+      if (!b.rendered_value)
       {
-        if (!b.rendered_value)
-        {
-          $.ajax({
-            block_id: b.id, // Used in the success function
-            url: that.block_url(b) + '/render',
-            type: 'get',
-            success: function(html) {
-              $('#the_modal #block_' + this.block_id).replaceWith(html);
-              
-              var b2 = that.block_with_id(this.block_id);
-              b2.rendered_value = html;
-              that.set_clickable(b2);                            
-              that.autosize();
-            },            
-          });
-        }
-        else
-          $('#the_modal #block_' + b.id).replaceWith(b.rendered_value);
+        $.ajax({
+          block_id: b.id, // Used in the success function
+          url: that.block_url(b) + '/render',
+          type: 'get',
+          success: function(html) {
+            $('#the_modal #block_' + this.block_id).replaceWith(html);
+            
+            var b2 = that.block_with_id(this.block_id);
+            b2.rendered_value = html;
+            that.set_clickable(b2);                            
+            that.autosize();
+          },            
+        });
       }
-    });        
+      else
+        $('#the_modal #block_' + b.id).replaceWith(b.rendered_value);
+    }
+    else
+      that.set_block_value_editable(b);
   },
   
   /****************************************************************************/
+
+  //set_editable: function()
+  //{
+  //  var that = this;
+  //  that.set_block_value_editable(that.block);        
+  //  $.each(that.block.children, function(i, b) {
+  //    that.set_block_value_editable(b);                         
+  //  });        
+  //},
+  
+  set_block_value_editable: function(b)
+  {    
+    var that = this;    
+    var bt = b.block_type;                      
+    if (bt.field_type == 'block' || bt.field_type == 'richtext')        
+      return;      
+    var h = {
+      name: 'value',
+      type: bt.field_type,      
+      nice_name: bt.description ? bt.description : bt.name,
+      width: bt.width ? bt.width : 780,      
+      after_update: function() { that.parent_controller.render_blocks(); },
+      after_cancel: function() { that.parent_controller.render_blocks(); }
+    };     
+    h['value'] = b.value
+    if (bt.field_type == 'checkbox')       h['value'] = b.value ? 'true' : 'false';
+    //if (bt.field_type == 'image')          h['value'] = b.image.tiny_url;
+    //if (bt.field_type == 'file')           h['value'] = b.file.url;                
+    if (bt.field_type == 'select')         h['text'] = b.value;
+    if (bt.height)                         h['height'] = bt.height;
+    if (bt.fixed_placeholder)              h['fixed_placeholder'] = bt.fixed_placeholder;      
+    if (bt.options || bt.options_function) h['options_url'] = '/admin/block-types/' + bt.id + '/options';
+    else if (bt.options_url)               h['options_url'] = bt.options_url;
+    if (bt.field_type == 'file')           h['update_url'] = that.block_url(b) + '/file';
+    if (bt.field_type == 'image')
+    {
+      h['update_url'] = that.block_url(b) + '/image'
+      h['image_refresh_delay'] = 100;
+    }
+        
+    m = new ModelBinder({
+      name: 'Block',
+      id: b.id,
+      update_url: that.block_url(b),
+      authenticity_token: that.authenticity_token,
+      attributes: [h]            
+    });
+  },
   
   set_clickable: function(b)
   {        
@@ -116,57 +321,9 @@ var BlockModalController = DefaultBlockModalController.extend({
     }    
   },
 
-  /****************************************************************************/
-
-  set_editable: function()
-  {
-    var that = this;
-    that.set_block_value_editable(that.block);        
-    $.each(that.block.children, function(i, b) {
-      that.set_block_value_editable(b);                         
-    });        
-  },
-  
-  set_block_value_editable: function(b)
-  {    
-    var that = this;    
-    var bt = b.block_type;                      
-    if (bt.field_type == 'block' || bt.field_type == 'richtext')        
-      return;      
-    var h = {
-      name: 'value',
-      type: bt.field_type,      
-      nice_name: bt.description ? bt.description : bt.name,
-      width: bt.width ? bt.width : 780,      
-      after_update: function() { that.parent_controller.render_blocks(); },
-      after_cancel: function() { that.parent_controller.render_blocks(); }
-    };     
-    h['value'] = b.value
-    if (bt.field_type == 'checkbox')       h['value'] = b.value ? 'true' : 'false';
-    //if (bt.field_type == 'image')          h['value'] = b.image.tiny_url;
-    //if (bt.field_type == 'file')           h['value'] = b.file.url;                
-    if (bt.field_type == 'select')         h['text'] = b.value;
-    if (bt.height)                         h['height'] = bt.height;
-    if (bt.fixed_placeholder)              h['fixed_placeholder'] = bt.fixed_placeholder;      
-    if (bt.options || bt.options_function) h['options_url'] = '/admin/block-types/' + bt.id + '/options';
-    else if (bt.options_url)               h['options_url'] = bt.options_url;
-    if (bt.field_type == 'file')           h['update_url'] = that.block_url(b) + '/file';
-    if (bt.field_type == 'image')
-    {
-      h['update_url'] = that.block_url(b) + '/image'
-      h['image_refresh_delay'] = 100;
-    }
-        
-    m = new ModelBinder({
-      name: 'Block',
-      id: b.id,
-      update_url: that.block_url(b),
-      authenticity_token: that.authenticity_token,
-      attributes: [h]            
-    });
-  },
-  
-  /****************************************************************************/
+  /*****************************************************************************
+  CRUD
+  *****************************************************************************/
 
   add_block: function(block_type_id)
   {
@@ -253,6 +410,126 @@ var BlockModalController = DefaultBlockModalController.extend({
         }
       }
     });        
+  },
+
+  delete_block: function(confirm)
+  {
+    var that = this;
+    if (!confirm)
+    {
+      var p = $('<p/>').addClass('note warning')
+        .append("Are you sure you want to delete the block? This can't be undone.<br />")      
+        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.delete_block(true); })).append(' ')
+        .append($('<input/>').attr('type','button').val('No').click(function() { $('#modal_message').empty(); that.autosize(); 
+        }));
+      that.autosize(p);
+      return;
+    }
+    that.autosize("<p class='loading'>Deleting block...</p>");
+    $.ajax({
+      url: that.block_url(that.block),
+      type: 'delete',    
+      success: function(resp) {
+        if (resp.error) that.autosize("<p class='note error'>" + resp.error + "</p>");
+        if (resp.redirect) 
+        {
+          that.close();
+          that.parent_controller.render_blocks();          
+        }
+      }
+    });
+  },
+    
+  move_up: function()
+  {
+    var that = this;
+    that.autosize("<p class='loading'>Moving up...</p>");
+    $.ajax({
+      url: that.block_url(that.block) + '/move-up',
+      type: 'put',    
+      success: function(resp) {
+        if (resp.error) that.autosize("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) 
+        {
+          that.autosize("<p class='note success'>" + resp.success + "</p>");          
+          that.parent_controller.render_blocks();
+        }
+      }
+    });    
+  },
+  
+  move_down: function()
+  {
+    var that = this;
+    that.autosize("<p class='loading'>Moving down...</p>");
+    $.ajax({
+      url: that.block_url(that.block) + '/move-down',
+      type: 'put',    
+      success: function(resp) {
+        if (resp.error) that.autosize("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) 
+        {
+          that.autosize("<p class='note success'>" + resp.success + "</p>");          
+          that.parent_controller.render_blocks();
+        }
+      }
+    });    
+  },
+  
+  /*****************************************************************************
+  Helper methods
+  *****************************************************************************/
+  
+  block_with_id: function(block_id, b)
+  {
+    var that = this;
+    if (!b) b = that.block;
+    if (b.id == block_id) return b;
+    
+    var the_block = false;
+    $.each(b.children, function(i, b2) {
+      the_block = that.block_with_id(block_id, b2);
+      if (the_block)
+        return false;
+    });
+    return the_block;        
+  },
+  
+  base_url: function(b)
+  {
+    var that = this;
+    if (!b) b = that.block;    
+    return '/admin/' + (b.page_id ? 'pages/' + b.page_id : 'posts/' + b.post_id) + '/blocks';        
+  },
+  
+  block_url: function(b)
+  {
+    var that = this;
+    if (!b) b = that.block;
+    return this.base_url(b) + '/' + b.id;          
+  },
+  
+  child_block: function(name, b)
+  {
+    var that = this;
+    if (!b) b = that.block;
+    var the_block = false;
+    $.each(b.children, function(i, b2) {
+      if (b2.name == name)
+      {
+        the_block = b2;
+        return false;
+      }
+    });
+    return the_block;
+  },
+  
+  child_block_value: function(name, b)
+  {
+    var that = this;
+    var b2 = that.child_block(name, b);
+    if (!b2) return false;
+    return b2.value;
   },
 
 });

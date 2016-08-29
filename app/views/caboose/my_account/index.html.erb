@@ -196,7 +196,7 @@ function update_card()
         type: 'put',
         data: { token: resp.id, card: resp.card },
         success: function(resp2) {
-          if (resp2.error) $('#payment_message').html("<p class='note error'>" + resp2.error + "</p>");
+          if (resp2.error) $('#message').html("<p class='note error'>" + resp2.error + "</p>");
           if (resp2.success) window.location.reload(true);
         }
       });

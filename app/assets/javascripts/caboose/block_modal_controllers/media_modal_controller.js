@@ -1,5 +1,5 @@
 
-var MediaModalController = DefaultBlockModalController.extend({
+var MediaModalController = BlockModalController.extend({
     
   media_id: false,
   top_cat_id: false,

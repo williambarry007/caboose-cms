@@ -1,5 +1,5 @@
 
-var RichtextModalController = DefaultBlockModalController.extend({
+var RichtextModalController = BlockModalController.extend({
     
   tinymce_initialized: false,
   modal_width: 820,

@@ -3,6 +3,38 @@ require 'aws-sdk'
 
 namespace :caboose do
   
+  desc "Save sample asset"
+  task :save_sample_asset => :environment do
+    
+    #file = "benttree/images/icons/loading.gif"    
+    #Digest::MD5.new.update("2.0.0.beta.13").update("")
+    
+    #puts Rails.application.assets.find_asset(file).digest_path
+    #benttree/images/icons/loading.gif: benttree/images/icons/loading-ff6f6c33c614d972df49796e54c2bf53.gif                                 
+    
+    #a = Rails.application.assets.find_asset(file)
+    #puts a.inspect
+    
+    file = "/Users/william/Sites/caboosecms.com/sites/benttree/images/icons/loading.gif"
+    str = File.read(file)
+    
+    temp_file = Rails.root.join('tmp', Caboose.random_string(20))
+    File.write(temp_file, str)
+        
+    #Digest::MD5.new.update("2.0.0.beta.13").update("")
+        
+    #puts "ff6f6c33c614d972df49796e54c2bf53"    
+    #puts "MD5:      #{Digest::MD5.hexdigest(str)}"    
+    #puts Rails.application.config.assets.digest.file('/Users/william/Sites/caboosecms.com/sites/benttree/images/icons/loading.gif')
+    #puts Rails.application.config.assets.stat('benttree/images/icons/loading.gif').inspect
+    puts Rails.application.assets.file_digest(file)
+    puts Rails.application.assets.file_digest(temp_file)    
+    #puts Rails.application.config.assets.digests['benttree/images/icons/loading.gif']
+    
+    #resp = Caboose::AssetManifest.save_asset('assets/william/test1.js', 'var x = 32;')
+    #puts resp
+  end
+  
   desc "Refresh invoice transactions"
   task :refresh_invoice_transactions => :environment do
     inv = Caboose::Invoice.where(:status => 'pending').reorder("id desc").first

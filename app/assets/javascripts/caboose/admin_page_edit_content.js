@@ -48,12 +48,15 @@ PageContentController.prototype = {
     var that = this;
     var b = that.block_with_id(block_id);
     var modal_controller = '';    
-    if (b.block_type.use_js_for_modal == true) { 
-      $.each(b.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); }); 
-    }
+    if (b.block_type.use_js_for_modal == true) {
+      if (b.name)
+        $.each(b.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });
+      else
+        $.each(b.block_type.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });      
+    }    
     else if (b.block_type.field_type == 'image')    { modal_controller = 'Media';    }
     else if (b.block_type.field_type == 'richtext') { modal_controller = 'Richtext'; }
-    else                                            { modal_controller = 'Block';    }
+    else                                            { modal_controller = 'Block';    }    
     that.modal = eval("new " + modal_controller + "ModalController({ " +
       "  page_id: " + that.page_id + ", " +
       "  block_id: " + block_id + ", " + 

@@ -1,13 +1,50 @@
-<!DOCTYPE html> 
+<%
+# See if we're using cloudflare
+protocol = 'http://'
+if request.env['HTTP_CF_VISITOR'] && request.env['HTTP_CF_VISITOR'].include?('https')
+  protocol = 'https://'
+  request.env['REQUEST_URI']     = "https://#{request.env['REQUEST_URI'][7..-1]}" if (request.env['REQUEST_URI'] =~ %r"http://") == 0    
+  request.env['SERVER_PORT']     = '443' if request.env['SERVER_PORT'] == '80'
+  request.env['HTTP_REFERER']    = "https://#{request.env['HTTP_REFERER'][7..-1]}" if (request.env['HTTP_REFERER'] =~ %r"http://") == 0    
+  request.env['rack.url_scheme'] = 'https'
+  request.env['HTTPS']           = 'on'
+end
+
+content_for :admin_css do
+  %><%= stylesheet_link_tag "caboose/admin", :media => "all" %><%
+  if File.exists?("#{Rails.root}/app/assets/stylesheets/admin.css")
+    %><%= stylesheet_link_tag "admin", :media => "all" %><%
+  end
+  %><%= yield :caboose_css %><%
+end
+
+css = yield(:admin_css)
+css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
+css.gsub!("<link href='//" , "<link href='#{protocol}")
+if protocol == 'https://' 
+  css.gsub!("<link href=\"http://", "<link href=\"https://")
+  css.gsub!("<link href='http://" , "<link href='https://")
+end
+
+content_for :admin_js do
+  %><%= javascript_include_tag "caboose/admin" %><%
+  %><%= yield :caboose_js %><%
+end
+
+js = yield(:admin_js)
+js.gsub!("<script src=\"//", "<script src=\"#{protocol}")
+js.gsub!("<script src='//" , "<script src='#{protocol}")
+if protocol == 'https://' 
+  js.gsub!("<script src=\"http://", "<script src=\"https://")
+  js.gsub!("<script src='http://" , "<script src='https://")
+end
+
+%><!DOCTYPE html> 
 <html class="no-js" lang="en">
 <head>
 <meta charset="utf-8" />
 <title>Caboose Admin</title>	
-<%= stylesheet_link_tag "caboose/admin", :media => "all" %>
-<% if File.exists?("#{Rails.root}/app/assets/stylesheets/admin.css") %>
-<%= stylesheet_link_tag "admin", :media => "all" %>
-<% end %>
-<%= yield :caboose_css %>
+<%= raw css %>
 <%= csrf_meta_tags %>
 </head>
 <body>
@@ -28,7 +65,6 @@
   </div>
 </div>
 <div class="footer"></div>
-<%= javascript_include_tag "caboose/admin" %>
-<%= yield :caboose_js %>
+<%= raw js %>
 </body>
 </html>

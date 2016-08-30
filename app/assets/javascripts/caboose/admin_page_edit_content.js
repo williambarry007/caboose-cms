@@ -45,6 +45,7 @@ PageContentController.prototype = {
     
   edit_block: function(block_id)
   {     
+    console.log('PageContentController.edit_block');
     var that = this;
     var b = that.block_with_id(block_id);
     var modal_controller = '';    
@@ -69,8 +70,8 @@ PageContentController.prototype = {
   
   new_block: function(parent_id, before_block_id, after_block_id)
   {
-    var that = this;        
-    //console.log(parent_id);
+    console.log('PageContentController.new_block');
+    var that = this;
     //caboose_modal_url('/admin/pages/' + this.page_id + '/blocks/' + parent_id + '/new');
     that.modal = new BlockModalController({ 
       page_id: that.page_id,
@@ -226,7 +227,7 @@ PageContentController.prototype = {
       
     if (parent_allows_child_blocks && (!b.name || b.name.length == 0))
     {            
-      $('#block_' + b.id).prepend($('<div/>')          
+      $('#block_' + b.id).before($('<div/>')          
         .addClass('new_block_link')
         .append($('<div/>').addClass('line'))
         .append($('<a/>')
@@ -234,7 +235,7 @@ PageContentController.prototype = {
           .html("New Block")
           .click(function(e) { 
             e.preventDefault(); e.stopPropagation();
-            //caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + parent_id + '/new?before_id=' + b.id);
+            console.log('Adding new block...');
             that.new_block(parent_id, b.id);
           })
         )
@@ -243,7 +244,7 @@ PageContentController.prototype = {
       );
       if (is_last_child && is_last_child == true)
       {
-        $('#block_' + b.id).append($('<div/>')          
+        $('#block_' + b.id).after($('<div/>')          
           .addClass('new_block_link')
           .append($('<div/>').addClass('line'))
           .append($('<a/>')
@@ -251,7 +252,7 @@ PageContentController.prototype = {
             .html("New Block")
             .click(function(e) { 
               e.preventDefault(); e.stopPropagation();
-              //caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + parent_id + '/new?after_id=' + b.id);
+              console.log('Adding new block...');
               that.new_block(parent_id, null, b.id);
             })
           )

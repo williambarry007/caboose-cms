@@ -722,6 +722,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_css_updated        , :datetime   ],
         [ :default_layout_id       , :integer    ],
         [ :login_fail_lock_count   , :integer     , { :default => 5 }]
+        #[ :custom_css              , :text       ],
+        #[ :custom_css_files        , :text       ],
+        #[ :custom_js               , :text       ],
+        #[ :custom_js_files         , :text       ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],

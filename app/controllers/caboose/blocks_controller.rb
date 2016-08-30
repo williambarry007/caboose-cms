@@ -233,7 +233,7 @@ module Caboose
             :controller_view_content => nil,
             :modal => false,
             :editing => true,
-            :empty_text => params[:empty_text],            
+            :empty_text => params[:empty_text] ? params[:empy_text] : '[Empty, click to edit]',            
             :css => '|CABOOSE_CSS|',                     
             :js => '|CABOOSE_JAVASCRIPT|',
             :csrf_meta_tags => '|CABOOSE_CSRF|',

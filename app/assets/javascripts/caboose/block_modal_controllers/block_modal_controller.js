@@ -385,25 +385,24 @@ var BlockModalController = ModalController.extend({
       );
       that.modal(div, 780);
       return;
-    }
+    }    
+    that.autosize("<p class='loading'>Adding block...</p>");
     
-    that.autosize("<p class='loading'>Adding block...</p>");    
-    var h = {                      
-      authenticity_token: that.authenticity_token,
-      block_type_id: block_type_id
-    };
-    if (that.before_id ) h['before_id'] = that.before_id;
-    if (that.after_id  ) h['after_id' ] = that.after_id;
-
     bt = false;
     $.ajax({      
       url: '/admin/block-types/' + block_type_id + '/json',
       type: 'get',      
       success: function(resp) { bt = resp; },
       async: false      
-    });
+    });        
+    that.include_assets('caboose/block_modal_controllers/' + bt.name + '_modal_controller.js');
     
-    that.include_assets('caboose/block_modal_controllers/' + bt.name + '_modal_controller');    
+    var h = {                      
+      authenticity_token: that.authenticity_token,
+      block_type_id: block_type_id
+    };
+    if (that.before_id ) h['before_id'] = that.before_id;
+    if (that.after_id  ) h['after_id' ] = that.after_id;
     $.ajax({
       url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/blocks/' + that.block_id,
       type: 'post',

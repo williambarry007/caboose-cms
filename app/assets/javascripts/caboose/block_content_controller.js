@@ -1,8 +1,9 @@
  
-var PageContentController = function(params) { this.init(params); };
+var BlockContentController = function(params) { this.init(params); };
 
-PageContentController.prototype = {
+BlockContentController.prototype = {
 
+  post_id: false,
   page_id: false,    
   new_block_type_id: false,
   selected_block_ids: [],
@@ -24,7 +25,7 @@ PageContentController.prototype = {
   {
     var that = this;
     $.ajax({
-      url: '/admin/pages/' + that.page_id + '/blocks/tree',
+      url: that.base_url() + '/tree',
       type: 'get',
       success: function(resp) {
         that.blocks = resp;
@@ -32,34 +33,36 @@ PageContentController.prototype = {
       }
     });    
   },
-  
-  draggable_blocks: function() 
-  {
-    $('#new_blocks li').draggable({
-      dropOnEmpty: true,
-      connectToSortable: "#blocks",
-      helper: "clone",
-      revert: "invalid"    
-    });    
-  },
     
   edit_block: function(block_id)
-  {     
-    console.log('PageContentController.edit_block');
+  {
     var that = this;
-    var b = that.block_with_id(block_id);
+    var b = that.block_with_id(block_id);    
     var modal_controller = '';    
     if (b.block_type.use_js_for_modal == true) {
       if (b.name)
         $.each(b.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });
       else
         $.each(b.block_type.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });      
-    }    
+    }
     else if (b.block_type.field_type == 'image')    { modal_controller = 'Media';    }
     else if (b.block_type.field_type == 'richtext') { modal_controller = 'Richtext'; }
-    else                                            { modal_controller = 'Block';    }    
+    else                                            { modal_controller = 'Block';    }
+        
+    console.log(b.block_type)
+    if (b.block_type.use_js_for_modal == true)
+    {
+      var js_file = b.block_type.field_type;                
+      if (b.block_type.field_type == 'image') js_file = 'media';
+      if (b.block_type.field_type == 'file')  js_file = 'media';
+
+      console.log('Including caboose/block_modal_controllers/' + js_file + '_modal_controller.js');
+      var mc = new ModalController({ parent_controller: this, assets_path: that.assets_path });
+      mc.include_assets('caboose/block_modal_controllers/' + js_file + '_modal_controller.js');
+    }
+    
     that.modal = eval("new " + modal_controller + "ModalController({ " +
-      "  page_id: " + that.page_id + ", " +
+      "  " + (that.page_id ? "page_id: " + that.page_id : "post_id: " + that.post_id) + ", " +
       "  block_id: " + block_id + ", " + 
       "  authenticity_token: '" + that.authenticity_token + "', " + 
       "  parent_controller: this, " +
@@ -69,18 +72,18 @@ PageContentController.prototype = {
   },
   
   new_block: function(parent_id, before_block_id, after_block_id)
-  {
-    console.log('PageContentController.new_block');
-    var that = this;
-    //caboose_modal_url('/admin/pages/' + this.page_id + '/blocks/' + parent_id + '/new');
-    that.modal = new BlockModalController({ 
-      page_id: that.page_id,
+  {    
+    var that = this;    
+    var options = {      
       block_id: parent_id,
       authenticity_token: that.authenticity_token,
       parent_controller: this,      
       assets_path: that.assets_path,
       new_block_on_init: true
-    })
+    }
+    if (that.page_id) options['page_id'] = that.page_id;
+    else              options['post_id'] = that.post_id;
+    that.modal = new BlockModalController(options)
   },
   
   select_block: function(block_id)
@@ -124,7 +127,7 @@ PageContentController.prototype = {
     for (var i in this.selected_block_ids)
     {               
       $.ajax({
-        url: '/admin/pages/' + this.page_id + '/blocks/' + this.selected_block_ids[i],
+        url: that.base_url() + '/' + this.selected_block_ids[i],
         type: 'delete',
         async: false,
         success: function(resp) {}
@@ -138,7 +141,7 @@ PageContentController.prototype = {
     var that = this;
     this.loadify($('#block_' + block_id + '_move_up_handle span'));    
     $.ajax({
-      url: '/admin/pages/' + this.page_id + '/blocks/' + block_id + '/move-up',
+      url: that.base_url() + '/' + block_id + '/move-up',
       type: 'put',      
       success: function(resp) {        
         if (resp.success) that.render_blocks(function() { that.stop_loadify(); });      
@@ -151,7 +154,7 @@ PageContentController.prototype = {
     var that = this;
     this.loadify($('#block_' + block_id + '_move_down_handle span'));
     $.ajax({
-      url: '/admin/pages/' + this.page_id + '/blocks/' + block_id + '/move-down',
+      url: that.base_url() + '/' + block_id + '/move-down',
       type: 'put',      
       success: function(resp) {        
         if (resp.success) that.render_blocks(function() { that.stop_loadify(); });      
@@ -194,7 +197,7 @@ PageContentController.prototype = {
     $('.sortable').sortable('destroy');
     var that = this;                
     $.ajax({
-      url: '/admin/pages/' + this.page_id + '/blocks/render-second-level',
+      url: that.base_url() + '/render-second-level',
       success: function(blocks) {        
         if (before_render) before_render();
         $(blocks).each(function(i, b) {
@@ -234,8 +237,7 @@ PageContentController.prototype = {
           .attr('href', '#')
           .html("New Block")
           .click(function(e) { 
-            e.preventDefault(); e.stopPropagation();
-            console.log('Adding new block...');
+            e.preventDefault(); e.stopPropagation();            
             that.new_block(parent_id, b.id);
           })
         )
@@ -251,8 +253,7 @@ PageContentController.prototype = {
             .attr('href', '#')
             .html("New Block")
             .click(function(e) { 
-              e.preventDefault(); e.stopPropagation();
-              console.log('Adding new block...');
+              e.preventDefault(); e.stopPropagation();              
               that.new_block(parent_id, null, b.id);
             })
           )
@@ -279,24 +280,7 @@ PageContentController.prototype = {
           show_mouseover = false;
         that.set_clickable_helper(b2, b.id, b.block_type.allow_child_blocks, i == (count-1));
       });            
-    }
-    //if (b.allow_child_blocks)
-    //{      
-    //  $('#block_' + b.id).after($('<div/>')          
-    //    .addClass('new_block_link')
-    //    .append($('<div/>').addClass('line'))
-    //    .append($('<a/>')
-    //      .attr('href', '#')
-    //      .html("New Block")
-    //      .click(function(e) { 
-    //        e.preventDefault(); e.stopPropagation();
-    //        caboose_modal_url('/admin/pages/' + that.page_id + '/blocks/' + b.id + '/new?after_id=' + b.id);                        
-    //      })
-    //    )
-    //    .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
-    //    .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
-    //  );
-    //}
+    }   
     if (show_mouseover)
     {
       $('#block_' + b.id).mouseover(function(el) { $('#block_' + b.id).addClass(   'block_over'); });
@@ -323,12 +307,16 @@ PageContentController.prototype = {
       });
     }
     return the_block;
-  }      
+  },
+  
+  base_url: function()
+  {
+    var that = this;        
+    return '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/blocks';        
+  }    
 };
 
 function toggle_blocks()
 {
   $('#new_blocks_container2').slideToggle();
 }
-
-

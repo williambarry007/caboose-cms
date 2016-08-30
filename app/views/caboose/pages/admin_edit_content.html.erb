@@ -1,3 +1,6 @@
+<%
+# app/views/caboose/pages/admin_edit_content.html.erb
+%>
 
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'jquery-ui' %>
@@ -59,20 +62,15 @@
 <%= javascript_include_tag 'caboose/model/all' %>
 <%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
 <%= javascript_include_tag "caboose/clipboard" %>
-<%= javascript_include_tag 'caboose/admin_page_edit_content' %>
+<%= javascript_include_tag 'caboose/block_content_controller' %>
 <%= javascript_include_tag "caboose/class" %>
 <%= javascript_include_tag "caboose/modal_controller" %>
 <%= javascript_include_tag "caboose/block_modal_controllers/block_modal_controller" %>
-<%= javascript_include_tag "caboose/block_modal_controllers/media_modal_controller" %>
-<%= javascript_include_tag "caboose/block_modal_controllers/richtext_modal_controller" %>
-<% @page.block.modal_js_block_names.each do |s| %>
-  <%= javascript_include_tag "caboose/block_modal_controllers/#{s}_modal_controller" %>
-<% end %>   
 <script type='text/javascript'>
 
 var controller = false;
 $(document).ready(function() {
-  controller = new PageContentController({
+  controller = new BlockContentController({
     page_id: <%= @page.id %>,
     assets_path: <%= raw Caboose.json(asset_path('loading.gif').gsub('loading.gif', '')) %>
   });

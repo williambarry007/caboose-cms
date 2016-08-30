@@ -6,6 +6,13 @@ var ModalController = Class.extend({
   modal_element: false,  
   parent_controller: false,
   
+  init: function(params)
+  {
+    var that = this;
+    for (var i in params)
+      that[i] = params[i];
+  },
+  
   modal: function(el, width, height, callback)
   {
     var that = this;

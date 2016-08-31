@@ -171,7 +171,7 @@ var MediaModalController = BlockModalController.extend({
           .data('media_id', m.id)
           .click(function(e) { that.print_media_detail($(this).data('media_id')); })
           .append($('<span/>').addClass('name').html(m.original_name));
-        if (m.image_urls)
+        if (m.image_urls && m.image_urls != undefined)
           li.append($('<img/>').attr('src', m.image_urls.tiny_url + '?' + d));
         //if (that.selected_media.indexOf(m.id) > -1)
         //  li.addClass('selected ui-selected');
@@ -202,25 +202,28 @@ var MediaModalController = BlockModalController.extend({
     var m = that.media_with_id(media_id);
          
     var image_urls = $('<div/>').attr('id', 'image_urls').css('margin-bottom', '20px');
-    for (var size in m.image_urls)
+    if (m.image_urls)
     {
-      var s = size.replace('_url', '');
-      s = s[0].toUpperCase() + s.slice(1);
-      var url = m.image_urls[size];
-      image_urls.append($('<div/>')
-        .append($('<span/>').addClass('size').append(s))
-        .append($('<input/>').attr('type', 'text').attr('id', 'size_' + s).addClass('url').val(url))
-        .append($('<button/>').addClass('clippy').data('clipboard-target', '#size_' + s).append('Copy'))                
-      );                        
-    }    
+      image_urls.append($('<h2/>').append('Image URLs'));
+      for (var size in m.image_urls)
+      {
+        var s = size.replace('_url', '');
+        s = s[0].toUpperCase() + s.slice(1);
+        var url = m.image_urls[size];
+        image_urls.append($('<div/>')
+          .append($('<span/>').addClass('size').append(s))
+          .append($('<input/>').attr('type', 'text').attr('id', 'size_' + s).addClass('url').val(url))
+          .append($('<button/>').addClass('clippy').data('clipboard-target', '#size_' + s).append('Copy'))                
+        );                        
+      }
+    }
     
     $('#top_controls').empty();
     $('#media').empty()              
-      .append($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls.thumb_url))      
+      .append($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls ? m.image_urls.thumb_url : '//placehold.it/250x250'))      
       .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_media_category_id' ))) 
       .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_name'              )))
-      .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_description'       )))
-      .append($('<h2/>').append('Image URLs'))
+      .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_description'       )))      
       .append(image_urls);
     $('#modal_controls').empty()
       .append($('<p/>').css('clear', 'both')
@@ -248,9 +251,9 @@ var MediaModalController = BlockModalController.extend({
     $('#media_' + media_id + '_name'              + '_container').css('width', '400px');
     $('#media_' + media_id + '_description'       + '_container').css('width', '400px');
        
-    $('#image_urls span.size'       ).css('width', '70px').css('display', 'inline-block');
-    $('#image_urls input.url'       ).css('width', '270px').css('border', '#ccc 1px solid');
-    $('#image_urls button').css('width', '60px');
+    $('#image_urls span.size' ).css('width', '70px').css('display', 'inline-block');
+    $('#image_urls input.url' ).css('width', '270px').css('border', '#ccc 1px solid');
+    $('#image_urls button'    ).css('width', '60px');
     
     //c = new Clipboard('.clippy');
     //c.on('success', function(e) {
@@ -429,3 +432,5 @@ var MediaModalController = BlockModalController.extend({
   },    
 
 });
+
+$(document).trigger('media_modal_controller_loaded');

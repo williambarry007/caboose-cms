@@ -2,6 +2,7 @@
 var BlockModalController = ModalController.extend({
   
   page_id: false,
+  post_id: false,
   block_id: false,
   block: false,
   block_types: false,
@@ -33,12 +34,12 @@ var BlockModalController = ModalController.extend({
   
   refresh_block: function(callback)
   {    
-    var that = this
+    var that = this;
     $.ajax({
-      url: '/admin/pages/' + that.page_id + '/blocks/' + that.block_id + '/tree',
+      url: that.block_url() + '/tree',
       type: 'get',
       success: function(arr) {
-        that.block = arr[0];
+        that.block = arr[0];        
         if (callback) callback();
       }        
     });
@@ -180,10 +181,10 @@ var BlockModalController = ModalController.extend({
       update_url: that.block_url(b),      
       authenticity_token: that.authenticity_token,
       attributes: [
-        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, options_url: '/admin/block-types/options'                      , after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
-        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, options_url: '/admin/pages/' + that.page_id + '/block-options' , after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
-        { name: 'constrain'     , nice_name: 'Constrain'  , type: 'checkbox' , value: b.constrain     ? 1 : 0 ,                                        width: 400, fixed_placeholder: true,                                                                  after_update: function() { that.parent_controller.render_blocks(); that.block.constrain     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
-        { name: 'full_width'    , nice_name: 'Full Width' , type: 'checkbox' , value: b.full_width    ? 1 : 0 ,                                        width: 400, fixed_placeholder: true,                                                                  after_update: function() { that.parent_controller.render_blocks(); that.block.full_width    = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }}
+        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/block-types/options' },
+        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/block-options' },
+        { name: 'constrain'     , nice_name: 'Constrain'  , type: 'checkbox' , value: b.constrain     ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.constrain     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
+        { name: 'full_width'    , nice_name: 'Full Width' , type: 'checkbox' , value: b.full_width    ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.full_width    = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }}
       ]
     });
     that.autosize();
@@ -209,14 +210,13 @@ var BlockModalController = ModalController.extend({
     {
       if (!b.rendered_value)
       {
-        $.ajax({
-          block_id: b.id, // Used in the success function
+        $.ajax({          
           url: that.block_url(b) + '/render',
           type: 'get',
           success: function(html) {
-            $('#the_modal #block_' + this.block_id).replaceWith(html);
+            $('#the_modal #block_' + b.id).replaceWith(html);
             
-            var b2 = that.block_with_id(this.block_id);
+            var b2 = that.block_with_id(b.id);            
             b2.rendered_value = html;
             that.set_clickable(b2);                            
             that.autosize();
@@ -282,8 +282,8 @@ var BlockModalController = ModalController.extend({
   
   set_clickable: function(b)
   {        
-    var that = this;       
-    
+    var that = this;
+        
     if (!b)
     {
       $.each(that.block.children, function(i,b) {
@@ -292,19 +292,10 @@ var BlockModalController = ModalController.extend({
     }
 
     $('#the_modal #block_' + b.id).attr('onclick','').unbind('click');    
-    $('#the_modal #block_' + b.id).click(function(e) {
+    $('#the_modal #block_' + b.id).click(function(e) {      
       e.stopPropagation();
       that.parent_controller.edit_block(b.id); 
-    });
-    //if (b.allow_child_blocks == true)
-    //{
-    //  $('#new_block_' + b.id).replaceWith($('<input/>')
-    //    .attr('type', 'button')
-    //    .val('New Block')
-    //    .click(function(e) { e.stopPropagation(); that.new_block(b.id);          
-    //    })
-    //  );
-    //} 
+    });     
     var show_mouseover = true;
     if (b.children && b.children.length > 0)
     {
@@ -405,7 +396,7 @@ var BlockModalController = ModalController.extend({
     if (that.before_id ) h['before_id'] = that.before_id;
     if (that.after_id  ) h['after_id' ] = that.after_id;
     $.ajax({
-      url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/blocks/' + that.block_id,
+      url: that.block_url(),
       type: 'post',
       data: h,
       success: function(resp) {
@@ -506,16 +497,17 @@ var BlockModalController = ModalController.extend({
   
   base_url: function(b)
   {
-    var that = this;
-    if (!b) b = that.block;    
-    return '/admin/' + (b.page_id ? 'pages/' + b.page_id : 'posts/' + b.post_id) + '/blocks';        
+    var that = this;        
+    if (!b)
+      return '/admin/' + (that.page_id && that.page_id != null ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/blocks';            
+    return '/admin/' + (b.page_id && b.page_id != null ? 'pages/' + b.page_id : 'posts/' + b.post_id) + '/blocks';        
   },
   
   block_url: function(b)
   {
-    var that = this;
-    if (!b) b = that.block;
-    return this.base_url(b) + '/' + b.id;          
+    var that = this;    
+    if (!b) return that.base_url() + '/' + that.block_id;    
+    return that.base_url(b) + '/' + b.id;          
   },
   
   child_block: function(name, b)
@@ -542,3 +534,5 @@ var BlockModalController = ModalController.extend({
   },
 
 });
+
+$(document).trigger('block_modal_controller_loaded');

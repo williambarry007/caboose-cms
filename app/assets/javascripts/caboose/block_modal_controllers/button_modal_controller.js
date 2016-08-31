@@ -58,3 +58,5 @@ var ButtonModalController = BlockModalController.extend({
   }
   
 });
+
+$(document).trigger('button_modal_controller_loaded');

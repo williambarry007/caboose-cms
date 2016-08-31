@@ -90,3 +90,5 @@ var RichtextModalController = BlockModalController.extend({
     }
   }  
 });
+
+$(document).trigger('richtext_modal_controller_loaded');

@@ -10,6 +10,7 @@ BlockContentController.prototype = {
   blocks: false,
   assets_path: false,
   included_assets: false,
+  mc: false,
   
   init: function(params)
   {
@@ -17,8 +18,9 @@ BlockContentController.prototype = {
     for (var i in params)
       that[i] = params[i];      
     that.refresh_blocks(function() {
-      that.set_clickable();
-    });        
+      that.set_clickable();    
+    });
+    that.mc = new ModalController({ parent_controller: this, assets_path: that.assets_path });
   },
   
   refresh_blocks: function(callback)
@@ -37,40 +39,45 @@ BlockContentController.prototype = {
   edit_block: function(block_id)
   {
     var that = this;
-    var b = that.block_with_id(block_id);    
-    var modal_controller = '';    
-    if (b.block_type.use_js_for_modal == true) {
-      if (b.name)
-        $.each(b.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });
-      else
-        $.each(b.block_type.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });      
-    }
-    else if (b.block_type.field_type == 'image')    { modal_controller = 'Media';    }
-    else if (b.block_type.field_type == 'richtext') { modal_controller = 'Richtext'; }
-    else                                            { modal_controller = 'Block';    }
-        
-    console.log(b.block_type)
-    if (b.block_type.use_js_for_modal == true)
-    {
-      var js_file = b.block_type.field_type;                
-      if (b.block_type.field_type == 'image') js_file = 'media';
-      if (b.block_type.field_type == 'file')  js_file = 'media';
-
-      console.log('Including caboose/block_modal_controllers/' + js_file + '_modal_controller.js');
-      var mc = new ModalController({ parent_controller: this, assets_path: that.assets_path });
-      mc.include_assets('caboose/block_modal_controllers/' + js_file + '_modal_controller.js');
-    }
+    var b = that.block_with_id(block_id);
+    var bt = b.block_type;
+    var ft = bt.field_type; // == 'image' || bt.field_type == 'file' ? 'media' : bt.field_type;
     
-    that.modal = eval("new " + modal_controller + "ModalController({ " +
-      "  " + (that.page_id ? "page_id: " + that.page_id : "post_id: " + that.post_id) + ", " +
+    var modal_controller = '';    
+    if (bt.use_js_for_modal == true) { modal_controller = b.name ? b.name : bt.name; }      
+    else if (ft == 'image')          { modal_controller = 'media';    }
+    else if (ft == 'file')           { modal_controller = 'media';    }
+    else if (ft == 'richtext')       { modal_controller = 'richtext'; }
+    else                             { modal_controller = 'block';    }
+        
+    var new_modal_eval_string = "new " + that.underscores_to_camelcase(modal_controller) + "ModalController({ " +
+      "  " + (that.page_id && that.page_id != null ? "page_id: " + that.page_id : "post_id: " + that.post_id) + ", " +
       "  block_id: " + block_id + ", " + 
       "  authenticity_token: '" + that.authenticity_token + "', " + 
-      "  parent_controller: this, " +
+      "  parent_controller: that, " +
       "  assets_path: '" + that.assets_path + "'" +
-      "})"
-    );
+      "})";
+
+    var js_file = 'caboose/block_modal_controllers/' + modal_controller + '_modal_controller.js';
+    if (!that.mc.asset_included(js_file))    
+    {
+      // Include the file before instantiating the controller      
+      $(document).on(modal_controller + '_modal_controller_loaded', function() { that.modal = eval(new_modal_eval_string); });
+      that.mc.include_assets(js_file);      
+    }
+    else // We're good, go ahead and instantiate
+    {      
+      that.modal = eval(new_modal_eval_string);                  
+    }
   },
   
+  underscores_to_camelcase: function(str)
+  {
+    var str2 = '';
+    $.each(str.split('_'), function(j, word) { str2 += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });
+    return str2;
+  },
+      
   new_block: function(parent_id, before_block_id, after_block_id)
   {    
     var that = this;    
@@ -81,8 +88,8 @@ BlockContentController.prototype = {
       assets_path: that.assets_path,
       new_block_on_init: true
     }
-    if (that.page_id) options['page_id'] = that.page_id;
-    else              options['post_id'] = that.post_id;
+    if (that.page_id && that.page_id != null) options['page_id'] = that.page_id;
+    else                                      options['post_id'] = that.post_id;
     that.modal = new BlockModalController(options)
   },
   
@@ -210,7 +217,7 @@ BlockContentController.prototype = {
   },                                                                                                                               
          
   set_clickable: function()
-  {            
+  {
     var that = this;            
     var count = that.blocks.length;        
     $(that.blocks).each(function(i,b) {
@@ -219,9 +226,8 @@ BlockContentController.prototype = {
   },
   
   set_clickable_helper: function(b, parent_id, parent_allows_child_blocks, is_last_child)
-  {
-    var that = this;
-        
+  {    
+    var that = this;            
     $('#block_' + b.id)      
       .prepend($('<a/>').attr('id', 'block_' + b.id + '_select_handle'    ).addClass('select_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-check'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.select_block(b.id);    }))      
       .prepend($('<a/>').attr('id', 'block_' + b.id + '_move_up_handle'   ).addClass('move_up_handle'   ).append($('<span/>').addClass('ui-icon ui-icon-arrow-1-n'  )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.move_block_up(b.id);   }))
@@ -265,9 +271,9 @@ BlockContentController.prototype = {
     
     $('#block_' + b.id + ' *').attr('onclick', '').unbind('click');
     $('#block_' + b.id).attr('onclick','').unbind('click');
-    $('#block_' + b.id).click(function(e) {
+    $('#block_' + b.id).click(function(e) {      
       e.preventDefault();
-      e.stopPropagation();
+      e.stopPropagation();      
       that.edit_block(b.id); 
     });
      
@@ -311,8 +317,8 @@ BlockContentController.prototype = {
   
   base_url: function()
   {
-    var that = this;        
-    return '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/blocks';        
+    var that = this;
+    return '/admin/' + (that.page_id && that.page_id != null ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/blocks';        
   }    
 };
 

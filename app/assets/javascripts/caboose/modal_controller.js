@@ -75,7 +75,7 @@ var ModalController = Class.extend({
   
   // Called at the beginning of init to include modal assets,
   // and can be called at anytime with more assets
-  include_assets: function(arr)
+  include_assets: function(arr, after)
   {
     var that = this;    
     if (!arr) arr = that.assets_to_include();
@@ -84,15 +84,36 @@ var ModalController = Class.extend({
     if (!that.parent_controller.included_assets || that.parent_controller.included_assets == undefined)
       that.parent_controller.included_assets = [];
     if (typeof arr == 'string') arr = [arr];
-    $.each(arr, function(i, url) {        
-      if (that.parent_controller.included_assets.indexOf(url) > -1) return;
+    $.each(arr, function(i, url) {      
+      if (that.asset_included(url)) return;      
       var full_url = url.match(/^http:.*?/) || url.match(/^https:.*?$/) || url.match(/^\/\/.*?$/) ? url : that.assets_path + url;        
       if (url.match(/\.js/))
-      {
+      {        
         var el = document.createElement('script');    
         el.setAttribute('type', 'text/javascript');                  
         el.setAttribute('src', full_url);        
         document.getElementsByTagName('head')[0].appendChild(el)
+        
+        //$.getScript(full_url, function() {
+        //  if (after) after();
+        //});
+        //        
+        //var trigger = 'script_' + Math.floor((Math.random() * 1000) + 1) + '_loaded'
+        //$(document).on(trigger, function() {
+        //  if (after) after();
+        //  $(document).unbind(trigger);
+        //});                          
+        //$.ajax({
+        //  trigger: trigger,
+        //  url: full_url,
+        //  type: 'get',
+        //  success: function(js) {                                     
+        //    var el = document.createElement('script');            
+        //    el.setAttribute('type', 'text/javascript');                  
+        //    el.innerHTML = js + "\n$(document).trigger('" + this.trigger + "');\n",
+        //    document.getElementsByTagName('head')[0].appendChild(el);
+        //  }                      
+        //});
       }
       else if (url.match(/\.css/))
       {
@@ -104,6 +125,14 @@ var ModalController = Class.extend({
       }
       that.parent_controller.included_assets.push(url);
     });
+  },
+  
+  asset_included: function(url)
+  {
+    var that = this;
+    if (!that.parent_controller.included_assets || that.parent_controller.included_assets == undefined)
+      that.parent_controller.included_assets = [];
+    return that.parent_controller.included_assets.indexOf(url) > -1;    
   },
   
   include_inline_css: function(str)  

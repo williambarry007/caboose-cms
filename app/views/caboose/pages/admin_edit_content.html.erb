@@ -5,6 +5,7 @@
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'jquery-ui' %>
 <%= stylesheet_link_tag 'caboose/admin_block_edit_image' %>
+
 <%= stylesheet_link_tag "caboose/modal_inline" %>
 <style type='text/css'>
 
@@ -72,7 +73,8 @@ var controller = false;
 $(document).ready(function() {
   controller = new BlockContentController({
     page_id: <%= @page.id %>,
-    assets_path: <%= raw Caboose.json(asset_path('loading.gif').gsub('loading.gif', '')) %>
+    assets_path: <%= raw Caboose.json(asset_path('loading.gif').gsub('loading.gif', '')) %>,
+    included_assets: ['caboose/block_modal_controllers/block_modal_controller.js']
   });
 
   $('body').append($('<div/>')        

@@ -5,6 +5,7 @@ module Caboose
     self.primary_key = 'id'
 
     belongs_to :site
+    belongs_to :variant
     has_many :user_subscriptions
     attr_accessible :id    ,      
       :site_id             ,

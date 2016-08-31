@@ -90,16 +90,16 @@ IndexTable.prototype = {
   after_print: false,
   table_class: 'data',
   allow_export: false,
-  export_urls: false, // Example: 
-                      // [
-                      //   {
-                      //     name: 'My Export',  
-                      //     url: '<url that starts export process>',
-                      //     wait_for_processing: true,
-                      //     status_url: function(resp) { return resp.status_url; },
-                      //     ready: function(resp) { return resp.redirect_url; } 
-                      //   }
-                      // ]
+  exports: false, // Example: 
+                  // [
+                  //   {
+                  //     name: 'My Export',  
+                  //     url: '<url that starts export process>',
+                  //     wait_for_processing: true,
+                  //     status_url: function(resp) { return resp.status_url; },
+                  //     ready: function(resp) { return resp.redirect_url; } 
+                  //   }
+                  // ]
           
   //============================================================================
   // End of parameters
@@ -716,9 +716,9 @@ IndexTable.prototype = {
     };
   	
   	var p = $('<p/>');  	
-  	$.each(that.export_urls, function(i, h) {  	  
-  	  that.export_urls[i] = $.extend({}, defaults, h);  	  
-      p.append($('<input/>').attr('type', 'button').val(that.export_urls[i].name).click(function(e) { that.csv_export_start($(this).val()); })).append(' ');
+  	$.each(that.exports, function(i, h) {  	  
+  	  that.exports[i] = $.extend({}, defaults, h);  	  
+      p.append($('<input/>').attr('type', 'button').val(that.exports[i].name).click(function(e) { that.csv_export_start($(this).val()); })).append(' ');
     });
         
     var div = $('<div/>').addClass('note')
@@ -735,7 +735,7 @@ IndexTable.prototype = {
     var p = that.pager_params();                  
   	  	  	
   	var h = false;  	
-  	$.each(that.export_urls, function(i, h2) {  	 
+  	$.each(that.exports, function(i, h2) {  	 
   	 if (h2.name == name) { h = h2; return false; } 
   	});
   	

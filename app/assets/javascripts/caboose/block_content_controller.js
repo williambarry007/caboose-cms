@@ -63,7 +63,7 @@ BlockContentController.prototype = {
     {
       // Include the file before instantiating the controller      
       $(document).on(modal_controller + '_modal_controller_loaded', function() { that.modal = eval(new_modal_eval_string); });
-      that.mc.include_assets(js_file);      
+      that.mc.include_assets(js_file);                  
     }
     else // We're good, go ahead and instantiate
     {      

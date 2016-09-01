@@ -48,12 +48,16 @@ module Caboose
     end
     
     # Capture funds from a previously authorized transaction
-    def capture
+    def capture(amount = nil)
       
       return { :error => "This invoice doesn't seem to be authorized." } if !self.success
       
       ct = InvoiceTransaction.where(:parent_id => self.id, :transaction_type => InvoiceTransaction::TYPE_CAPTURE, :success => true).first      
       return { :error => "Funds for this invoice have already been captured." } if ct
+      
+      # Make sure the amount given isn't greater than the invoice total      
+      return { :error => "Amount given to capture is greater than the current invoice total." } if amount && amount.to_f > self.invoice.total.to_f        
+      amount = self.invoice.total if amount.nil?      
             
       resp = Caboose::StdClass.new
       sc = self.invoice.site.store_config                
@@ -63,9 +67,10 @@ module Caboose
                                                                                     
           Stripe.api_key = sc.stripe_secret_key.strip
           bt = nil
-          begin
-            c = Stripe::Charge.retrieve(self.transaction_id)
-            c = c.capture
+          begin            
+            c = Stripe::Charge.retrieve(self.transaction_id)            
+            return { :error => "Amount given to capture is greater than the amount authorized." } if amount.to_f > (c.amount/100).to_f            
+            c = c.capture({ :amount => (amount*100).to_i })
             bt = Stripe::BalanceTransaction.retrieve(c.balance_transaction)
           rescue Exception => ex
             resp.error = "Error during capture process\n#{ex.message}"                

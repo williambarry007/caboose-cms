@@ -717,7 +717,7 @@ InvoiceController.prototype = {
   summary_table: function(table)
   {    
     var that = this;
-    var requires_shipping = that.invoice_requires_shipping();
+    var requires_shipping = that.invoice_requires_shipping();        
     if (that.invoice.line_items.length > 0 || that.invoice.invoice_packages.length > 0)
     {
       table.append($('<tr/>').append($('<th/>').attr('colspan', requires_shipping ? '6' : '5').html('&nbsp;')));
@@ -938,11 +938,12 @@ InvoiceController.prototype = {
   capture_transaction: function(transaction_id, confirm)
   {
     var that = this;    
-    var t = that.transaction_with_id(transaction_id);          
+    var t = that.transaction_with_id(transaction_id);
+    var amount = that.invoice.total < t.amount ? that.invoice.total : t.amount;         
     if (!confirm)
     {    
       var p = $('<p/>').addClass('note confirm')
-        .append("Are you sure you want to charge $" + parseFloat(t.amount).toFixed(2) + " to the customer?<br />")
+        .append("Are you sure you want to charge $" + parseFloat(amount).toFixed(2) + " to the customer?<br />")
         .append($('<input/>').attr('type','button').val('Yes').click(function() { that.capture_transaction(transaction_id, true); }))
         .append(' ')
         .append($('<input/>').attr('type','button').val('No').click(function() { $('#transactions_message').empty(); }));
@@ -952,10 +953,12 @@ InvoiceController.prototype = {
     $('#transactions_message').html("<p class='loading'>Capturing funds...</p>");
     $.ajax({
       url: '/admin/invoices/' + that.invoice.id + '/transactions/' + transaction_id + '/capture',
+      type: 'get',
+      data: { amount: amount },
       success: function(resp) {
-        if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) { $('#message').empty(); that.refresh_transactions(); }
-        if (resp.refresh) { $('#message').empty(); that.refresh_transactions(); }
+        if (resp.error)     $('#transactions_message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) { $('#transactions_message').empty(); that.refresh_transactions(); }
+        if (resp.refresh) { $('#transactions_message').empty(); that.refresh_transactions(); }
       }
     });
   },
@@ -1166,8 +1169,8 @@ InvoiceController.prototype = {
   {
     var that = this;
     var requires = false;
-    $.each(that.invoice.line_items, function(i, li) {
-      if (li.requires_shipping && !li.downloadable)
+    $.each(that.invoice.line_items, function(i, li) {      
+      if (li.variant.requires_shipping && !li.variant.downloadable)
         requires = true;              
     });
     return requires;

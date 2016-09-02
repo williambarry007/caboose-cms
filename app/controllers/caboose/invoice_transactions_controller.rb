@@ -6,7 +6,7 @@ module Caboose
       return if !user_is_allowed('invoices', 'edit')
     
       it = InvoiceTransaction.find(params[:id])
-      resp = params[:amount] ? it.capture(params[:amount]) : it.capture 
+      resp = params[:amount] ? it.capture(params[:amount].to_f) : it.capture 
       
       render :json => resp            
     end

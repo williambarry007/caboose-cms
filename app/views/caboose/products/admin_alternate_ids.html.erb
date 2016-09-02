@@ -1,0 +1,58 @@
+
+<div id='crumbtrail'></div>
+<h1>Product Alternate IDs</h1>
+
+<p>Alternate IDs are used during import and export processes to associate products from other systems with the products in this system.</p>
+
+<table class='data'>
+  <tr>
+    <th>Product ID     </th>      
+    <th>Variant ID     </th>
+    <th>Alternate ID   </th>
+    <th>Title          </th>
+    <th>Option 1       </th><th>Value 1 </th>
+    <th>Option 2       </th><th>Value 2 </th>
+    <th>Option 3       </th><th>Value 3 </th>    
+  </tr>
+  <% @rows.each do |row| %>
+    <tr>
+      <td><%= row.product_id     %></td>      
+      <td><%= row.variant_id     %></td>
+      <td><div id='variant_<%= row.variant_id %>_alternate_id'></div></td>
+      <td><%= row.title          %></td>
+      <td><%= row.option1        %></td>
+      <td><%= row.option1_value  %></td>
+      <td><%= row.option2        %></td>
+      <td><%= row.option2_value  %></td>
+      <td><%= row.option3        %></td>
+      <td><%= row.option3_value  %></td>      
+    </tr>
+  <% end %>
+</table><br />
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  var that = this;
+  
+  add_to_crumbtrail('/admin', 'Admin');
+  add_to_crumbtrail('/admin/products', 'Products');
+  add_to_crumbtrail('/admin/products/alternate-ids', 'Alternate IDs');
+  
+  <% @rows.each do |row| %>
+  new ModelBinder({
+    name: 'Variant',
+    id: <%= row.variant_id %>,
+    update_url: '/admin/products/<%= row.product_id %>/variants/<%= row.variant_id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [      
+      { name: 'alternate_id', nice_name: 'Alternate ID', type: 'text', value: <%= raw Caboose.json(row.alternate_id) %>, width: 100, fixed_placeholder: false }      
+    ]
+  });
+  <% end %>
+});
+    
+</script>
+<% end %>

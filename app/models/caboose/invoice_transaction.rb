@@ -69,8 +69,13 @@ module Caboose
           bt = nil
           begin            
             c = Stripe::Charge.retrieve(self.transaction_id)            
-            return { :error => "Amount given to capture is greater than the amount authorized." } if amount.to_f > (c.amount/100).to_f            
-            c = c.capture({ :amount => (amount*100).to_i })
+            return { :error => "Amount given to capture is greater than the amount authorized. amount = #{amount}, c.amount = #{c.amount}" } if (amount*100).to_i > c.amount            
+            amount = (amount.to_f * 100.0).to_i
+            if amount == c.amount              
+              c = c.capture
+            else
+              c = c.capture({ :amount => amount })
+            end
             bt = Stripe::BalanceTransaction.retrieve(c.balance_transaction)
           rescue Exception => ex
             resp.error = "Error during capture process\n#{ex.message}"                

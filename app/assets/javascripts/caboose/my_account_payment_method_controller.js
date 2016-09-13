@@ -47,8 +47,11 @@ MyAccountPaymentMethodController.prototype = {
     var msg = that.card_brand && that.card_last4 ? that.card_brand + ' ending in ' + that.card_last4 : 'You have no card on file.';    
     var div = $('<div/>');
     
-    if (that.ic.invoice.financial_status == 'pending')
-      div.append($('<p/>').append($('<input/>').attr('type', 'button').addClass('btn').val('Confirm').click(function(e) { e.preventDefault(); that.ic.refresh_invoice( function() { that.ic.confirm_invoice(); }); })));
+    if (that.ic.invoice.financial_status == 'pending') {
+      if (that.card_brand && that.card_last4) {
+        div.append($('<p/>').append($('<input/>').attr('type', 'button').addClass('btn').val('Confirm').click(function(e) { e.preventDefault(); that.ic.refresh_invoice( function() { that.ic.confirm_invoice(); }); })));
+      }
+    }
             
     if (that.ic.invoice.total > 0.00)
     {

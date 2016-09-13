@@ -19,7 +19,7 @@ module Caboose
     #end        
     
     # Sends a confirmation email to the customer about a new invoice 
-    def customer_new_invoice(invoice)      
+    def customer_new_invoice(invoice)
       @invoice = invoice
       mail(:to => invoice.customer.email, :subject => 'Thank you for your order!')
     end

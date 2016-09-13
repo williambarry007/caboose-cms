@@ -6,80 +6,68 @@ PostContentController.prototype = {
   post_id: false,    
   new_block_type_id: false,
   selected_block_ids: [],
+  blocks: false,
+  assets_path: false,
+  included_assets: false,
   
-  init: function(post_id)
+  init: function(params)
   {
-    this.post_id = post_id;
     var that = this;
-    that.set_clickable();       
-    that.sortable_blocks();
-    //  that.draggable_blocks();
-    //});
+    for (var i in params)
+      that[i] = params[i];      
+    that.refresh_blocks(function() {
+      that.set_clickable();
+    });        
   },
   
-  sortable_blocks: function()
-  { 
-    //var that = this;
-    //$('.sortable').sortable({
-    //  //hoverClass: "ui-state-active",
-    //  placeholder: 'sortable-placeholder',
-    //  forcePlaceholderSize: true,
-    //  handle: '.sort_handle',
-    //  receive: function(e, ui) {      
-    //    that.new_block_type_id = ui.item.attr('id').replace('new_block_', '');    
-    //  },
-    //  update: function(e, ui) {        
-    //    if (that.new_block_type_id)
-    //    {
-    //      $.ajax({
-    //        url: '/admin/posts/' + that.post_id + '/blocks',
-    //        type: 'post',
-    //        data: { block_type_id: that.new_block_type_id, index: ui.item.index() },
-    //        success: function(resp) { that.render_blocks(function() { that.edit_block(resp.block.id); }); }
-    //      });                    
-    //      that.new_block_type_id = false;
-    //    }
-    //    else
-    //    {
-    //      var ids = [];
-    //      $.each($(e.target).children(), function(i, el) {
-    //        var id = $(el).attr('id');            
-    //        if (id && id.substr(0, 6) == 'block_') ids.push(id.substr(6));
-    //      });          
-    //        
-    //      $.ajax({
-    //        url: '/admin/posts/' + that.post_id + '/block-order',
-    //        type: 'put',
-    //        data: {
-    //          block_ids: ids,
-    //        },
-    //        success: function(resp) {}
-    //      });
-    //    }
-    //  }
-    //});
-  },
-  
-  draggable_blocks: function() 
+  refresh_blocks: function(callback)
   {
-    $('#new_blocks li').draggable({
-      dropOnEmpty: true,
-      connectToSortable: "#blocks",
-      helper: "clone",
-      revert: "invalid"    
+    var that = this;
+    $.ajax({
+      url: '/admin/posts/' + that.page_id + '/blocks/tree',
+      type: 'get',
+      success: function(resp) {
+        that.blocks = resp;
+        if (callback) callback();
+      }
     });    
   },
     
   edit_block: function(block_id)
   {
-    caboose_modal_url('/admin/posts/' + this.post_id + '/blocks/' + block_id + '/edit');    
+    var that = this;
+    var b = that.block_with_id(block_id);
+    var modal_controller = '';    
+    if (b.block_type.use_js_for_modal == true) {
+      if (b.name)
+        $.each(b.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });
+      else
+        $.each(b.block_type.name.split('_'), function(j, word) { modal_controller += word.charAt(0).toUpperCase() + word.toLowerCase().slice(1); });      
+    }    
+    else if (b.block_type.field_type == 'image')    { modal_controller = 'Media';    }
+    else if (b.block_type.field_type == 'richtext') { modal_controller = 'Richtext'; }
+    else                                            { modal_controller = 'Block';    }    
+    that.modal = eval("new " + modal_controller + "ModalController({ " +
+      "  post_id: " + that.post_id + ", " +
+      "  block_id: " + block_id + ", " + 
+      "  authenticity_token: '" + that.authenticity_token + "', " + 
+      "  parent_controller: this, " +
+      "  assets_path: '" + that.assets_path + "'" +
+      "})"
+    );    
   },
   
   new_block: function(block_id)
   {
-    console.log('this.post_id = ' + this.post_id);
-    console.log('block_id = ' + block_id);    
-    caboose_modal_url('/admin/posts/' + this.post_id + '/blocks/' + block_id + '/new');    
+    var that = this;    
+    that.modal = new BlockModalController({ 
+      post_id: that.post_id,
+      block_id: parent_id,
+      authenticity_token: that.authenticity_token,
+      parent_controller: this,      
+      assets_path: that.assets_path,
+      new_block_on_init: true
+    })    
   },
   
   select_block: function(block_id)
@@ -187,35 +175,31 @@ PostContentController.prototype = {
   Block Rendering
   *****************************************************************************/
   
-  render_blocks: function(before_render) {
+  render_blocks: function(before_render) 
+  {
+    var that = this;
     $('.sortable').sortable('destroy');
     var that = this;                
     $.ajax({
-      url: '/admin/posts/' + this.post_id + '/blocks/render-second-level',
-      success: function(blocks) {
+      url: '/admin/pages/' + this.page_id + '/blocks/render-second-level',
+      success: function(blocks) {        
         if (before_render) before_render();
         $(blocks).each(function(i, b) {
           $('#block_' + b.id).replaceWith(b.html);                              
         });
-        that.set_clickable();
-        that.sortable_blocks();
+        that.refresh_blocks(function() { that.set_clickable(); });                
         that.selected_block_ids = [];
       }
     });
-  },                                                                                                                               
-         
+  },   
+  
   set_clickable: function()
-  {        
-    var that = this;                
-    $.ajax({      
-      url: '/admin/posts/' + this.post_id + '/blocks/tree',
-      success: function(blocks) {
-        var count = blocks.length;        
-        $(blocks).each(function(i,b) {
-          that.set_clickable_helper(b, false, false, (i == count-1));
-        });        
-      }
-    });    
+  {
+    var that = this;            
+    var count = that.blocks.length;        
+    $(that.blocks).each(function(i,b) {
+      that.set_clickable_helper(b, false, false, (i == count-1));
+    });                    
   },
   
   set_clickable_helper: function(b, parent_id, parent_allows_child_blocks, is_last_child)
@@ -230,15 +214,15 @@ PostContentController.prototype = {
       
     if (parent_allows_child_blocks && (!b.name || b.name.length == 0))
     {            
-      $('#block_' + b.id).prepend($('<div/>')          
+      $('#block_' + b.id).before($('<div/>')          
         .addClass('new_block_link')
         .append($('<div/>').addClass('line'))
         .append($('<a/>')
           .attr('href', '#')
           .html("New Block")
           .click(function(e) { 
-            e.preventDefault(); e.stopPropagation();
-            caboose_modal_url('/admin/posts/' + that.post_id + '/blocks/' + parent_id + '/new?before_id=' + b.id);                        
+            e.preventDefault(); e.stopPropagation();           
+            that.new_block(parent_id, b.id);
           })
         )
         .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
@@ -246,15 +230,15 @@ PostContentController.prototype = {
       );
       if (is_last_child && is_last_child == true)
       {
-        $('#block_' + b.id).append($('<div/>')          
+        $('#block_' + b.id).after($('<div/>')          
           .addClass('new_block_link')
           .append($('<div/>').addClass('line'))
           .append($('<a/>')
             .attr('href', '#')
             .html("New Block")
             .click(function(e) { 
-              e.preventDefault(); e.stopPropagation();
-              caboose_modal_url('/admin/posts/' + that.post_id + '/blocks/' + parent_id + '/new?after_id=' + b.id);                        
+              e.preventDefault(); e.stopPropagation();              
+              that.new_block(parent_id, null, b.id);
             })
           )
           .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
@@ -262,9 +246,11 @@ PostContentController.prototype = {
         );
       }
     }
-            
-    $('#block_' + b.id).attr('onclick','').unbind('click');    
+    
+    $('#block_' + b.id + ' *').attr('onclick', '').unbind('click');
+    $('#block_' + b.id).attr('onclick','').unbind('click');
     $('#block_' + b.id).click(function(e) {
+      e.preventDefault();
       e.stopPropagation();
       that.edit_block(b.id); 
     });
@@ -274,40 +260,41 @@ PostContentController.prototype = {
     {
       var count = b.children.length;
       $.each(b.children, function(i, b2) {        
-        if (b2.field_type == 'block')
+        if (b2.block_type.field_type == 'block')
           show_mouseover = false;
-        that.set_clickable_helper(b2, b.id, b.allow_child_blocks, i == (count-1));
+        that.set_clickable_helper(b2, b.id, b.block_type.allow_child_blocks, i == (count-1));
       });            
-    }
-    //if (b.allow_child_blocks)
-    //{      
-    //  $('#block_' + b.id).after($('<div/>')          
-    //    .addClass('new_block_link')
-    //    .append($('<div/>').addClass('line'))
-    //    .append($('<a/>')
-    //      .attr('href', '#')
-    //      .html("New Block")
-    //      .click(function(e) { 
-    //        e.preventDefault(); e.stopPropagation();
-    //        caboose_modal_url('/admin/posts/' + that.post_id + '/blocks/' + b.id + '/new?after_id=' + b.id);                        
-    //      })
-    //    )
-    //    .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
-    //    .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
-    //  );
-    //}
+    }    
     if (show_mouseover)
     {
       $('#block_' + b.id).mouseover(function(el) { $('#block_' + b.id).addClass(   'block_over'); });
       $('#block_' + b.id).mouseout(function(el)  { $('#block_' + b.id).removeClass('block_over'); }); 
     }    
-  }    
+  },
   
+  /*****************************************************************************
+  Helper methods
+  *****************************************************************************/
+  
+  block_with_id: function(block_id, b)
+  {
+    var that = this;                
+    if (b && b.id == block_id)
+      return b;
+    var the_block = false;
+    if ((!b && that.blocks) || (b && b.children))
+    {
+      $.each(b ? b.children : that.blocks, function(i, b2) {        
+        the_block = that.block_with_id(block_id, b2);
+        if (the_block)
+          return false;
+      });
+    }
+    return the_block;
+  }  
 };
 
 function toggle_blocks()
 {
   $('#new_blocks_container2').slideToggle();
 }
-
-

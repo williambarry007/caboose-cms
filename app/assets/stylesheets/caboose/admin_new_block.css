@@ -1,0 +1,9 @@
+
+#modal_content div.icons { height: 400px; overflow-y: scroll; }
+#modal_content div.icons h2 { clear: both; padding: 20px 0px 10px 0; text-align: center; }
+#modal_content div.icons a { display: block; float: left; margin: 4px; border: #fff 0px solid; width: 120px; height: 100px; text-align: center; vertical-align: middle; border: #666 4px solid; }
+#modal_content div.icons a span.icon { display: block; padding: 10px 20px; font-size: 24pt; color: #fff; }
+#modal_content div.icons a span.name { display: block; }               
+#modal_content div.icons a:hover { background: #fff69f; color: #000; border: #666 0px solid; border: #666 4px solid; }
+#modal_content div.icons a:hover span.icon { color: #000; }
+#modal_content div.icons a:hover span.name { color: #000; }

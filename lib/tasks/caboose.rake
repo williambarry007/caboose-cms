@@ -3,6 +3,38 @@ require 'aws-sdk'
 
 namespace :caboose do
   
+  desc "Save sample asset"
+  task :save_sample_asset => :environment do
+    
+    #file = "benttree/images/icons/loading.gif"    
+    #Digest::MD5.new.update("2.0.0.beta.13").update("")
+    
+    #puts Rails.application.assets.find_asset(file).digest_path
+    #benttree/images/icons/loading.gif: benttree/images/icons/loading-ff6f6c33c614d972df49796e54c2bf53.gif                                 
+    
+    #a = Rails.application.assets.find_asset(file)
+    #puts a.inspect
+    
+    file = "/Users/william/Sites/caboosecms.com/sites/benttree/images/icons/loading.gif"
+    str = File.read(file)
+    
+    temp_file = Rails.root.join('tmp', Caboose.random_string(20))
+    File.write(temp_file, str)
+        
+    #Digest::MD5.new.update("2.0.0.beta.13").update("")
+        
+    #puts "ff6f6c33c614d972df49796e54c2bf53"    
+    #puts "MD5:      #{Digest::MD5.hexdigest(str)}"    
+    #puts Rails.application.config.assets.digest.file('/Users/william/Sites/caboosecms.com/sites/benttree/images/icons/loading.gif')
+    #puts Rails.application.config.assets.stat('benttree/images/icons/loading.gif').inspect
+    puts Rails.application.assets.file_digest(file)
+    puts Rails.application.assets.file_digest(temp_file)    
+    #puts Rails.application.config.assets.digests['benttree/images/icons/loading.gif']
+    
+    #resp = Caboose::AssetManifest.save_asset('assets/william/test1.js', 'var x = 32;')
+    #puts resp
+  end
+  
   desc "Refresh invoice transactions"
   task :refresh_invoice_transactions => :environment do
     inv = Caboose::Invoice.where(:status => 'pending').reorder("id desc").first
@@ -188,32 +220,34 @@ namespace :caboose do
     puts "Create a new Nine Lite site\n"
     puts "--------------------------------------------------------------------------------\n"
 
-    input = ''
-    STDOUT.puts "What is the name of the site?"
-    input = STDIN.gets.chomp
-    puts "\n"
-
-    input2 = ''
-    STDOUT.puts "What is the ID of the home page?"
-    input2 = STDIN.gets.chomp
-    puts "\n"
-
-    input3 = ''
-    STDOUT.puts "E-commerce? (y/n)"
-    input3 = STDIN.gets.chomp
-    puts "\n"
-
-    if !input.blank? && !input2.blank? && !input3.blank?
-      helper = SiteHelper.new(input,input2,input3)
-      helper.create_site
-
-      puts "\n"
-      puts "--------------------------------------------------------------------------------\n"
-      puts "Choo! Choo! Your site is set up!\n"
-      puts "--------------------------------------------------------------------------------\n"
-    else
-      puts "Invalid site name or home page ID"
+    site_name = ''
+    while site_name.nil? || site_name.strip.length == 0 do
+      STDOUT.puts "What is the name of the site?"
+      site_name = STDIN.gets.chomp
     end
+    puts "\n"
+    
+    use_store = ''
+    while use_store.nil? || (use_store.downcase != 'y' && use_store.downcase != 'n') do 
+      STDOUT.puts "E-commerce? (y/n)"
+      use_store = STDIN.gets.chomp
+    end
+    puts "\n"
+    
+    use_mls = ''
+    while use_mls.nil? || (use_mls.downcase != 'y' && use_mls.downcase != 'n') do
+      STDOUT.puts "MLS? (y/n)"
+      use_mls = STDIN.gets.chomp
+    end
+    puts "\n"
+    
+    helper = SiteHelper.new    
+    helper.create_site(site_name, use_store.downcase == 'y', use_mls.downcase == 'y')
+    
+    puts "\n"
+    puts "--------------------------------------------------------------------------------\n"
+    puts "Choo! Choo! Your site is set up!\n"
+    puts "--------------------------------------------------------------------------------\n"    
   end
 
   desc "Create blocks for new site"

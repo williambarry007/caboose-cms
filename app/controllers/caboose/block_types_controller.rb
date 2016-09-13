@@ -113,6 +113,7 @@ module Caboose
           when 'render_function'                 then bt.render_function                = v
           when 'use_render_function'             then bt.use_render_function            = v
           when 'use_render_function_for_layout'  then bt.use_render_function_for_layout = v
+          when 'use_js_for_modal'                then bt.use_js_for_modal               = v
           when 'allow_child_blocks'              then bt.allow_child_blocks             = v
           when 'default_child_block_type_id'     then bt.default_child_block_type_id    = v
           when 'name'                            then bt.name                           = v
@@ -150,6 +151,25 @@ module Caboose
     end
         
     # @route_priority 1
+    # @route GET /admin/block-types/new-options    
+    def admin_options_for_new_block
+      return unless user_is_allowed('blocktypes', 'edit')
+      #cats = BlockTypeCategory.where("parent_id is not null and name != ?", 'Layouts').all.collect{ |cat| {
+      #  :block_type_category => cat,
+      #  :block_types => Caboose::BlockType.includes(:block_type_site_memberships).where(:parent_id => nil, :block_type_category_id => cat.id).where("block_type_site_memberships.site_id = ?", @site.id).reorder(:description).all
+      #}}
+      
+      cats = BlockTypeCategory.where("name != ?", 'Layouts').all.collect{ |cat| {
+        :block_type_category => cat,
+        :block_types => Caboose::BlockType.includes(:block_type_site_memberships)
+          .where(:parent_id => nil, :block_type_category_id => cat.id)
+          .where("block_type_site_memberships.site_id = ?", @site.id)
+          .reorder(:description).all
+      }}
+      render :json => cats
+    end
+    
+    # @route_priority 2
     # @route GET /admin/block-types/:field-options
     # @route GET /admin/block-types/options
     # @route GET /admin/block-types/:id/options

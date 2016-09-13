@@ -180,6 +180,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :render_function                 , :text    ],
         [ :use_render_function             , :boolean , { :default => false }],
         [ :use_render_function_for_layout  , :boolean , { :default => false }],
+        [ :use_js_for_modal                , :boolean , { :default => false }],
         [ :allow_child_blocks              , :boolean , { :default => false }],
         [ :default_child_block_type_id     , :integer ],
         [ :field_type                      , :string  ],
@@ -478,7 +479,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :hide                  , :boolean , { :default => false }],
         [ :content_format        , :integer , { :default => Caboose::Page::CONTENT_FORMAT_HTML }],
         [ :custom_css            , :text    ],
+        [ :custom_css_files      , :text    ],
         [ :custom_js             , :text    ],
+        [ :custom_js_files       , :text    ],
         [ :linked_resources      , :text    ],
         [ :layout                , :string  ],
         [ :sort_order            , :integer , { :default => 0                }],
@@ -719,6 +722,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_css_updated        , :datetime   ],
         [ :default_layout_id       , :integer    ],
         [ :login_fail_lock_count   , :integer     , { :default => 5 }]
+        #[ :custom_css              , :text       ],
+        #[ :custom_css_files        , :text       ],
+        #[ :custom_js               , :text       ],
+        #[ :custom_js_files         , :text       ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
@@ -869,6 +876,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :subscription_id  , :integer ],
         [ :user_id          , :integer ],
         [ :date_started     , :date    ],
+        [ :date_started_full, :date    ],
         [ :status           , :string  ]
       ],
       Caboose::Variant => [

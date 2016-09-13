@@ -43,6 +43,11 @@ BoundRichText = BoundControl.extend({
     setTimeout(function() {
       //tinymce.EditorManager.execCommand("mceAddEditor", false, this2.el);
       //tinymce.EditorManager.execCommand("mceAddEditor", false, this2.el);
+      
+      if (tinymce.get(this2.el))
+      {
+        try { tinymce.EditorManager.execCommand('mceRemoveEditor', true, this2.el); } catch(err) {}
+      }
       tinymce.execCommand("mceAddEditor", false, this2.el);      
       //var ed = tinymce.EditorManager.createEditor(this2.el);
       //alert(ed);

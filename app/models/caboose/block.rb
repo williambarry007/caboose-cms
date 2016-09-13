@@ -604,6 +604,22 @@ class Caboose::Block < ActiveRecord::Base
       end
     end
   end
-    
+  
+  def modal_js_block_names
+    arr = []
+    arr << self.block_type.name if self.block_type.use_js_for_modal
+    self.children.each do |b2|
+      self.modal_js_controllers_helper(b2, arr)
+    end
+    return arr
+  end
+  
+  def modal_js_controllers_helper(b, arr)
+    bt = b.block_type
+    arr << bt.name if bt.use_js_for_modal
+    b.children.each do |b2|
+      self.modal_js_controllers_helper(b2, arr)
+    end                          
+  end
 
 end

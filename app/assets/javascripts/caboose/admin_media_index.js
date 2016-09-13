@@ -6,7 +6,8 @@ MediaController.prototype = {
   top_cat_id: false,
   cat: false,
   cat_id: false,
-  categories: false,  
+  categories: false,
+  media: false,
   s3_upload_url: false,
 	aws_access_key_id: false,		
 	policy: false,
@@ -42,6 +43,39 @@ MediaController.prototype = {
     that.refresh_categories();
     that.refresh_media();
     that.print_controls();    
+  },
+  
+  refresh_categories: function(after) 
+  {
+    var that = this;
+    $.ajax({
+      url: '/admin/media-categories/flat-tree',
+      type: 'get',
+      async: false,      
+      success: function(resp) { 
+        that.categories = resp;
+        if (!that.cat_id)
+          that.cat_id = that.categories[0].id;
+        that.print_categories();
+        if (after) after();
+      }        
+    });
+  },
+  
+  refresh_media: function() 
+  {
+    var that = this;
+    $.ajax({
+      url: '/admin/media/json',
+      type: 'get',
+      async: false,
+      data: { media_category_id: that.cat_id },
+      success: function(resp) {
+        that.media = resp;        
+        that.selected_media = [];
+        that.print_media();                
+      }        
+    });
   },
 
   change_sort_order: function(list) {
@@ -162,41 +196,7 @@ MediaController.prototype = {
       $("#the_uploader").slideDown();      
     }
   },
-    
-  refresh_categories: function(after) 
-  {
-    var that = this;
-    $.ajax({
-      url: '/admin/media-categories/flat-tree',
-      type: 'get',
-      async: false,      
-      success: function(resp) { 
-        that.categories = resp;
-        if (!that.cat_id)
-          that.cat_id = that.categories[0].id;
-        that.print_categories();
-        if (after) after();
-      }        
-    });
-  },
-  
-  refresh_media: function() 
-  {
-    var that = this;
-    $.ajax({
-      url: '/admin/media/json',
-      type: 'get',
-      async: false,
-      data: { media_category_id: that.cat_id },
-      success: function(resp) {
-        that.cat = resp;
-        that.cat_id = that.cat.id;
-        that.selected_media = [];
-        that.print_media();                
-      }        
-    });
-  },
-  
+        
   check_processing_status: function() 
   {     
     var that = this;
@@ -306,9 +306,9 @@ MediaController.prototype = {
     var that = this;
     var ul = $('<ul/>');
     var processing = false;
-    if (that.cat.media.length > 0)
+    if (that.media.length > 0)
     {      
-      $.each(that.cat.media, function(i, m) {
+      $.each(that.media, function(i, m) {
         if (m.media_type == 'image' && m.processed == false)
           processing = true
         var li = $('<li/>')
@@ -345,7 +345,7 @@ MediaController.prototype = {
       setTimeout(function() { that.check_processing_status(); }, 2000);
     }
     
-    $.each(that.cat.media, function(i, m) {
+    $.each(that.media, function(i, m) {
       $('li.media').draggable({
         multiple: true,
         revert: 'invalid',
@@ -381,7 +381,7 @@ MediaController.prototype = {
     
     // See if they're all selected
     var all_selected = true;
-    $.each(that.cat.media, function(i, m) {
+    $.each(that.media, function(i, m) {
       if (that.selected_media.indexOf(m.id) == -1)
       {
         all_selected = false
@@ -396,7 +396,7 @@ MediaController.prototype = {
     // And re-select everything if not everything was previously selected
     if (!all_selected)
     {
-      $.each(that.cat.media, function(i, m) {
+      $.each(that.media, function(i, m) {
         $('#media' + m.id).addClass('selected ui-selected');
         that.selected_media[i] = m.id;
       });
@@ -489,7 +489,7 @@ MediaController.prototype = {
       url: '/admin/media-categories',
       type: 'post',
       data: {
-        parent_id: that.cat.id,
+        parent_id: that.cat_id,
         name: name
       },
       success: function(resp) {
@@ -533,9 +533,9 @@ MediaController.prototype = {
   {
     var that = this;
     var m = false;
-    if (that.cat.media.length > 0)
+    if (that.media.length > 0)
     {      
-      $.each(that.cat.media, function(i, m2) {        
+      $.each(that.media, function(i, m2) {        
         if (parseInt(m2.id) == parseInt(media_id))
         {
           m = m2;

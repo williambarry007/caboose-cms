@@ -268,16 +268,18 @@ InvoiceController.prototype = {
   {
     var that = this;        
     
+    var requires_shipping = that.invoice_requires_shipping();
     var transactions = that.transactions_table();                
     var table = $('<table/>').addClass('data');
-    table.append($('<tr/>')  
-      .append($('<th/>').html('Customer'))
-      .append($('<th/>').html('Shipping Address'))
-      .append($('<th/>').html('Billing Address'))
-      .append($('<th/>').html('Invoice Status'))
-      .append($('<th/>').html('Payment'))      
-    );    
-    table.append($('<tr/>')      
+    var tr = 
+    $('<tr/>').append($('<th/>').html('Customer'));
+    if (requires_shipping)
+      tr.append($('<th/>').html('Shipping Address'))
+      //.append($('<th/>').html('Billing Address'))
+    tr.append($('<th/>').html('Invoice Status'))
+      .append($('<th/>').html('Payment'));      
+    table.append(tr);
+    tr = $('<tr/>')      
       .append($('<td/>').attr('valign', 'top')
         .append($('<div/>').attr('id', 'customer').append(that.noneditable_customer(true)))
         .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
@@ -287,17 +289,22 @@ InvoiceController.prototype = {
             else                    { that.noneditable_customer(); a.html('Edit');     }
           });
         }))
-      )      
-      .append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(that.noneditable_shipping_address()))      
-      .append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
-      .append($('<td/>').attr('valign', 'top').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_status')))
+      );
+    if (requires_shipping)
+    {
+      tr.append($('<td/>').attr('valign', 'top').attr('id', 'shipping_address' ).append(
+        requires_shipping ? that.noneditable_shipping_address() : "This invoice doesn't require shipping."
+      ));
+    }
+    //.append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
+    tr.append($('<td/>').attr('valign', 'top').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_status')))
       .append($('<td/>').attr('valign', 'top')
         .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_payment_terms'))
         .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_payment_terms'))
         .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_financial_status'))
         .append($('<div/>').attr('id', 'transactions').attr('align', 'center').append(transactions))
-      )      
-    );
+      );
+    table.append(tr);    
     return table;  
   },
   
@@ -407,73 +414,73 @@ InvoiceController.prototype = {
     });
   },
   
-  noneditable_billing_address: function()
-  {
-    var that = this;
-    
-    var sa = that.invoice.billing_address;
-    if (!sa) sa = {};
-    var str = '';
-    str += (sa.first_name ? sa.first_name : '[Empty first name]') + ' ';
-    str += (sa.last_name  ? sa.last_name  : '[Empty last name]');        
-    str += '<br />' + (sa.address1 ? sa.address1 : '[Empty address]');
-    if (sa.address2) str += "<br />" + sa.address2;             
-    str += '<br/>' + (sa.city ? sa.city : '[Empty city]') + ", " + (sa.state ? sa.state : '[Empty state]') + " " + (sa.zip ? sa.zip : '[Empty zip]');
-    
-    var div = $('<div/>')
-      .append(str)      
-      .append("<br />")
-      .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
-        var a = $(this);
-        that.refresh_invoice(function() { that.edit_billing_address(); });
-      }));
-    return div;    
-  },
-  
-  edit_billing_address: function()
-  {
-    var that = this;
-    var sa = that.invoice.billing_address;
-    if (!sa) sa = { id: 1 };
-    var table = $('<table/>').addClass('billing_address')
-      .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
-        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_first_name')))
-        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_last_name')))
-      ))))
-      .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
-        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_address1')))                                
-      ))))
-      .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')        
-        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_address2')))                        
-      ))))
-      .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
-        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_city')))
-        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_state')))        
-        .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_zip')))        
-      ))));
-    $('#billing_address').empty()
-      .append(table)
-      .append($('<a/>').attr('href', '#').html('Finished').click(function(e) {
-        var a = $(this);
-        that.refresh_invoice(function() { $('#billing_address').empty().append(that.noneditable_billing_address()); });
-      }));      
-            
-    new ModelBinder({
-      name: 'BillingAddress',
-      id: sa.id,
-      update_url: '/admin/invoices/' + that.invoice.id + '/billing-address',
-      authenticity_token: that.authenticity_token,
-      attributes: [        
-        { name: 'first_name'  , nice_name: 'First Name' , type: 'text'  , value: sa.first_name , width: 150, fixed_placeholder: false },
-        { name: 'last_name'   , nice_name: 'Last Name'  , type: 'text'  , value: sa.last_name  , width: 150, fixed_placeholder: false },
-        { name: 'address1'    , nice_name: 'Address 1'  , type: 'text'  , value: sa.address1   , width: 320, fixed_placeholder: false },
-        { name: 'address2'    , nice_name: 'Address 2'  , type: 'text'  , value: sa.address2   , width: 320, fixed_placeholder: false },
-        { name: 'city'        , nice_name: 'City'       , type: 'text'  , value: sa.city       , width: 180, fixed_placeholder: false },
-        { name: 'state'       , nice_name: 'State'      , type: 'text'  , value: sa.state      , width: 40, fixed_placeholder: false },
-        { name: 'zip'         , nice_name: 'Zip'        , type: 'text'  , value: sa.zip        , width: 60, fixed_placeholder: false }
-      ]
-    });
-  },
+  //noneditable_billing_address: function()
+  //{
+  //  var that = this;
+  //  
+  //  var sa = that.invoice.billing_address;
+  //  if (!sa) sa = {};
+  //  var str = '';
+  //  str += (sa.first_name ? sa.first_name : '[Empty first name]') + ' ';
+  //  str += (sa.last_name  ? sa.last_name  : '[Empty last name]');        
+  //  str += '<br />' + (sa.address1 ? sa.address1 : '[Empty address]');
+  //  if (sa.address2) str += "<br />" + sa.address2;             
+  //  str += '<br/>' + (sa.city ? sa.city : '[Empty city]') + ", " + (sa.state ? sa.state : '[Empty state]') + " " + (sa.zip ? sa.zip : '[Empty zip]');
+  //  
+  //  var div = $('<div/>')
+  //    .append(str)      
+  //    .append("<br />")
+  //    .append($('<a/>').attr('href', '#').html('Edit').click(function(e) {
+  //      var a = $(this);
+  //      that.refresh_invoice(function() { that.edit_billing_address(); });
+  //    }));
+  //  return div;    
+  //},
+  //
+  //edit_billing_address: function()
+  //{
+  //  var that = this;
+  //  var sa = that.invoice.billing_address;
+  //  if (!sa) sa = { id: 1 };
+  //  var table = $('<table/>').addClass('billing_address')
+  //    .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
+  //      .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_first_name')))
+  //      .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_last_name')))
+  //    ))))
+  //    .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
+  //      .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_address1')))                                
+  //    ))))
+  //    .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')        
+  //      .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_address2')))                        
+  //    ))))
+  //    .append($('<tr/>').append($('<td/>').append($('<table/>').append($('<tr/>')
+  //      .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_city')))
+  //      .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_state')))        
+  //      .append($('<td/>').append($('<div/>').attr('id', 'billingaddress_' + sa.id + '_zip')))        
+  //    ))));
+  //  $('#billing_address').empty()
+  //    .append(table)
+  //    .append($('<a/>').attr('href', '#').html('Finished').click(function(e) {
+  //      var a = $(this);
+  //      that.refresh_invoice(function() { $('#billing_address').empty().append(that.noneditable_billing_address()); });
+  //    }));      
+  //          
+  //  new ModelBinder({
+  //    name: 'BillingAddress',
+  //    id: sa.id,
+  //    update_url: '/admin/invoices/' + that.invoice.id + '/billing-address',
+  //    authenticity_token: that.authenticity_token,
+  //    attributes: [        
+  //      { name: 'first_name'  , nice_name: 'First Name' , type: 'text'  , value: sa.first_name , width: 150, fixed_placeholder: false },
+  //      { name: 'last_name'   , nice_name: 'Last Name'  , type: 'text'  , value: sa.last_name  , width: 150, fixed_placeholder: false },
+  //      { name: 'address1'    , nice_name: 'Address 1'  , type: 'text'  , value: sa.address1   , width: 320, fixed_placeholder: false },
+  //      { name: 'address2'    , nice_name: 'Address 2'  , type: 'text'  , value: sa.address2   , width: 320, fixed_placeholder: false },
+  //      { name: 'city'        , nice_name: 'City'       , type: 'text'  , value: sa.city       , width: 180, fixed_placeholder: false },
+  //      { name: 'state'       , nice_name: 'State'      , type: 'text'  , value: sa.state      , width: 40, fixed_placeholder: false },
+  //      { name: 'zip'         , nice_name: 'Zip'        , type: 'text'  , value: sa.zip        , width: 60, fixed_placeholder: false }
+  //    ]
+  //  });
+  //},
   
   // Show all the packages and the line items in each package
   invoice_packages_table: function(table)
@@ -643,6 +650,7 @@ InvoiceController.prototype = {
   {
     var that = this;
     
+    var requires_shipping = that.invoice_requires_shipping();
     var has_unassigned_line_items = false
     $.each(that.invoice.line_items, function(i, li) {
       if (!li.invoice_package_id || li.invoice_package_id == -1)
@@ -653,38 +661,44 @@ InvoiceController.prototype = {
     });
     if (!has_unassigned_line_items)
       return;
-      
-    table.append($('<tr/>')      
-      .append($('<th/>').html('Package'    ))
-      .append($('<th/>').html('Item'       ))
+    
+    var tr = $('<tr/>');
+    if (requires_shipping) tr.append($('<th/>').html('Package'    ));
+    tr.append($('<th/>').html('Item'       ))
       .append($('<th/>').html('Status'     ))    
       .append($('<th/>').html('Unit Price' ))
       .append($('<th/>').html('Quantity'   ))
-      .append($('<th/>').html('Subtotal'   ))
-    );
-    
+      .append($('<th/>').html('Subtotal'   ))      
+    table.append(tr);
+        
     $.each(that.invoice.line_items, function(i, li) {
       if (li.invoice_package_id && li.invoice_package_id != -1) return true;
-            
-      var div = false;
       
-      if (li.variant.downloadable)
-      {
-        div = $('<div/>').append('This item is downloadable.');
-      }
-      else
-      {        
-        div = $('<div/>').attr('id', 'assign_to_package_' + li.id)
-          .append('Unpackaged! ')
-          .append($('<a/>').data('line_item_id', li.id).attr('href', '#').html('Assign to package').click(function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            that.assign_to_package_form($(this).data('line_item_id'));
-          }));
-      }
-                                     
       var tr = $('<tr/>');
-      tr.append($('<td/>').append(div));
+      if (requires_shipping)
+      {
+        var div = false;      
+        if (li.variant.downloadable)
+        {
+          div = $('<div/>').append('This item is downloadable.');
+        }
+        else if (!li.variant.requires_shipping)
+        {
+          div = $('<div/>').append("This items doesn't require shipping.");
+        }
+        else
+        {        
+          div = $('<div/>').attr('id', 'assign_to_package_' + li.id)
+            .append('Unpackaged! ')
+            .append($('<a/>').data('line_item_id', li.id).attr('href', '#').html('Assign to package').click(function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              that.assign_to_package_form($(this).data('line_item_id'));
+            }));
+        }                                           
+        tr.append($('<td/>').append(div));
+      }
+      
       tr.append($('<td/>')
         .append(that.line_item_link(li))        
         .append(that.gift_options(li))            
@@ -703,22 +717,23 @@ InvoiceController.prototype = {
   summary_table: function(table)
   {    
     var that = this;
+    var requires_shipping = that.invoice_requires_shipping();        
     if (that.invoice.line_items.length > 0 || that.invoice.invoice_packages.length > 0)
     {
-      table.append($('<tr/>').append($('<th/>').attr('colspan', '6').html('&nbsp;')));
+      table.append($('<tr/>').append($('<th/>').attr('colspan', requires_shipping ? '6' : '5').html('&nbsp;')));
     }
     
     if (that.invoice.line_items.length > 0)
     {
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Subtotal'    )).append($('<td/>').attr('align', 'right').attr('id', 'subtotal').html(curr(that.invoice.subtotal))));
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').append('Tax '      ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_tax();      }))).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_tax'))));                
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Shipping'    )).append($('<td/>').attr('align', 'right').attr('id', 'shipping').html(curr(that.invoice.shipping))));
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').append('Handling ' ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_handling(); }))).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_handling'))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Subtotal'    )).append($('<td/>').attr('align', 'right').attr('id', 'subtotal').html(curr(that.invoice.subtotal))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').append('Tax '      ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_tax();      }))).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_tax'))));                
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Shipping'    )).append($('<td/>').attr('align', 'right').attr('id', 'shipping').html(curr(that.invoice.shipping))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').append('Handling ' ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_handling(); }))).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_handling'))));
       if (that.invoice.discounts)
       {
         $.each(that.invoice.discounts, function(i, d) {
           table.append($('<tr/>')
-            .append($('<td/>').attr('colspan', '5').attr('align', 'right')
+            .append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right')
               .append($('<a/>').attr('href', '#').html('Remove').click(function(e) { that.remove_discount(d.id); }))
               .append(' "' + d.gift_card.code + '" Discount')
             )
@@ -726,12 +741,12 @@ InvoiceController.prototype = {
           );
         });
       }    
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Discount')).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_custom_discount'))));
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '5').attr('align', 'right').html('Total' )).append($('<td/>').attr('align', 'right').attr('id', 'total').html(curr(that.invoice.total))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Discount')).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_custom_discount'))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Total' )).append($('<td/>').attr('align', 'right').attr('id', 'total').html(curr(that.invoice.total))));
     }    
     else
     {
-      table.append($('<tr/>').append($('<td/>').attr('colspan', '6')
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '6' : '5')
         .append($('<p/>')
           .append('There are no items in this invoice. ')
           .append($('<a/>').attr('href','#').html('Add one!').click(function(e) {
@@ -923,11 +938,12 @@ InvoiceController.prototype = {
   capture_transaction: function(transaction_id, confirm)
   {
     var that = this;    
-    var t = that.transaction_with_id(transaction_id);          
+    var t = that.transaction_with_id(transaction_id);
+    var amount = that.invoice.total < t.amount ? that.invoice.total : t.amount;         
     if (!confirm)
     {    
       var p = $('<p/>').addClass('note confirm')
-        .append("Are you sure you want to charge $" + parseFloat(t.amount).toFixed(2) + " to the customer?<br />")
+        .append("Are you sure you want to charge $" + parseFloat(amount).toFixed(2) + " to the customer?<br />")
         .append($('<input/>').attr('type','button').val('Yes').click(function() { that.capture_transaction(transaction_id, true); }))
         .append(' ')
         .append($('<input/>').attr('type','button').val('No').click(function() { $('#transactions_message').empty(); }));
@@ -937,10 +953,12 @@ InvoiceController.prototype = {
     $('#transactions_message').html("<p class='loading'>Capturing funds...</p>");
     $.ajax({
       url: '/admin/invoices/' + that.invoice.id + '/transactions/' + transaction_id + '/capture',
+      type: 'get',
+      data: { amount: amount },
       success: function(resp) {
-        if (resp.error)   $('#message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) { $('#message').empty(); that.refresh_transactions(); }
-        if (resp.refresh) { $('#message').empty(); that.refresh_transactions(); }
+        if (resp.error)     $('#transactions_message').html("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success) { $('#transactions_message').empty(); that.refresh_transactions(); }
+        if (resp.refresh) { $('#transactions_message').empty(); that.refresh_transactions(); }
       }
     });
   },
@@ -1145,7 +1163,18 @@ InvoiceController.prototype = {
       }
     });
     return t;
-  }      
+  },
+  
+  invoice_requires_shipping: function()
+  {
+    var that = this;
+    var requires = false;
+    $.each(that.invoice.line_items, function(i, li) {      
+      if (li.variant.requires_shipping && !li.variant.downloadable)
+        requires = true;              
+    });
+    return requires;
+  }
 };
 
 function formatted_date(str)

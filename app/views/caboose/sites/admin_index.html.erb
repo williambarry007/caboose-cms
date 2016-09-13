@@ -1,31 +1,31 @@
 <h1>Sites</h1>
 
-<form action='/admin/sites' method='get' class='search_form'>
-<input type='text' name='name_like' placeholder='Name' />
-<input type='submit' value='Search' />
-</form>
+<div id='sites'></div>
 
-<p><a href='/admin/sites/new'>New Site</a></p>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
 
-<% if @sites && @sites.count > 0 %>
-  <table class='data' id='users_table'>
-    <tr>
-      <%= raw @pager.sortable_table_headings({
-  				'name'               => 'Name',
-  				'description'        => 'Description',
-  				'name, description'  => 'Domains'
-  			})
-  		%>
-    </tr>
-  <% @sites.each do |site| %>
-    <tr onclick="window.location='/admin/sites/<%= site.id %>';">
-      <td><%= site.name %></td>
-      <td><%= site.description %></td>
-      <td><%= raw site.domains ? site.domains.collect{ |d| d.domain }.join('<br />') : '' %></td>    
-    </tr>
-  <% end %>
-  </table>
-  <p><%= raw @pager.generate %></p>
-<% else %>
-  <p>There are no sites right now.</p>
+$(document).ready(function() {
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'sites',
+    base_url: '/admin/sites',            
+    fields: [
+      { name: 'name'        , sort: 'name'              , show: true , bulk_edit: false, nice_name: 'Name'        , type: 'text' , value: function(site) { return site.name;        }, width: 400 },
+      { name: 'description' , sort: 'description'       , show: true , bulk_edit: false, nice_name: 'Description' , type: 'text' , value: function(site) { return site.description; }, width: 400 },                              
+      { name: 'domains'     , sort: 'name, description' , show: true , bulk_edit: false, nice_name: 'Domains'     , type: 'text' , value: function(site) { return site.domains ? site.domains.map(function(d) { return d.id }) : []; }, text: function(site) { return site.domains ? site.domains.map(function(d) { return d.domain }).join('<br />') : ''; }, width: 400, height: 200, editable: false }      
+    ],
+    search_fields: [
+      { name: 'name_like', nice_name: 'Name', type: 'text', width: 400 }      
+    ],
+    new_model_text: 'New Site',
+    new_model_fields: [
+      { name: 'name', nice_name: 'Name', type: 'text', width: 400 }                      
+    ],    
+  });
+});
+    
+</script>
 <% end %>

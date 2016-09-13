@@ -140,11 +140,18 @@ module Caboose
       end
       
       if c.nil?
-        c = Stripe::Customer.create(
-          :source => params[:token],
-          :email => u.email,
-          :metadata => { :user_id => u.id }          
-        )
+        begin
+          c = Stripe::Customer.create(
+            :source => params[:token],
+            :email => u.email,
+            :metadata => { :user_id => u.id }          
+          )
+        rescue Stripe::CardError => e
+          render :json => {
+            :error => e.message
+          }
+          return
+        end          
       end
       
       u.stripe_customer_id = c.id

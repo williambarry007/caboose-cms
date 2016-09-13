@@ -175,6 +175,33 @@ module Caboose
       render :json => vendor.save
     end
     
+    # @route GET /admin/products/alternate-ids
+    def admin_alternate_ids
+      return if !user_is_allowed('products', 'view')
+      
+      query = ["select P.id as product_id, V.id as variant_id, P.title, P.option1, V.option1 as option1_value, P.option2, V.option2 as option2_value, P.option3, V.option3 as option3_value, V.alternate_id
+        from store_variants V
+        left join store_products P on V.product_id = P.id
+        where P.site_id = ?
+        order by title, P.option1, V.option1", @site.id]      
+      rows = ActiveRecord::Base.connection.select_rows(ActiveRecord::Base.send(:sanitize_sql_array, query))
+      
+      @rows = rows.collect{ |row| Caboose::StdClass.new({
+        :product_id     => row[0],      
+        :variant_id     => row[1],
+        :title          => row[2],
+        :option1        => row[3],
+        :option1_value  => row[4],
+        :option2        => row[5],
+        :option2_value  => row[6],
+        :option3        => row[7],
+        :option3_value  => row[8],
+        :alternate_id   => row[9]        
+      })}
+
+      render :layout => 'caboose/admin'
+    end
+    
     # @route GET /admin/products
     def admin_index
       return if !user_is_allowed('products', 'view')

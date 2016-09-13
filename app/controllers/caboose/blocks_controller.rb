@@ -77,20 +77,83 @@ module Caboose
       blocks = []
       if params[:id]
         b = Block.find(params[:id])
-        blocks << { 'id' => b.id, 'children' => admin_tree_helper(b), 'field_type' => b.block_type.field_type }
+        bt = b.block_type
+        blocks << { 
+          'id'                 => b.id,
+          'parent_id'          => b.parent_id,
+          'page_id'            => b.page_id,          
+          'post_id'            => b.post_id,          
+          'name'               => b.name,
+          'value'              => b.value,
+          'constrain'          => b.constrain,
+          'full_width'         => b.full_width,
+          'block_type'         => bt,
+          'children'           => admin_tree_helper(b),
+          'crumbtrail'         => self.crumbtrail(b)          
+          #'block_type_id'      => bt.id,           
+          #'field_type'         => bt.field_type,
+          #'allow_child_blocks' => bt.allow_child_blocks,
+          #'use_js_for_modal'   => bt.use_js_for_modal,                              
+        }
       else
         q = params[:page_id] ? ["parent_id is null and page_id = ?", params[:page_id]] : ["parent_id is null and post_id = ?", params[:post_id]] 
-        Block.where(q).reorder(:sort_order).all.each do |b|      
-          blocks << { 'id' => b.id, 'allow_child_blocks' => b.block_type.allow_child_blocks, 'children' => admin_tree_helper(b), 'field_type' => b.block_type.field_type }
+        Block.where(q).reorder(:sort_order).all.each do |b|
+          bt = b.block_type
+          blocks << { 
+            'id'                 => b.id,
+            'parent_id'          => b.parent_id,
+            'page_id'            => b.page_id,            
+            'post_id'            => b.post_id,                        
+            'name'               => b.name, 
+            'value'              => b.value,
+            'constrain'          => b.constrain,
+            'full_width'         => b.full_width,
+            'block_type'         => bt,
+            'children'           => admin_tree_helper(b)            
+            #'block_type_id'      => bt.id,
+            #'field_type'         => bt.field_type,
+            #'allow_child_blocks' => bt.allow_child_blocks,
+            #'use_js_for_modal'   => bt.use_js_for_modal,                                    
+          }
         end        
       end
       render :json => blocks
-    end        
+    end
+    
+    def crumbtrail(block)
+      crumbs = []      
+      b = block
+      while b
+        bt = b.block_type
+        crumbs << {
+          :block_id => b.id,
+          :text => b.name && b.name.downcase != bt.description.downcase  ? "#{bt.description} (#{b.name})" : bt.description
+        }        
+        b = b.parent
+      end
+      return crumbs.reverse
+    end
       
     def admin_tree_helper(b)
       arr = []
       b.children.each do |b2|
-        arr << { 'id' => b2.id, 'allow_child_blocks' => b2.block_type.allow_child_blocks, 'children' => admin_tree_helper(b2), 'field_type' => b2.block_type.field_type }
+        bt = b2.block_type
+        arr << {
+          'id'                 => b2.id,
+          'parent_id'          => b2.parent_id,
+          'page_id'            => b2.page_id,
+          'post_id'            => b2.post_id,
+          'name'               => b2.name,
+          'value'              => b2.value,
+          'constrain'          => b2.constrain,
+          'full_width'         => b2.full_width,
+          'block_type'         => bt,
+          'children'           => admin_tree_helper(b2)          
+          #'block_type_id'      => bt.id,          
+          #'field_type'         => bt.field_type,
+          #'allow_child_blocks' => bt.allow_child_blocks,
+          #'use_js_for_modal'   => bt.use_js_for_modal,          
+        }
       end
       return arr
     end      
@@ -122,7 +185,7 @@ module Caboose
         :post => params[:post_id] ? @p : nil,            
         :request => request
       })
-      render :json => html            
+      render :inline => html            
     end        
           
     # @route GET /admin/pages/:page_id/blocks/render
@@ -170,7 +233,7 @@ module Caboose
             :controller_view_content => nil,
             :modal => false,
             :editing => true,
-            :empty_text => params[:empty_text],            
+            :empty_text => params[:empty_text] ? params[:empy_text] : '[Empty, click to edit]',            
             :css => '|CABOOSE_CSS|',                     
             :js => '|CABOOSE_JAVASCRIPT|',
             :csrf_meta_tags => '|CABOOSE_CSRF|',
@@ -212,8 +275,7 @@ module Caboose
         begin        
           render "caboose/blocks/admin_edit_#{@block.block_type.field_type}", :layout => 'caboose/modal'
         rescue ActionView::MissingTemplate => ex        
-          render :layout => 'caboose/modal'
-          Caboose.log('test4')
+          render :layout => 'caboose/modal'          
         end
       end
     end
@@ -244,10 +306,7 @@ module Caboose
     def admin_create
       return unless user_is_allowed('pages', 'add')
 
-      resp = Caboose::StdClass.new({
-          'error' => nil,
-          'redirect' => nil
-      })
+      resp = Caboose::StdClass.new
 
       b = Block.new      
       if params[:page_id]
@@ -307,11 +366,9 @@ module Caboose
 
       # Send back the response
       #resp.block = b
-      if params[:page_id]
-        resp.redirect = "/admin/pages/#{b.page_id}/blocks/#{b.id}/edit"
-      else
-        resp.redirect = "/admin/posts/#{b.post_id}/blocks/#{b.id}/edit"
-      end        
+      resp.success = true
+      resp.new_id = b.id
+      resp.redirect = params[:page_id] ? "/admin/pages/#{b.page_id}/blocks/#{b.id}" : "/admin/posts/#{b.post_id}/blocks/#{b.id}"              
       render :json => resp
     end
     

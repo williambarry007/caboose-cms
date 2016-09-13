@@ -28,10 +28,10 @@ module Caboose
       s = self.subscription
       d = nil
       if s.interval == Subscription::INTERVAL_YEARLY        
-        d = Date(self.date_started.year, s.start_month, s.start_day)
+        d = Date.new(self.date_started.year, s.start_month, s.start_day)
         d = d + 1.year if d < self.date_started        
       elsif s.interval == Subscription::INTERVAL_MONTHLY        
-        d = Date(self.date_started.year, self.date_started.month, s.start_day)
+        d = Date.new(self.date_started.year, s.start_month, s.start_day)
         d = d + 1.month if d < self.date_started                
       end
       self.date_started_full = d
@@ -48,7 +48,7 @@ module Caboose
       
       self.calculate_date_started_full if self.date_started_full.nil?
               
-      interval = case self.subcription.interval
+      interval = case self.subscription.interval
         when Subscription::INTERVAL_MONTHLY then 1.month
         when Subscription::INTERVAL_YEARLY  then 1.year
       end
@@ -57,7 +57,7 @@ module Caboose
       unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)
       
       # Special case if the subscription starts on specific day
-      if self.subscription.start_on_day && Date.today > self.date_started_full
+      if self.subscription.start_on_day && (Date.today > self.date_started_full)
         li = self.line_items.where("date_starts = ? date_ends = ?", self.date_started, self.date_started_full - 1.day).first
         if li.nil?
           prorated_unit_price = unit_price + 0.00          
@@ -97,12 +97,13 @@ module Caboose
         d2 = d2 + interval
       end
       d  = self.date_started + 1.day - 1.day
-      while d <= d2
+      while d <= d2 do
         # See if an invoice has already been created for today      
-        li = self.line_items.where("date_starts = ? date_ends = ?", d, d + interval - 1.day).first
+        li = self.line_items.where("date_starts = ? AND date_ends = ?", d, d + interval - 1.day).first
         if li.nil?
           invoice = Caboose::Invoice.create(        
             :site_id          => self.subscription.site_id,
+            :customer_id      => self.user_id,
             :status           => Caboose::Invoice::STATUS_PENDING,
             :financial_status => Caboose::Invoice::STATUS_PENDING,
             :date_created     => DateTime.now,                                    
@@ -123,6 +124,7 @@ module Caboose
           invoice.calculate
           invoice.save                    
         end
+        d = d + interval
       end        
       return true      
     end

@@ -1,4 +1,10 @@
 
+#detail_image {
+  float: right;
+  margin: 0;  
+  width: 370px;
+}
+  
 #left_content {
   width: 200px;
   float: left; 
@@ -36,7 +42,7 @@
       }
       
       &.selected {
-        a {
+        & > a {
           font-weight: bold;
           background-color: #90dbf9;
         }

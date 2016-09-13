@@ -40,13 +40,51 @@ module Caboose
       render :layout => 'caboose/admin'      
     end
     
+    # @route GET /admin/media/policy
+    def admin_policy
+      return if !user_is_allowed('media', 'view')
+      
+      config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]      
+      access_key = config['access_key_id']
+      secret_key = config['secret_access_key']
+      bucket     = config['bucket']      
+      policy = {        
+        "expiration" => 1.hour.from_now.utc.xmlschema,
+        "conditions" => [
+          { "bucket" => "#{bucket}-uploads" },          
+          { "acl" => "public-read" },
+          [ "starts-with", "$key", '' ],
+          #[ "starts-with", "$Content-Type", 'image/' ],          
+          [ 'starts-with', '$name', '' ], 	
+          [ 'starts-with', '$Filename', '' ],          
+        ]
+      }
+      policy = Base64.encode64(policy.to_json).gsub(/\n/,'')
+      render :json => {
+        :policy             => policy,      
+        :signature          => Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), secret_key, policy)).gsub("\n",""),      
+        :s3_upload_url      => "https://#{bucket}-uploads.s3.amazonaws.com/",
+        :aws_access_key_id  => access_key,
+        :top_media_category => Caboose::MediaCategory.top_category(@site.id),
+      }
+    end
+    
     # @route GET /admin/media/json
     def admin_json
       return if !user_is_allowed('media', 'view')
       render :json => false and return if @site.nil?
-      id = params[:media_category_id]        
-      cat = id ? MediaCategory.find(id) : MediaCategory.top_category(@site.id)      
-      render :json => cat.api_hash
+            
+      arr = Media.where(:media_category_id => params[:media_category_id]).reorder(:sort_order).all
+      render :json => arr.collect{ |m| m.api_hash }                  
+    end
+    
+    # @route GET /admin/media/:id/json
+    def admin_json_single
+      return if !user_is_allowed('media', 'view')
+      render :json => false and return if @site.nil?
+            
+      m = Media.where(:id => params[:id]).first
+      render :json => m.api_hash      
     end
     
     # @route GET /admin/media/last-upload-processed

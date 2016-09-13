@@ -130,14 +130,15 @@ class Caboose::Media < ActiveRecord::Base
   
   def api_hash
     {
-      :id            => self.id,
-      :name          => self.name,
-      :original_name => self.original_name,
-      :description   => self.description,
-      :processed     => self.processed,
-      :image_urls    => self.image_urls,
-      :file_url      => self.file ? self.file.url : nil,
-      :media_type    => self.is_image? ? 'image' : 'file'
+      :id                 => self.id,
+      :name               => self.name,
+      :original_name      => self.original_name,
+      :description        => self.description,
+      :processed          => self.processed,
+      :image_urls         => self.image_urls,
+      :file_url           => self.file ? self.file.url : nil,
+      :media_type         => self.is_image? ? 'image' : 'file',
+      :media_category_id  => self.media_category_id
     }    
   end
   

@@ -1,0 +1,31 @@
+<div id='crumbtrail'>
+  <a href='/admin'>Admin</a> >
+  Assets
+</div>
+
+<p><%= raw asset_path('test.gif') %></p>
+
+<div id='manifest'></div>
+<div id='editor'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/class' %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/assets_controller' %>
+<script type='text/javascript' src="/assets/ace/ace.js"></script>
+<script type='text/javascript'>
+
+var controller = false;
+$(document).ready(function() {
+  controller = new AssetsController({
+    assets_path: <%= raw Caboose.json(@assets_path) %>,    
+    authenticity_token: "<%= raw form_authenticity_token %>"
+  });    
+});
+
+</script>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= stylesheet_link_tag 'caboose/admin_assets_index' %>
+<% end %>

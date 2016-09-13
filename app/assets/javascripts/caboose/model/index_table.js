@@ -90,7 +90,16 @@ IndexTable.prototype = {
   after_print: false,
   table_class: 'data',
   allow_export: false,
-  export_url: false,
+  exports: false, // Example: 
+                  // [
+                  //   {
+                  //     name: 'My Export',  
+                  //     url: '<url that starts export process>',
+                  //     wait_for_processing: true,
+                  //     status_url: function(resp) { return resp.status_url; },
+                  //     ready: function(resp) { return resp.redirect_url; } 
+                  //   }
+                  // ]
           
   //============================================================================
   // End of parameters
@@ -694,14 +703,70 @@ IndexTable.prototype = {
   
   csv_export: function()
   {
+    var that = this;  	  	
+  	
+    var defaults = {
+  	  name: "Export",
+  	  url: that.base_url + '/export.csv',
+  	  type: 'get',
+  	  wait_for_processing: false,
+  	  status_url: function(resp) { return resp.status_url; },
+  	  ready:      function(resp) { return resp.redirect_url.length > 0; },
+  	  final_url:  function(resp) { return resp.redirect_url; }
+    };
+  	
+  	var p = $('<p/>');  	
+  	$.each(that.exports, function(i, h) {  	  
+  	  that.exports[i] = $.extend({}, defaults, h);  	  
+      p.append($('<input/>').attr('type', 'button').val(that.exports[i].name).click(function(e) { that.csv_export_start($(this).val()); })).append(' ');
+    });
+        
+    var div = $('<div/>').addClass('note')
+      .append($('<p/>').append('Which export would you like to run?'))
+      .append(p)
+      .append($('<div/>').attr('id', 'export_message'))
+      .append($('<p/>').append($('<input/>').attr('type', 'button').val('Cancel').click(function(e) { that.hide_message(); })));        
+    that.show_message(div);          	    
+  },
+  
+  csv_export_start: function(name)
+  {
     var that = this;
-    var p = this.pager_params();                  
-  	var qs = [];
-  	$.each(p, function(k,v) {  	  
-  	  if (k != '[object Object]') qs.push('' + k + '=' + encodeURIComponent(v)); 
+    var p = that.pager_params();                  
+  	  	  	
+  	var h = false;  	
+  	$.each(that.exports, function(i, h2) {  	 
+  	 if (h2.name == name) { h = h2; return false; } 
   	});
-  	var url = that.export_url ? that.export_url : that.base_url + '/export.csv';
-  	window.location = url + '?' + qs.join('&');    
+  	
+  	if (!h.wait_for_processing) 
+  	{
+  	  var qs = [];
+  	  $.each(p, function(k,v) { if (k != '[object Object]') qs.push('' + k + '=' + encodeURIComponent(v)); });
+  	  window.location = h.url + '?' + qs.join('&');
+  	  return; 
+  	}
+  	  	
+  	$('#export_message').html("<p class='loading'>Creating export...</p>");  	  	
+  	var qs = {};
+  	$.each(p, function(k,v) { if (k != '[object Object]') qs[k] = v; });  	
+    $.ajax({ url: h.url, type: h.type, data: qs, success: function(resp) { h.status_url = h.status_url(resp); }, async: false });    
+    setTimeout(function() { that.csv_export_status(h); }, 1000);
+  },
+  
+  csv_export_status: function(h)
+  {
+    var that = this;
+    $.ajax({
+      url: h.status_url,
+      type: 'get',      
+      success: function(resp) {
+        if (h.ready(resp))
+          window.location = h.final_url(resp);
+        else
+          setTimeout(function() { that.csv_export_status(h); }, 1000);
+      }                      
+    });
   },
   
   pager_div: function(summary)

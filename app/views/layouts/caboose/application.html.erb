@@ -6,6 +6,9 @@
 <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
 <% @page.linked_resources_map[:js].each do |r| %><%= gzip_javascript_include_tag r %><% end %>
 <% if @site.date_js_updated %><script type='text/javascript' src="<%= raw @site.custom_js_url %>"></script><% end %>
+<% if @page.custom_js_files && @page.custom_js_files.strip.length > 0 %>
+  <% @page.custom_js_files.split("\n").each do |url| %><script type='text/javascript' src="<%= raw url %>"></script><% end %>
+<% end %>
 <% if @page.custom_js && @page.custom_js.strip.length > 0 %><script type='text/javascript'><%= raw @page.custom_js %></script><% end %>
 <%= yield :caboose_js %>
 <% end %>
@@ -15,6 +18,9 @@
 <% Caboose::stylesheets.each do |css| %><%= gzip_stylesheet_link_tag(css) %><% end %>
 <% @page.linked_resources_map[:css].each do |r| %><%= gzip_stylesheet_link_tag r %><% end %>
 <% if @site.date_css_updated %><link rel='stylesheet' type='text/css' url="<%= raw @site.custom_css_url %>" /><% end %>
+<% if @page.custom_css_files && @page.custom_css_files.strip.length > 0 %>
+  <% @page.custom_css_files.split("\n").each do |url| %><link rel="stylesheet" type='text/css' href="<%= raw url %>" /><% end %>
+<% end %>
 <% if @page.custom_css && @page.custom_css.strip.length > 0 %><style><%= raw @page.custom_css %></style><% end %>
 <%= yield :caboose_css %>
 <% end %>

@@ -1,0 +1,76 @@
+<div id='crumbtrail'>
+  <a href='/admin'>Admin</a> >
+  Assets
+</div>
+
+<div id='editor'>
+var AssetsController = Class.extend({
+
+  manifest: false,
+  editable_extensions: ['css', 'js', 'scss'],
+  
+  init: function(params)
+  {
+    var that = this;
+    for (var i in params)
+      that[i] = params[i];
+    that.refresh_manifest(function() { that.print(); });
+    
+    var h = $(window).outerHeight() - 52; 
+    $('#manifest').css('height', '' + h + 'px').css('max-height', '' + h + 'px');    
+  },
+  
+  refresh_manifest: function(after)
+  {
+    var that = this;
+    $.ajax({
+      url: '/admin/assets/manifest',
+      type: 'get',
+      success: function(resp) {
+        that.manifest = resp;
+        if (after) after();
+      }        
+    });        
+  },
+  
+  print: function()
+  {
+    var that = this;
+    that.print_manifest();
+  },
+  
+  print_manifest: function()
+  {
+    var that = this;
+    var ul = $('<ul/>');                
+    $.each(sorted_hash(that.manifest), function(name, h) {      
+      ul.append(that.print_manifest_helper(name, h, ''));
+    });
+    $('#manifest').empty().append(ul);    
+  },      
+});
+
+</div>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/theme-monokai.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/mode-javascript.js"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/javascript");
+</script>
+<% end %>
+
+<% content_for :caboose_css do %>
+<style type="text/css" media="screen">
+    #editor { 
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+</style>
+<% end %>

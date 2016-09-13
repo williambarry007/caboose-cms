@@ -84,6 +84,7 @@ module Caboose
         
         # Javascript
         'caboose/*.js',      
+        'caboose/block_modal_controllers/*.js',
         'caboose/checkout/*.js',
         'caboose/model/*.js',        
         'jquery.js',
@@ -113,7 +114,7 @@ module Caboose
         'jquery-ui.css',                
         '*/css/application.css', # Site CSS
         
-        # PLUpload        
+        # PLUpload 
         'plupload/i18n/*.js',
         'plupload/jquery.plupload.queue/css/*.css',
         'plupload/jquery.plupload.queue/img/*.gif',

@@ -2,10 +2,24 @@
 #left_content {
   width: 280px;
   float: left; 
+  &.hide-products {
+    #categories ul li.product-sub-li {
+      display: none;
+    }
+    #categories ul li.products-li a::after {
+      transform: rotate(180deg);
+    }
+  }
 }
 
 #right_content {
   margin-left: 300px; 
+}
+
+#uploader {
+  .caboose-btn {
+    margin-right: 6px;
+  }
 }
 
 #categories {  
@@ -13,35 +27,51 @@
     list-style: none; 
     margin: 0; 
     padding: 0;
-    
     li {       
       list-style: none; 
       margin: 0;
       padding: 0;
-      
+      &.products-li a {
+        text-transform: uppercase;
+        background: #e6ffe1;
+        &::after {
+          content: "^";
+          position: absolute;
+          right: 10px;
+          top: 3px;
+          transition: transform 300ms ease;
+        }
+      }
+      &.product-sub-li {
+    //    display: none;
+      }
       a {
         display: block;
         margin: 0 0 2px 0;
-        padding: 4px 8px;
-        background: #ddd;
-        border: #999 1px solid;
-        color: #000;
+        padding: 5px 8px 3px 8px;
+        font-size: 14px;
+        line-height: 18px;
+        background: #efefef;
+        border: #c7c7c7 1px solid;
+        color: #292929;
         text-decoration: none;
-        
+        &:focus {
+          outline-width: 0;
+        }
         &:hover {
-          background-color: #fff799;        
+          background-color: #fffcdb;        
         }
       }
       
       &.selected {
         a {
-          font-weight: bold;
-          background-color: #90dbf9;
+     //     font-weight: bold;
+          background-color: #d1f2ff;
         }
       }
       &.cat_hover {
         a {
-          background-color: #fff799 !important;
+          background-color: #fffcdb !important;
         }
       }
     }    
@@ -52,14 +82,14 @@
   #delete {
     p.delete_dropper {        
       padding: 8px 8px;
-      background: #ddd;
-      border: #999 1px solid;
+      background: #efefef;
+      border: #c7c7c7 1px solid;
       color: #000;
       text-decoration: none;
     }
     &.hover {
       p.delete_dropper {        
-        background-color: #fff799 !important;    
+        background-color: #fffcdb !important;    
       }
     }
   }
@@ -71,37 +101,79 @@
 }
     
 #media {
+  padding-right: 2%;
   ul {
     list-style: none; 
     margin: 0 0 20px 0; 
     padding: 0; 
-    
-    li { 
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+    flex-wrap: wrap;
+    li {
+      -webkit-box-flex: 0 1 150px;
+      -moz-box-flex:  0 1 150px;
+      -webkit-flex:  0 1 150px;
+      -ms-flex:  0 1 150px;
+      flex:  0 1 150px;
       position: relative;
       list-style: none; 
-      margin: 4px; 
-      padding: 0;   
-      display: inline-block;
-      width: 150px;
-      height: 165px;
+      margin: 0 10px 20px 0; 
+      padding: 0 0 35px 0;   
+      display: block;
       overflow: hidden;
-      background-color: #666;
-      background-position: center;
-      background-size: contain; 
-      background-repeat: no-repeat;
-      border: #666 4px solid;
       text-align: center;
+    //  padding: 8px;
+      border: 1px solid #dadada;
+      &.png {
+        background-image: url('/assets/caboose/grid.png');
+        background-size: 16px;
+        background-color: #e4e4e4;
+        &.selected {
+          background-image: none;
+        }
+      }
+      &.empty {
+        background-color: #bdbdbd;
+        background-image: none;
+      }
+      .table {
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+        height: 120px;
+      }
+
+      .table-cell {
+        display: table-cell;
+        vertical-align: middle;
+        width: 100%;
+        height: 100%;
+      }
       img {
+        display: block;
+        margin: 0 auto 0 auto;
+        max-width: 100%;
         max-height: 120px;
-        max-width: 90%;
       }
       span.name { 
         display: block; 
-        position: absolute; 
-        bottom: 18px;
-        font-size: 13px;
-        width: 150px; 
+        position: relative; 
+        // top: 0;
+        // left: 0;
+        height: auto;
+        overflow: hidden;
+        width: 100%;
+        font-size: 12px;
         text-align: center;        
+        background: rgba(0,0,0,0.7);
+        padding: 3px;
         color: #fff; 
         text-decoration: none !important;                                   
       }
@@ -110,36 +182,64 @@
         width: 80px;
         margin: 10px auto 0 auto;
       }
+      .buttons {
+        margin-top: 10px;
+     //   padding: 0 10px 6px 10px;
+        position: absolute;
+        left: 2%;
+        bottom: 3px;
+        width: 96%;
+        &::after {
+          content: "."; 
+          visibility: hidden; 
+          display: block; 
+          height: 0; 
+          clear: both;
+        }
+      }
       a {
-        text-decoration: underline;
+        text-decoration: none;
         cursor: pointer;
         display: inline-block;
-        font-size: 13px;
-        position: absolute;
-        bottom: 0;
-        left: 0;
+        font-size: 11px;
         text-align: center;
         color: #000;
-        &:hover {
-          color: blue;
+        border-radius: 4px;
+        padding: 4px;
+        &:focus {
+          outline-width: 0;
+        }
+        &:first-of-type {
+          background: #516dbb;
+          color: #fff;
+          float: left;
+          &:hover {
+            background: shade(#516dbb, 10%);
+          }
         }
         &.dl {
-          right: 0;
+          // right: 8px;
           left: initial;
-          width: 100%;
+          float: right;
+          background: #51bd63;
+          color: #fff;
+          // width: 100%;
+          &:hover {
+            background: shade(#51bd63, 10%);
+          }
           &.i {
             width: auto;
           }
         }
       }
       &:hover {
-        background-color: #fff799;
-        border: #fff799 4px solid;
-        span { background-color: #fff799; color: #000; }
+        background-image: none;
+        background-color: #fffcdb;
+     //   span { background-color: #fffcdb; color: #000; }
       }
       &.selected {
-        background-color: #90dbf9;
-        border: #90dbf9 4px solid;
+        background-color: #d1f2ff;
+   //     border: #90dbf9 4px solid;
         span { background-color: #90dbf9; color: #000; }
       }
     }

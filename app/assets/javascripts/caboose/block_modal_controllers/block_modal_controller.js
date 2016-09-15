@@ -10,6 +10,8 @@ var BlockModalController = ModalController.extend({
   new_block_on_init: false,
   assets_path: false,
   block_types: false,
+  before_id: false,
+  after_id: false,
   complex_field_types: ['block', 'richtext', 'image', 'file'],
     
   init: function(params) 

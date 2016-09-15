@@ -1,4 +1,3 @@
-/*
 @font-face {
 	font-family: 'icomoon';
 	src:url('/assets/icomoon.eot?-tne7s4');
@@ -9,15 +8,20 @@
 	font-weight: normal;
 	font-style: normal;
 }
-*/
 
 #the_modal div.icons [class^="icon-"]:before,
-#the_modal div.icons [class*=" icon-"]:before {
+#the_modal div.icons [class*=" icon-"]:before
+ {
   font-family: 'icomoon' !important;  
 }
 
+#modal_content div.icons [id*="icon_"] span::before {
+	font-family: 'icomoon' !important;  
+}
+
 #the_modal div.icons [class^="icon-"],
-#the_modal div.icons [class*=" icon-"] {
+#the_modal div.icons [class*=" icon-"],
+#modal_content div.icons [class*="icon-"] {
 	font-family: 'icomoon' !important;
 	speak: none;
 	font-style: normal;

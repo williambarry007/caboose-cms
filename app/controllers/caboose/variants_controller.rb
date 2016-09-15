@@ -527,6 +527,7 @@ module Caboose
     # Option methods
     #===========================================================================
     
+    # @route_priority 1
     # @route GET /admin/variants/status-options
     def admin_status_options
       arr = ['Active', 'Inactive', 'Deleted']

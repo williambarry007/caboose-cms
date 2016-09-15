@@ -27,14 +27,12 @@ MediaController.prototype = {
     $("#uploader")
       .empty()
       .append($('<p/>')
-        .append($('<a/>').attr('href', '#').html('Upload').click(function(e) { e.preventDefault(); that.toggle_uploader(); }))
-        .append(' | ')
-        .append($('<a/>').attr('href', '#').html('Select All').click(function(e) { e.preventDefault(); that.select_all_media(); }))
-        .append(' | ')
-        .append($('<a/>').attr('href', '#').attr('id', 'sort-btn').html('Sort').click(function(e) { e.preventDefault(); that.sort_media(); }))
+        .append($('<a/>').addClass('caboose-btn').attr('href', '#').html('Upload').click(function(e) { e.preventDefault(); that.toggle_uploader(); }))
+        .append($('<a/>').addClass('caboose-btn').attr('href', '#').html('Select All').click(function(e) { e.preventDefault(); that.select_all_media(); }))
+        .append($('<a/>').addClass('caboose-btn').attr('href', '#').attr('id', 'sort-btn').html('Sort').click(function(e) { e.preventDefault(); that.sort_media(); }))
       )
       .append($('<div/>').attr('id', 'the_uploader'));          
-    that.refresh();        
+    that.refresh();   
   },    
   
   refresh: function()
@@ -221,9 +219,10 @@ MediaController.prototype = {
   {
     var that = this;
     var ul = $('<ul/>');
+    var product_cat_id = 0;
     if (that.categories.length > 0)
     {      
-      $.each(that.categories, function(i, cat) {        
+      $.each(that.categories, function(i, cat) {
         var li = $('<li/>')
           .addClass('category')
           .attr('id', 'cat' + cat.id)
@@ -231,6 +230,16 @@ MediaController.prototype = {
           .append($('<a/>').attr('href', '#').html(cat.name + ' (' + cat.media_count + ')').click(function(e) { e.preventDefault(); that.select_category($(this).parent().data('media_category_id')); }));
         if (cat.id == that.cat_id)
           li.addClass('selected');
+     //   console.dir(cat);
+        if (cat.name && cat.name.indexOf('Products') > -1 && product_cat_id == 0) {
+          li.addClass('products-li');
+          li.html('').append($('<a/>').attr('href', '#').html(cat.name).click(function(e) { e.preventDefault(); $(this).closest('#left_content').toggleClass('hide-products'); }));
+          product_cat_id = cat.id;
+        }
+        else if ( cat.parent_id == product_cat_id ) {
+          li.addClass('product-sub-li');
+          li.html('').append($('<a/>').attr('href', '#').html(cat.name + ' (' + cat.media_count + ')').click(function(e) { e.preventDefault(); that.select_category($(this).parent().data('media_category_id')); }));
+        }
         ul.append(li);
       });      
     }
@@ -313,26 +322,33 @@ MediaController.prototype = {
           processing = true
         var li = $('<li/>')
           .attr('id', 'media' + m.id)
-          .addClass('media')          
+          .addClass('media')
           .data('media_id', m.id)
           .click(function(e) { that.select_media($(this).data('media_id')); })
           .append($('<span/>').addClass('name').html(m.original_name).click(function(e) {
             e.stopPropagation();
             that.edit_media_description($(this).parent().data('media_id'));
           }));
+    //    console.dir(m);
+        if (m.original_name && m.original_name.indexOf('png') > 0) {
+          li.addClass("png");
+        }
         if (m.image_urls)
-          li.append($('<img/>').attr('src', m.image_urls.tiny_url).attr("id","image-" + m.id));  
+          li.append($("<div/>").addClass("table").append($("<div/>").addClass("table-cell").append($('<img/>').attr('src', m.image_urls.tiny_url).attr("id","image-" + m.id))));  
         else if (m.original_name) {
           var ext = m.original_name.match(/\.[0-9a-z]+$/i);
+          li.addClass('empty');
           if (ext && ext.length > 0)
             li.append($('<img/>').attr('src', '/assets/caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
         }                                  
         if (that.selected_media.indexOf(m.id) > -1)
           li.addClass('selected ui-selected');
-        if (that.allow_edit && m.image_urls) li.append($("<a/>").html("Edit Image").click(function() { that.edit_image($(this).parent().data('media_id')); }));
-        else                                 li.append($("<a/>").attr('href', m.file_url).html("Direct URL"));
-        if ( m.image_urls )                  li.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
-        else                                 li.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().data('media_id')); }));
+        var btndiv = $("<div/>").addClass("buttons");
+        li.append(btndiv);
+        if (that.allow_edit && m.image_urls) btndiv.append($("<a/>").html("Edit Image").click(function() { that.edit_image($(this).parent().parent().data('media_id')); }));
+        else                                 btndiv.append($("<a/>").attr('href', m.file_url).html("Direct URL"));
+        if ( m.image_urls )                  btndiv.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().parent().data('media_id')); }));
+        else                                 btndiv.append($("<a/>").addClass("dl i").html("Download").click(function() { that.download_image($(this).parent().parent().data('media_id')); }));
         ul.append(li);
       });
     }

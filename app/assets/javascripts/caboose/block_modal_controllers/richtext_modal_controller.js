@@ -52,9 +52,9 @@ var RichtextModalController = BlockModalController.extend({
           height: 300,
           fixed_placeholder: false,
           after_update: function() {            
-            tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'block_' + that.block_id + '_value');
+   //         tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'block_' + that.block_id + '_value');
             that.parent_controller.render_blocks();
-            that.close(); 
+        //    that.close(); 
           },
           after_cancel: function() { that.parent_controller.render_blocks(); that.close(); }
         }]

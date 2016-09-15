@@ -34,10 +34,10 @@
 .move_up_handle   { display: none; }
 .move_down_handle { display: none; }
 .delete_handle    { display: none; }
-.block_over > .select_handle    { display: block; position: relative; }
-.block_over > .move_up_handle   { display: block; position: relative; }
-.block_over > .move_down_handle { display: block; position: relative; }
-.block_over > .delete_handle    { display: block; position: relative; }
+.block_over > .select_handle    { display: block; position: relative; z-index: 3; }
+.block_over > .move_up_handle   { display: block; position: relative; z-index: 3; }
+.block_over > .move_down_handle { display: block; position: relative; z-index: 3; }
+.block_over > .delete_handle    { display: block; position: relative; z-index: 3; }
 .block_over > .select_handle    span { position: absolute; top: 0; right: 54px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
 .block_over > .move_up_handle   span { position: absolute; top: 0; right: 36px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
 .block_over > .move_down_handle span { position: absolute; top: 0; right: 18px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }

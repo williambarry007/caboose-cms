@@ -77,6 +77,7 @@ module Caboose
       blocks = []
       if params[:id]
         b = Block.find(params[:id])
+        b.create_children
         bt = b.block_type
         blocks << { 
           'id'                 => b.id,

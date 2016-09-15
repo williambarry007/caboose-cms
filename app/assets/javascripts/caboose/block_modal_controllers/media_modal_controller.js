@@ -165,14 +165,33 @@ var MediaModalController = BlockModalController.extend({
       $.each(that.media, function(i, m) {
         if (m.media_type == 'image' && m.processed == false)
           processing = true
-        var li = $('<li/>')          
+        // var li = $('<li/>')          
+        //   .attr('id', 'media' + m.id)
+        //   .addClass('media')          
+        //   .data('media_id', m.id)
+        //   .click(function(e) { that.print_media_detail($(this).data('media_id')); })
+        //   .append($('<span/>').addClass('name').html(m.original_name));
+        // if (m.image_urls && m.image_urls != undefined)
+        //   li.append($('<img/>').attr('src', m.image_urls.tiny_url + '?' + d));
+
+        var li = $('<li/>')
           .attr('id', 'media' + m.id)
-          .addClass('media')          
+          .addClass('media')
           .data('media_id', m.id)
           .click(function(e) { that.print_media_detail($(this).data('media_id')); })
           .append($('<span/>').addClass('name').html(m.original_name));
+        if (m.original_name && m.original_name.indexOf('png') > 0) {
+          li.addClass("png");
+        }
         if (m.image_urls && m.image_urls != undefined)
-          li.append($('<img/>').attr('src', m.image_urls.tiny_url + '?' + d));
+          li.append($("<div/>").addClass("table").append($("<div/>").addClass("table-cell").append($('<img/>').attr('src', m.image_urls.tiny_url + '?' + d).attr("id","image-" + m.id))));  
+        else if (m.original_name) {
+          var ext = m.original_name.match(/\.[0-9a-z]+$/i);
+          li.addClass('empty');
+          if (ext && ext.length > 0)
+            li.append($('<img/>').attr('src', '/assets/caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
+        }   
+
         //if (that.selected_media.indexOf(m.id) > -1)
         //  li.addClass('selected ui-selected');
         if (m.id == that.media_id)
@@ -182,7 +201,7 @@ var MediaModalController = BlockModalController.extend({
     }
     else
       ul = $('<p/>').html("This category is empty.");
-    $('#media').empty().append(ul);
+    $('#the_modal #media').empty().append(ul);
     if (that.refresh_unprocessed_images == true && processing)
       setTimeout(function() { that.refresh(); }, 2000);
     that.autosize();
@@ -219,7 +238,7 @@ var MediaModalController = BlockModalController.extend({
     }
     
     $('#top_controls').empty();
-    $('#media').empty()              
+    $('#the_modal #media').empty()              
       .append($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls ? m.image_urls.thumb_url : '//placehold.it/250x250'))      
       .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_media_category_id' ))) 
       .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_name'              )))
@@ -227,13 +246,13 @@ var MediaModalController = BlockModalController.extend({
       .append(image_urls);
     $('#modal_controls').empty()
       .append($('<p/>').css('clear', 'both')
-        .append($('<input/>').attr('type', 'button').val('< Back'            ).click(function(e) { 
+        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('< Back'            ).click(function(e) { 
           that.print_top_controls();
           that.print_media();
           that.print_controls();
         }))
-        .append($('<input/>').attr('type', 'button').val('Select this Image' ).click(function(e) { that.select_media(media_id)                           }))        
-        .append($('<input/>').attr('type', 'button').val('Close'             ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
+        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Select this Image' ).click(function(e) { that.select_media(media_id)                           }))        
+        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Close'             ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
       );
     
     var m = new ModelBinder({

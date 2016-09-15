@@ -378,13 +378,14 @@ module Caboose
       page.parent_id = parent_id      
       page.hide = true
       page.content_format = Caboose::Page::CONTENT_FORMAT_HTML
+      page.save
 
       i = 0
       begin 
         page.slug = Page.slug(page.title + (i > 0 ? " #{i}" : ""))
         page.uri = parent.parent_id == -1 ? page.slug : "#{parent.uri}/#{page.slug}"
         i = i+1
-      end while (Page.where(:uri => page.uri).count > 0 && i < 10)
+      end while (Page.where(:uri => page.uri, :site_id => page.site_id).count > 0 && i < 10)
 
       page.save
       

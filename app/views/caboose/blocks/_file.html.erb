@@ -14,7 +14,7 @@ if editing
   if url.nil? || url.starts_with?('http://placehold.it') || url.include?('missing')  
     %><div id='block_<%= block.id %>'><p>Empty file: <%= block.name %></p></div><%
   else
-    %><div id='block_<%= block.id %>'><p><a href="/admin/<%= block.page_id ? "pages/#{block.page_id}" : "posts/#{block.post_id}" %>/blocks/<%= block.id %>/edit"><%= name %></a></p></div><%
+    %><div id='block_<%= block.id %>'><p><span><%= name %></span></p></div><%
   end
 elsif url
   %><div id='block_<%= block.id %>'><p><a href="<%= raw file.url %>">Download File</a></p></div><%

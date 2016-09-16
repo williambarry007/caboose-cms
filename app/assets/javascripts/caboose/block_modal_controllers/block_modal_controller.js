@@ -293,7 +293,7 @@ var BlockModalController = ModalController.extend({
       });
     }
 
-    $('#the_modal #block_' + b.id).attr('onclick','').unbind('click');    
+    $('#the_modal #block_' + b.id).attr('onclick','').unbind('click');
     $('#the_modal #block_' + b.id).click(function(e) {      
       e.stopPropagation();
       that.parent_controller.edit_block(b.id); 

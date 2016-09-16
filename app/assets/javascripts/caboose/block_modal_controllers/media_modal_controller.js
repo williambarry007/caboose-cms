@@ -99,6 +99,15 @@ var MediaModalController = BlockModalController.extend({
     that.print_media();
     that.autosize();
   },
+
+  alphabetize_media: function() {
+    var mylist = $('#the_modal #media > ul');
+    var listitems = mylist.children('li').get();
+    listitems.sort(function(a, b) {
+       return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+    })
+    $.each(listitems, function(idx, itm) { mylist.append(itm); });
+  },
   
   print_top_controls: function() 
   {
@@ -115,7 +124,8 @@ var MediaModalController = BlockModalController.extend({
         .append($('<select/>').attr('id', 'categories')).append(' | ')        
         .append($('<a/>').attr('href', '#').html('New Category'                                                 ).click(function(e) { e.preventDefault(); that.add_category();     })).append(' | ')              
         .append($('<a/>').attr('href', '#').html('Upload to this Category'                                      ).click(function(e) { e.preventDefault(); that.toggle_uploader();  })).append(' | ')
-        .append($('<a/>').attr('href', '#').html(that.file_view == 'thumbnail' ? 'List View' : 'Thumbnail View' ).click(function(e) { e.preventDefault(); that.toggle_file_view(); }))
+        .append($('<a/>').attr('href', '#').html(that.file_view == 'list' ? 'Thumbnail View' : 'List View' ).click(function(e) { e.preventDefault(); that.toggle_file_view(); $(this).html( that.file_view == 'thumbnail' ? 'List View' : 'Thumbnail View'  ); })).append(' | ')
+        .append($('<a/>').attr('href', '#').html('Alphabetize'                                      ).click(function(e) { e.preventDefault(); that.alphabetize_media();  }))
       )
       .append($('<div/>').attr('id', 'new_cat_message'))              
       .append($('<div/>').attr('id', 'uploader'   ).append($('<div/>').attr('id', 'the_uploader')));     
@@ -238,12 +248,14 @@ var MediaModalController = BlockModalController.extend({
     }
     
     $('#top_controls').empty();
-    $('#the_modal #media').empty()              
-      .append($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls ? m.image_urls.thumb_url : '//placehold.it/250x250'))      
+    var img_tag = m.media_type == 'image' ? ($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls ? m.image_urls.thumb_url : '//placehold.it/250x250')) : ( $('<p/>').text(m.original_name) );
+    $('#the_modal #media').empty()
+      .append(img_tag)      
       .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_media_category_id' ))) 
       .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_name'              )))
       .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_description'       )))      
       .append(image_urls);
+    var select_text = m.media_type == 'image' ? 'Select this Image' : 'Select this File';
     $('#modal_controls').empty()
       .append($('<p/>').css('clear', 'both')
         .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('< Back'            ).click(function(e) { 
@@ -251,7 +263,7 @@ var MediaModalController = BlockModalController.extend({
           that.print_media();
           that.print_controls();
         }))
-        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Select this Image' ).click(function(e) { that.select_media(media_id)                           }))        
+        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val(select_text ).click(function(e) { that.select_media(media_id)                           }))        
         .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Close'             ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
       );
     
@@ -432,8 +444,9 @@ var MediaModalController = BlockModalController.extend({
   toggle_file_view: function()
   {
     var that = this;
-    that.file_view = (that.file_view == 'thumbnail' ? 'list' : 'thumbnail');    
-    that.print_media();        
+    that.file_view = (that.file_view == 'thumbnail' ? 'list' : 'thumbnail');
+
+    that.print_media();
   },  
   
   media_with_id: function(media_id)

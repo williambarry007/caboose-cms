@@ -134,27 +134,30 @@
       position: relative;
       list-style: none; 
       margin: 4px; 
-      padding: 4px;                     
-      background-color: #666;
+      padding: 4px 6px; 
+      background-color: #e2e2e2;
       background-position: center;
       background-size: contain; 
       background-repeat: no-repeat;
-      border: #666 4px solid;
-
+      border: #b5b5b5 1px solid;
+      border-radius: 2px;
+      cursor: pointer;
+      img {
+        display: none;
+      }
       span.name { 
         display: block;                
-        color: #fff; 
+        color: #292929;
+        font-size: 15px;
         text-decoration: none !important;                                   
       }
       &:hover {
-        background-color: #fff799;
-        border: #fff799 4px solid;
-        span { background-color: #fff799; color: #000; }
+        background-color: #fffcdb;
+        span { background-color: #fffcdb; }
       }
       &.selected {
-        background-color: #90dbf9;
-        border: #90dbf9 4px solid;
-        span { background-color: #90dbf9; color: #000; }
+        background-color: #d1f2ff;
+        span { background-color: #d1f2ff; }
       }
     }
   }  
@@ -238,7 +241,7 @@
 
     
 #media {
-  ul {
+  ul.thumbnail_view {
     list-style: none; 
     margin: 0 0 20px 0; 
     padding: 0; 

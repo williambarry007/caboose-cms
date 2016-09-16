@@ -104,9 +104,16 @@ var MediaModalController = BlockModalController.extend({
     var mylist = $('#the_modal #media > ul');
     var listitems = mylist.children('li').get();
     listitems.sort(function(a, b) {
-       return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
-    })
-    $.each(listitems, function(idx, itm) { mylist.append(itm); });
+      return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+    });
+    if ( mylist.data('alph-order') == null || mylist.data('alph-order') == 'desc' ) {
+      $.each(listitems, function(idx, itm) { mylist.append(itm); });
+      mylist.data('alph-order', 'asc');
+    }
+    else {
+      $.each(listitems, function(idx, itm) { mylist.prepend(itm); });
+      mylist.data('alph-order', 'desc');
+    }
   },
   
   print_top_controls: function() 

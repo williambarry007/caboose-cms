@@ -1,23 +1,16 @@
-<% 
-gravatar_id = Digest::MD5.hexdigest(@edituser.email.downcase)
-pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/default_user_pic.png"  
-%>
 
 <%= render :partial => 'caboose/users/admin_header' %>
 
-<p id='gravatar'><img src='<%= pic %>' /><a href='http://gravatar.com'>Update on gravatar</a></p>
-<p><div id='user_<%= @edituser.id %>_first_name' ></div></p>
-<p><div id='user_<%= @edituser.id %>_last_name'  ></div></p>
-<p><div id='user_<%= @edituser.id %>_username'   ></div></p>
-<p><div id='user_<%= @edituser.id %>_email'      ></div></p>
-<p><div id='user_<%= @edituser.id %>_locked'     ></div></p>
+<h1>Delete User</h1>
+
+<div id='message'>
+<input type='button' value='Delete User'              onclick="delete_user(<%= @edituser.id %>);" />
+</div>
 
 <%= render :partial => 'caboose/users/admin_footer' %>
 
 <% content_for :caboose_css do %>
 <style type='text/css'>
-#content input[type=checkbox] { position: relative; }
-#roles { height: 200px; overflow-y: scroll; margin-bottom: 20px; }
 </style>
 <% end %>
 <% content_for :caboose_js do %>
@@ -40,19 +33,27 @@ $(document).ready(function() {
   });  
 });
 
-</script>
-<% end %>
+function delete_user(user_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note confirm')
+      .append('Are you sure you want to delete the user? ')
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_user(user_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+    $('#message').empty().append(p);
+    return;
+  }
+  $('#message').html("<p class='loading'>Deleting user...</p>");
+  $.ajax({
+    url: '/admin/users/' + user_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
 
-<% content_for :caboose_css do %>
-<style type='text/css'>
-#gravatar {  
-  width: 150px;
-  text-align: right;
-  margin: 0 4px 0 0;
-  padding: 0;
-}
-#gravatar img {
-  border: #fff 2px solid;
-}
-</style>
+</script>
 <% end %>

@@ -113,6 +113,26 @@ module Caboose
       render :json => resp
     end
     
+    # @route GET /admin/invoices/:id/authorize-and-capture
+    def admin_authorize_and_capture
+      return if !user_is_allowed('invoices', 'edit')
+           
+      invoice = Invoice.find(params[:id])
+      resp = invoice.authorize_and_capture   
+      
+      # Send out emails
+      #begin
+      #  InvoicesMailer.configure_for_site(@site.id).customer_new_invoice(@invoice).deliver
+      #  InvoicesMailer.configure_for_site(@site.id).fulfillment_new_invoice(@invoice).deliver
+      #rescue
+      #  puts "=================================================================="
+      #  puts "Error sending out invoice confirmation emails for invoice ID #{@invoice.id}"
+      #  puts "=================================================================="
+      #end
+      
+      render :json => resp
+    end
+    
     # @route GET /admin/invoices/:id/void
     def admin_void
       return if !user_is_allowed('invoices', 'edit')

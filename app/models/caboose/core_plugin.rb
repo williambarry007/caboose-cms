@@ -71,5 +71,9 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
   def self.request_protocol(current_value, request)
     return current_value
   end
+  
+  def self.admin_user_tabs(tabs, user, site)
+    return tabs    
+  end
 
 end

@@ -10,6 +10,8 @@ StripePaymentMethodController.prototype = {
   card_last4: false,
   card_name: false,
   card_zip: false,
+  refresh_url: '/checkout/stripe/json',
+  after_update_url: '/checkout/stripe-details',
   
   init: function(params)
   {
@@ -22,7 +24,7 @@ StripePaymentMethodController.prototype = {
   {
     var that = this;
     $.ajax({
-      url: '/checkout/stripe/json',
+      url: that.refresh_url,
       type: 'get',          
       success: function(resp) {        
         that.stripe_key   = resp.stripe_key;
@@ -143,7 +145,7 @@ StripePaymentMethodController.prototype = {
         that.card_brand = resp.card.brand;
         that.card_last4 = resp.card.last4;                                
         $.ajax({
-          url: '/checkout/stripe-details',
+          url: that.after_update_url,
           type: 'put',
           data: { token: resp.id, card: resp.card },
           success: function(resp2) {

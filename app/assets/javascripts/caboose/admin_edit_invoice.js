@@ -296,9 +296,12 @@ InvoiceController.prototype = {
         requires_shipping ? that.noneditable_shipping_address() : "This invoice doesn't require shipping."
       ));
     }
-    //.append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))        
+    //.append($('<td/>').attr('valign', 'top').attr('id', 'billing_address'  ).append(that.noneditable_billing_address()))
+    
+    var c = that.invoice.customer;         
     tr.append($('<td/>').attr('valign', 'top').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_status')))
       .append($('<td/>').attr('valign', 'top')
+        .append($('<div/>').append(c && c.card_last4 ? "Card on file: " + c.card_brand + " ending in " + c.card_last4 : "No card on file."))       
         .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_payment_terms'))
         .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_payment_terms'))
         .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_financial_status'))
@@ -764,7 +767,12 @@ InvoiceController.prototype = {
     var p = $('<p/>');
     p.append($('<input/>').attr('type', 'button').val('< Back').click(function() { window.location = '/admin/invoices'; })).append(' ');
     if (that.invoice.total > 0 && that.invoice.financial_status == 'pending')    
-      p.append($('<input/>').attr('type', 'button').val('Send for Payment').click(function() { that.send_for_authorization(); })).append(' ');        
+    {      
+      if (that.invoice.customer.card_last4)
+        p.append($('<input/>').attr('type', 'button').val('Charge Card on File').click(function() { that.authorize_and_capture(); })).append(' ');
+      else
+        p.append($('<input/>').attr('type', 'button').val('Send for Payment').click(function() { that.send_for_authorization(); })).append(' ');
+    }
     if (that.invoice.total > 0 && (that.invoice.financial_status == 'captured' || that.invoice.financial_status == 'paid by check' || that.invoice.financial_status == 'paid by other means'))    
       p.append($('<input/>').attr('type', 'button').val('Send Receipt to Customer' ).click(function() { that.send_receipt();   })).append(' ');
     p.append($('<input/>').attr('type', 'button').val('Add Item'                 ).click(function() { that.add_variant();     })).append(' ');
@@ -1028,6 +1036,30 @@ InvoiceController.prototype = {
       success: function(resp) {
         if (resp.error)   { that.flash_error(resp.error); }
         if (resp.success) { that.refresh(function() { that.flash_success("An email has been sent successfully to the customer."); }); }        
+      }
+    });
+  },
+  
+  authorize_and_capture: function(confirm)
+  {
+    var that = this;    
+    if (!confirm)
+    {    
+      var c = that.invoice.customer;
+      var p = $('<p/>').addClass('note confirm')
+        .append("Are you sure you want to authorize and capture $" + curr(that.invoice.total) + " to customer's " + c.card_brand + " ending in " + c.card_last4 + "?<br/><br/>")
+        .append($('<input/>').attr('type','button').val('Yes').click(function() { that.authorize_and_capture(true); }))
+        .append(' ')                
+        .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
+      $('#message').empty().append(p);
+      return;
+    }
+    $('#message').html("<p class='loading'>Charging card on file...</p>");
+    $.ajax({
+      url: '/admin/invoices/' + that.invoice.id + '/authorize-and-capture',
+      success: function(resp) {
+        if (resp.error)   { that.flash_error(resp.error); }
+        if (resp.success) { that.refresh(function() { that.flash_success("The customer's card on file has been charged successfuly."); }); }        
       }
     });
   },

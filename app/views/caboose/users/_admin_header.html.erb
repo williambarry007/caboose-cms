@@ -4,22 +4,23 @@
 <%= javascript_include_tag "caboose/model/all" %>
 <% end %>
 
-<h1>Edit Advertiser</h1>
+<h1>Edit User - <%= @edituser.first_name %> <%= @edituser.last_name %></h1>
 <ul id='tabs'>
 <%
 tabs = {                             
-  'General'            => "/admin/advertisers/#{@advertiser.id}",
-  'Authorize.net Info' => "/admin/advertisers/#{@advertiser.id}/authnet",
-  'Users'              => "/admin/advertisers/#{@advertiser.id}/users",
-  'Campaigns'          => "/admin/advertisers/#{@advertiser.id}/campaigns",  
-  'Invoices'           => "/admin/advertisers/#{@advertiser.id}/invoices",
-  'Delete'             => "/admin/advertisers/#{@advertiser.id}/delete"  
+  'General'         => "/admin/users/#{@edituser.id}",
+  'Payment Method'  => "/admin/users/#{@edituser.id}/payment-method",
+  'Login Logs'      => "/admin/login-logs?user_id=#{@edituser.id}",
+  'Password'        => "/admin/users/#{@edituser.id}/password",
+  'Roles'           => "/admin/users/#{@edituser.id}/roles",    
+  'Delete'          => "/admin/users/#{@edituser.id}/delete"  
 }
+tabs = Caboose.plugin_hook('admin_user_tabs', tabs, @edituser, @site)
 %>
 <% tabs.each do |text, href| %>
 <% selected = true if request.fullpath == href || (text != 'General' && request.fullpath.starts_with?(href)) %>
 <li<% if selected %> class='selected'<% end %>><a href='<%= href %>'><%= raw text %></a></li>
 <% end %>
-<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/advertisers';" /></li>
+<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/users';" /></li>
 </ul>
 <div id='content2'>

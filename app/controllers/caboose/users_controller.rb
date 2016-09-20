@@ -54,6 +54,21 @@ module Caboose
       render :json => u.as_json(:include => :roles)
     end
     
+    # @route GET /admin/users/:id/stripe/json
+    def admin_stripe_json_single
+      return if !user_is_allowed('users', 'view')
+      sc = @site.store_config
+      u = User.find(params[:id])
+      render :json => {
+        :stripe_key     => sc.stripe_publishable_key.strip,        
+        :customer_id    => u.stripe_customer_id,                   
+        :card_last4     => u.card_last4,     
+        :card_brand     => u.card_brand,       
+        :card_exp_month => u.card_exp_month, 
+        :card_exp_year  => u.card_exp_year
+      }          
+    end
+    
     # @route GET /admin/users/new
     def admin_new
       return if !user_is_allowed('users', 'add')
@@ -73,7 +88,21 @@ module Caboose
       @roles = Role.roles_with_user(@edituser.id)
     end
     
-    # @route GET /admin/users/:id/edit-password
+    # @route GET /admin/users/:id/roles
+    def admin_edit_roles
+      return if !user_is_allowed('users', 'edit')
+      @edituser = User.find(params[:id])    
+      @all_roles = Role.tree(@site.id)
+      @roles = Role.roles_with_user(@edituser.id)
+    end
+    
+    # @route GET /admin/users/:id/payment-method
+    def admin_edit_payment_method
+      return if !user_is_allowed('users', 'edit')
+      @edituser = User.find(params[:id])          
+    end
+    
+    # @route GET /admin/users/:id/password
     def admin_edit_password
       return if !user_is_allowed('users', 'edit')
       @edituser = User.find(params[:id])
@@ -82,6 +111,12 @@ module Caboose
     def random_string(length)
       o = [('a'..'z'),('A'..'Z'),('0'..'9')].map { |i| i.to_a }.flatten
       return (0...length).map { o[rand(o.length)] }.join
+    end
+    
+    # @route GET /admin/users/:id/delete
+    def admin_delete_form
+      return if !user_is_allowed('users', 'edit')
+      @edituser = User.find(params[:id])
     end
           
     # @route POST /admin/users/import
@@ -212,7 +247,31 @@ module Caboose
     	  	when "roles"
     	  	  user.roles = [];
     	  	  value.each { |rid| user.roles << Role.find(rid) } unless value.nil?
-    	  	  resp.attribute = { 'text' => user.roles.collect{ |r| r.name }.join(', ') }    		  
+    	  	  resp.attribute = { 'text' => user.roles.collect{ |r| r.name }.join(', ') }
+    	  	
+    	  	when 'card'
+    	  	  
+    	  	  sc = @site.store_config      
+    	  	  Stripe.api_key = sc.stripe_secret_key.strip    	  	              
+      
+    	  	  c = nil
+            if user.stripe_customer_id
+              c = Stripe::Customer.retrieve(user.stripe_customer_id)
+              begin          
+                c.source = params[:token]
+                c.save
+              rescue          
+                c = nil
+              end
+            end                  
+            c = Stripe::Customer.create(:source => params[:token], :email => user.email, :metadata => { :user_id => user.id }) if c.nil?                  
+            user.stripe_customer_id = c.id
+            user.card_last4     = params[:card][:last4]
+            user.card_brand     = params[:card][:brand]  
+            user.card_exp_month = params[:card][:exp_month]
+            user.card_exp_year  = params[:card][:exp_year]
+            user.save
+            
     	  end
     	end
     	

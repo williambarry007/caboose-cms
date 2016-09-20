@@ -1,0 +1,35 @@
+
+<%= render :partial => 'caboose/users/admin_header' %>
+
+<div id='roles'>
+<table class='data'>
+<% Caboose::Role.flat_tree(@site.id).each do |r| %>
+<% is_member = Caboose::RoleMembership.where(:role_id => r.id, :user_id => @edituser.id).exists? %>
+<tr><td><input type='checkbox' name='role<%= r.id %>' <%= is_member ? "checked='true'" : '' %> onclick="toggle_role(<%= @edituser.id %>, <%= r.id %>, $(this).prop('checked'));" /></td><td><%= r.name %></td></tr>
+<% end %>
+</table>
+</div>
+
+<%= render :partial => 'caboose/users/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#content input[type=checkbox] { position: relative; }
+#roles {}
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+function toggle_role(user_id, role_id, checked)
+{
+  $.ajax({
+    url: '/admin/users/' + user_id +'/roles/' + role_id,
+    type: checked ? 'post' : 'delete',    
+    succes: function(resp) { }
+  });
+}
+
+</script>
+<% end %>

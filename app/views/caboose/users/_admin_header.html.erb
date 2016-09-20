@@ -9,12 +9,15 @@
 <%
 tabs = {                             
   'General'         => "/admin/users/#{@edituser.id}",
-  'Payment Method'  => "/admin/users/#{@edituser.id}/payment-method",
   'Login Logs'      => "/admin/login-logs?user_id=#{@edituser.id}",
   'Password'        => "/admin/users/#{@edituser.id}/password",
   'Roles'           => "/admin/users/#{@edituser.id}/roles",    
   'Delete'          => "/admin/users/#{@edituser.id}/delete"  
 }
+if @site.use_store
+	arr = tabs.to_a.insert(1, ['Payment Method', "/admin/users/#{@edituser.id}/payment-method"])
+  tabs = Hash[arr]
+end
 tabs = Caboose.plugin_hook('admin_user_tabs', tabs, @edituser, @site)
 %>
 <% tabs.each do |text, href| %>

@@ -864,7 +864,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :payment_profile_id           , :string     ],
         [ :locked                       , :boolean     , { :default => false }],
         [ :authnet_customer_profile_id  , :string     ],
-        [ :authnet_payment_profile_id   , :string     ],
+        [ :authnet_payment_profile_id   , :string     ],        
         [ :valid_authnet_payment_id     , :boolean     , { :default => false }],
         [ :stripe_customer_id           , :string     ],
         [ :card_last4                   , :string     ],

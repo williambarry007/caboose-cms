@@ -72,6 +72,8 @@ module Caboose
     FINANCIAL_STATUS_CAPTURED            = 'captured'
     FINANCIAL_STATUS_REFUNDED            = 'refunded'
     FINANCIAL_STATUS_VOIDED              = 'voided'
+    FINANCIAL_STATUS_WAIVED              = 'waived'
+    FINANCIAL_STATUS_OVERDUE             = 'overdue'
     FINANCIAL_STATUS_PAID_BY_CHECK       = 'paid by check'
     FINANCIAL_STATUS_PAID_BY_OTHER_MEANS = 'paid by other means'
         

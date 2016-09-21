@@ -27,27 +27,21 @@ module Caboose
       :hide_prices           ,
       :user_subscription_id  ,            
       :date_starts           ,
-      :date_ends             
+      :date_ends
+    
+    STATUS_PENDING = 'pending'
+    STATUS_SHIPPED = 'shipped'
 
     #
     # Scopes
-    #
-    
+    #    
     scope :pending, where('status = ?', 'pending')
     scope :fulfilled, where('status = ?', 'shipped')
     scope :unfulfilled, where('status != ?', 'shipped')
-    #
-    # Validations
-    #
     
-    validates :status, :inclusion => {
-      :in      => ['pending', 'shipped'],
-      :message => "%{value} is not a valid status. Must be either 'pending' or 'shipped'"
-    }
+    #validates :quantity, :numericality => { :greater_than_or_equal_to => 0 }    
+    #validate :quantity_in_stock
     
-    validates :quantity, :numericality => { :greater_than_or_equal_to => 0 }
-    
-    validate :quantity_in_stock
     def quantity_in_stock
       errors.add(:base, "There #{self.variant.quantity_in_stock > 1 ? 'are' : 'is'} only #{self.variant.quantity_in_stock} left in stock.") if self.variant.quantity_in_stock - self.quantity < 0
     end

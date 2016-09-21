@@ -10,7 +10,7 @@ module Caboose
             
       @pager = Caboose::PageBarGenerator.new(params, {
         'customer_id'          => logged_in_user.id,         
-        'status'               => [Invoice::STATUS_PENDING, Invoice::STATUS_CANCELED, Invoice::STATUS_READY_TO_SHIP, Invoice::STATUS_SHIPPED]        
+        'status'               => ''        
       }, {
         'model'          => 'Caboose::Invoice',
         'sort'           => 'invoice_number',

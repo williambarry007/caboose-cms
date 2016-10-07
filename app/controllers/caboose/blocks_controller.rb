@@ -508,6 +508,17 @@ module Caboose
 
       render :json => resp
     end
+
+    # @route PUT /admin/pages/:page_id/blocks/:id/duplicate
+    # @route PUT /admin/posts/:post_id/blocks/:id/duplicate
+    def admin_duplicate
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new
+      b = Block.find(params[:id])
+      b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
+      resp.success = true
+      render :json => resp
+    end
     
     # @route PUT /admin/pages/:page_id/blocks/:id/move-up
     # @route PUT /admin/posts/:post_id/blocks/:id/move-up

@@ -173,7 +173,6 @@ BlockContentController.prototype = {
 
   duplicate_block: function(block_id)
   {
-    console.log('duplicating');
     var that = this;
     that.loadify($('#block_' + block_id + '_duplicate_handle span'));    
     $.ajax({

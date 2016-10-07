@@ -445,7 +445,6 @@ var BlockModalController = ModalController.extend({
 
   duplicate_block: function()
   {
-    console.log('duplicating');
     var that = this;
     that.autosize("<p class='loading'>Duplicating...</p>");
     $.ajax({

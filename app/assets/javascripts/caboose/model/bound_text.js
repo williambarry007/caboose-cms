@@ -33,6 +33,8 @@ BoundText = BoundControl.extend({
       $('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('mb_placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));
       $('#'+this.el).css('background', 'transparent');
     }
+    console.log("width: " + that.width);
+    console.log("width2: " + this.attribute.width);
     if (this.attribute.width)  $('#'+this.el).css('width' , this.attribute.width);    
     if (this.attribute.fixed_placeholder && this.attribute.align != 'right')
     {

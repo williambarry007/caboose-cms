@@ -620,7 +620,6 @@ class Caboose::Block < ActiveRecord::Base
       :name               => self.name,
       :value              => self.value
     )
-  #  b.create_children
     self.children.each do |b2|
       if b2.name 
         # The block is part of the block type, so we have to find the corresponding child block in the new block type        

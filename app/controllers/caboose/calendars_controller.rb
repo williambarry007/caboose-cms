@@ -27,6 +27,12 @@ module Caboose
       
       render :layout => 'caboose/admin'
     end
+    
+    # @route GET /admin/calendars/:id/json
+    def admin_json_single
+      return unless user_is_allowed('calendars', 'edit')       
+      render :json => Calendar.find(params[:id])           
+    end
             
     # @route PUT /admin/calendars/:id
     def admin_update

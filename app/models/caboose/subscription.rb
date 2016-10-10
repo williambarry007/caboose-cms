@@ -19,7 +19,11 @@ module Caboose
       :prorate_function    ,
       :start_on_day        ,
       :start_day           ,
-      :start_month
+      :start_month         ,
+      :status      
+      
+    STATUS_ACTIVE = 'active'
+    STATUS_INACTIVE = 'inactive'
 
     INTERVAL_MONTHLY = 'monthly'
     INTERVAL_YEARLY  = 'yearly'

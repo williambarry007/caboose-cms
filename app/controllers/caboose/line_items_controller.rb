@@ -119,7 +119,7 @@ module Caboose
     
     # @route GET /admin/invoices/line-items/status-options
     def admin_status_options
-      arr = ['pending', 'ready to ship', 'shipped', 'backinvoiceed', 'canceled']
+      arr = ['pending', 'ready to ship', 'shipped', 'backordered', 'canceled']
       options = []
       arr.each do |status|
         options << {

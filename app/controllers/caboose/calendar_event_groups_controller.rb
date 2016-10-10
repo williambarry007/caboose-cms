@@ -1,6 +1,6 @@
 
 module Caboose
-  class EventGroupsController < ApplicationController
+  class CalendarEventGroupsController < ApplicationController
     
     helper :application
     
@@ -30,7 +30,7 @@ module Caboose
         end
       end
       g.save
-      g.create_events
+      g.create_events(params[:after_calendar_event_id])
     
       resp.success = true
       render :json => resp

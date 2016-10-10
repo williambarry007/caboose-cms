@@ -26,15 +26,23 @@ module Caboose
     REPEAT_BY_DAY_OF_MONTH = 'Day of month'
     REPEAT_BY_DAY_OF_WEEK  = 'Day of week'
     
-    def create_events      
+    def create_events(after_calendar_event_id = nil)      
       return if self.date_start.nil?      
       return if self.date_end.nil?      
       return if self.date_end < self.date_start      
       
-      e = self.calendar_events.reorder(:begin_date).first      
+      dates = []
+      e = self.calendar_events.reorder(:begin_date).first
       return if e.nil?
       
-      dates = [e.begin_date.to_date]
+      if after_calendar_event_id
+        e = CalendarEvent.find(after_calendar_event_id)
+        events = self.calendar_events.where("begin_date <= ?", e.begin_date).reorder(:begin_date).all        
+        dates = events.collect{ |ev| ev.begin_date.to_date }        
+      else
+        dates = [e.begin_date.to_date]
+      end
+            
       if self.period == 'Day'
         d = self.date_start
         while d <= self.date_end

@@ -1,119 +1,21 @@
 
 <h1>Edit Calendar</h1>
-<p><div id='calendar_<%= @calendar.id %>_name'        ></div></p>
-<p><div id='calendar_<%= @calendar.id %>_color'       ></div></p>
-<p><div id='calendar_<%= @calendar.id %>_description' ></div></p>
-
-<div id='calendar'>
-  <h2><%= @d.strftime('%B %Y') %></h2>
-  <p>
-    <input type='button' value='< Previous Month' onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= (@d - 1.month).strftime('%Y-%m-%d') %>';" />
-    <input type='button' value='Current Month'    onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= DateTime.now.strftime('%Y-%m-%d')   %>';" />
-    <input type='button' value='Next Month >'     onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= (@d + 1.month).strftime('%Y-%m-%d') %>';" />
-  </p>    
-  <p><a href='/admin/calendars/<%= @calendar.id %>/events/new' id='new_event'>New Event</a></p>    
-  <table>
-    <tr>
-      <th>Sun</th>
-      <th>Mon</th>
-      <th>Tue</th>
-      <th>Wed</th>
-      <th>Thu</th>
-      <th>Fri</th>
-      <th>Sat</th>
-    </tr>
-    <%    
-    days_in_previous_month = (@d - (@d - 1.month)).to_f.ceil.to_i
-    days_in_month          = ((@d + 1.month) - @d).to_f.ceil.to_i  
-    start_day = @d.strftime('%w').to_i
-    %>
-    <tr>
-    <% (0...start_day).each do |i| %><td class='blank'><span class='day'><%= days_in_previous_month - (start_day - i) %></span></td><% end %>
-    <% day = 1 %>
-    <% while day <= days_in_month %>
-      <% d = @d + (day-1).days %>
-      <% if (day + start_day-1) % 7 == 0 %></tr><% if day < days_in_month %><tr><% end %><% end %>
-      <td id='day_<%= d.strftime('%Y-%m-%d') %>'>
-        <span class='day'><%= day %></span>
-        <% events = Caboose::CalendarEvent.events_for_day(@calendar.id, d) %>
-        <% if events.count > 0 %>
-          <ul>
-            <% events.each do |ev| %><li><a href='/admin/calendars/<%= @calendar.id %>/events/<%= ev.id %>' class='event_link'><%= ev.name %></a></li><% end %>
-          </ul>
-        <% end %>      
-      </td>
-      <% day = day + 1 %>
-    <% end %>
-    <% last_day = (start_day + days_in_month) % 7 %>
-    <% remaining_days = 7 - last_day %>    
-    <% if last_day > 0 %><% (0...remaining_days).each do |i| %><td class='blank'><span class='day'><%= (i + 1) %></span></td><% end %><% end %>
-    <% if (start_day + days_in_month) != 0 %></tr><% end %>
-  </table><br />
-</div>
-
-<div id='message'></div>
-<div id='controls'>
-<input type='button' value='Back'            onclick="window.location='/admin/calendars';" />
-<input type='button' value='Delete Calendar' onclick="delete_calendar(<%= @calendar.id %>);" />
-</div>
+<div id='calendar_container'></div>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/modal_controller" %>
+<%= javascript_include_tag "caboose/admin_calendar_event_modal_controller" %>
+<%= javascript_include_tag "caboose/admin_calendar_controller" %>
 <script type="text/javascript">
 
+var controller = false;
 $(document).ready(function() {
-  new ModelBinder({
-    name: 'Calendar',
-    id: <%= @calendar.id %>,
-    update_url: '/admin/calendars/<%= @calendar.id %>',
-    authenticity_token: '<%= form_authenticity_token %>',
-    attributes: [
-      { name: 'name'        , nice_name: 'Name'        , type: 'text'    , value: <%= raw Caboose.json(@calendar.name        ) %>, width: 400 },
-      { name: 'description' , nice_name: 'Description' , type: 'textarea', value: <%= raw Caboose.json(@calendar.description ) %>, width: 400, height: 100 },
-      { name: 'color' , nice_name: 'Color' , type: 'color', value: <%= raw Caboose.json(@calendar.color ) %>, width: 400, height: 100 }  
-    ]    
-  });  
-  $('#calendar td')
-    .mouseover(function(e) { $(this).addClass('over'); })
-    .mouseout(function(e) { $(this).removeClass('over'); })
-    .click(function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!$(this).hasClass('blank'))
-      {        
-        var d = $(this).attr('id').replace('day_', '');        
-        caboose_modal_url('/admin/calendars/<%= @calendar.id %>/events/new?begin_date=' + d);
-      }
-    });
-  $('#calendar td a.event_link')    
-    .click(function(e) {
-      e.preventDefault();
-      e.stopPropagation();              
-      caboose_modal_url($(this).attr('href'));
-    });
+  controller = new AdminCalendarController({
+    calendar_id: <%= @calendar.id %>,
+    authenticity_token: '<%= form_authenticity_token %>'      
+  });    
 });
-
-function delete_calendar(calendar_id, confirm)
-{
-  if (!confirm)
-  {
-    var p = $('<p/>').addClass('note confirm')
-      .append('Are you sure you want to delete the calendar? ')
-      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_calendar(calendar_id, true); })).append(' ')
-      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));
-    $('#message').empty().append(p);
-    return;
-  }
-  $('#message').html("<p class='loading'>Deleting calendar...</p>");
-  $.ajax({
-    url: '/admin/calendars/' + calendar_id,
-    type: 'delete',
-    success: function(resp) {
-      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
-      if (resp.redirect) window.location = resp.redirect;
-    }
-  });
-}
 
 </script>
 <% end %>
@@ -134,6 +36,11 @@ function delete_calendar(calendar_id, confirm)
 .calendar_<%= @calendar.id %>_color_bound_color {
   width: 100px !important;
 }
+
+#datetime_container { }
+
+#repeat_dates_container { clear: left; }
+#week_container { clear: left; padding-top: 10px; }
 
 </style>
 <% end %>

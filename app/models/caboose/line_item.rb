@@ -6,6 +6,7 @@ module Caboose
     belongs_to :invoice
     belongs_to :invoice_package, :class_name => 'InvoicePackage'
     belongs_to :parent, :class_name => 'LineItem', :foreign_key => 'parent_id'
+    belongs_to :user_subscription, :class_name => 'UserSubscription'
     has_many :children, :class_name => 'LineItem', :foreign_key => 'parent_id'
     
     attr_accessible :id      ,
@@ -51,9 +52,13 @@ module Caboose
     #
     
     before_save :update_subtotal
-    after_save { self.invoice.calculate }    
+    after_save :calculate_invoice    
     after_initialize :check_nil_fields
     
+    def calculate_invoice
+      self.invoice.calculate if self.invoice
+    end
+        
     def check_nil_fields      
       self.subtotal = 0.00 if self.subtotal.nil?        
     end
@@ -64,7 +69,7 @@ module Caboose
     
     def update_subtotal
       if self.unit_price.nil?
-        self.unit_price = self.variant.on_sale? ? self.variant.sale_price : self.variant.price        
+        self.unit_price = self.variant ? (self.variant.on_sale? ? self.variant.sale_price : self.variant.price) : 0.00        
       end      
       self.subtotal = self.unit_price * self.quantity
     end

@@ -66,6 +66,13 @@ module Caboose
       :downloadable,
       :download_path,
       :is_bundle
+      
+    STATUS_ACTIVE = 'Active'
+    STATUS_INACTIVE = 'Inactive'
+    
+    STATUS_ACTIVE   = 'active'
+    STATUS_INACTIVE = 'inactive'
+    STATUS_DELETED  = 'deleted'
     
     after_initialize do |v|
       v.price       = 0.00 if v.price.nil?

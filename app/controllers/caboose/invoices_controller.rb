@@ -172,7 +172,12 @@ module Caboose
         invoice.save
       end
       render :json => invoice.as_json(:include => [        
-        { :line_items => { :include => { :variant => { :include => :product }}}},
+        {
+          :line_items => { :include => { 
+            :variant => { :include => :product },
+            :user_subscription => { :include => { :subscription => { :include => { :variant => { :include => :product }}}}}
+          }}
+        },
         { :invoice_packages => { :include => [:shipping_package, :shipping_method] }},
         { :discounts => { :include => :gift_card }},
         :customer,
@@ -298,21 +303,29 @@ module Caboose
           statuses = [
             Invoice::STATUS_CART, 
             Invoice::STATUS_PENDING, 
-            Invoice::STATUS_READY_TO_SHIP, 
-            Invoice::STATUS_SHIPPED,
-            Invoice::STATUS_PAID, 
+            Invoice::STATUS_PROCESSED, 
+            Invoice::STATUS_UNDER_REVIEW,             
             Invoice::STATUS_CANCELED
           ]
           options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}
-        when 'financial-status'
+        when 'shipping-status'
           statuses = [
+            Invoice::SHIPPING_STATUS_PENDING ,
+            Invoice::SHIPPING_STATUS_READY   ,
+            Invoice::SHIPPING_STATUS_SHIPPED                
+          ]
+          options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}
+        when 'financial-status'
+          statuses = [          
             Invoice::FINANCIAL_STATUS_PENDING             ,
             Invoice::FINANCIAL_STATUS_AUTHORIZED          ,
             Invoice::FINANCIAL_STATUS_CAPTURED            ,
             Invoice::FINANCIAL_STATUS_REFUNDED            ,
             Invoice::FINANCIAL_STATUS_VOIDED              ,
+            Invoice::FINANCIAL_STATUS_WAIVED              ,
+            Invoice::FINANCIAL_STATUS_OVERDUE             ,
             Invoice::FINANCIAL_STATUS_PAID_BY_CHECK       ,
-            Invoice::FINANCIAL_STATUS_PAID_BY_OTHER_MEANS                
+            Invoice::FINANCIAL_STATUS_PAID_BY_OTHER_MEANS                                
           ]
           options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}
         when 'payment-terms'

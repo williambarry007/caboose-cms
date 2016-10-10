@@ -1,10 +1,15 @@
 #cboxLoadedContent { margin-bottom: 0; }
-
  
 body {
   margin: 0;
   padding: 0;  
   font-family: "Avenir", serif;
+}
+
+body * {
+ -moz-box-sizing: border-box;
+ -webkit-box-sizing: border-box;
+ box-sizing: border-box; 
 }
 
 #cboxOverlay {
@@ -70,8 +75,8 @@ body {
 
 #content h1 {
   margin: 0 0 20px -30px;
-  padding: 40px 0 0 30px;
-  height: 80px;  
+  padding: 30px 0 0 30px;
+  height: 120px;  
   background: #e1e1e1;
   border-bottom: #aaa 1px solid;
   font-size: 36pt;

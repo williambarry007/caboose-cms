@@ -220,7 +220,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :site_id      , :integer  ],
         [ :name         , :string   ],
         [ :description  , :text     ],
-        [ :color        , :string   ]
+        [ :color        , :string   ],
+        [ :timezone     , :string    , { :default => 'Central Time (US & Canada)' }]        
       ],
       Caboose::CalendarEvent => [
         [ :calendar_id              , :integer  ],
@@ -431,6 +432,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :cost                  , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
         [ :profit                , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
         [ :customer_id           , :integer  ],
+        [ :shipping_status       , :string   ],
         [ :financial_status      , :string   ],
         [ :shipping_address_id   , :integer  ],
         [ :billing_address_id    , :integer  ],
@@ -781,6 +783,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :authnet_relay_domain              , :string  ], # pp_relay_domain
         [ :stripe_secret_key                 , :string  ],
         [ :stripe_publishable_key            , :string  ],
+        [ :allow_instore_pickup              , :boolean  , { :default => false }],
         [ :ups_username                      , :string  ],
         [ :ups_password                      , :string  ],
         [ :ups_key                           , :string  ],
@@ -837,7 +840,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :prorate_function    , :text    ],
         [ :start_on_day        , :boolean  , { :default => false }],
         [ :start_day           , :integer ],
-        [ :start_month         , :integer ]       
+        [ :start_month         , :integer ],
+        [ :status              , :string  ]
       ],
       Caboose::User => [
         [ :site_id                      , :integer    ],
@@ -1154,5 +1158,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
     if Caboose::ShippingMethod.all.count == 0
       Caboose::ShippingMethodLoader.load_shipping_methods
     end
+    
+    Caboose::Invoice.where(:shipping_status => nil    ).all.each{ |invoice| invoice.update_column('shipping_status', 'pending' ) }
+    Caboose::Invoice.where(:status => 'ready to ship' ).all.each{ |invoice| invoice.update_column('status', 'processed') && invoice.update_column('shipping_status', 'ready'   ) }
+    Caboose::Invoice.where(:status => 'shipped'       ).all.each{ |invoice| invoice.update_column('status', 'processed') && invoice.update_column('shipping_status', 'shipped' ) }
+    
   end
 end

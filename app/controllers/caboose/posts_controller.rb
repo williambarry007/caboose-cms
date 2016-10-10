@@ -5,7 +5,7 @@ module Caboose
      
     # @route GET /posts
     def index
-    	@posts = Post.where(:published => true).limit(5).reorder('created_at DESC')
+    	@posts = Post.where(:site_id => @site.id, :published => true).limit(5).reorder('created_at DESC')
     end
     
     # @route GET /posts/:id
@@ -22,8 +22,8 @@ module Caboose
         uri = "#{params[:year]}/#{params[:month]}/#{params[:day]}/#{params[:slug]}"
         @post = Post.where(:site_id => @site.id, :uri => request.fullpath).first
       end      
-      render :file => "caboose/extras/error404" and return if @post.nil?                 
-
+      render :file => "caboose/extras/error404" and return if @post.nil? || @post.site_id != @site.id
+      
       @post = Caboose.plugin_hook('post_content', @post)
       @editmode = !params['edit'].nil? && user.is_allowed('posts', 'edit') ? true : false  
     end

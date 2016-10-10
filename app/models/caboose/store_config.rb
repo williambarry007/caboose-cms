@@ -12,6 +12,7 @@ module Caboose
       :authnet_relay_url,           # pp_relay_url
       :stripe_secret_key,
       :stripe_publishable_key,
+      :allow_instore_pickup,
       :ups_username,
       :ups_password,
       :ups_key,

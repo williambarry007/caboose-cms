@@ -48,24 +48,17 @@ module Caboose
       :landing_page_ref      ,
       :auth_amount           ,
       :gift_message          ,
-      :include_receipt               
-          
-    STATUS_CART          = 'cart'
-    STATUS_PENDING       = 'pending'    
-    STATUS_CANCELED      = 'canceled'
-    STATUS_READY_TO_SHIP = 'ready to ship'
-    STATUS_SHIPPED       = 'shipped'    
-    STATUS_PAID          = 'paid'
-    STATUS_TESTING       = 'testing'
+      :include_receipt        
     
-    # New
-    #STATUS_PENDING        = 'Pending'
-    #STATUS_OVERDUE        = 'Overdue'
-    #STATUS_UNDER_REVIEW   = 'Under Review'
-    #STATUS_PAID           = 'Paid'
-    #STATUS_PAID_BY_CHECK  = 'Paid By Check'
-    #STATUS_CANCELED       = 'Canceled'
-    #STATUS_WAIVED         = 'Waived'
+    STATUS_CART          = 'cart'
+    STATUS_PENDING       = 'pending'
+    STATUS_PROCESSED     = 'processed'
+    STATUS_CANCELED      = 'canceled'
+    STATUS_UNDER_REVIEW  = 'under review'
+    
+    SHIPPING_STATUS_PENDING = 'pending'
+    SHIPPING_STATUS_READY   = 'ready'
+    SHIPPING_STATUS_SHIPPED = 'shipped'
              
     FINANCIAL_STATUS_PENDING             = 'pending'
     FINANCIAL_STATUS_AUTHORIZED          = 'authorized'
@@ -76,6 +69,10 @@ module Caboose
     FINANCIAL_STATUS_OVERDUE             = 'overdue'
     FINANCIAL_STATUS_PAID_BY_CHECK       = 'paid by check'
     FINANCIAL_STATUS_PAID_BY_OTHER_MEANS = 'paid by other means'
+    
+    # STATUS_READY_TO_SHIP = 'ready to ship'
+    # STATUS_SHIPPED       = 'shipped'
+    # STATUS_OVERDUE       = 'overdue'
         
     PAYMENT_TERMS_PIA   = 'pia'
     PAYMENT_TERMS_NET7  = 'net7'
@@ -99,21 +96,7 @@ module Caboose
     scope :captured   , where('financial_status = ?', 'captured')
     scope :refunded   , where('financial_status = ?', 'refunded')
     scope :voided     , where('financial_status = ?', 'voided')        
-    
-    #
-    # Validations
-    #
-    
-    validates :status, :inclusion => {
-      :in      => ['cart', 'pending', 'canceled', 'ready to ship', 'shipped', 'paid', 'testing'],
-      :message => "%{value} is not a valid status. Must be either 'pending' or 'shipped'"
-    }
-    
-    validates :financial_status, :inclusion => {
-      :in      => ['pending', 'authorized', 'captured', 'refunded', 'voided', 'paid by check', 'paid by other means'],
-      :message => "%{value} is not a valid financial status. Must be 'authorized', 'captured', 'refunded' or 'voided'"
-    }
-    
+           
     after_initialize :check_nil_fields
     
     def check_nil_fields
@@ -224,7 +207,7 @@ module Caboose
       return x
     end
     
-    def calculate_total
+    def calculate_total            
       return (self.subtotal + self.tax + self.shipping + self.handling + self.gift_wrap) - self.discount
     end
     
@@ -232,7 +215,10 @@ module Caboose
       x = 0.0
       invalid_cost = false
       self.line_items.each do |li|
-        invalid_cost = true if li.variant.nil? || li.variant.cost.nil?
+        if li.variant.nil? || li.variant.cost.nil?
+          invalid_cost = true
+          break
+        end
         x = x + (li.variant.cost * li.quantity)
       end
       return 0.00 if invalid_cost

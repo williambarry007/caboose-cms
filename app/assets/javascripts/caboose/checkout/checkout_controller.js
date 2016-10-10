@@ -33,6 +33,7 @@ CheckoutController.prototype = {
   show_gift_wrap: true,
   show_discounts: true,
   show_gift_options: true,
+  allow_instore_pickup: false,
   
   init: function(params)
   {
@@ -125,7 +126,7 @@ CheckoutController.prototype = {
   {
     var that = this;
     var div = $('<div/>')            
-      .append($('<h2/>').html(confirm ? 'Confirm Invoice' : 'Checkout'))
+      .append($('<h2/>').html(confirm ? 'Confirm Order' : 'Checkout'))
       .append($('<section/>').attr('id', 'shipping_address_container'))
       .append($('<section/>').attr('id', 'cart'))
       .append($('<section/>').attr('id', 'gift_cards_container'))      
@@ -187,7 +188,7 @@ CheckoutController.prototype = {
     
     $('#message').empty().append($('<p/>')
       .append($('<input/>').attr('type', 'button').val('Make Changes' ).click(function(e) { that.print(); })).append(' ')
-      .append($('<input/>').attr('type', 'button').val('Confirm Invoice').click(function(e) { that.confirm_invoice(); }))
+      .append($('<input/>').attr('type', 'button').val('Confirm Order').click(function(e) { that.confirm_invoice(); }))
     );    
   },
 
@@ -220,7 +221,7 @@ CheckoutController.prototype = {
             .append($('<p/>').addClass('note error').append(resp.error))
             .append($('<p/>')
               .append($('<input/>').attr('type', 'button').val('Make Changes' ).click(function(e) { that.print(); })).append(' ')
-              .append($('<input/>').attr('type', 'button').val('Confirm Invoice').click(function(e) { that.confirm_invoice(); }))
+              .append($('<input/>').attr('type', 'button').val('Confirm Order').click(function(e) { that.confirm_invoice(); }))
             );
         }
       }                        

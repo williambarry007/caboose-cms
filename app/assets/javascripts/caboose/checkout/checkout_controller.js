@@ -40,7 +40,7 @@ CheckoutController.prototype = {
     for (var i in params)
       that[i] = params[i];
         
-    that.gift_cards_controller       = new GiftCardsController({           cc: that });
+    that.gift_cards_controller       = new GiftCardsController({           cc: that });     
     that.shipping_address_controller = new ShippingAddressController({     cc: that });    
     if (that.pp_name == 'stripe')       that.payment_method_controller = new StripePaymentMethodController({ cc: that });
     //else if (that.pp_name == 'authnet') that.payment_method_controller = new AuthnetPaymentMethodController({ cc: that });
@@ -125,13 +125,35 @@ CheckoutController.prototype = {
   {
     var that = this;
     var div = $('<div/>')            
-      .append($('<h2/>').html(confirm ? 'Confirm Invoice' : 'Checkout'))
+      .append($('<h2/>').html(confirm ? 'Confirm Order' : 'Checkout'))
+      .append($('<div/>').attr('id', 'invoice_1_instore_pickup' ))
       .append($('<section/>').attr('id', 'shipping_address_container'))
       .append($('<section/>').attr('id', 'cart'))
       .append($('<section/>').attr('id', 'gift_cards_container'))      
       .append($('<section/>').attr('id', 'payment_method_container'))      
       .append($('<div/>').attr('id', 'message'));      
     $('#'+that.container).empty().append(div);
+    
+    that.model_binder = new ModelBinder({
+      name: 'Invoice',
+      id: 1,
+      update_url: '/checkout/invoice',
+      authenticity_token: that.authenticity_token,
+      attributes: [                                                                                                  
+        { name: 'instore_pickup', nice_name: 'In-store Pickup', type: 'checkbox' , value: that.invoice.instore_pickup, fixed_placeholder: true,
+          //before_update: function() { this.value_old = this.value_clean; }, 
+          after_update: function()  {
+            var arr = ['shipping_address_container'];
+            $.each(that.invoice.invoice_packages, function(i, ip) {
+              arr.push('invoice_package_' + ip.id + '_shipping_method');
+            });            
+            if (parseInt(this.value) == 0) $.each(arr, function(i, el) { $('#'+el).slideDown(); });
+            else                           $.each(arr, function(i, el) { $('#'+el).slideUp();   });
+            that.print_ready_message();                                            
+          }                  
+        }
+      ]            
+    });
     
     if (confirm)
     {      
@@ -147,7 +169,7 @@ CheckoutController.prototype = {
       that.gift_cards_controller.edit();
       that.shipping_address_controller.edit();
       if (that.invoice.payment_terms == 'pia')
-        that.payment_method_controller.print();                
+        that.payment_method_controller.print_or_edit_if_empty();                
       that.cart_controller.print();      
       that.print_ready_message();
     }
@@ -187,7 +209,7 @@ CheckoutController.prototype = {
     
     $('#message').empty().append($('<p/>')
       .append($('<input/>').attr('type', 'button').val('Make Changes' ).click(function(e) { that.print(); })).append(' ')
-      .append($('<input/>').attr('type', 'button').val('Confirm Invoice').click(function(e) { that.confirm_invoice(); }))
+      .append($('<input/>').attr('type', 'button').val('Confirm Order').click(function(e) { that.confirm_invoice(); }))
     );    
   },
 
@@ -199,11 +221,11 @@ CheckoutController.prototype = {
   {
     var that = this;
     
-    $('#message').html("<p class='loading'>Verifying invoice total...</p>");    
+    $('#message').html("<p class='loading'>Verifying order total...</p>");    
     var t = $.ajax_value('/checkout/total');    
     if (parseFloat(t) != that.invoice.total)
     {
-      $('#message').html("<p class='note error'>It looks like the invoice total has changed since this was loaded. Please submit your invoice again after this page refreshes.</p>");
+      $('#message').html("<p class='note error'>It looks like the order total has changed since this was loaded. Please submit your order again after this page refreshes.</p>");
       setTimeout(function() { window.location.reload(true); }, 3000);
       return;
     }
@@ -220,7 +242,7 @@ CheckoutController.prototype = {
             .append($('<p/>').addClass('note error').append(resp.error))
             .append($('<p/>')
               .append($('<input/>').attr('type', 'button').val('Make Changes' ).click(function(e) { that.print(); })).append(' ')
-              .append($('<input/>').attr('type', 'button').val('Confirm Invoice').click(function(e) { that.confirm_invoice(); }))
+              .append($('<input/>').attr('type', 'button').val('Confirm Order').click(function(e) { that.confirm_invoice(); }))
             );
         }
       }                        

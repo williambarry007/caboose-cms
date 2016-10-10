@@ -438,6 +438,28 @@ module Caboose
                                    
       render :json => { :success => true }               
     end
+        
+    # @route PUT /checkout/invoice
+    def update_invoice
+      render :json => false and return if !logged_in?      
+      resp = Caboose::StdClass.new
+      
+      params.each do |k,v|
+        case k
+          when 'instore_pickup'
+            @invoice.instore_pickup = v
+            @invoice.save
+            
+            @invoice.invoice_packages.each do |ip
+              ip.instore_pickup = v
+              ip.save
+            end
+        end
+      end
+      
+      resp.success = true
+      render :json => resp                  
+    end
     
     # GET /checkout/payment
     #def payment

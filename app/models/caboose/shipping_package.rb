@@ -19,7 +19,8 @@ module Caboose
       :empty_weight,
       :cylinder,
       :priority,
-      :flat_rate_price            
+      :flat_rate_price,
+      :instore_pickup
           
     def fits(variants)  
       

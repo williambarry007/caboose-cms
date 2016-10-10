@@ -27,7 +27,7 @@ ShippingAddressController.prototype = {
     var sa = that.cc.invoice.shipping_address;    
     
     var div = $('<div/>').append($('<h3/>').html('Shipping Address'));
-    
+            
     if (that.cc.is_empty_address(sa))
       div.append($('<p/>').append('[Empty]'));
     else
@@ -46,6 +46,7 @@ ShippingAddressController.prototype = {
     
     div.append($('<p/>').append($('<a/>').attr('href', '#').html('Edit').click(function(e) { e.preventDefault(); that.cc.refresh_and_print(); })));              
     $('#shipping_address_container').empty().append(div);
+    if (that.cc.invoice.instore_pickup) $('#shipping_address_container').css('display', 'none');
   },
   
   edit: function()
@@ -61,7 +62,7 @@ ShippingAddressController.prototype = {
     var sa = that.cc.invoice.shipping_address;
     if (!sa.id) sa.id = 1;
     
-    var div = $('<div/>')          
+    var div = $('<div/>')
       .append($('<h3/>').html('Shipping Address'))
       .append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_first_name' ))
       .append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_last_name'  ))
@@ -70,8 +71,9 @@ ShippingAddressController.prototype = {
       .append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_address2'   ))
       .append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_city'       ))
       .append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_state'      ))
-      .append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_zip'        ));
+      .append($('<div/>').attr('id', 'shippingaddress_' + sa.id + '_zip'        ));          
     $('#shipping_address_container').empty().append(div);
+    if (that.cc.invoice.instore_pickup) $('#shipping_address_container').css('display', 'none');
     
     that.model_binder = new ModelBinder({
       name: 'ShippingAddress',
@@ -93,8 +95,9 @@ ShippingAddressController.prototype = {
   
   ready: function()
   {
-    var that = this;
-    if (that.cc.all_downloadable()) return true;
+    var that = this;    
+    if (that.cc.invoice.instore_pickup) return true;
+    if (that.cc.all_downloadable()) return true;    
     if (that.cc.is_empty_address(that.cc.invoice.shipping_address)) return false;
     
     var sa = that.cc.invoice.shipping_address;    

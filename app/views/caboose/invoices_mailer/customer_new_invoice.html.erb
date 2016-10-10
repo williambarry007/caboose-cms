@@ -21,9 +21,13 @@
       <tr>
         <% if i == 0 %>
           <td rowspan="<%= op.line_items.count %>">
-            <div><%= op.shipping_method.service_name %></div>
-            <div><%= op.status %></div>
-            <% if op.tracking_number %><div><%= op.tracking_number %></div><% end %>
+            <% if op.instore_pickup %>
+              <div>In-store Pickup</div>
+            <% else %>
+              <div><%= op.shipping_method.service_name %></div>
+              <div><%= op.status %></div>
+              <% if op.tracking_number %><div><%= op.tracking_number %></div><% end %>
+            <% end %>
           </td>
         <% end %>
         <td>
@@ -89,7 +93,7 @@
   <tr><td colspan="4" align='right'>Total:     </td><td align='right'><%= number_to_currency(@invoice.total) %></td></tr>
 </table>
 
-<% if @invoice.shipping_address %>
+<% if !@invoice.instore_pickup && @invoice.shipping_address %>
   <% sa = @invoice.shipping_address %>
   <h2>Shipping Address</h2>
   <p>

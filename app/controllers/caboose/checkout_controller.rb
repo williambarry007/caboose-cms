@@ -155,17 +155,55 @@ module Caboose
       u.save
       
       render :json => {
-        :success => true,
-        :customer_id => u.stripe_customer_id
+        :success        => true,
+        :customer_id    => u.stripe_customer_id,                                                           
+        :card_last4     => u.card_last4,     
+        :card_brand     => u.card_brand,       
+        :card_exp_month => u.card_exp_month, 
+        :card_exp_year  => u.card_exp_year
       }      
     end
-    
+        
+    # @route DELETE /checkout/payment-method
+    def remove_payment_method
+      render :json => false and return if !logged_in?
+      
+      resp = Caboose::StdClass.new
+      sc = @site.store_config      
+      if sc.pp_name == 'stripe'
+        Stripe.api_key = sc.stripe_secret_key.strip
+        u = logged_in_user        
+        if u.stripe_customer_id          
+          begin
+            c = Stripe::Customer.retrieve(u.stripe_customer_id)
+            c.delete
+          rescue Exception => ex
+            Caboose.log(ex)
+            resp.error = ex.message if !ex.message.starts_with?('No such customer')
+          end
+          if resp.error.nil?            
+            u.stripe_customer_id = nil          
+            u.card_last4         = nil
+            u.card_brand         = nil
+            u.card_exp_month     = nil
+            u.card_exp_year      = nil
+            u.save
+          else
+            resp.success = true
+          end
+        end
+      end      
+      render :json => resp      
+    end
+            
     # @route POST /checkout/confirm
     def confirm
       render :json => { :error => 'Not logged in.'            } and return if !logged_in?
       #render :json => { :error => 'Invalid billing address.'  } and return if @invoice.billing_address.nil?
-      render :json => { :error => 'Invalid shipping address.' } and return if @invoice.has_shippable_items? && @invoice.shipping_address.nil?      
-      render :json => { :error => 'Invalid shipping methods.' } and return if @invoice.has_shippable_items? && @invoice.has_empty_shipping_methods?      
+      if !@invoice.instore_pickup && @invoice.has_shippable_items?
+        render :json => { :error => 'Invalid shipping address.' } and return if @invoice.shipping_address.nil?      
+        render :json => { :error => 'Invalid shipping methods.' } and return if @invoice.has_empty_shipping_methods?
+      end
       
       resp = Caboose::StdClass.new
       sc = @site.store_config
@@ -409,6 +447,28 @@ module Caboose
       ba.save
                         
       render :json => { :success => true }
+    end
+    
+    # @route PUT /checkout/invoice
+    def update_invoice
+      render :json => false and return if !logged_in?      
+      resp = Caboose::StdClass.new
+      
+      params.each do |k,v|
+        case k
+          when 'instore_pickup'
+            @invoice.instore_pickup = v
+            @invoice.save
+            
+            @invoice.invoice_packages.each do |ip|
+              ip.instore_pickup = v
+              ip.save
+            end
+        end
+      end
+      
+      resp.success = true
+      render :json => resp                  
     end
     
     # @route POST /checkout/attach-user

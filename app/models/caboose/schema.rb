@@ -409,11 +409,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::InvoicePackage => [
         [ :invoice_id           , :integer ],
+        [ :instore_pickup       , :boolean  , { :default => false }],
         [ :shipping_method_id   , :integer ],
         [ :shipping_package_id  , :integer ],
         [ :status               , :string  ],
         [ :tracking_number      , :string  ],
-        [ :total                , :decimal  , { :precision => 8, :scale => 2 }]
+        [ :total                , :decimal  , { :precision => 8, :scale => 2 }]        
       ],
       Caboose::Invoice => [
         [ :site_id               , :integer  ],
@@ -447,7 +448,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :landing_page_ref      , :string   ],
         [ :auth_amount           , :decimal  , { :precision => 8, :scale => 2 }],
         [ :gift_message          , :text     ],
-        [ :include_receipt       , :boolean  , { :default => true }]
+        [ :include_receipt       , :boolean  , { :default => true }],
+        [ :instore_pickup        , :boolean  , { :default => false }]
                 
         #[ :email                 , :string   ],
         #[ :invoice_number        , :string   ],
@@ -699,8 +701,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :outside_height     , :decimal ],        
         [ :volume             , :decimal ],
         [ :empty_weight       , :decimal ],
-        [ :cylinder           , :boolean , { :default => false }],
-        [ :priority           , :integer , { :default => 1 }],
+        [ :cylinder           , :boolean  , { :default => false }],
+        [ :priority           , :integer  , { :default => 1 }],
         [ :flat_rate_price    , :decimal ]
       ],
       Caboose::ShippingPackageMethod => [
@@ -823,7 +825,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :default_payment_terms             , :string   , { :default => 'pia' }],
         [ :default_vendor_id                 , :integer ],
         [ :default_product_status            , :string  ],
-        [ :default_taxable                   , :boolean ]                      
+        [ :default_taxable                   , :boolean ],
+        [ :allow_instore_pickup              , :boolean  , { :default => false }]        
       ],  
       Caboose::Subscription => [
         [ :site_id             , :integer ],

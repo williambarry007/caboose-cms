@@ -604,6 +604,38 @@ class Caboose::Block < ActiveRecord::Base
       end
     end
   end
+
+
+  # Assumes that we start the duplicate process at the top level block
+  def duplicate_block(site_id, page_id, post_id, new_block_type_id = nil, new_parent_id = nil)      
+    b = Caboose::Block.create(
+      :page_id            => page_id,          
+      :post_id            => post_id,         
+      :parent_id          => new_parent_id,
+      :media_id           => self.media_id,
+      :block_type_id      => self.block_type_id,    
+      :sort_order         => self.sort_order + 1,
+      :constrain          => self.constrain,
+      :full_width         => self.full_width,
+      :name               => self.name,
+      :value              => self.value
+    )
+    self.children.each do |b2|
+      if b2.name 
+        # The block is part of the block type, so we have to find the corresponding child block in the new block type        
+        bt = Caboose::BlockType.where(:parent_id => self.block_type_id, :name => b2.name).first
+        if bt
+          b2.duplicate_block(site_id, page_id, post_id, bt.id, b.id)
+        else
+          # Don't duplicate it because the corresponding child block doesn't exist in the new block type
+        end
+      else
+        # The block is a child block that isn't part of the block type definition
+        b2.duplicate_block(site_id, page_id, post_id, b2.block_type_id, b.id)
+      end
+    end
+    return true
+  end
   
   def modal_js_block_names
     arr = []

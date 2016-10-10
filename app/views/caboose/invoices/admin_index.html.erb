@@ -27,7 +27,7 @@
   <p><select name='status'>
       <optgroup label='Status'>
         <option value=''>-- All statuses --</option>
-        <% statuses = ['cart', 'pending', 'ready to ship', 'shipped', 'canceled', 'backordered'] %>
+        <% statuses = ['cart','pending','canceled','ready to ship','shipped','paid'] %>
         <% statuses.each do |status| %>
           <option value='<%= status %>'<%= @pager.params['status'] == status ? " selected='true'" : '' %>><%= status.capitalize %></option>
         <% end %>

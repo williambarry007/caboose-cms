@@ -146,8 +146,8 @@ input, select, textarea {
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
   border-radius: 2px;
-  padding: 4px 8px;
-  height: 34px;
+  padding: 6px 4px 4px 8px;
+  height: 36px;
   font-size: 20px;
   z-index: 20;
 }

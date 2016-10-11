@@ -1,0 +1,38 @@
+
+<%= render :partial => 'caboose/users/admin_header' %>
+
+<p><div id='usersubscription_<%= @user_subscription.id %>_subscription_id'    ></div></p>
+<p><div id='usersubscription_<%= @user_subscription.id %>_user_id'            ></div></p>
+<p><div id='usersubscription_<%= @user_subscription.id %>_date_started'       ></div></p>
+<p><div id='usersubscription_<%= @user_subscription.id %>_date_started_full'  ></div></p>
+<p><div id='usersubscription_<%= @user_subscription.id %>_status'             ></div></p>
+
+<%= render :partial => 'caboose/users/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+#content input[type=checkbox] { position: relative; }
+#roles { height: 200px; overflow-y: scroll; margin-bottom: 20px; }
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'UserSubcription',
+    id: <%= @edituser.id %>,
+    update_url: '/admin/users/<%= @edituser.id %>/subscriptions/<%= @user_subscription.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'subscription_id'    , nice_name: 'Subcription'       , type: 'select' , value: <%= raw Caboose.json(@edituser.subscription_id   ) %>, width: 400, options_url '/admin/users/<%= @edituser.id %>/subscriptions/subscription-options' },        
+      { name: 'date_started'       , nice_name: 'Date Started'      , type: 'date'   , value: <%= raw Caboose.json(@edituser.date_started      ) %>, width: 400 },
+      { name: 'date_started_full'  , nice_name: 'Date Started Full' , type: 'date'   , value: <%= raw Caboose.json(@edituser.date_started_full ) %>, width: 400 },
+      { name: 'status'             , nice_name: 'Status'            , type: 'select' , value: <%= raw Caboose.json(@edituser.status            ) %>, width: 400, options_url '/admin/users/<%= @edituser.id %>/subscriptions/status-options' }      
+    ]    
+  });  
+});
+
+</script>
+<% end %>

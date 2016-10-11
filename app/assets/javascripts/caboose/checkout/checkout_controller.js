@@ -143,6 +143,7 @@ CheckoutController.prototype = {
         { name: 'instore_pickup', nice_name: 'In-store Pickup', type: 'checkbox' , value: that.invoice.instore_pickup, fixed_placeholder: true,
           //before_update: function() { this.value_old = this.value_clean; }, 
           after_update: function()  {
+            that.invoice.instore_pickup = this.value;
             var arr = ['shipping_address_container'];
             $.each(that.invoice.invoice_packages, function(i, ip) {
               arr.push('invoice_package_' + ip.id + '_shipping_method');

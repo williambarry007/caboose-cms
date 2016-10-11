@@ -125,6 +125,9 @@ CheckoutController.prototype = {
   print: function(confirm)
   {
     var that = this;
+    
+    $(document).trigger('checkout_controller_before_print', that);
+    
     var div = $('<div/>').append($('<h2/>').html(confirm ? 'Confirm Order' : 'Checkout'));
     if (that.allow_instore_pickup) 
       div.append($('<div/>').attr('id', 'invoice_1_instore_pickup' ));
@@ -178,6 +181,8 @@ CheckoutController.prototype = {
       that.cart_controller.print();      
       that.print_ready_message();
     }
+    
+    $(document).trigger('checkout_controller_after_print', that);
   },
   
   print_ready_message: function()

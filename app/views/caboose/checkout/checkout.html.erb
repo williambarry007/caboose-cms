@@ -21,7 +21,8 @@ store_config = @site.store_config
 $(document).ready(function() {      
   var checkout_controller = new CheckoutController({
     authenticity_token: '<%= raw form_authenticity_token %>',
-    pp_name: <%= raw Caboose.json(store_config.pp_name) %>
+    pp_name: <%= raw Caboose.json(store_config.pp_name) %>,
+    allow_instore_pickup: <%= store_config.allow_instore_pickup ? 'true' : 'false' %>
   });   
 });
 

@@ -96,7 +96,7 @@ ShippingAddressController.prototype = {
   ready: function()
   {
     var that = this;    
-    if (that.cc.invoice.instore_pickup) return true;
+    if (that.cc.allow_instore_pickup && that.cc.invoice.instore_pickup) return true;
     if (that.cc.all_downloadable()) return true;    
     if (that.cc.is_empty_address(that.cc.invoice.shipping_address)) return false;
     

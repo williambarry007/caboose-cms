@@ -25,6 +25,7 @@ CheckoutController.prototype = {
   cart_controller: false,
 
   // Cart options
+  allow_instore_pickup: false,
   allow_edit_line_items: true,
   allow_edit_gift_cards: true,
   show_total: true,
@@ -124,37 +125,40 @@ CheckoutController.prototype = {
   print: function(confirm)
   {
     var that = this;
-    var div = $('<div/>')            
-      .append($('<h2/>').html(confirm ? 'Confirm Order' : 'Checkout'))
-      .append($('<div/>').attr('id', 'invoice_1_instore_pickup' ))
-      .append($('<section/>').attr('id', 'shipping_address_container'))
+    var div = $('<div/>').append($('<h2/>').html(confirm ? 'Confirm Order' : 'Checkout'));
+    if (that.allow_instore_pickup) 
+      div.append($('<div/>').attr('id', 'invoice_1_instore_pickup' ));
+    div.append($('<section/>').attr('id', 'shipping_address_container'))
       .append($('<section/>').attr('id', 'cart'))
       .append($('<section/>').attr('id', 'gift_cards_container'))      
       .append($('<section/>').attr('id', 'payment_method_container'))      
       .append($('<div/>').attr('id', 'message'));      
     $('#'+that.container).empty().append(div);
     
-    that.model_binder = new ModelBinder({
-      name: 'Invoice',
-      id: 1,
-      update_url: '/checkout/invoice',
-      authenticity_token: that.authenticity_token,
-      attributes: [                                                                                                  
-        { name: 'instore_pickup', nice_name: 'In-store Pickup', type: 'checkbox' , value: that.invoice.instore_pickup, fixed_placeholder: true,
-          //before_update: function() { this.value_old = this.value_clean; }, 
-          after_update: function()  {
-            that.invoice.instore_pickup = this.value;
-            var arr = ['shipping_address_container'];
-            $.each(that.invoice.invoice_packages, function(i, ip) {
-              arr.push('invoice_package_' + ip.id + '_shipping_method');
-            });            
-            if (parseInt(this.value) == 0) $.each(arr, function(i, el) { $('#'+el).slideDown(); });
-            else                           $.each(arr, function(i, el) { $('#'+el).slideUp();   });
-            that.print_ready_message();                                            
-          }                  
-        }
-      ]            
-    });
+    if (that.allow_instore_pickup)
+    {
+      that.model_binder = new ModelBinder({
+        name: 'Invoice',
+        id: 1,
+        update_url: '/checkout/invoice',
+        authenticity_token: that.authenticity_token,
+        attributes: [                                                                                                  
+          { name: 'instore_pickup', nice_name: 'In-store Pickup', type: 'checkbox' , value: that.invoice.instore_pickup, fixed_placeholder: true,
+            //before_update: function() { this.value_old = this.value_clean; }, 
+            after_update: function()  {
+              that.invoice.instore_pickup = this.value;
+              var arr = ['shipping_address_container'];
+              $.each(that.invoice.invoice_packages, function(i, ip) {
+                arr.push('invoice_package_' + ip.id + '_shipping_method');
+              });            
+              if (parseInt(this.value) == 0) $.each(arr, function(i, el) { $('#'+el).slideDown(); });
+              else                           $.each(arr, function(i, el) { $('#'+el).slideUp();   });
+              that.print_ready_message();                                            
+            }                  
+          }
+        ]            
+      });
+    }
     
     if (confirm)
     {      

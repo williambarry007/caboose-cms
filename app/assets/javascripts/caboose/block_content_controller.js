@@ -94,6 +94,38 @@ BlockContentController.prototype = {
     else                                      options['post_id'] = that.post_id;
     that.modal = new BlockModalController(options)
   },
+
+  block_url: function(parent_id, b)
+  {
+    var that = this;    
+    if (!b) return that.base_url() + '/' + parent_id;    
+    return that.base_url(b) + '/' + b.id;     
+  },
+
+  create_block: function(block_type_id, parent_id, before_block_id, after_block_id) {
+    var that = this;
+    var h = {                      
+      authenticity_token: that.authenticity_token,
+      block_type_id: block_type_id,
+      before_id: before_block_id,
+      after_id: after_block_id
+    };
+    $.ajax({
+      url: that.block_url(parent_id, null),
+      type: 'post',
+      data: h,
+      success: function(resp) {
+        if (resp.error)   that.autosize("<p class='note error'>" + resp.error + "</p>");
+        if (resp.success)
+        {                    
+          that.refresh_blocks(function() {
+            that.edit_block(resp.new_id);
+            that.render_blocks();            
+          });
+        }
+      }
+    });
+  },
   
   select_block: function(block_id)
   {            
@@ -254,33 +286,55 @@ BlockContentController.prototype = {
     {            
       $('#block_' + b.id).before($('<div/>')          
         .addClass('new_block_link')
-        .append($('<div/>').addClass('line'))
-        .append($('<a/>')
-          .attr('href', '#')
-          .html("New Block")
-          .click(function(e) { 
-            e.preventDefault(); e.stopPropagation();            
-            that.new_block(parent_id, b.id, null);
-          })
-        )
-        .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
-        .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
+        .append($('<div/>').addClass('line').droppable({
+          classes: {
+            "ui-droppable-active": "ui-state-active",
+            "ui-droppable-hover": "ui-state-hover"
+          },
+          drop: function(event, ui) {
+         //   console.dir(ui);
+         //   window.ui = ui;
+            that.create_block(ui.draggable.data('btid'), parent_id, b.id, null);
+          //  console.log("dropped here");
+          }
+        }))
+        // .append($('<a/>')
+        //   .attr('href', '#')
+        //   .html("New Block")
+        //   .click(function(e) { 
+        //     e.preventDefault(); e.stopPropagation();            
+        //     that.new_block(parent_id, b.id, null);
+        //   })
+        // )
+        // .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
+        // .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
       );
       if (is_last_child && is_last_child == true)
       {
         $('#block_' + b.id).after($('<div/>')          
           .addClass('new_block_link')
-          .append($('<div/>').addClass('line'))
-          .append($('<a/>')
-            .attr('href', '#')
-            .html("New Block")
-            .click(function(e) { 
-              e.preventDefault(); e.stopPropagation();              
-              that.new_block(parent_id, null, b.id);
-            })
-          )
-          .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
-          .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
+          .append($('<div/>').addClass('line').droppable({
+            classes: {
+              "ui-droppable-active": "ui-state-active",
+              "ui-droppable-hover": "ui-state-hover"
+            },
+            drop: function(event, ui) {
+            //  console.dir(ui);
+           //   window.ui = ui;
+              that.create_block(ui.draggable.data('btid'), parent_id, null, b.id);
+          //    console.log("dropped here");
+            }
+          }))
+          // .append($('<a/>')
+          //   .attr('href', '#')
+          //   .html("New Block")
+          //   .click(function(e) { 
+          //     e.preventDefault(); e.stopPropagation();              
+          //     that.new_block(parent_id, null, b.id);
+          //   })
+          // )
+          // .mouseover(function(e) { $(this).removeClass('new_block_link').addClass('new_block_link_over'); e.stopPropagation(); })
+          // .mouseout(function(e)  { $(this).removeClass('new_block_link_over').addClass('new_block_link'); e.stopPropagation(); })
         );
       }
     }

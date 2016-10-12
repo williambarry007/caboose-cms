@@ -328,7 +328,7 @@ module Caboose
           i = i + 1                  
         end
         
-      elsif params[:before_id]
+      elsif params[:before_id] && !params[:before_id].blank?
         b2 = Block.find(params[:before_id].to_i)
         b.sort_order = b2.sort_order
         
@@ -339,7 +339,7 @@ module Caboose
           i = i + 1                  
         end
       
-      elsif params[:after_id]
+      elsif params[:after_id] && !params[:after_id].blank?
         b2 = Block.find(params[:after_id].to_i)
         b.sort_order = b2.sort_order + 1
         

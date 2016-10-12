@@ -526,7 +526,7 @@ var BlockModalController = ModalController.extend({
   {
     var that = this;    
     if (!b) return that.base_url() + '/' + that.block_id;    
-    return that.base_url(b) + '/' + b.id;          
+    return that.base_url(b) + '/' + b.id;     
   },
   
   child_block: function(name, b)

@@ -1,13 +1,20 @@
-<div id='new_blocks_container1'>
+<%
+btsm = Caboose::BlockTypeSiteMembership.where(:site_id => @site.id).pluq(:block_type_id)
+@block_types = Caboose::BlockType.where(:parent_id => nil, :block_type_category_id => 2).where(:id => btsm).order(:description)
+%>
+<!-- <div id='new_blocks_container1'>
   <p><input type='button' value='New Page Block' onclick='toggle_blocks();' /></p>
-</div>
-<div id='new_blocks_container2' style='display: none;'>
-  <input type='button' value='New Page Block' onclick='toggle_blocks();' />
-  <p>Drag a block onto the page.</p>
+</div> -->
+<div id='new_blocks_container2'>
+<!--   <input type='button' value='New Page Block' onclick='toggle_blocks();' /> -->
+  <h4>Drag a block onto the page.</h4>
   <ul id='new_blocks'>
-    <% @block_types.each do |block_type| %><li id='new_block_<%= block_type.id %>'><%= block_type.description %></li><% end %>
+    <% @block_types.each do |block_type| %>
+    	<li id='new_block_<%= block_type.id %>'>
+    		<span data-btid='<%= block_type.id %>'><%= block_type.description %></span>
+    	</li>
+    <% end %>
   </ul>
-  <p><a href='#' onclick='toggle_blocks();'>Close</a></p>
+ <!--  <p><a href='#' onclick='toggle_blocks();'>Close</a></p> -->
 </div>
-<ul id='blocks'></ul>
-
+<!-- <ul id='blocks'></ul> -->

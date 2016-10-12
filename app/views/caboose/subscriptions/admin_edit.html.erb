@@ -1,81 +1,46 @@
-<%
-s = @subscription
-%>
 
-<h1>Edit Subscription</h1>
+<%= render :partial => 'caboose/users/admin_header' %>
 
-<p><div id='subscription_<%= s.id %>_name'                ></div></p>
-<p><div id='subscription_<%= s.id %>_description'         ></div></p>
-<p><div id='subscription_<%= s.id %>_variant_id'          ></div></p>
-<p><div id='subscription_<%= s.id %>_interval'            ></div></p>
-<p><div id='subscription_<%= s.id %>_prorate'             ></div></p>
-<p><div id='subscription_<%= s.id %>_prorate_method'      ></div></p>
-<p><div id='subscription_<%= s.id %>_prorate_flat_amount' ></div></p>
-
-<p><code>def custom_prorate_function() {</code></p>
-<p><div id='subscription_<%= s.id %>_prorate_function'    ></div></p>
-<p><code>
-# Returns the amount that should be prorated for the first invoice for a subscription.<br />
-# Note: self represents the user subscription object.<br />
-}</code></p>
-<p><div id='subscription_<%= s.id %>_start_on_day'        ></div></p>
-<p><div id='subscription_<%= s.id %>_start_day'           ></div></p>
-<p><div id='subscription_<%= s.id %>_start_month'         ></div></p>
+<p><div id='subscription_<%= @subscription.id %>_variant_id'         ></div></p>
+<p><div id='subscription_<%= @subscription.id %>_date_started'       ></div></p>
+<p><div id='subscription_<%= @subscription.id %>_date_started_full'  ></div></p>
+<p><div id='subscription_<%= @subscription.id %>_status'             ></div></p>
 
 <div id='message'></div>
-
 <p>
-<input type='button' value='< Back' onclick="window.location='/admin/subscriptions';" />
-<input type='button' value='Delete Subscription' onclick="delete_subscription(<%= s.id %>);" />
-</p>
+<input type='button' value='Create Invoices for this Subscription' onclick="create_subscription_invoices(<%= @subscription.id %>);" />
+
+<%= render :partial => 'caboose/users/admin_footer' %>
 
 <% content_for :caboose_js do %>
-<%= javascript_include_tag 'caboose/model/all' %>
-<script type='text/javascript'>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
 
 $(document).ready(function() {
   new ModelBinder({
     name: 'Subscription',
-    id: <%= s.id %>,
-    update_url: '/admin/subscriptions/<%= s.id %>',
+    id: <%= @subscription.id %>,
+    update_url: '/admin/users/<%= @edituser.id %>/subscriptions/<%= @subscription.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
-    attributes: [
-      { name: 'name'                , nice_name: 'Name'                    , type: 'text'     , value: <%= raw Caboose.json(s.name                )%>, width: 400, align: 'left' },
-      { name: 'description'         , nice_name: 'Description'             , type: 'textarea' , value: <%= raw Caboose.json(s.description         )%>, width: 400, align: 'left'  , height: 75 },
-      { name: 'variant_id'          , nice_name: 'Variant ID'              , type: 'text'     , value: <%= raw Caboose.json(s.variant_id          )%>, width: 400, align: 'left' },
-      { name: 'interval'            , nice_name: 'Interval'                , type: 'select'   , value: <%= raw Caboose.json(s.interval            )%>, width: 400, align: 'left'  , options_url: '/admin/subscriptions/interval-options' },
-      { name: 'prorate'             , nice_name: 'Prorate'                 , type: 'checkbox' , value: <%= raw Caboose.json(s.prorate             )%>, width: 400, align: 'left' },
-      { name: 'prorate_method'      , nice_name: 'Prorate method'          , type: 'select'   , value: <%= raw Caboose.json(s.prorate_method      )%>, width: 400, align: 'left'  , options_url: '/admin/subscriptions/prorate-method-options' },
-      { name: 'prorate_flat_amount' , nice_name: 'Prorate flat amount'     , type: 'text'     , value: <%= raw Caboose.json(s.prorate_flat_amount )%>, width: 400, align: 'left' },
-      { name: 'prorate_function'    , nice_name: 'Custom Prorate Function' , type: 'textarea' , value: <%= raw Caboose.json(s.prorate_function    )%>, width: 400, align: 'left'  , height: 100 },
-      { name: 'start_on_day'        , nice_name: 'Start on day'            , type: 'checkbox' , value: <%= raw Caboose.json(s.start_on_day        )%>, width: 400, align: 'left' },
-      { name: 'start_day'           , nice_name: 'Start day'               , type: 'select'   , value: <%= raw Caboose.json(s.start_day           )%>, width: 400, align: 'left'  , options_url: '/admin/subscriptions/start-day-options' },
-      { name: 'start_month'         , nice_name: 'Start month'             , type: 'select'   , value: <%= raw Caboose.json(s.start_month         )%>, width: 400, align: 'left'  , options_url: '/admin/subscriptions/start-month-options' }                  
-    ]    
-  });       
+    attributes: [      
+      { name: 'variant_id'         , nice_name: 'Variant'           , type: 'select' , value: <%= raw Caboose.json(@subscription.variant_id        ) %>, width: 400 , options_url: '/admin/subscriptions/subscription-options' },        
+      { name: 'date_started'       , nice_name: 'Date Started'      , type: 'date'   , value: <%= raw Caboose.json(@subscription.date_started      ) %>, width: 400 , date_format: 'Y-m-d' },
+      { name: 'date_started_full'  , nice_name: 'Date Started Full' , type: 'date'   , value: <%= raw Caboose.json(@subscription.date_started_full ) %>, width: 400 , date_format: 'Y-m-d' },
+      { name: 'status'             , nice_name: 'Status'            , type: 'select' , value: <%= raw Caboose.json(@subscription.status            ) %>, width: 400 , options_url: '/admin/subscriptions/status-options' }
+    ]                                                                           
+  });
 });
 
-function delete_subscription(subscription_id, confirm)
+function create_subscription_invoices(subscription_id)
 {
-  if (!confirm)
-  {
-    var p = $('<p/>')
-      .addClass('note warning')
-      .append("Are you sure you want to delete the subscription? ")
-      .append($('<input/>').attr('type','button').val('Yes').click(function(e) { delete_subscription(subscription_id, true); })).append(' ')
-      .append($('<input/>').attr('type','button').val('No' ).click(function(e) { $('#message').empty(); }));              
-    $('#message').empty().append(p);
-    return;        
-  }
-  $('#message').html("<p class='loading'>Deleting subscription...</p>");
   $.ajax({
-    url: '/admin/subscriptions/' + subscription_id,
-    type: 'delete',
+    url: "/admin/users/<%= @edituser.id %>/subscriptions/" + subscription_id + "/invoices",
+    type: 'post',
     success: function(resp) {
       if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
-      if (resp.success) window.location = '/admin/subscriptions';
-    }    
-  });
+      if (resp.success) $('#message').html("<p class='note success'>Invoices have been created successfully.</p>");            
+    }      
+  });  
 }
 
 </script>

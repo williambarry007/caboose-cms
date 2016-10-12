@@ -4,6 +4,7 @@ module Caboose
     
     belongs_to :variant
     belongs_to :invoice
+    belongs_to :subscription
     belongs_to :invoice_package, :class_name => 'InvoicePackage'
     belongs_to :parent, :class_name => 'LineItem', :foreign_key => 'parent_id'
     has_many :children, :class_name => 'LineItem', :foreign_key => 'parent_id'
@@ -25,7 +26,7 @@ module Caboose
       :gift_message          ,
       :gift_wrap             ,
       :hide_prices           ,
-      :user_subscription_id  ,            
+      :subscription_id       ,            
       :date_starts           ,
       :date_ends
     

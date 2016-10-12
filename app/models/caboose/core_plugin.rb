@@ -20,8 +20,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'smtp'              , 'text' => 'SMTP (Mail)'         , 'href' => '/admin/smtp'               , 'modal' => false } if user.is_allowed('smtp'              , 'view')
     item['children'] << { 'id' => 'social'            , 'text' => 'Social Media'        , 'href' => '/admin/social'             , 'modal' => false } if user.is_allowed('social'            , 'view')
     item['children'] << { 'id' => 'store'             , 'text' => 'Store'               , 'href' => '/admin/store'              , 'modal' => false } if user.is_allowed('store'             , 'view') if site.use_store == true
-    item['children'] << { 'id' => 'users'             , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'             , 'view')
-    item['children'] << { 'id' => 'usersubscriptions' , 'text' => 'User Subscriptions'  , 'href' => '/admin/user-subscriptions' , 'modal' => false } if user.is_allowed('usersubscriptions' , 'view')
+    item['children'] << { 'id' => 'users'             , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'             , 'view')    
     item['children'] << { 'id' => 'subscriptions'     , 'text' => 'Subscriptions'       , 'href' => '/admin/subscriptions'      , 'modal' => false } if user.is_allowed('subscriptions'     , 'view')
     item['children'] << { 'id' => 'variables'         , 'text' => 'Variables'           , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'          , 'view')    
     nav << item if item['children'].count > 0

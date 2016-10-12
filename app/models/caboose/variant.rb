@@ -65,7 +65,27 @@ module Caboose
       :sort_order,      
       :downloadable,
       :download_path,
-      :is_bundle
+      :is_bundle,
+      :is_subscription,
+      :subscription_interval            ,
+      :subscription_prorate             ,
+      :subscription_prorate_method      ,
+      :subscription_prorate_flat_amount ,
+      :subscription_prorate_function    ,
+      :subscription_start_on_day        ,
+      :subscription_start_day           ,
+      :subscription_start_month
+      
+    STATUS_ACTIVE   = 'Active'
+    STATUS_INACTIVE = 'Inactive'
+    STATUS_DELETED  = 'Deleted'
+    
+    SUBSCRIPTION_INTERVAL_MONTHLY = 'monthly'
+    SUBSCRIPTION_INTERVAL_YEARLY  = 'yearly'
+    
+    SUBSCRIPTION_PRORATE_METHOD_FLAT       = 'flat'
+    SUBSCRIPTION_PRORATE_METHOD_PERCENTAGE = 'percentage'
+    SUBSCRIPTION_PRORATE_METHOD_CUSTOM     = 'custom'
     
     after_initialize do |v|
       v.price       = 0.00 if v.price.nil?

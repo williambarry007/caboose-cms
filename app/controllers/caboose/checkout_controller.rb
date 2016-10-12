@@ -315,7 +315,7 @@ module Caboose
         @invoice.calculate
         total = @invoice.total
       end
-      render :json => total.to_f      
+      render :json => total.to_f.round(2)      
     end
     
     # @route GET /checkout/address

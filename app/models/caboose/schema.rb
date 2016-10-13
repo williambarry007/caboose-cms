@@ -436,6 +436,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :shipping_address_id   , :integer  ],
         [ :billing_address_id    , :integer  ],
         [ :notes                 , :text     ],
+        [ :customer_notes        , :text     ],
         [ :status                , :string   ],
         [ :payment_terms         , :string   ],
         [ :date_created          , :datetime ],

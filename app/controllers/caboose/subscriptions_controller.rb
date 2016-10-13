@@ -41,7 +41,7 @@ module Caboose
     	})
     	render :json => {
     	  :pager => pager,
-    	  :models => pager.items.as_json(:include => [:user, :subscription])
+    	  :models => pager.items.as_json(:include => [:user, { :variant => { :include => :product }}])
     	}
     end
 
@@ -137,7 +137,7 @@ module Caboose
       options = []
       case params[:field]                
         when 'variant'
-          arr = Variant.join(:product.where("store_products.site_id = ? and is_subscription = ?", @site.id, true).reorder("store_products.title").all          
+          arr = Variant.joins(:product).where("store_products.site_id = ? and is_subscription = ?", @site.id, true).reorder("store_products.title").all          
           options = arr.collect{ |v| { 'value' => v.id, 'text' => v.product.title }}
         when 'status'
           options = [

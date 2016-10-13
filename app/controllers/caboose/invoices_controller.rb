@@ -19,7 +19,9 @@ module Caboose
         'status'               => Invoice::STATUS_PENDING,
         'shipping_method_code' => '',
         'id'                   => '',
-        'invoice_number'       => ''
+        'invoice_number'       => '',
+        'total_lte'            => '',
+        'total_gte'            => ''
       }, {
         'model'          => 'Caboose::Invoice',
         'sort'           => 'id',
@@ -225,11 +227,15 @@ module Caboose
             invoice.total = invoice.calculate_total
           when 'status'
             invoice.status = value
-            invoice.date_shipped = DateTime.now.utc if value == 'Shipped'                          
-          when 'financial_status'            
-            invoice.financial_status = value
-          when 'customer_id'
-            invoice.customer_id = value            
+            invoice.date_shipped = DateTime.now.utc if value == 'Shipped'
+            
+          when 'financial_status'    then invoice.financial_status = value
+          when 'customer_id'         then invoice.customer_id      = value          
+          when 'notes'               then invoice.notes            = value
+          when 'customer_notes'      then invoice.customer_notes   = value                    
+          when 'payment_terms'       then invoice.payment_terms    = value          
+          when 'date_due'            then invoice.date_due         = value
+                            
         end
       end
 

@@ -107,12 +107,14 @@ InvoiceController.prototype = {
       update_url: '/admin/invoices/' + that.invoice.id,
       authenticity_token: that.authenticity_token,
       attributes: [
-        { name: 'status'           , nice_name: 'Status'        , type: 'select', value: that.invoice.status                , width: 100, fixed_placeholder: false, options_url: '/admin/invoices/status-options' },
-        { name: 'financial_status' , nice_name: 'Status'        , type: 'select', value: that.invoice.financial_status      , width: 100, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/financial-status-options' },
-        { name: 'payment_terms'    , nice_name: 'Terms'         , type: 'select', value: that.invoice.payment_terms         , width: 200, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/payment-terms-options' },
-        { name: 'tax'              , nice_name: 'Tax'           , type: 'text'  , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'handling'         , nice_name: 'Handling'      , type: 'text'  , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'custom_discount'  , nice_name: 'Discount'      , type: 'text'  , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }}
+        { name: 'status'           , nice_name: 'Status'             , type: 'select'   , value: that.invoice.status                , width: 100, fixed_placeholder: false, options_url: '/admin/invoices/status-options' },
+        { name: 'financial_status' , nice_name: 'Status'             , type: 'select'   , value: that.invoice.financial_status      , width: 100, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/financial-status-options' },
+        { name: 'payment_terms'    , nice_name: 'Terms'              , type: 'select'   , value: that.invoice.payment_terms         , width: 200, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/payment-terms-options' },
+        { name: 'tax'              , nice_name: 'Tax'                , type: 'text'     , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'handling'         , nice_name: 'Handling'           , type: 'text'     , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'custom_discount'  , nice_name: 'Discount'           , type: 'text'     , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'notes'            , nice_name: 'Notes (not public)' , type: 'textarea' , value: that.invoice.notes                 , width: 100, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 50 },
+        { name: 'customer_notes'   , nice_name: 'Customer Notes'     , type: 'textarea' , value: that.invoice.notes                 , width: 100, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 50 }
       ]
     });        
   },

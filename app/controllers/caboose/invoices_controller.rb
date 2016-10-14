@@ -10,12 +10,13 @@ module Caboose
     end
     
     # @route GET /admin/invoices
+    # @route GET /admin/users/:user_id/invoices
     def admin_index
       return if !user_is_allowed('invoices', 'view')
       
       @pager = Caboose::PageBarGenerator.new(params, {
         'site_id'              => @site.id,
-        'customer_id'          => '', 
+        'customer_id'          => params[:user_id] ? params[:user_id] : '', 
         'status'               => Invoice::STATUS_PENDING,
         'shipping_method_code' => '',
         'id'                   => '',
@@ -26,11 +27,12 @@ module Caboose
         'model'          => 'Caboose::Invoice',
         'sort'           => 'id',
         'desc'           => 1,
-        'base_url'       => '/admin/invoices',
+        'base_url'       => params[:user_id] ? "/admin/users/#{params[:user_id]}/invoices" : "/admin/invoices",
         'use_url_params' => false,
         'items_per_page' => 100
       })
       
+      @edituser = params[:user_id] ? User.find(params[:user_id]) : nil
       @invoices  = @pager.items
       @customers = Caboose::User.where(:site_id => @site.id).reorder('last_name, first_name').all
       
@@ -68,13 +70,15 @@ module Caboose
       )    
       render :json => { :sucess => true, :redirect => "/admin/invoices/#{invoice.id}" }
     end
-      
+        
     # @route_priority 50
     # @route GET /admin/invoices/:id
+    # @route GET /admin/users/:user_id/invoices/:id
     def admin_edit
       return if !user_is_allowed('invoices', 'edit')
       @invoice = Invoice.where(:id => params[:id]).first
-
+      @edituser = params[:user_id] ? User.find(params[:user_id]) : nil
+      
       if params[:id].nil? || @invoice.nil?
         render :file => 'caboose/invoices/admin_invalid_invoice', :layout => 'caboose/admin'
         return

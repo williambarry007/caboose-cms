@@ -87,7 +87,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :amount_discounted     ,
         :auth_code             ,                
         :date_shipped          ,                        
-        :decremented           
+        :decremented           ,
+        :user_subscription_id
       ],        
       #Caboose::PageCache => [:block],
       #Caboose::RetargetingConfig => [:fb_pixels_function],

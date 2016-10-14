@@ -2,6 +2,10 @@ require "caboose/version"
 require 'aws-sdk'
 
 namespace :caboose do
+    
+  task :subscription_migration => :environment do
+    Caboose::Subscription.migrate_from_user_subscriptions
+  end
   
   desc "Save sample asset"
   task :save_sample_asset => :environment do

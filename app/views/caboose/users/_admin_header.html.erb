@@ -9,9 +9,11 @@
 <%
 tabs = {                             
   'General'         => "/admin/users/#{@edituser.id}",
+  'Invoices'        => "/admin/users/#{@edituser.id}/invoices",
   'Login Logs'      => "/admin/login-logs?user_id=#{@edituser.id}",
   'Password'        => "/admin/users/#{@edituser.id}/password",
-  'Roles'           => "/admin/users/#{@edituser.id}/roles",    
+  'Roles'           => "/admin/users/#{@edituser.id}/roles",
+  'Subscriptions'   => "/admin/users/#{@edituser.id}/subscriptions",
   'Delete'          => "/admin/users/#{@edituser.id}/delete"  
 }
 if @site.use_store

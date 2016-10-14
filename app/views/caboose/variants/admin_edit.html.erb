@@ -55,6 +55,22 @@ v = @variant
 <div id='variant_<%= v.id %>_is_bundle'></div>
 <div id='variant_children'></div>
 
+<h2>Subscription</h2>
+<div id='variant_<%= v.id %>_is_subscription'></div>
+<div id='variant_<%= v.id %>_subscription_interval'            ></div>
+<div id='variant_<%= v.id %>_subscription_prorate'             ></div>
+<div id='variant_<%= v.id %>_subscription_prorate_method'      ></div>
+<div id='variant_<%= v.id %>_subscription_prorate_flat_amount' ></div>
+<div id='variant_<%= v.id %>_subscription_start_on_day'        ></div>
+<div id='variant_<%= v.id %>_subscription_start_day'           ></div>
+<div id='variant_<%= v.id %>_subscription_start_month'         ></div>
+<p><code>def custom_prorate_function() {</code></p>
+<p><div id='variant_<%= v.id %>_subscription_prorate_function'    ></div></p>
+<p><code>
+# Returns the amount that should be prorated for the first invoice for a subscription.<br />
+# Note: self represents the subscription object.<br />
+}</code></p>
+
 <h2>Delete Variant</h2>
 <div id='message'></div>
 <p><input type='button' value='Delete Variant' onclick="delete_variant(<%= v.id %>);" /></p>
@@ -124,7 +140,16 @@ $(document).ready(function() {
           else
             vcc.hide();          
         }
-      }
+      },      
+      { name: 'is_subscription'                      , nice_name: 'Is Subscription'                  , type: 'checkbox' , align: 'right' , width: 400, value: <%= raw Caboose.json(v.is_subscription ? 1 : 0          ) %> },                    
+      { name: 'subscription_interval'                , nice_name: 'Interval'                         , type: 'select'   , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_interval            ) %>  , options_url: '/admin/variants/subscription-interval-options' },
+      { name: 'subscription_prorate'                 , nice_name: 'Prorate'                          , type: 'checkbox' , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_prorate             ) %> },
+      { name: 'subscription_prorate_method'          , nice_name: 'Prorate method'                   , type: 'select'   , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_prorate_method      ) %>  , options_url: '/admin/variants/subscription-prorate-method-options' },
+      { name: 'subscription_prorate_flat_amount'     , nice_name: 'Prorate flat amount'              , type: 'text'     , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_prorate_flat_amount ) %> },
+      { name: 'subscription_prorate_function'        , nice_name: 'Custom Prorate Function'          , type: 'textarea' , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_prorate_function    ) %>  , height: 100 },
+      { name: 'subscription_start_on_day'            , nice_name: 'Start on day'                     , type: 'checkbox' , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_start_on_day        ) %> },
+      { name: 'subscription_start_day'               , nice_name: 'Start day'                        , type: 'select'   , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_start_day           ) %>  , options_url: '/admin/variants/subscription-start-day-options' },
+      { name: 'subscription_start_month'             , nice_name: 'Start month'                      , type: 'select'   , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_start_month         ) %>  , options_url: '/admin/variants/subscription-start-month-options' }
     ]
   });  
   vcc = new VariantChildrenController({

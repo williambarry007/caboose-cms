@@ -12,31 +12,28 @@ $(document).ready(function() {
   var table = new IndexTable({    
     form_authenticity_token: '<%= form_authenticity_token %>',
     container: 'subscriptions',
-    base_url: '/admin/subscriptions',
+    base_url: '/admin/users/<%= @edituser.id %>/subscriptions',
     allow_bulk_edit: true,
     allow_bulk_delete: true,
     allow_duplicate: false,
     allow_advanced_edit: true,
     search_fields: [                                              
-      { name: 'variant_id' , nice_name: 'Variant' , type: 'select', width: 400, options_url: '/admin/subscriptions/variant-options' , empty_option_text: '-- Any Variant --' },
-      { name: 'user_id'    , nice_name: 'User'    , type: 'select', width: 400, options_url: '/admin/subscriptions/user-options'    , empty_option_text: '-- Any User --' },      
+      { name: 'variant_id' , nice_name: 'Variant' , type: 'select', width: 400, options_url: '/admin/subscriptions/variant-options' , empty_option_text: '-- Any Variant --' },            
       { name: 'status'     , nice_name: 'Status'  , type: 'select', width: 400, options_url: '/admin/subscriptions/status-options'  , empty_option_text: '-- Any Status --' }
     ],
     fields: [  
-      { show: true, bulk_edit: true, name: 'variant_id'        , nice_name: 'Variant'           , sort: 'variant_id'        , type: 'select' , value: function(s) { return s.variant_id        }, text: function(s) { return s.variant && s.variant.product ? s.variant.product.title : s.variant_id; }, width: 75, align: 'left', options_url: '/admin/subscriptions/variant-options' },
-      { show: true, bulk_edit: true, name: 'user_id'           , nice_name: 'User'              , sort: 'user_id'           , type: 'select' , value: function(s) { return s.user_id           }, text: function(s) { return s.user ? s.user.first_name + ' ' + s.user.last_name : s.user_id; }, width: 75, align: 'left', options_url: '/admin/subscriptions/user-options' },
+      { show: true, bulk_edit: true, name: 'variant_id'        , nice_name: 'Variant'           , sort: 'variant_id'        , type: 'select' , value: function(s) { return s.variant_id        }, text: function(s) { return s.variant && s.variant.product ? s.variant.product.title : s.variant_id; }, width: 75, align: 'left', options_url: '/admin/subscriptions/variant-options' },      
       { show: true, bulk_edit: true, name: 'date_started'      , nice_name: 'Date Started'      , sort: 'date_started'      , type: 'date'   , value: function(s) { return s.date_started      }, width: 100, align: 'left' , date_format: 'Y-m-d' },
       { show: true, bulk_edit: true, name: 'date_started_full' , nice_name: 'Date Started Full' , sort: 'date_started_full' , type: 'date'   , value: function(s) { return s.date_started_full }, width: 100, align: 'left' , date_format: 'Y-m-d' },
       { show: true, bulk_edit: true, name: 'status'            , nice_name: 'Status'            , sort: 'status'            , type: 'select' , value: function(s) { return s.status            }, width: 75, align: 'left' , options_url: '/admin/subscriptions/status-options' }
     ],
     new_model_text: 'New Subscription',
-    no_models_text: "There are subscriptions right now.",
+    no_models_text: "There are subscriptions right now for this user.",
     new_model_fields: [
-      { name: 'variant_id' , nice_name: 'Variant' , type: 'select', width: 400, options_url: '/admin/subscriptions/variant-options' },
-      { name: 'user_id'    , nice_name: 'User'    , type: 'select', width: 400, options_url: '/admin/subscriptions/user-options'    }
+      { name: 'variant_id' , nice_name: 'Variant' , type: 'select', width: 400, options_url: '/admin/subscriptions/variant-options' }      
     ],
-    bulk_import_fields: ['variant_id', 'user_id', 'date_started', 'date_started_full', 'status'],
-    bulk_import_url: '/admin/subscriptions/bulk'
+    bulk_import_fields: ['variant_id', 'date_started', 'date_started_full', 'status'],
+    bulk_import_url: '/admin/users/<%= @edituser.id %>/subscriptions/bulk'
   });        
 });
 

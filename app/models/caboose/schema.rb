@@ -745,7 +745,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :password             , :string ],
         [ :authentication       , :string ], # :plain, :login, :cram_md5.
         [ :enable_starttls_auto , :boolean , { :default => true }],
-        [ :from_address         , :string ]
+        [ :from_address         , :string ],
+        [ :reply_to_address     , :string ]
       ],
       Caboose::SocialConfig => [
         [ :site_id              , :integer ],
@@ -1154,5 +1155,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
     if Caboose::ShippingMethod.all.count == 0
       Caboose::ShippingMethodLoader.load_shipping_methods
     end
+    
+    # Make sure all the reply-to addresses are populated
+    Caboose::SmtpConfig.where('reply_to_address is null and from_address is not null').all.each do |smtp|
+      smtp.reply_to_address = smtp.from_address
+      smtp.save
+    end
+    
   end
 end

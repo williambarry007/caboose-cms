@@ -7,23 +7,24 @@ AdminBlockTypeParserController.prototype = {
   authenticity_token: false,
   //original_html: "<div data-num='30' data-thumb='assets/minimalist-basic/thumbnails/p02.png' data-cat='0,13'>\n  <div class='row clearfix'>\n    <div class='column half'>\n      <div class='display'>\n        <h1>Beautiful content. Responsive.</h1>\n        <p>Lorem Ipsum is simply dummy text.</p>\n        <div style='margin:1em 0 2.5em;'>\n          <a href='#' class='btn btn-primary edit'>Read More</a>\n        </div>\n      </div>\n    </div>\n    <div class='column half'>\n      <img src='assets/minimalist-basic/p02-1.jpg'>\n    </div>\n  </div>\n</div>\n",
   //original_html: "<div data-num='1' data-thumb='assets/minimalist-basic/thumbnails/a01.png' data-cat='1'>\n  <div class='row clearfix'>\n    <div class='column full'>\n      <h1 class='size-96 is-title1-96 is-title-lite'>Lorem Ipsum</h1>\n    </div>\n  </div>\n</div>\n",
-  original_html: "" +
-    "<div data-num='30' data-thumb='assets/minimalist-basic/thumbnails/p02.png' data-cat='0,13'>\n" +
-    "  <div class='row clearfix'>\n" +
-    "    <div class='column half'>\n" +
-    "      <div class='display'>\n" +
-    "        <h1>Beautiful content. Responsive.</h1>\n" +
-    "        <p>Lorem Ipsum is simply dummy text.</p>\n" +
-    "        <div style='margin:1em 0 2.5em;'>\n" +
-    "          <a href='#' class='btn btn-primary edit'>Read More</a>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "    </div>\n" +
-    "    <div class='column half'>\n" +
-    "      <img src='assets/minimalist-basic/p02-1.jpg'>\n" +
-    "    </div>\n" +
-    "	</div>\n" +
-    "</div>\n",  
+  //original_html: "" +
+  //  "<div data-num='30' data-thumb='assets/minimalist-basic/thumbnails/p02.png' data-cat='0,13'>\n" +
+  //  "  <div class='row clearfix'>\n" +
+  //  "    <div class='column half'>\n" +
+  //  "      <div class='display'>\n" +
+  //  "        <h1>Beautiful content. Responsive.</h1>\n" +
+  //  "        <p>Lorem Ipsum is simply dummy text.</p>\n" +
+  //  "        <div style='margin:1em 0 2.5em;'>\n" +
+  //  "          <a href='#' class='btn btn-primary edit'>Read More</a>\n" +
+  //  "        </div>\n" +
+  //  "      </div>\n" +
+  //  "    </div>\n" +
+  //  "    <div class='column half'>\n" +
+  //  "      <img src='assets/minimalist-basic/p02-1.jpg'>\n" +
+  //  "    </div>\n" +
+  //  "	</div>\n" +
+  //  "</div>\n",
+  original_html: "",
   parsable_tags: { heading: 'Headings' , richtext: 'Rich Text' , img: 'Images' , link: 'Links' },
   tags_to_parse: { heading: true       , richtext: true        , img: true     , link: true    },
   render_function: false,

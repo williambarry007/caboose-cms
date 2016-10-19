@@ -47,6 +47,20 @@ module Caboose
       block_type = BlockType.find(params[:id])
       render :json => block_type.as_json(:include => :sites)      
     end
+    
+    # @route GET /admin/block-types/parse
+    def admin_parse_form
+      return if !user_is_allowed('pages', 'view')      
+      render :layout => 'caboose/admin'      
+    end
+    
+    # @route POST /admin/block-types/parse-tags
+    def admin_parse_tags
+      return if !user_is_allowed('pages', 'view')      
+      children = params[:children] && params[:children] != 'false' ? params[:children] : nil
+      resp = BlockTypeParser.parse_html(params[:html], params[:tags], children)
+      render :json => resp
+    end
 
     # @route GET /admin/block-types/new
     # @route GET /admin/block-types/:id/new

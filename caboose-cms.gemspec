@@ -54,6 +54,7 @@ Gem::Specification.new do |s|
   s.add_dependency "prawn"
   s.add_dependency "prawn-table"
   s.add_dependency "nokogiri"
+  s.add_dependency "nokogiri-styles"
   s.add_dependency 'delayed_job_active_record'  
   s.add_dependency 'aws-sdk', '< 2.0'
   s.add_dependency 'asset_sync'

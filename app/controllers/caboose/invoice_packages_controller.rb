@@ -187,6 +187,23 @@ module Caboose
       rates = ShippingCalculator.invoice_package_rates(op)      
       render :json => rates            
     end
+    
+    # @route_priority 1
+    # @route GET /admin/invoice-packages/:field-options
+    def admin_options
+      return if !user_is_allowed('invoices', 'edit')
+      
+      options = []
+      case params[:field]
+        when 'status'
+          options = [
+            { :value => InvoicePackage::STATUS_PENDING       , :text => 'Pending'       },
+            { :value => InvoicePackage::STATUS_READY_TO_SHIP , :text => 'Ready to Ship' },
+            { :value => InvoicePackage::STATUS_SHIPPED       , :text => 'Shipped'       }            
+          ]
+      end
+      render :json => options
+    end
             
   end
 end

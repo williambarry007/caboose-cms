@@ -67,7 +67,13 @@ module Caboose
         :status => Invoice::STATUS_PENDING,                          
         :financial_status => Invoice::FINANCIAL_STATUS_PENDING,
         :invoice_number => @site.store_config.next_invoice_number
-      )    
+      )
+      InvoiceLog.create(
+        :invoice_id     => invoice.id,
+        :user_id        => logged_in_user.id,
+        :date_logged    => DateTime.now.utc,
+        :invoice_action => InvoiceLog::ACTION_INVOICE_CREATED                        
+      )      
       render :json => { :sucess => true, :redirect => "/admin/invoices/#{invoice.id}" }
     end
         
@@ -216,8 +222,20 @@ module Caboose
       resp = Caboose::StdClass.new({'attributes' => {}})
       invoice = Invoice.find(params[:id])    
             
-      save = true    
-      params.each do |name,value|        
+      save = true
+      fields_to_log = ['tax','handling','custom_discount','financial_status','customer_id','notes','customer_notes','payment_terms','date_due','status']            
+      params.each do |name,value|
+        if fields_to_log.include?(name)                                                  
+          InvoiceLog.create(
+            :invoice_id     => invoice.id,
+            :user_id        => logged_in_user.id,
+            :date_logged    => DateTime.now.utc,
+            :invoice_action => InvoiceLog::ACTION_INVOICE_UPDATED,
+            :field          => name,
+            :old_value      => invoice[name.to_sym],
+            :new_value      => value                                                                  
+          )
+        end
         case name
           when 'tax' 
             invoice.tax = value
@@ -229,9 +247,9 @@ module Caboose
             invoice.custom_discount = value
             invoice.discount = invoice.calculate_discount
             invoice.total = invoice.calculate_total
-          when 'status'
-            invoice.status = value
-            invoice.date_shipped = DateTime.now.utc if value == 'Shipped'
+          when 'status'            
+            invoice.status = value             
+            invoice.date_processed = DateTime.now.utc if value == Invoice::STATUS_PROCESSED
             
           when 'financial_status'    then invoice.financial_status = value
           when 'customer_id'         then invoice.customer_id      = value          
@@ -240,7 +258,7 @@ module Caboose
           when 'payment_terms'       then invoice.payment_terms    = value          
           when 'date_due'            then invoice.date_due         = value
                             
-        end
+        end                        
       end
 
       #invoice.calculate
@@ -254,7 +272,13 @@ module Caboose
     # @route DELETE /admin/invoices/:id
     def admin_delete
       return if !user_is_allowed('invoices', 'delete')
-      Invoice.find(params[:id]).destroy
+      Invoice.find(params[:id]).destroy      
+      InvoiceLog.create(
+        :invoice_id     => params[:id],
+        :user_id        => logged_in_user.id,
+        :date_logged    => DateTime.now.utc,
+        :invoice_action => InvoiceLog::ACTION_INVOICE_DELETED                                                                          
+      )      
       render :json => Caboose::StdClass.new({
         :redirect => '/admin/invoices'
       })
@@ -309,8 +333,7 @@ module Caboose
             Invoice::STATUS_CART, 
             Invoice::STATUS_PENDING, 
             Invoice::STATUS_READY_TO_SHIP, 
-            Invoice::STATUS_SHIPPED,
-            Invoice::STATUS_PAID, 
+            Invoice::STATUS_PROCESSED,             
             Invoice::STATUS_CANCELED
           ]
           options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}
@@ -346,16 +369,16 @@ module Caboose
       if Caboose::Setting.exists?(:name => 'google_feed_date_last_submitted')                  
         d1 = Caboose::Setting.where(:name => 'google_feed_date_last_submitted').first.value      
         d1 = DateTime.parse(d1)
-      elsif Invoice.exists?("status = ? and date_authorized is not null", Invoice::STATUS_SHIPPED)
-        d1 = Invoice.where("status = ? and date_authorized is not null", Invoice::STATUS_SHIPPED).reorder("date_authorized DESC").limit(1).pluck('date_authorized')
+      elsif Invoice.exists?("status = ? and date_authorized is not null", Invoice::STATUS_PROCESSED)
+        d1 = Invoice.where("status = ? and date_authorized is not null", Invoice::STATUS_PROCESSED).reorder("date_authorized DESC").limit(1).pluck('date_authorized')
         d1 = DateTime.parse(d1)
       end
       
       # Google Feed Docs
       # https://support.google.com/trustedstoresmerchant/answer/3272612?hl=en&ref_topic=3272286?hl=en
       tsv = ["merchant invoice id\ttracking number\tcarrier code\tother carrier name\tship date"]            
-      if Invoice.exists?("status = ? and date_authorized > '#{d1.strftime("%F %T")}'", Invoice::STATUS_SHIPPED)
-        Invoice.where("status = ? and date_authorized > ?", Invoice::STATUS_SHIPPED, d1).reorder(:id).all.each do |invoice|
+      if Invoice.exists?("status = ? and date_authorized > '#{d1.strftime("%F %T")}'", Invoice::STATUS_PROCESSED)
+        Invoice.where("status = ? and date_authorized > ?", Invoice::STATUS_PROCESSED, d1).reorder(:id).all.each do |invoice|
           tracking_numbers = invoice.line_items.collect{ |li| li.tracking_number }.compact.uniq
           tn = tracking_numbers && tracking_numbers.count >= 1 ? tracking_numbers[0] : ""
           tsv << "#{invoice.id}\t#{tn}\tUPS\t\t#{invoice.date_shipped.strftime("%F")}"                              

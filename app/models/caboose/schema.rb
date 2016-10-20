@@ -408,6 +408,17 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :invoice_id            , :integer ],
         [ :discount_id           , :integer ]
       ],
+      Caboose::InvoiceLog => [
+        [ :invoice_id         , :integer  ],
+        [ :invoice_package_id , :integer  ],
+        [ :line_item_id       , :integer  ],
+        [ :user_id            , :integer  ],
+        [ :date_logged        , :datetime ],
+        [ :invoice_action     , :string   ],
+        [ :field              , :string   ],
+        [ :old_value          , :text     ],
+        [ :new_value          , :text     ]
+      ],
       Caboose::InvoicePackage => [
         [ :invoice_id           , :integer ],
         [ :instore_pickup       , :boolean  , { :default => false }],
@@ -444,6 +455,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_authorized       , :datetime ],
         [ :date_captured         , :datetime ],
         [ :date_shipped          , :datetime ],
+        [ :date_processed        , :datetime ],
         [ :date_due              , :date     ],
         [ :referring_site        , :text     ],
         [ :landing_page          , :string   ],
@@ -1162,5 +1174,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
       smtp.save
     end
     
+    # Change the invoice statuses
+    Caboose::Invoice.where("status = ? or status = ?", 'shipped', 'paid').all.each do |invoice|
+      invoice.status = 'processed'
+      invoice.save
+    end
+
   end
 end

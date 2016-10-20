@@ -83,6 +83,14 @@ module Caboose
         @invoice.landing_page_ref = params[:ref] || nil
         @invoice.payment_terms    = @site.store_config.default_payment_terms
         @invoice.save
+        
+        InvoiceLog.create(
+          :invoice_id     => @invoice.id,          
+          :user_id        => logged_in_user.id,
+          :date_logged    => DateTime.now.utc,
+          :invoice_action => InvoiceLog::ACTION_INVOICE_CREATED                
+        )
+        
         # Save the cart ID in the session
         session[:cart_id] = @invoice.id
       end                  

@@ -30,15 +30,17 @@ module Caboose
       :date_starts           ,
       :date_ends
     
-    STATUS_PENDING = 'pending'
-    STATUS_SHIPPED = 'shipped'
+    STATUS_PENDING       = 'pending'    
+    STATUS_BACKORDERED   = 'backordered'
+    STATUS_CANCELED      = 'canceled'
+    STATUS_PROCESSED     = 'processed'
 
     #
     # Scopes
     #    
-    scope :pending, where('status = ?', 'pending')
-    scope :fulfilled, where('status = ?', 'shipped')
-    scope :unfulfilled, where('status != ?', 'shipped')
+    scope :pending     , where('status = ?', 'pending')
+    scope :fulfilled   , where('status = ?', 'shipped')
+    scope :unfulfilled , where('status != ?', 'shipped')
     
     #validates :quantity, :numericality => { :greater_than_or_equal_to => 0 }    
     #validate :quantity_in_stock

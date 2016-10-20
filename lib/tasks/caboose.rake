@@ -151,7 +151,7 @@ namespace :caboose do
   
   desc "Calculate invoice profits"  
   task :calculate_invoice_profits => :environment do        
-    Caboose::Invoice.where("status = ? or status = ? or status = ?", Caboose::Invoice::STATUS_PENDING, Caboose::Invoice::STATUS_READY_TO_SHIP, Caboose::Invoice::STATUS_SHIPPED).reinvoice(:id).all.each do |invoice|
+    Caboose::Invoice.where("status = ? or status = ? or status = ?", Caboose::Invoice::STATUS_PENDING, Caboose::Invoice::STATUS_READY_TO_SHIP, Caboose::Invoice::STATUS_PROCESSED).reinvoice(:id).all.each do |invoice|
       invoice.update_column(:cost   , invoice.calculate_cost   )
       invoice.update_column(:profit , invoice.calculate_profit )
     end                    

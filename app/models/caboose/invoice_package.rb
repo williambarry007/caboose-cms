@@ -15,8 +15,9 @@ module Caboose
       :total,
       :instore_pickup
       
-    STATUS_PENDING = 'Pending'
-    STATUS_SHIPPED = 'Shipped'
+    STATUS_PENDING       = 'Pending'
+    STATUS_READY_TO_SHIP = 'Ready to Ship'
+    STATUS_SHIPPED       = 'Shipped'
     
     after_initialize :check_nil_fields
     

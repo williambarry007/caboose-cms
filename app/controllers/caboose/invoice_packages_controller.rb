@@ -26,7 +26,15 @@ module Caboose
           :shipping_method_id  => params[:shipping_method_id],
           :status              => InvoicePackage::STATUS_PENDING          
         )        
-        op.save        
+        op.save
+        
+        InvoiceLog.create(
+          :invoice_id        => params[:invoice_id],
+          :invoice_packag_id => op.id,
+          :user_id           => logged_in_user.id,
+          :date_logged       => DateTime.now.utc,
+          :invoice_action    => InvoiceLog::ACTION_INVOICE_PACKAGE_CREATED                                                                            
+        )        
         resp.new_id = op.id
         resp.redirect = "/admin/invoices/#{params[:invoice_id]}/packages/#{op.id}"
         
@@ -42,8 +50,21 @@ module Caboose
       resp = Caboose::StdClass.new
       op = InvoicePackage.find(params[:id])    
       
-      save = true    
+      save = true
+      fields_to_log = ['invoice_id','shipping_method_id','shipping_package_id','status','tracking_number','total','package_method']
       params.each do |name,value|
+        if fields_to_log.include?(name)              
+          InvoiceLog.create(
+            :invoice_id         => params[:invoice_id],
+            :invoice_package_id => op.id,
+            :user_id            => logged_in_user.id,
+            :date_logged        => DateTime.now.utc,
+            :invoice_action     => InvoiceLog::ACTION_INVOICE_PACKAGE_UPDATED,
+            :field              => name,
+            :old_value          => op[name.to_sym],
+            :new_value          => value
+          )                      
+        end                
         case name
           when 'invoice_id'          then op.invoice_id              = value
           when 'shipping_method_id'  then op.shipping_method_id    = value
@@ -113,6 +134,13 @@ module Caboose
       op = InvoicePackage.find(params[:id])
       if op.line_items.nil? || op.line_items.count == 0
         op.destroy
+        InvoiceLog.create(
+          :invoice_id         => params[:invoice_id],
+          :invoice_package_id => params[:id],
+          :user_id            => logged_in_user.id,
+          :date_logged        => DateTime.now.utc,
+          :invoice_action     => InvoiceLog::ACTION_INVOICE_PACKAGE_DELETED                                                                            
+        )
         resp.redirect = "/admin/invoices/#{params[:invoice_id]}"
       else
         resp.error = "Only empty packages can be deleted."

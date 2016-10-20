@@ -61,8 +61,7 @@ module Caboose
     end
 
     # @route POST /my-account/confirm
-    def confirm
-      Caboose::log(params)
+    def confirm      
       sc = @site.store_config
       @invoice = Invoice.find(params[:id])
 
@@ -111,7 +110,7 @@ module Caboose
           capture_resp = @invoice.capture_funds
           if capture_resp.success == true
             @invoice.take_gift_card_funds
-            @invoice.status = Caboose::Invoice::STATUS_PAID
+            @invoice.status = Caboose::Invoice::STATUS_PROCESSED
           end
         end
       end

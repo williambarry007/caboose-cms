@@ -21,15 +21,24 @@ module Caboose
       
       resp = StdClass.new
       v = Variant.find(params[:variant_id])
-      li = LineItem.new(
-        :invoice_id   => params[:invoice_id],
+      li = LineItem.create(
+        :invoice_id => params[:invoice_id],
         :variant_id => params[:variant_id],
         :quantity   => 1,
         :unit_price => v.price,
         :subtotal   => v.price,
-        :status     => 'pending'                
-      )         
-      resp.success = li.save
+        :status     => LineItem::STATUS_PENDING                
+      )
+      resp.success = true
+      resp.new_id = li.id
+            
+      InvoiceLog.create(
+        :invoice_id     => params[:invoice_id],
+        :line_item_id   => li.id,
+        :user_id        => logged_in_user.id,
+        :date_logged    => DateTime.now.utc,
+        :invoice_action => InvoiceLog::ACTION_LINE_ITEM_CREATED                                                                          
+      )      
       render :json => resp
     end
       
@@ -42,7 +51,20 @@ module Caboose
       
       save = true
       send_status_email = false
-      params.each do |name,value|        
+      fields_to_log = ['invoice_id','invoice_package_id','variant_id','parent_id','notes','custom1','custom2','custom3','unit_price','quantity','tracking_number','status']
+      params.each do |name,value|
+        if fields_to_log.include?(name)                
+          InvoiceLog.create(
+            :invoice_id     => params[:invoice_id],
+            :line_item_id   => li.id,
+            :user_id        => logged_in_user.id,
+            :date_logged    => DateTime.now.utc,
+            :invoice_action => InvoiceLog::ACTION_LINE_ITEM_UPDATED,
+            :field          => name,
+            :old_value      => li[name.to_sym],
+            :new_value      => value
+          )
+        end                
         case name
           when 'invoice_id'         then li.invoice_id          = value
           when 'invoice_package_id' then li.invoice_package_id  = value
@@ -53,29 +75,20 @@ module Caboose
           when 'custom1'            then li.custom1             = value
           when 'custom2'            then li.custom2             = value
           when 'custom3'            then li.custom3             = value
-          when 'unit_price'
-            Caboose.log("li.unit_price = #{li.unit_price}")
+          when 'unit_price'            
             li.unit_price = value
-            li.save
-            Caboose.log("li.unit_price = #{li.unit_price}")
+            li.save            
             li.subtotal = li.unit_price * li.quantity
             li.save
             li.invoice.subtotal = li.invoice.calculate_subtotal
             li.invoice.total = li.invoice.calculate_total
+            
           when 'quantity'
             li.quantity = value
             li.subtotal = li.unit_price * li.quantity            
             li.save                        
             li.invoice.subtotal = li.invoice.calculate_subtotal
             li.invoice.total = li.invoice.calculate_total
-            
-            # Recalculate everything
-            #r = ShippingCalculator.rate(li.invoice, li.invoice.shipping_method_code)
-            #li.invoice.shipping = r['negotiated_rate'] / 100
-            #li.invoice.handling = (r['negotiated_rate'] / 100) * 0.05
-            #li.invoice.tax = TaxCalculator.tax(li.invoice)            
-            #li.invoice.calculate_total
-            #li.invoice.save
             
           when 'tracking_number'
             li.tracking_number = value
@@ -104,6 +117,14 @@ module Caboose
       invoice.total    = invoice.calculate_total
       invoice.save
       
+      InvoiceLog.create(
+        :invoice_id     => params[:invoice_id],
+        :line_item_id   => params[:id],
+        :user_id        => logged_in_user.id,
+        :date_logged    => DateTime.now.utc,
+        :invoice_action => InvoiceLog::ACTION_LINE_ITEM_DELETED                                                                          
+      )
+      
       render :json => Caboose::StdClass.new({
         :redirect => '/admin/invoices'
       })
@@ -118,15 +139,13 @@ module Caboose
     end
     
     # @route GET /admin/invoices/line-items/status-options
-    def admin_status_options
-      arr = ['pending', 'ready to ship', 'shipped', 'backinvoiceed', 'canceled']
-      options = []
-      arr.each do |status|
-        options << {
-          :value => status,
-          :text  => status
-        }
-      end
+    def admin_status_options      
+      options = [
+        { :value => LineItem::STATUS_PENDING       , :text => 'Pending'       },        
+        { :value => LineItem::STATUS_BACKORDERED   , :text => 'Backordered'   },
+        { :value => LineItem::STATUS_CANCELED      , :text => 'Canceled'      },
+        { :value => LineItem::STATUS_PROCESSED     , :text => 'Processed'     }
+      ]          
       render :json => options
     end
     

@@ -2,6 +2,11 @@
 <% if @edituser %>
   <%= render :partial => 'caboose/users/admin_header' %>
 <% else %>
+  <div id='crumbtrail'>
+    <a href='/admin'>Admin</a> >
+    <a href='/admin/invoices'>Invoices</a> >
+    Invoice #<%= @invoice.id %>
+  </div>
   <h1>Edit Invoice #<%= @invoice.id %></h1>
 <% end %>
 

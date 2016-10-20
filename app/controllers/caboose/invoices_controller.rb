@@ -17,7 +17,7 @@ module Caboose
       @pager = Caboose::PageBarGenerator.new(params, {
         'site_id'              => @site.id,
         'customer_id'          => params[:user_id] ? params[:user_id] : '', 
-        'status'               => Invoice::STATUS_PENDING,
+        'status'               => Invoice::STATUS_PENDING,      
         'shipping_method_code' => '',
         'id'                   => '',
         'invoice_number'       => '',

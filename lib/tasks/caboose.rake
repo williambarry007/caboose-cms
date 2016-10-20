@@ -7,6 +7,10 @@ namespace :caboose do
     Caboose::Subscription.migrate_from_user_subscriptions
   end
   
+  task :create_subscription_invoices => :environment do
+    Caboose::Subscription.create_invoices
+  end
+  
   desc "Save sample asset"
   task :save_sample_asset => :environment do
     

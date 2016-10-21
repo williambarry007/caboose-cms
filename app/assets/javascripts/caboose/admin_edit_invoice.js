@@ -80,7 +80,7 @@ InvoiceController.prototype = {
         authenticity_token: that.authenticity_token,
         attributes: [
           { name: 'instore_pickup'  , nice_name: 'In-store Pickup' , type: 'checkbox' , value: op.instore_pickup                                    , width: 300, fixed_placeholder: true },
-          { name: 'status'          , nice_name: 'Status'          , type: 'select'   , value: op.status                                            , width: 300, fixed_placeholder: true , options_url: '/admin/invoices/line-items/status-options' },          
+          { name: 'status'          , nice_name: 'Status'          , type: 'select'   , value: op.status                                            , width: 300, fixed_placeholder: true , options_url: '/admin/invoice-packages/status-options' },          
           { name: 'package_method'  , nice_name: 'Package/Method'  , type: 'select'   , value: op.shipping_package_id + '_' + op.shipping_method_id , width: 300, fixed_placeholder: false, options_url: '/admin/shipping-packages/package-method-options' },
           { name: 'tracking_number' , nice_name: 'Tracking Number' , type: 'text'     , value: op.tracking_number                                   , width: 300, fixed_placeholder: true, align: 'right' },
           { name: 'total'           , nice_name: 'Shipping Total'  , type: 'text'     , value: curr(op.total)                                       , width: 300, fixed_placeholder: true, align: 'right' , after_update: function() { that.refresh_invoice(); }}

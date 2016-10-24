@@ -142,9 +142,9 @@ module Caboose
       
       invoice.invoice_packages.all.each do |pk|
 
-        carrier = pk.shipping_method.carrier
-        service = pk.shipping_method.service_name
-        package = pk.shipping_package.name
+        carrier = pk.shipping_method ? pk.shipping_method.carrier : nil
+        service = pk.shipping_method ? pk.shipping_method.service_name : nil
+        package = pl.shipping_package ? pk.shipping_package.name : nil
 
         pk.line_items.each_with_index do |li, index|
           options = ''

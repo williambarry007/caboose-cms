@@ -150,13 +150,14 @@ CheckoutController.prototype = {
             //before_update: function() { this.value_old = this.value_clean; }, 
             after_update: function()  {
               that.invoice.instore_pickup = this.value;
-              var arr = ['shipping_address_container'];
-              $.each(that.invoice.invoice_packages, function(i, ip) {
-                arr.push('invoice_package_' + ip.id + '_shipping_method');
-              });            
-              if (parseInt(this.value) == 0) $.each(arr, function(i, el) { $('#'+el).slideDown(); });
-              else                           $.each(arr, function(i, el) { $('#'+el).slideUp();   });
-              that.print_ready_message();                                            
+              //var arr = ['shipping_address_container'];
+              //$.each(that.invoice.invoice_packages, function(i, ip) {
+              //  arr.push('invoice_package_' + ip.id + '_shipping_method');
+              //});            
+              //if (parseInt(this.value) == 0) $.each(arr, function(i, el) { $('#'+el).slideDown(); });
+              //else                           $.each(arr, function(i, el) { $('#'+el).slideUp();   });
+              that.refresh_and_print();
+              //that.print_ready_message();                                            
             }                  
           }
         ]            

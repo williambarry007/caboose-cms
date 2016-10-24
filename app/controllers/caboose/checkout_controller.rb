@@ -464,6 +464,8 @@ module Caboose
               ip.instore_pickup = v
               ip.save
             end
+            
+            @invoice.calculate
         end
       end
       

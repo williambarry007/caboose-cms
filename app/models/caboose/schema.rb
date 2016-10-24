@@ -842,6 +842,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :default_product_status            , :string  ],
         [ :default_taxable                   , :boolean ],
         [ :allow_instore_pickup              , :boolean  , { :default => false }],
+        [ :instore_tax_rate                  , :decimal  , { :precision => 8, :scale => 2 }],
         [ :custom_invoice_pdf                , :string  ]
       ],  
       Caboose::Subscription => [      

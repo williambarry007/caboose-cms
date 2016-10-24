@@ -1,14 +1,6 @@
 module Caboose
   class InvoicesController < Caboose::ApplicationController
     
-    # @route GET /admin/invoices/weird-test
-    def admin_weird_test
-      Caboose.log("Before the admin_weird_test")
-      x = Invoice.new
-      Caboose.log("After the admin_weird_test")
-      render :json => x      
-    end
-    
     # @route GET /admin/invoices
     # @route GET /admin/users/:user_id/invoices
     def admin_index
@@ -51,7 +43,7 @@ module Caboose
       resp.invoice_transactions = invoice.invoice_transactions.reorder(:date_processed).all
       
       render :json => resp
-    ends
+    end
     
     # @route GET /admin/invoices/new
     def admin_new
@@ -111,7 +103,7 @@ module Caboose
       invoice.save
       render :json => { :success => true }      
     end
-
+    
     # @route GET /admin/invoices/:id/capture
     def capture_funds
       return if !user_is_allowed('invoices', 'edit')
@@ -154,7 +146,7 @@ module Caboose
     
       render :json => resp
     end
-  
+    
     # @route GET /admin/invoices/:id/refund
     def admin_refund
       return if !user_is_allowed('invoices', 'edit')
@@ -193,7 +185,7 @@ module Caboose
         :invoice_transactions
       ])
     end
-  
+    
     # @route GET /admin/invoices/:id/print
     def admin_print
       return if !user_is_allowed('invoices', 'edit')           
@@ -262,7 +254,7 @@ module Caboose
                             
         end                        
       end
-
+    
       #invoice.calculate
       #invoice.calculate_total
       #resp.attributes['total'] = { 'value' => invoice.total }
@@ -285,7 +277,7 @@ module Caboose
         :redirect => '/admin/invoices'
       })
     end
-
+    
     # @route GET /admin/invoices/:id/send-for-authorization
     def admin_send_for_authorization
       return if !user_is_allowed('invoices', 'edit')
@@ -305,7 +297,7 @@ module Caboose
     # @route GET /admin/invoices/city-report
     def admin_city_report
       return if !user_is_allowed('invoices', 'view')
-
+    
       @d1 = params[:d1] ? DateTime.strptime("#{params[:d1]} 00:00:00", '%Y-%m-%d %H:%M:%S') : DateTime.strptime(DateTime.now.strftime("%Y-%m-01 00:00:00"), '%Y-%m-%d %H:%M:%S')
       @d2 = params[:d2] ? DateTime.strptime("#{params[:d2]} 00:00:00", '%Y-%m-%d %H:%M:%S') : @d1 + 1.month      
       @rows = InvoiceReporter.city_report(@site.id, @d1, @d2)
@@ -316,14 +308,14 @@ module Caboose
     # @route GET /admin/invoices/summary-report
     def admin_summary_report
       return if !user_is_allowed('invoices', 'view')
-
+    
       @d1 = params[:d1] ? DateTime.strptime("#{params[:d1]} 00:00:00", '%Y-%m-%d %H:%M:%S') : DateTime.strptime(DateTime.now.strftime("%Y-%m-01 00:00:00"), '%Y-%m-%d %H:%M:%S')
       @d2 = params[:d2] ? DateTime.strptime("#{params[:d2]} 00:00:00", '%Y-%m-%d %H:%M:%S') : @d1 + 1.month      
       @rows = InvoiceReporter.summary_report(@site.id, @d1, @d2)
       
       render :layout => 'caboose/admin'    
     end
-
+    
     # @route GET /admin/invoices/:field-options    
     def admin_options
       return if !user_is_allowed('invoices', 'view')

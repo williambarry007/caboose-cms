@@ -99,18 +99,10 @@ namespace :caboose do
   
   desc "Check ruby syntax in all ruby files"
   task :check_syntax => :environment do    
-    puts "Checking syntax in all ruby files...\n\n"
-    
-    str = `find #{Rails.root} -name "*.rb"`
-    files = str ? str.strip.split("\n") : []
-    
+        
     errors = {}
-    files.each do |file|
-      str = `ruby -c #{file}`      
-      next if str.nil? || str.strip == 'Syntax OK'
-      errors[file] = str
-    end
     
+    puts "Checking syntax in caboose-cms gem ruby files...\n\n"
     str = `find #{Gem.loaded_specs['caboose-cms'].full_gem_path} -name "*.rb"`
     files = str ? str.strip.split("\n") : []        
     files.each do |file|
@@ -119,6 +111,15 @@ namespace :caboose do
       errors[file] = str
     end
     
+    puts "Checking syntax in application ruby files...\n\n"    
+    str = `find #{Rails.root} -name "*.rb"`
+    files = str ? str.strip.split("\n") : []        
+    files.each do |file|
+      str = `ruby -c #{file}`      
+      next if str.nil? || str.strip == 'Syntax OK'
+      errors[file] = str
+    end
+            
     if errors.count == 0      
       puts "                                           \n"
       puts "             █████                         \n"

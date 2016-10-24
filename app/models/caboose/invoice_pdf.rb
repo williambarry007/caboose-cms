@@ -106,9 +106,16 @@ module Caboose
       ]
       
       sa = invoice.shipping_address
-      sa_address = "#{sa.address1}" + (sa.address2.blank? ? '' : "\n#{sa.address2}") + "\n#{sa.city}, #{sa.state} #{sa.zip}"
+      sa_name = sa && sa.first_name ? "#{sa.first_name} #{sa.last_name}" : "#{c.first_name} #{c.last_name}"
+      sa_address = sa ? 
+        (sa.address1 && sa.address1.length > 0 ? "#{sa.address1}\n" : '') + 
+        (sa.address2 && sa.address2.length > 0 ? "#{sa.address2}\n" : '') + 
+        (sa.city     && sa.city.length     > 0 ? "#{sa.city}, "     : '') +
+        (sa.state    && sa.state.length    > 0 ? "#{sa.state} "     : '') +
+        (sa.zip      && sa.zip.length      > 0 ? sa.zip             : '') : ''
+        
       shipped_to = [
-        [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => "#{sa.first_name} #{sa.last_name}" , :border_width => 0, :width => 200 }],
+        [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => sa_name                            , :border_width => 0, :width => 200 }],
         [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }],
         [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }],
         [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]

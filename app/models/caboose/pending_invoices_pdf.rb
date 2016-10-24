@@ -95,19 +95,19 @@ module Caboose
               
       sa = invoice.shipping_address
       shipped_to = []
-      if sa
-        sa_address = "#{sa.address1}" + (sa.address2.blank? ? '' : "\n#{sa.address2}") + "\n#{sa.city}, #{sa.state} #{sa.zip}"
-        shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => "#{sa.first_name} #{sa.last_name}" , :border_width => 0, :width => 200 }]
-        shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }]
-        shipped_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }]
-        shipped_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
-      else
-        shipped_to << [{ :content => "Name"    , :border_width => 0 }]
-        shipped_to << [{ :content => "Address" , :border_width => 0 }]
-        shipped_to << [{ :content => "Email"   , :border_width => 0 }]
-        shipped_to << [{ :content => "Phone"   , :border_width => 0 }]
-      end
-
+      shipped_to_name = sa && sa.first_name && sa.first_name.length > 0 ? "#{sa.first_name} #{sa.last_name}" : "#{c.first_name} #{c.last_name}"
+      shipped_to_address = sa ? 
+        (sa.address1 && sa.address1.length > 0 ? "#{sa.address1}\n" : '') + 
+        (sa.address2 && sa.address2.length > 0 ? "#{sa.address2}\n" : '') + 
+        (sa.city     && sa.city.length     > 0 ? "#{sa.city}, "     : '') +
+        (sa.state    && sa.state.length    > 0 ? "#{sa.state} "     : '') +
+        (sa.zip      && sa.zip.length      > 0 ? sa.zip             : '') : ''
+      
+      shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => shipped_to_name                    , :border_width => 0, :width => 200 }]
+      shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => shipped_to_address                 , :border_width => 0, :width => 200 }]        
+      shipped_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }]
+      shipped_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
+            
       tbl = []
       tbl << [
         { :content => "Shipping Information" , :align => :left, :width => 255, :font_style => :bold },
@@ -142,9 +142,9 @@ module Caboose
       
       invoice.invoice_packages.all.each do |pk|
 
-        carrier = pk.shipping_method ? pk.shipping_method.carrier : nil
-        service = pk.shipping_method ? pk.shipping_method.service_name : nil
-        package = pk.shipping_package ? pk.shipping_package.name : nil
+        carrier = pk.shipping_method  ? pk.shipping_method.carrier      : ''
+        service = pk.shipping_method  ? pk.shipping_method.service_name : ''
+        package = pk.shipping_package ? pk.shipping_package.name        : ''
 
         pk.line_items.each_with_index do |li, index|
           options = ''

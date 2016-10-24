@@ -114,12 +114,16 @@ module Caboose
         (sa.state    && sa.state.length    > 0 ? "#{sa.state} "     : '') +
         (sa.zip      && sa.zip.length      > 0 ? sa.zip             : '') : ''
         
-      shipped_to = [
-        [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => sa_name                            , :border_width => 0, :width => 200 }],
-        [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }],
-        [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }],
-        [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
-      ]
+      shipped_to = []
+      if invoice.instore_pickup
+        shipped_to << [{ :content => "Name"            , :border_width => 0, :width =>  55 },{ :content => "#{c.first_name} #{c.last_name}"   , :border_width => 0, :width => 200 }],
+        shipped_to << [{ :content => "IN-STORE PICKUP" , :border_width => 0, :width => 255 }],        
+      else        
+        shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => sa_name                            , :border_width => 0, :width => 200 }],
+        shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }],
+        shipped_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }],
+        shipped_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
+      end
 
       tbl = []
       tbl << [

@@ -111,6 +111,14 @@ namespace :caboose do
       errors[file] = str
     end
     
+    str = `find #{Gem.loaded_specs['caboose-cms'].full_gem_path} -name "*.rb"`
+    files = str ? str.strip.split("\n") : []        
+    files.each do |file|
+      str = `ruby -c #{file}`      
+      next if str.nil? || str.strip == 'Syntax OK'
+      errors[file] = str
+    end
+    
     if errors.count == 0      
       puts "                                           \n"
       puts "             █████                         \n"

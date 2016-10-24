@@ -144,7 +144,7 @@ module Caboose
 
         carrier = pk.shipping_method ? pk.shipping_method.carrier : nil
         service = pk.shipping_method ? pk.shipping_method.service_name : nil
-        package = pl.shipping_package ? pk.shipping_package.name : nil
+        package = pk.shipping_package ? pk.shipping_package.name : nil
 
         pk.line_items.each_with_index do |li, index|
           options = ''

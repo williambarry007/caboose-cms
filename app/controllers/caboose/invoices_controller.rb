@@ -51,7 +51,7 @@ module Caboose
       resp.invoice_transactions = invoice.invoice_transactions.reorder(:date_processed).all
       
       render :json => resp
-    end
+    ends
     
     # @route GET /admin/invoices/new
     def admin_new

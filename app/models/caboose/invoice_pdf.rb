@@ -54,6 +54,8 @@ module Caboose
       sc = self.invoice.site.store_config
       ot = self.invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       
+      return unless ot
+
       case ot.payment_processor
         when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
           
@@ -84,6 +86,18 @@ module Caboose
       invoice_info = "Invoice Number: #{invoice.invoice_number}\n"
       invoice_info << "Invoice Date: #{invoice.date_created.strftime('%d %b %Y %H:%M:%S %p')}\n"
       invoice_info << "Status: #{invoice.status.capitalize}\n"
+      
+      if invoice.status == Invoice::STATUS_PENDING
+        s  = self.invoice.site
+        sc = self.invoice.site.store_config
+        invoice_info << "\n"
+        invoice_info << "Please mail payments to:\n"
+        invoice_info << "#{s.description}\n"
+        invoice_info << "#{sc.origin_address1}\n"
+        invoice_info << "#{sc.origin_address2}\n"
+        invoice_info << "#{sc.origin_city}, " << "#{sc.origin_state} " << "#{sc.origin_zip}\n"
+      end
+
       tbl = []
       tbl << [
         { :content => invoice_info }
@@ -94,6 +108,7 @@ module Caboose
 
     
     def customer_info
+      return if self.invoice.status == Invoice::STATUS_PENDING
 
       c = invoice.customer
 
@@ -256,6 +271,7 @@ module Caboose
     end
 
     def payment_info
+      return if self.invoice.status == Invoice::STATUS_PENDING
 
       trans = invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       tbl = []

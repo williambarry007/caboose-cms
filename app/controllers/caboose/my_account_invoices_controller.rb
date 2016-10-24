@@ -165,6 +165,21 @@ module Caboose
         :invoice_transactions
       ])
     end
+
+    # @route GET /my-account/invoices/:id/print
+    def invoice_pdf
+      invoice = Invoice.find(params[:id])
+
+      if invoice.customer_id != logged_in_user.id
+        @error = "The given invoice does not belong to you."
+        render :file => 'caboose/extras/error'
+        return
+      end
+
+      pdf = InvoicePdf.new
+      pdf.invoice = Invoice.find(params[:id])
+      send_data pdf.to_pdf, :filename => "invoice_#{pdf.invoice.id}.pdf", :type => "application/pdf", :disposition => "inline"
+    end
     
     # @route GET  /my-account/invoices/authnet-relay
     # @route POST /my-account/invoices/authnet-relay

@@ -4,7 +4,7 @@
 <p><div id="vendor_<%= @vendor.id %>_featured"></div></p>
 <p><div id="vendor_<%= @vendor.id %>_image"></div></p>
 <div id='message'></div>
-<input type="button" value="< Back" onclick="window.location='/admin/vendors';" />
+<input type="button" value="< Back" onclick="window.location='/admin/store/vendors';" />
 <input type="button" value="Delete" onclick="delete_vendor(<%= @vendor.id %>);" />
 
 <% content_for :caboose_js do %>
@@ -14,13 +14,13 @@ $(document).ready(function() {
   m = new ModelBinder({
     id: <%= @vendor.id %>,
     name: 'Vendor',
-    update_url: '/admin/vendors/<%= @vendor.id %>',
+    update_url: '/admin/store/vendors/<%= @vendor.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'name'     , nice_name: 'Name'     , type: 'text'     , value: <%= raw Caboose.json(@vendor.name)              %>, width: 500 },
-      { name: 'status'   , nice_name: 'Status'   , type: 'select'   , value: <%= raw Caboose.json(@vendor.status)            %>, width: 500, options_url: '/admin/vendors/status-options' },
+      { name: 'status'   , nice_name: 'Status'   , type: 'select'   , value: <%= raw Caboose.json(@vendor.status)            %>, width: 500, options_url: '/admin/store/vendors/status-options' },
       { name: 'featured' , nice_name: 'Featured' , type: 'checkbox' , value: <%= @vendor.featured ? 1 : 0                    %>, width: 500 },
-      { name: 'image'    , nice_name: 'Image'    , type: 'image'    , value: <%= raw Caboose.json(@vendor.image.url(:thumb)) %>, width: 500 , update_url: '/admin/vendors/<%= @vendor.id %>/image' }
+      { name: 'image'    , nice_name: 'Image'    , type: 'image'    , value: <%= raw Caboose.json(@vendor.image.url(:thumb)) %>, width: 500 , update_url: '/admin/store/vendors/<%= @vendor.id %>/image' }
     ]
   })
 });
@@ -38,7 +38,7 @@ function delete_vendor(vendor_id, confirm)
   }
   $('#message').html("<p class='loading'>Deleting vendor...</p>");
   $.ajax({
-    url: '/admin/vendors/' + vendor_id,
+    url: '/admin/store/vendors/' + vendor_id,
     type: 'delete',
     success: function(resp) {
       if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");

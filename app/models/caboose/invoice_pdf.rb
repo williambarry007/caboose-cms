@@ -14,9 +14,8 @@ module Caboose
       font_size 9
 
       img = open("http://cabooseit.s3.amazonaws.com/uploads/template.jpg")
-   #   image img, :width => 610, :at => [-30, 755]
-
-      #image open("https://dmwwflw4i3miv.cloudfront.net/logo.png"), :position => :center
+   
+      header_info
       move_down 10
       invoice_info
       move_down 15
@@ -26,6 +25,9 @@ module Caboose
       move_down 15
       payment_info
       render
+    end
+    
+    def header_info
     end
     
     def formatted_phone(str)

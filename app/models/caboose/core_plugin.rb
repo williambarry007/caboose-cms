@@ -39,7 +39,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
       item['children'] << { 'id' => 'invoices'         , 'href' => '/admin/invoices'          , 'text' => 'Invoices'          , 'modal' => false } if user.is_allowed('invoices'         , 'view')
       item['children'] << { 'id' => 'products'         , 'href' => '/admin/products'          , 'text' => 'Products'          , 'modal' => false } if user.is_allowed('products'         , 'view')
       item['children'] << { 'id' => 'shippingpackages' , 'href' => '/admin/shipping-packages' , 'text' => 'Shipping Packages' , 'modal' => false } if user.is_allowed('shippingpackages' , 'view')
-      item['children'] << { 'id' => 'vendors'          , 'href' => '/admin/vendors'           , 'text' => 'Vendors'           , 'modal' => false } if user.is_allowed('vendors'          , 'view')    
+      item['children'] << { 'id' => 'vendors'          , 'href' => '/admin/store/vendors'     , 'text' => 'Vendors'           , 'modal' => false } if user.is_allowed('vendors'          , 'view')    
       nav << item if item['children'].count > 0
     end
                 

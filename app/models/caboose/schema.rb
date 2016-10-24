@@ -841,7 +841,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :default_vendor_id                 , :integer ],
         [ :default_product_status            , :string  ],
         [ :default_taxable                   , :boolean ],
-        [ :allow_instore_pickup              , :boolean  , { :default => false }]        
+        [ :allow_instore_pickup              , :boolean  , { :default => false }],
+        [ :custom_invoice_pdf                , :string  ]
       ],  
       Caboose::Subscription => [      
         [ :variant_id  , :integer ],

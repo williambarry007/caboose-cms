@@ -1,14 +1,14 @@
 module Caboose
   class VendorsController < Caboose::ApplicationController
         
-    # @route GET /admin/vendors/:id
+    # @route GET /admin/store/vendors/:id
     def admin_edit
       return if !user_is_allowed('vendors', 'edit')
       @vendor = Vendor.find(params[:id])
       render :layout => 'caboose/admin'
     end
 
-    # @route GET /admin/vendors
+    # @route GET /admin/store/vendors
     def admin_index
       return if !user_is_allowed('vendors', 'view')
       
@@ -30,13 +30,13 @@ module Caboose
     end
     
     # @route_priority 3
-    # @route GET /admin/vendors/new
+    # @route GET /admin/store/vendors/new
     def admin_new
       return if !user_is_allowed('vendors', 'add')
       render :layout => 'caboose/admin'
     end
 
-    # @route POST /admin/vendors/:id/image
+    # @route POST /admin/store/vendors/:id/image
     def admin_update_image
       return if !user_is_allowed('vendors', 'edit')
       
@@ -50,7 +50,7 @@ module Caboose
       render :json => resp            
     end
 
-    # @route PUT /admin/vendors/:id/update
+    # @route PUT /admin/store/vendors/:id/update
     def admin_update
       return if !user_is_allowed('vendors', 'edit')
       vendor = Vendor.find(params[:id])
@@ -67,7 +67,7 @@ module Caboose
       render :json => { :success => vendor.save }
     end
 
-    # @route POST /admin/vendors
+    # @route POST /admin/store/vendors
     def admin_add
       return if !user_is_allowed('vendors', 'add')
       
@@ -81,7 +81,7 @@ module Caboose
       render :json => { :success => vendor.save, :redirect => "/admin/vendors/#{vendor.id}" }
     end
     
-    # @route DELETE /admin/vendors/:id
+    # @route DELETE /admin/store/vendors/:id
     def admin_delete      
       return if !user_is_allowed('vendors', 'delete')
       v = Vendor.find(params[:id])
@@ -94,13 +94,13 @@ module Caboose
     end
     
     # @route_priority 1
-    # @route GET /admin/vendors/options
+    # @route GET /admin/store/vendors/options
     def options      
       render :json => Vendor.where(:site_id => @site.id).reorder(:name).all.collect{ |v| { :value => v.id, :text => v.name }}      
     end
     
     # @route_priority 2
-    # @route GET /admin/vendors/status-options
+    # @route GET /admin/store/vendors/status-options
     def status_options      
       render :json => [
         { :text => 'Active'   , :value => 'Active'   },

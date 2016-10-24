@@ -226,9 +226,19 @@ class Caboose::Block < ActiveRecord::Base
       #end
       
       arr = [
-        "../../sites/#{site.name}/blocks/#{full_name}",
-        "../../sites/#{site.name}/blocks/#{block.block_type.name}",
-        "../../sites/#{site.name}/blocks/#{block.block_type.field_type}",
+        #"../../sites/#{site.name}/blocks/#{full_name}",
+        #"../../sites/#{site.name}/blocks/#{block.block_type.name}",
+        #"../../sites/#{site.name}/blocks/#{block.block_type.field_type}",
+        #"../../app/views/caboose/blocks/#{full_name}",
+        #"../../app/views/caboose/blocks/#{block.block_type.name}",
+        #"../../app/views/caboose/blocks/#{block.block_type.field_type}",
+        #"caboose/blocks/#{full_name}",                
+        #"caboose/blocks/#{block.block_type.name}",                
+        #"caboose/blocks/#{block.block_type.field_type}"
+        
+        "../../app/views/caboose/blocks/#{site.name}/#{full_name}",
+        "../../app/views/caboose/blocks/#{site.name}/#{block.block_type.name}",
+        "../../app/views/caboose/blocks/#{site.name}/#{block.block_type.field_type}",
         "../../app/views/caboose/blocks/#{full_name}",
         "../../app/views/caboose/blocks/#{block.block_type.name}",
         "../../app/views/caboose/blocks/#{block.block_type.field_type}",
@@ -314,7 +324,8 @@ class Caboose::Block < ActiveRecord::Base
     site = options[:site]
     
     begin
-      str = view.render(:partial => "../../sites/#{site.name}/blocks/#{name}", :locals => options2)
+      #str = view.render(:partial => "../../sites/#{site.name}/blocks/#{name}", :locals => options2)
+      str = view.render(:partial => "../../app/views/caboose/blocks/#{site.name}/#{name}", :locals => options2)
     rescue ActionView::MissingTemplate => ex      
       begin
         str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)      

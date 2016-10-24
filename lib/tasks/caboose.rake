@@ -2,6 +2,34 @@ require "caboose/version"
 require 'aws-sdk'
 
 namespace :caboose do
+            
+  task :move_site_blocks => :environment do
+    
+    #Dir["sites/*/blocks"].each do |file|
+    #  arr = file.split('/')
+    #  site_name = arr[1]                  
+    #  next if site_name.nil? || site_name.strip.length == 0      
+    #  `mv sites/#{site_name}/blocks app/views/caboose/blocks/#{site_name}` if !File.exist?("app/views/caboose/blocks/#{site_name}")
+    #end
+    
+    Dir["app/views/caboose/blocks/*/*"].each do |file|
+      arr = file.split('/')
+      site_name = arr[4]
+      partial_name = arr[5]      
+      next if site_name.nil? || site_name.strip.length == 0 || partial_name.nil? || partial_name.strip.length == 0
+            
+      #puts "site_name = #{site_name}, partial_name = #{partial_name}"
+      
+      str = File.read(file)
+      str2 = str.gsub("../../sites/#{site_name}/blocks", "caboose/blocks/#{site_name}")
+      if str != str2
+        puts file
+        File.open(file, 'w') { |the_file| the_file.write(str2) }
+      end
+            
+    end
+
+  end
     
   task :subscription_migration => :environment do
     Caboose::Subscription.migrate_from_user_subscriptions
@@ -519,10 +547,10 @@ namespace :assets do
       # Copy any site assets into the host app assets directory first
       puts "Copying site assets into host assets..."
       Caboose::Site.all.each do |site|
-        site_js     = Rails.root.join('sites', site.name, 'js')    
-        site_css    = Rails.root.join('sites', site.name, 'css')   
-        site_images = Rails.root.join('sites', site.name, 'images')
-        site_fonts  = Rails.root.join('sites', site.name, 'fonts') 
+        site_js     = Rails.root.join(Caboose::site_assets_path, site.name, 'js')    
+        site_css    = Rails.root.join(Caboose::site_assets_path, site.name, 'css')   
+        site_images = Rails.root.join(Caboose::site_assets_path, site.name, 'images')
+        site_fonts  = Rails.root.join(Caboose::site_assets_path, site.name, 'fonts') 
             
         host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
         host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)

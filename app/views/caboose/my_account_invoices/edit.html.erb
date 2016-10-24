@@ -14,7 +14,7 @@ store_config = @invoice.site.store_config
 
 <p>
 	<input type='button' value='< Back' class='btn' onclick="window.location='/my-account/invoices';" />
-	<input type='button' value='Print Invoice' class='btn' onclick='window.location="/invoices/<%= @invoice.id %>/print";' />
+	<input type='button' value='Print Invoice' class='btn' onclick='window.location="/my-account/invoices/<%= @invoice.id %>/print";' />
 </p>
 
 <% content_for :caboose_js do %>

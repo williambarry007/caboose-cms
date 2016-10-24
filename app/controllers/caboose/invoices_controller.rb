@@ -51,18 +51,7 @@ module Caboose
       resp.invoice_transactions = invoice.invoice_transactions.reorder(:date_processed).all
       
       render :json => resp
-    end
-
-    # @route GET /invoices/:id/print
-    def print
-      invoice = Invoice.find(params[:id])
-
-      return if invoice.customer_id != logged_in_user.id
-
-      pdf = InvoicePdf.new
-      pdf.invoice = Invoice.find(params[:id])
-      send_data pdf.to_pdf, :filename => "invoice_#{pdf.invoice.id}.pdf", :type => "application/pdf", :disposition => "inline"
-    end
+    ends
     
     # @route GET /admin/invoices/new
     def admin_new

@@ -16,7 +16,7 @@ module Caboose
     belongs_to :option1_media, :class_name => 'Caboose::Media'
     belongs_to :option2_media, :class_name => 'Caboose::Media'
     belongs_to :option3_media, :class_name => 'Caboose::Media'
-    has_many :variant_childen, :class_name => 'Caboose::VariantChild'
+    has_many :variant_children, :class_name => 'Caboose::VariantChild'
     
     attr_accessible :id,
       :alternate_id,

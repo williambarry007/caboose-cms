@@ -184,7 +184,7 @@ CartController.prototype = {
     var that = this;
     
     tbody.append($('<tr/>')
-      .append($('<th/>').addClass('invoice_totals_header').attr('colspan', '4').html('<h3>Invoice Totals</h3>')));
+      .append($('<th/>').addClass('invoice_totals_header').attr('colspan', '4').html('<h3>Order Totals</h3>')));
     tbody.append($('<tr/>')        
       .append($('<td/>').css('text-align', 'right').attr('colspan', 3).html('Subtotal'))
       .append($('<td/>').css('text-align', 'right').attr('id', 'totals_subtotal').html('$' + parseFloat(that.cc.invoice.subtotal).toFixed(2)))

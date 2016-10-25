@@ -87,7 +87,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :amount_discounted     ,
         :auth_code             ,                
         :date_shipped          ,                        
-        :decremented           
+        :decremented           ,
+        :user_subscription_id
       ],        
       #Caboose::PageCache => [:block],
       #Caboose::RetargetingConfig => [:fb_pixels_function],
@@ -341,7 +342,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :gift_message          , :text     ],
         [ :gift_wrap             , :boolean   , { :default => false }],
         [ :hide_prices           , :boolean   , { :default => false }],
-        [ :user_subscription_id  , :integer  ],            
+        [ :subscription_id       , :integer  ],            
         [ :date_starts           , :date     ],
         [ :date_ends             , :date     ]
       ],
@@ -407,13 +408,25 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :invoice_id            , :integer ],
         [ :discount_id           , :integer ]
       ],
+      Caboose::InvoiceLog => [
+        [ :invoice_id         , :integer  ],
+        [ :invoice_package_id , :integer  ],
+        [ :line_item_id       , :integer  ],
+        [ :user_id            , :integer  ],
+        [ :date_logged        , :datetime ],
+        [ :invoice_action     , :string   ],
+        [ :field              , :string   ],
+        [ :old_value          , :text     ],
+        [ :new_value          , :text     ]
+      ],
       Caboose::InvoicePackage => [
         [ :invoice_id           , :integer ],
+        [ :instore_pickup       , :boolean  , { :default => false }],
         [ :shipping_method_id   , :integer ],
         [ :shipping_package_id  , :integer ],
         [ :status               , :string  ],
         [ :tracking_number      , :string  ],
-        [ :total                , :decimal  , { :precision => 8, :scale => 2 }]
+        [ :total                , :decimal  , { :precision => 8, :scale => 2 }]        
       ],
       Caboose::Invoice => [
         [ :site_id               , :integer  ],
@@ -435,19 +448,22 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :shipping_address_id   , :integer  ],
         [ :billing_address_id    , :integer  ],
         [ :notes                 , :text     ],
+        [ :customer_notes        , :text     ],
         [ :status                , :string   ],
         [ :payment_terms         , :string   ],
         [ :date_created          , :datetime ],
         [ :date_authorized       , :datetime ],
         [ :date_captured         , :datetime ],
         [ :date_shipped          , :datetime ],
+        [ :date_processed        , :datetime ],
         [ :date_due              , :date     ],
         [ :referring_site        , :text     ],
         [ :landing_page          , :string   ],
         [ :landing_page_ref      , :string   ],
         [ :auth_amount           , :decimal  , { :precision => 8, :scale => 2 }],
         [ :gift_message          , :text     ],
-        [ :include_receipt       , :boolean  , { :default => true }]
+        [ :include_receipt       , :boolean  , { :default => true }],
+        [ :instore_pickup        , :boolean  , { :default => false }]
                 
         #[ :email                 , :string   ],
         #[ :invoice_number        , :string   ],
@@ -699,8 +715,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :outside_height     , :decimal ],        
         [ :volume             , :decimal ],
         [ :empty_weight       , :decimal ],
-        [ :cylinder           , :boolean , { :default => false }],
-        [ :priority           , :integer , { :default => 1 }],
+        [ :cylinder           , :boolean  , { :default => false }],
+        [ :priority           , :integer  , { :default => 1 }],
         [ :flat_rate_price    , :decimal ]
       ],
       Caboose::ShippingPackageMethod => [
@@ -741,7 +757,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :password             , :string ],
         [ :authentication       , :string ], # :plain, :login, :cram_md5.
         [ :enable_starttls_auto , :boolean , { :default => true }],
-        [ :from_address         , :string ]
+        [ :from_address         , :string ],
+        [ :reply_to_address     , :string ]
       ],
       Caboose::SocialConfig => [
         [ :site_id              , :integer ],
@@ -823,21 +840,17 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :default_payment_terms             , :string   , { :default => 'pia' }],
         [ :default_vendor_id                 , :integer ],
         [ :default_product_status            , :string  ],
-        [ :default_taxable                   , :boolean ]                      
+        [ :default_taxable                   , :boolean ],
+        [ :allow_instore_pickup              , :boolean  , { :default => false }],
+        [ :instore_tax_rate                  , :decimal  , { :precision => 8, :scale => 2 }],
+        [ :custom_invoice_pdf                , :string  ]
       ],  
-      Caboose::Subscription => [
-        [ :site_id             , :integer ],
-        [ :name                , :string  ],
-        [ :description         , :text    ],
-        [ :variant_id          , :integer ],
-        [ :interval            , :string  ],
-        [ :prorate             , :boolean  , { :default => false }],
-        [ :prorate_method      , :string  ],        
-        [ :prorate_flat_amount , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
-        [ :prorate_function    , :text    ],
-        [ :start_on_day        , :boolean  , { :default => false }],
-        [ :start_day           , :integer ],
-        [ :start_month         , :integer ]       
+      Caboose::Subscription => [      
+        [ :variant_id  , :integer ],
+        [ :user_id          , :integer ],
+        [ :date_started     , :date    ],
+        [ :date_started_full, :date    ],
+        [ :status           , :string  ]
       ],
       Caboose::User => [
         [ :site_id                      , :integer    ],
@@ -871,59 +884,61 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :card_brand                   , :string     ],  
         [ :card_exp_month               , :integer    ],
         [ :card_exp_year                , :integer    ]
-      ],
-      Caboose::UserSubscription => [
-        [ :subscription_id  , :integer ],
-        [ :user_id          , :integer ],
-        [ :date_started     , :date    ],
-        [ :date_started_full, :date    ],
-        [ :status           , :string  ]
-      ],
+      ],      
       Caboose::Variant => [
-        [ :product_id                    , :integer  ],
-        [ :alternate_id                  , :string   ],
-        [ :sku                           , :string   ],
-        [ :barcode                       , :string   ],
-        [ :cost                          , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
-        [ :price                         , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
-        [ :sale_price                    , :decimal   , { :precision => 8, :scale => 2 }],
-        [ :date_sale_starts              , :datetime ],
-        [ :date_sale_ends                , :datetime ],
-        [ :date_sale_end                 , :datetime ],        
-        [ :clearance                     , :boolean   , { :default => false }],
-        [ :clearance_price               , :decimal   , { :precision => 8, :scale => 2 }],
-        [ :available                     , :boolean   , { :default => true  }],
-        [ :quantity_in_stock             , :integer   , { :default => 0     }],        
-        [ :ignore_quantity               , :boolean   , { :default => false }],
-        [ :allow_backorder               , :boolean   , { :default => false }],
-        [ :weight                        , :decimal  ],
-        [ :length                        , :decimal  ],
-        [ :width                         , :decimal  ],
-        [ :height                        , :decimal  ],
-        [ :volume                        , :decimal  ],
-        [ :cylinder                      , :boolean   , { :default => false }],
-        [ :option1                       , :string   ],
-        [ :option2                       , :string   ],
-        [ :option3                       , :string   ],        
-        [ :option1_media_id              , :integer  ],
-        [ :option2_media_id              , :integer  ],
-        [ :option3_media_id              , :integer  ],
-        [ :requires_shipping             , :boolean   , { :default => true  }],
-        [ :taxable                       , :boolean   , { :default => true  }],        
-        [ :shipping_unit_value           , :numeric  ],
-        [ :flat_rate_shipping            , :boolean   , { :default => false }],
-        [ :flat_rate_shipping_package_id , :integer  ],
-        [ :flat_rate_shipping_method_id  , :integer  ],
-        [ :flat_rate_shipping_single     , :decimal   , { :precision => 8, :scale => 2, :default => 0.0 }],
-        [ :flat_rate_shipping_combined   , :decimal   , { :precision => 8, :scale => 2, :default => 0.0 }],      
-        [ :status                        , :string   ],
-        [ :option1_sort_order            , :integer   , { :default => 0 }],
-        [ :option2_sort_order            , :integer   , { :default => 0 }],
-        [ :option3_sort_order            , :integer   , { :default => 0 }],
-        [ :sort_order                    , :integer   , { :default => 0 }],
-        [ :downloadable                  , :boolean   , { :default => false }],
-        [ :download_path                 , :string   ],
-        [ :is_bundle                     , :boolean   , { :default => false }]
+        [ :product_id                       , :integer  ],
+        [ :alternate_id                     , :string   ],
+        [ :sku                              , :string   ],
+        [ :barcode                          , :string   ],
+        [ :cost                             , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :price                            , :decimal   , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :sale_price                       , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :date_sale_starts                 , :datetime ],
+        [ :date_sale_ends                   , :datetime ],
+        [ :date_sale_end                    , :datetime ],        
+        [ :clearance                        , :boolean   , { :default => false }],
+        [ :clearance_price                  , :decimal   , { :precision => 8, :scale => 2 }],
+        [ :available                        , :boolean   , { :default => true  }],
+        [ :quantity_in_stock                , :integer   , { :default => 0     }],        
+        [ :ignore_quantity                  , :boolean   , { :default => false }],
+        [ :allow_backorder                  , :boolean   , { :default => false }],
+        [ :weight                           , :decimal  ],
+        [ :length                           , :decimal  ],
+        [ :width                            , :decimal  ],
+        [ :height                           , :decimal  ],
+        [ :volume                           , :decimal  ],
+        [ :cylinder                         , :boolean   , { :default => false }],
+        [ :option1                          , :string   ],
+        [ :option2                          , :string   ],
+        [ :option3                          , :string   ],        
+        [ :option1_media_id                 , :integer  ],
+        [ :option2_media_id                 , :integer  ],
+        [ :option3_media_id                 , :integer  ],
+        [ :requires_shipping                , :boolean   , { :default => true  }],
+        [ :taxable                          , :boolean   , { :default => true  }],        
+        [ :shipping_unit_value              , :numeric  ],
+        [ :flat_rate_shipping               , :boolean   , { :default => false }],
+        [ :flat_rate_shipping_package_id    , :integer  ],
+        [ :flat_rate_shipping_method_id     , :integer  ],
+        [ :flat_rate_shipping_single        , :decimal   , { :precision => 8, :scale => 2, :default => 0.0 }],
+        [ :flat_rate_shipping_combined      , :decimal   , { :precision => 8, :scale => 2, :default => 0.0 }],      
+        [ :status                           , :string   ],
+        [ :option1_sort_order               , :integer   , { :default => 0 }],
+        [ :option2_sort_order               , :integer   , { :default => 0 }],
+        [ :option3_sort_order               , :integer   , { :default => 0 }],
+        [ :sort_order                       , :integer   , { :default => 0 }],
+        [ :downloadable                     , :boolean   , { :default => false }],
+        [ :download_path                    , :string   ],
+        [ :is_bundle                        , :boolean   , { :default => false }],
+        [ :is_subscription                  , :boolean   , { :default => false }],
+        [ :subscription_interval            , :string  ],
+        [ :subscription_prorate             , :boolean  , { :default => false }],
+        [ :subscription_prorate_method      , :string  ],        
+        [ :subscription_prorate_flat_amount , :decimal  , { :precision => 8, :scale => 2, :default => 0.00 }],
+        [ :subscription_prorate_function    , :text    ],
+        [ :subscription_start_on_day        , :boolean  , { :default => false }],
+        [ :subscription_start_day           , :integer ],
+        [ :subscription_start_month         , :integer ]
       ],
       Caboose::VariantChild => [
         [ :parent_id    , :integer ],
@@ -1154,5 +1169,18 @@ class Caboose::Schema < Caboose::Utilities::Schema
     if Caboose::ShippingMethod.all.count == 0
       Caboose::ShippingMethodLoader.load_shipping_methods
     end
+    
+    # Make sure all the reply-to addresses are populated
+    Caboose::SmtpConfig.where('reply_to_address is null and from_address is not null').all.each do |smtp|
+      smtp.reply_to_address = smtp.from_address
+      smtp.save
+    end
+    
+    # Change the invoice statuses
+    Caboose::Invoice.where("status = ? or status = ?", 'shipped', 'paid').all.each do |invoice|
+      invoice.status = 'processed'
+      invoice.save
+    end
+
   end
 end

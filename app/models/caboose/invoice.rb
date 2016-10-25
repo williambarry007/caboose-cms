@@ -54,8 +54,7 @@ module Caboose
     STATUS_PENDING       = 'pending'    
     STATUS_CANCELED      = 'canceled'
     STATUS_READY_TO_SHIP = 'ready to ship'
-    STATUS_SHIPPED       = 'shipped'    
-    STATUS_PAID          = 'paid'
+    STATUS_PROCESSED     = 'processed'            
     STATUS_TESTING       = 'testing'
     
     # New
@@ -99,21 +98,7 @@ module Caboose
     scope :captured   , where('financial_status = ?', 'captured')
     scope :refunded   , where('financial_status = ?', 'refunded')
     scope :voided     , where('financial_status = ?', 'voided')        
-    
-    #
-    # Validations
-    #
-    
-    validates :status, :inclusion => {
-      :in      => ['cart', 'pending', 'canceled', 'ready to ship', 'shipped', 'paid', 'testing'],
-      :message => "%{value} is not a valid status. Must be either 'pending' or 'shipped'"
-    }
-    
-    validates :financial_status, :inclusion => {
-      :in      => ['pending', 'authorized', 'captured', 'refunded', 'voided', 'paid by check', 'paid by other means'],
-      :message => "%{value} is not a valid financial status. Must be 'authorized', 'captured', 'refunded' or 'voided'"
-    }
-    
+        
     after_initialize :check_nil_fields
     
     def check_nil_fields

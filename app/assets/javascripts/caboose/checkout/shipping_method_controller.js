@@ -19,8 +19,7 @@ ShippingMethodController.prototype = {
     var div = $('<div/>');
     
     var sa = that.cc.invoice.shipping_address;
-    var op = that.cc.invoice_package_for_id(that.invoice_package_id);
-    console.log(op);
+    var op = that.cc.invoice_package_for_id(that.invoice_package_id);    
     var sm = op && op.shipping_method ? op.shipping_method : false;     
     
     if (!op)
@@ -44,8 +43,10 @@ ShippingMethodController.prototype = {
     {      
       div.append($('<p/>').append(sm.service_name + ' - $' + op.total))      
     }
-            
+    
     $('#invoice_package_' + that.invoice_package_id + '_shipping_method').empty().append(div);
+    if (that.cc.invoice.instore_pickup)
+      $('#invoice_package_' + that.invoice_package_id + '_shipping_method').css('display', 'none');    
   },
   
   edit: function()
@@ -97,6 +98,8 @@ ShippingMethodController.prototype = {
       .append($('<p/>').append(select))
       .append($('<div/>').attr('id', 'invoice_package_' + that.invoice_package_id + '_message'));                
     $('#invoice_package_' + that.invoice_package_id + '_shipping_method').empty().append(div);
+    if (that.cc.invoice.instore_pickup)
+      $('#invoice_package_' + that.invoice_package_id + '_shipping_method').css('display', 'none');
   },
   
   update: function(shipping_method_id, total)

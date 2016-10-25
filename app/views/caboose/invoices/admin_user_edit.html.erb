@@ -1,24 +1,15 @@
 
-<% if @edituser %>
-  <%= render :partial => 'caboose/users/admin_header' %>
-<% else %>
-  <div id='crumbtrail'>
-    <a href='/admin'>Admin</a> >
-    <a href='/admin/invoices'>Invoices</a> >
-    Invoice #<%= @invoice.id %>
-  </div>
-  <h1>Edit Invoice #<%= @invoice.id %></h1>
-<% end %>
-
+<%= render :partial => 'caboose/users/admin_header' %>
 <input type='hidden' name='invoice_id'    id='invoice_id'     value='<%= @invoice.id %>' />
+
+<h1>Edit Invoice #<%= @invoice.id %></h1>
+
 <div id='overview_table'></div>
 <div id='invoice_table'></div>
 <div id='message'></div>
 <div id='controls'></div>
 
-<% if @edituser %>
-  <%= render :partial => 'caboose/users/admin_footer' %>
-<% end %>
+<%= render :partial => 'caboose/users/admin_footer' %>
 
 <!--
 <p>
@@ -58,7 +49,6 @@ $(document).ready(function() {
 <% content_for :caboose_css do %>
 <style type='text/css'>
 
-table.subscription_dates td,
 table.shipping_address td,
 table.billing_address td {
   padding: 0 !important; 

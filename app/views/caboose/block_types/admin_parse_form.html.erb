@@ -1,0 +1,32 @@
+<div id='crumbtrail'>
+  <a href='/admin'>Admin</a> >
+  <a href='/admin/block-types'>Block Types</a> >
+  Parser
+</div>
+
+<h1>Block Type Parser</h1>
+
+<div id='block_type_parser'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<%= javascript_include_tag 'caboose/admin_block_type_parser_controller' %>
+<script type='text/javascript'>
+
+var controller = false; 
+$(document).ready(function() {
+  controller = new AdminBlockTypeParserController({          
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    original_html: ''
+  });
+});
+    
+</script>
+<% end %>
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+textarea { font-family: Courier; font-size: 10pt; white-space: pre; overflow-wrap: normal; overflow-x: scroll; }
+
+</style>
+<% end %>

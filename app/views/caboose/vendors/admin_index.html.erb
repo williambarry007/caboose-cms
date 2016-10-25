@@ -1,8 +1,8 @@
 <h1>Vendors</h1>
 
-<p><a href="/admin/vendors/new">New Vendor</a></p>
+<p><a href="/admin/store/vendors/new">New Vendor</a></p>
 
-<form action="/admin/vendors" method="get" style="margin: 0 0 12px">
+<form action="/admin/store/vendors" method="get" style="margin: 0 0 12px">
   <input name="name_like" value="<%= params[:name_like] %>" placeholder="Search for vendor" />
   <input type="submit" value="Search" />
 </form>
@@ -20,7 +20,7 @@
     </tr>
     
     <% @vendors.each do |vendor| %>
-      <tr onclick="window.location='/admin/vendors/<%= vendor.id %>';">
+      <tr onclick="window.location='/admin/store/vendors/<%= vendor.id %>';">
         <td style="text-align: center"><%= raw vendor.id %></td>
         <td><% if vendor.image %><img src='<%= raw vendor.image.url(:tiny) %>' /><% else %>&nbsp;<% end %></td>
         <td><%= raw vendor.name %></td>

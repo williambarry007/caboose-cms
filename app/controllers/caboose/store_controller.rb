@@ -126,6 +126,7 @@ module Caboose
           when 'download_url_expires_in'          then sc.download_url_expires_in          = value            
           when 'starting_invoice_number'          then sc.starting_invoice_number          = value
           when 'default_payment_terms'            then sc.default_payment_terms            = value
+          when 'allow_instore_pickup'             then sc.allow_instore_pickup             = value
                                 
           when 'product_vendor_id'                      then pd.vendor_id                      = value   
           when 'product_option1'                        then pd.option1                        = value

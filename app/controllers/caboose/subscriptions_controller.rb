@@ -8,79 +8,83 @@ module Caboose
     
     # @route GET /admin/subscriptions
     def admin_index
+      return if !user_is_allowed('subscriptions', 'view')      
+      render :layout => 'caboose/admin'      
+    end
+    
+    # @route GET /admin/users/:user_id/subscriptions
+    def admin_user_index
       return if !user_is_allowed('subscriptions', 'view')
+      @edituser = User.find(params[:user_id])
       render :layout => 'caboose/admin'      
     end
     
     # @route GET /admin/subscriptions/json
+    # @route GET /admin/users/:user_id/subscriptions/json
     def admin_json
       return if !user_is_allowed('subscriptions', 'view')
       
       pager = PageBarGenerator.new(params, {
-          'site_id'             => @site.id,          
-          'name_like'           => '',
-          'description_like'    => '',
-          'variant_id'          => '',
-          'interval'            => '',
-          'prorate'             => '',
-          'prorate_method'      => '',
-          'prorate_flat_amount' => '',
-          'start_on_day'        => '',
-          'start_day'           => '',
-          'start_month'         => ''                
+          'variant_id'            => '',
+          'user_id'               => params[:user_id] ? params[:user_id] : '',
+          'date_started_gte'      => '',
+          'date_started_lte'      => '',
+          'date_started_full_gte' => '',
+          'date_started_full_lte' => '',
+          'status'                => ''                                
     		},{
     		  'model'          => 'Caboose::Subscription',
-    	    'sort'			     => 'name',
+    	    'sort'			     => 'date_started',
     		  'desc'			     => false,
-    		  'base_url'		   => "/admin/subscriptions",
+    		  'base_url'		   => params[:user_id] ? "/admin/users/#{params[:user_id]}/subscriptions" : '/admin/subscriptions',
     		  'use_url_params' => false
     	})
     	render :json => {
     	  :pager => pager,
-    	  :models => pager.items
+    	  :models => pager.items.as_json(:include => [:user, { :variant => { :include => :product }}])
     	}
     end
 
     # @route GET /admin/subscriptions/:id
+    # @route GET /admin/users/:user_id/subscriptions/:id
     def admin_edit
       return if !user_is_allowed('subscriptions', 'edit')    
-      @subscription = Subscription.find(params[:id])            
+      @subscription = Subscription.find(params[:id])      
+      @edituser = @subscription.user
       render :layout => 'caboose/admin'
     end
     
-    # @route GET /admin/subscriptions/:id/json
+    # @route GET /admin/users/:user_id/subscriptions/:id/json
     def admin_json_single
       return if !user_is_allowed('subscriptions', 'view')    
       s = Subscription.find(params[:id])      
       render :json => s
     end
 
-    # @route POST /admin/subscriptions
+    # @route POST /admin/users/:user_id/subscriptions
     def admin_add
       return unless user_is_allowed('subscriptions', 'add')
 
       resp = Caboose::StdClass.new            
-      name = params[:name]      
+      v = params[:variant_id] ? Variant.where(:id => params[:variant_id]).first : nil      
 
-      if name.nil? || name.strip.length == 0
-        resp.error = "A name is required."
-      elsif Subscription.where(:site_id => @site.id, :name => params[:name]).exists?                 
-        resp.error = "A subscription with that name already exists."
+      if params[:variant_id].nil? || v.nil? || v.product.site_id != @site.id || !v.is_subscription 
+        resp.error = "A valid subscription variant is required."      
       else
         s = Subscription.create(
-          :site_id             => @site.id,
-          :name                => params[:name].strip,                
-          :interval            => Subscription::INTERVAL_MONTHLY,
-          :prorate             => false,        
-          :start_on_day        => false
+          :variant_id        => v.id,
+          :user_id           => params[:user_id],
+          :date_started      => Date.today,
+          :date_started_full => Date.today,
+          :status            => UserSubcription::STATUS_ACTIVE
         )                                    
-        resp.redirect = "/admin/subscriptions/#{s.id}"
+        resp.redirect = "/admin/users/#{params[:user_id]}/subscriptions/#{s.id}"
         resp.success = true
       end                  
       render :json => resp
     end
     
-    # @route PUT /admin/subscriptions/:id
+    # @route PUT /admin/users/:user_id/subscriptions/:id
     def admin_update
       return unless user_is_allowed('subscriptions', 'edit')
       
@@ -89,39 +93,41 @@ module Caboose
             
       params.each do |k, v|        
         case k
-          when 'name'                then models.each{ |s| s.name                = v }
-          when 'description'         then models.each{ |s| s.description         = v }
-          when 'variant_id'          then models.each{ |s| s.variant_id          = v }
-          when 'interval'            then models.each{ |s| s.interval            = v }
-          when 'prorate'             then models.each{ |s| s.prorate             = v }
-          when 'prorate_method'      then models.each{ |s| s.prorate_method      = v }
-          when 'prorate_flat_amount' then models.each{ |s| s.prorate_flat_amount = v }
-          when 'prorate_function'    then models.each{ |s| s.prorate_function    = v }
-          when 'start_on_day'        then models.each{ |s| s.start_on_day        = v }
-          when 'start_day'           then models.each{ |s| s.start_day           = v }
-          when 'start_month'         then models.each{ |s| s.start_month         = v }
+          when 'variant_id'        then models.each{ |s| s.variant_id        = v }
+          when 'user_id'           then models.each{ |s| s.user_id           = v }
+          when 'date_started'      then models.each{ |s| s.date_started      = v }
+          when 'date_started_full' then models.each{ |s| s.date_started_full = v }
+          when 'status'            then models.each{ |s| s.status            = v }                
         end
       end
       models.each{ |s| s.save }
       resp.success = true      
       render :json => resp
     end
+       
+    # @route POST /admin/users/:user_id/subscriptions/:id/invoices
+    def admin_create_invoices
+      return if !user_is_allowed('subscriptions', 'edit')    
+      s = Subscription.find(params[:id])
+      s.create_invoices
+      render :json => { :success => true }      
+    end
     
-    # @route DELETE /admin/subscriptions/:id
+    # @route DELETE /admin/users/:user_id/subscriptions/:id
     def admin_delete
       return unless user_is_allowed('subscriptions', 'delete')
       
       model_ids = params[:id] == 'bulk' ? params[:model_ids] : [params[:id]]      
       model_ids.each do |model_id|
-        UserSubscription.where(:subscription_id => model_id).destroy_all
-        Subscription.where(:id => model_id).destroy_all
+        Subscription.where(:id => model_id).destroy_all        
       end
       
       render :json => { :sucess => true }
     end
         
     # @route_priority 1
-    # @route GET /admin/subscriptions/:field-options        
+    # @route GET /admin/subscriptions/:field-options
+    # @route GET /admin/users/:user_id/subscriptions/:field-options        
     def admin_options
       if !user_is_allowed('subscriptions', 'edit')
         render :json => false
@@ -130,21 +136,17 @@ module Caboose
       
       options = []
       case params[:field]                
-        when 'interval'
+        when 'variant'
+          arr = Variant.joins(:product).where("store_products.site_id = ? and is_subscription = ?", @site.id, true).reorder("store_products.title").all          
+          options = arr.collect{ |v| { 'value' => v.id, 'text' => v.product.title }}
+        when 'status'
           options = [
-            { 'value' => Subscription::INTERVAL_MONTHLY , 'text' => 'Monthly' },
-            { 'value' => Subscription::INTERVAL_YEARLY  , 'text' => 'Yearly'  }
-          ]                      
-        when 'prorate-method'
-          options = [
-            { 'value' => Subscription::PRORATE_METHOD_FLAT       , 'text' => 'Flat Amount'            },
-            { 'value' => Subscription::PRORATE_METHOD_PERCENTAGE , 'text' => 'Percentage of Interval' },
-            { 'value' => Subscription::PRORATE_METHOD_CUSTOM     , 'text' => 'Custom'                 }
-          ]
-        when 'start-day'
-          options = (1..31).collect{ |i| { 'value' => i, 'text' => i }}            
-        when 'start-month'    
-          options = (1..12).collect{ |i| { 'value' => i, 'text' => Date.new(2000, i, 1).strftime('%B') }}
+            { 'value' => Subscription::STATUS_ACTIVE   , 'text' => 'Active'   },
+            { 'value' => Subscription::STATUS_INACTIVE , 'text' => 'Inactive' }
+          ]          
+        when 'user'
+          arr = User.where(:site_id => @site.id).reorder('last_name, first_name').all          
+          options = arr.collect{ |u| { 'value' => u.id, 'text' => "#{u.first_name} #{u.last_name}" }}
       end              
       render :json => options 		
     end

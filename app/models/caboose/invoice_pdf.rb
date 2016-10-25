@@ -14,9 +14,8 @@ module Caboose
       font_size 9
 
       img = open("http://cabooseit.s3.amazonaws.com/uploads/template.jpg")
-   #   image img, :width => 610, :at => [-30, 755]
-
-      #image open("https://dmwwflw4i3miv.cloudfront.net/logo.png"), :position => :center
+   
+      header_info
       move_down 10
       invoice_info
       move_down 15
@@ -26,6 +25,9 @@ module Caboose
       move_down 15
       payment_info
       render
+    end
+    
+    def header_info
     end
     
     def formatted_phone(str)
@@ -52,6 +54,8 @@ module Caboose
       sc = self.invoice.site.store_config
       ot = self.invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       
+      return unless ot
+
       case ot.payment_processor
         when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
           
@@ -82,6 +86,18 @@ module Caboose
       invoice_info = "Invoice Number: #{invoice.invoice_number}\n"
       invoice_info << "Invoice Date: #{invoice.date_created.strftime('%d %b %Y %H:%M:%S %p')}\n"
       invoice_info << "Status: #{invoice.status.capitalize}\n"
+      
+      if invoice.status == Invoice::STATUS_PENDING
+        s  = self.invoice.site
+        sc = self.invoice.site.store_config
+        invoice_info << "\n"
+        invoice_info << "Please mail payments to:\n"
+        invoice_info << "#{s.description}\n"
+        invoice_info << "#{sc.origin_address1}\n"
+        invoice_info << "#{sc.origin_address2}\n"
+        invoice_info << "#{sc.origin_city}, " << "#{sc.origin_state} " << "#{sc.origin_zip}\n"
+      end
+
       tbl = []
       tbl << [
         { :content => invoice_info }
@@ -92,6 +108,7 @@ module Caboose
 
     
     def customer_info
+      return if self.invoice.status == Invoice::STATUS_PENDING
 
       c = invoice.customer
 
@@ -106,13 +123,24 @@ module Caboose
       ]
       
       sa = invoice.shipping_address
-      sa_address = "#{sa.address1}" + (sa.address2.blank? ? '' : "\n#{sa.address2}") + "\n#{sa.city}, #{sa.state} #{sa.zip}"
-      shipped_to = [
-        [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => "#{sa.first_name} #{sa.last_name}" , :border_width => 0, :width => 200 }],
-        [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }],
-        [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }],
-        [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
-      ]
+      sa_name = sa && sa.first_name ? "#{sa.first_name} #{sa.last_name}" : "#{c.first_name} #{c.last_name}"
+      sa_address = sa ? 
+        (sa.address1 && sa.address1.length > 0 ? "#{sa.address1}\n" : '') + 
+        (sa.address2 && sa.address2.length > 0 ? "#{sa.address2}\n" : '') + 
+        (sa.city     && sa.city.length     > 0 ? "#{sa.city}, "     : '') +
+        (sa.state    && sa.state.length    > 0 ? "#{sa.state} "     : '') +
+        (sa.zip      && sa.zip.length      > 0 ? sa.zip             : '') : ''
+        
+      shipped_to = []
+      if invoice.instore_pickup
+        shipped_to << [{ :content => "Name"            , :border_width => 0, :width =>  55 },{ :content => "#{c.first_name} #{c.last_name}"   , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "IN-STORE PICKUP" , :border_width => 0, :width => 255 }]
+      else        
+        shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => sa_name                            , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
+      end
 
       tbl = []
       tbl << [
@@ -243,6 +271,7 @@ module Caboose
     end
 
     def payment_info
+      return if self.invoice.status == Invoice::STATUS_PENDING
 
       trans = invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       tbl = []

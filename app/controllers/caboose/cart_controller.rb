@@ -42,29 +42,45 @@ module Caboose
       v = Variant.find(params[:variant_id])
       qty = params[:quantity] ? params[:quantity].to_i : 1
       
+      resp = StdClass.new
+            
       if @invoice.line_items.exists?(:variant_id => v.id)
         li = @invoice.line_items.find_by_variant_id(v.id)
         li.quantity += qty
         li.subtotal = li.unit_price * li.quantity
+        InvoiceLog.create(
+          :invoice_id     => @invoice.id,
+          :line_item_id   => li.id,
+          :user_id        => logged_in_user.id,
+          :date_logged    => DateTime.now.utc,
+          :invoice_action => InvoiceLog::ACTION_LINE_ITEM_UPDATED,
+          :field          => 'quantity',
+          :old_value      => li.quantity - qty,
+          :new_value      => li.quantity
+        )
       else
         unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)
-        li = LineItem.new(
+        li = LineItem.create(
           :invoice_id   => @invoice.id,
           :variant_id => v.id,
           :quantity   => qty,
           :unit_price => unit_price,
           :subtotal   => unit_price * qty,
           :status     => 'pending'
+        )        
+        InvoiceLog.create(
+          :invoice_id     => @invoice.id,
+          :line_item_id   => li.id,
+          :user_id        => logged_in_user.id,
+          :date_logged    => DateTime.now.utc,
+          :invoice_action => InvoiceLog::ACTION_LINE_ITEM_CREATED                                                                          
         )
       end
-
       GA.delay(:queue => 'caboose_store').event(@site.id, 'cart', 'add', "Product #{v.product.id}, Variant #{v.id}")
-
-      render :json => { 
-        :success => li.save, 
-        :errors => li.errors.full_messages,
-        :item_count => @invoice.item_count 
-      }      
+      
+      resp.success = true
+      resp.item_count = @invoice.item_count
+      render :json => resp
     end
     
     # @route PUT /cart/:line_item_id
@@ -73,7 +89,20 @@ module Caboose
       li = LineItem.find(params[:line_item_id])
 
       save = true    
+      fields_to_log = ['quantity', 'is_gift', 'include_gift_message', 'gift_message', 'gift_wrap', 'hide_prices']            
       params.each do |name,value|
+        if fields_to_log.include?(name)        
+          InvoiceLog.create(
+            :invoice_id     => @invoice.id,
+            :line_item_id   => li.id,
+            :user_id        => logged_in_user.id,
+            :date_logged    => DateTime.now.utc,
+            :invoice_action => InvoiceLog::ACTION_LINE_ITEM_UPDATED,
+            :field          => name,
+            :old_value      => li[name.to_sym],
+            :new_value      => value
+          )            
+        end
         case name
           when 'quantity'    then
             if value.to_i != li.quantity
@@ -92,6 +121,13 @@ module Caboose
             li.quantity = value.to_i
             if li.quantity == 0
               li.destroy
+              InvoiceLog.create(
+                :invoice_id     => @invoice.id,
+                :line_item_id   => li.id,
+                :user_id        => logged_in_user.id,
+                :date_logged    => DateTime.now.utc,
+                :invoice_action => InvoiceLog::ACTION_LINE_ITEM_DELETED                
+              )
             else            
               li.subtotal = li.unit_price * li.quantity
               li.save
@@ -112,7 +148,14 @@ module Caboose
     
     # @route DELETE /cart/:line_item_id
     def remove                  
-      li = LineItem.find(params[:line_item_id]).destroy      
+      li = LineItem.find(params[:line_item_id]).destroy
+      InvoiceLog.create(
+        :invoice_id     => @invoice.id,
+        :line_item_id   => params[:line_item_id],
+        :user_id        => logged_in_user.id,
+        :date_logged    => DateTime.now.utc,
+        :invoice_action => InvoiceLog::ACTION_LINE_ITEM_DELETED                
+      )
       op = li.invoice_package
       if op
         op.shipping_method_id = nil
@@ -140,7 +183,7 @@ module Caboose
       elsif gc.card_type == GiftCard::CARD_TYPE_AMOUNT && gc.balance <= 0       then resp.error = "That gift card has a zero balance." 
       elsif gc.min_invoice_total && @invoice.total < gc.min_invoice_total             then resp.error = "Your invoice must be at least $#{sprintf('%.2f',gc.min_invoice_total)} to use this gift card." 
       elsif Discount.where(:invoice_id => @invoice.id, :gift_card_id => gc.id).exists? then resp.error = "That gift card has already been applied to this invoice."
-      else
+      else            
         # Create the discount and recalculate the invoice
         d = Discount.create(:invoice_id => @invoice.id, :gift_card_id => gc.id, :amount => 0.0)
         d.calculate_amount                

@@ -1,12 +1,12 @@
 <h1>New Vendor</h1>
 
-<form id="new-vendor" action="/admin/vendors" method="post">
+<form id="new-vendor" action="/admin/store/vendors" method="post">
   <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
   <p><input id="name" name="name" id='name' type="text" placeholder="Vendor Name" style="width: 400px" /></p>
   <p><input type='checkbox' name='stay' id='stay' value='1' /> Stay here so I can add another vendor</p>
   <div id='message'></div>
   <p>
-    <input type="button" value="< Back" onclick="window.location='/admin/vendors';" />
+    <input type="button" value="< Back" onclick="window.location='/admin/store/vendors';" />
     <input type="submit" value="Add Vendor" />    
   </p>
 </form>
@@ -20,7 +20,7 @@ $(document).ready(function() {
     
     $('#message').html("<p class='loading'>Adding vendor...</p>");        
     $.ajax({
-      url: '/admin/vendors',
+      url: '/admin/store/vendors',
       type: 'post',
       data: $('#new-vendor').serialize(),
       success: function(resp) {

@@ -46,7 +46,9 @@ module Caboose
       :custom_tax_function,                  
       :length_unit,
       :download_instructions,
-      :weight_unit
+      :weight_unit,
+      :allow_instore_pickup,
+      :custom_invoice_pdf
       
     WEIGHT_UNIT_METRIC   = 'g'
     WEIGHT_UNIT_IMPERIAL = 'oz'

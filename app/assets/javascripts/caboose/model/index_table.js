@@ -1044,6 +1044,30 @@ IndexTable.prototype = {
         });
         td.append(select);
       }
+      //else if (f.type == 'checkbox_multiple')
+      //{
+      //  var options = false;
+      //  if (!f.options && f.options_url)
+      //  {
+      //    $.ajax({
+      //      url: f.options_url,
+      //      type: 'get',
+      //      success: function(resp) { f.options = resp; },
+      //      async: false
+      //    });
+      //  }
+      //  var div = $('<div/>');        
+      //  //if (f.empty_option_text)
+      //  //{
+      //  //  div.append($('<input/>').attr('type', 'checkbox').attr('id', f.name + '_empty').val(''))
+      //  //    .append($('<label/>').attr('for', f.name + '_empty').html(f.empty_option_text));
+      //  //}
+      //  $.each(f.options, function(j, option) {
+      //    div.append($('<input/>').attr('type', 'checkbox').attr('id', f.name + '_' + j).val(option.value).prop('checked', pp[f.name].indexOf(option.value) > -1))          
+      //      .append($('<label/>').attr('for', f.name + '_' + j).html(option.text));
+      //  });
+      //  td.append(div);
+      //}
       tr.append(td);
       tbody.append(tr);
     });    

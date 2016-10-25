@@ -54,26 +54,29 @@ module Caboose
       sc = self.invoice.site.store_config
       ot = self.invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
 
-      case ot.payment_processor
-        when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
-          
-          if ot 
-            t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
-            resp = t.get_transaction_details(ot.transaction_id)
-            t2 = resp.transaction
-            if t2
-              self.card_type = t2.payment_method.card_type.upcase
-              self.card_number = t2.payment_method.card_number.gsub('X', '')
+      if ot
+
+        case ot.payment_processor
+          when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
+            
+            if ot 
+              t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
+              resp = t.get_transaction_details(ot.transaction_id)
+              t2 = resp.transaction
+              if t2
+                self.card_type = t2.payment_method.card_type.upcase
+                self.card_number = t2.payment_method.card_number.gsub('X', '')
+              end
+            else 
+              self.card_type = ""
+              self.card_number = ""
             end
-          else 
-            self.card_type = ""
-            self.card_number = ""
-          end
-        
-        when StoreConfig::PAYMENT_PROCESSOR_STRIPE
           
-          self.card_type   = self.invoice.customer.card_brand
-          self.card_number = self.invoice.customer.card_last4
+          when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+            
+            self.card_type   = self.invoice.customer.card_brand
+            self.card_number = self.invoice.customer.card_last4
+        end
           
       end
             

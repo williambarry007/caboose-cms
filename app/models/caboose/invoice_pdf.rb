@@ -123,7 +123,7 @@ module Caboose
       shipped_to = []
       if invoice.instore_pickup
         shipped_to << [{ :content => "Name"            , :border_width => 0, :width =>  55 },{ :content => "#{c.first_name} #{c.last_name}"   , :border_width => 0, :width => 200 }]
-        shipped_to << [{ :content => "IN-STORE PICKUP" , :border_width => 0, :width => 255 }]
+        shipped_to << [{ :content => "IN-STORE PICKUP" , :border_width => 0, :width => 255 , :colspan => 2 }]
       else        
         shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => sa_name                            , :border_width => 0, :width => 200 }]
         shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }]
@@ -165,9 +165,9 @@ module Caboose
       
       invoice.invoice_packages.all.each do |pk|
 
-        carrier = pk.shipping_method.carrier
-        service = pk.shipping_method.service_name
-        package = pk.shipping_package.name
+        carrier = pk.shipping_method  ? pk.shipping_method.carrier      : ''
+        service = pk.shipping_method  ? pk.shipping_method.service_name : ''
+        package = pk.shipping_package ? pk.shipping_package.name        : ''
 
         pk.line_items.each_with_index do |li, index|
           options = ''

@@ -7,6 +7,12 @@
   overflow: hidden;
 }
 
+.mb_container * {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; 
+}
+
 .mb_container div.mb_model_attribute_text {
   color: #000;
 }
@@ -101,7 +107,7 @@ div.mb_container form.mb_file_form div.mb_placeholder {
 
 .mb_container .mb_placeholder span {
   display: block;
-  font-size: 20px;
+  font-size: 16px;
   color: #757575;
 }
 

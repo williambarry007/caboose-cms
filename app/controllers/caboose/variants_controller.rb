@@ -243,41 +243,63 @@ module Caboose
       render :json => { :success => true }
     end
     
-    # @route PUT /admin/products/:product_id/variants/bulk
-    def admin_bulk_update
+    # @route PUT /admin/products/:product_id/variants/:id
+    # @route PUT /admin/products/:product_id/variants/bulk    
+    def admin_update
       return unless user_is_allowed_to 'edit', 'sites'
     
       resp = Caboose::StdClass.new    
-      variants = params[:model_ids].collect{ |variant_id| Variant.find(variant_id) }      
+      variants = params[:id] == 'bulk' ? params[:model_ids].collect{ |variant_id| Variant.find(variant_id) } : [Variant.find(params[:id])]      
     
       save = true
       params.each do |k,value|
         case k
-          when 'alternate_id'       then variants.each { |v| v.alternate_id       = value }
-          when 'sku'                then variants.each { |v| v.sku                = value }
-          when 'barcode'            then variants.each { |v| v.barcode            = value }
-          when 'price'              then variants.each { |v| v.price              = value }
-          when 'quantity_in_stock'  then variants.each { |v| v.quantity_in_stock  = value }
-          when 'ignore_quantity'    then variants.each { |v| v.ignore_quantity    = value }
-          when 'allow_backorder'    then variants.each { |v| v.allow_backorder    = value }
-          when 'clearance'          then variants.each { |v| v.clearance          = value }
-          when 'clearance_price'    then variants.each { |v| v.clearance_price    = value }
-          when 'status'             then variants.each { |v| v.status             = value }
-          when 'weight'             then variants.each { |v| v.weight             = value }
-          when 'length'             then variants.each { |v| v.length             = value }
-          when 'width'              then variants.each { |v| v.width              = value }
-          when 'height'             then variants.each { |v| v.height             = value }
-          when 'option1'            then variants.each { |v| v.option1            = value }
-          when 'option2'            then variants.each { |v| v.option2            = value }
-          when 'option3'            then variants.each { |v| v.option3            = value }
-          when 'option1_media_id'   then variants.each { |v| v.option1_media_id   = value }
-          when 'option2_media_id'   then variants.each { |v| v.option2_media_id   = value }
-          when 'option3_media_id'   then variants.each { |v| v.option3_media_id   = value }
-          when 'requires_shipping'  then variants.each { |v| v.requires_shipping  = value }
-          when 'taxable'            then variants.each { |v| v.taxable            = value }
-          when 'downloadable'       then variants.each { |v| v.downloadable       = value }
-          when 'download_path'      then variants.each { |v| v.download_path      = value }
-
+          when 'alternate_id'                         then variants.each { |v| v.alternate_id                     = value }
+          when 'sku'                                  then variants.each { |v| v.sku                              = value }
+          when 'barcode'                              then variants.each { |v| v.barcode                          = value }
+          when 'cost'                                 then variants.each { |v| v.cost                             = value }
+          when 'price'                                then variants.each { |v| v.price                            = value }
+          when 'quantity_in_stock'                    then variants.each { |v| v.quantity_in_stock                = value }
+          when 'ignore_quantity'                      then variants.each { |v| v.ignore_quantity                  = value }
+          when 'allow_backorder'                      then variants.each { |v| v.allow_backorder                  = value }
+          when 'clearance'                            then variants.each { |v| v.clearance                        = value }
+          when 'clearance_price'                      then variants.each { |v| v.clearance_price                  = value }
+          when 'status'                               then variants.each { |v| v.status                           = value }
+          when 'weight'                               then variants.each { |v| v.weight                           = value }
+          when 'length'                               then variants.each { |v| v.length                           = value }
+          when 'width'                                then variants.each { |v| v.width                            = value }
+          when 'height'                               then variants.each { |v| v.height                           = value }
+          when 'option1'                              then variants.each { |v| v.option1                          = value }
+          when 'option2'                              then variants.each { |v| v.option2                          = value }
+          when 'option3'                              then variants.each { |v| v.option3                          = value }
+          when 'option1_media_id'                     then variants.each { |v| v.option1_media_id                 = value }
+          when 'option2_media_id'                     then variants.each { |v| v.option2_media_id                 = value }
+          when 'option3_media_id'                     then variants.each { |v| v.option3_media_id                 = value }
+          when 'requires_shipping'                    then variants.each { |v| v.requires_shipping                = value }
+          when 'taxable'                              then variants.each { |v| v.taxable                          = value }
+          when 'downloadable'                         then variants.each { |v| v.downloadable                     = value }
+          when 'download_path'                        then variants.each { |v| v.download_path                    = value }
+          when 'is_subscription'                      then variants.each { |v| v.is_subscription                  = value }
+          when 'subscription_interval'                then variants.each { |v| v.subscription_interval            = value }
+          when 'subscription_prorate'                 then variants.each { |v| v.subscription_prorate             = value }
+          when 'subscription_prorate_method'          then variants.each { |v| v.subscription_prorate_method      = value }
+          when 'subscription_prorate_flat_amount'     then variants.each { |v| v.subscription_prorate_flat_amount = value }
+          when 'subscription_prorate_function'        then variants.each { |v| v.subscription_prorate_function    = value }
+          when 'subscription_start_on_day'            then variants.each { |v| v.subscription_start_on_day        = value }
+          when 'subscription_start_day'               then variants.each { |v| v.subscription_start_day           = value }
+          when 'subscription_start_month'             then variants.each { |v| v.subscription_start_month         = value }            
+          when 'is_bundle'                            then variants.each { |v| v.is_bundle                        = value }          
+          when 'flat_rate_shipping'                   then variants.each { |v| v.flat_rate_shipping               = value }
+          when 'flat_rate_shipping_single'            then variants.each { |v| v.flat_rate_shipping_single        = value }
+          when 'flat_rate_shipping_combined'          then variants.each { |v| v.flat_rate_shipping_combined      = value }
+          when 'flat_rate_shipping_package_id'        then variants.each { |v| v.flat_rate_shipping_package_id    = value }
+          when 'flat_rate_shipping_method_id'         then variants.each { |v| v.flat_rate_shipping_method_id     = value }
+          when 'flat_rate_shipping_package_method_id' then
+            arr = value.split('_')
+            variants.each do |v|               
+              v.flat_rate_shipping_package_id = arr[0].to_i
+              v.flat_rate_shipping_method_id  = arr[1].to_i
+            end          
           when 'sale_price'
             variants.each_with_index do |v, i|              
               v.sale_price = value            
@@ -321,67 +343,6 @@ module Caboose
       variants.each{ |v| v.save }
     
       resp.success = true
-      render :json => resp
-    end
-    
-    # @route PUT /admin/products/:product_id/variants/:id
-    def admin_update
-      return if !user_is_allowed('variants', 'edit')
-      
-      resp = Caboose::StdClass.new({'attributes' => {}})
-      v = Variant.find(params[:id])    
-      
-      save = true    
-      params.each do |name,value|
-        case name        
-          when 'alternate_id'                  then v.alternate_id                  = value
-          when 'sku'                           then v.sku                           = value
-          when 'barcode'                       then v.barcode                       = value
-          when 'cost'                          then v.cost                          = value
-          when 'price'                         then v.price                         = value                      
-          when 'quantity_in_stock'             then v.quantity_in_stock             = value
-          when 'ignore_quantity'               then v.ignore_quantity               = value
-          when 'allow_backorder'               then v.allow_backorder               = value
-          when 'clearance'                     then v.clearance                     = value
-          when 'clearance_price'               then v.clearance_price               = value
-          when 'status'                        then v.status                        = value
-          when 'weight'                        then v.weight                        = value
-          when 'length'                        then v.length                        = value
-          when 'width'                         then v.width                         = value
-          when 'height'                        then v.height                        = value
-          when 'option1'                       then v.option1                       = value
-          when 'option2'                       then v.option2                       = value
-          when 'option3'                       then v.option3                       = value
-          when 'requires_shipping'             then v.requires_shipping             = value
-          when 'taxable'                       then v.taxable                       = value
-          when 'is_bundle'                     then v.is_bundle                     = value
-          when 'flat_rate_shipping'            then v.flat_rate_shipping            = value
-          when 'flat_rate_shipping_single'     then v.flat_rate_shipping_single     = value
-          when 'flat_rate_shipping_combined'   then v.flat_rate_shipping_combined   = value
-          when 'flat_rate_shipping_package_id' then v.flat_rate_shipping_package_id = value
-          when 'flat_rate_shipping_method_id'  then v.flat_rate_shipping_method_id  = value
-          when 'flat_rate_shipping_package_method_id' then
-            arr = value.split('_')
-            v.flat_rate_shipping_package_id = arr[0].to_i
-            v.flat_rate_shipping_method_id  = arr[1].to_i
-          when 'downloadable'                then v.downloadable                = value
-          when 'download_path'               then v.download_path               = value
-            
-          when 'sale_price'
-            v.sale_price = value            
-            v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale            
-          when 'date_sale_starts'
-            v.date_sale_starts = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
-            v.product.delay(:run_at => v.date_sale_starts, :queue => 'caboose_store').update_on_sale
-            v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale
-          when 'date_sale_ends'
-            v.date_sale_ends = ModelBinder.local_datetime_to_utc(value, @logged_in_user.timezone)                        
-            v.product.delay(:run_at => v.date_sale_ends  , :queue => 'caboose_store').update_on_sale  
-            v.product.delay(:run_at => 3.seconds.from_now, :queue => 'caboose_store').update_on_sale
-          
-        end
-      end
-      resp.success = save && v.save
       render :json => resp
     end
   
@@ -528,17 +489,39 @@ module Caboose
     #===========================================================================
     
     # @route_priority 1
-    # @route GET /admin/variants/status-options
-    def admin_status_options
-      arr = ['Active', 'Inactive', 'Deleted']
+    # @route GET /admin/variants/:field-options        
+    def admin_options
+      if !user_is_allowed('variants', 'edit')
+        render :json => false
+        return
+      end
+      
       options = []
-      arr.each do |status|
-        options << {
-          :value => status,
-          :text => status
-        }
+      case params[:field]                
+        when 'subscription-interval'
+          options = [
+            { 'value' => Variant::SUBSCRIPTION_INTERVAL_MONTHLY , 'text' => 'Monthly' },
+            { 'value' => Variant::SUBSCRIPTION_INTERVAL_YEARLY  , 'text' => 'Yearly'  }
+          ]                      
+        when 'subscription-prorate-method'
+          options = [
+            { 'value' => Variant::SUBSCRIPTION_PRORATE_METHOD_FLAT       , 'text' => 'Flat Amount'            },
+            { 'value' => Variant::SUBSCRIPTION_PRORATE_METHOD_PERCENTAGE , 'text' => 'Percentage of Interval' },
+            { 'value' => Variant::SUBSCRIPTION_PRORATE_METHOD_CUSTOM     , 'text' => 'Custom'                 }
+          ]
+        when 'subscription-start-day'
+          options = (1..31).collect{ |i| { 'value' => i, 'text' => i }}            
+        when 'subscription-start-month'    
+          options = (1..12).collect{ |i| { 'value' => i, 'text' => Date.new(2000, i, 1).strftime('%B') }}
+        when 'status'
+          options = [
+            { 'value' => Variant::STATUS_ACTIVE   , 'text' => 'Active'   },
+            { 'value' => Variant::STATUS_INACTIVE , 'text' => 'Inactive' },
+            { 'value' => Variant::STATUS_DELETED  , 'text' => 'Deleted'  }
+          ]
       end
       render :json => options
     end
+        
   end
 end

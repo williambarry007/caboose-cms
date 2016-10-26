@@ -14,9 +14,8 @@ module Caboose
       font_size 9
 
       img = open("http://cabooseit.s3.amazonaws.com/uploads/template.jpg")
-   #   image img, :width => 610, :at => [-30, 755]
-
-      #image open("https://dmwwflw4i3miv.cloudfront.net/logo.png"), :position => :center
+   
+      header_info
       move_down 10
       invoice_info
       move_down 15
@@ -26,6 +25,9 @@ module Caboose
       move_down 15
       payment_info
       render
+    end
+    
+    def header_info
     end
     
     def formatted_phone(str)
@@ -51,27 +53,30 @@ module Caboose
                       
       sc = self.invoice.site.store_config
       ot = self.invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
-      
-      case ot.payment_processor
-        when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
-          
-          if ot 
-            t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
-            resp = t.get_transaction_details(ot.transaction_id)
-            t2 = resp.transaction
-            if t2
-              self.card_type = t2.payment_method.card_type.upcase
-              self.card_number = t2.payment_method.card_number.gsub('X', '')
+
+      if ot
+
+        case ot.payment_processor
+          when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
+            
+            if ot 
+              t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
+              resp = t.get_transaction_details(ot.transaction_id)
+              t2 = resp.transaction
+              if t2
+                self.card_type = t2.payment_method.card_type.upcase
+                self.card_number = t2.payment_method.card_number.gsub('X', '')
+              end
+            else 
+              self.card_type = ""
+              self.card_number = ""
             end
-          else 
-            self.card_type = ""
-            self.card_number = ""
-          end
-        
-        when StoreConfig::PAYMENT_PROCESSOR_STRIPE
           
-          self.card_type   = self.invoice.customer.card_brand
-          self.card_number = self.invoice.customer.card_last4
+          when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+            
+            self.card_type   = self.invoice.customer.card_brand
+            self.card_number = self.invoice.customer.card_last4
+        end
           
       end
             
@@ -82,6 +87,7 @@ module Caboose
       invoice_info = "Invoice Number: #{invoice.invoice_number}\n"
       invoice_info << "Invoice Date: #{invoice.date_created.strftime('%d %b %Y %H:%M:%S %p')}\n"
       invoice_info << "Status: #{invoice.status.capitalize}\n"
+
       tbl = []
       tbl << [
         { :content => invoice_info }
@@ -106,13 +112,24 @@ module Caboose
       ]
       
       sa = invoice.shipping_address
-      sa_address = "#{sa.address1}" + (sa.address2.blank? ? '' : "\n#{sa.address2}") + "\n#{sa.city}, #{sa.state} #{sa.zip}"
-      shipped_to = [
-        [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => "#{sa.first_name} #{sa.last_name}" , :border_width => 0, :width => 200 }],
-        [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }],
-        [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }],
-        [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
-      ]
+      sa_name = sa && sa.first_name ? "#{sa.first_name} #{sa.last_name}" : "#{c.first_name} #{c.last_name}"
+      sa_address = sa ? 
+        (sa.address1 && sa.address1.length > 0 ? "#{sa.address1}\n" : '') + 
+        (sa.address2 && sa.address2.length > 0 ? "#{sa.address2}\n" : '') + 
+        (sa.city     && sa.city.length     > 0 ? "#{sa.city}, "     : '') +
+        (sa.state    && sa.state.length    > 0 ? "#{sa.state} "     : '') +
+        (sa.zip      && sa.zip.length      > 0 ? sa.zip             : '') : ''
+        
+      shipped_to = []
+      if invoice.instore_pickup
+        shipped_to << [{ :content => "Name"            , :border_width => 0, :width =>  55 },{ :content => "#{c.first_name} #{c.last_name}"   , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "IN-STORE PICKUP" , :border_width => 0, :width => 255 , :colspan => 2 }]
+      else        
+        shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => sa_name                            , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
+      end
 
       tbl = []
       tbl << [
@@ -148,9 +165,9 @@ module Caboose
       
       invoice.invoice_packages.all.each do |pk|
 
-        carrier = pk.shipping_method.carrier
-        service = pk.shipping_method.service_name
-        package = pk.shipping_package.name
+        carrier = pk.shipping_method  ? pk.shipping_method.carrier      : ''
+        service = pk.shipping_method  ? pk.shipping_method.service_name : ''
+        package = pk.shipping_package ? pk.shipping_package.name        : ''
 
         pk.line_items.each_with_index do |li, index|
           options = ''

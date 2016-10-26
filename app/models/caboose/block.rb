@@ -226,9 +226,19 @@ class Caboose::Block < ActiveRecord::Base
       #end
       
       arr = [
-        "../../sites/#{site.name}/blocks/#{full_name}",
-        "../../sites/#{site.name}/blocks/#{block.block_type.name}",
-        "../../sites/#{site.name}/blocks/#{block.block_type.field_type}",
+        #"../../sites/#{site.name}/blocks/#{full_name}",
+        #"../../sites/#{site.name}/blocks/#{block.block_type.name}",
+        #"../../sites/#{site.name}/blocks/#{block.block_type.field_type}",
+        #"../../app/views/caboose/blocks/#{full_name}",
+        #"../../app/views/caboose/blocks/#{block.block_type.name}",
+        #"../../app/views/caboose/blocks/#{block.block_type.field_type}",
+        #"caboose/blocks/#{full_name}",                
+        #"caboose/blocks/#{block.block_type.name}",                
+        #"caboose/blocks/#{block.block_type.field_type}"
+        
+        "../../app/views/caboose/blocks/#{site.name}/#{full_name}",
+        "../../app/views/caboose/blocks/#{site.name}/#{block.block_type.name}",
+        "../../app/views/caboose/blocks/#{site.name}/#{block.block_type.field_type}",
         "../../app/views/caboose/blocks/#{full_name}",
         "../../app/views/caboose/blocks/#{block.block_type.name}",
         "../../app/views/caboose/blocks/#{block.block_type.field_type}",
@@ -314,7 +324,8 @@ class Caboose::Block < ActiveRecord::Base
     site = options[:site]
     
     begin
-      str = view.render(:partial => "../../sites/#{site.name}/blocks/#{name}", :locals => options2)
+      #str = view.render(:partial => "../../sites/#{site.name}/blocks/#{name}", :locals => options2)
+      str = view.render(:partial => "../../app/views/caboose/blocks/#{site.name}/#{name}", :locals => options2)
     rescue ActionView::MissingTemplate => ex      
       begin
         str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)      
@@ -603,6 +614,38 @@ class Caboose::Block < ActiveRecord::Base
         b2.duplicate_page_block(site_id, page_id, b2.block_type_id, b.id)
       end
     end
+  end
+
+
+  # Assumes that we start the duplicate process at the top level block
+  def duplicate_block(site_id, page_id, post_id, new_block_type_id = nil, new_parent_id = nil)      
+    b = Caboose::Block.create(
+      :page_id            => page_id,          
+      :post_id            => post_id,         
+      :parent_id          => new_parent_id,
+      :media_id           => self.media_id,
+      :block_type_id      => self.block_type_id,    
+      :sort_order         => self.sort_order + 1,
+      :constrain          => self.constrain,
+      :full_width         => self.full_width,
+      :name               => self.name,
+      :value              => self.value
+    )
+    self.children.each do |b2|
+      if b2.name 
+        # The block is part of the block type, so we have to find the corresponding child block in the new block type        
+        bt = Caboose::BlockType.where(:parent_id => self.block_type_id, :name => b2.name).first
+        if bt
+          b2.duplicate_block(site_id, page_id, post_id, bt.id, b.id)
+        else
+          # Don't duplicate it because the corresponding child block doesn't exist in the new block type
+        end
+      else
+        # The block is a child block that isn't part of the block type definition
+        b2.duplicate_block(site_id, page_id, post_id, b2.block_type_id, b.id)
+      end
+    end
+    return true
   end
   
   def modal_js_block_names

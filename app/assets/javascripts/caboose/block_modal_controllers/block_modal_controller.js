@@ -129,7 +129,8 @@ var BlockModalController = ModalController.extend({
       .append($('<input/>').attr('type', 'button').addClass('btn').val('Close').click(function() { that.close(); that.parent_controller.render_blocks(); })).append(' ');
     if (!that.block.name)                        
     {
-      p.append($('<input/>').attr('type', 'button').addClass('btn').val('Delete Block').click(function() { that.delete_block(); })).append(' '); 
+      p.append($('<input/>').attr('type', 'button').addClass('btn').val('Delete Block').click(function() { that.delete_block(); })).append(' ');
+      p.append($('<input/>').attr('type', 'button').addClass('btn').val('Duplicate Block').click(function() { that.duplicate_block(); })).append(' ');
     }
     p.append($('<input/>').attr('type', 'button').addClass('btn').val('Move Up'   ).click(function() { that.move_up();         })).append(' ');
     p.append($('<input/>').attr('type', 'button').addClass('btn').val('Move Down' ).click(function() { that.move_down();       })).append(' ');    
@@ -440,6 +441,22 @@ var BlockModalController = ModalController.extend({
         }
       }
     });
+  },
+
+  duplicate_block: function()
+  {
+    var that = this;
+    that.autosize("<p class='loading'>Duplicating...</p>");
+    $.ajax({
+      url: that.block_url(that.block) + '/duplicate',
+      type: 'put',
+      success: function(resp) {        
+        if (resp.success) {
+          that.autosize("<p class='note success'>Duplicated block.</p>");          
+          that.parent_controller.render_blocks();
+        }   
+      }
+    });    
   },
     
   move_up: function()

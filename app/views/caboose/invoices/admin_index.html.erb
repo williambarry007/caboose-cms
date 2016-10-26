@@ -1,4 +1,13 @@
-<h1>Invoices</h1>
+
+<% if @edituser %>
+  <%= render :partial => 'caboose/users/admin_header' %>
+<% else %>
+  <div id='crumbtrail'>
+    <a href='/admin'>Admin</a> >
+    Invoices
+  </div>
+  <h1>Invoices</h1>
+<% end %>
 
 <style type='text/css'>
 #search_form_wrapper { margin-bottom: 10px; position: absolute; top:0; right: 0; }
@@ -14,28 +23,55 @@
 <form action='/admin/invoices' method='get' id='search_form' style='display: none;'>
   <p><input type='text' name='id'           placeholder='Invoice ID'     value="<%= @pager.params['id']           %>" style='width: 100px;' /></p>
   <p><input type='text' name='invoice_number' placeholder='Invoice Number' value="<%= @pager.params['invoice_number'] %>" style='width: 100px;' /></p>
-  <p><select name='customer_id'>
-      <optgroup label='Status' style='width: 100px'>
-        <option value=''>-- All customers --</option>        
-        <% @customers.each do |c| %>
-          <option value='<%= c.id %>'<%= @pager.params['customer_id'] == c.id ? " selected='true'" : '' %>>
-            <%= c.first_name.blank? && c.last_name.blank? ? c.username : "#{c.last_name}, #{c.first_name}" %>
-          </option>
-        <% end %>
-      </optgroup>
-    </select></p>
-  <p><select name='status'>
+  <% if @edituser.nil? %>
+    <p><select name='customer_id'>
+        <optgroup label='Status' style='width: 100px'>
+          <option value=''>-- All customers --</option>        
+          <% @customers.each do |c| %>
+            <option value='<%= c.id %>'<%= @pager.params['customer_id'] == c.id ? " selected='true'" : '' %>>
+              <%= c.first_name.blank? && c.last_name.blank? ? c.username : "#{c.last_name}, #{c.first_name}" %>
+            </option>
+          <% end %>
+        </optgroup>
+      </select></p>
+  <% end %>
+  <p><input type='text' name='total_gte' placeholder='Total Min' value="<%= @pager.params['total_gte'] %>" style='width: 100px;' /></p>
+  <p><input type='text' name='total_lte' placeholder='Total Max' value="<%= @pager.params['total_lte'] %>" style='width: 100px;' /></p>
+  <p>
+    <!--
+    <select name='status'>
       <optgroup label='Status'>
         <option value=''>-- All statuses --</option>
-        <% statuses = ['cart', 'pending', 'ready to ship', 'shipped', 'canceled', 'backordered'] %>
+        <% statuses = ['cart','pending','canceled','ready to ship','shipped','paid'] %>
         <% statuses.each do |status| %>
           <option value='<%= status %>'<%= @pager.params['status'] == status ? " selected='true'" : '' %>><%= status.capitalize %></option>
         <% end %>
       </optgroup>
-    </select></p>  
+    </select>
+    -->    
+    <%
+    statuses = [
+      Caboose::Invoice::STATUS_CART          ,          
+      Caboose::Invoice::STATUS_PENDING       ,      
+      Caboose::Invoice::STATUS_READY_TO_SHIP ,
+      Caboose::Invoice::STATUS_PROCESSED     ,
+      Caboose::Invoice::STATUS_CANCELED
+    ]
+    all_checked = true
+    statuses.each do |status|
+      all_checked = false if !@pager.params['status'].include?(status)
+    end
+    Caboose.log(@pager.params['status'])
+    %>    
+    Status: 
+    <% statuses.each do |status| %>
+      <input type='checkbox' name='status[]' id='status_<%= status %>' value='<%= status %>' <% if @pager.params['status'].include?(status) %> checked='true'<% end %> />
+      <label for='status_<%= status %>'><%= status.capitalize %></label>
+    <% end %>                    
+  </p>  
   <p>
     <input type='submit' value='Search' />
-    <input type='button' value='Clear' onclick="window.location='/admin/invoices';" />
+    <input type='button' value='Clear' onclick="window.location='/admin<%= @edituser ? "/users/#{@edituser.id}" : '' %>/invoices';" />
   </p>
 </form>
 
@@ -53,7 +89,7 @@
   		%>
     </tr>
   <% @invoices.each do |invoice| %>
-    <tr onclick="window.location='/admin/invoices/<%= invoice.id %>';">
+    <tr onclick="window.location='/admin<%= @edituser ? "/users/#{@edituser.id}" : '' %>/invoices/<%= invoice.id %>';">
       <td><%= raw invoice.id %></td>
       <td><%= raw invoice.invoice_number %></td>
       <td>
@@ -76,6 +112,10 @@
   <p><%= raw @pager.generate %></p>
 <% else %>
   <p>There are no invoices right now.</p>
+<% end %>
+
+<% if @edituser %>
+  <%= render :partial => 'caboose/users/admin_footer' %>
 <% end %>
 
 <% content_for :caboose_js do %>

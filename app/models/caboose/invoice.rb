@@ -54,11 +54,18 @@ module Caboose
     STATUS_PENDING       = 'pending'
     STATUS_PROCESSED     = 'processed'
     STATUS_CANCELED      = 'canceled'
-    STATUS_UNDER_REVIEW  = 'under review'
+    STATUS_READY_TO_SHIP = 'ready to ship'
+    STATUS_PROCESSED     = 'processed'            
+    STATUS_TESTING       = 'testing'
     
-    SHIPPING_STATUS_PENDING = 'pending'
-    SHIPPING_STATUS_READY   = 'ready'
-    SHIPPING_STATUS_SHIPPED = 'shipped'
+    # New
+    #STATUS_PENDING        = 'Pending'
+    #STATUS_OVERDUE        = 'Overdue'
+    #STATUS_UNDER_REVIEW   = 'Under Review'
+    #STATUS_PAID           = 'Paid'
+    #STATUS_PAID_BY_CHECK  = 'Paid By Check'
+    #STATUS_CANCELED       = 'Canceled'
+    #STATUS_WAIVED         = 'Waived'
              
     FINANCIAL_STATUS_PENDING             = 'pending'
     FINANCIAL_STATUS_AUTHORIZED          = 'authorized'
@@ -96,7 +103,7 @@ module Caboose
     scope :captured   , where('financial_status = ?', 'captured')
     scope :refunded   , where('financial_status = ?', 'refunded')
     scope :voided     , where('financial_status = ?', 'voided')        
-           
+
     after_initialize :check_nil_fields
     
     def check_nil_fields

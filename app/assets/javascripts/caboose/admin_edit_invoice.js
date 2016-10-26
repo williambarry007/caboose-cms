@@ -78,30 +78,33 @@ InvoiceController.prototype = {
         id: op.id,
         update_url: '/admin/invoices/' + op.invoice_id + '/packages/' + op.id,
         authenticity_token: that.authenticity_token,
-        attributes: [                      
-          { name: 'status'          , nice_name: 'Status'          , type: 'select' , value: op.status                                            , width: 300, fixed_placeholder: true , options_url: '/admin/invoices/line-items/status-options' },          
-          { name: 'package_method'  , nice_name: 'Package/Method'  , type: 'select' , value: op.shipping_package_id + '_' + op.shipping_method_id , width: 300, fixed_placeholder: false, options_url: '/admin/shipping-packages/package-method-options' },
-          { name: 'tracking_number' , nice_name: 'Tracking Number' , type: 'text'   , value: op.tracking_number                                   , width: 300, fixed_placeholder: true, align: 'right' },
-          { name: 'total'           , nice_name: 'Shipping Total'  , type: 'text'   , value: curr(op.total)                                       , width: 300, fixed_placeholder: true, align: 'right' , after_update: function() { that.refresh_invoice(); }}
+        attributes: [
+          { name: 'instore_pickup'  , nice_name: 'In-store Pickup' , type: 'checkbox' , value: op.instore_pickup                                    , width: 300, fixed_placeholder: true },
+          { name: 'status'          , nice_name: 'Status'          , type: 'select'   , value: op.status                                            , width: 300, fixed_placeholder: true , options_url: '/admin/invoice-packages/status-options' },          
+          { name: 'package_method'  , nice_name: 'Package/Method'  , type: 'select'   , value: op.shipping_package_id + '_' + op.shipping_method_id , width: 300, fixed_placeholder: false, options_url: '/admin/shipping-packages/package-method-options' },
+          { name: 'tracking_number' , nice_name: 'Tracking Number' , type: 'text'     , value: op.tracking_number                                   , width: 300, fixed_placeholder: true, align: 'right' },
+          { name: 'total'           , nice_name: 'Shipping Total'  , type: 'text'     , value: curr(op.total)                                       , width: 300, fixed_placeholder: true, align: 'right' , after_update: function() { that.refresh_invoice(); }}
         ]
       });              
     });    
     $.each(that.invoice.line_items, function(i, li) {
-      var attribs = [        
+      var arr = [
+        { name: 'status'          , nice_name: 'Status'           , type: 'select'  , align: 'left' , value: li.status           , text: li.status, width: 150, fixed_placeholder: false, options_url: '/admin/invoices/line-items/status-options' },
+        { name: 'tracking_number' , nice_name: 'Tracking Number'  , type: 'text'    , align: 'left' , value: li.tracking_number  , width: 200, fixed_placeholder: false },
         { name: 'unit_price'      , nice_name: 'Unit Price'       , type: 'text'    , align: 'right', value: curr(li.unit_price) , width:  75, fixed_placeholder: false, after_update: function() { that.refresh_invoice(); } },
         { name: 'quantity'        , nice_name: 'Quantity'         , type: 'text'    , align: 'right', value: li.quantity         , width:  75, fixed_placeholder: false, after_update: function() { that.refresh_invoice(); } }
       ];
-      if (li.user_subscription_id)
+      if (li.subscription_id)
       {
-        attribs.push({ name: 'date_starts' , nice_name: 'Date Starts' , type: 'date' , align: 'left' , value: li.date_starts , width: 100, fixed_placeholder: false });
-        attribs.push({ name: 'date_ends'   , nice_name: 'Date Ends'   , type: 'date' , align: 'left' , value: li.date_ends   , width: 100, fixed_placeholder: false });
-      }          
+        arr.push({ name: 'date_starts'     , nice_name: 'Starts'           , type: 'date'    , align: 'left' , value: li.date_starts      , width: 100, fixed_placeholder: false, date_format: 'Y-m-d' });
+        arr.push({ name: 'date_ends'       , nice_name: 'Ends'             , type: 'date'    , align: 'left' , value: li.date_ends        , width: 100, fixed_placeholder: false, date_format: 'Y-m-d' });
+      }
       new ModelBinder({
         name: 'Lineitem',
         id: li.id,
         update_url: '/admin/invoices/' + li.invoice_id + '/line-items/' + li.id,
         authenticity_token: that.authenticity_token,
-        attributes: attribs        
+        attributes: arr
       });
     });    
     new ModelBinder({
@@ -110,12 +113,14 @@ InvoiceController.prototype = {
       update_url: '/admin/invoices/' + that.invoice.id,
       authenticity_token: that.authenticity_token,
       attributes: [
-        { name: 'status'           , nice_name: 'Invoice Status' , type: 'select', value: that.invoice.status                , width: 200, fixed_placeholder: true , options_url: '/admin/invoices/status-options' },
-        { name: 'financial_status' , nice_name: 'Status'         , type: 'select', value: that.invoice.financial_status      , width: 200, fixed_placeholder: true , options_url: '/admin/invoices/financial-status-options' },
-        { name: 'payment_terms'    , nice_name: 'Terms'          , type: 'select', value: that.invoice.payment_terms         , width: 200, fixed_placeholder: true , options_url: '/admin/invoices/payment-terms-options' },
-        { name: 'tax'              , nice_name: 'Tax'            , type: 'text'  , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'handling'         , nice_name: 'Handling'       , type: 'text'  , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'custom_discount'  , nice_name: 'Discount'       , type: 'text'  , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }}
+        { name: 'status'           , nice_name: 'Status'             , type: 'select'   , value: that.invoice.status                , width: 100, fixed_placeholder: false, options_url: '/admin/invoices/status-options' },
+        { name: 'financial_status' , nice_name: 'Status'             , type: 'select'   , value: that.invoice.financial_status      , width: 100, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/financial-status-options' },
+        { name: 'payment_terms'    , nice_name: 'Terms'              , type: 'select'   , value: that.invoice.payment_terms         , width: 200, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/payment-terms-options' },
+        { name: 'tax'              , nice_name: 'Tax'                , type: 'text'     , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'handling'         , nice_name: 'Handling'           , type: 'text'     , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'custom_discount'  , nice_name: 'Discount'           , type: 'text'     , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
+        { name: 'notes'            , nice_name: 'Notes (not public)' , type: 'textarea' , value: that.invoice.notes                 , width: 100, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 50 },
+        { name: 'customer_notes'   , nice_name: 'Customer Notes'     , type: 'textarea' , value: that.invoice.notes                 , width: 100, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 50 }
       ]
     });        
   },
@@ -511,13 +516,16 @@ InvoiceController.prototype = {
           if (j == 0)
           {
             tr.append($('<td/>').attr('rowspan', line_items.length).attr('valign', 'top').append(that.package_summary(op, line_items)));
-          }                       
+          } 
           tr.append($('<td/>')
             .append(that.line_item_link(li))
+            .append(that.subscription_dates(li))                    
             .append(that.line_item_weight(li))
             .append(that.gift_options(li))
             .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
-          );                              
+          );
+          tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
+          //tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
           tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_unit_price')));
           tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
           tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));        
@@ -558,7 +566,8 @@ InvoiceController.prototype = {
       total_weight += li.variant.weight * li.quantity;
     });
     
-    var div = $('<div/>');                
+    var div = $('<div/>');
+    div.append($('<div/>').attr('id', 'invoicepackage_' + op.id + '_instore_pickup'));
     div.append($('<div/>').attr('id', 'invoicepackage_' + op.id + '_package_method'));
     div.append($('<div/>').attr('id', 'invoicepackage_' + op.id + '_status'));
     div.append($('<div/>').attr('id', 'invoicepackage_' + op.id + '_tracking_number'));
@@ -739,15 +748,35 @@ InvoiceController.prototype = {
       }
       
       tr.append($('<td/>')
-        .append(that.line_item_link(li))        
-        .append(that.gift_options(li))            
+        .append(that.line_item_link(li))
+        .append(that.subscription_dates(li))                                    
+        .append(that.gift_options(li))
         .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
-      );          
+      );
+            
+      tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
+      //tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));
       tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_unit_price')));
       tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
       tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));
       table.append(tr);
     });
+  },
+  
+  // Show the invoice summary
+  subscription_dates: function(li)
+  {    
+    var that = this;
+    if (!li.subscription_id)
+      return $('<div/>');
+    
+    return $('<table/>').addClass('subscription_dates')
+      .append($('<tbody/>')
+        .append($('<tr/>')                  
+          .append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_date_starts' )))
+          .append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_date_ends'   )))
+        )
+      );    
   },
   
   // Show the invoice summary

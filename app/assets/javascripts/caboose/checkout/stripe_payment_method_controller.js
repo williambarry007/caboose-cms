@@ -37,6 +37,17 @@ StripePaymentMethodController.prototype = {
     });    
   },
   
+  print_or_edit_if_empty: function()
+  {
+    var that = this;
+    that.refresh(function() {
+      if (!that.card_brand || !that.card_last4)
+        that.edit();
+      else        
+        that.print(); 
+    });    
+  },
+    
   print: function()
   {
     var that = this;
@@ -53,8 +64,10 @@ StripePaymentMethodController.prototype = {
       var msg = that.card_brand && that.card_last4 ? that.card_brand + ' ending in ' + that.card_last4 : 'You have no card on file.';    
       div.append($('<p/>')
         .append(msg).append(' ')
-        .append($('<a/>').attr('href', '#').html('Edit').click(function(e) { e.preventDefault(); that.edit(); })
-      ));
+        .append($('<a/>').attr('href', '#').html('Edit'   ).click(function(e) { e.preventDefault(); that.edit();   })).append(' ')
+        .append($('<a/>').attr('href', '#').html('Remove' ).click(function(e) { e.preventDefault(); that.delete(); }))
+        .append($('<div/>').attr('id', 'payment_message'))
+      );
     }
     else
     {          
@@ -152,6 +165,9 @@ StripePaymentMethodController.prototype = {
             if (resp2.success)
             {              
               that.customer_id = resp2.customer_id;
+              that.card_brand  = resp2.card_brand;
+              that.card_last4  = resp2.card_last4;
+      
               that.print();              
               that.cc.print_ready_message();
             }
@@ -160,6 +176,40 @@ StripePaymentMethodController.prototype = {
         });
       }
     });  
+  },
+  
+  delete: function(confirm)
+  {    
+    var that = this;
+    
+    if (!confirm)
+    {
+      var div = $('<div/>').addClass('note error')
+        .append($('<p/>').append("Are you sure you want to remove your payment method on file?"))
+        .append($('<p/>')
+          .append($('<input/>').attr('type', 'button').val('Yes').click(function() { that.delete(true); })).append(' ')
+          .append($('<input/>').attr('type', 'button').val('No' ).click(function() { $('#payment_message').empty(); }))
+        );        
+      $('#payment_message').empty().append(div);
+      return;
+    }
+    $('#payment_message').html("<p class='loading'>Removing payment method...</p>");
+    $.ajax({
+      url: '/checkout/payment-method',
+      type: 'delete',          
+      success: function(resp) {
+        if (resp.error)
+          $('#payment_message').html("<p class='note error'>" + resp.error + "</p>");
+        else
+        {
+          that.customer_id  = null;
+          that.card_brand   = null;
+          that.card_last4   = null;
+          that.edit();
+          that.cc.print_ready_message();
+        }
+      }
+    });    
   },
   
   ready: function()

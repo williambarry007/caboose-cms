@@ -136,6 +136,9 @@ module Caboose
   mattr_accessor :use_comment_routes
   @@use_comment_routes = true
   
+  mattr_accessor :site_assets_path
+  @@site_assets_path = "sites"
+  
 end
 
 # These are used so that both local filestorage and S3 can work without having to change paperclip paths in models

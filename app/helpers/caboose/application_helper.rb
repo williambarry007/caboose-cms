@@ -41,5 +41,11 @@ tinyMCE.init({
       tag.html_safe
     end
     
+    def cloudfront_asset_path(path)
+      str = asset_path(str)      
+      str = str.gsub('http://', 'https://') if request.env['HTTPS'] == 'on'
+      return str
+    end
+    
   end
 end

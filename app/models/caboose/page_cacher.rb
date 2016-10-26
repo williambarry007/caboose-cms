@@ -90,15 +90,18 @@ module Caboose
         else
           full_name = bt.full_name
           full_name = "lksdjflskfjslkfjlskdfjlkjsdf" if full_name.nil? || full_name.length == 0
-          if    File.file?(Rails.root.join("sites/#{site.name}/blocks/_#{full_name}.html.erb"     )) then f = Rails.root.join("sites/#{site.name}/blocks/_#{full_name}.html.erb")
-          elsif File.file?(Rails.root.join("sites/#{site.name}/blocks/_#{bt.name}.html.erb"       )) then f = Rails.root.join("sites/#{site.name}/blocks/_#{bt.name}.html.erb")
-          elsif File.file?(Rails.root.join("sites/#{site.name}/blocks/_#{bt.field_type}.html.erb" )) then f = Rails.root.join("sites/#{site.name}/blocks/_#{bt.field_type}.html.erb")
-          elsif File.file?(Rails.root.join("app/views/caboose/blocks/_#{full_name}.html.erb"      )) then f = Rails.root.join("app/views/caboose/blocks/_#{full_name}.html.erb")
-          elsif File.file?(Rails.root.join("app/views/caboose/blocks/_#{bt.name}.html.erb"        )) then f = Rails.root.join("app/views/caboose/blocks/_#{bt.name}.html.erb")
-          elsif File.file?(Rails.root.join("app/views/caboose/blocks/_#{bt.field_type}.html.erb"  )) then f = Rails.root.join("app/views/caboose/blocks/_#{bt.field_type}.html.erb")
-          elsif File.file?("#{Caboose.root}/app/views/caboose/blocks/_#{full_name}.html.erb"       ) then f = "#{Caboose.root}/app/views/caboose/blocks/_#{full_name}.html.erb"
-          elsif File.file?("#{Caboose.root}/app/views/caboose/blocks/_#{bt.name}.html.erb"         ) then f = "#{Caboose.root}/app/views/caboose/blocks/_#{bt.name}.html.erb"
-          elsif File.file?("#{Caboose.root}/app/views/caboose/blocks/_#{bt.field_type}.html.erb"   ) then f = "#{Caboose.root}/app/views/caboose/blocks/_#{bt.field_type}.html.erb"
+          #if    File.file?(Rails.root.join("sites/#{site.name}/blocks/_#{full_name}.html.erb"     )) then f = Rails.root.join("sites/#{site.name}/blocks/_#{full_name}.html.erb")
+          #elsif File.file?(Rails.root.join("sites/#{site.name}/blocks/_#{bt.name}.html.erb"       )) then f = Rails.root.join("sites/#{site.name}/blocks/_#{bt.name}.html.erb")
+          #elsif File.file?(Rails.root.join("sites/#{site.name}/blocks/_#{bt.field_type}.html.erb" )) then f = Rails.root.join("sites/#{site.name}/blocks/_#{bt.field_type}.html.erb")
+          if    File.file?(Rails.root.join("app/views/caboose/blocks/#{site.name}/_#{full_name}.html.erb"     )) then f = Rails.root.join("app/views/caboose/blocks/#{site.name}/_#{full_name}.html.erb")
+          elsif File.file?(Rails.root.join("app/views/caboose/blocks/#{site.name}/_#{bt.name}.html.erb"       )) then f = Rails.root.join("app/views/caboose/blocks/#{site.name}/_#{bt.name}.html.erb")
+          elsif File.file?(Rails.root.join("app/views/caboose/blocks/#{site.name}/_#{bt.field_type}.html.erb" )) then f = Rails.root.join("app/views/caboose/blocks/#{site.name}/_#{bt.field_type}.html.erb")            
+          elsif File.file?(Rails.root.join("app/views/caboose/blocks/_#{full_name}.html.erb"                  )) then f = Rails.root.join("app/views/caboose/blocks/_#{full_name}.html.erb")
+          elsif File.file?(Rails.root.join("app/views/caboose/blocks/_#{bt.name}.html.erb"                    )) then f = Rails.root.join("app/views/caboose/blocks/_#{bt.name}.html.erb")
+          elsif File.file?(Rails.root.join("app/views/caboose/blocks/_#{bt.field_type}.html.erb"              )) then f = Rails.root.join("app/views/caboose/blocks/_#{bt.field_type}.html.erb")
+          elsif File.file?("#{Caboose.root}/app/views/caboose/blocks/_#{full_name}.html.erb"                   ) then f = "#{Caboose.root}/app/views/caboose/blocks/_#{full_name}.html.erb"
+          elsif File.file?("#{Caboose.root}/app/views/caboose/blocks/_#{bt.name}.html.erb"                     ) then f = "#{Caboose.root}/app/views/caboose/blocks/_#{bt.name}.html.erb"
+          elsif File.file?("#{Caboose.root}/app/views/caboose/blocks/_#{bt.field_type}.html.erb"               ) then f = "#{Caboose.root}/app/views/caboose/blocks/_#{bt.field_type}.html.erb"
           end
           f = (f && f.to_s.strip.length > 0 ? File.read(f) : '')
         end

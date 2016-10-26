@@ -10,7 +10,7 @@ module Caboose
             
       @pager = Caboose::PageBarGenerator.new(params, {
         'customer_id'          => logged_in_user.id,         
-        'status'               => [Invoice::STATUS_PENDING, Invoice::STATUS_CANCELED, Invoice::STATUS_READY_TO_SHIP, Invoice::STATUS_SHIPPED]        
+        'status'               => ''        
       }, {
         'model'          => 'Caboose::Invoice',
         'sort'           => 'invoice_number',
@@ -61,8 +61,7 @@ module Caboose
     end
 
     # @route POST /my-account/confirm
-    def confirm
-      Caboose::log(params)
+    def confirm      
       sc = @site.store_config
       @invoice = Invoice.find(params[:id])
 
@@ -111,7 +110,7 @@ module Caboose
           capture_resp = @invoice.capture_funds
           if capture_resp.success == true
             @invoice.take_gift_card_funds
-            @invoice.status = Caboose::Invoice::STATUS_PAID
+            @invoice.status = Caboose::Invoice::STATUS_PROCESSED
           end
         end
       end
@@ -165,6 +164,21 @@ module Caboose
         :billing_address,
         :invoice_transactions
       ])
+    end
+
+    # @route GET /my-account/invoices/:id/print
+    def invoice_pdf
+      invoice = Invoice.find(params[:id])
+
+      if invoice.customer_id != logged_in_user.id
+        @error = "The given invoice does not belong to you."
+        render :file => 'caboose/extras/error'
+        return
+      end
+
+      pdf = InvoicePdf.new
+      pdf.invoice = Invoice.find(params[:id])
+      send_data pdf.to_pdf, :filename => "invoice_#{pdf.invoice.id}.pdf", :type => "application/pdf", :disposition => "inline"
     end
     
     # @route GET  /my-account/invoices/authnet-relay

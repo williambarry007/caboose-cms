@@ -1,34 +1,30 @@
 module Caboose
   class InvoicesController < Caboose::ApplicationController
     
-    # @route GET /admin/invoices/weird-test
-    def admin_weird_test
-      Caboose.log("Before the admin_weird_test")
-      x = Invoice.new
-      Caboose.log("After the admin_weird_test")
-      render :json => x      
-    end
-    
     # @route GET /admin/invoices
+    # @route GET /admin/users/:user_id/invoices
     def admin_index
       return if !user_is_allowed('invoices', 'view')
       
       @pager = Caboose::PageBarGenerator.new(params, {
         'site_id'              => @site.id,
-        'customer_id'          => '', 
-        'status'               => Invoice::STATUS_PENDING,
+        'customer_id'          => params[:user_id] ? params[:user_id] : '', 
+        'status'               => Invoice::STATUS_PENDING,      
         'shipping_method_code' => '',
         'id'                   => '',
-        'invoice_number'       => ''
+        'invoice_number'       => '',
+        'total_lte'            => '',
+        'total_gte'            => ''
       }, {
         'model'          => 'Caboose::Invoice',
         'sort'           => 'id',
         'desc'           => 1,
-        'base_url'       => '/admin/invoices',
+        'base_url'       => params[:user_id] ? "/admin/users/#{params[:user_id]}/invoices" : "/admin/invoices",
         'use_url_params' => false,
         'items_per_page' => 100
       })
       
+      @edituser = params[:user_id] ? User.find(params[:user_id]) : nil
       @invoices  = @pager.items
       @customers = Caboose::User.where(:site_id => @site.id).reorder('last_name, first_name').all
       
@@ -63,16 +59,24 @@ module Caboose
         :status => Invoice::STATUS_PENDING,                          
         :financial_status => Invoice::FINANCIAL_STATUS_PENDING,
         :invoice_number => @site.store_config.next_invoice_number
-      )    
+      )
+      InvoiceLog.create(
+        :invoice_id     => invoice.id,
+        :user_id        => logged_in_user.id,
+        :date_logged    => DateTime.now.utc,
+        :invoice_action => InvoiceLog::ACTION_INVOICE_CREATED                        
+      )      
       render :json => { :sucess => true, :redirect => "/admin/invoices/#{invoice.id}" }
     end
-      
+        
     # @route_priority 50
     # @route GET /admin/invoices/:id
+    # @route GET /admin/users/:user_id/invoices/:id
     def admin_edit
       return if !user_is_allowed('invoices', 'edit')
       @invoice = Invoice.where(:id => params[:id]).first
-
+      @edituser = params[:user_id] ? User.find(params[:user_id]) : nil
+      
       if params[:id].nil? || @invoice.nil?
         render :file => 'caboose/invoices/admin_invalid_invoice', :layout => 'caboose/admin'
         return
@@ -99,7 +103,7 @@ module Caboose
       invoice.save
       render :json => { :success => true }      
     end
-
+    
     # @route GET /admin/invoices/:id/capture
     def capture_funds
       return if !user_is_allowed('invoices', 'edit')
@@ -142,7 +146,7 @@ module Caboose
     
       render :json => resp
     end
-  
+    
     # @route GET /admin/invoices/:id/refund
     def admin_refund
       return if !user_is_allowed('invoices', 'edit')
@@ -186,12 +190,14 @@ module Caboose
         :invoice_transactions
       ])
     end
-  
+    
     # @route GET /admin/invoices/:id/print
     def admin_print
       return if !user_is_allowed('invoices', 'edit')           
       
-      pdf = InvoicePdf.new
+      pdf = @site.store_config.custom_invoice_pdf
+      pdf = "InvoicePdf" if pdf.nil? || pdf.strip.length == 0                              
+      eval("pdf = #{pdf}.new")
       pdf.invoice = Invoice.find(params[:id])             
       send_data pdf.to_pdf, :filename => "invoice_#{pdf.invoice.id}.pdf", :type => "application/pdf", :disposition => "inline"   
     end
@@ -215,8 +221,20 @@ module Caboose
       resp = Caboose::StdClass.new({'attributes' => {}})
       invoice = Invoice.find(params[:id])    
             
-      save = true    
-      params.each do |name,value|        
+      save = true
+      fields_to_log = ['tax','handling','custom_discount','financial_status','customer_id','notes','customer_notes','payment_terms','date_due','status']            
+      params.each do |name,value|
+        if fields_to_log.include?(name)                                                  
+          InvoiceLog.create(
+            :invoice_id     => invoice.id,
+            :user_id        => logged_in_user.id,
+            :date_logged    => DateTime.now.utc,
+            :invoice_action => InvoiceLog::ACTION_INVOICE_UPDATED,
+            :field          => name,
+            :old_value      => invoice[name.to_sym],
+            :new_value      => value                                                                  
+          )
+        end
         case name
           when 'tax' 
             invoice.tax = value
@@ -228,16 +246,20 @@ module Caboose
             invoice.custom_discount = value
             invoice.discount = invoice.calculate_discount
             invoice.total = invoice.calculate_total
-          when 'status'
-            invoice.status = value
-            invoice.date_shipped = DateTime.now.utc if value == 'Shipped'                          
-          when 'financial_status'            
-            invoice.financial_status = value
-          when 'customer_id'
-            invoice.customer_id = value            
-        end
+          when 'status'            
+            invoice.status = value             
+            invoice.date_processed = DateTime.now.utc if value == Invoice::STATUS_PROCESSED
+            
+          when 'financial_status'    then invoice.financial_status = value
+          when 'customer_id'         then invoice.customer_id      = value          
+          when 'notes'               then invoice.notes            = value
+          when 'customer_notes'      then invoice.customer_notes   = value                    
+          when 'payment_terms'       then invoice.payment_terms    = value          
+          when 'date_due'            then invoice.date_due         = value
+                            
+        end                        
       end
-
+    
       #invoice.calculate
       #invoice.calculate_total
       #resp.attributes['total'] = { 'value' => invoice.total }
@@ -249,12 +271,18 @@ module Caboose
     # @route DELETE /admin/invoices/:id
     def admin_delete
       return if !user_is_allowed('invoices', 'delete')
-      Invoice.find(params[:id]).destroy
+      Invoice.find(params[:id]).destroy      
+      InvoiceLog.create(
+        :invoice_id     => params[:id],
+        :user_id        => logged_in_user.id,
+        :date_logged    => DateTime.now.utc,
+        :invoice_action => InvoiceLog::ACTION_INVOICE_DELETED                                                                          
+      )      
       render :json => Caboose::StdClass.new({
         :redirect => '/admin/invoices'
       })
     end
-
+    
     # @route GET /admin/invoices/:id/send-for-authorization
     def admin_send_for_authorization
       return if !user_is_allowed('invoices', 'edit')
@@ -274,7 +302,7 @@ module Caboose
     # @route GET /admin/invoices/city-report
     def admin_city_report
       return if !user_is_allowed('invoices', 'view')
-
+    
       @d1 = params[:d1] ? DateTime.strptime("#{params[:d1]} 00:00:00", '%Y-%m-%d %H:%M:%S') : DateTime.strptime(DateTime.now.strftime("%Y-%m-01 00:00:00"), '%Y-%m-%d %H:%M:%S')
       @d2 = params[:d2] ? DateTime.strptime("#{params[:d2]} 00:00:00", '%Y-%m-%d %H:%M:%S') : @d1 + 1.month      
       @rows = InvoiceReporter.city_report(@site.id, @d1, @d2)
@@ -285,14 +313,14 @@ module Caboose
     # @route GET /admin/invoices/summary-report
     def admin_summary_report
       return if !user_is_allowed('invoices', 'view')
-
+    
       @d1 = params[:d1] ? DateTime.strptime("#{params[:d1]} 00:00:00", '%Y-%m-%d %H:%M:%S') : DateTime.strptime(DateTime.now.strftime("%Y-%m-01 00:00:00"), '%Y-%m-%d %H:%M:%S')
       @d2 = params[:d2] ? DateTime.strptime("#{params[:d2]} 00:00:00", '%Y-%m-%d %H:%M:%S') : @d1 + 1.month      
       @rows = InvoiceReporter.summary_report(@site.id, @d1, @d2)
       
       render :layout => 'caboose/admin'    
     end
-
+    
     # @route GET /admin/invoices/:field-options    
     def admin_options
       return if !user_is_allowed('invoices', 'view')
@@ -301,10 +329,10 @@ module Caboose
       case params[:field]
         when 'status'
           statuses = [
-            Invoice::STATUS_CART, 
-            Invoice::STATUS_PENDING, 
-            Invoice::STATUS_PROCESSED, 
-            Invoice::STATUS_UNDER_REVIEW,             
+            Invoice::STATUS_CART,
+            Invoice::STATUS_PENDING,
+            Invoice::STATUS_READY_TO_SHIP,
+            Invoice::STATUS_PROCESSED,
             Invoice::STATUS_CANCELED
           ]
           options = statuses.collect{ |s| { 'text' => s.capitalize, 'value' => s }}
@@ -349,16 +377,16 @@ module Caboose
       if Caboose::Setting.exists?(:name => 'google_feed_date_last_submitted')                  
         d1 = Caboose::Setting.where(:name => 'google_feed_date_last_submitted').first.value      
         d1 = DateTime.parse(d1)
-      elsif Invoice.exists?("status = ? and date_authorized is not null", Invoice::STATUS_SHIPPED)
-        d1 = Invoice.where("status = ? and date_authorized is not null", Invoice::STATUS_SHIPPED).reorder("date_authorized DESC").limit(1).pluck('date_authorized')
+      elsif Invoice.exists?("status = ? and date_authorized is not null", Invoice::STATUS_PROCESSED)
+        d1 = Invoice.where("status = ? and date_authorized is not null", Invoice::STATUS_PROCESSED).reorder("date_authorized DESC").limit(1).pluck('date_authorized')
         d1 = DateTime.parse(d1)
       end
       
       # Google Feed Docs
       # https://support.google.com/trustedstoresmerchant/answer/3272612?hl=en&ref_topic=3272286?hl=en
       tsv = ["merchant invoice id\ttracking number\tcarrier code\tother carrier name\tship date"]            
-      if Invoice.exists?("status = ? and date_authorized > '#{d1.strftime("%F %T")}'", Invoice::STATUS_SHIPPED)
-        Invoice.where("status = ? and date_authorized > ?", Invoice::STATUS_SHIPPED, d1).reorder(:id).all.each do |invoice|
+      if Invoice.exists?("status = ? and date_authorized > '#{d1.strftime("%F %T")}'", Invoice::STATUS_PROCESSED)
+        Invoice.where("status = ? and date_authorized > ?", Invoice::STATUS_PROCESSED, d1).reorder(:id).all.each do |invoice|
           tracking_numbers = invoice.line_items.collect{ |li| li.tracking_number }.compact.uniq
           tn = tracking_numbers && tracking_numbers.count >= 1 ? tracking_numbers[0] : ""
           tsv << "#{invoice.id}\t#{tn}\tUPS\t\t#{invoice.date_shipped.strftime("%F")}"                              

@@ -22,7 +22,7 @@ $(document).ready(function() {
   var checkout_controller = new CheckoutController({
     authenticity_token: '<%= raw form_authenticity_token %>',
     pp_name: <%= raw Caboose.json(store_config.pp_name) %>,
-    allow_instore_pickup: <%= raw Caboose.json(store_config.allow_instore_pickup) %>
+    allow_instore_pickup: <%= store_config.allow_instore_pickup ? 'true' : 'false' %>
   });   
 });
 
@@ -79,6 +79,11 @@ tr.invoice_totals_header td { border: 0; }
 #checkout select.state     { display: block; width:  75px !important; height: 36px !important; font-size: 1em; float: left; }          
 #checkout input.zip        { display: block; width:  75px !important; }
 */
+
+#invoice_1_instore_pickup_placeholder { left: 4px; top: 0; }
+#invoice_1_instore_pickup_placeholder span { color: #000 !important; }
+#invoice_1_instore_pickup_background { border: none; }
+#invoice_1_instore_pickup { top: 0; width: 30px; height: 30px; }
 
 .mb_container.first_name { display: block; width:  50% !important; float: left; } .mb_container.first_name input  { width: 100% !important; border-color: #b9b9b9; border-right: none; border-bottom: none; }  
 .mb_container.last_name  { display: block; width:  50% !important; }              .mb_container.last_name  input  { width: 100% !important; border-color: #b9b9b9;                     border-bottom: none; }  

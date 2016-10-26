@@ -16,7 +16,7 @@ module Caboose
     belongs_to :option1_media, :class_name => 'Caboose::Media'
     belongs_to :option2_media, :class_name => 'Caboose::Media'
     belongs_to :option3_media, :class_name => 'Caboose::Media'
-    has_many :variant_childen, :class_name => 'Caboose::Variant'
+    has_many :variant_children, :class_name => 'Caboose::VariantChild', :foreign_key => 'parent_id'
     
     attr_accessible :id,
       :alternate_id,
@@ -64,15 +64,28 @@ module Caboose
       :flat_rate_shipping_package_id,
       :sort_order,      
       :downloadable,
-      :download_path,
-      :is_bundle
-      
-    STATUS_ACTIVE = 'Active'
-    STATUS_INACTIVE = 'Inactive'
+      :download_path,      
+      :is_bundle,
+      :is_subscription,
+      :subscription_interval            ,
+      :subscription_prorate             ,
+      :subscription_prorate_method      ,
+      :subscription_prorate_flat_amount ,
+      :subscription_prorate_function    ,
+      :subscription_start_on_day        ,
+      :subscription_start_day           ,
+      :subscription_start_month
     
     STATUS_ACTIVE   = 'active'
     STATUS_INACTIVE = 'inactive'
-    STATUS_DELETED  = 'deleted'
+    STATUS_DELETED  = 'deleted'      
+        
+    SUBSCRIPTION_INTERVAL_MONTHLY = 'monthly'
+    SUBSCRIPTION_INTERVAL_YEARLY  = 'yearly'
+    
+    SUBSCRIPTION_PRORATE_METHOD_FLAT       = 'flat'
+    SUBSCRIPTION_PRORATE_METHOD_PERCENTAGE = 'percentage'
+    SUBSCRIPTION_PRORATE_METHOD_CUSTOM     = 'custom'
     
     after_initialize do |v|
       v.price       = 0.00 if v.price.nil?

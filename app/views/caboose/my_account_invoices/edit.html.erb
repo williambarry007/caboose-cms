@@ -12,7 +12,10 @@ store_config = @invoice.site.store_config
 <div id='invoice_table'></div>
 <div id='message'></div>
 
-<p><input type='button' value='< Back' class='btn' onclick="window.location='/my-account/invoices';" /></p>
+<p>
+	<input type='button' value='< Back' class='btn' onclick="window.location='/my-account/invoices';" />
+	<input type='button' value='Print Invoice' class='btn' onclick='window.location="/my-account/invoices/<%= @invoice.id %>/print";' />
+</p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'https://js.stripe.com/v2/' %>

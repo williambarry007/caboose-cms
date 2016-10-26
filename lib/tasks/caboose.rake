@@ -2,6 +2,42 @@ require "caboose/version"
 require 'aws-sdk'
 
 namespace :caboose do
+            
+  task :move_site_blocks => :environment do
+    
+    #Dir["sites/*/blocks"].each do |file|
+    #  arr = file.split('/')
+    #  site_name = arr[1]                  
+    #  next if site_name.nil? || site_name.strip.length == 0      
+    #  `mv sites/#{site_name}/blocks app/views/caboose/blocks/#{site_name}` if !File.exist?("app/views/caboose/blocks/#{site_name}")
+    #end
+    
+    Dir["app/views/caboose/blocks/*/*"].each do |file|
+      arr = file.split('/')
+      site_name = arr[4]
+      partial_name = arr[5]      
+      next if site_name.nil? || site_name.strip.length == 0 || partial_name.nil? || partial_name.strip.length == 0
+            
+      #puts "site_name = #{site_name}, partial_name = #{partial_name}"
+      
+      str = File.read(file)
+      str2 = str.gsub("../../sites/#{site_name}/blocks", "caboose/blocks/#{site_name}")
+      if str != str2
+        puts file
+        File.open(file, 'w') { |the_file| the_file.write(str2) }
+      end
+            
+    end
+
+  end
+    
+  task :subscription_migration => :environment do
+    Caboose::Subscription.migrate_from_user_subscriptions
+  end
+  
+  task :create_subscription_invoices => :environment do
+    Caboose::Subscription.create_invoices
+  end
   
   desc "Save sample asset"
   task :save_sample_asset => :environment do
@@ -63,18 +99,27 @@ namespace :caboose do
   
   desc "Check ruby syntax in all ruby files"
   task :check_syntax => :environment do    
-    puts "Checking syntax in all ruby files...\n\n"
-    
-    str = `find #{Rails.root} -name "*.rb"`
-    files = str ? str.strip.split("\n") : []
-    
+        
     errors = {}
+    
+    puts "Checking syntax in caboose-cms gem ruby files...\n\n"
+    str = `find #{Gem.loaded_specs['caboose-cms'].full_gem_path} -name "*.rb"`
+    files = str ? str.strip.split("\n") : []        
     files.each do |file|
       str = `ruby -c #{file}`      
       next if str.nil? || str.strip == 'Syntax OK'
       errors[file] = str
     end
     
+    puts "Checking syntax in application ruby files...\n\n"    
+    str = `find #{Rails.root} -name "*.rb"`
+    files = str ? str.strip.split("\n") : []        
+    files.each do |file|
+      str = `ruby -c #{file}`      
+      next if str.nil? || str.strip == 'Syntax OK'
+      errors[file] = str
+    end
+            
     if errors.count == 0      
       puts "                                           \n"
       puts "             █████                         \n"
@@ -147,7 +192,7 @@ namespace :caboose do
   
   desc "Calculate invoice profits"  
   task :calculate_invoice_profits => :environment do        
-    Caboose::Invoice.where("status = ? or status = ? or status = ?", Caboose::Invoice::STATUS_PENDING, Caboose::Invoice::STATUS_READY_TO_SHIP, Caboose::Invoice::STATUS_SHIPPED).reinvoice(:id).all.each do |invoice|
+    Caboose::Invoice.where("status = ? or status = ? or status = ?", Caboose::Invoice::STATUS_PENDING, Caboose::Invoice::STATUS_READY_TO_SHIP, Caboose::Invoice::STATUS_PROCESSED).reinvoice(:id).all.each do |invoice|
       invoice.update_column(:cost   , invoice.calculate_cost   )
       invoice.update_column(:profit , invoice.calculate_profit )
     end                    
@@ -511,10 +556,10 @@ namespace :assets do
       # Copy any site assets into the host app assets directory first
       puts "Copying site assets into host assets..."
       Caboose::Site.all.each do |site|
-        site_js     = Rails.root.join('sites', site.name, 'js')    
-        site_css    = Rails.root.join('sites', site.name, 'css')   
-        site_images = Rails.root.join('sites', site.name, 'images')
-        site_fonts  = Rails.root.join('sites', site.name, 'fonts') 
+        site_js     = Rails.root.join(Caboose::site_assets_path, site.name, 'js')    
+        site_css    = Rails.root.join(Caboose::site_assets_path, site.name, 'css')   
+        site_images = Rails.root.join(Caboose::site_assets_path, site.name, 'images')
+        site_fonts  = Rails.root.join(Caboose::site_assets_path, site.name, 'fonts') 
             
         host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
         host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)

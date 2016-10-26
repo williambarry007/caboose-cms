@@ -170,6 +170,19 @@ BlockContentController.prototype = {
       }
     });    
   },
+
+  duplicate_block: function(block_id)
+  {
+    var that = this;
+    that.loadify($('#block_' + block_id + '_duplicate_handle span'));    
+    $.ajax({
+      url: that.base_url() + '/' + block_id + '/duplicate',
+      type: 'put',
+      success: function(resp) {        
+        if (resp.success) that.render_blocks(function() { that.stop_loadify(); });      
+      }
+    });    
+  },
   
   loadify: function(el)
   {
@@ -233,6 +246,7 @@ BlockContentController.prototype = {
     $('#block_' + b.id + ' *').attr('onclick', '').unbind('click');
     $('#block_' + b.id)
       .prepend($('<a/>').attr('id', 'block_' + b.id + '_select_handle'    ).addClass('select_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-check'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.select_block(b.id);    }))      
+      .prepend($('<a/>').attr('id', 'block_' + b.id + '_duplicate_handle' ).addClass('duplicate_handle' ).append($('<span/>').addClass('ui-icon ui-icon-copy'       )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.duplicate_block(b.id); }))      
       .prepend($('<a/>').attr('id', 'block_' + b.id + '_move_up_handle'   ).addClass('move_up_handle'   ).append($('<span/>').addClass('ui-icon ui-icon-arrow-1-n'  )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.move_block_up(b.id);   }))
       .prepend($('<a/>').attr('id', 'block_' + b.id + '_move_down_handle' ).addClass('move_down_handle' ).append($('<span/>').addClass('ui-icon ui-icon-arrow-1-s'  )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.move_block_down(b.id); }))
       .prepend($('<a/>').attr('id', 'block_' + b.id + '_delete_handle'    ).addClass('delete_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-close'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(b.id);    }));

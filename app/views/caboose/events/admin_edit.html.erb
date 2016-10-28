@@ -48,8 +48,9 @@ g = @event.calendar_event_group
 
 <div id='message'></div>
 <p>
-<input type='button' value='Close'        onclick="modal.close();" />
-<input type='button' value='Delete Event' onclick="delete_event(<%= @event.id %>);" />
+<input type='button' value='Close'              onclick="modal.close();" />
+<input type='button' value='Delete Event'       onclick="delete_event(<%= @event.id %>);" />
+<input type='button' value='Delete Event Group' onclick="delete_event_group(<%= @event.id %>);" />
 </p>
 
 <% content_for :caboose_js do %>
@@ -117,6 +118,28 @@ function delete_event(event_id, confirm)
   modal.autosize("<p class='loading'>Deleting event...</p>");
   $.ajax({
     url: '/admin/calendars/<%= c.id %>/events/' + event_id,
+    type: 'delete',
+    success: function(resp) {
+      if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) modal.close();
+    }
+  });
+}
+
+function delete_event_group(event_id, confirm)
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note confirm')
+      .append('Are you sure you want to delete the event group? ')
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_event_group(event_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));    
+    modal.autosize(p);
+    return;
+  }
+  modal.autosize("<p class='loading'>Deleting event group...</p>");
+  $.ajax({
+    url: '/admin/event-groups/<%= g.id %>',
     type: 'delete',
     success: function(resp) {
       if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");

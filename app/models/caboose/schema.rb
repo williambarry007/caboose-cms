@@ -971,6 +971,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :downloadable                  , :boolean   , { :default => false }],        
         [ :is_bundle                     , :boolean   , { :default => false }]
       ],
+      Caboose::VariantLimit => [
+        [ :variant_id       , :integer ],
+        [ :user_id          , :integer ],
+        [ :min_quantity     , :integer ],
+        [ :max_quantity     , :integer ],
+        [ :current_value    , :integer ]      
+      ]
       Caboose::Vendor => [
         [ :site_id      , :integer    ],
         [ :alternate_id , :string     ],

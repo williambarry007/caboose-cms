@@ -977,7 +977,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :min_quantity     , :integer ],
         [ :max_quantity     , :integer ],
         [ :current_value    , :integer ]      
-      ]
+      ],
       Caboose::Vendor => [
         [ :site_id      , :integer    ],
         [ :alternate_id , :string     ],

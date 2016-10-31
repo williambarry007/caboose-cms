@@ -23,7 +23,7 @@ $(document).ready(function() {
     update_url: '/admin/users/<%= @edituser.id %>/subscriptions/<%= @subscription.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [      
-      { name: 'variant_id'         , nice_name: 'Variant'           , type: 'select' , value: <%= raw Caboose.json(@subscription.variant_id        ) %>, width: 400 , options_url: '/admin/subscriptions/subscription-options' },        
+      { name: 'variant_id'         , nice_name: 'Variant'           , type: 'select' , value: <%= raw Caboose.json(@subscription.variant_id        ) %>, width: 400 , options_url: '/admin/subscriptions/variant-options' },        
       { name: 'date_started'       , nice_name: 'Date Started'      , type: 'date'   , value: <%= raw Caboose.json(@subscription.date_started      ) %>, width: 400 , date_format: 'Y-m-d' },
       { name: 'date_started_full'  , nice_name: 'Date Started Full' , type: 'date'   , value: <%= raw Caboose.json(@subscription.date_started_full ) %>, width: 400 , date_format: 'Y-m-d' },
       { name: 'status'             , nice_name: 'Status'            , type: 'select' , value: <%= raw Caboose.json(@subscription.status            ) %>, width: 400 , options_url: '/admin/subscriptions/status-options' }

@@ -25,9 +25,10 @@ module Caboose
     
     def self.events_for_month(calendar_id, month, year)
       d1 = Date.new(year.to_i, month.to_i, 1)
-      d2 = d1 + 1.month              
+      d2 = d1 + 1.month - 1.day
       q = ["calendar_id = ? and cast(begin_date as date) <= ? and cast(end_date as date) >= ?", calendar_id, d2, d1]
-      self.where(q).reorder(:begin_date).all
+      r = self.where(q).reorder(:begin_date).all
+      return r
       
       #q = ["calendar_id = ? 
       #  and (

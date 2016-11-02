@@ -151,13 +151,13 @@ var AdminCalendarController = Class.extend({
     $.each(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], function(i, day) { tr.append($('<th/>').append(day)); });
     
     var div = $('<div/>').attr('id', 'calendar')
-      .append($('<h2/>').attr(month_name(d) + ' ' + that.current_month.getYear()))
+      .append($('<h2/>').append(month_name(that.current_month) + ' ' + that.current_month.getFullYear()))
       .append($('<p/>')
-        .append($('<input/>').attr('type', 'button').val('< Previous Month' ).click(function() { that.current_month.setMonth(that.current_month.getMonth()-1); that.print(); })).append(' ')
-        .append($('<input/>').attr('type', 'button').val('Current Month'    ).click(function() { that.current_month = new Date();                              that.print(); })).append(' ')
-        .append($('<input/>').attr('type', 'button').val('Next Month >'     ).click(function() { that.current_month.setMonth(that.current_month.getMonth()+1); that.print(); })).append(' ')
+        .append($('<input/>').attr('type', 'button').val('< Previous Month' ).click(function() { that.current_month.setMonth(that.current_month.getMonth()-1); that.refresh_events_and_print(); })).append(' ')
+        .append($('<input/>').attr('type', 'button').val('Current Month'    ).click(function() { that.current_month = new Date();                              that.refresh_events_and_print(); })).append(' ')
+        .append($('<input/>').attr('type', 'button').val('Next Month >'     ).click(function() { that.current_month.setMonth(that.current_month.getMonth()+1); that.refresh_events_and_print(); })).append(' ')
       )          
-      .append($('<p/>').append($('<a/>').attr('href', '#').click(function(e) { e.preventDefault(); that.new_event(); }).html("New Event")))
+      .append($('<p/>').append($('<a/>').attr('href', '#').click(function(e) { e.preventDefault(); that.new_calendar_event(iso8601_date(new Date())); }).html("New Event")))
       .append($('<table/>').append($('<thead/>').append(tr)).append(tbody))            
       .append($('<br/>'));            
     return div;

@@ -50,22 +50,26 @@ module Caboose
 
       # Check the variant limits
       vl = VariantLimit.where(:variant_id => v.id, :user_id => @logged_in_user.id).first
-      vl = VariantLimit.where(:variant_id => v.id, :user_id => User.logged_out_user_id(@site.id)).first if v.nil?      
+      vl = VariantLimit.where(:variant_id => v.id, :user_id => User.logged_out_user_id(@site.id)).first if vl.nil?      
       if vl && !vl.no_purchases_allowed
         resp.error = "You don't have permission to purchase this item."
         resp.error << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?        
         render :json => resp
         return
       end
-      if vl && !vl.qty_within_range(qty)
+      qty2 = logged_in? && vl && vl.current_value ? qty + vl.current_value : qty 
+      if vl && !vl.qty_within_range(qty2)
         resp.quantity_message = vl.quantity_message
-        resp.quantity_message << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?
-                
-        if vl.qty_too_low(qty)       
-          qty = vl.min_quantity
-        elsif vl.quty_too_high(qty)
-          qty = vl.max_quantity
-        end          
+        if !logged_in?                  
+          resp.quantity_message << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?                
+          if vl.qty_too_low(qty)        then qty = vl.min_quantity
+          elsif vl.quty_too_high(qty)   then qty = vl.max_quantity
+          end
+        else
+          if vl.qty_too_low(qty)        then qty = vl.min_quantity
+          elsif vl.qty_too_high(qty2)   then qty = vl.max_quantity - vl.current_value
+          end
+        end
       end
       
       if @invoice.line_items.exists?(:variant_id => v.id)

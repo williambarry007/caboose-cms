@@ -211,11 +211,11 @@ module Caboose
       # Make sure all the variants still exist      
       @invoice.line_items.each do |li|
         v = Variant.where(:id => li.variant_id).first
-        vl = @invoice.customer.max_variant_quantity_allowed(v.id)
+        vl = VariantLimit.where(:variant_id => v.id, :user_id => @invoice.customer_id).first
         if v.nil? || v.status == 'Deleted'
           render :json => { :error => 'One or more of the products you are purchasing are no longer available.' }
           return
-        elsif li.quantity > vl
+        elsif !vl.qty_within_range( vl.current_value + li.quantity )
           render :json => { :error => 'You have exceeded the limit you are allowed to purchase.' }
           return
         end
@@ -271,7 +271,7 @@ module Caboose
       @invoice.line_items.each do |li|
         vl = VariantLimit.where(:user_id => @invoice.customer_id, :variant_id => li.variant_id).first
         if vl
-          vl.current_value = li.quantity
+          vl.current_value += li.quantity
           vl.save
         end
       end

@@ -61,15 +61,6 @@ class Caboose::User < ActiveRecord::Base
     end
     return false;
   end
-
-  def max_variant_quantity_allowed(variant_id)
-    vl = Caboose::VariantLimit.where(:user_id => self.id, :variant_id => variant_id).first
-    if vl
-      return (vl.max_quantity - vl.current_value)
-    else
-      return 999999999
-    end
-  end
   
   def self.validate_token(token)
     user = self.where('token' => token).first

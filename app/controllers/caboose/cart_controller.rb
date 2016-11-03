@@ -38,21 +38,38 @@ module Caboose
     end
     
     # @route POST /cart
-    def add      
+    def add
+      resp = StdClass.new
+      
       v = Variant.find(params[:variant_id])
       qty = params[:quantity] ? params[:quantity].to_i : 1
+      if @invoice.line_items.exists?(:variant_id => v.id)
+        li = @invoice.line_items.find_by_variant_id(v.id)        
+        qty = li.quantity + qty
+      end
 
-      vl = @invoice && @invoice.customer ? @invoice.customer.max_variant_quantity_allowed(v.id) : 99999999
-      
-      resp = StdClass.new
+      # Check the variant limits
+      vl = VariantLimit.where(:variant_id => v.id, :user_id => @logged_in_user.id).first
+      vl = VariantLimit.where(:variant_id => v.id, :user_id => User.logged_out_user_id(@site.id)).first      
+      if vl && !vl.no_purchases_allowed
+        resp.error = "You don't have permission to purchase this item."
+        resp.error << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?        
+        render :json => resp
+        return
+      end
+      if vl && !vl.qty_within_range(qty)
+        resp.quantity_message = vl.quantity_message
+        resp.quantity_message << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?
+                
+        if vl.qty_too_low(qty)       
+          qty = vl.min_quantity
+        elsif vl.quty_too_high(qty)
+          qty = vl.max_quantity
+        end          
+      end
       
       if @invoice.line_items.exists?(:variant_id => v.id)
         li = @invoice.line_items.find_by_variant_id(v.id)
-        old_qty = li.quantity
-        requested_qty = old_qty + qty
-        new_qty = (vl <= 0) ? 0 : ( requested_qty > vl ? vl : requested_qty )
-        li.quantity = new_qty
-        li.subtotal = li.unit_price * new_qty
         InvoiceLog.create(
           :invoice_id     => @invoice.id,
           :line_item_id   => li.id,
@@ -60,18 +77,20 @@ module Caboose
           :date_logged    => DateTime.now.utc,
           :invoice_action => InvoiceLog::ACTION_LINE_ITEM_UPDATED,
           :field          => 'quantity',
-          :old_value      => old_qty,
-          :new_value      => new_qty
+          :old_value      => li.quantity,
+          :new_value      => qty
         )
+        li.quantity = qty
+        li.subtotal = li.unit_price * qty
+        li.save
       else
-        unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)
-        vlqty = (vl <= 0) ? 0 : ( qty > vl ? vl : qty ) # quantity added to cart is the max allowed for this user & variant
+        unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)        
         li = LineItem.create(
           :invoice_id   => @invoice.id,
           :variant_id => v.id,
-          :quantity   => vlqty,
+          :quantity   => qty,
           :unit_price => unit_price,
-          :subtotal   => unit_price * vlqty,
+          :subtotal   => unit_price * qty,
           :status     => 'pending'
         )        
         InvoiceLog.create(

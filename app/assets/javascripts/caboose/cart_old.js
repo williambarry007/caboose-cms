@@ -107,7 +107,7 @@ Caboose.Store.Modules.Cart = (function() {
             if (!self.$add_to_cart.find('.message').length) {                            
               self.$add_to_cart
                 .append($('<div/>').hide().addClass('message')
-                  .append($('<p/>').text(resp.quantity_message ? resp.quantity_message : 'Successfully added to cart'))
+                  .append($('<p/>').text(response.quantity_message ? response.quantity_message : 'Successfully added to cart'))
                   .append($('<p/>')
                     .append($('<a/>').attr('href', '/cart').html('View cart')).append(' | ')
                     .append($('<a/>').attr('href', '/checkout').html('Continue to checkout'))

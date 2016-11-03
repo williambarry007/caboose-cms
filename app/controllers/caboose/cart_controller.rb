@@ -66,8 +66,12 @@ module Caboose
           elsif vl.qty_too_high(qty)    then qty = vl.max_quantity
           end
         else
-          if vl.qty_too_low(qty)        then qty = vl.min_quantity
-          elsif vl.qty_too_high(qty2)   then qty = vl.max_quantity - vl.current_value
+          if vl.qty_too_low(qty)
+            qty = vl.min_quantity
+            resp.quantity_message = "You must purchase at least #{vl.min_quantity} of this item, your cart has been updated."
+          elsif vl.qty_too_high(qty2)
+            qty = vl.max_quantity - vl.current_value
+            resp.quantity_message = "You can only purchase #{vl.max_quantity} of this item, your cart has been updated."
           end
         end
       end
@@ -156,7 +160,7 @@ module Caboose
                 elsif vl.qty_too_high(qty)    then qty = vl.max_quantity
                 end
               else
-                if vl.qty_too_low(qty)        then qty = vl.min_quantity
+                if vl.qty_too_low(qty)        then qty = (qty == 0 ? 0 : vl.min_quantity)
                 elsif vl.qty_too_high(qty2)   then qty = vl.max_quantity - vl.current_value
                 end
               end

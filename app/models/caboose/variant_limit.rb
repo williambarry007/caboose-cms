@@ -17,12 +17,15 @@ module Caboose
       end
       if self.max_quantity
         if self.min_quantity && self.min_quantity > 0
-          return "You are allowed to purchase between #{self.min_quantity} and #{self.max_quantity} of this item".
+          return "You are allowed to purchase between #{self.min_quantity} and #{self.max_quantity} of this item."
         else
           return "You are allowed to purchase up to #{self.max_quantity} of this item."
         end
-      end            
-      return "You must purchase at least #{self.min_quantity} of this item." 
+      end
+      if self.min_quantity && self.min_quantity > 0
+        return "You must purchase at least #{self.min_quantity} of this item." 
+      end
+      return nil
     end
     
     def no_purchases_allowed

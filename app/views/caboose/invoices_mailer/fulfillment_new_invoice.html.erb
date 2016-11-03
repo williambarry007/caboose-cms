@@ -3,7 +3,7 @@
 <!-- <h1>Thank you for your invoice!</h1> -->
 <h1>New Order Received</h1>
 
-<h4><a href="<%= @invoice.site.store_config.authnet_relay_domain %>/admin/invoices/<%= @invoice.id %>" target="_blank" title="View Order">View Order</a></h4>
+<h4><a href="http://<%= @invoice.site.primary_domain.domain %>/admin/invoices/<%= @invoice.id %>" target="_blank" title="View Order">View Order</a></h4>
 
 <h2>Order Details</h2>
 

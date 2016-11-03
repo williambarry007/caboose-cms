@@ -41,13 +41,18 @@ module Caboose
     def add      
       v = Variant.find(params[:variant_id])
       qty = params[:quantity] ? params[:quantity].to_i : 1
+
+      vl = @invoice && @invoice.customer ? @invoice.customer.max_variant_quantity_allowed(v.id) : 99999999
       
       resp = StdClass.new
-            
+      
       if @invoice.line_items.exists?(:variant_id => v.id)
         li = @invoice.line_items.find_by_variant_id(v.id)
-        li.quantity += qty
-        li.subtotal = li.unit_price * li.quantity
+        old_qty = li.quantity
+        requested_qty = old_qty + qty
+        new_qty = (vl <= 0) ? 0 : ( requested_qty > vl ? vl : requested_qty )
+        li.quantity = new_qty
+        li.subtotal = li.unit_price * new_qty
         InvoiceLog.create(
           :invoice_id     => @invoice.id,
           :line_item_id   => li.id,
@@ -55,17 +60,18 @@ module Caboose
           :date_logged    => DateTime.now.utc,
           :invoice_action => InvoiceLog::ACTION_LINE_ITEM_UPDATED,
           :field          => 'quantity',
-          :old_value      => li.quantity - qty,
-          :new_value      => li.quantity
+          :old_value      => old_qty,
+          :new_value      => new_qty
         )
       else
         unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)
+        vlqty = (vl <= 0) ? 0 : ( qty > vl ? vl : qty ) # quantity added to cart is the max allowed for this user & variant
         li = LineItem.create(
           :invoice_id   => @invoice.id,
           :variant_id => v.id,
-          :quantity   => qty,
+          :quantity   => vlqty,
           :unit_price => unit_price,
-          :subtotal   => unit_price * qty,
+          :subtotal   => unit_price * vlqty,
           :status     => 'pending'
         )        
         InvoiceLog.create(
@@ -105,7 +111,10 @@ module Caboose
         end
         case name
           when 'quantity'    then
-            if value.to_i != li.quantity
+            vl = li.invoice.customer.max_variant_quantity_allowed(li.variant_id)
+            value = value.to_i
+            new_qty = (vl <= 0) ? 0 : ( value > vl ? vl : value )
+            if new_qty != li.quantity
               op = li.invoice_package
               if op
                 op.shipping_method_id = nil
@@ -118,7 +127,7 @@ module Caboose
                 li.invoice.calculate        
               end
             end
-            li.quantity = value.to_i
+            li.quantity = new_qty
             if li.quantity == 0
               li.destroy
               InvoiceLog.create(

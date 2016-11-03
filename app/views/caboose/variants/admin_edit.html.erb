@@ -73,7 +73,7 @@ v = @variant
 
 <h2>Delete Variant</h2>
 <div id='message'></div>
-<p><input type='button' value='Delete Variant' onclick="delete_variant(<%= v.id %>);" /></p>
+<p><input type='button' value='Delete Variant' onclick="delete_variant(<%= p.id %>, <%= v.id %>);" /></p>
 
 <%= render :partial => 'caboose/products/admin_footer' %>
 

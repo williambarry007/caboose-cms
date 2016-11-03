@@ -120,8 +120,8 @@ module Caboose
       min = 100000
       max = 0
       
-      self.variants.each do |variant|        
-        next if variant.nil? || variant.price.nil? || variant.price <= 0
+      self.variants.each do |variant|
+        next if variant.nil? || variant.price.nil? || variant.price <= 0 || variant.status != Variant::STATUS_ACTIVE
         price = variant.on_sale? ? variant.sale_price : variant.price
         min = price if price < min
         max = price if price > max

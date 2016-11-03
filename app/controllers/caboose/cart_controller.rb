@@ -63,7 +63,7 @@ module Caboose
         if !logged_in?                  
           resp.quantity_message << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?                
           if vl.qty_too_low(qty)        then qty = vl.min_quantity
-          elsif vl.quty_too_high(qty)   then qty = vl.max_quantity
+          elsif vl.qty_too_high(qty)    then qty = vl.max_quantity
           end
         else
           if vl.qty_too_low(qty)        then qty = vl.min_quantity

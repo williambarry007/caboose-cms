@@ -50,7 +50,7 @@ module Caboose
 
       # Check the variant limits
       vl = VariantLimit.where(:variant_id => v.id, :user_id => @logged_in_user.id).first
-      vl = VariantLimit.where(:variant_id => v.id, :user_id => User.logged_out_user_id(@site.id)).first      
+      vl = VariantLimit.where(:variant_id => v.id, :user_id => User.logged_out_user_id(@site.id)).first if v.nil?      
       if vl && !vl.no_purchases_allowed
         resp.error = "You don't have permission to purchase this item."
         resp.error << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?        

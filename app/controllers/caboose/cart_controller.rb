@@ -141,6 +141,7 @@ module Caboose
         end
       end
       li.save
+      li.invoice.reload # Reload invoice in case li.quantity changed
       li.invoice.calculate
       resp.success = true
       render :json => resp                                    

@@ -25,6 +25,7 @@ module Caboose
       return if !user_is_allowed('subscriptions', 'view')
       
       pager = PageBarGenerator.new(params, {
+          'site_id'               => @site.id,
           'variant_id'            => '',
           'user_id'               => params[:user_id] ? params[:user_id] : '',
           'date_started_gte'      => '',

@@ -33,17 +33,18 @@ BoundSelect = BoundControl.extend({
         )
       );
     }
-    var this2 = this;
-    $('#'+this.el+'_container').append($('<input/>')
+    var this2 = this;        
+    var input = $('<input/>')
       .attr('type', 'text')
       .attr('id', this.el)
       .addClass('mb_fake_option')
       .attr('placeholder', this.attribute.empty_text)
       .click(function() { this2.edit(); })
-      .val(this.attribute.text && this.attribute.text.length > 0 ? this.attribute.text : this.attribute.empty_text)
-    );
-    if (this.attribute.width)
-      $('#'+this.el).css('width', this.attribute.width);
+      .val(this.attribute.text && this.attribute.text.length > 0 ? this.attribute.text : this.attribute.empty_text);      
+    if (this2.attribute.align == 'right')
+      input.css('text-align', 'right');    
+    $('#'+this.el+'_container').append(input);    
+    if (this.attribute.width) $('#'+this.el).css('width', this.attribute.width);
     
     if (this.attribute.fixed_placeholder)
     {
@@ -76,6 +77,8 @@ BoundSelect = BoundControl.extend({
                 select2.empty();                
                 if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html(this2.attribute.empty_text ? this2.attribute.empty_text : '-- Empty --'));
                 if (this2.attribute.quick_add_url)      select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
+                //if (this2.attribute.align == 'right')   select.attr('dir', 'rtl').css('text-align', 'right');
+                  
                 $.each(this2.attribute.options, function(i, option) {
                   var opt = $('<option/>').val(option.value).html(option.text);
                   if (option.value == new_id)
@@ -118,8 +121,8 @@ BoundSelect = BoundControl.extend({
         });
       }
       if (this2.attribute.show_empty_option)  select.append($('<option/>').val('').html(this2.attribute.empty_text ? this2.attribute.empty_text : '-- Empty --'));
-      if (this2.attribute.quick_add_url)      
-        select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
+      if (this2.attribute.quick_add_url)      select.append($('<option/>').val('quickadd').html('-- ' + this2.attribute.quick_add_text + ' --'));
+      //if (this2.attribute.align == 'right')   select.attr('dir', 'rtl').css('text-align', 'right');
       $.each(this2.attribute.options, function(i, option) {
         var opt = $('<option/>')
           .val(option.value)

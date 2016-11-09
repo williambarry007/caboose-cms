@@ -280,13 +280,13 @@ module Caboose
             value = value == true || value == 1 || value == '1' ? true : false            
             variants.each { |v|
               v.requires_shipping = value
-              v.downloadable      = !value
+              v.downloadable      = false if value
             }            
           when 'downloadable'                         then
             value = value == true || value == 1 || value == '1' ? true : false            
             variants.each { |v|
               v.downloadable      = value
-              v.requires_shipping = !value
+              v.requires_shipping = false if value
             }            
           when 'download_path'                        then variants.each { |v| v.download_path                    = value }
           when 'is_subscription'                      then variants.each { |v| v.is_subscription                  = value }

@@ -59,13 +59,14 @@ module Caboose
         while d <= self.date_end          
           (0..6).each do |i|            
             d = d + 1
-            Caboose.log("d = #{d}")
+            # Caboose.log("d = #{d}")
             next if d < self.date_start
             break if d > self.date_end
             w = d.strftime('%w').to_i
             if (w == 0 && self.sun) || (w == 1 && self.mon) || (w == 2 && self.tue) || (w == 3 && self.wed) || (w == 4 && self.thu) || (w == 5 && self.fri) || (w == 6 && self.sat)
-              Caboose.log("Found a day")
+              # Caboose.log("Found a day")
               if !CalendarEvent.where("calendar_event_group_id = ? and cast(begin_date as date) = ?", self.id, d).exists?
+                Caboose::log(d)
                 e.duplicate(d)
                 dates << d.to_date
               end
@@ -122,6 +123,7 @@ module Caboose
       end
       
       # Get rid of events that shouldn't be in the group            
+      Caboose::log(dates)
       CalendarEvent.where("calendar_event_group_id = ? and cast(begin_date as date) not in (?)", self.id, dates).destroy_all
                   
     end    

@@ -78,7 +78,7 @@ var AdminCalendarEventModalController = ModalController.extend({
       .append(that.repeat_container())                     
       .append($('<div/>').attr('id', 'modal_message'))
       .append($('<p/>')
-        .append($('<input/>').attr('type', 'button').val('Close'        ).click(function() { that.close(); })).append(' ')
+        .append($('<input/>').attr('type', 'button').val('Close'        ).click(function() { that.close(); that.parent_controller.refresh_events_and_print(); })).append(' ')
         .append($('<input/>').attr('type', 'button').val('Delete Event' ).click(function() { that.delete_event(); }))
       );
     that.modal(div);
@@ -90,7 +90,7 @@ var AdminCalendarEventModalController = ModalController.extend({
   {
     var that = this;
     var e = that.event;
-    var g = that.event.calendar_event_group;    
+    var g = that.event.calendar_event_group;  
     new ModelBinder({
       name: 'CalendarEvent',
       id: that.event_id,
@@ -98,7 +98,7 @@ var AdminCalendarEventModalController = ModalController.extend({
       authenticity_token: that.parent_controller.authenticity_token,
       attributes: [
         { name: 'name'        , nice_name: 'Name'         , type: 'text'     , value: e.name                     , width: 500, after_update: function() { e.name        = this.value; }},        
-        { name: 'description' , nice_name: 'Description'  , type: 'textarea' , value: e.description              , width: 500, after_update: function() { e.description = this.value; }, height: 100 },
+        { name: 'description' , nice_name: 'Description'  , type: 'richtext' , value: e.description              , width: 500, after_update: function() { e.description = this.value; }, height: 100 },
         { name: 'location'    , nice_name: 'Location'     , type: 'text'     , value: e.location                 , width: 500, after_update: function() { e.location    = this.value; }},
         { name: 'begin_date'  , nice_name: 'Begin'        , type: 'date'     , value: pretty_date(e.begin_date ) , width: 160, after_update: function() {}, align: 'right' },
         { name: 'begin_time'  , nice_name: 'Begin'        , type: 'time'     , value: pretty_time(e.begin_date ) , width: 100, after_update: function() {}, fixed_placeholder: false },
@@ -338,8 +338,10 @@ function pretty_date(d)
 {  
   if (!d) return '';  
   if (typeof d == 'string') d = new Date(d);
-  var m = d.getMonth() + 1;
-  var day = d.getDate();
+
+  var m = d.getUTCMonth() + 1;
+  var day = d.getUTCDate();
+  console.log("Pretty date: " + d);
   return '' + m + '/' + add_zero(day) + '/' + d.getFullYear();
 }
 
@@ -347,9 +349,10 @@ function pretty_time(d)
 {
   if (!d) return '';
   if (typeof d == 'string') d = new Date(d);
-  var h = d.getHours();
-  var m = d.getMinutes();
-  var ampm = m >= 12 ? 'pm' : 'am';
+  var h = d.getUTCHours();
+  var m = d.getUTCMinutes();
+  var ampm = h >= 12 ? 'pm' : 'am';
+  h = h >= 12 ? h - 12 : h
   return '' + h + ':' + add_zero(m) + ' ' + ampm;     
 }
 

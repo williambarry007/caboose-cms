@@ -92,7 +92,14 @@ var AdminCalendarController = Class.extend({
       ed = new Date(ev.end_date);
       if (bd.getDate() == d.getDate() || ed.getDate() == d.getDate())
       {        
-        ul.append($('<li/>').append($('<a/>').attr('href', '#').addClass('event_link').html(ev.name).data('event_id', ev.id).click(function(e) {
+        if (ev.all_day) {
+          name = ev.name;
+        }
+        else {
+          name = ev.name + ' - ' + pretty_time(ev.begin_date);
+        }
+        ul.append($('<li/>').append($('<a/>').attr('href', '#').addClass('event_link').html(name).data('event_id', ev.id).click(function(e) {
+          console.log(ev);
           e.preventDefault();
           e.stopPropagation();
           that.edit_calendar_event($(this).data('event_id'));                         
@@ -224,4 +231,25 @@ function iso8601_date(d)
 function month_name(d, use_short_name)
 {   
   return d.toLocaleString('en-us', { month: use_short_name ? 'short' : 'long' });
+}
+
+function pretty_date(d)
+{  
+  if (!d) return '';  
+  if (typeof d == 'string') d = new Date(d);
+
+  var m = d.getUTCMonth() + 1;
+  var day = d.getUTCDate();
+  return '' + m + '/' + add_zero(day) + '/' + d.getFullYear();
+}
+
+function pretty_time(d)
+{
+  if (!d) return '';
+  if (typeof d == 'string') d = new Date(d);
+  var h = d.getUTCHours();
+  var m = d.getUTCMinutes();
+  var ampm = h >= 12 ? 'pm' : 'am';
+  h = h >= 12 ? h - 12 : h
+  return '' + h + ':' + add_zero(m) + ' ' + ampm;     
 }

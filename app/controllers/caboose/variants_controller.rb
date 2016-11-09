@@ -275,9 +275,19 @@ module Caboose
           when 'option1_media_id'                     then variants.each { |v| v.option1_media_id                 = value }
           when 'option2_media_id'                     then variants.each { |v| v.option2_media_id                 = value }
           when 'option3_media_id'                     then variants.each { |v| v.option3_media_id                 = value }
-          when 'requires_shipping'                    then variants.each { |v| v.requires_shipping                = value }
           when 'taxable'                              then variants.each { |v| v.taxable                          = value }
-          when 'downloadable'                         then variants.each { |v| v.downloadable                     = value }
+          when 'requires_shipping'                    then
+            value = value == true || value == 1 || value == '1' ? true : false            
+            variants.each { |v|
+              v.requires_shipping = value
+              v.downloadable      = !value
+            }            
+          when 'downloadable'                         then
+            value = value == true || value == 1 || value == '1' ? true : false            
+            variants.each { |v|
+              v.downloadable      = value
+              v.requires_shipping = !value
+            }            
           when 'download_path'                        then variants.each { |v| v.download_path                    = value }
           when 'is_subscription'                      then variants.each { |v| v.is_subscription                  = value }
           when 'subscription_interval'                then variants.each { |v| v.subscription_interval            = value }

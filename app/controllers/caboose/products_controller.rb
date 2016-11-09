@@ -71,7 +71,7 @@ module Caboose
           
         elsif params[:id].to_i > 0 && Product.exists?(params[:id])
           @product = Product.find(params[:id])
-          render 'product/not_available' and return if @product.status == 'Inactive'
+          render 'product/not_available' and return if @product.status == 'Inactive' || @product.site_id != @site.id
           
           @category       = @product.categories.first
           @review         = Review.new

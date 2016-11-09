@@ -927,7 +927,29 @@ IndexTable.prototype = {
           async: false          
         });
       }
-    });        
+    });
+      
+    //var arr = [];
+    //$.each(this.new_model_fields, function(i, f) {
+    //  if (f.options_url && !f.options)
+    //  {
+    //    console.log("Testing1");
+    //    arr.push($.ajax({
+    //      url: f.options_url,
+    //      type: 'get'                              
+    //    }));
+    //  }
+    //});
+    //if (arr.length > 0)
+    //{
+    //  console.log("Testing");
+    //  that.show_message($('<p/>').addClass('loading').html("Getting options..."));
+    //  $.when.apply(null, arr).done(function(resp) {
+    //    console.log(resp);                                      
+    //    //that.new_form();          
+    //  });
+    //  return;
+    //}
     
     var form = $('<form/>').attr('id', 'new_form')
       .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(that.form_authenticity_token));

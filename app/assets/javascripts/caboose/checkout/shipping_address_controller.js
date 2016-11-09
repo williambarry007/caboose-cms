@@ -35,7 +35,9 @@ ShippingAddressController.prototype = {
       var name = sa ? sa.first_name + ' ' + sa.last_name : '';
       if (name.length == 0) name = '[Empty name]';
       var address = sa && sa.address1.length > 0 ? sa.address1 : '[Empty address]'
-      var city_state_zip = sa ? (sa.city.length > 0 ? sa.city : '[Empty city]') + ', ' + (sa.state.length > 0 ? sa.state : '[Empty state]') + ' ' + (sa.zip.length > 0 ? sa.zip : '[Empty zip]') : ''; 
+      var city_state_zip = sa ? (sa.city && sa.city.length > 0 ? sa.city : '[Empty city]') + ', ' + 
+        (sa.state && sa.state.length > 0 ? sa.state : '[Empty state]') + ' ' + 
+        (sa.zip && sa.zip.length > 0 ? sa.zip : '[Empty zip]') : ''; 
       
                                                        div.append($('<span/>').addClass('name'           ).html(name           )).append($('<br/>'));
       if (sa && sa.company && sa.company.length > 0)   div.append($('<span/>').addClass('company'        ).html(sa.company     )).append($('<br/>'));

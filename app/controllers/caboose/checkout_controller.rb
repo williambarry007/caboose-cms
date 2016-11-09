@@ -215,7 +215,7 @@ module Caboose
         if v.nil? || v.status == 'Deleted'
           render :json => { :error => 'One or more of the products you are purchasing are no longer available.' }
           return
-        elsif !vl.qty_within_range( vl.current_value + li.quantity )
+        elsif vl && !vl.qty_within_range( vl.current_value + li.quantity )
           render :json => { :error => 'You have exceeded the limit you are allowed to purchase.' }
           return
         end

@@ -22,7 +22,8 @@ v = @variant
 <div id='variant_<%= v.id %>_cost'               ></div>
 <div id='variant_<%= v.id %>_price'              ></div>
 <div id='variant_<%= v.id %>_quantity_in_stock'  ></div>
-<div id='variant_<%= v.id %>_ignore_quantity'  ></div>
+<div id='variant_<%= v.id %>_ignore_quantity'    ></div>
+<div id='variant_<%= v.id %>_max_quantity'       ></div>
 
 <h2>Dimensions</h2>
 <div id='variant_<%= v.id %>_cylinder'           ></div>
@@ -84,6 +85,8 @@ v = @variant
 <script type='text/javascript'>
 <%
 sc = @site.store_config
+elo = Caboose::User.where(:site_id => @site.id, :username => 'elo').first
+vl = Caboose::VariantLimit.where(:user_id => elo.id, :variant_id => v.id).first if elo && v
 %>
 var vcc = false;
 $(document).ready(function() {
@@ -100,6 +103,7 @@ $(document).ready(function() {
     update_url: '/admin/products/<%= v.product_id %>/variants/<%= v.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
+<<<<<<< Updated upstream
       <% if p.option1 %>{ name: 'option1'            , nice_name: <%= raw Caboose.json(p.option1) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option1                      ) %> },<% end %>
       <% if p.option2 %>{ name: 'option2'            , nice_name: <%= raw Caboose.json(p.option2) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option2                      ) %> },<% end %>
       <% if p.option3 %>{ name: 'option3'            , nice_name: <%= raw Caboose.json(p.option3) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option3                      ) %> },<% end %>
@@ -115,6 +119,7 @@ $(document).ready(function() {
       { name: 'clearance_price'                      , nice_name: 'Clearance price'                  , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.clearance_price              ) %> },      
       { name: 'quantity_in_stock'                    , nice_name: 'Quantity'                         , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.quantity_in_stock            ) %> }, 
       { name: 'ignore_quantity'                      , nice_name: 'Ignore Quantity'                  , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.ignore_quantity              ) %> },
+      { name: 'max_quantity'  , nice_name: 'Max Quantity per User'  , type: 'text' , align: 'right' , width: 500, value: <%= raw Caboose.json(vl && vl.max_quantity ? vl.max_quantity : ''     ) %>, update_url: '/admin/variant-limits/<%== vl ? vl.id : "new/#{v.id}" %>' },
       { name: 'weight'                               , nice_name: 'Weight (<%= sc.weight_unit %>)'   , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.weight                       ) %> }, 
       { name: 'length'                               , nice_name: 'Length (<%= sc.length_unit %>)'   , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.length                       ) %> }, 
       { name: 'width'                                , nice_name: 'Width (<%= sc.length_unit %>)'    , type: 'text'     , align: 'right' , width: 175, value: <%= raw Caboose.json(v.width                        ) %> }, 
@@ -129,7 +134,7 @@ $(document).ready(function() {
       { name: 'flat_rate_shipping'                   , nice_name: 'Use flat rate shipping'           , type: 'checkbox' , align: 'right' , width: 250, value: <%= raw Caboose.json(v.flat_rate_shipping           ) %> },
       { name: 'flat_rate_shipping_single'            , nice_name: 'Amount (single)'                  , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.flat_rate_shipping_single    ) %> },
       { name: 'flat_rate_shipping_combined'          , nice_name: 'Amount (combined)'                , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.flat_rate_shipping_combined  ) %> },
-      { name: 'flat_rate_shipping_package_method_id' , nice_name: 'Package method'                   , type: 'select'   , align: 'right' , width: 250, options_url: '/admin/shipping-packages/package-method-options',   
+      { name: 'flat_rate_shipping_package_method_id' , nice_name: 'Package method'                   , type: 'select'   , align: 'right' , width: 250, options_url: '/admin/shipping-packages/package-method-options',
         value: <%= raw Caboose.json("#{v.flat_rate_shipping_package_id}_#{v.flat_rate_shipping_method_id}") %>,
         text:  <%= raw Caboose.json(v.flat_rate_shipping_package && v.flat_rate_shipping_method ? "#{v.flat_rate_shipping_package.name} - #{v.flat_rate_shipping_method.service_name}" : '') %>         
       },

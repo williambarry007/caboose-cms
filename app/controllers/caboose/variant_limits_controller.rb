@@ -47,6 +47,20 @@ module Caboose
       end
       render :json => resp
     end
+
+    # @route PUT /admin/variant-limits/new/:variant_id
+    def admin_create
+      resp = Caboose::StdClass.new
+      mq = params[:max_quantity]
+      elo = User.where(:site_id => @site.id, :username => 'elo').first
+      vl = VariantLimit.where(:user_id => elo.id, :variant_id => params[:variant_id]).first
+      vl = VariantLimit.create(:user_id => elo.id, :variant_id => params[:variant_id]) if vl.nil?
+      vl.max_quantity = mq.blank? ? nil : mq
+      vl.min_quantity = 0
+      vl.current_value = 0
+      resp.success = vl.save
+      render :json => resp
+    end
       
     # @route PUT /admin/variant-limits/:id
     def admin_update
@@ -55,7 +69,6 @@ module Caboose
       variantlimit = VariantLimit.find(params[:id])
       user = logged_in_user
       if user
-
         params.each do |k,v|
           case k
             when "user_id" then variantlimit.user_id = v
@@ -65,7 +78,6 @@ module Caboose
             when "current_value" then variantlimit.current_value = v
           end
         end
-
         resp.success = variantlimit.save
       end
       render :json => resp
@@ -75,6 +87,18 @@ module Caboose
     def admin_edit
       return unless (user_is_allowed_to 'edit', 'users')
       @edituser = Caboose::User.find(params[:user_id])
+    end
+
+    # @route DELETE /admin/variant-limits/bulk
+    def admin_bulk_delete
+      return if !user_is_allowed('variantlimits', 'delete')
+      resp = Caboose::StdClass.new
+      params[:model_ids].each do |vl_id|
+        vl = VariantLimit.find(vl_id)
+        vl.destroy
+      end
+      resp.success = true
+      render :json => resp
     end
 
     # @route_priority 1

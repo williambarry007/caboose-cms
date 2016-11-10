@@ -83,6 +83,23 @@ class Caboose::User < ActiveRecord::Base
     end
     return true
   end
+
+  def create_variant_limits
+    elo = Caboose::User.where(:site_id => self.site_id, :username => 'elo').first if !self.site_id.blank?
+    variant_limits = Caboose::VariantLimit.where(:user_id => elo.id).all if elo
+    if variant_limits && variant_limits.count > 0
+      variant_limits.each do |vl|
+        new_vl = Caboose::VariantLimit.where(:user_id => self.id, :variant_id => vl.variant_id).first
+        if new_vl.nil?
+          new_vl = Caboose::VariantLimit.create(:user_id => self.id, :variant_id => vl.variant_id)
+          new_vl.min_quantity = vl.min_quantity
+          new_vl.max_quantity = vl.max_quantity
+          new_vl.current_value = 0
+          new_vl.save
+        end
+      end
+    end
+  end
   
   def is_member?(role_id)
     roles.each do |r|

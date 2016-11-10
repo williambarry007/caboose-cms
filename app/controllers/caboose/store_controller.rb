@@ -120,6 +120,7 @@ module Caboose
           when 'custom_packages_function'         then sc.custom_packages_function         = value
           when 'custom_shipping_function'         then sc.custom_shipping_function         = value   
           when 'custom_tax_function'              then sc.custom_tax_function              = value        
+          when 'instore_tax_rate'                 then sc.instore_tax_rate                 = value
           when 'length_unit'                      then sc.length_unit                      = value
           when 'weight_unit'                      then sc.weight_unit                      = value
           when 'download_instructions'            then sc.download_instructions            = value

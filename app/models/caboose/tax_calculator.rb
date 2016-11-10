@@ -9,8 +9,7 @@ module Caboose
     
     def self.tax(invoice)
       sc = invoice.site.store_config                                                      
-      return self.custom_tax(sc, invoice) if !sc.auto_calculate_tax
-      
+
       if invoice.instore_pickup
         if sc.instore_tax_rate.nil?
           Caboose.log("Error: Null in-store tax rate")
@@ -19,6 +18,7 @@ module Caboose
         return invoice.subtotal * sc.instore_tax_rate
       end
 
+      return self.custom_tax(sc, invoice) if !sc.auto_calculate_tax
       return 0.00 if !invoice.shipping_address 
       return 0.00 if !invoice.has_taxable_items?
       return 0.00 if !invoice.has_shippable_items?

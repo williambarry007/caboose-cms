@@ -61,7 +61,7 @@ module Caboose
       carriers.each do |name, carrier|          
         if sp.uses_carrier(name)                        
           resp = carrier.find_rates(origin, destination, package)                        
-          resp.rates.sort_by(&:price).each do |rate|                            
+          resp.rates.sort_by(&:price).each do |rate|
             sm = ShippingMethod.where( :carrier => name, :service_code => rate.service_code, :service_name => rate.service_name).first
             sm = ShippingMethod.create(:carrier => name, :service_code => rate.service_code, :service_name => rate.service_name) if sm.nil?
             next if !sp.uses_shipping_method(sm)
@@ -94,6 +94,7 @@ module Caboose
       #Caboose.log(op.shipping_method.inspect)
 
       sm = op.shipping_method
+      Caboose.log(sm.inspect)      
       package = op.activemerchant_package                                        
       resp = carrier.find_rates(origin, destination, package)                        
       resp.rates.sort_by(&:price).each do |rate|

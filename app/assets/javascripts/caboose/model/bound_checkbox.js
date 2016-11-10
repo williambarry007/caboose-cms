@@ -43,7 +43,7 @@ BoundCheckbox = BoundControl.extend({
     $('#'+this.el+'_container').append(cb);
     
     if (this.attribute.align == 'right')
-      $('#'+this.el).css('left', this.attribute.width - 10)
+      $('#'+this.el).css('left', this.attribute.width - 24)
     else if (this.attribute.align == 'center')
       $('#'+this.el).css('left', Math.floor($('#'+this.el+'_container').outerWidth()/2))
     else // left

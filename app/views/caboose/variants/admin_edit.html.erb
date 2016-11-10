@@ -103,7 +103,6 @@ $(document).ready(function() {
     update_url: '/admin/products/<%= v.product_id %>/variants/<%= v.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-<<<<<<< Updated upstream
       <% if p.option1 %>{ name: 'option1'            , nice_name: <%= raw Caboose.json(p.option1) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option1                      ) %> },<% end %>
       <% if p.option2 %>{ name: 'option2'            , nice_name: <%= raw Caboose.json(p.option2) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option2                      ) %> },<% end %>
       <% if p.option3 %>{ name: 'option3'            , nice_name: <%= raw Caboose.json(p.option3) %> , type: 'text'     , align: 'right' , width: 250, value: <%= raw Caboose.json(v.option3                      ) %> },<% end %>
@@ -138,7 +137,7 @@ $(document).ready(function() {
         value: <%= raw Caboose.json("#{v.flat_rate_shipping_package_id}_#{v.flat_rate_shipping_method_id}") %>,
         text:  <%= raw Caboose.json(v.flat_rate_shipping_package && v.flat_rate_shipping_method ? "#{v.flat_rate_shipping_package.name} - #{v.flat_rate_shipping_method.service_name}" : '') %>         
       },
-      { name: 'is_bundle'                            , nice_name: 'Is Bundle'                       , type: 'checkbox' , align: 'right' , width: 175, value: <%= raw Caboose.json(v.is_bundle ? 1 : 0             ) %> , 
+      { name: 'is_bundle'                            , nice_name: 'Is Bundle'                       , type: 'checkbox' , align: 'right' , width: 500, value: <%= raw Caboose.json(v.is_bundle ? 1 : 0             ) %> , 
         after_update: function() {
           if ($('#variant_<%= v.id %>_is_bundle').is(':checked'))
             vcc.print();
@@ -146,15 +145,15 @@ $(document).ready(function() {
             vcc.hide();          
         }
       },      
-      { name: 'is_subscription'                      , nice_name: 'Is Subscription'                  , type: 'checkbox' , align: 'right' , width: 400, value: <%= raw Caboose.json(v.is_subscription ? 1 : 0          ) %> },                    
-      { name: 'subscription_interval'                , nice_name: 'Interval'                         , type: 'select'   , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_interval            ) %>  , options_url: '/admin/variants/subscription-interval-options' },
-      { name: 'subscription_prorate'                 , nice_name: 'Prorate'                          , type: 'checkbox' , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_prorate             ) %> },
-      { name: 'subscription_prorate_method'          , nice_name: 'Prorate method'                   , type: 'select'   , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_prorate_method      ) %>  , options_url: '/admin/variants/subscription-prorate-method-options' },
-      { name: 'subscription_prorate_flat_amount'     , nice_name: 'Prorate flat amount'              , type: 'text'     , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_prorate_flat_amount ) %> },
-      { name: 'subscription_prorate_function'        , nice_name: 'Custom Prorate Function'          , type: 'textarea' , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_prorate_function    ) %>  , height: 100 },
-      { name: 'subscription_start_on_day'            , nice_name: 'Start on day'                     , type: 'checkbox' , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_start_on_day        ) %> },
-      { name: 'subscription_start_day'               , nice_name: 'Start day'                        , type: 'select'   , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_start_day           ) %>  , options_url: '/admin/variants/subscription-start-day-options' },
-      { name: 'subscription_start_month'             , nice_name: 'Start month'                      , type: 'select'   , align: 'right' , width: 400, value: <%= raw Caboose.json(v.subscription_start_month         ) %>  , options_url: '/admin/variants/subscription-start-month-options' }
+      { name: 'is_subscription'                      , nice_name: 'Is Subscription'                  , type: 'checkbox' , align: 'right' , width: 500, value: <%= raw Caboose.json(v.is_subscription ? 1 : 0          ) %> },                    
+      { name: 'subscription_interval'                , nice_name: 'Interval'                         , type: 'select'   , align: 'right' , width: 500, value: <%= raw Caboose.json(v.subscription_interval            ) %>  , options_url: '/admin/variants/subscription-interval-options' },
+      { name: 'subscription_prorate'                 , nice_name: 'Prorate'                          , type: 'checkbox' , align: 'right' , width: 500, value: <%= raw Caboose.json(v.subscription_prorate             ) %> },
+      { name: 'subscription_prorate_method'          , nice_name: 'Prorate method'                   , type: 'select'   , align: 'right' , width: 500, value: <%= raw Caboose.json(v.subscription_prorate_method      ) %>  , options_url: '/admin/variants/subscription-prorate-method-options' },
+      { name: 'subscription_prorate_flat_amount'     , nice_name: 'Prorate flat amount'              , type: 'text'     , align: 'right' , width: 500, value: <%= raw Caboose.json(v.subscription_prorate_flat_amount ) %> },
+      { name: 'subscription_prorate_function'        , nice_name: 'Custom Prorate Function'          , type: 'textarea' , align: 'right' , width: 500, value: <%= raw Caboose.json(v.subscription_prorate_function    ) %>  , height: 100 },
+      { name: 'subscription_start_on_day'            , nice_name: 'Start on day'                     , type: 'checkbox' , align: 'right' , width: 500, value: <%= raw Caboose.json(v.subscription_start_on_day        ) %> },
+      { name: 'subscription_start_day'               , nice_name: 'Start day'                        , type: 'select'   , align: 'right' , width: 500, value: <%= raw Caboose.json(v.subscription_start_day           ) %>  , options_url: '/admin/variants/subscription-start-day-options' },
+      { name: 'subscription_start_month'             , nice_name: 'Start month'                      , type: 'select'   , align: 'right' , width: 500, value: <%= raw Caboose.json(v.subscription_start_month         ) %>  , options_url: '/admin/variants/subscription-start-month-options' }
     ]
   });  
   vcc = new VariantChildrenController({

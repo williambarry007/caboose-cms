@@ -3,6 +3,7 @@ module Caboose
     layout 'caboose/admin'
 
     # @route GET /admin/variant-limits/json
+    # @route GET /admin/users/:user_id/variant-limits/json
     def admin_json 
       render :json => false and return if !user_is_allowed_to 'view', 'variantlimits'
       pager = Caboose::Pager.new(params, {
@@ -23,6 +24,7 @@ module Caboose
     end
 
     # @route GET /admin/variant-limits/:id/json
+    # @route GET /admin/users/:user_id/variant-limits/:id/json
     def admin_json_single
       render :json => false and return if !user_is_allowed_to 'edit', 'variantlimits'
       variantlimit = VariantLimit.find(params[:id])
@@ -49,6 +51,7 @@ module Caboose
     end
       
     # @route PUT /admin/variant-limits/:id
+    # @route PUT /admin/users/:user_id/variant-limits/:id
     def admin_update
       return unless (user_is_allowed_to 'edit', 'variantlimits')
       resp = Caboose::StdClass.new
@@ -74,9 +77,16 @@ module Caboose
     end
 
     # @route GET /admin/users/:user_id/variant-limits
+    def admin_user_index
+      return unless (user_is_allowed_to 'edit', 'users')
+      @edituser = Caboose::User.find(params[:user_id])
+    end
+    
+    # @route GET /admin/users/:user_id/variant-limits/:id
     def admin_edit
       return unless (user_is_allowed_to 'edit', 'users')
       @edituser = Caboose::User.find(params[:user_id])
+      @variant_limit = Caboose::VariantLimit.find(params[:id])
     end
 
     # @route_priority 1

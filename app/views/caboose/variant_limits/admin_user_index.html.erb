@@ -1,0 +1,38 @@
+<%= render :partial => 'caboose/users/admin_header' %> 
+
+<div id='variant-limits'></div>
+
+<%= render :partial => 'caboose/users/admin_footer' %> 
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'variant-limits',
+    base_url: '/admin/users/<%= @edituser.id %>/variant-limits',
+    allow_bulk_edit: false,
+    allow_bulk_delete: false,
+    allow_duplicate: false,
+    allow_advanced_edit: true,
+    allow_import: false,
+    fields: [ 
+      { show: true, editable: true , bulk_edit: false, name: 'variant_id'         , nice_name: 'Product Variant'  , sort: 'variant_id'         , type: 'select'   , value: function(r) { return r.variant_id          }, width: 150  , text: function(r) { return (r.variant ? (r.variant.alternate_id ? r.variant.alternate_id : r.variant.id) : '') }, options_url: '/admin/variant-limits/variant-options' },
+      { show: true, editable: true , bulk_edit: false, name: 'min_quantity_value' , nice_name: 'Min Qty Value'    , sort: 'min_quantity_value' , type: 'text'     , value: function(r) { return r.min_quantity_value  }, width: 150 },
+      { show: true, editable: true , bulk_edit: false, name: 'min_quantity_func'  , nice_name: 'Min Qty Function' , sort: 'min_quantity_func'  , type: 'textarea' , value: function(r) { return r.min_quantity_func   }, width: 150 },
+      { show: true, editable: true , bulk_edit: false, name: 'max_quantity_value' , nice_name: 'Max Qty Value'    , sort: 'max_quantity_value' , type: 'text'     , value: function(r) { return r.max_quantity_value  }, width: 150 },
+      { show: true, editable: true , bulk_edit: false, name: 'max_quantity_func'  , nice_name: 'Max Qty Function' , sort: 'max_quantity_func'  , type: 'textarea' , value: function(r) { return r.max_quantity_func   }, width: 150 },
+      { show: true, editable: false, bulk_edit: false, name: 'current_value'      , nice_name: 'Purchased'        , sort: 'current_value'      , type: 'text'     , value: function(r) { return r.current_value       }, width: 150 }
+    ],
+    new_model_text: 'New Variant Limit',
+    new_model_fields: [
+      { name: 'variant_id', nice_name: 'Product', type: 'select', width: 400, options_url: '/admin/variant-limits/variant-options' },
+      { name: 'user_id', nice_name: 'User', type: 'hidden', width: 400, value: <%= @edituser.id %> }
+    ]    
+  });
+});
+</script>
+<% end %>

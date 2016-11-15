@@ -1,6 +1,12 @@
 <%= render :partial => 'caboose/users/admin_header' %> 
 
-<div id='variant-limits'></div>
+<h2>Edit Variant Limit</h2>
+<p><div id='variantlimit_<%= @variant_limit.id %>_variant_id'         ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_min_quantity_value' ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_min_quantity_func'  ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_max_quantity_value' ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_max_quantity_func'  ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_current_value'      ></div></p>
 
 <%= render :partial => 'caboose/users/admin_footer' %> 
 
@@ -9,28 +15,20 @@
 <script type='text/javascript'>
 
 $(document).ready(function() {
-  var that = this;
-  var table = new IndexTable({    
-    form_authenticity_token: '<%= form_authenticity_token %>',
-    container: 'variant-limits',
-    base_url: '/admin/variant-limits',
-    allow_bulk_edit: false,
-    allow_bulk_delete: false,
-    allow_duplicate: false,
-    allow_advanced_edit: false,
-    allow_import: false,
-    fields: [ 
-      { show: true  , editable: true, bulk_edit: false, name: 'variant_id'        , nice_name: 'Product Variant'        , sort: 'variant_id'        , type: 'select'   , value: function(r) { return r.variant_id }, text: function(r) { return (r.variant ? (r.variant.alternate_id ? r.variant.alternate_id : r.variant.id) : '') }, width: 150, options_url: '/admin/variant-limits/variant-options' },
-      { show: true  , editable: true, bulk_edit: false, name: 'min_quantity'        , nice_name: 'Min Qty'        , sort: 'min_quantity'        , type: 'text'   , value: function(r) { return r.min_quantity }, width: 150 },
-      { show: true  , editable: true, bulk_edit: false, name: 'max_quantity'        , nice_name: 'Max Qty'        , sort: 'max_quantity'        , type: 'text'   , value: function(r) { return (r.max_quantity == null || r.max_quantity == '' ? 0 : r.max_quantity) }, width: 150 },
-      { show: true  , editable: false, bulk_edit: false, name: 'current_value'        , nice_name: 'Purchased'        , sort: 'current_value'        , type: 'text'   , value: function(r) { return (r.current_value ) }, width: 150 }
-    ],
-    new_model_text: 'New Variant Limit',
-    new_model_fields: [
-      { name: 'variant_id', nice_name: 'Product', type: 'select', width: 400, options_url: '/admin/variant-limits/variant-options' },
-      { name: 'user_id', nice_name: 'User', type: 'hidden', width: 400, value: <%= @edituser.id %> }
+  new ModelBinder({
+    name: 'VariantLimit',
+    id: <%= @variant_limit.id %>,
+    update_url: '/admin/variant-limits/<%= @variant_limit.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'variant_id'         , nice_name: 'Product Variant'  , type: 'select'   , value: <%= raw Caboose.json(@variant_limit.variant_id         ) %>, width: 600  , options_url: '/admin/variant-limits/variant-options' },
+      { name: 'min_quantity_value' , nice_name: 'Min Qty Value'    , type: 'text'     , value: <%= raw Caboose.json(@variant_limit.min_quantity_value ) %>, width: 600 },
+      { name: 'min_quantity_func'  , nice_name: 'Min Qty Function' , type: 'textarea' , value: <%= raw Caboose.json(@variant_limit.min_quantity_func  ) %>, width: 600 , height: 100 },
+      { name: 'max_quantity_value' , nice_name: 'Max Qty Value'    , type: 'text'     , value: <%= raw Caboose.json(@variant_limit.max_quantity_value ) %>, width: 600 },
+      { name: 'max_quantity_func'  , nice_name: 'Max Qty Function' , type: 'textarea' , value: <%= raw Caboose.json(@variant_limit.max_quantity_func  ) %>, width: 600 , height: 100 },
+      { name: 'current_value'      , nice_name: 'Purchased'        , type: 'text'     , value: <%= raw Caboose.json(@variant_limit.current_value      ) %>, width: 600 }
     ]    
-  });
+  });      
 });
 </script>
 <% end %>

@@ -39,8 +39,8 @@ module Caboose
         c = VariantLimit.new
         c.user_id = params[:user_id]
         c.variant_id = params[:variant_id]
-        c.min_quantity = 0
-        c.max_quantity = 0
+        c.min_quantity_value = 0
+        c.max_quantity_value = 0
         c.current_value = 0
         c.save
         resp.success = true
@@ -58,11 +58,13 @@ module Caboose
 
         params.each do |k,v|
           case k
-            when "user_id" then variantlimit.user_id = v
-            when "variant_id" then variantlimit.variant_id = v
-            when "min_quantity" then variantlimit.min_quantity = v
-            when "max_quantity" then variantlimit.max_quantity = v
-            when "current_value" then variantlimit.current_value = v
+            when "user_id"            then variantlimit.user_id            = v
+            when "variant_id"         then variantlimit.variant_id         = v
+            when "min_quantity_value" then variantlimit.min_quantity_value = v
+            when "min_quantity_func"  then variantlimit.min_quantity_func  = v
+            when "max_quantity_value" then variantlimit.max_quantity_value = v
+            when "max_quantity_func"  then variantlimit.max_quantity_func  = v
+            when "current_value"      then variantlimit.current_value      = v
           end
         end
 

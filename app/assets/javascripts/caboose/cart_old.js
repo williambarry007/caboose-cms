@@ -124,7 +124,7 @@ Caboose.Store.Modules.Cart = (function() {
             if (!self.$add_to_cart.find('.message').length) {                            
               self.$add_to_cart
                 .append($('<div/>').hide().addClass('note error')
-                  .append($('<p/>').text(resp.error ? resp.error : (resp.errors ? resp.errors[0] : "Error adding to cart")))
+                  .append($('<p/>').text(response.error ? response.error : (response.errors ? response.errors[0] : "Error adding to cart")))
                   .append($('<p/>').append($('<a/>').attr('href', '/cart').html('View cart')))                                      
                 );                
               self.$add_to_cart.find('.message').fadeIn();              

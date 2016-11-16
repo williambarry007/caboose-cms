@@ -12,18 +12,18 @@ module Caboose
       :max_quantity_value ,
       :max_quantity_func  ,
       :current_value
-      
+
     def min_quantity
-      return self.min_quantity_value if self.min_quantity_func.nil? || self.min_quantity_func.strip.length == 0      
-      return eval(self.min_quantity_func)            
-    end
-    
-    def max_quantity      
-      return self.max_quantity_value if self.max_quantity_func.nil? || self.max_quantity_func.strip.length == 0      
-      return eval(self.max_quantity_func)            
+      return self.min_quantity_value if self.min_quantity_func.nil? || self.min_quantity_func.strip.length == 0
+      return eval(self.min_quantity_func)
     end
 
-    def quantity_message      
+    def max_quantity
+      return self.max_quantity_value if self.max_quantity_func.nil? || self.max_quantity_func.strip.length == 0
+      return eval(self.max_quantity_func)
+    end
+
+    def quantity_message
       if self.min_quantity == 0 && self.max_quantity == 0
         return "You are not allowed to purchase this item."
       end

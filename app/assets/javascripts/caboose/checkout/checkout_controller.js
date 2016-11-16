@@ -81,7 +81,7 @@ CheckoutController.prototype = {
       success: function(resp) {
         that.invoice = resp;        
         $.each(that.invoice.invoice_packages, function(i, op) {
-          that.invoice.invoice_packages[i].shipping_method_controller = new ShippingMethodController({ cc: that, invoice_package_id: op.id });
+          that.invoice.invoice_packages[i].shipping_method_controller = new ShippingMethodController({ cc: that, invoice_package_id: op.id, package_number: i });
         });                
         if (!that.invoice.shipping_address) that.invoice.shipping_address = that.empty_address();
         //if (!that.invoice.billing_address)  that.invoice.billing_address  = that.empty_address();
@@ -188,31 +188,35 @@ CheckoutController.prototype = {
   
   print_ready_message: function()
   {
-    var that = this;
-    var ready = true;
-    if (!that.shipping_address_controller.ready()) ready = false;            
-    if (that.invoice.payment_terms == 'pia' && !that.payment_method_controller.ready()) ready = false;
+    var that = this;    
+    var msg = that.shipping_address_controller.ready_error();
+    if (!msg && that.invoice.payment_terms == 'pia') msg = that.payment_method_controller.ready_error()        
+    $.each(that.invoice.invoice_packages, function(i, op) {
+      if (!msg) msg = that.invoice.invoice_packages[i].shipping_method_controller.ready_error();        
+    });
 
-    if (ready)
+    if (msg)
+    {
+      $('#message').empty().append($('<p/>').addClass('note warning').append(msg));
+    }
+    else
     {
       $('#message').empty().append($('<p/>').append($('<input/>').attr('type', 'button').val('Continue to Confirmation').click(function(e) {
         that.print(true);          
       })));
-    }
-    else
-    {
-      $('#message').empty().append($('<p/>').addClass('note warning').append("Please complete all the fields."));
     }
   },
   
   print_confirm_message: function()
   {
     var that = this;
-    var ready = true;
-    if (!that.shipping_address_controller.ready()) ready = false;            
-    if (that.invoice.payment_terms == 'pia' && !that.payment_method_controller.ready()) ready = false;
-
-    if (!ready)
+    var msg = that.shipping_address_controller.ready_error();
+    if (!msg && that.invoice.payment_terms == 'pia') msg = that.payment_method_controller.ready_error();
+    $.each(that.invoice.invoice_packages, function(i, op) {
+      if (!msg) msg = that.invoice.invoice_packages[i].shipping_method_controller.ready_error();        
+    });
+    
+    if (msg)
     {
       that.refresh_and_print();      
       return;

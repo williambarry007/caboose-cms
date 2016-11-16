@@ -212,13 +212,13 @@ StripePaymentMethodController.prototype = {
     });    
   },
   
-  ready: function()
+  ready_error: function()
   {
     var that = this;
-    if (that.cc.invoice.total <= 0.00) return true;
-    if (!that.customer_id ) return false;
-    if (!that.card_brand  ) return false;
-    if (!that.card_last4  ) return false;
-    return true;
+    if (that.cc.invoice.total <= 0.00) return null;
+    if (!that.customer_id ) return "Please enter your credit card information.";
+    if (!that.card_brand  ) return "Please enter your credit card information.";
+    if (!that.card_last4  ) return "Please enter your credit card information.";
+    return null;
   }
 };

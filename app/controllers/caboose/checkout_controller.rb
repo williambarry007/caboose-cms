@@ -313,14 +313,14 @@ module Caboose
       add_ga_event('Ecommerce', 'Checkout', 'Payment', (@last_invoice.total*100).to_i)
     end
     
-    #===========================================================================    
+    #===========================================================================
     
     # @route GET /checkout/state-options
     def state_options                            
       options = Caboose::States.all.collect { |abbr, state| { 'value' => abbr, 'text' => abbr }}
       render :json => options
     end
-        
+                
     # @route GET /checkout/total
     def verify_total
       total = 0.00

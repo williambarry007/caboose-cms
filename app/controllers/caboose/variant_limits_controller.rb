@@ -39,11 +39,11 @@ module Caboose
         resp.error = 'That variant is already added to this user.'
       else
         c = VariantLimit.new
-        c.user_id = params[:user_id]
-        c.variant_id = params[:variant_id]
+        c.user_id            = params[:user_id]
+        c.variant_id         = params[:variant_id]
         c.min_quantity_value = 0
         c.max_quantity_value = 0
-        c.current_value = 0
+        c.current_value      = 0
         c.save
         resp.success = true
       end

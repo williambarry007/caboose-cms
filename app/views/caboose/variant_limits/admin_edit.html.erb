@@ -6,7 +6,9 @@
 <p><div id='variantlimit_<%= @variant_limit.id %>_min_quantity_func'  ></div></p>
 <p><div id='variantlimit_<%= @variant_limit.id %>_max_quantity_value' ></div></p>
 <p><div id='variantlimit_<%= @variant_limit.id %>_max_quantity_func'  ></div></p>
-<p><div id='variantlimit_<%= @variant_limit.id %>_current_value'      ></div></p>
+<p>Quantity Purchased: <%= @variant_limit.current_value %></p>
+
+<a href="/admin/users/<%= @edituser.id %>/variant-limits" class="caboose-btn">Back</a>
 
 <%= render :partial => 'caboose/users/admin_footer' %> 
 
@@ -25,8 +27,7 @@ $(document).ready(function() {
       { name: 'min_quantity_value' , nice_name: 'Min Qty Value'    , type: 'text'     , value: <%= raw Caboose.json(@variant_limit.min_quantity_value ) %>, width: 600 },
       { name: 'min_quantity_func'  , nice_name: 'Min Qty Function' , type: 'textarea' , value: <%= raw Caboose.json(@variant_limit.min_quantity_func  ) %>, width: 600 , height: 100 },
       { name: 'max_quantity_value' , nice_name: 'Max Qty Value'    , type: 'text'     , value: <%= raw Caboose.json(@variant_limit.max_quantity_value ) %>, width: 600 },
-      { name: 'max_quantity_func'  , nice_name: 'Max Qty Function' , type: 'textarea' , value: <%= raw Caboose.json(@variant_limit.max_quantity_func  ) %>, width: 600 , height: 100 },
-      { name: 'current_value'      , nice_name: 'Purchased'        , type: 'text'     , value: <%= raw Caboose.json(@variant_limit.current_value      ) %>, width: 600 }
+      { name: 'max_quantity_func'  , nice_name: 'Max Qty Function' , type: 'textarea' , value: <%= raw Caboose.json(@variant_limit.max_quantity_func  ) %>, width: 600 , height: 100 }
     ]    
   });      
 });

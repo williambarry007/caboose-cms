@@ -113,7 +113,7 @@ module Caboose
       vl = VariantLimit.where(:variant_id => v.id, :user_id => User.logged_out_user_id(@site.id)).first if vl.nil?      
       if vl && vl.no_purchases_allowed(@invoice)
         resp.error = "You don't have permission to purchase this item."
-        resp.error << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?        
+        resp.error << " You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?        
         render :json => resp
         return
       end
@@ -125,13 +125,20 @@ module Caboose
           if vl.qty_too_low(qty, @invoice)     then qty = vl.min_quantity(@invoice)
           elsif vl.qty_too_high(qty, @invoice) then qty = vl.max_quantity(@invoice)
           end
-        else
+        else   
           if vl.qty_too_low(qty, @invoice)
             qty = vl.min_quantity(@invoice)
             resp.quantity_message = "You must purchase at least #{vl.min_quantity(@invoice)} of this item, your cart has been updated."
           elsif vl.qty_too_high(qty2, @invoice)
-            qty = vl.max_quantity(@invoice) - vl.current_value
-            resp.quantity_message = "You can only purchase #{vl.max_quantity(@invoice)} of this item, your cart has been updated."
+            qty = vl.max_quantity(@invoice) - vl.current_value                      
+            if vl.max_quantity == vl.current_value            
+              resp.success = false
+              resp.error = "You have already purchased the maximum quantity allowed for this item."
+              render :json => resp
+              return
+            else
+              resp.quantity_message = "You can only purchase #{qty} of this item, your cart has been updated."
+            end
           end
         end
       end

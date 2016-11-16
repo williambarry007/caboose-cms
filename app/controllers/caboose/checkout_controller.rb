@@ -207,6 +207,8 @@ module Caboose
       
       resp = Caboose::StdClass.new
       sc = @site.store_config
+
+      @invoice.customer.create_variant_limits if @invoice.customer
       
       # Make sure all the variants still exist      
       @invoice.line_items.each do |li|

@@ -40,14 +40,14 @@ module Caboose
     # @route GET /cart/check-variant-limits
     def check_variant_limits
       resp = StdClass.new
-      resp.errors = []
+      errors = []
       
       if @invoice.nil?
-        resp.errors << "No invoice found."
+        errors << "No invoice found."
       else
         @invoice.line_items.each do |li|                
-          vl = VariantLimit.where(:variant_id => v.id, :user_id => @logged_in_user.id).first
-          vl = VariantLimit.where(:variant_id => v.id, :user_id => User.logged_out_user_id(@site.id)).first if vl.nil?
+          vl = VariantLimit.where(:variant_id => li.variant_id, :user_id => @logged_in_user.id).first
+          vl = VariantLimit.where(:variant_id => li.variant_id, :user_id => User.logged_out_user_id(@site.id)).first if vl.nil?
           next if vl.nil?
           
           if vl.no_purchases_allowed(@invoice)
@@ -61,7 +61,7 @@ module Caboose
             li.destroy
             @invoice.shipping = 0.00
 
-            resp.errors << "You don't have permission to purchase this item." + (!logged_in? ? "You may have different purchase permissions if you <a href='/login'>login</a>." : '')
+            errors << "You don't have permission to purchase this item." + (!logged_in? ? "You may have different purchase permissions if you <a href='/login'>login</a>." : '')
             next
             
           end
@@ -85,11 +85,11 @@ module Caboose
             end            
           end          
           li.save
-          resp.errors << error
+          errors << error
         end
-        if resp.errors.count > 0
+        if errors.count > 0
           @invoice.calculate
-          resp.error = resp.errors.join("<br/>")
+          resp.error = errors.join("<br/>")
         else
           resp.success = true
         end        

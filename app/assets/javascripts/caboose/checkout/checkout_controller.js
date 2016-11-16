@@ -240,7 +240,7 @@ CheckoutController.prototype = {
     {
       $('#message').html("<p class='loading'>Verifying order total...</p>");             
       $.get('/checkout/total', function(x) {
-        if (parseFloat(t) != that.invoice.total)
+        if (parseFloat(x) != that.invoice.total)
         {
           $('#message').html("<p class='note error'>It looks like the order total has changed since this was loaded. Please submit your order again after this page refreshes.</p>");
           setTimeout(function() { window.location.reload(true); }, 3000);        

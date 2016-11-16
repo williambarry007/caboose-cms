@@ -5,12 +5,15 @@ ShippingMethodController.prototype = {
 
   cc: false, // CheckoutController
   invoice_package_id: false,
+  invoice_package: false,
+  package_number: false,
     
   init: function(params)
   {
     var that = this;
     for (var i in params)
       that[i] = params[i];
+    that.invoice_package = that.cc.invoice_package_for_id(that.invoice_package_id);
   },
     
   print: function()
@@ -19,7 +22,7 @@ ShippingMethodController.prototype = {
     var div = $('<div/>');
     
     var sa = that.cc.invoice.shipping_address;
-    var op = that.cc.invoice_package_for_id(that.invoice_package_id);    
+    var op = that.invoice_package;    
     var sm = op && op.shipping_method ? op.shipping_method : false;     
     
     if (!op)
@@ -53,7 +56,7 @@ ShippingMethodController.prototype = {
   {
     var that = this;
     var div = $('<div/>').append($('<p/>').addClass('loading').html("Getting rates..."));
-    var op = that.cc.invoice_package_for_id(that.invoice_package_id);
+    var op = that.invoice_package;
     
     $('#invoice_package_' + that.invoice_package_id + '_shipping_method').empty().append(div);
       
@@ -91,7 +94,7 @@ ShippingMethodController.prototype = {
       });
       select.change(function(e) {
         var opt = $(this).find('option').filter(':selected');      
-        that.update(opt.val(), opt.data('total')); 
+        that.update(opt.val(), opt.data('total'));       
       });
     }
     div = $('<div/>')
@@ -103,9 +106,7 @@ ShippingMethodController.prototype = {
   },
   
   update: function(shipping_method_id, total)
-  {
-    //console.log('shipping_method_id = ' + shipping_method_id);
-    //console.log('total = ' + total);
+  {    
     var that = this;
     $.ajax({
       url: '/checkout/shipping',
@@ -115,10 +116,29 @@ ShippingMethodController.prototype = {
         shipping_method_id: shipping_method_id,
         total: total
       },
-      success: function(resp) {
+      success: function(resp) {        
         if (resp.error) $('#invoice_package_' + that.invoice_package_id + '_message').html("<p class='note error'>" + resp.error + "</p>");
-        if (resp.success) that.cc.refresh_totals();        
+        if (resp.success)
+        {          
+          that.invoice_package.shipping_method_id = shipping_method_id;
+          that.invoice_package.total = total;
+          that.cc.refresh_totals();
+        }
+        that.cc.print_ready_message();
       }
     });        
-  }  
+  },  
+  
+  ready_error: function()
+  {
+    var that = this;    
+    if (that.cc.allow_instore_pickup && that.cc.invoice.instore_pickup) return null;
+    if (that.cc.all_downloadable()) return null;
+        
+    var op = that.invoice_package;    
+    if (!op)                    return "Please select a shipping method for package " + (that.package_number + 1);
+    if (!op.shipping_method_id) return "Please select a shipping method for package " + (that.package_number + 1);
+    
+    return null;    
+  }
 };

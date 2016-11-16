@@ -99,7 +99,7 @@ Caboose.Store.Modules.Cart = (function() {
         type: $form.attr('method'),
         url: $form.attr('action'),
         data: $form.serialize(),
-        success: function(response) {          
+        success: function(response) {      
           if (response.success) {
             self.render_item_count(response.item_count);
             if (self.$add_to_cart.length) self.$add_to_cart.trigger('added');
@@ -123,9 +123,9 @@ Caboose.Store.Modules.Cart = (function() {
           } else {                        
             if (!self.$add_to_cart.find('.message').length) {                            
               self.$add_to_cart
-                .append($('<div/>').hide().addClass('note error')
-                  .append($('<p/>').text(response.error ? response.error : (response.errors ? response.errors[0] : "Error adding to cart")))
-                  .append($('<p/>').append($('<a/>').attr('href', '/cart').html('View cart')))                                      
+                .append($('<div/>').hide().addClass('message')
+                  .append($('<p/>').addClass('note error').html(response.error ? response.error : (response.errors ? response.errors[0] : "Error adding to cart")))
+             //     .append($('<p/>').append($('<a/>').attr('href', '/cart').html('View cart')))                                      
                 );                
               self.$add_to_cart.find('.message').fadeIn();              
             }            

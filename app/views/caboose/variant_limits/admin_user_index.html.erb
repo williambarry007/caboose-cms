@@ -21,10 +21,10 @@ $(document).ready(function() {
     allow_import: false,
     fields: [ 
       { show: true, editable: true , bulk_edit: false, name: 'variant_id'         , nice_name: 'Product Variant'  , sort: 'variant_id'         , type: 'select'   , value: function(r) { return r.variant_id          }, width: 150  , text: function(r) { return (r.variant ? (r.variant.alternate_id ? r.variant.alternate_id : r.variant.id) : '') }, options_url: '/admin/variant-limits/variant-options' },
-      { show: true, editable: true , bulk_edit: false, name: 'min_quantity_value' , nice_name: 'Min Qty Value'    , sort: 'min_quantity_value' , type: 'text'     , value: function(r) { return r.min_quantity_value  }, width: 150 },
-      { show: true, editable: true , bulk_edit: false, name: 'min_quantity_func'  , nice_name: 'Min Qty Function' , sort: 'min_quantity_func'  , type: 'textarea' , value: function(r) { return r.min_quantity_func   }, width: 150 },
-      { show: true, editable: true , bulk_edit: false, name: 'max_quantity_value' , nice_name: 'Max Qty Value'    , sort: 'max_quantity_value' , type: 'text'     , value: function(r) { return r.max_quantity_value  }, width: 150 },
-      { show: true, editable: true , bulk_edit: false, name: 'max_quantity_func'  , nice_name: 'Max Qty Function' , sort: 'max_quantity_func'  , type: 'textarea' , value: function(r) { return r.max_quantity_func   }, width: 150 },
+      { show: true, editable: true , bulk_edit: false, name: 'min_quantity_value' , nice_name: 'Min Qty'    , sort: 'min_quantity_value' , type: 'text'     , value: function(r) { return r.min_quantity_value  }, width: 150 },
+      { show: false, editable: true , bulk_edit: false, name: 'min_quantity_func'  , nice_name: 'Min Qty Function' , sort: 'min_quantity_func'  , type: 'textarea' , value: function(r) { return r.min_quantity_func   }, width: 150 },
+      { show: true, editable: true , bulk_edit: false, name: 'max_quantity_value' , nice_name: 'Max Qty'    , sort: 'max_quantity_value' , type: 'text'     , value: function(r) { return r.max_quantity_value  }, width: 150 },
+      { show: false, editable: true , bulk_edit: false, name: 'max_quantity_func'  , nice_name: 'Max Qty Function' , sort: 'max_quantity_func'  , type: 'textarea' , value: function(r) { return r.max_quantity_func   }, width: 150 },
       { show: true, editable: false, bulk_edit: false, name: 'current_value'      , nice_name: 'Purchased'        , sort: 'current_value'      , type: 'text'     , value: function(r) { return r.current_value       }, width: 150 }
     ],
     new_model_text: 'New Variant Limit',

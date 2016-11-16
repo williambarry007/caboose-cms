@@ -14,12 +14,12 @@ module Caboose
       :current_value
 
     def min_quantity
-      return self.min_quantity_value if self.min_quantity_func.nil? || self.min_quantity_func.strip.length == 0
+      return self.min_quantity_value if self.min_quantity_func.blank?
       return eval(self.min_quantity_func)
     end
 
     def max_quantity
-      return self.max_quantity_value if self.max_quantity_func.nil? || self.max_quantity_func.strip.length == 0
+      return self.max_quantity_value if self.max_quantity_func.blank?
       return eval(self.max_quantity_func)
     end
 

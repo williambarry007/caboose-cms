@@ -46,14 +46,14 @@ var AdminCalendarEventModalController = ModalController.extend({
       var div = $('<div/>')
         .append($('<h1/>').append('Edit Event'))
         .append($('<p/>').addClass('loading').append("Getting event details..."));
-      that.modal(div, 600);      
+      that.modal(div, 800);      
       that.refresh(function() { that.print(); });
       return;
     }    
     if (!that.edit_recurring && that.event.repeats == true)
     {
       var div = that.edit_recurring_form();      
-      that.modal(div, 600);
+      that.modal(div, 800);
       return;      
     }
                      
@@ -105,10 +105,11 @@ var AdminCalendarEventModalController = ModalController.extend({
         { name: 'end_date'    , nice_name: 'End'          , type: 'date'     , value: pretty_date(e.end_date   ) , width: 150, after_update: function() {}, align: 'right' },
         { name: 'end_time'    , nice_name: 'End'          , type: 'time'     , value: pretty_time(e.end_date   ) , width: 100, after_update: function() {}, fixed_placeholder: false },
         { name: 'all_day'     , nice_name: 'All day'      , type: 'checkbox' , value: e.all_day ? 1 : 0          , width: 115, after_update: function() { e.all_day = this.value; that.after_all_day_update(); } },
-        { name: 'repeats'     , nice_name: 'Repeats'      , type: 'checkbox' , value: e.repeats ? 1 : 0          , width: 130, after_update: function() { e.repeats = this.value; that.after_repeats_update(); } }      
+        { name: 'repeats'     , nice_name: 'Repeats'      , type: 'checkbox' , value: e.repeats ? 1 : 0          , width: 130, after_update: function() { e.repeats = this.value; g.refresh; that.after_repeats_update(); } }      
       ],
       on_load: function() { that.autosize(); }    
     });  
+    console.log(g);
     new ModelBinder({
       name: 'CalendarEventGroup',
       id: g.id,

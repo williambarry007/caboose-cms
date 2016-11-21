@@ -99,7 +99,6 @@ var AdminCalendarController = Class.extend({
           name = ev.name + ' - ' + pretty_time(ev.begin_date);
         }
         ul.append($('<li/>').append($('<a/>').attr('href', '#').addClass('event_link').html(name).data('event_id', ev.id).click(function(e) {
-          console.log(ev);
           e.preventDefault();
           e.stopPropagation();
           that.edit_calendar_event($(this).data('event_id'));                         
@@ -132,7 +131,7 @@ var AdminCalendarController = Class.extend({
       if ((day + start_day - 1) % 7 == 0)
       {
         tbody.append(tr);
-        if (day < days_in_month)
+        if (day <= days_in_month)
           tr = $('<tr/>');
       }
       tr.append($('<td/>').attr('id', 'day_' + F).data('F', F)
@@ -205,7 +204,7 @@ var AdminCalendarController = Class.extend({
       event_id: false,
       new_event_date: d,
       parent_controller: this,
-      modal_width: 600
+      modal_width: 805
     });    
   },
   
@@ -216,7 +215,7 @@ var AdminCalendarController = Class.extend({
       calendar_id: that.calendar_id,
       event_id: event_id,      
       parent_controller: this,
-      modal_width: 600
+      modal_width: 805
     });    
   }    
 });

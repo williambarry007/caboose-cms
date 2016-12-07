@@ -3,19 +3,23 @@ store_config = @invoice.site.store_config
 %>
 <h1>Invoice #<%= @invoice.invoice_number %></h1>
 
-<div id='overview_table'></div>
-<% if @invoice.financial_status == Caboose::Invoice::FINANCIAL_STATUS_PENDING %>  
-  <div id='payment_form'></div>
-  <div id='payment_message'></div>
-  <iframe id="relay" name="relay" style='<% if @show_relay %>display: block; width: 800px; height: 400px; border: #000 1px solid;<% else %>display: none;<% end %>'></iframe>  
+<% if @invoice.status == Caboose::Invoice::STATUS_CART %>
+  <p class='note error'>This invoice is still in cart status. Please <a href='/checkout'>checkout</a> to view this invoice.</p>
+  <p><input type='button' value='< Back' class='btn' onclick="window.location='/my-account/invoices';" /></p>
+<% else %>
+  <div id='overview_table'></div>
+  <% if @invoice.financial_status == Caboose::Invoice::FINANCIAL_STATUS_PENDING %>  
+    <div id='payment_form'></div>
+    <div id='payment_message'></div>
+    <iframe id="relay" name="relay" style='<% if @show_relay %>display: block; width: 800px; height: 400px; border: #000 1px solid;<% else %>display: none;<% end %>'></iframe>  
+  <% end %>
+  <div id='invoice_table'></div>
+  <div id='message'></div>
+  <p>
+    <p><input type='button' value='< Back' class='btn' onclick="window.location='/my-account/invoices';" /></p>	
+  	<input type='button' value='Print Invoice' class='btn' onclick='window.location="/my-account/invoices/<%= @invoice.id %>/print";' />
+  </p>
 <% end %>
-<div id='invoice_table'></div>
-<div id='message'></div>
-
-<p>
-	<input type='button' value='< Back' class='btn' onclick="window.location='/my-account/invoices';" />
-	<input type='button' value='Print Invoice' class='btn' onclick='window.location="/my-account/invoices/<%= @invoice.id %>/print";' />
-</p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'https://js.stripe.com/v2/' %>
@@ -25,6 +29,7 @@ store_config = @invoice.site.store_config
 <%= javascript_include_tag 'caboose/my_account_payment_method_controller' %>
 <script type='text/javascript'>
 
+<% if @invoice.status != Caboose::Invoice::STATUS_CART %>
 var controller = false;
 $(document).ready(function() {
   controller = new MyAccountInvoiceController({ 
@@ -32,6 +37,7 @@ $(document).ready(function() {
     authenticity_token: <%= raw Caboose.json(form_authenticity_token) %>
   });
 });
+<% end %>
 
 </script>
 <% end %>

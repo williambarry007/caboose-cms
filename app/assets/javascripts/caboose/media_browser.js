@@ -8,6 +8,7 @@ MediaBrowser.prototype = {
   cat: false,
   cat_id: false,
   categories: false,  
+  media: false,
   s3_upload_url: false,
 	aws_access_key_id: false,		
 	policy: false,
@@ -131,7 +132,7 @@ MediaBrowser.prototype = {
       async: false,
       data: { media_category_id: that.cat_id },
       success: function(resp) { 
-        that.cat = resp;
+        that.media = resp;
         that.cat_id = that.cat.id;
         that.selected_media = [];
         that.print_media();
@@ -184,10 +185,10 @@ MediaBrowser.prototype = {
     var processing = false;
     var d = new Date();
     d = d.getTime();
-        
-    if (that.cat.media.length > 0)
+
+    if (that.media.length > 0)
     {      
-      $.each(that.cat.media, function(i, m) {
+      $.each(that.media, function(i, m) {
         if (m.media_type == 'image' && m.processed == false)
           processing = true
         var li = $('<li/>')          
@@ -213,7 +214,7 @@ MediaBrowser.prototype = {
     if (modal)
       modal.autosize();
     
-    $.each(that.cat.media, function(i, m) {
+    $.each(that.media, function(i, m) {
       $('li.media').draggable({
         multiple: true,
         revert: 'invalid',

@@ -441,14 +441,14 @@ module Caboose
     
     def to_json
       {
-        :base_url       => @options['base_url'],
-        :sort           => @options['sort'],
-        :desc           => @options['desc'],
-        :item_count     => @options['item_count'],  		
-        :items_per_page => @options['items_per_page'],
-        :page           => @options['page'],		  		
+        :base_url       => @options ? @options['base_url']       : nil,
+        :sort           => @options ? @options['sort']           : nil,
+        :desc           => @options ? @options['desc']           : nil,
+        :item_count     => @options ? @options['item_count']     : nil,  		
+        :items_per_page => @options ? @options['items_per_page'] : nil,
+        :page           => @options ? @options['page']           : nil,		  		
         :use_url_params => @use_url_params  				  		
-      }
+      }.to_json
     end
   end
 end

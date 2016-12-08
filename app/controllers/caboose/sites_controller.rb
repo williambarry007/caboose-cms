@@ -37,14 +37,14 @@ module Caboose
         'description'       => '',
         'name_like'         => '',
         'description_like'  => '',
-      }      
+      }
       pager = Caboose::Pager.new(params, h, {      
-        'model' => 'Caboose::Site',
-        'sort'  => 'name',
-        'desc'  => 'false',
-        'base_url' => "/admin/sites",
+        'model'          => 'Caboose::Site',
+        'sort'           => 'name',
+        'desc'           => 'false',
+        'base_url'       => "/admin/sites",
         'items_per_page' => 1000        
-      })      
+      })
       render :json => {
         :pager => pager,
         :models => pager.items.as_json(:include => :domains)

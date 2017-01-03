@@ -57,7 +57,7 @@ Gem::Specification.new do |s|
   s.add_dependency "nokogiri-styles"
   s.add_dependency 'delayed_job_active_record'  
   s.add_dependency 'aws-sdk', '< 2.0'
-  s.add_dependency 'asset_sync'
+  s.add_dependency 'asset_sync', '~> 1.3.0'
   s.add_dependency 'unf'
   s.add_dependency 'highline'
   

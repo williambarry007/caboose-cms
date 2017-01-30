@@ -7,11 +7,12 @@
 <p>Order #<%= @invoice.invoice_number %></p>
 
 <% if @invoice.customer %>
+  <% c = @invoice.customer %>
   <h2>Customer</h2>
   <p>
-    <%= @customer.first_name %> <%= @customer.last_name %><br />
-    <a href='mailto:<%= @customer.email %>'><%= @customer.email %></a><br />
-    <% if @customer.phone %><%= raw @customer.phone %><% end %>
+    <%= c.first_name %> <%= c.last_name %><br />
+    <a href='mailto:<%= c.email %>'><%= c.email %></a><br />
+    <% if c.phone %><%= raw c.phone %><% end %>
   </p>
 <% end %>
 

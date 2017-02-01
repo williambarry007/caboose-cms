@@ -200,6 +200,7 @@ module Caboose
     def confirm
       render :json => { :error => 'Not logged in.'            } and return if !logged_in?
       #render :json => { :error => 'Invalid billing address.'  } and return if @invoice.billing_address.nil?
+      render :json => { :error => 'Cart is empty.'            } and return if @invoice.line_items.nil? or @invoice.line_items.count == 0
       if !@invoice.instore_pickup && @invoice.has_shippable_items?
         render :json => { :error => 'Invalid shipping address.' } and return if @invoice.shipping_address.nil?      
         render :json => { :error => 'Invalid shipping methods.' } and return if @invoice.has_empty_shipping_methods?

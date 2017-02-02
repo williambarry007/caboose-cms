@@ -1,5 +1,6 @@
 module Caboose
   class PostsController < ApplicationController
+    layout 'caboose/admin'
     
     helper :application
      
@@ -32,21 +33,30 @@ module Caboose
     # Admin actions
     #=============================================================================
     
+    # @route_priority 100
     # @route GET /admin/posts
     def admin_index
+      return if !user_is_allowed('posts', 'view')            
+    end
+
+    # @route GET /admin/posts/json
+    def admin_json
       return if !user_is_allowed('posts', 'view')
         
-      @gen = Caboose::PageBarGenerator.new(params, {
+      pager = PageBarGenerator.new(params, {
           'site_id'     => @site.id,
-          'name'        => ''
+          'title_like'  => '',
       },{
           'model'       => 'Caboose::Post',
-          'sort'        => 'created_at DESC',
-          'desc'        => false,
-          'base_url'    => '/admin/posts'
+          'sort'        => 'created_at',
+          'desc'        => true,
+          'base_url'    => '/admin/posts',
+          'use_url_params' => false
       })
-      @posts = @gen.items    
-      render :layout => 'caboose/admin'
+      render :json => {
+        :pager => pager,
+        :models => pager.items.as_json()        
+      }
     end
     
     # @route GET /admin/posts/:id/json

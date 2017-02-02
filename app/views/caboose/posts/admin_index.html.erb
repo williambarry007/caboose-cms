@@ -1,37 +1,36 @@
 <h1>Posts</h1>
-<p><input type='button' value='New Post' onclick="window.location='/admin/posts/new';" /></p>
-
-<% if @posts && @posts.count > 0 %>
-  <table class='data'>
-    <tr>
-      <%= raw @gen.sortable_table_headings({
-  				'id'         => 'ID #',
-          'published'  => 'Published',
-  				'title'	     => 'Title',
-  		#		'body'       => 'Body',
-  				'created_at' => 'Date Created'
-  			})
-  		%>
-    </tr>
-    <% @posts.each do |p| %>
-      <tr onclick="window.location='/admin/posts/<%= p.id %>';">
-        <td><%= raw p.id %></td>
-        <td><%= p.published ? "Yes" : "No" %></td>
-        <td><%= raw p.title %></td>
-   
-        <td><%= p.created_at.strftime("%m/%d/%Y") %></td>    
-      </tr>
-    <% end %>
-  </table>
-  <p><%= raw @gen.generate %></p>
-<% else %>
-  <p>There are no posts right now.</p>
-<% end %>
+<div id='posts'></div>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
 <script type='text/javascript'>
-$(document).ready(function() { 
-  var modal = new CabooseModal(800);
+
+$(document).ready(function() {  
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'posts',
+    base_url: '/admin/posts',
+    allow_bulk_import:   false ,
+    allow_bulk_edit:     false ,
+    allow_bulk_delete:   false ,
+    allow_duplicate:     false ,
+    allow_advanced_edit: true  ,
+    fields: [
+      { show: true , bulk_edit: false , name: 'title'        , nice_name: 'Title'        , sort: 'title'        , type: 'text'     , value: function(p) { return p.title                    }, width: 300 },
+      { show: true , bulk_edit: false , name: 'published'    , nice_name: 'Published'    , sort: 'published'    , type: 'checkbox' , value: function(p) { return p.published ? 'Yes' : 'No' }, width: 100 },
+      { show: true , bulk_edit: false , name: 'created_at'   , nice_name: 'Date Created' , sort: 'created_at'   , type: 'date'     , value: function(p) { return p.created_at               }, width: 100 },
+    ],
+    new_model_text: 'New Post',
+    no_models_text: 'There are no posts right now.',
+    new_model_fields: [
+      { name: 'title', nice_name: 'Title', type: 'text', width: 400 }
+    ],
+    search_fields: [
+      { name: 'title_like', nice_name: 'Title' , type: 'text', width: 400 },
+    ],
+  });
 });
+
 </script>
 <% end %>

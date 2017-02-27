@@ -18,10 +18,12 @@ module Caboose
       
       if params[:id]
         @post = Post.where(:id => params[:id]).first
+        render :layout => "caboose/application"
       else      
         # Find the page with an exact URI match        
         uri = "#{params[:year]}/#{params[:month]}/#{params[:day]}/#{params[:slug]}"
         @post = Post.where(:site_id => @site.id, :uri => request.fullpath).first
+        render :layout => "caboose/application"
       end      
       render :file => "caboose/extras/error404" and return if @post.nil?                 
 

@@ -218,7 +218,7 @@ module Caboose
       invalid_cost = false
       self.line_items.each do |li|
         invalid_cost = true if li.variant.nil? || li.variant.cost.nil?
-        x = x + (li.variant.cost * li.quantity)
+        x = (x + (li.variant.cost * li.quantity)) if (!li.variant.cost.blank? && !li.quantity.blank?)
       end
       return 0.00 if invalid_cost
       return x            

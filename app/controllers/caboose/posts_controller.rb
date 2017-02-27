@@ -1,6 +1,5 @@
 module Caboose
   class PostsController < ApplicationController
-    layout 'caboose/admin'
     
     helper :application
      
@@ -18,12 +17,12 @@ module Caboose
       
       if params[:id]
         @post = Post.where(:id => params[:id]).first
-        render :layout => "caboose/application"
+     #   render :layout => "caboose/application"
       else      
         # Find the page with an exact URI match        
         uri = "#{params[:year]}/#{params[:month]}/#{params[:day]}/#{params[:slug]}"
         @post = Post.where(:site_id => @site.id, :uri => request.fullpath).first
-        render :layout => "caboose/application"
+      #  render :layout => "caboose/application"
       end      
       render :file => "caboose/extras/error404" and return if @post.nil?                 
 
@@ -38,7 +37,8 @@ module Caboose
     # @route_priority 100
     # @route GET /admin/posts
     def admin_index
-      return if !user_is_allowed('posts', 'view')            
+      return if !user_is_allowed('posts', 'view')
+      render :layout => 'caboose/admin'           
     end
 
     # @route GET /admin/posts/json

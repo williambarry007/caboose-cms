@@ -1,4 +1,3 @@
-
 var MediaController = function(params) { this.init(params); };
 
 MediaController.prototype = {

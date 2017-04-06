@@ -1,4 +1,9 @@
-<p><img src='<%= @invoice.site.logo.url(:thumb) %>' /></p>
+<%
+logo = @invoice.site.logo.url(:thumb)
+logo = logo.gsub('//','https://') if !logo.nil?
+%>
+
+<p><img src='<%= logo %>' /></p>
 
 <h1>Receipt</h1>
 

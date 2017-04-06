@@ -1,6 +1,7 @@
 <%
 logo = @invoice.site.logo.url(:thumb)
 logo = logo.gsub('//','https://') if !logo.nil?
+
 %>
 
 <p><img src='<%= logo %>' /></p>

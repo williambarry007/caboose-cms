@@ -57,8 +57,7 @@ module Caboose
           redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)		  		
           return
         else
-          page.title = 'Access Denied'
-          #page.content = "<p class='note error'>You do not have access to view this page.</p>"
+          render :file => "caboose/extras/error404", :layout => "caboose/application", :formats => [:html]
         end
       end
 

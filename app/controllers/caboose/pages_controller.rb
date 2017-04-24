@@ -57,6 +57,7 @@ module Caboose
           redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)		  		
           return
         else
+          # go to 404 page
           render :file => "caboose/extras/error404", :layout => "caboose/application", :formats => [:html]
         end
       end

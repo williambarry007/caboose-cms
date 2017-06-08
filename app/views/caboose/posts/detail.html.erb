@@ -2,5 +2,5 @@
 <div class='post'>
   <h1><%= raw @post[:title] %></h1>
   <figure><img src="<%= @post.image.url(:medium) %>" /></figure>
-  <article><%= raw @article[:body] %></article>
+  <article><%= raw @post[:body] %></article>
 </div>

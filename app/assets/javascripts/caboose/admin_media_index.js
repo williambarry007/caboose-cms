@@ -154,7 +154,7 @@ MediaController.prototype = {
 		    file_data_name: 'file', // optional, but better be specified directly
 		    filters: {			
 		    	max_file_size: '100mb', // Maximum file size			
-		    	mime_types: [{ title: "Upload files", extensions: "jpg,jpeg,png,gif,tif,tiff,pdf,doc,docx,odt,odp,ods,ppt,pptx,xls,xlsx,zip,tgz,csv,txt" }] // Specify what files to browse for		    	
+		    	mime_types: [{ title: "Upload files", extensions: "jpg,jpeg,png,gif,tif,tiff,mp3,pdf,doc,docx,odt,odp,ods,ppt,pptx,xls,xlsx,zip,tgz,csv,txt" }] // Specify what files to browse for		    	
 		    },		
 		    flash_swf_url: '../../js/Moxie.swf', // Flash settings		
 		    silverlight_xap_url: '../../js/Moxie.xap', // Silverlight settings

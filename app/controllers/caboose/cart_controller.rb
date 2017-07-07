@@ -131,7 +131,7 @@ module Caboose
             resp.quantity_message = "You must purchase at least #{vl.min_quantity(@invoice)} of this item, your cart has been updated."
           elsif vl.qty_too_high(qty2, @invoice)
             qty = vl.max_quantity(@invoice) - vl.current_value                      
-            if vl.max_quantity == vl.current_value            
+            if vl.max_quantity(@invoice) == vl.current_value            
               resp.success = false
               resp.error = "You have already purchased the maximum quantity allowed for this item."
               render :json => resp

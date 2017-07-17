@@ -119,7 +119,7 @@ InvoiceController.prototype = {
         { name: 'tax'              , nice_name: 'Tax'                , type: 'text'     , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
         { name: 'handling'         , nice_name: 'Handling'           , type: 'text'     , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
         { name: 'custom_discount'  , nice_name: 'Discount'           , type: 'text'     , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'notes'            , nice_name: 'Notes (not public)' , type: 'textarea' , value: that.invoice.notes                 , width: 100, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 50 },
+        { name: 'notes'            , nice_name: 'Notes (not public)' , type: 'textarea' , value: that.invoice.notes                 , width: 500, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 100 },
         { name: 'customer_notes'   , nice_name: 'Customer Notes'     , type: 'textarea' , value: that.invoice.notes                 , width: 100, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 50 }
       ]
     });        
@@ -316,7 +316,8 @@ InvoiceController.prototype = {
         .append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_financial_status'))
         .append($('<div/>').attr('id', 'transactions').attr('align', 'center').append(transactions))
       );
-    table.append(tr);    
+    table.append(tr); 
+    table.append($('<tr/>').append($('<td/>').attr('align', 'left').html('Internal Notes')).append($('<td/>').attr('align','right').attr('colspan', '2').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_notes'))));  
     return table;  
   },
   

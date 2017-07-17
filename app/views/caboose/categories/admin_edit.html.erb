@@ -9,7 +9,7 @@
 <h2>Products</h2>
 
 <% if @category.products.any? %>
-  <ul>
+  <ul id="cat-products">
     <% @category.products.each do |product| %>
       <li><a href="/admin/products/<%= product.id %>/general"><%= product.title %></a></li>
     <% end %>
@@ -18,6 +18,12 @@
   <p>This category has no associated products.</p>
 <% end %>
 
+<div class="add-form">
+  <h5>Add Product to This Category</h5>
+  <input type="text" id="product-finder" placeholder="Product name" />
+  <ul id="product-results"></ul>
+</div>
+<br /><br />
 <div id="message"></div>
 <p>
 <input type="button" value="< Back" onclick="window.location='/admin/categories';" />
@@ -30,6 +36,12 @@
 <% content_for :caboose_css do %>
   <style>
     .push-below { margin-bottom: 24px; }
+    #product-results li {
+      cursor: pointer;
+    }
+    #product-results li:hover {
+      color: blue;
+    }
   </style>
 <% end %>
 
@@ -51,6 +63,45 @@ $(document).ready(function() {
       { name: 'image'      , nice_name: 'Image'   , type: 'image'   , value: <%= raw Caboose.json(@category.image.url(:medium)) %> , width: 200 }
     ]
   });
+});
+
+function add_product_to_category(product_id, title) {
+  $.ajax({
+    url: '/admin/categories/<%= @category.id %>/products/' + product_id + '/add',
+    type: 'put',
+    success: function(resp) {
+      $("#product-results").html("");
+      if ( resp && resp.success ) {
+        var a = $("<a />").attr('href','/admin/products' + product_id + '/general').text(title);
+        var li = $("<li />").append(a);
+        $("#cat-products").append(li);
+        $("#message").html("<p class='note success'>Product added to category.</p>");
+      }
+    }
+  });
+}
+
+$("#product-finder").keyup(function() {
+  var q = $("#product-finder").val();
+  var ul = $("#product-results");
+  ul.html("");
+  if ( q && q != '' ) {
+    $.ajax({
+      url: '/api/products/keyword',
+      data: {
+        query: q
+      },
+      type: 'get',
+      success: function(resp) {
+        if ( resp && resp.products && resp.products.length > 0 ) {
+          $.each(resp.products, function(k,v) {
+            var li = $("<li />").attr('onclick',"add_product_to_category(" + v.id + ",'" + v.title + "');return false;").text(v.title);
+            ul.append(li);
+          });
+        }
+      }
+    });
+  }
 });
 
 function delete_category(cat_id, confirm) {

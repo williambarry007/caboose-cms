@@ -275,6 +275,7 @@ module Caboose
         'vendor_name'  => '',
         'search_like'  => '',
         'category_id'  => '',
+        'status'       => 'Active',
         'price'        => params[:filters] && params[:filters][:missing_prices] ? 0 : ''
       }, {
         'model'          => 'Caboose::Product',
@@ -637,6 +638,16 @@ module Caboose
     def api_index
       render :json => Product.where(:status => 'Active')
     end
+
+    # @route GET /api/products/keyword
+    def api_keyword
+      query = params[:query]
+      resp = Caboose::StdClass.new({'products' => {}})
+      if query && !query.blank?
+        resp.products = Product.select('title, id').where(:site_id => @site.id).where('title ILIKE (?)',"%#{query}%").order(:title).limit(30)
+      end
+      render :json => resp
+    end
     
     # @route GET /api/products/:id
     def api_details
@@ -649,6 +660,9 @@ module Caboose
       p = Product.where(:id => params[:id]).first
       render :json => p ? p.variants : { :error => 'Invalid product ID' }
     end
+
+    
+
         
   end
 end

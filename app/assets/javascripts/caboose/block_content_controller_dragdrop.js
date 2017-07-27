@@ -129,7 +129,7 @@ BlockContentController.prototype = {
     });
   },
 
-  is_loading: function(loading, message = 'Loading...') {
+  is_loading: function(loading, message) {
     var that = this;
     if ( loading == true )
       $("#caboose-loading").fadeIn().find('h4').text(message);
@@ -314,7 +314,7 @@ BlockContentController.prototype = {
     $(that.blocks).each(function(i,b) {
       that.set_clickable_helper(b, false, false, (i == count-1));
     });
-    that.is_loading(false);
+    that.is_loading(false, 'Loading...');
   },
   
   set_clickable_helper: function(b, parent_id, parent_allows_child_blocks, is_last_child)

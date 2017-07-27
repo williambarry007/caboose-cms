@@ -209,6 +209,7 @@ body > .container, body > .mm-page > .container {
     font-weight: 300;
     font-size: 15px;
     text-decoration: none;
+    line-height: 20px;
     &:hover {
       color: #dbc553;
     }
@@ -279,6 +280,9 @@ body > .container, body > .mm-page > .container {
       border: 1px dashed gray;
       position: relative;
       font-size: 14px;
+      p {
+        color: #1d1d1d;
+      }
       &.highlight {
         background: #9cb9fb;
         color: transparent;

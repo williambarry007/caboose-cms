@@ -357,6 +357,11 @@ module Caboose
       
       # Save the block
       b.save
+
+      if !b.block_type.default.blank?
+        b.value = b.block_type.default
+        b.save
+      end
       
       # Ensure that all the children are created for the block
       b.create_children

@@ -10,6 +10,7 @@ var BlockModalController = ModalController.extend({
   new_block_on_init: false,
   assets_path: false,
   block_types: false,
+  trapFocus: false,
   before_id: false,
   after_id: false,
   complex_field_types: ['block', 'richtext', 'image', 'file'],
@@ -308,7 +309,7 @@ var BlockModalController = ModalController.extend({
         that.set_clickable(b2);
       });
     }    
-    if (show_mouseover)
+    if (false && show_mouseover)
     {
       $('#the_modal #block_' + b.id).mouseover(function(el) { $('#the_modal #block_' + b.id).addClass(   'block_over'); });
       $('#the_modal #block_' + b.id).mouseout(function(el)  { $('#the_modal #block_' + b.id).removeClass('block_over'); }); 
@@ -420,7 +421,7 @@ var BlockModalController = ModalController.extend({
     var that = this;
     if (!confirm)
     {
-      var p = $('<p/>').addClass('note warning')
+      var p = $('<p/>').addClass('caboose_note delete')
         .append("Are you sure you want to delete the block? This can't be undone.<br />")      
         .append($('<input/>').attr('type','button').val('Yes').click(function() { that.delete_block(true); })).append(' ')
         .append($('<input/>').attr('type','button').val('No').click(function() { $('#modal_message').empty(); that.autosize(); 

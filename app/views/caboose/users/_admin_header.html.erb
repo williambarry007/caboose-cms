@@ -13,11 +13,16 @@ tabs = {
   'Login Logs'      => "/admin/login-logs?user_id=#{@edituser.id}",
   'Password'        => "/admin/users/#{@edituser.id}/password",
   'Roles'           => "/admin/users/#{@edituser.id}/roles",
-  'Subscriptions'   => "/admin/users/#{@edituser.id}/subscriptions",
   'Delete'          => "/admin/users/#{@edituser.id}/delete"  
 }
 if @site.use_store
 	arr = tabs.to_a.insert(1, ['Payment Method', "/admin/users/#{@edituser.id}/payment-method"])
+	tabs = Hash[arr]
+	arr = tabs.to_a.insert(5, ['Variant Limits', "/admin/users/#{@edituser.id}/variant-limits"])
+  tabs = Hash[arr]
+end
+if Caboose::Subscription.where(:site_id => @site.id).exists?
+	arr = tabs.to_a.insert(6, ['Subscriptions', "/admin/users/#{@edituser.id}/subscriptions"])
   tabs = Hash[arr]
 end
 tabs = Caboose.plugin_hook('admin_user_tabs', tabs, @edituser, @site)

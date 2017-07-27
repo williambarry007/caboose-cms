@@ -95,6 +95,7 @@ module Caboose
     
     # @route_priority 1
     # @route GET /admin/store/vendors/options
+    # @route GET /admin/vendors/options
     def options      
       render :json => Vendor.where(:site_id => @site.id).reorder(:name).all.collect{ |v| { :value => v.id, :text => v.name }}      
     end

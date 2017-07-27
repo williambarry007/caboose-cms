@@ -64,7 +64,7 @@ module Caboose
       @block = params[:id] ? Block.find(params[:id]) : (params[:page_id] ? Block.new(:page_id => params[:page_id]) : Block.new(:post_id => params[:post_id]))
       @after_id = params[:after_id] ? params[:after_id] : nil
       @before_id = params[:before_id] ? params[:before_id] : nil
-      render :layout => 'caboose/modal'                
+      render :layout => 'caboose/modal'
     end
     
     # @route GET /admin/pages/:page_id/blocks/tree
@@ -128,7 +128,8 @@ module Caboose
         bt = b.block_type
         crumbs << {
           :block_id => b.id,
-          :text => b.name && b.name.downcase != bt.description.downcase  ? "#{bt.description} (#{b.name})" : bt.description
+          :text => bt.description
+       #   :text => b.name && b.name.downcase != bt.description.downcase  ? "#{bt.description} (#{b.name})" : bt.description
         }        
         b = b.parent
       end
@@ -137,7 +138,7 @@ module Caboose
       
     def admin_tree_helper(b)
       arr = []
-      b.children.each do |b2|
+      b.children.order(:block_type_id).each do |b2|
         bt = b2.block_type
         arr << {
           'id'                 => b2.id,
@@ -359,7 +360,27 @@ module Caboose
       
       # Ensure that all the children are created for the block
       b.create_children
-      
+
+      # Default child block count
+      if !params[:child_count].blank? && params[:child_count].to_i > 0
+        (1..params[:child_count].to_i).each_with_index do |cc, ind|
+          b1 = Block.new
+          if params[:page_id]
+            b1.page_id = params[:page_id].to_i
+          else
+            b1.post_id = params[:post_id].to_i
+          end
+          b1.parent_id = b.id
+          b1.sort_order = ind
+          b1.block_type_id = b.block_type.default_child_block_type_id
+          b1.save
+          b1.create_children
+          bw = b1.child('width')
+          bw.value = (100.0 / params[:child_count].to_f).to_i.to_s + '%'
+          bw.save
+        end
+      end
+
       # Set the global values if necessary
       if b.block_type.is_global        
         b.get_global_value(@site.id)
@@ -517,6 +538,39 @@ module Caboose
       b = Block.find(params[:id])
       b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
       resp.success = true
+      render :json => resp
+    end
+
+    # @route POST /admin/pages/:page_id/blocks/:id/move
+    # @route POST /admin/posts/:post_id/blocks/:id/move
+    def admin_move
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new
+      b = Block.find(params[:id])
+      if params[:before_id] && !params[:before_id].blank?
+        b2 = Block.find(params[:before_id].to_i)
+        b.sort_order = b2.sort_order
+        i = 1
+        b2.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
+          b3.sort_order = b.sort_order + i
+          b3.save
+          i = i + 1                  
+        end
+      elsif params[:after_id] && !params[:after_id].blank?
+        b2 = Block.find(params[:after_id].to_i)
+        b.sort_order = b2.sort_order + 1
+        i = 1
+        b2.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
+          b3.sort_order = b.sort_order + i
+          b3.save
+          i = i + 1                  
+        end
+      elsif params[:parent_id]
+        b.sort_order = Block.where(:parent_id => params[:parent_id]).count
+      end
+      b.parent_id = params[:parent_id]
+      resp.success = true
+      b.save
       render :json => resp
     end
     

@@ -1,15 +1,40 @@
-<p><img src='<%= @invoice.site.logo.url(:thumb) %>' /></p>
+<%
+logo = @invoice.site.logo.url(:thumb)
+logo = logo.gsub('//','https://') if !logo.nil?
+
+%>
+
+<p><img src='<%= logo %>' /></p>
 
 <!-- <h1>Thank you for your invoice!</h1> -->
 <h1>New Order Received</h1>
-
-<h4><a href="<%= @invoice.site.store_config.authnet_relay_domain %>/admin/invoices/<%= @invoice.id %>" target="_blank" title="View Order">View Order</a></h4>
-
-<h2>Order Details</h2>
+<p><a href="http://<%= @invoice.site.primary_domain.domain %>/admin/invoices/<%= @invoice.id %>" target="_blank" title="View Order">View Order</a></p>
 
 <p>Order #<%= @invoice.invoice_number %></p>
 
-<table binvoice='1' style='binvoice-collapse: collapse;'>
+<% if @invoice.customer %>
+  <% c = @invoice.customer %>
+  <h2>Customer</h2>
+  <p>
+    <%= c.first_name %> <%= c.last_name %><br />
+    <a href='mailto:<%= c.email %>'><%= c.email %></a><br />
+    <% if c.phone %><%= raw c.phone %><% end %>
+  </p>
+<% end %>
+
+<% if @invoice.shipping_address %>
+  <% sa = @invoice.shipping_address %>
+  <h2>Shipping Address</h2>
+  <p>
+    <%= sa.first_name %> <%= sa.last_name %><br />
+    <%= sa.address1 %><br />
+    <% if sa.address2 && sa.address2.strip.length > 0 %><%= sa.address2 %><br /><% end %>
+    <%= sa.city %>, <%= sa.state %> <%= sa.zip %>
+  </p>
+<% end %>
+
+<h2>Order Details</h2>
+<table border='1' style='border-collapse: collapse;'>
   <tr>
     <th>Package</th>
     <th>Line Item</th>
@@ -91,25 +116,3 @@
   <% end %>      
   <tr><td colspan="4" align='right'>Total:     </td><td align='right'><%= number_to_currency(@invoice.total) %></td></tr>
 </table>
-
-<% if @invoice.shipping_address %>
-  <% sa = @invoice.shipping_address %>
-  <h2>Shipping Address</h2>
-  <p>
-    <%= sa.first_name %> <%= sa.last_name %><br />
-    <%= sa.address1 %><br />
-    <% if sa.address2 && sa.address2.strip.length > 0 %><%= sa.address2 %><br /><% end %>
-    <%= sa.city %>, <%= sa.state %> <%= sa.zip %>
-  </p>
-<% end %>
-
-<% if @invoice.billing_address %>
-  <% ba = @invoice.billing_address %>
-  <h2>Billing Address</h2>
-  <p>
-    <%= ba.first_name %> <%= ba.last_name %><br />
-    <%= ba.address1 %><br />
-    <% if ba.address2 && ba.address2.strip.length > 0 %><%= ba.address2 %><br /><% end %>
-    <%= ba.city %>, <%= ba.state %> <%= ba.zip %>
-  </p>
-<% end %>

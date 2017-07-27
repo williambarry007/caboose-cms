@@ -10,10 +10,15 @@ module Caboose
             
       @pager = Caboose::PageBarGenerator.new(params, {
         'customer_id'          => logged_in_user.id,         
-        'status'               => ''        
+        'status'               => [          
+          Invoice::STATUS_PENDING       ,    
+          Invoice::STATUS_CANCELED      ,
+          Invoice::STATUS_READY_TO_SHIP ,
+          Invoice::STATUS_PROCESSED          
+        ]
       }, {
         'model'          => 'Caboose::Invoice',
-        'sort'           => 'invoice_number',
+        'sort'           => 'id',
         'desc'           => 1,
         'base_url'       => '/my-account/invoices',
         'use_url_params' => false
@@ -176,9 +181,11 @@ module Caboose
         return
       end
 
-      pdf = InvoicePdf.new
-      pdf.invoice = Invoice.find(params[:id])
-      send_data pdf.to_pdf, :filename => "invoice_#{pdf.invoice.id}.pdf", :type => "application/pdf", :disposition => "inline"
+      pdf = @site.store_config.custom_invoice_pdf
+      pdf = "InvoicePdf" if pdf.nil? || pdf.strip.length == 0                              
+      eval("pdf = #{pdf}.new")
+      pdf.invoice = Invoice.find(params[:id])             
+      send_data pdf.to_pdf, :filename => "invoice_#{pdf.invoice.id}.pdf", :type => "application/pdf", :disposition => "inline"   
     end
     
     # @route GET  /my-account/invoices/authnet-relay

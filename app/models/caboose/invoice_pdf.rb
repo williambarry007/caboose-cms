@@ -53,29 +53,30 @@ module Caboose
                       
       sc = self.invoice.site.store_config
       ot = self.invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
-      
-      return unless ot
 
-      case ot.payment_processor
-        when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
-          
-          if ot 
-            t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
-            resp = t.get_transaction_details(ot.transaction_id)
-            t2 = resp.transaction
-            if t2
-              self.card_type = t2.payment_method.card_type.upcase
-              self.card_number = t2.payment_method.card_number.gsub('X', '')
+      if ot
+
+        case ot.payment_processor
+          when StoreConfig::PAYMENT_PROCESSOR_AUTHNET
+            
+            if ot 
+              t = AuthorizeNet::Reporting::Transaction.new(sc.authnet_api_login_id, sc.authnet_api_transaction_key)
+              resp = t.get_transaction_details(ot.transaction_id)
+              t2 = resp.transaction
+              if t2
+                self.card_type = t2.payment_method.card_type.upcase
+                self.card_number = t2.payment_method.card_number.gsub('X', '')
+              end
+            else 
+              self.card_type = ""
+              self.card_number = ""
             end
-          else 
-            self.card_type = ""
-            self.card_number = ""
-          end
-        
-        when StoreConfig::PAYMENT_PROCESSOR_STRIPE
           
-          self.card_type   = self.invoice.customer.card_brand
-          self.card_number = self.invoice.customer.card_last4
+          when StoreConfig::PAYMENT_PROCESSOR_STRIPE
+            
+            self.card_type   = self.invoice.customer.card_brand
+            self.card_number = self.invoice.customer.card_last4
+        end
           
       end
             
@@ -86,17 +87,6 @@ module Caboose
       invoice_info = "Invoice Number: #{invoice.invoice_number}\n"
       invoice_info << "Invoice Date: #{invoice.date_created.strftime('%d %b %Y %H:%M:%S %p')}\n"
       invoice_info << "Status: #{invoice.status.capitalize}\n"
-      
-      if invoice.status == Invoice::STATUS_PENDING
-        s  = self.invoice.site
-        sc = self.invoice.site.store_config
-        invoice_info << "\n"
-        invoice_info << "Please mail payments to:\n"
-        invoice_info << "#{s.description}\n"
-        invoice_info << "#{sc.origin_address1}\n"
-        invoice_info << "#{sc.origin_address2}\n"
-        invoice_info << "#{sc.origin_city}, " << "#{sc.origin_state} " << "#{sc.origin_zip}\n"
-      end
 
       tbl = []
       tbl << [
@@ -108,7 +98,6 @@ module Caboose
 
     
     def customer_info
-      return if self.invoice.status == Invoice::STATUS_PENDING
 
       c = invoice.customer
 
@@ -134,7 +123,7 @@ module Caboose
       shipped_to = []
       if invoice.instore_pickup
         shipped_to << [{ :content => "Name"            , :border_width => 0, :width =>  55 },{ :content => "#{c.first_name} #{c.last_name}"   , :border_width => 0, :width => 200 }]
-        shipped_to << [{ :content => "IN-STORE PICKUP" , :border_width => 0, :width => 255 }]
+        shipped_to << [{ :content => "IN-STORE PICKUP" , :border_width => 0, :width => 255 , :colspan => 2 }]
       else        
         shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => sa_name                            , :border_width => 0, :width => 200 }]
         shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }]
@@ -176,9 +165,9 @@ module Caboose
       
       invoice.invoice_packages.all.each do |pk|
 
-        carrier = pk.shipping_method.carrier
-        service = pk.shipping_method.service_name
-        package = pk.shipping_package.name
+        carrier = pk.shipping_method  ? pk.shipping_method.carrier      : ''
+        service = pk.shipping_method  ? pk.shipping_method.service_name : ''
+        package = pk.shipping_package ? pk.shipping_package.name        : ''
 
         pk.line_items.each_with_index do |li, index|
           options = ''
@@ -271,7 +260,6 @@ module Caboose
     end
 
     def payment_info
-      return if self.invoice.status == Invoice::STATUS_PENDING
 
       trans = invoice.invoice_transactions.where(:transaction_type => InvoiceTransaction::TYPE_AUTHORIZE, :success => true).first
       tbl = []

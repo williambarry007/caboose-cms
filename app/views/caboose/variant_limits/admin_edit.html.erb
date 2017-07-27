@@ -1,0 +1,35 @@
+<%= render :partial => 'caboose/users/admin_header' %> 
+
+<h2>Edit Variant Limit</h2>
+<p><div id='variantlimit_<%= @variant_limit.id %>_variant_id'         ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_min_quantity_value' ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_min_quantity_func'  ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_max_quantity_value' ></div></p>
+<p><div id='variantlimit_<%= @variant_limit.id %>_max_quantity_func'  ></div></p>
+<p>Quantity Purchased: <%= @variant_limit.current_value %></p>
+
+<a href="/admin/users/<%= @edituser.id %>/variant-limits" class="caboose-btn">Back</a>
+
+<%= render :partial => 'caboose/users/admin_footer' %> 
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'VariantLimit',
+    id: <%= @variant_limit.id %>,
+    update_url: '/admin/variant-limits/<%= @variant_limit.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'variant_id'         , nice_name: 'Product Variant'  , type: 'select'   , value: <%= raw Caboose.json(@variant_limit.variant_id         ) %>, width: 600  , options_url: '/admin/variant-limits/variant-options' },
+      { name: 'min_quantity_value' , nice_name: 'Min Qty Value'    , type: 'text'     , value: <%= raw Caboose.json(@variant_limit.min_quantity_value ) %>, width: 600 },
+      { name: 'min_quantity_func'  , nice_name: 'Min Qty Function' , type: 'textarea' , value: <%= raw Caboose.json(@variant_limit.min_quantity_func  ) %>, width: 600 , height: 100 },
+      { name: 'max_quantity_value' , nice_name: 'Max Qty Value'    , type: 'text'     , value: <%= raw Caboose.json(@variant_limit.max_quantity_value ) %>, width: 600 },
+      { name: 'max_quantity_func'  , nice_name: 'Max Qty Function' , type: 'textarea' , value: <%= raw Caboose.json(@variant_limit.max_quantity_func  ) %>, width: 600 , height: 100 }
+    ]    
+  });      
+});
+</script>
+<% end %>

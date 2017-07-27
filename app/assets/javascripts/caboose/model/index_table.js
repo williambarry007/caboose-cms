@@ -188,8 +188,8 @@ IndexTable.prototype = {
     // Set both hash and querystring values in the pager
     for (var i in b)
     {
-      if (i == 'sort' || i == 'desc' || i == 'page')      
-        this.pager.options[i] = b[i];
+      if (i == 'sort' || i == 'desc' || i == 'page')        
+        this.pager.options[i] = i == 'sort' ? b[i] : parseInt(b[i]);      
       else
         this.pager.params[i] = b[i];              
     }
@@ -770,12 +770,12 @@ IndexTable.prototype = {
   },
   
   pager_div: function(summary)
-  {
+  {    
     var that = this;
     var p = this.pager;
     
     // Set default parameter values if not present    
-    if (!p.options.items_per_page) p.options.items_per_page = 10  
+    if (!p.options.items_per_page) p.options.items_per_page = 10    
     if (!p.options.page) 		       p.options.page           = 1   
   		
   	var page = parseInt(p.options.page);
@@ -783,8 +783,8 @@ IndexTable.prototype = {
   	// Max links to show (must be odd) 
   	var total_links = 5;
   	var prev_page = page - 1;
-  	var next_page = page + 1;
-  	var total_pages = Math.ceil(parseFloat(p.options.item_count)/parseFloat(p.options.items_per_page));
+  	var next_page = page + 1;  	
+  	var total_pages = Math.ceil(parseFloat(p.options.item_count)/parseFloat(p.options.items_per_page));  	
   	var start = 1;
   	var stop = 1;
   	
@@ -806,18 +806,18 @@ IndexTable.prototype = {
   			if (start < 1) start = 1;
   		}
   	}
-  	
+  	  	
   	var div = $('<div/>').addClass('pager');
   	if (summary)
   	  div.append($('<p/>').html("Results: showing page " + page + " of " + total_pages));
 
   	if (total_pages > 1)
-  	{
+  	{  	  
   	  var div2 = $('<div/>').addClass('page_links');
   	  if (page > 1)
   	    div2.append($('<a/>').attr('href', this.pager_hash({ page: prev_page })).html('Previous').click(function(e) { that.hash_click(e, this); }));  	        	      	  
   	  for (i=start; i<=stop; i++)
-  	  {
+  	  {  	    
   	  	if (page != i)
   	  	  div2.append($('<a/>').attr('href', this.pager_hash({ page: i })).html(i).click(function(e) { that.hash_click(e, this); }));
   	  	else
@@ -826,7 +826,7 @@ IndexTable.prototype = {
   	  if (page < total_pages)
   	    div2.append($('<a/>').attr('href', this.pager_hash({ page: next_page })).html('Next').click(function(e) { that.hash_click(e, this); }));
   	  div.append(div2);
-  	}
+  	}  	
   	return div;
   },
   
@@ -840,15 +840,12 @@ IndexTable.prototype = {
   pager_params: function(h)
   {
     var that = this;
-    var skip = this.pager.options && this.pager.options.skip ? this.pager.options.skip : [];    
+    var skip = this.pager.skip ? this.pager.skip : [];    
     var p = {};
-    for (var i in this.pager.params) if (skip.indexOf(i) == -1) p[i] = this.pager.params[i];
-    if (this.pager.options)
-    {      
-      if (this.pager.options.sort) p.sort = this.pager.options.sort;
-      if (this.pager.options.desc) p.desc = this.pager.options.desc ? 1 : 0;
-      if (this.pager.options.page) p.page = this.pager.options.page;
-    }
+    for (var i in this.pager.params) if (skip.indexOf(i) == -1) p[i] = this.pager.params[i];          
+    if (this.pager.options.sort) p.sort = this.pager.options.sort;
+    if (this.pager.options.desc) p.desc = this.pager.options.desc ? 1 : 0;
+    if (this.pager.options.page) p.page = this.pager.options.page;    
     if (h)      
     {                  
       for (var i in h)
@@ -927,7 +924,29 @@ IndexTable.prototype = {
           async: false          
         });
       }
-    });        
+    });
+      
+    //var arr = [];
+    //$.each(this.new_model_fields, function(i, f) {
+    //  if (f.options_url && !f.options)
+    //  {
+    //    console.log("Testing1");
+    //    arr.push($.ajax({
+    //      url: f.options_url,
+    //      type: 'get'                              
+    //    }));
+    //  }
+    //});
+    //if (arr.length > 0)
+    //{
+    //  console.log("Testing");
+    //  that.show_message($('<p/>').addClass('loading').html("Getting options..."));
+    //  $.when.apply(null, arr).done(function(resp) {
+    //    console.log(resp);                                      
+    //    //that.new_form();          
+    //  });
+    //  return;
+    //}
     
     var form = $('<form/>').attr('id', 'new_form')
       .append($('<input/>').attr('type', 'hidden').attr('name', 'authenticity_token').val(that.form_authenticity_token));

@@ -37,17 +37,114 @@ module Caboose
       render :json => { :item_count => @invoice.item_count }            
     end
     
+    # @route GET /cart/check-variant-limits
+    def check_variant_limits
+      resp = StdClass.new
+      errors = []
+      
+      if @invoice.nil?
+        errors << "No invoice found."
+      else
+        @invoice.line_items.each do |li|                
+          vl = VariantLimit.where(:variant_id => li.variant_id, :user_id => @logged_in_user.id).first
+          vl = VariantLimit.where(:variant_id => li.variant_id, :user_id => User.logged_out_user_id(@site.id)).first if vl.nil?
+          next if vl.nil?
+          
+          if vl.no_purchases_allowed(@invoice)
+            
+            InvoiceLog.create(:invoice_id => @invoice.id, :line_item_id => li.id, :user_id => logged_in_user.id, :date_logged => DateTime.now.utc, :invoice_action => InvoiceLog::ACTION_LINE_ITEM_DELETED)            
+            if li.invoice_package_id              
+              li.invoice_package.shipping_method_id = nil
+              li.invoice_package.total = nil
+              li.invoice_package.save                
+            end
+            li.destroy
+            @invoice.shipping = 0.00
+
+            errors << "You don't have permission to purchase this item." + (!logged_in? ? "You may have different purchase permissions if you <a href='/login'>login</a>." : '')
+            next
+            
+          end
+          
+          qty = vl.current_value ? vl.current_value + li.quantity : li.quantity 
+          next if vl.qty_within_range(qty, @invoice)
+          
+          error = vl.quantity_message(@invoice)
+          if !logged_in?
+            error << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?                
+            if vl.qty_too_low(li.quantity, @invoice) then li.quantity = vl.min_quantity(@invoice)
+            elsif vl.qty_too_high(qty, @invoice)     then li.quantity = vl.max_quantity(@invoice)
+            end
+          else
+            if vl.qty_too_low(li.quantity, @invoice)
+              li.quantity = vl.min_quantity(@invoice)
+              error = "You must purchase at least #{li.quantity} of this item, your cart has been updated."
+            elsif vl.qty_too_high(qty, @invoice)
+              li.quantity = vl.max_quantity(@invoice) - vl.current_value
+              error = "You can only purchase #{li.quantity} of this item, your cart has been updated."
+            end            
+          end          
+          li.save
+          errors << error
+        end
+        if errors.count > 0
+          @invoice.calculate
+          resp.error = errors.join("<br/>")
+        else
+          resp.success = true
+        end        
+      end
+      render :json => resp
+    end
+    
     # @route POST /cart
-    def add      
+    def add
+      resp = StdClass.new
+      
       v = Variant.find(params[:variant_id])
       qty = params[:quantity] ? params[:quantity].to_i : 1
+      if @invoice.line_items.exists?(:variant_id => v.id)
+        li = @invoice.line_items.find_by_variant_id(v.id)        
+        qty = li.quantity + qty
+      end
+
+      # Check the variant limits
+      vl = VariantLimit.where(:variant_id => v.id, :user_id => @logged_in_user.id).first
+      vl = VariantLimit.where(:variant_id => v.id, :user_id => User.logged_out_user_id(@site.id)).first if vl.nil?      
+      if vl && vl.no_purchases_allowed(@invoice)
+        resp.error = "You don't have permission to purchase this item."
+        resp.error << " You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?        
+        render :json => resp
+        return
+      end
+      qty2 = logged_in? && vl && vl.current_value ? qty + vl.current_value : qty 
+      if vl && !vl.qty_within_range(qty2, @invoice)
+        resp.quantity_message = vl.quantity_message(@invoice)
+        if !logged_in?
+          resp.quantity_message << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?                
+          if vl.qty_too_low(qty, @invoice)     then qty = vl.min_quantity(@invoice)
+          elsif vl.qty_too_high(qty, @invoice) then qty = vl.max_quantity(@invoice)
+          end
+        else   
+          if vl.qty_too_low(qty, @invoice)
+            qty = vl.min_quantity(@invoice)
+            resp.quantity_message = "You must purchase at least #{vl.min_quantity(@invoice)} of this item, your cart has been updated."
+          elsif vl.qty_too_high(qty2, @invoice)
+            qty = vl.max_quantity(@invoice) - vl.current_value                      
+            if vl.max_quantity(@invoice) == vl.current_value            
+              resp.success = false
+              resp.error = "You have already purchased the maximum quantity allowed for this item."
+              render :json => resp
+              return
+            else
+              resp.quantity_message = "You can only purchase #{qty} of this item, your cart has been updated."
+            end
+          end
+        end
+      end
       
-      resp = StdClass.new
-            
       if @invoice.line_items.exists?(:variant_id => v.id)
         li = @invoice.line_items.find_by_variant_id(v.id)
-        li.quantity += qty
-        li.subtotal = li.unit_price * li.quantity
         InvoiceLog.create(
           :invoice_id     => @invoice.id,
           :line_item_id   => li.id,
@@ -55,11 +152,14 @@ module Caboose
           :date_logged    => DateTime.now.utc,
           :invoice_action => InvoiceLog::ACTION_LINE_ITEM_UPDATED,
           :field          => 'quantity',
-          :old_value      => li.quantity - qty,
-          :new_value      => li.quantity
+          :old_value      => li.quantity,
+          :new_value      => qty
         )
+        li.quantity = qty
+        li.subtotal = li.unit_price * qty
+        li.save
       else
-        unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)
+        unit_price = v.clearance && v.clearance_price ? v.clearance_price : (v.on_sale? ? v.sale_price : v.price)        
         li = LineItem.create(
           :invoice_id   => @invoice.id,
           :variant_id => v.id,
@@ -105,7 +205,35 @@ module Caboose
         end
         case name
           when 'quantity'    then
-            if value.to_i != li.quantity
+
+            value = value.to_i
+            qty = value
+
+            # Check the variant limits
+            vl = VariantLimit.where(:variant_id => li.variant_id, :user_id => @logged_in_user.id).first
+            vl = VariantLimit.where(:variant_id => li.variant_id, :user_id => User.logged_out_user_id(@site.id)).first if vl.nil?      
+            if vl && vl.no_purchases_allowed(@invoice)
+              resp.error = "You don't have permission to purchase this item."
+              resp.error << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?        
+              render :json => resp
+              return
+            end
+            qty2 = logged_in? && vl && vl.current_value ? qty + vl.current_value : qty 
+            if vl && !vl.qty_within_range(qty2, @invoice)
+              resp.quantity_message = vl.quantity_message(@invoice)
+              if !logged_in?                  
+                resp.quantity_message << "You may have different purchase permissions if you <a href='/login'>login</a>." if !logged_in?                
+                if vl.qty_too_low(qty, @invoice)      then qty = vl.min_quantity(@invoice)
+                elsif vl.qty_too_high(qty, @invoice)  then qty = vl.max_quantity(@invoice)
+                end
+              else
+                if vl.qty_too_low(qty, @invoice)      then qty = (qty == 0 ? 0 : vl.min_quantity(@invoice))
+                elsif vl.qty_too_high(qty2, @invoice) then qty = vl.max_quantity(@invoice) - vl.current_value
+                end
+              end
+            end
+
+            if qty != li.quantity
               op = li.invoice_package
               if op
                 op.shipping_method_id = nil
@@ -118,7 +246,7 @@ module Caboose
                 li.invoice.calculate        
               end
             end
-            li.quantity = value.to_i
+            li.quantity = qty
             if li.quantity == 0
               li.destroy
               InvoiceLog.create(
@@ -141,6 +269,7 @@ module Caboose
         end
       end
       li.save
+      li.invoice.reload # Reload invoice in case li.quantity changed
       li.invoice.calculate
       resp.success = true
       render :json => resp                                    

@@ -200,6 +200,7 @@ module Caboose
     def confirm
       render :json => { :error => 'Not logged in.'            } and return if !logged_in?
       #render :json => { :error => 'Invalid billing address.'  } and return if @invoice.billing_address.nil?
+      render :json => { :error => 'Cart is empty.'            } and return if @invoice.line_items.nil? or @invoice.line_items.count == 0
       if !@invoice.instore_pickup && @invoice.has_shippable_items?
         render :json => { :error => 'Invalid shipping address.' } and return if @invoice.shipping_address.nil?      
         render :json => { :error => 'Invalid shipping methods.' } and return if @invoice.has_empty_shipping_methods?
@@ -207,12 +208,18 @@ module Caboose
       
       resp = Caboose::StdClass.new
       sc = @site.store_config
+
+      @invoice.customer.create_variant_limits if @invoice.customer
       
       # Make sure all the variants still exist      
       @invoice.line_items.each do |li|
         v = Variant.where(:id => li.variant_id).first
+        vl = VariantLimit.where(:variant_id => v.id, :user_id => @invoice.customer_id).first
         if v.nil? || v.status == 'Deleted'
           render :json => { :error => 'One or more of the products you are purchasing are no longer available.' }
+          return
+        elsif vl && !vl.qty_within_range(vl.current_value + li.quantity, @invoice)
+          render :json => { :error => 'You have exceeded the limit you are allowed to purchase.' }
           return
         end
       end
@@ -262,6 +269,15 @@ module Caboose
       
       @invoice.status = Invoice::STATUS_PENDING
       @invoice.invoice_number = @site.store_config.next_invoice_number
+
+      # Update variant limits to reflect this purchase
+      @invoice.line_items.each do |li|
+        vl = VariantLimit.where(:user_id => @invoice.customer_id, :variant_id => li.variant_id).first
+        if vl
+          vl.current_value += li.quantity
+          vl.save
+        end
+      end
       
       # Send out emails
       begin
@@ -300,14 +316,14 @@ module Caboose
       add_ga_event('Ecommerce', 'Checkout', 'Payment', (@last_invoice.total*100).to_i)
     end
     
-    #===========================================================================    
+    #===========================================================================
     
     # @route GET /checkout/state-options
     def state_options                            
       options = Caboose::States.all.collect { |abbr, state| { 'value' => abbr, 'text' => abbr }}
       render :json => options
     end
-        
+                
     # @route GET /checkout/total
     def verify_total
       total = 0.00

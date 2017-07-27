@@ -99,15 +99,15 @@ Caboose.Store.Modules.Cart = (function() {
         type: $form.attr('method'),
         url: $form.attr('action'),
         data: $form.serialize(),
-        success: function(response) {          
+        success: function(response) {      
           if (response.success) {
             self.render_item_count(response.item_count);
             if (self.$add_to_cart.length) self.$add_to_cart.trigger('added');
             
-            if (!self.$add_to_cart.find('.message').length) {
+            if (!self.$add_to_cart.find('.message').length) {                            
               self.$add_to_cart
                 .append($('<div/>').hide().addClass('message')
-                  .append($('<p/>').text('Successfully added to cart'))
+                  .append($('<p/>').text(response.quantity_message ? response.quantity_message : 'Successfully added to cart'))
                   .append($('<p/>')
                     .append($('<a/>').attr('href', '/cart').html('View cart')).append(' | ')
                     .append($('<a/>').attr('href', '/checkout').html('Continue to checkout'))
@@ -120,8 +120,16 @@ Caboose.Store.Modules.Cart = (function() {
               //  self.$add_to_cart.find('.message').fadeOut(function() { $(this).remove() });
               //}, 5000);
             }
-          } else {
-            alert(response.errors[0]);
+          } else {                        
+            if (!self.$add_to_cart.find('.message').length) {                            
+              self.$add_to_cart
+                .append($('<div/>').hide().addClass('message')
+                  .append($('<p/>').addClass('note error').html(response.error ? response.error : (response.errors ? response.errors[0] : "Error adding to cart")))
+             //     .append($('<p/>').append($('<a/>').attr('href', '/cart').html('View cart')))                                      
+                );                
+              self.$add_to_cart.find('.message').fadeIn();              
+            }            
+            //alert(response.errors[0]);
           }
         }
       });

@@ -166,6 +166,20 @@ module Caboose
       end      
     end
 
+    # @route PUT /admin/categories/:category_id/products/:product_id/add
+    def admin_add_product
+      resp = Caboose::StdClass.new
+      resp.success = false
+      cat = Category.find(params[:category_id])
+      prod = Product.find(params[:product_id])
+      if cat && prod && cat.site_id == prod.site_id
+        cm = CategoryMembership.where(:product_id => prod.id, :category_id => cat.id).first
+        cm = CategoryMembership.create(:product_id => prod.id, :category_id => cat.id) if cm.nil?
+        resp.success = true
+      end
+      render :json => resp
+    end
+
   end
 end
 

@@ -31,7 +31,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::InvoiceTransaction => { :order_id => :invoice_id },
       Caboose::LineItem           => { :order_id => :invoice_id, :order_package_id  => :invoice_package_id },
       Caboose::RetargetingConfig  => { :conversion_id   => :google_conversion_id, :labels_function => :google_labels_function },
-      Caboose::StoreConfig        => { :starting_order_number => :starting_invoice_number }
+      Caboose::StoreConfig        => { :starting_order_number => :starting_invoice_number }                  
     }
   end
 
@@ -96,6 +96,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::Site => [:shipping_cost_function],
       Caboose::StoreConfig => [:use_usps, :allowed_shipping_codes, :default_shipping_code, :pp_relay_url, :pp_response_url],
       Caboose::Variant => [:quantity, :on_sale],
+      Caboose::VariantLimit => [:min_quantity, :max_quantity],
       Caboose::Vendor => [:vendor, :vendor_id]
     }
   end
@@ -734,6 +735,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :allow_self_registration , :boolean     , { :default => false }],
         [ :analytics_id            , :string     ],        
         [ :use_retargeting         , :boolean     , { :default => false }],
+        [ :use_dragdrop            , :boolean     , { :default => false }],
         [ :date_js_updated         , :datetime   ],
         [ :date_css_updated        , :datetime   ],
         [ :default_layout_id       , :integer    ],
@@ -970,6 +972,17 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :status                        , :string   ],        
         [ :downloadable                  , :boolean   , { :default => false }],        
         [ :is_bundle                     , :boolean   , { :default => false }]
+      ],
+      Caboose::VariantLimit => [
+        [ :variant_id         , :integer ],
+        [ :user_id            , :integer ],
+        #[ :min_quantity       , :integer ],
+        #[ :max_quantity       , :integer ],
+        [ :min_quantity_value , :integer ],
+        [ :min_quantity_func  , :text    ],
+        [ :max_quantity_value , :integer ],
+        [ :max_quantity_func  , :text    ],        
+        [ :current_value      , :integer ]      
       ],
       Caboose::Vendor => [
         [ :site_id      , :integer    ],

@@ -81,7 +81,7 @@ CheckoutController.prototype = {
       success: function(resp) {
         that.invoice = resp;        
         $.each(that.invoice.invoice_packages, function(i, op) {
-          that.invoice.invoice_packages[i].shipping_method_controller = new ShippingMethodController({ cc: that, invoice_package_id: op.id });
+          that.invoice.invoice_packages[i].shipping_method_controller = new ShippingMethodController({ cc: that, invoice_package_id: op.id, package_number: i });
         });                
         if (!that.invoice.shipping_address) that.invoice.shipping_address = that.empty_address();
         //if (!that.invoice.billing_address)  that.invoice.billing_address  = that.empty_address();
@@ -188,31 +188,35 @@ CheckoutController.prototype = {
   
   print_ready_message: function()
   {
-    var that = this;
-    var ready = true;
-    if (!that.shipping_address_controller.ready()) ready = false;            
-    if (that.invoice.payment_terms == 'pia' && !that.payment_method_controller.ready()) ready = false;
+    var that = this;    
+    var msg = that.shipping_address_controller.ready_error();
+    if (!msg && that.invoice.payment_terms == 'pia') msg = that.payment_method_controller.ready_error()        
+    $.each(that.invoice.invoice_packages, function(i, op) {
+      if (!msg) msg = that.invoice.invoice_packages[i].shipping_method_controller.ready_error();        
+    });
 
-    if (ready)
+    if (msg)
+    {
+      $('#message').empty().append($('<p/>').addClass('note warning').append(msg));
+    }
+    else
     {
       $('#message').empty().append($('<p/>').append($('<input/>').attr('type', 'button').val('Continue to Confirmation').click(function(e) {
         that.print(true);          
       })));
-    }
-    else
-    {
-      $('#message').empty().append($('<p/>').addClass('note warning').append("Please complete all the fields."));
     }
   },
   
   print_confirm_message: function()
   {
     var that = this;
-    var ready = true;
-    if (!that.shipping_address_controller.ready()) ready = false;            
-    if (that.invoice.payment_terms == 'pia' && !that.payment_method_controller.ready()) ready = false;
-
-    if (!ready)
+    var msg = that.shipping_address_controller.ready_error();
+    if (!msg && that.invoice.payment_terms == 'pia') msg = that.payment_method_controller.ready_error();
+    $.each(that.invoice.invoice_packages, function(i, op) {
+      if (!msg) msg = that.invoice.invoice_packages[i].shipping_method_controller.ready_error();        
+    });
+    
+    if (msg)
     {
       that.refresh_and_print();      
       return;
@@ -228,35 +232,50 @@ CheckoutController.prototype = {
   Invoice confirmation
   *****************************************************************************/    
   
-  confirm_invoice: function(t)
+  confirm_invoice: function(total_is_ok, variant_limits_are_ok)
   {
     var that = this;
     
-    $('#message').html("<p class='loading'>Verifying order total...</p>");    
-    var t = $.ajax_value('/checkout/total');    
-    if (parseFloat(t) != that.invoice.total)
+    if (!total_is_ok)
     {
-      $('#message').html("<p class='note error'>It looks like the order total has changed since this was loaded. Please submit your order again after this page refreshes.</p>");
-      setTimeout(function() { window.location.reload(true); }, 3000);
+      $('#message').html("<p class='loading'>Verifying order total...</p>");             
+      $.get('/checkout/total', function(x) {
+        if (parseFloat(x) != that.invoice.total)
+        {
+          $('#message').html("<p class='note error'>It looks like the order total has changed since this was loaded. Please submit your order again after this page refreshes.</p>");
+          setTimeout(function() { window.location.reload(true); }, 3000);        
+        }
+        else    
+          that.confirm_invoice(true); 
+      });
+      return;
+    }            
+    if (!variant_limits_are_ok)
+    {
+      $('#message').html("<p class='loading'>Verifying limits...</p>");    
+      $.get('/cart/check-variant-limits', function(resp) {
+        if (resp.success) that.confirm_invoice(true, true);
+        if (resp.error)
+        {          
+          $('#message').html("<p class='note error'>" + resp.error + "</p>");
+          setTimeout(function() { window.location.reload(true); }, 3000);          
+        }        
+      });
       return;
     }
     
     $('#message').html("<p class='loading'>Processing payment...</p>");
-    $.ajax({
-      url: '/checkout/confirm',
-      type: 'post',
-      success: function(resp) {
-        if (resp.success) window.location = '/checkout/thanks';
-        if (resp.error)
-        {        
-          $('#message').empty()
-            .append($('<p/>').addClass('note error').append(resp.error))
-            .append($('<p/>')
-              .append($('<input/>').attr('type', 'button').val('Make Changes' ).click(function(e) { that.print(); })).append(' ')
-              .append($('<input/>').attr('type', 'button').val('Confirm Order').click(function(e) { that.confirm_invoice(); }))
-            );
-        }
-      }                        
+    $.post('/checkout/confirm', function(resp) {
+      if (resp.success) window.location = '/checkout/thanks';
+      if (resp.error)
+      {        
+        $('#message').empty()
+          .append($('<p/>').addClass('note error').append(resp.error))
+          .append($('<p/>')
+            .append($('<input/>').attr('type', 'button').val('Make Changes' ).click(function(e) { that.print(); })).append(' ')
+            .append($('<input/>').attr('type', 'button').val('Confirm Order').click(function(e) { that.confirm_invoice(); }))
+          );
+      }                              
     });        
   },
     

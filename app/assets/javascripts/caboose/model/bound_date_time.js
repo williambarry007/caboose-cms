@@ -35,7 +35,7 @@ BoundDateTime = BoundControl.extend({
     if (this.attribute.fixed_placeholder)
     {
       var w = $('#'+this.el+'_placeholder').outerWidth();
-      $('#'+this.el).attr('placeholder', 'empty').css('padding-left', '+=' + w).css('width', '-=' + w);
+      //$('#'+this.el).attr('placeholder', 'empty').css('padding-left', '+=' + w).css('width', '-=' + w);
     }
     
     var this2 = this;

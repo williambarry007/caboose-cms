@@ -25,6 +25,7 @@ module Caboose
       return if !user_is_allowed('subscriptions', 'view')
       
       pager = PageBarGenerator.new(params, {
+          'site_id'               => @site.id,
           'variant_id'            => '',
           'user_id'               => params[:user_id] ? params[:user_id] : '',
           'date_started_gte'      => '',
@@ -138,7 +139,7 @@ module Caboose
       case params[:field]                
         when 'variant'
           arr = Variant.joins(:product).where("store_products.site_id = ? and is_subscription = ?", @site.id, true).reorder("store_products.title").all          
-          options = arr.collect{ |v| { 'value' => v.id, 'text' => v.product.title }}
+          options = arr.collect{ |v| { 'value' => v.id, 'text' => "#{v.product.title} - #{v.alternate_id}" }}
         when 'status'
           options = [
             { 'value' => Subscription::STATUS_ACTIVE   , 'text' => 'Active'   },

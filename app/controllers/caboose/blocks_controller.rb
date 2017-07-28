@@ -444,16 +444,16 @@ module Caboose
       end
       
       # Trigger the page cache to be updated
-      if params[:page_id]
-        pc = PageCache.where(:page_id => b.page_id).first
-        if pc
-          pc.refresh = true
-          pc.save
-          PageCacher.delay(:queue => 'caboose_cache').refresh
-        else
-          PageCacher.delay(:queue => 'caboose_cache').cache(b.page_id)
-        end
-      end
+      # if params[:page_id]
+      #   pc = PageCache.where(:page_id => b.page_id).first
+      #   if pc
+      #     pc.refresh = true
+      #     pc.save
+      #     PageCacher.delay(:queue => 'caboose_cache').refresh
+      #   else
+      #     PageCacher.delay(:queue => 'caboose_cache').cache(b.page_id)
+      #   end
+      # end
                 
       resp.success = save && b.save
       b.create_children

@@ -346,12 +346,12 @@ namespace :caboose do
         
   desc "Update expired caches and cache pages that aren't cached"
   task :cache_pages => :environment do    
-    Caboose::PageCacher.delay(:queue => 'caboose_cache').refresh    
+ #   Caboose::PageCacher.delay(:queue => 'caboose_cache').refresh    
   end
   
   desc "Cache all pages"
   task :cache_all_pages => :environment do    
-    Caboose::PageCacher.delay(:queue => 'caboose_cache').cache_all    
+#    Caboose::PageCacher.delay(:queue => 'caboose_cache').cache_all    
   end
   
   desc "Run rspec tests on Caboose"

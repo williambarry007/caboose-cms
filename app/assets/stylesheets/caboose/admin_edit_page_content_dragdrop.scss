@@ -239,9 +239,9 @@ body > .container, body > .mm-page > .container {
 .block_over > .delete_handle    span { position: absolute; top: 0; right:  0px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
 .block_over > .duplicate_handle    span { position: absolute; top: 0; right:  36px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
 
-.flex-grid-unit.block_over > .delete_handle span { top: -10px; right: auto; left: 26px; background-color: #f1e9e9; }
-.flex-grid-unit.block_over > .duplicate_handle span { top: -10px; right: auto; left: -10px; background-color: #f1e9e9; }
-.flex-grid-unit.block_over > .select_handle span { top: -10px; right: auto; left: 8px; background-color: #f1e9e9; }
+.flex-grid-unit.block_over > .delete_handle span { right: auto; left: 36px; background-color: #f1e9e9; }
+.flex-grid-unit.block_over > .duplicate_handle span { right: auto; left: 0; background-color: #f1e9e9; }
+.flex-grid-unit.block_over > .select_handle span { right: auto; left: 18px; background-color: #f1e9e9; }
 .flex-grid-unit.block_over > .drag_handle span { display: none; }
 
 .unslider-block-wrapper > .delete_handle,

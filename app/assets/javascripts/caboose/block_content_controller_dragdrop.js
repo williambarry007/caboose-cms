@@ -38,16 +38,13 @@ BlockContentController.prototype = {
   show_edit_modal: function(block_id, use_js_for_modal, field_type, bname, btname) {
     var that = this;
     var ft = field_type;
-    
     var modal_controller = '';    
     if (use_js_for_modal == true) { modal_controller = bname ? bname : btname; }      
     else if (ft == 'image')          { modal_controller = 'media';    }
     else if (ft == 'file')           { modal_controller = 'media';    }
     else if (ft == 'richtext')       { modal_controller = 'richtext'; }
     else    { modal_controller = 'block';    }
-
     var filename = modal_controller == 'block' ? 'block_dd' : modal_controller;
-
     var new_modal_eval_string = "new " + that.underscores_to_camelcase(modal_controller) + "ModalController({ " +
       "  " + (that.page_id && that.page_id != null ? "page_id: " + that.page_id : "post_id: " + that.post_id) + ", " +
       "  block_id: " + block_id + ", " + 
@@ -55,7 +52,6 @@ BlockContentController.prototype = {
       "  parent_controller: that, " +
       "  assets_path: '" + that.assets_path + "'" +
       "})";
-
     var js_file = 'caboose/block_modal_controllers/' + filename + '_modal_controller.js';
     if (!that.mc.asset_included(js_file))    
     {    

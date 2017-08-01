@@ -1,7 +1,3 @@
-<%
-# app/views/caboose/posts/admin_edit_content.html.erb
-%>
-
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'jquery-ui' %>
 <%= stylesheet_link_tag 'caboose/admin_block_edit_image' %>
@@ -19,14 +15,15 @@
 <%= javascript_include_tag 'caboose/model/all' %>
 <%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
 <%= javascript_include_tag "caboose/clipboard" %>
-<% if @site && @site.use_dragdrop %>
-<%= javascript_include_tag 'caboose/block_content_controller_dragdrop' %>
-<% else %>
-<%= javascript_include_tag 'caboose/block_content_controller' %>
-<% end %>
 <%= javascript_include_tag "caboose/class" %>
 <%= javascript_include_tag "caboose/modal_controller" %>
+<% if @site && @site.use_dragdrop %>
+<%= javascript_include_tag 'caboose/block_content_controller_dragdrop' %>
+<%= javascript_include_tag "caboose/block_modal_controllers/block_dd_modal_controller" %>
+<% else %>
+<%= javascript_include_tag 'caboose/block_content_controller' %>
 <%= javascript_include_tag "caboose/block_modal_controllers/block_modal_controller" %>
+<% end %>
 <script type='text/javascript'>
 
 var controller = false;
@@ -34,7 +31,11 @@ $(document).ready(function() {
   controller = new BlockContentController({
     post_id: <%= @post.id %>,
     assets_path: <%= raw Caboose.json(asset_path('loading.gif').gsub('loading.gif', '')) %>,
-    included_assets: ['caboose/block_modal_controllers/block_modal_controller.js']
+    <% if @site && @site.use_dragdrop %>
+      included_assets: ['caboose/block_modal_controllers/block_dd_modal_controller.js']
+    <% else %>
+      included_assets: ['caboose/block_modal_controllers/block_modal_controller.js']
+    <% end %>
   });
 
   $('body').append($('<div/>')        

@@ -395,6 +395,7 @@ module Caboose
       #resp.block = b
       resp.success = true
       resp.new_id = b.id
+      resp.parent_id = b.parent_id
       resp.redirect = params[:page_id] ? "/admin/pages/#{b.page_id}/blocks/#{b.id}" : "/admin/posts/#{b.post_id}/blocks/#{b.id}"              
       render :json => resp
     end
@@ -541,8 +542,32 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')
       resp = StdClass.new
       b = Block.find(params[:id])
-      b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
-      resp.success = true
+      resp.new_id = b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
+      render :json => resp
+    end
+
+    # @route GET /admin/pages/:page_id/blocks/:id/api-info
+    # @route GET /admin/posts/:post_id/blocks/:id/api-info
+    def admin_block_info
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new
+      b = Block.find(params[:id])
+      bt = b.block_type if b
+      resp.block_name = b.name
+      resp.bt_name = bt.name
+      resp.use_js_for_modal = bt.use_js_for_modal
+      resp.field_type = bt.field_type
+      render :json => resp
+    end
+
+    # @route GET /admin/pages/:page_id/blocks/:id/parent-block
+    # @route GET /admin/posts/:post_id/blocks/:id/parent-block
+    def admin_parent_block
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new
+      b = Block.find(params[:id])
+      resp.parent_id = b.parent_id if b && b.parent && b.parent.name.blank?
+      resp.grandparent_id = b.parent.parent_id if b && b.parent && b.parent.parent && b.parent.parent.name.blank?
       render :json => resp
     end
 

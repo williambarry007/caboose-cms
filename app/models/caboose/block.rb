@@ -645,7 +645,7 @@ class Caboose::Block < ActiveRecord::Base
         b2.duplicate_block(site_id, page_id, post_id, b2.block_type_id, b.id)
       end
     end
-    return true
+    return b.id
   end
   
   def modal_js_block_names

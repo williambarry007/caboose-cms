@@ -206,32 +206,32 @@ BlockContentController.prototype = {
   {
     var that = this;      
     if (this.selected_block_ids.indexOf(block_id) == -1)
-        this.selected_block_ids.push(block_id);
+      this.selected_block_ids.push(block_id);
     var other_count = this.selected_block_ids.length - 1;
-
     if (!confirm)
     {
       var message = "Are you sure you want to delete this block";      
       if (other_count > 0)
         message += " and the " + other_count + " other selected block" + (other_count == 1 ? '' : 's');
       message += "?<br />";
-      
       var p = $('<p/>')
         .addClass('caboose_note delete')
         .append(message)
         .append($('<input/>').attr('type', 'button').val('Yes').click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(block_id, true); })).append(" ")
-        .append($('<input/>').attr('type', 'button').val('No').click(function(e) {  e.preventDefault(); e.stopPropagation(); }));
+        .append($('<input/>').attr('type', 'button').val('No').click(function(e) { e.preventDefault(); e.stopPropagation(); that.render_block(block_id); }));
       $('#block_' + block_id).attr('onclick','').unbind('click');
       $('#block_' + block_id).empty().append(p);
       return;
     }
-    for (var i in this.selected_block_ids) {
-      var bid = this.selected_block_ids[i];
-      $('#block_' + bid).remove();
-      that.delete_block_save(bid);
+    else {
+      for (var i in this.selected_block_ids) {
+        var bid = this.selected_block_ids[i];
+        $('#block_' + bid).remove();
+        that.delete_block_save(bid);
+      }
+      that.selected_block_ids = [];
+      that.add_dropzones();
     }
-    that.selected_block_ids = [];
-    that.add_dropzones();
   },
 
   delete_block_save: function(block_id) {
@@ -366,8 +366,7 @@ BlockContentController.prototype = {
         });
       }
 
-      if ( $(v).parents('.content_wrapper').length > 0 )
-        that.add_handles_to_block(bid);
+      that.add_handles_to_block(bid);
 
     });
 
@@ -378,23 +377,21 @@ BlockContentController.prototype = {
     var el = $('#block_' + block_id);
     if ( el.attr('id').indexOf('_value') >= 0 || el.children('.drag_handle').length > 0 )
       return true;
-    $('#block_' + block_id + ' *').attr('onclick', '').unbind('click');
-      el
-        .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_drag'      ).addClass('drag_handle'      ).append($('<span/>').addClass('ui-icon ui-icon-arrow-4'    )).click(function(e) { e.preventDefault(); e.stopPropagation();  }))
+    if ( el.parents('.content_body').length > 0 ) {
+      $('#block_' + block_id + ' *').attr('onclick', '').unbind('click');
+      el.prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_drag'      ).addClass('drag_handle'      ).append($('<span/>').addClass('ui-icon ui-icon-arrow-4'    )).click(function(e) { e.preventDefault(); e.stopPropagation();  }))
         .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_select'    ).addClass('select_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-check'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.select_block(block_id);    }))
         .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_duplicate' ).addClass('duplicate_handle' ).append($('<span/>').addClass('ui-icon ui-icon-copy'       )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.duplicate_block(block_id); }))
         .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_delete'    ).addClass('delete_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-close'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(block_id);    }));
+      el.mouseover(function(el) { $('#block_' + block_id).addClass(   'block_over'); });
+      el.mouseout(function(el)  { $('#block_' + block_id).removeClass('block_over'); });
+    }
     el.attr('onclick','').unbind('click');
     el.click(function(e) {      
       e.preventDefault();
       e.stopPropagation();      
       that.edit_block(block_id);
     });
-    var show_mouseover = true;
-    if (show_mouseover) {
-      el.mouseover(function(el) { $('#block_' + block_id).addClass(   'block_over'); });
-      el.mouseout(function(el)  { $('#block_' + block_id).removeClass('block_over'); }); 
-    }
   },
   
   /*****************************************************************************

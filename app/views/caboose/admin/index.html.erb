@@ -8,6 +8,7 @@ width = 200
 %>
 
 <h1>Admin</h1>
+<div id="admin-list">
 <ul>
   <!--
   <li id='nav_item_logout'><a href='/logout'><span class='icon'></span><span class='text'>Logout</span></a>
@@ -34,6 +35,7 @@ width = 200
     <% i + 1 %>
   <% end %>
 </ul>
+</div>
 
 <%= content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/station" %>
@@ -46,8 +48,25 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<%= content_for :caboose_css do %>
-<style type='text/css'>
-
+<% content_for :caboose_css do %>
+<style>
+  #admin-list ul li {
+    line-height: 26px;
+  }
+  #admin-list ul li a {
+    color: #2424b1;
+    text-decoration: none;
+  }
+  #admin-list ul li a:visited {
+    color: #824daf;
+  }
+  #admin-list ul li a:hover {
+    color: #24b14b;
+    text-decoration: underline;
+  }
+  #admin-list ul li span.disabled {
+    text-decoration: line-through;
+    color: #888888;
+  }
 </style>
 <% end %>

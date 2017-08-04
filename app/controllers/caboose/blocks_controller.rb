@@ -306,7 +306,7 @@ module Caboose
     # @route POST /admin/posts/:post_id/blocks
     # @route POST /admin/posts/:post_id/blocks/:id
     def admin_create
-      return unless user_is_allowed('pages', 'add')
+      return unless user_is_allowed('pages', 'edit')
 
       resp = Caboose::StdClass.new
 
@@ -508,7 +508,7 @@ module Caboose
     # @route DELETE /admin/pages/:page_id/blocks/:id
     # @route DELETE /admin/posts/:post_id/blocks/:id
     def admin_delete
-      return unless user_is_allowed('pages', 'delete')
+      return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])
@@ -607,7 +607,7 @@ module Caboose
     # @route PUT /admin/pages/:page_id/blocks/:id/move-up
     # @route PUT /admin/posts/:post_id/blocks/:id/move-up
     def admin_move_up
-      return unless user_is_allowed('pages', 'delete')
+      return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])
@@ -623,7 +623,7 @@ module Caboose
     # @route PUT /admin/pages/:page_id/blocks/:id/move-down
     # @route PUT /admin/posts/:post_id/blocks/:id/move-down
     def admin_move_down
-      return unless user_is_allowed('pages', 'delete')
+      return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])

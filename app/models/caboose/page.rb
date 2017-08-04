@@ -195,12 +195,15 @@ class Caboose::Page < ActiveRecord::Base
     end
     actions = []
     user.roles.each do |role|
-      actions + Caboose::PagePermission.where({
+      acts = Caboose::PagePermission.where({
           :role_id => role.id, 
           :page_id => page_id
-        }).pluck(:action)
+        }).pluq(:action)
+      acts.each do |ac|
+        actions << ac
+      end
     end
-    return actions.uniq
+    return actions
   end
   
   def self.page_ids_with_permission(user, action)

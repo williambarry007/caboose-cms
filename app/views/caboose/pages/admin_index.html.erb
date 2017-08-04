@@ -1,8 +1,35 @@
 <h1>Pages</h1>
 
 <% if @domain %>
+	<% if @user.is_allowed('pages','add') %>
   <p><a href='/admin/pages/new' class="caboose-btn-white">New Page</a></p>
+  <% end %>
+  <div id="page-list">
   <%= raw pages_list(@home_page) %>
+  </div>
 <% else %>
   <p>It doesn't look like this site is configured for the current domain.  Please <a href='/admin/sites'>configure your sites</a>.</p>
 <% end %>  
+
+<% content_for :caboose_css do %>
+<style>
+	#page-list ul li {
+		line-height: 26px;
+	}
+	#page-list ul li a {
+		color: #2424b1;
+		text-decoration: none;
+	}
+	#page-list ul li a:visited {
+		color: #824daf;
+	}
+	#page-list ul li a:hover {
+		color: #24b14b;
+		text-decoration: underline;
+	}
+	#page-list ul li span.disabled {
+		text-decoration: line-through;
+    color: #888888;
+	}
+</style>
+<% end %>

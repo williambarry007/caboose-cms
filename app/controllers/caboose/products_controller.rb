@@ -644,7 +644,7 @@ module Caboose
       query = params[:query]
       resp = Caboose::StdClass.new({'products' => {}})
       if query && !query.blank?
-        resp.products = Product.select('title, id').where(:site_id => @site.id).where('title ILIKE (?)',"%#{query}%").order(:title).limit(30)
+        resp.products = Product.select('title, id').where(:status => 'Active').where(:site_id => @site.id).where('title ILIKE (?)',"%#{query}%").order(:title).limit(30)
       end
       render :json => resp
     end

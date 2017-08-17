@@ -107,6 +107,19 @@ module Caboose
   
       render :json => { 'redirect' => '/admin/post-custom-fields' }      
     end
+
+    # @route GET /admin/post-custom-fields/:pcfid/options
+    def admin_field_options
+      options = []
+      pcf = PostCustomField.where(:site_id => @site.id, :id => params[:pcfid]).first
+      if pcf && !pcf.options.blank?
+        pcf.options.split(/\n/).each do |f|
+          opt = {'text' => f, 'value' => f}
+          options << opt
+        end
+      end
+      render :json => options
+    end
         
     # @route_priority 1
     # @route GET /admin/post-custom-fields/:field-options    

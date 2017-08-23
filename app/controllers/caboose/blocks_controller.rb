@@ -188,7 +188,7 @@ module Caboose
         :request => request
       })
       render :inline => html            
-    end        
+    end
           
     # @route GET /admin/pages/:page_id/blocks/render
     # @route GET /admin/posts/:post_id/blocks/render
@@ -381,8 +381,10 @@ module Caboose
           b1.save
           b1.create_children
           bw = b1.child('width')
-          bw.value = (100.0 / params[:child_count].to_f).to_i.to_s + '%'
-          bw.save
+          if bw
+            bw.value = (100.0 / params[:child_count].to_f).to_i.to_s + '%'
+            bw.save
+          end
         end
       end
 

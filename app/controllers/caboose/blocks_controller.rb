@@ -545,6 +545,7 @@ module Caboose
       resp = StdClass.new
       b = Block.find(params[:id])
       resp.new_id = b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
+      resp.success = true
       render :json => resp
     end
 

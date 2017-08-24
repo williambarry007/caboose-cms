@@ -750,23 +750,38 @@ IndexTable.prototype = {
   	$('#export_message').html("<p class='loading'>Creating export...</p>");  	  	
   	var qs = {};
   	$.each(p, function(k,v) { if (k != '[object Object]') qs[k] = v; });  	
-    $.ajax({ url: h.url, type: h.type, data: qs, success: function(resp) { h.status_url = h.status_url(resp); }, async: false });    
-    setTimeout(function() { that.csv_export_status(h); }, 1000);
+    $.ajax({ 
+      url: h.url, 
+      type: h.type, 
+      data: qs, 
+      success: function(resp) { 
+        h.status_url = h.status_url(resp);
+        setTimeout(function() { that.csv_export_status(h); }, 1000);
+      }
+    });    
+    
   },
   
   csv_export_status: function(h)
   {
     var that = this;
-    $.ajax({
-      url: h.status_url,
-      type: 'get',      
-      success: function(resp) {
-        if (h.ready(resp))
-          window.location = h.final_url(resp);
-        else
-          setTimeout(function() { that.csv_export_status(h); }, 1000);
-      }                      
-    });
+    if ( typeof h.status_url === "function") {
+      console.log('error');
+    }
+    else {
+      $.ajax({
+        url: h.status_url,
+        type: 'get',      
+        success: function(resp) {
+          if (h.ready(resp)) {
+            $('#export_message').html("");    
+            window.location = h.final_url(resp);
+          }
+          else
+            setTimeout(function() { that.csv_export_status(h); }, 1000);
+        }                      
+      });
+    }
   },
   
   pager_div: function(summary)

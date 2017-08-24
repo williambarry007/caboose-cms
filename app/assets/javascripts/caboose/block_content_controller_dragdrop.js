@@ -140,7 +140,6 @@ BlockContentController.prototype = {
       $("#caboose-loading").fadeOut();
   },
 
-
   move_block: function(block_id, parent_id, before_block_id, after_block_id) {
     var that = this;
     var block_id = block_id.replace('block_','');
@@ -155,9 +154,11 @@ BlockContentController.prototype = {
       else if (after_block_id)
         $('#block_' + after_block_id).after(el);
       else if (parent_id) {
-        if ( $('#block_' + parent_id).children('.content_body').children('.new_block_link.np').length > 0 ) {
-          $('#block_' + parent_id).children('.content_body').children('.new_block_link.np').remove();
-          $('#block_' + parent_id).find('.content_body').append(el);
+        var el2 = $('#block_' + parent_id).find('.content_body').first();
+        var first_parent_block = el2.parents("[id^='block_']").first();
+        if ( ('block_' + parent_id) == first_parent_block.attr('id') && el2.children('.new_block_link.np').length > 0 ) {
+          el2.children('.new_block_link.np').remove();
+          el2.append(el);
         }
         else
           $('#block_' + parent_id).append(el);
@@ -168,7 +169,6 @@ BlockContentController.prototype = {
 
     }
   },
-
 
   move_block_save: function(block_id, parent_id, before_block_id, after_block_id) {
     var that = this;

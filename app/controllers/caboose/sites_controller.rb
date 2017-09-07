@@ -162,6 +162,7 @@ module Caboose
           when 'under_construction_html'  then site.under_construction_html = value
           when 'use_store'                then site.use_store               = value
           when 'use_fonts'                then site.use_fonts               = value
+          when 'use_dragdrop'             then site.use_dragdrop            = value
           when 'use_retargeting'          then site.use_retargeting         = value
           when 'custom_css'               then site.custom_css              = value            
           when 'custom_js'                then site.custom_js               = value

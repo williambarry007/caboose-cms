@@ -64,7 +64,7 @@ module Caboose
       @block = params[:id] ? Block.find(params[:id]) : (params[:page_id] ? Block.new(:page_id => params[:page_id]) : Block.new(:post_id => params[:post_id]))
       @after_id = params[:after_id] ? params[:after_id] : nil
       @before_id = params[:before_id] ? params[:before_id] : nil
-      render :layout => 'caboose/modal'                
+      render :layout => 'caboose/modal'
     end
     
     # @route GET /admin/pages/:page_id/blocks/tree
@@ -128,7 +128,8 @@ module Caboose
         bt = b.block_type
         crumbs << {
           :block_id => b.id,
-          :text => b.name && b.name.downcase != bt.description.downcase  ? "#{bt.description} (#{b.name})" : bt.description
+          :text => bt.description
+       #   :text => b.name && b.name.downcase != bt.description.downcase  ? "#{bt.description} (#{b.name})" : bt.description
         }        
         b = b.parent
       end
@@ -137,7 +138,7 @@ module Caboose
       
     def admin_tree_helper(b)
       arr = []
-      b.children.each do |b2|
+      b.children.order(:block_type_id).each do |b2|
         bt = b2.block_type
         arr << {
           'id'                 => b2.id,
@@ -187,7 +188,7 @@ module Caboose
         :request => request
       })
       render :inline => html            
-    end        
+    end
           
     # @route GET /admin/pages/:page_id/blocks/render
     # @route GET /admin/posts/:post_id/blocks/render
@@ -305,7 +306,7 @@ module Caboose
     # @route POST /admin/posts/:post_id/blocks
     # @route POST /admin/posts/:post_id/blocks/:id
     def admin_create
-      return unless user_is_allowed('pages', 'add')
+      return unless user_is_allowed('pages', 'edit')
 
       resp = Caboose::StdClass.new
 
@@ -328,7 +329,7 @@ module Caboose
           i = i + 1                  
         end
         
-      elsif params[:before_id]
+      elsif params[:before_id] && !params[:before_id].blank?
         b2 = Block.find(params[:before_id].to_i)
         b.sort_order = b2.sort_order
         
@@ -339,7 +340,7 @@ module Caboose
           i = i + 1                  
         end
       
-      elsif params[:after_id]
+      elsif params[:after_id] && !params[:after_id].blank?
         b2 = Block.find(params[:after_id].to_i)
         b.sort_order = b2.sort_order + 1
         
@@ -356,10 +357,37 @@ module Caboose
       
       # Save the block
       b.save
+
+      if !b.block_type.default.blank?
+        b.value = b.block_type.default
+        b.save
+      end
       
       # Ensure that all the children are created for the block
       b.create_children
-      
+
+      # Default child block count
+      if !params[:child_count].blank? && params[:child_count].to_i > 0
+        (1..params[:child_count].to_i).each_with_index do |cc, ind|
+          b1 = Block.new
+          if params[:page_id]
+            b1.page_id = params[:page_id].to_i
+          else
+            b1.post_id = params[:post_id].to_i
+          end
+          b1.parent_id = b.id
+          b1.sort_order = ind
+          b1.block_type_id = b.block_type.default_child_block_type_id
+          b1.save
+          b1.create_children
+          bw = b1.child('width')
+          if bw
+            bw.value = (100.0 / params[:child_count].to_f).to_i.to_s + '%'
+            bw.save
+          end
+        end
+      end
+
       # Set the global values if necessary
       if b.block_type.is_global        
         b.get_global_value(@site.id)
@@ -369,6 +397,7 @@ module Caboose
       #resp.block = b
       resp.success = true
       resp.new_id = b.id
+      resp.parent_id = b.parent_id
       resp.redirect = params[:page_id] ? "/admin/pages/#{b.page_id}/blocks/#{b.id}" : "/admin/posts/#{b.post_id}/blocks/#{b.id}"              
       render :json => resp
     end
@@ -418,16 +447,16 @@ module Caboose
       end
       
       # Trigger the page cache to be updated
-      if params[:page_id]
-        pc = PageCache.where(:page_id => b.page_id).first
-        if pc
-          pc.refresh = true
-          pc.save
-          PageCacher.delay(:queue => 'caboose_cache').refresh
-        else
-          PageCacher.delay(:queue => 'caboose_cache').cache(b.page_id)
-        end
-      end
+      # if params[:page_id]
+      #   pc = PageCache.where(:page_id => b.page_id).first
+      #   if pc
+      #     pc.refresh = true
+      #     pc.save
+      #     PageCacher.delay(:queue => 'caboose_cache').refresh
+      #   else
+      #     PageCacher.delay(:queue => 'caboose_cache').cache(b.page_id)
+      #   end
+      # end
                 
       resp.success = save && b.save
       b.create_children
@@ -481,7 +510,7 @@ module Caboose
     # @route DELETE /admin/pages/:page_id/blocks/:id
     # @route DELETE /admin/posts/:post_id/blocks/:id
     def admin_delete
-      return unless user_is_allowed('pages', 'delete')
+      return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])
@@ -515,15 +544,73 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')
       resp = StdClass.new
       b = Block.find(params[:id])
-      b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
+      resp.new_id = b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
       resp.success = true
+      render :json => resp
+    end
+
+    # @route GET /admin/pages/:page_id/blocks/:id/api-info
+    # @route GET /admin/posts/:post_id/blocks/:id/api-info
+    def admin_block_info
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new
+      b = Block.find(params[:id])
+      bt = b.block_type if b
+      resp.block_name = b.name
+      resp.bt_name = bt.name
+      resp.use_js_for_modal = bt.use_js_for_modal
+      resp.field_type = bt.field_type
+      render :json => resp
+    end
+
+    # @route GET /admin/pages/:page_id/blocks/:id/parent-block
+    # @route GET /admin/posts/:post_id/blocks/:id/parent-block
+    def admin_parent_block
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new
+      b = Block.find(params[:id])
+      resp.parent_id = b.parent_id if b && b.parent && b.parent.name.blank?
+      resp.grandparent_id = b.parent.parent_id if b && b.parent && b.parent.parent && b.parent.parent.name.blank?
+      render :json => resp
+    end
+
+    # @route POST /admin/pages/:page_id/blocks/:id/move
+    # @route POST /admin/posts/:post_id/blocks/:id/move
+    def admin_move
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new
+      b = Block.find(params[:id])
+      if params[:before_id] && !params[:before_id].blank?
+        b2 = Block.find(params[:before_id].to_i)
+        b.sort_order = b2.sort_order
+        i = 1
+        b2.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
+          b3.sort_order = b.sort_order + i
+          b3.save
+          i = i + 1                  
+        end
+      elsif params[:after_id] && !params[:after_id].blank?
+        b2 = Block.find(params[:after_id].to_i)
+        b.sort_order = b2.sort_order + 1
+        i = 1
+        b2.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
+          b3.sort_order = b.sort_order + i
+          b3.save
+          i = i + 1                  
+        end
+      elsif params[:parent_id]
+        b.sort_order = Block.where(:parent_id => params[:parent_id]).count
+      end
+      b.parent_id = params[:parent_id]
+      resp.success = true
+      b.save
       render :json => resp
     end
     
     # @route PUT /admin/pages/:page_id/blocks/:id/move-up
     # @route PUT /admin/posts/:post_id/blocks/:id/move-up
     def admin_move_up
-      return unless user_is_allowed('pages', 'delete')
+      return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])
@@ -539,7 +626,7 @@ module Caboose
     # @route PUT /admin/pages/:page_id/blocks/:id/move-down
     # @route PUT /admin/posts/:post_id/blocks/:id/move-down
     def admin_move_down
-      return unless user_is_allowed('pages', 'delete')
+      return unless user_is_allowed('pages', 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])

@@ -1,64 +1,13 @@
-<%
-# app/views/caboose/posts/admin_edit_content.html.erb
-%>
-
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'jquery-ui' %>
 <%= stylesheet_link_tag 'caboose/admin_block_edit_image' %>
-<%= stylesheet_link_tag 'caboose/admin_post_edit_content' %>
+<% if @site && @site.use_dragdrop %>
+<%= stylesheet_link_tag 'caboose/admin_edit_page_content_dragdrop' %>
+<% else %>
+<%= stylesheet_link_tag 'caboose/admin_edit_page_content' %>
+<% end %>
 <%= stylesheet_link_tag "caboose/modal_inline" %>
-<style type='text/css'>
-
-#tiny_header {
-  display: block;  
-  color: #fff;
-  background-image: url(/assets/caboose/caboose_logo_small.png);
-  background-color: #000;  
-  background-repeat: no-repeat;
-  background-position: right 0;
-  padding: 0 50px 0 10px;
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  z-index: 100000;
-  border-left: #fff 1px solid;
-  border-bottom: #fff 1px solid;  
-}
-#tiny_header a {
-  display: inline-block;
-  color: #fff;
-  padding: 16px 10px;  
-}
-.block_over { background: #e3e3e3; }
-.select_handle    { display: none; }
-.move_up_handle   { display: none; }
-.move_down_handle { display: none; }
-.delete_handle    { display: none; }
-.duplicate_handle    { display: none; }
-.block_over > .select_handle    { display: block; position: relative; }
-.block_over > .move_up_handle   { display: block; position: relative; }
-.block_over > .move_down_handle { display: block; position: relative; }
-.block_over > .delete_handle    { display: block; position: relative; }
-.block_over > .duplicate_handle    { display: block; position: relative; }
-.block_over > .select_handle    span { position: absolute; top: 0; right: 72px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
-.block_over > .move_up_handle   span { position: absolute; top: 0; right: 36px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
-.block_over > .move_down_handle span { position: absolute; top: 0; right: 18px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
-.block_over > .delete_handle    span { position: absolute; top: 0; right:  0px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
-.block_over > .duplicate_handle    span { position: absolute; top: 0; right:  54px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
-
-.selected { background: #fff799; }
-
-.new_block_link { position: relative; width: 100%; }
-.new_block_link .line { position: absolute; top: -11px; width: 100%; height: 2px; background: transparent; }
-.new_block_link a { position: absolute; top: -20px; left: 45%; background: transparent; color: transparent !important; display: block; padding: 4px 8px; }
-
-.new_block_link_over { position: relative; width: 100%; }
-.new_block_link_over .line { position: absolute; top: -11px; width: 100%; height: 2px; background: #ccc; }
-.new_block_link_over a { position: absolute; top: -22px; left: 45%; color: #fff; background: #666; display: block; padding: 2px 4px; text-decoration: none; font-size: 12px; }
-
-.caboose_note { padding: 10px 20px; background: #990000; color: #fff; font-size: 16px; }
-
-</style>
+<%= stylesheet_link_tag "caboose/icomoon_fonts" %>
 <% end %>
 
 <% content_for :caboose_js do %>
@@ -66,10 +15,15 @@
 <%= javascript_include_tag 'caboose/model/all' %>
 <%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
 <%= javascript_include_tag "caboose/clipboard" %>
-<%= javascript_include_tag 'caboose/block_content_controller' %>
 <%= javascript_include_tag "caboose/class" %>
 <%= javascript_include_tag "caboose/modal_controller" %>
+<% if @site && @site.use_dragdrop %>
+<%= javascript_include_tag 'caboose/block_content_controller_dragdrop' %>
+<%= javascript_include_tag "caboose/block_modal_controllers/block_dd_modal_controller" %>
+<% else %>
+<%= javascript_include_tag 'caboose/block_content_controller' %>
 <%= javascript_include_tag "caboose/block_modal_controllers/block_modal_controller" %>
+<% end %>
 <script type='text/javascript'>
 
 var controller = false;
@@ -77,16 +31,32 @@ $(document).ready(function() {
   controller = new BlockContentController({
     post_id: <%= @post.id %>,
     assets_path: <%= raw Caboose.json(asset_path('loading.gif').gsub('loading.gif', '')) %>,
-    included_assets: ['caboose/block_modal_controllers/block_modal_controller.js']
+    <% if @site && @site.use_dragdrop %>
+      included_assets: ['caboose/block_modal_controllers/block_dd_modal_controller.js']
+    <% else %>
+      included_assets: ['caboose/block_modal_controllers/block_modal_controller.js']
+    <% end %>
   });
 
   $('body').append($('<div/>')        
     .attr('id', 'tiny_header')
     .append($('<a/>').attr('href', '/admin/posts').html("< Back"))
-    .append($('<a/>').attr('href', '#').html('Post Options').click(function(e) { e.preventDefault(); caboose_modal_url('/admin/posts/<%= @post.id %>/custom-fields'); }))
-    .append($('<a/>').attr('href', '/admin/posts/<%= @post.id %>/layout').html("Layout"))
-    .append($('<a/>').attr('href', '/admin/posts/<%= @post.id %>').html("Settings"))        
-  );    
+    .append($('<a/>').attr('href', '/admin/posts/<%= @post.id %>').html("Post Settings"))
+    .append($('<a/>').attr('href', '<%= @post.uri %>').attr('target','_blank').html("View Post"))     
+  );
+
+<% if @site && @site.use_dragdrop %>
+  var html = "<%== (render :partial => 'caboose/pages/new_block_header').gsub( / *\n+/, '' ) %> ";
+  $('body').append($('<div/>')
+    .attr('id', 'block_sidebar')
+    .append(html)
+  );
+  $("#new_blocks li.blocktype").draggable({ revert: true, helper: 'clone', appendTo: 'body', zIndex: 999999, scroll: false, start: function(event, ui) {
+    $(".line.ui-droppable").addClass('dropzone'); }, stop: function(event, ui) { $(".line.ui-droppable").removeClass('dropzone'); } });
+  $('body').addClass('icons');
+  $('body').append($('<div/>').attr('id','caboose-loading').append( $('<div/>').addClass('table').append($('<div/>').addClass('table-cell').append('<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg id="loader" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="60px" height="60px" viewBox="0 0 128 128" xml:space="preserve"><g><path d="M64 0L40.08 21.9a10.98 10.98 0 0 0-5.05 8.75C34.37 44.85 64 60.63 64 60.63V0z" fill="#ffb118"/><path d="M128 64l-21.88-23.9a10.97 10.97 0 0 0-8.75-5.05C83.17 34.4 67.4 64 67.4 64H128z" fill="#80c141"/><path d="M63.7 69.73a110.97 110.97 0 0 1-5.04-20.54c-1.16-8.7.68-14.17.68-14.17h38.03s-4.3-.86-14.47 10.1c-3.06 3.3-19.2 24.58-19.2 24.58z" fill="#cadc28"/><path d="M64 128l23.9-21.88a10.97 10.97 0 0 0 5.05-8.75C93.6 83.17 64 67.4 64 67.4V128z" fill="#cf171f"/><path d="M58.27 63.7a110.97 110.97 0 0 1 20.54-5.04c8.7-1.16 14.17.68 14.17.68v38.03s.86-4.3-10.1-14.47c-3.3-3.06-24.58-19.2-24.58-19.2z" fill="#ec1b21"/><path d="M0 64l21.88 23.9a10.97 10.97 0 0 0 8.75 5.05C44.83 93.6 60.6 64 60.6 64H0z" fill="#018ed5"/><path d="M64.3 58.27a110.97 110.97 0 0 1 5.04 20.54c1.16 8.7-.68 14.17-.68 14.17H30.63s4.3.86 14.47-10.1c3.06-3.3 19.2-24.58 19.2-24.58z" fill="#00bbf2"/><path d="M69.73 64.34a111.02 111.02 0 0 1-20.55 5.05c-8.7 1.14-14.15-.7-14.15-.7V30.65s-.86 4.3 10.1 14.5c3.3 3.05 24.6 19.2 24.6 19.2z" fill="#f8f400"/><circle cx="64" cy="64" r="2.03"/><animateTransform attributeName="transform" type="rotate" from="0 64 64" to="-360 64 64" dur="2100ms" repeatCount="indefinite"></animateTransform></g></svg>').append('<h4>Loading...</h4>') )  ));
+<% end %>
+
 });
 
 </script>

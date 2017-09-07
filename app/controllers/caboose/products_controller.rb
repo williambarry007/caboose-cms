@@ -13,8 +13,8 @@ module Caboose
       title = params[:title] ? params[:title].strip.downcase.split(' ') : nil
       render :json => [] and return if title.nil? || title.length == 0
       
-      where = ["site_id = ?"]      
-      vars = [@site.id]
+      where = ["site_id = ?","status = ?"]      
+      vars = [@site.id, 'Active']
       title.each do |str|
         where << 'lower(title) like ?'
         vars << "%#{str}%"
@@ -644,7 +644,7 @@ module Caboose
       query = params[:query]
       resp = Caboose::StdClass.new({'products' => {}})
       if query && !query.blank?
-        resp.products = Product.select('title, id').where(:site_id => @site.id).where('title ILIKE (?)',"%#{query}%").order(:title).limit(30)
+        resp.products = Product.select('title, id').where(:status => 'Active').where(:site_id => @site.id).where('title ILIKE (?)',"%#{query}%").order(:title).limit(30)
       end
       render :json => resp
     end

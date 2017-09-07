@@ -4,14 +4,14 @@ module Caboose
     
     def self.refresh
       PageCache.where(:refresh => true).all.each do |pc|
-        self.delay(:queue => 'caboose_cache').cache(pc.page_id)
+ #       self.delay(:queue => 'caboose_cache').cache(pc.page_id)
       end
       
       # Make sure all pages are cached
       query = ["select id from pages where id not in (select distinct(page_id) from page_cache)"]
       rows = ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
       if rows
-        rows.each{ |row| self.delay(:queue => 'caboose_cache').cache(row['id'].to_i) }
+#        rows.each{ |row| self.delay(:queue => 'caboose_cache').cache(row['id'].to_i) }
       end
     end
     
@@ -19,7 +19,7 @@ module Caboose
       query = ["select id from pages order by id"]
       rows = ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))
       if rows
-        rows.each{ |row| self.delay(:queue => 'caboose_cache').cache(row['id'].to_i) }
+  #      rows.each{ |row| self.delay(:queue => 'caboose_cache').cache(row['id'].to_i) }
       end            
     end
       

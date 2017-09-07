@@ -3,7 +3,7 @@
 
 <form action='/admin/pages/<%= @page.id %>' method='put' id='layout_form'>
 <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
-<h4 style="color:red;">WARNING: Changing the page layout will delete all existing content from the page.</h4>
+<!-- <h4 style="color:red;">WARNING: Changing the page layout will delete all existing content from the page.</h4> -->
 <p><select name='block_type_id'>
   <option value=''>-- Select a layout --</option>
   <% cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id } %>

@@ -300,20 +300,20 @@ var BlockModalController = ModalController.extend({
       e.stopPropagation();
       that.parent_controller.edit_block(b.id); 
     });     
-    var show_mouseover = true;
-    if (b.children && b.children.length > 0)
-    {
-      $.each(b.children, function(i, b2) {
-        if (b2.block_type.id = 34)
-          show_mouseover = false;
-        that.set_clickable(b2);
-      });
-    }    
-    if (false && show_mouseover)
-    {
-      $('#the_modal #block_' + b.id).mouseover(function(el) { $('#the_modal #block_' + b.id).addClass(   'block_over'); });
-      $('#the_modal #block_' + b.id).mouseout(function(el)  { $('#the_modal #block_' + b.id).removeClass('block_over'); }); 
-    }    
+    // var show_mouseover = true;
+    // if (b.children && b.children.length > 0)
+    // {
+    //   $.each(b.children, function(i, b2) {
+    //     if (b2.block_type.id = 34)
+    //       show_mouseover = false;
+    //     that.set_clickable(b2);
+    //   });
+    // }    
+    // if (false && show_mouseover)
+    // {
+    //   $('#the_modal #block_' + b.id).mouseover(function(el) { $('#the_modal #block_' + b.id).addClass(   'block_over'); });
+    //   $('#the_modal #block_' + b.id).mouseout(function(el)  { $('#the_modal #block_' + b.id).removeClass('block_over'); }); 
+    // }  
   },
 
   /*****************************************************************************
@@ -407,10 +407,8 @@ var BlockModalController = ModalController.extend({
         if (resp.error)   that.autosize("<p class='note error'>" + resp.error + "</p>");
         if (resp.success)
         {                    
-          that.parent_controller.refresh_blocks(function() {
-            that.parent_controller.edit_block(resp.new_id);
-            that.parent_controller.render_blocks();            
-          });
+          that.parent_controller.edit_block(resp.new_id);
+          that.parent_controller.render_block(resp.parent_id);
         }
       }
     });        
@@ -430,34 +428,16 @@ var BlockModalController = ModalController.extend({
       return;
     }
     that.autosize("<p class='loading'>Deleting block...</p>");
-    $.ajax({
-      url: that.block_url(that.block),
-      type: 'delete',    
-      success: function(resp) {
-        if (resp.error) that.autosize("<p class='note error'>" + resp.error + "</p>");
-        if (resp.redirect) 
-        {
-          that.close();
-          that.parent_controller.render_blocks();          
-        }
-      }
-    });
+    that.parent_controller.delete_block(that.block.id, true);
+    that.close();
   },
 
   duplicate_block: function()
   {
     var that = this;
     that.autosize("<p class='loading'>Duplicating...</p>");
-    $.ajax({
-      url: that.block_url(that.block) + '/duplicate',
-      type: 'put',
-      success: function(resp) {        
-        if (resp.success) {
-          that.autosize("<p class='note success'>Duplicated block.</p>");          
-          that.parent_controller.render_blocks();
-        }   
-      }
-    });    
+    that.parent_controller.duplicate_block(that.block.id);
+    that.autosize("<p class='note success'>Duplicated block.</p>");
   },
     
   move_up: function()
@@ -472,7 +452,7 @@ var BlockModalController = ModalController.extend({
         if (resp.success) 
         {
           that.autosize("<p class='note success'>" + resp.success + "</p>");          
-          that.parent_controller.render_blocks();
+          that.parent_controller.render_block(that.block.parent_id);
         }
       }
     });    
@@ -490,7 +470,7 @@ var BlockModalController = ModalController.extend({
         if (resp.success) 
         {
           that.autosize("<p class='note success'>" + resp.success + "</p>");          
-          that.parent_controller.render_blocks();
+          that.parent_controller.render_block(that.block.parent_id);
         }
       }
     });    

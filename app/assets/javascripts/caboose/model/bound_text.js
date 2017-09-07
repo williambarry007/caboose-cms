@@ -33,6 +33,21 @@ BoundText = BoundControl.extend({
       $('#'+that.el+'_container').append($('<div/>').attr('id', that.el + '_placeholder').addClass('mb_placeholder').append($('<span/>').html(that.attribute.nice_name + ': ')));
       $('#'+that.el).css('background', 'transparent');
     }    
+
+    // if (this.attribute.width)  $('#'+this.el).css('width' , this.attribute.width);    
+    // if (this.attribute.fixed_placeholder && this.attribute.align != 'right')
+    // {
+    //   that.set_placeholder_padding();
+    //   //setTimeout(function() {
+    //   //  var w = $('#'+that.el+'_placeholder').outerWidth();
+    //   //  $('#'+that.el).attr('placeholder', 'empty').css('padding-left', '+=' + w);//.css('width', '-=' + w);
+    //   //  }, 200);            
+    // }
+    // var this2 = this;
+    // $('#'+this.el).on('keyup', function(e) {
+    //   if (e.keyCode == 27) this2.cancel(); // Escape 
+    //   if (e.keyCode == 13) this2.save();   // Enter
+
     if (that.attribute.width)  $('#'+that.el).css('width', that.attribute.width);    
     if (that.attribute.fixed_placeholder && that.attribute.align != 'right')
       that.set_placeholder_padding();                  
@@ -40,6 +55,7 @@ BoundText = BoundControl.extend({
     $('#'+that.el).on('keyup', function(e) {
       if (e.keyCode == 27) that.cancel(); // Escape 
       if (e.keyCode == 13) that.save();   // Enter
+
       
       if ($('#'+that.el).val() != that.attribute.value_clean)
         $('#'+that.el).addClass('mb_dirty');

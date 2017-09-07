@@ -1,13 +1,34 @@
-<div id='new_blocks_container1'>
-  <p><input type='button' value='New Page Block' onclick='toggle_blocks();' /></p>
-</div>
-<div id='new_blocks_container2' style='display: none;'>
-  <input type='button' value='New Page Block' onclick='toggle_blocks();' />
-  <p>Drag a block onto the page.</p>
-  <ul id='new_blocks'>
-    <% @block_types.each do |block_type| %><li id='new_block_<%= block_type.id %>'><%= block_type.description %></li><% end %>
-  </ul>
-  <p><a href='#' onclick='toggle_blocks();'>Close</a></p>
-</div>
-<ul id='blocks'></ul>
+<%
+btsm = Caboose::BlockTypeSiteMembership.where(:site_id => @site.id).pluq(:block_type_id)
+@block_types = Caboose::BlockType.where(:parent_id => nil, :block_type_category_id => 2).where(:id => btsm).order(:description)
+%>
 
+<div class='icons' id='new_blocks_container2'>
+  <h4>Drag a block<br />onto the page.</h4>
+  <ul id='new_blocks'>
+  	<li class='title'><span>Structure</span></li>
+  	<li class='blocktype' id='new_block_3159_2' data-btid='3159' data-children='2'>
+  		<span class='icon icon-insert-template'></span>
+  		<span class='bname'>2 Column Row</span>
+  	</li>
+  	<li class='blocktype' id='new_block_3159_3' data-btid='3159' data-children='3'>
+  		<span class='icon icon-insert-template'></span>
+  		<span class='bname'>3 Column Row</span>
+  	</li>
+  	<li class='blocktype' id='new_block_3159_4' data-btid='3159' data-children='4'>
+  		<span class='icon icon-insert-template'></span>
+  		<span class='bname'>4 Column Row</span>
+  	</li>
+  	<li class='blocktype' id='new_block_3159_5' data-btid='3159' data-children='5'>
+  		<span class='icon icon-insert-template'></span>
+  		<span class='bname'>5 Column Row</span>
+  	</li>
+  	<li class='title'><span>Content</span></li>
+    <% @block_types.each do |block_type| %>
+    	<li class='blocktype' id='new_block_<%= block_type.id %>' data-btid='<%= block_type.id %>'>
+    		<span class='icon icon-<%= block_type.icon %>'></span>
+    		<span class='bname'><%= block_type.description %></span>
+    	</li>
+    <% end %>
+  </ul>
+</div>

@@ -30,6 +30,7 @@ class Caboose::Site < ActiveRecord::Base
     :allow_self_registration ,
     :analytics_id            ,
     :use_retargeting         ,
+    :use_dragdrop            ,
     :date_js_updated         ,
     :date_css_updated        ,
     :default_layout_id       ,

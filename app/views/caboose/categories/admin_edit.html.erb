@@ -72,7 +72,7 @@ function add_product_to_category(product_id, title) {
     success: function(resp) {
       $("#product-results").html("");
       if ( resp && resp.success ) {
-        var a = $("<a />").attr('href','/admin/products' + product_id + '/general').text(title);
+        var a = $("<a />").attr('href','/admin/products/' + product_id + '/general').text(title);
         var li = $("<li />").append(a);
         $("#cat-products").append(li);
         $("#message").html("<p class='note success'>Product added to category.</p>");
@@ -88,9 +88,7 @@ $("#product-finder").keyup(function() {
   if ( q && q != '' ) {
     $.ajax({
       url: '/api/products/keyword',
-      data: {
-        query: q
-      },
+      data: { query: q },
       type: 'get',
       success: function(resp) {
         if ( resp && resp.products && resp.products.length > 0 ) {

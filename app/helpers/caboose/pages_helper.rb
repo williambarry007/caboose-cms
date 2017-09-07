@@ -8,7 +8,12 @@ module Caboose
     end
     
     def pages_list_helper(page)
-      str = "<li><a href='/admin/pages/#{page.id}/content'>#{page.title}</a>"
+      can_edit = (@logged_in_user && (@logged_in_user.is_allowed('all', 'all') || Page.permissible_actions(@logged_in_user, page.id).include?('edit'))) ? true : false
+      if can_edit
+        str = "<li><a href='/admin/pages/#{page.id}/content'>#{page.title}</a>"
+      else
+        str = "<li><span class='disabled'>#{page.title}</span>"
+      end
       if page.children && page.children.count > 0
         str << "<ul>"
         page.children.each do |p|

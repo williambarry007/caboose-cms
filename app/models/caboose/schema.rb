@@ -735,6 +735,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :allow_self_registration , :boolean     , { :default => false }],
         [ :analytics_id            , :string     ],        
         [ :use_retargeting         , :boolean     , { :default => false }],
+        [ :use_dragdrop            , :boolean     , { :default => false }],
         [ :date_js_updated         , :datetime   ],
         [ :date_css_updated        , :datetime   ],
         [ :default_layout_id       , :integer    ],

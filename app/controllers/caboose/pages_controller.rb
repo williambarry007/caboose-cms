@@ -140,6 +140,7 @@ module Caboose
     # @route GET /admin/pages
     def admin_index
       return if !user_is_allowed('pages', 'view')            
+      @user = @logged_in_user
       @domain = Domain.where(:domain => request.host_with_port).first
       @home_page = @domain ? Page.index_page(@domain.site_id) : nil
       if @domain && @home_page.nil?
@@ -183,9 +184,11 @@ module Caboose
                
     # @route GET /admin/pages/:id/content
     def admin_edit_content
-      return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
-      if @page.block.nil?      
+      redirect_to "/login?return_url=/admin/pages/#{@page.id}/content" and return if @logged_in_user.nil?
+      condition = @logged_in_user && ( @logged_in_user.is_allowed('all','all') || @logged_in_user.is_allowed('pages','edit') && Page.permissible_actions(@logged_in_user, @page.id).include?('edit'))
+      redirect_to "/admin/pages" and return unless condition
+      if @page.block.nil?
         redirect_to "/admin/pages/#{@page.id}/layout"
         return
       end
@@ -203,8 +206,31 @@ module Caboose
     def admin_update_layout
       return unless user_is_allowed('pages', 'edit')      
       bt = BlockType.find(params[:block_type_id])
-      Block.where(:page_id => params[:id]).destroy_all
-      Block.create(:page_id => params[:id], :block_type_id => params[:block_type_id], :name => bt.name)
+      old_block = Block.where(:page_id => params[:id], :parent_id => nil).first
+      old_block_ids = Block.where(:page_id => params[:id]).pluq(:id)
+      new_block = Block.create(:page_id => params[:id], :block_type_id => params[:block_type_id], :name => bt.name)
+      new_block.create_children
+      saved_blocks = []
+      if new_block && old_block && new_block.child('content') && old_block.child('content')
+        old_content = old_block.child('content')
+        new_content = new_block.child('content')
+        old_content.children.each do |child|
+          child.parent_id = new_content.id
+          child.save
+          saved_blocks << child.id
+          child.children.each do |c1|
+            saved_blocks << c1.id
+            c1.children.each do |c2|
+              saved_blocks << c2.id
+              c2.children.each do |c3|
+                saved_blocks << c3.id
+              end
+            end
+          end
+        end
+      end
+      where1 = saved_blocks.count > 0 ? "id NOT IN (#{saved_blocks.to_s.gsub('[','').gsub(']','')})" : ''
+      Block.where(:id => old_block_ids).where(where1).destroy_all
       resp = Caboose::StdClass.new({
         'redirect' => "/admin/pages/#{params[:id]}/content"
       })

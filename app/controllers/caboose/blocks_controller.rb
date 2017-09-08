@@ -469,7 +469,13 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')
       resp = StdClass.new({'attributes' => {}})
       b = Block.find(params[:id])
-      b.value = params[:value]
+      # if b.block_type_id == 309 # Richtext
+        b.value = params[:value]
+      # elsif b.block_type_id == 1 # Heading
+      #   b1 = b.child('heading_text')
+      #   b1.value = params[:value]
+      #   b1.save
+      # end
       resp.success = b.save
       render :json => resp
     end

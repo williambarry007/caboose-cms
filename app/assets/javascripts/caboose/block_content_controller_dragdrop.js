@@ -12,7 +12,7 @@ BlockContentController.prototype = {
   included_assets: false,
   mc: false,
   editing_block: false,
-  inline_classes: ['richtext-block'],
+  inline_classes: ['rtedit'],
   
   init: function(params)
   {
@@ -42,18 +42,21 @@ BlockContentController.prototype = {
     var that = this;
     $.each(that.inline_classes, function(k1, c) {
       $.each($('.' + c), function(k2, b) {
-        $(b).attr('contenteditable','true');
-        var block_id = $(b).attr('id').replace('block_','');
-        var editor = CKEDITOR.inline('block_' + block_id);
-        editor.on('change', function(ev) {
-          var html = $(b).html();
-          $.ajax({
-            url: that.base_url() + '/' + block_id + '/value',
-            type: 'put',
-            data: { value: html },
-            success: function(resp) { }
+       // var el = $(b).find('.value').first();
+        if ( !$(b).hasClass('cke_editable') ) {
+          $(b).attr('contenteditable','true');
+          var block_id = $(b).attr('id').replace('rtedit-','');
+          var editor = CKEDITOR.inline('rtedit-' + block_id);
+          editor.on('change', function(ev) {
+            var html = $(b).html();
+            $.ajax({
+              url: that.base_url() + '/' + block_id + '/value',
+              type: 'put',
+              data: { value: html },
+              success: function(resp) { }
+            });
           });
-        });
+        }
       });
     });
   },
@@ -111,6 +114,7 @@ BlockContentController.prototype = {
         $('#block_' + block_id).replaceWith(html);
         that.is_loading(false, 'Loading...');
         that.add_dropzones();
+        that.init_inline_editor();
       }
     });
   },
@@ -413,7 +417,7 @@ BlockContentController.prototype = {
     el.click(function(e) {      
       e.preventDefault();
       e.stopPropagation();
-      if ( el.hasClass('richtext-block') || el.hasClass('heading-block') )
+      if ( el.hasClass('richtext-block') || el.hasClass('heading-block') || el.hasClass('staff-block') )
         return;
       else
         that.edit_block(block_id);

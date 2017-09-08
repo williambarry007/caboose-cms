@@ -462,6 +462,17 @@ module Caboose
       b.create_children
       render :json => resp      
     end
+
+    # @route PUT /admin/pages/:page_id/blocks/:id/value
+    # @route PUT /admin/posts/:post_id/blocks/:id/value
+    def admin_update_value
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new({'attributes' => {}})
+      b = Block.find(params[:id])
+      b.value = params[:value]
+      resp.success = b.save
+      render :json => resp
+    end
     
     # @route POST /admin/pages/:page_id/blocks/:id/image
     # @route POST /admin/posts/:post_id/blocks/:id/image

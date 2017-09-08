@@ -12,6 +12,7 @@ BlockContentController.prototype = {
   included_assets: false,
   mc: false,
   editing_block: false,
+  inline_classes: ['richtext-block'],
   
   init: function(params)
   {
@@ -20,6 +21,8 @@ BlockContentController.prototype = {
       that[i] = params[i];
     that.add_dropzones();
     that.mc = new ModalController({ parent_controller: this, assets_path: that.assets_path });
+    CKEDITOR.disableAutoInline = true;
+    that.init_inline_editor();
   },
 
   edit_block: function(block_id) {
@@ -32,6 +35,26 @@ BlockContentController.prototype = {
         that.editing_block = block_id;
         that.show_edit_modal(block_id, resp.use_js_for_modal, resp.field_type, resp.block_name, resp.bt_name );
       }
+    });
+  },
+
+  init_inline_editor: function() {
+    var that = this;
+    $.each(that.inline_classes, function(k1, c) {
+      $.each($('.' + c), function(k2, b) {
+        $(b).attr('contenteditable','true');
+        var block_id = $(b).attr('id').replace('block_','');
+        var editor = CKEDITOR.inline('block_' + block_id);
+        editor.on('change', function(ev) {
+          var html = $(b).html();
+          $.ajax({
+            url: that.base_url() + '/' + block_id + '/value',
+            type: 'put',
+            data: { value: html },
+            success: function(resp) { }
+          });
+        });
+      });
     });
   },
 
@@ -389,8 +412,11 @@ BlockContentController.prototype = {
     el.attr('onclick','').unbind('click');
     el.click(function(e) {      
       e.preventDefault();
-      e.stopPropagation();      
-      that.edit_block(block_id);
+      e.stopPropagation();
+      if ( el.hasClass('richtext-block') || el.hasClass('heading-block') )
+        return;
+      else
+        that.edit_block(block_id);
     });
   },
   

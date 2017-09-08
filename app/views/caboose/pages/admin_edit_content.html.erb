@@ -21,6 +21,8 @@
 <% if @site && @site.use_dragdrop %>
 <%= javascript_include_tag 'caboose/block_content_controller_dragdrop' %>
 <%= javascript_include_tag "caboose/block_modal_controllers/block_dd_modal_controller" %>
+<script>window.CKEDITOR_BASEPATH = '//cabooseit.s3.amazonaws.com/ckeditor/';</script>
+<%= javascript_include_tag "//cabooseit.s3.amazonaws.com/ckeditor/ckeditor.js" %>
 <% else %>
 <%= javascript_include_tag 'caboose/block_content_controller' %>
 <%= javascript_include_tag "caboose/block_modal_controllers/block_modal_controller" %>

@@ -89,6 +89,13 @@
   }
 }
 
+.cke_editable:focus {
+  outline-color: #c0dcff;
+  outline-offset: 7px;
+  outline-style: solid;
+  outline-width: 2px;
+}
+
 body > .ui-draggable-dragging {
   width: 95px;
   height: auto;

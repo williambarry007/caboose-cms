@@ -7,6 +7,14 @@ module Caboose
     def before_action
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
+
+    def sitemap
+      respond_to :xml
+    end
+
+    def robots
+      respond_to :text
+    end
             
     # @route GET /admin/sites
     def admin_index

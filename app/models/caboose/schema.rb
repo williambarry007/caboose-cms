@@ -739,7 +739,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_js_updated         , :datetime   ],
         [ :date_css_updated        , :datetime   ],
         [ :default_layout_id       , :integer    ],
-        [ :login_fail_lock_count   , :integer     , { :default => 5 }]
+        [ :login_fail_lock_count   , :integer     , { :default => 5 }],
+        [ :sitemap_xml , :text       ],
+        [ :robots_txt , :text        ]
         #[ :custom_css              , :text       ],
         #[ :custom_css_files        , :text       ],
         #[ :custom_js               , :text       ],

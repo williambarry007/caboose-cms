@@ -34,7 +34,9 @@ class Caboose::Site < ActiveRecord::Base
     :date_js_updated         ,
     :date_css_updated        ,
     :default_layout_id       ,
-    :login_fail_lock_count
+    :login_fail_lock_count   ,
+    :sitemap_xml             ,
+    :robots_txt              
             
   before_save :validate_presence_of_store_config
   

@@ -325,6 +325,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_expires      , :datetime ],
         [ :status            , :string   ]                                
       ],      
+      Caboose::LetsencryptPluginSetting => [
+        [ :private_key      , :text ]
+      ],
+      Caboose::LetsencryptPluginChallenge => [
+        [ :response         , :text ]
+      ],
       Caboose::LineItem => [
         [ :invoice_id            , :integer  ],
         [ :invoice_package_id    , :integer  ],

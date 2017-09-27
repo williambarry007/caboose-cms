@@ -23,6 +23,7 @@ BlockContentController.prototype = {
     that.mc = new ModalController({ parent_controller: this, assets_path: that.assets_path });
     CKEDITOR.disableAutoInline = true;
     that.init_inline_editor();
+    that.add_all_new_child_blocks();
   },
 
   edit_block: function(block_id) {
@@ -399,6 +400,59 @@ BlockContentController.prototype = {
 
   },
 
+  add_all_new_child_blocks: function() {
+    var that = this;
+    $.each( $('.content_body'), function(k,v) {
+      var el = $(v).parents("[id^='block_']").first();
+      that.add_new_child_blocks(el.attr('id').replace('block_',''));
+    });
+  },
+
+  // get NEW child blocks of this block
+  add_new_child_blocks: function(block_id) {
+    console.log('adding new child blocks for ' + block_id);
+    var that = this;
+    $.ajax({
+      url: that.base_url() + '/' + block_id + '/new-child-blocks',
+      type: 'get',
+      success: function(resp) {        
+        if ( resp && resp.blocks && resp.blocks.length > 0 ) {
+
+          $.each(resp.blocks, function(k,v) {
+
+        //    console.dir(v);
+
+            // render each of them
+            var url = that.base_url() + '/' + v.id + '/render';
+            $.ajax({
+              url: url,
+              data: {
+                is_new: 'yes'
+              },
+              type: 'get',
+              success: function(html) {
+            //    console.log(html);
+
+                if ( $('#block_' + block_id).find('.content_body').first().find('.new_block_link.np').length > 0 ) {
+                  $('#block_' + block_id).find('.content_body').first().html('');
+                }
+
+                $('#block_' + block_id).find('.content_body').first().append(html);
+
+                that.add_handles_to_block(v.id);
+              }
+            });
+
+          });
+
+          that.add_dropzones();
+          that.init_inline_editor();
+
+        }
+      }
+    });
+  },
+
   add_handles_to_block: function(block_id) {
     var that = this;
     var el = $('#block_' + block_id);
@@ -417,10 +471,10 @@ BlockContentController.prototype = {
     el.click(function(e) {      
       e.preventDefault();
       e.stopPropagation();
-      if ( el.hasClass('richtext-block') || el.hasClass('heading-block') || el.hasClass('staff-block') )
-        return;
-      else
-        that.edit_block(block_id);
+      // if ( el.hasClass('richtext-block') || el.hasClass('heading-block') || el.hasClass('staff-block') )
+      //   return;
+      // else
+      //   that.edit_block(block_id);
     });
   },
   

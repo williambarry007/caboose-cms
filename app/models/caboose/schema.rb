@@ -170,7 +170,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :file                  , :attachment ],
         [ :file_upload_name      , :string     ],
         [ :image                 , :attachment ],
-        [ :image_upload_name     , :string     ]
+        [ :image_upload_name     , :string     ],
+        [ :status,            :string ],
+        [ :new_parent_id, :integer ],
+        [ :new_sort_order, :integer ],
+        [ :new_value, :text ]
       ],
       Caboose::BlockType => [        
         [ :parent_id                       , :integer ],
@@ -509,7 +513,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :meta_robots           , :string  , { :default => 'index, follow'  }],
         [ :canonical_url         , :string  ],
         [ :fb_description        , :string  , { :limit => 156 }],
-        [ :gp_description        , :string  , { :limit => 156 }]
+        [ :gp_description        , :string  , { :limit => 156 }],
+        [ :status,                :string  ]
       ],
       Caboose::PageCache => [
         [ :page_id               , :integer ],
@@ -567,7 +572,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :updated_at           , :datetime   ],
         [ :image                , :attachment ],
         [ :slug                 , :string     ],        
-        [ :uri                  , :string     ]
+        [ :uri                  , :string     ],
+        [ :status               , :string     ]
       ],      
       Caboose::PostCategory => [
         [ :site_id  , :integer ],

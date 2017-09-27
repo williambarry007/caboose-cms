@@ -18,7 +18,8 @@ class Caboose::Post < ActiveRecord::Base
     :image_url   ,
     :published   ,
     :created_at  ,
-    :updated_at
+    :updated_at  ,
+    :status
     
   has_attached_file :image, 
     :path => ':caboose_prefixposts/:id_:style.:extension',

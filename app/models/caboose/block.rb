@@ -33,7 +33,11 @@ class Caboose::Block < ActiveRecord::Base
     :constrain,
     :full_width,
     :name,
-    :value            
+    :value,
+    :status,
+    :new_parent_id,
+    :new_sort_order,
+    :new_value
         
   after_initialize :caste_value
   before_save :caste_value
@@ -70,10 +74,27 @@ class Caboose::Block < ActiveRecord::Base
     if b.block_type.field_type == 'file'
       return b.media.file if b.media
       return b.file
-    end    
+    end
     #return b.image if b.block_type.field_type == 'image'
-    #return b.file  if b.block_type.field_type == 'file'        
-    return b.value        
+    #return b.file  if b.block_type.field_type == 'file'
+    return b.value
+  end
+
+  def cv(editing, name)
+    editing = defined?(editing) ? editing : false
+    b = self.child(name)
+    return nil if b.nil?
+    if b.block_type.field_type == 'image'
+      return b.media.image if b.media
+      return b.image
+    end
+    if b.block_type.field_type == 'file'
+      return b.media.file if b.media
+      return b.file
+    end
+    #return b.image if b.block_type.field_type == 'image'
+    #return b.file  if b.block_type.field_type == 'file'
+    return (editing && !b.new_value.blank?) ? b.new_value : b.value
   end
   
   def rendered_child_value(name, options)
@@ -247,7 +268,31 @@ class Caboose::Block < ActiveRecord::Base
         "caboose/blocks/#{block.block_type.field_type}"                
       ]
       #Caboose.log(arr)
-      str = self.render_helper(view, options2, block, full_name, arr, 0)
+
+
+
+      if options2[:editing] == true
+        block.value = block.new_value if !block.new_value.blank?
+        block.sort_order = block.new_sort_order if !block.new_sort_order.blank?
+        block.parent_id = block.new_parent_id if !block.new_parent_id.blank?
+       # Caboose.log("temp setting #{block.id}")
+        # block.children.each do |bc|
+        #   Caboose.log("temp setting #{bc.id}")
+        #   bc.value = bc.new_value if !bc.new_value.blank?
+        #   bc.sort_order = bc.new_sort_order if !bc.new_sort_order.blank?
+        #   bc.parent_id = bc.new_parent_id if !bc.new_parent_id.blank?
+        #   Caboose.log("bc value: #{bc.value}")
+        # end
+        if block.status != 'deleted' && ( block.new_parent_id.blank? || options2[:is_new] )
+          str = self.render_helper(view, options2, block, full_name, arr, 0)
+        end
+     #   str.gsub('child_value','edited_child_value')
+      else
+        if block.status != 'added'
+          str = self.render_helper(view, options2, block, full_name, arr, 0)
+        end
+      end
+
 
     end    
     return str
@@ -625,11 +670,12 @@ class Caboose::Block < ActiveRecord::Base
       :parent_id          => new_parent_id,
       :media_id           => self.media_id,
       :block_type_id      => self.block_type_id,    
-      :sort_order         => self.sort_order + 1,
+      :sort_order         => (self.new_sort_order.blank? ? (self.sort_order + 1) : (self.new_sort_order + 1)),
       :constrain          => self.constrain,
       :full_width         => self.full_width,
       :name               => self.name,
-      :value              => self.value
+      :value              => (self.new_value.blank? ? self.value : self.new_value),
+      :status             => 'added'
     )
     self.children.each do |b2|
       if b2.name 

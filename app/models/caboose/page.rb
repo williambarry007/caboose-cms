@@ -35,7 +35,8 @@ class Caboose::Page < ActiveRecord::Base
     :meta_robots           ,
     :canonical_url         ,
     :fb_description        ,
-    :gp_description
+    :gp_description        ,
+    :status
    
   CONTENT_FORMAT_HTML  = 1 
   CONTENT_FORMAT_TEXT  = 2

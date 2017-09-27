@@ -47,6 +47,7 @@ module Caboose
           end
           b.parent_id = params[:id]
           b.block_type_id = block_type_id
+          b.status = 'added'
           b.sort_order = Block.where(:parent_id => params[:id]).count              
           b.save
           b.create_children
@@ -59,8 +60,16 @@ module Caboose
         end
       end
     
-      @page = Page.find(params[:page_id]) if params[:page_id]              
-      @post = Post.find(params[:post_id]) if params[:post_id]      
+      @page = Page.find(params[:page_id]) if params[:page_id]
+      if @page
+        @page.status = 'edited'
+        @page.save
+      end
+      @post = Post.find(params[:post_id]) if params[:post_id] 
+      if @post
+        @post.status = 'edited'
+        @post.save
+      end     
       @block = params[:id] ? Block.find(params[:id]) : (params[:page_id] ? Block.new(:page_id => params[:page_id]) : Block.new(:post_id => params[:post_id]))
       @after_id = params[:after_id] ? params[:after_id] : nil
       @before_id = params[:before_id] ? params[:before_id] : nil
@@ -81,11 +90,11 @@ module Caboose
         bt = b.block_type
         blocks << { 
           'id'                 => b.id,
-          'parent_id'          => b.parent_id,
+          'parent_id'          => (b.new_parent_id.blank? ? b.parent_id : b.new_parent_id),
           'page_id'            => b.page_id,          
           'post_id'            => b.post_id,          
           'name'               => b.name,
-          'value'              => b.value,
+          'value'              => (b.new_value.blank? ? b.value : b.new_value),
           'constrain'          => b.constrain,
           'full_width'         => b.full_width,
           'block_type'         => bt,
@@ -102,11 +111,11 @@ module Caboose
           bt = b.block_type
           blocks << { 
             'id'                 => b.id,
-            'parent_id'          => b.parent_id,
+            'parent_id'          => (b.new_parent_id.blank? ? b.parent_id : b.new_parent_id),
             'page_id'            => b.page_id,            
             'post_id'            => b.post_id,                        
             'name'               => b.name, 
-            'value'              => b.value,
+            'value'              => (b.new_value.blank? ? b.value : b.new_value),
             'constrain'          => b.constrain,
             'full_width'         => b.full_width,
             'block_type'         => bt,
@@ -142,11 +151,11 @@ module Caboose
         bt = b2.block_type
         arr << {
           'id'                 => b2.id,
-          'parent_id'          => b2.parent_id,
+          'parent_id'          => (b2.new_parent_id.blank? ? b2.parent_id : b2.new_parent_id),
           'page_id'            => b2.page_id,
           'post_id'            => b2.post_id,
           'name'               => b2.name,
-          'value'              => b2.value,
+          'value'              => (b2.value.blank? ? b2.value : b2.value),
           'constrain'          => b2.constrain,
           'full_width'         => b2.full_width,
           'block_type'         => bt,
@@ -185,9 +194,10 @@ module Caboose
         :site => @site,
         :page => params[:page_id] ? @p : nil,
         :post => params[:post_id] ? @p : nil,            
-        :request => request
+        :request => request,
+        :is_new => (params[:is_new].blank? ? false : true)
       })
-      render :inline => html            
+      render :inline => html
     end
           
     # @route GET /admin/pages/:page_id/blocks/render
@@ -310,7 +320,8 @@ module Caboose
 
       resp = Caboose::StdClass.new
 
-      b = Block.new      
+      b = Block.new
+      b.status = 'added'    
       if params[:page_id]
         b.page_id = params[:page_id].to_i
       else
@@ -357,6 +368,14 @@ module Caboose
       
       # Save the block
       b.save
+
+      if b.page
+        b.page.status = 'edited'
+        b.page.save
+      elsif b.post
+        b.post.status = 'edited'
+        b.post.save
+      end
 
       if !b.block_type.default.blank?
         b.value = b.block_type.default
@@ -439,7 +458,8 @@ module Caboose
                 if b.block_type.field_type == 'checkbox_multiple'
                   b.value = Block.parse_checkbox_multiple_value(b, v)
                 else                    
-                  b.value = v
+                  b.new_value = v
+                  b.status = 'edited' if b.status == 'published'
                 end
               end
             end
@@ -470,7 +490,16 @@ module Caboose
       resp = StdClass.new({'attributes' => {}})
       b = Block.find(params[:id])
       # if b.block_type_id == 309 # Richtext
-        b.value = params[:value]
+      b.new_value = params[:value]
+      b.status = 'edited' if b.status == 'published'
+      if b.page
+        b.page.status = 'edited'
+        b.page.save
+      elsif b.post
+        b.post.status = 'edited'
+        b.post.save
+      end
+
       # elsif b.block_type_id == 1 # Heading
       #   b1 = b.child('heading_text')
       #   b1.value = params[:value]
@@ -541,11 +570,13 @@ module Caboose
       else
         resp.close = true
       end
-      b.destroy
+      b.status = 'deleted'
+      b.save
+     # b.destroy
       
       if parent_id
         i = 0
-        Block.where(:parent_id => parent_id).reorder(:sort_order).all.each do |b2|
+        Block.where(:parent_id => parent_id).where('status != ?', 'deleted').reorder(:sort_order).all.each do |b2|
           b2.sort_order = i
           b2.save
           i = i + 1
@@ -563,6 +594,20 @@ module Caboose
       b = Block.find(params[:id])
       resp.new_id = b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
       resp.success = true
+      render :json => resp
+    end
+
+    # @route GET /admin/pages/:page_id/blocks/:id/new-child-blocks
+    # @route GET /admin/posts/:post_id/blocks/:id/new-child-blocks
+    def admin_new_child_blocks
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new
+      resp.blocks = []
+
+      Block.where(:new_parent_id => params[:id]).all.each do |b|
+        resp.blocks << b
+      end
+
       render :json => resp
     end
 
@@ -599,26 +644,27 @@ module Caboose
       b = Block.find(params[:id])
       if params[:before_id] && !params[:before_id].blank?
         b2 = Block.find(params[:before_id].to_i)
-        b.sort_order = b2.sort_order
+        b.new_sort_order = (b2.new_sort_order.blank? ? b2.sort_order : b2.new_sort_order)
         i = 1
         b2.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
-          b3.sort_order = b.sort_order + i
+          b3.new_sort_order = b.new_sort_order + i
           b3.save
           i = i + 1                  
         end
       elsif params[:after_id] && !params[:after_id].blank?
         b2 = Block.find(params[:after_id].to_i)
-        b.sort_order = b2.sort_order + 1
+        b.new_sort_order = (b2.new_sort_order.blank? ? (b2.sort_order + 1) : (b2.new_sort_order + 1))
         i = 1
         b2.parent.children.where('sort_order >= ?', b.sort_order).reorder(:sort_order).all.each do |b3|
-          b3.sort_order = b.sort_order + i
+          b3.new_sort_order = b.sort_order + i
           b3.save
-          i = i + 1                  
+          i = i + 1
         end
       elsif params[:parent_id]
-        b.sort_order = Block.where(:parent_id => params[:parent_id]).count
+        b.new_sort_order = Block.where(:parent_id => params[:parent_id]).count
       end
-      b.parent_id = params[:parent_id]
+      b.new_parent_id = params[:parent_id]
+      b.status = 'edited' if b.status == 'published'
       resp.success = true
       b.save
       render :json => resp

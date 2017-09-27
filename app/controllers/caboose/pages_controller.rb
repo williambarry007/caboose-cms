@@ -136,6 +136,27 @@ module Caboose
     #===========================================================================
     # Admin actions
     #===========================================================================
+
+    # @route GET /admin/pages/:id/publish
+    def admin_publish
+      return unless user_is_allowed('pages', 'edit')
+      resp = StdClass.new({'attributes' => {}})
+      Block.where(:page_id => params[:id]).where('status = ? OR status = ?','edited','added').all.each do |b|
+        b.value = b.new_value if !b.new_value.blank?
+        b.sort_order = b.new_sort_order if !b.new_sort_order.blank?
+        b.parent_id = b.new_parent_id if !b.new_parent_id.blank?
+        b.status = 'published'
+        b.new_value = nil
+        b.new_sort_order = nil
+        b.new_parent_id = nil
+        b.save
+      end
+      Block.where(:page_id => params[:id], :status => 'deleted').all.each do |b|
+        b.destroy
+      end
+      resp.success = true
+      render :json => resp
+    end
     
     # @route GET /admin/pages
     def admin_index

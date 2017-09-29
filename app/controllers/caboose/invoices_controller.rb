@@ -287,7 +287,7 @@ module Caboose
     end
     
     # @route GET /admin/invoices/:id/send-receipt
-    def admin_send_for_authorization
+    def admin_send_receipt
       return if !user_is_allowed('invoices', 'edit')
       invoice = Invoice.find(params[:id])
       invoice.delay(:queue => 'caboose_store').send_receipt_email      

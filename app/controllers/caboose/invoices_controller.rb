@@ -56,7 +56,8 @@ module Caboose
       return if !user_is_allowed('invoices', 'add')
       invoice = Invoice.create(
         :site_id => @site.id,
-        :status => Invoice::STATUS_PENDING,                          
+        :status => Invoice::STATUS_PENDING,
+        :date_created => DateTime.now,
         :financial_status => Invoice::FINANCIAL_STATUS_PENDING,
         :invoice_number => @site.store_config.next_invoice_number
       )

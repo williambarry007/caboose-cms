@@ -66,5 +66,16 @@ table.billing_address td {
   border: 0 !important; 
 }
 
+td.td-loading {
+  background-image: url("<%= asset_path '/assets/shared/loading.gif' %>") !important;
+  background-size: 20px !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  color: rgba(0,0,0,0.1) !important;
+}
+td.td-loading .mb_container {
+  opacity: 0.1 !important;
+}
+
 </style>
 <% end %>

@@ -96,19 +96,19 @@ class Caboose::Site < ActiveRecord::Base
   end
   
   def custom_js_url
-    url = "http://#{Caboose::cdn_domain}/assets/#{self.name}/js/custom.js"
+    url = "//#{Caboose::cdn_domain}/assets/#{self.name}/js/custom.js"
     url << "?#{self.date_js_updated.strftime('%Y%m%d%H%M%S')}" if self.date_js_updated
     return url
   end
   
   def custom_css_url
-    url = "http://#{Caboose::cdn_domain}/assets/#{self.name}/css/custom.css"
+    url = "//#{Caboose::cdn_domain}/assets/#{self.name}/css/custom.css"
     url << "?#{self.date_css_updated.strftime('%Y%m%d%H%M%S')}" if self.date_css_updated
     return url
   end
     
-  def custom_js              
-    resp = HTTParty.get(self.custom_js_url)
+  def custom_js
+    resp = HTTParty.get('https:' + self.custom_js_url)
     if resp.nil? || resp.code.to_i == 403
       self.custom_js = ""
       return ""            
@@ -117,7 +117,7 @@ class Caboose::Site < ActiveRecord::Base
   end
   
   def custom_css    
-    resp = HTTParty.get(self.custom_css_url)
+    resp = HTTParty.get('https:' + self.custom_css_url)
     if resp.nil? || resp.code.to_i == 403
       self.custom_css = ""
       return ""            

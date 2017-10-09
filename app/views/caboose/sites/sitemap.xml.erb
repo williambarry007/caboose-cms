@@ -8,9 +8,69 @@
       xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <url>
-  <loc>http://<%= prim %>/</loc>
-  <changefreq>weekly</changefreq>
+  <loc><%= @protocol %><%= prim %></loc>
+  <changefreq>daily</changefreq>
   <priority>1.00</priority>
 </url>
+
+<% pages = Caboose::Page.index_page(@site.id) ? Caboose::Page.index_page(@site.id).children.where(:hide => false).order(:sort_order).all : [] %>
+<% level_2 = [] %>
+<% level_3 = [] %>
+<% level_4 = [] %>
+<% level_5 = [] %>
+
+
+<% pages.each do |p| %>
+  <url>
+    <loc><%= @protocol %><%= prim %>/<%= p.uri %></loc>
+	  <changefreq>weekly</changefreq>
+	  <priority>1.00</priority>
+  </url>
+  <% p.children.where(:hide => false).order(:sort_order).all.each do |s| %>
+		<% level_2 << s.uri %>
+		<% s.children.where(:hide => false).order(:sort_order).all.each do |s1| %>
+			<% level_3 << s1.uri %>
+			<% s1.children.where(:hide => false).order(:sort_order).all.each do |s2| %>
+				<% level_4 << s2.uri %>
+				<% s2.children.where(:hide => false).order(:sort_order).all.each do |s3| %>
+					<% level_5 << s3.uri %>
+			  <% end %>
+		  <% end %>
+	  <% end %>
+  <% end %>
+<% end %>
+
+<% level_2.each do |p| %>
+  <url>
+    <loc><%= @protocol %><%= prim %>/<%= p %></loc>
+	  <changefreq>weekly</changefreq>
+	  <priority>0.8</priority>
+  </url>
+<% end %>
+
+<% level_3.each do |p| %>
+  <url>
+    <loc><%= @protocol %><%= prim %>/<%= p %></loc>
+	  <changefreq>weekly</changefreq>
+	  <priority>0.7</priority>
+  </url>
+<% end %>
+
+<% level_4.each do |p| %>
+  <url>
+    <loc><%= @protocol %><%= prim %>/<%= p %></loc>
+	  <changefreq>weekly</changefreq>
+	  <priority>0.6</priority>
+  </url>
+<% end %>
+
+<% level_5.each do |p| %>
+  <url>
+    <loc><%= @protocol %><%= prim %>/<%= p %></loc>
+	  <changefreq>weekly</changefreq>
+	  <priority>0.5</priority>
+  </url>
+<% end %>
+
 </urlset>
 <% end %>

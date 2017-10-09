@@ -9,7 +9,14 @@ module Caboose
     end
 
     def sitemap
-      respond_to :xml
+      @protocol = request && request.protocol ? request.protocol : 'http'
+      begin
+        view = ActionView::Base.new(ActionController::Base.view_paths)
+        str = view.render(:partial => "../../app/views/caboose/blocks/#{@site.name}/sitemap", :locals => {:site => @site, :protocol => @protocol})
+        render :inline => str
+      rescue ActionView::MissingTemplate => ex
+        respond_to :xml
+      end
     end
 
     def robots

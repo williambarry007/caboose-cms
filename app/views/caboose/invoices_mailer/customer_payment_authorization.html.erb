@@ -15,14 +15,15 @@ logo = logo.gsub('//','https://') if !logo.nil?
 	<p><%== @invoice.site.store_config.download_instructions %></p>
 <% end %>
 
-<% if defined?(Colonnade::SuiteMenu) %>
-	<%
-	sm = Colonnade::SuiteMenu.where(:invoice_id => @invoice.id).first
-	game = sm.menu.game if sm && sm.menu
-	%>
-	<% if game %>
-		<p>Game: <%= game.opponent %> on <%= game.date.strftime('%B %-d, %Y') %></p>
-	<% end %> 
+
+<% if Colonnade::SuiteMenu.respond_to?(:to_s) %>
+  <%
+  sm = Colonnade::SuiteMenu.where(:invoice_id => @invoice.id).first
+  game = sm.menu.game if sm && sm.menu
+  %>
+  <% if game %>
+    <p>Game: <%= game.opponent %> on <%= game.date.strftime('%B %-d, %Y') %></p>
+  <% end %> 
 <% end %>
 
 <table border='1' style='border-collapse: collapse;'>

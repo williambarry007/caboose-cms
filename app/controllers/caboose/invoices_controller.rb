@@ -67,7 +67,7 @@ module Caboose
         :date_logged    => DateTime.now.utc,
         :invoice_action => InvoiceLog::ACTION_INVOICE_CREATED                        
       )
-      if !params[:colonnade_game_id].blank? && defined?(Colonnade::Campus) && Colonnade::Campus.where(:site_id => @site.id).exists?
+      if !params[:colonnade_game_id].blank? && Colonnade::SuiteMenu.respond_to?(:to_s) && Colonnade::Campus.where(:site_id => @site.id).exists?
         game = Colonnade::Game.where(:id => params[:colonnade_game_id], :site_id => @site.id).first
         menu = Colonnade::Menu.where(:game_id => game.id, :site_id => @site.id).first if game
         user = Caboose::User.where(:site_id => @site.id, :id => params[:colonnade_user_id]).first
@@ -298,6 +298,7 @@ module Caboose
       return if !user_is_allowed('invoices', 'edit')
       invoice = Invoice.find(params[:id])
       invoice.delay(:queue => 'caboose_store').send_payment_authorization_email
+    #  invoice.send_payment_authorization_email
       render :json => { :success => true }
     end
     
@@ -305,7 +306,8 @@ module Caboose
     def admin_send_receipt
       return if !user_is_allowed('invoices', 'edit')
       invoice = Invoice.find(params[:id])
-      invoice.delay(:queue => 'caboose_store').send_receipt_email      
+      invoice.delay(:queue => 'caboose_store').send_receipt_email
+    #  invoice.send_receipt_email        
       render :json => { :success => true }
     end
     

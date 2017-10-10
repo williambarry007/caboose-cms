@@ -9,7 +9,7 @@ logo = logo.gsub('//','https://') if !logo.nil?
 
 <p>Your invoice number #<%= @invoice.id %> has been paid.</p>
 
-<% if defined?(Colonnade::SuiteMenu) %>
+<% if Colonnade::SuiteMenu.respond_to?(:to_s) %>
   <%
   sm = Colonnade::SuiteMenu.where(:invoice_id => @invoice.id).first
   game = sm.menu.game if sm && sm.menu

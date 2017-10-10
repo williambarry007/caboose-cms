@@ -2,7 +2,7 @@
 
 <p>This will create a new invoice that you can populate and then send to the customer for payment.</p>
 
-<% if defined?(Colonnade::Campus) && Colonnade::Campus.where(:site_id => @site.id).exists? %>
+<% if Colonnade::Campus.respond_to?(:to_s) && Colonnade::Campus.where(:site_id => @site.id).exists? %>
 <form id="colonnade_info">
 	<h5>Game</h5>
 	<select name="colonnade_game_id" id="colonnade_game_id">
@@ -44,7 +44,7 @@ function create_invoice()
   $.ajax({
     url: '/admin/invoices',
     type: 'post',
- <% if defined?(Colonnade::Campus) && Colonnade::Campus.where(:site_id => @site.id).exists? %>
+ <% if Colonnade::Campus.respond_to?(:to_s) && Colonnade::Campus.where(:site_id => @site.id).exists? %>
  		data: { 
  			colonnade_game_id: $('#colonnade_game_id').val(),
  			colonnade_suite_id: $('#colonnade_suite_id').val(),

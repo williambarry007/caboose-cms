@@ -24,7 +24,7 @@
   <url>
     <loc><%= @protocol %><%= prim %>/<%= p.uri %></loc>
 	  <changefreq>weekly</changefreq>
-	  <priority>1.00</priority>
+	  <priority>0.9</priority>
   </url>
   <% p.children.where(:hide => false).order(:sort_order).all.each do |s| %>
 		<% level_2 << s.uri %>

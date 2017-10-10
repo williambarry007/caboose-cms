@@ -66,7 +66,21 @@ module Caboose
         :user_id        => logged_in_user.id,
         :date_logged    => DateTime.now.utc,
         :invoice_action => InvoiceLog::ACTION_INVOICE_CREATED                        
-      )      
+      )
+      if !params[:colonnade_game_id].blank? && defined?(Colonnade::Campus) && Colonnade::Campus.where(:site_id => @site.id).exists?
+        game = Colonnade::Game.where(:id => params[:colonnade_game_id], :site_id => @site.id).first
+        menu = Colonnade::Menu.where(:game_id => game.id, :site_id => @site.id).first if game
+        user = Caboose::User.where(:site_id => @site.id, :id => params[:colonnade_user_id]).first
+        suite = Colonnade::Suite.where(:id => params[:colonnade_suite_id], :site_id => @site.id).first
+        if suite && menu && user && invoice
+          sm = Colonnade::SuiteMenu.where(:suite_id => suite.id, :menu_id => menu.id, :user_id => user.id, :invoice_id => invoice.id).first
+          sm = Colonnade::SuiteMenu.create(:suite_id => suite.id, :menu_id => menu.id, :user_id => user.id, :invoice_id => invoice.id, :site_id => @site.id, :status => 'empty') if sm.nil?
+        end
+        if user
+          invoice.customer_id = user.id
+          invoice.save
+        end
+      end
       render :json => { :sucess => true, :redirect => "/admin/invoices/#{invoice.id}" }
     end
         
@@ -283,7 +297,7 @@ module Caboose
     def admin_send_for_authorization
       return if !user_is_allowed('invoices', 'edit')
       invoice = Invoice.find(params[:id])
-      invoice.delay(:queue => 'caboose_store').send_payment_authorization_email      
+      invoice.delay(:queue => 'caboose_store').send_payment_authorization_email
       render :json => { :success => true }
     end
     

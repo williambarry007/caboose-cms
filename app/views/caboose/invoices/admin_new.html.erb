@@ -2,6 +2,33 @@
 
 <p>This will create a new invoice that you can populate and then send to the customer for payment.</p>
 
+<% if defined?(Colonnade::Campus) && Colonnade::Campus.where(:site_id => @site.id).exists? %>
+<form id="colonnade_info">
+	<h5>Game</h5>
+	<select name="colonnade_game_id" id="colonnade_game_id">
+		<option value="">-- Select --</option>
+		<% Colonnade::Game.where('date > ?', (DateTime.now - 2.months)).where(:site_id => @site.id).order(:date).all.each do |g| %>
+			<option value="<%= g.id %>"><%= g.opponent %> - <%= g.date.strftime('%B %-d, %Y') %></option>
+		<% end %>
+	</select>
+	<h5>Suite</h5>
+	<select name="colonnade_suite_id" id="colonnade_suite_id">
+		<option value="">-- Select --</option>
+		<% Colonnade::Suite.where(:site_id => @site.id).order(:number).all.each do |s| %>
+			<option value="<%= s.id %>"><%= s.venue ? s.venue.name : '' %> - <%= s.number %></option>
+		<% end %>
+	</select>
+	<h5>User</h5>
+	<select name="colonnade_user_id" id="colonnade_user_id">
+		<option value="">-- Select --</option>
+		<% Caboose::User.where(:site_id => @site.id).order(:last_name).all.each do |u| %>
+			<% next if u.username == 'admin' || u.username == 'elo' || u.username == 'eli' %>
+			<option value="<%= u.id %>"><%= u.first_name %> <%= u.last_name %></option>
+		<% end %>
+	</select>
+</form>
+<% end %>
+
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/invoices';" />
 <input type='button' value='Create Order' onclick='create_invoice();' />
@@ -12,10 +39,18 @@
 
 function create_invoice()
 {
-  $('#message').empty().append("<p class='loading'>Creating invoice...</p>");  
+  $('#message').empty().append("<p class='loading'>Creating invoice...</p>");
+
   $.ajax({
     url: '/admin/invoices',
-    type: 'post',    
+    type: 'post',
+ <% if defined?(Colonnade::Campus) && Colonnade::Campus.where(:site_id => @site.id).exists? %>
+ 		data: { 
+ 			colonnade_game_id: $('#colonnade_game_id').val(),
+ 			colonnade_suite_id: $('#colonnade_suite_id').val(),
+ 			colonnade_user_id: $('#colonnade_user_id').val()
+ 		},
+ <% end %>
     success: function(resp) {
       if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
       if (resp.redirect) window.location = resp.redirect;      
@@ -24,4 +59,13 @@ function create_invoice()
 }
 
 </script>
+<% end %>
+
+<% content_for :caboose_css do %>
+<style>
+	h5 {
+		margin: 20px 0 5px 0;
+		font-size: 16px;
+	}
+</style>
 <% end %>

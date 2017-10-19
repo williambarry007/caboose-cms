@@ -308,12 +308,12 @@ var BlockModalController = ModalController.extend({
           show_mouseover = false;
         that.set_clickable(b2);
       });
-    }    
-    if (false && show_mouseover)
-    {
-      $('#the_modal #block_' + b.id).mouseover(function(el) { $('#the_modal #block_' + b.id).addClass(   'block_over'); });
-      $('#the_modal #block_' + b.id).mouseout(function(el)  { $('#the_modal #block_' + b.id).removeClass('block_over'); }); 
-    }    
+    }
+    // if (false && show_mouseover)
+    // {
+    //   $('#the_modal #block_' + b.id).mouseover(function(el) { $('#the_modal #block_' + b.id).addClass(   'block_over'); });
+    //   $('#the_modal #block_' + b.id).mouseout(function(el)  { $('#the_modal #block_' + b.id).removeClass('block_over'); }); 
+    // }    
   },
 
   /*****************************************************************************

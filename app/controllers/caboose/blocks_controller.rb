@@ -158,7 +158,18 @@ module Caboose
         }
       end
       return arr
-    end      
+    end     
+
+    # @route PUT /admin/pages/:page_id/blocks/:id/remove-media
+    # @route PUT /admin/posts/:post_id/blocks/:id/remove-media
+    def admin_remove_media
+      return unless user_is_allowed('pages', 'edit')
+      resp = Caboose::StdClass.new   
+      b = Block.find(params[:id])      
+      b.media = nil
+      resp.success = b.save
+      render :json => resp      
+    end 
       
     # @route GET /admin/pages/:page_id/blocks/:id/render
     # @route GET /admin/posts/:post_id/blocks/:id/render

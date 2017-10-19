@@ -283,6 +283,23 @@ var BlockModalController = ModalController.extend({
       attributes: [h]            
     });
   },
+
+  remove_media: function(block) {
+    var that = this;
+
+    $.ajax({          
+      url: that.block_url(block) + '/remove-media',
+      type: 'put',
+      success: function(html) {
+        $('#the_modal img#block_' + block.id).attr('src','//placehold.it/150x150');
+        $('#the_modal div#block_' + block.id + ' p').html('Empty file.');
+        $('#the_modal #block_' + block.id).parent().find('.caboose-btn').remove();
+        that.parent_controller.render_blocks();
+        that.autosize();
+      },            
+    });
+
+  },
   
   set_clickable: function(b)
   {        
@@ -299,7 +316,28 @@ var BlockModalController = ModalController.extend({
     $('#the_modal #block_' + b.id).click(function(e) {      
       e.stopPropagation();
       that.parent_controller.edit_block(b.id); 
-    });     
+    });
+
+    if ( b.block_type && b.block_type.field_type == 'image' && b.rendered_value.indexOf('placehold') < 0 ) {
+      btn = $('<a href="#" class="caboose-btn">Remove</a>');
+      btn.css('position','relative').css('left','10px').css('bottom','10px').css('font-size','13px');
+      btn.on('click', function(e) {
+        e.preventDefault();
+        that.remove_media(b);
+      });
+      $('#the_modal #block_' + b.id).after(btn);
+    }
+
+    if ( b.block_type && b.block_type.field_type == 'file' && b.rendered_value.indexOf('Empty file') < 0 ) {
+      btn = $('<a href="#" class="caboose-btn">Remove</a>');
+      btn.css('margin-bottom','10px').css('font-size','13px');
+      btn.on('click', function(e) {
+        e.preventDefault();
+        that.remove_media(b);
+      });
+      $('#the_modal #block_' + b.id).after(btn);
+    }
+
     // var show_mouseover = true;
     // if (b.children && b.children.length > 0)
     // {

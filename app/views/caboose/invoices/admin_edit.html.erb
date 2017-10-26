@@ -5,9 +5,9 @@
   <div id='crumbtrail'>
     <a href='/admin'>Admin</a> >
     <a href='/admin/invoices'>Invoices</a> >
-    Invoice #<%= @invoice.id %>
+    Invoice #<%= @invoice.invoice_number %>
   </div>
-  <h1>Edit Invoice #<%= @invoice.id %></h1>
+  <h1>Edit Invoice #<%= @invoice.invoice_number %></h1>
 <% end %>
 
 <input type='hidden' name='invoice_id'    id='invoice_id'     value='<%= @invoice.id %>' />

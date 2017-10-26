@@ -7,7 +7,7 @@ logo = logo.gsub('//','https://') if !logo.nil?
 
 <h1>Receipt</h1>
 
-<p>Your invoice number #<%= @invoice.id %> has been paid.</p>
+<p>Your invoice number #<%= @invoice.invoice_number %> has been paid.</p>
 
 <% if Colonnade::SuiteMenu.respond_to?(:to_s) %>
   <%

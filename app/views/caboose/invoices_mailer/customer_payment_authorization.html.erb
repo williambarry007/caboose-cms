@@ -7,7 +7,7 @@ logo = logo.gsub('//','https://') if !logo.nil?
 
 <h1>Invoice</h1>
 
-<p>Your invoice number #<%= @invoice.id %> is ready for payment!</p>
+<p>Your invoice number #<%= @invoice.invoice_number %> is ready for payment!</p>
 
 <p>Click <a href="https://<%== @invoice.site.primary_domain.domain %>/my-account">here</a> to login to your account to update billing information.</p>
 

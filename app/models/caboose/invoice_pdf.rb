@@ -161,7 +161,7 @@ module Caboose
         tbl[0] << { :content => "Amount"     , :align => :right , :valign => :bottom }
       end
 
-      invoice.calculate
+      # invoice.calculate
       
       invoice.invoice_packages.all.each do |pk|
 

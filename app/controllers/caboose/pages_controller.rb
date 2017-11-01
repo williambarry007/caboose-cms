@@ -324,7 +324,7 @@ module Caboose
       parent_id            = params[:parent_id]
       block_type_id        = params[:block_type_id]
       child_block_type_id  = params[:child_block_type_id]
-      duplicate_children   = params[:duplicate_children] ? true : false
+      duplicate_children   = params[:duplicate_children] == 'true' ? true : false
       
       if p.nil?            then resp.error = "Invalid page"
       elsif site_id.nil?   then resp.error = "Invalid site"

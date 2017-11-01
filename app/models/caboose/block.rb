@@ -587,12 +587,11 @@ class Caboose::Block < ActiveRecord::Base
   
   # Assumes that we start the duplicate process at the top level block
   def duplicate_page_block(site_id, page_id, new_block_type_id = nil, new_parent_id = nil)        
-    m = self.media_id ? self.media.duplicate(site_id) : nil
     b = Caboose::Block.create(
       :page_id            => page_id,          
       :post_id            => nil,         
       :parent_id          => new_parent_id,
-      :media_id           => self.media_id ? m.id : nil,
+      :media_id           => self.media_id,
       :block_type_id      => new_block_type_id,    
       :sort_order         => self.sort_order,
       :constrain          => self.constrain,

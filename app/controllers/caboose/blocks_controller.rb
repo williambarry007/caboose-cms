@@ -393,7 +393,7 @@ module Caboose
           b1.create_children
           bw = b1.child('width')
           if bw
-            bw.value = (100.0 / params[:child_count].to_f).to_i.to_s + '%'
+            bw.value = 'auto' # (100.0 / params[:child_count].to_f).to_i.to_s + '%'
             bw.save
           end
         end

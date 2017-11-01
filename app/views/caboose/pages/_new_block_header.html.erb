@@ -7,25 +7,25 @@ btsm = Caboose::BlockTypeSiteMembership.where(:site_id => @site.id).pluq(:block_
   <h4>Drag a block<br />onto the page.</h4>
   <ul id='new_blocks'>
   	<li class='title'><span>Structure</span></li>
-  	<li class='blocktype' id='new_block_3159_2' data-btid='3159' data-children='2'>
+  	<li class='blocktype bt' id='new_block_3159_2' data-btid='3159' data-children='2'>
   		<span class='icon icon-insert-template'></span>
   		<span class='bname'>2 Column Row</span>
   	</li>
-  	<li class='blocktype' id='new_block_3159_3' data-btid='3159' data-children='3'>
+  	<li class='blocktype bt' id='new_block_3159_3' data-btid='3159' data-children='3'>
   		<span class='icon icon-insert-template'></span>
   		<span class='bname'>3 Column Row</span>
   	</li>
-  	<li class='blocktype' id='new_block_3159_4' data-btid='3159' data-children='4'>
+  	<li class='blocktype bt' id='new_block_3159_4' data-btid='3159' data-children='4'>
   		<span class='icon icon-insert-template'></span>
   		<span class='bname'>4 Column Row</span>
   	</li>
-  	<li class='blocktype' id='new_block_3159_5' data-btid='3159' data-children='5'>
+  	<li class='blocktype bt' id='new_block_3159_5' data-btid='3159' data-children='5'>
   		<span class='icon icon-insert-template'></span>
   		<span class='bname'>5 Column Row</span>
   	</li>
   	<li class='title'><span>Content</span></li>
     <% @block_types.each do |block_type| %>
-    	<li class='blocktype' id='new_block_<%= block_type.id %>' data-btid='<%= block_type.id %>'>
+    	<li class='blocktype bt' id='new_block_<%= block_type.id %>' data-btid='<%= block_type.id %>'>
     		<span class='icon icon-<%= block_type.icon %>'></span>
     		<span class='bname'><%= block_type.description %></span>
     	</li>

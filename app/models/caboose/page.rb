@@ -413,7 +413,7 @@ class Caboose::Page < ActiveRecord::Base
       p = Caboose::Page.create(:site_id => site_id, :parent_id => parent_id)
     end
 
-    p.title                = self.title                 
+    p.title                = "Copy of " + self.title                 
     p.menu_title           = self.menu_title            
     p.slug                 = self.slug                  
     p.alias                = self.alias                 

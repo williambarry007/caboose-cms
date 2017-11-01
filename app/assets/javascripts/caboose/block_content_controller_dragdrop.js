@@ -165,9 +165,6 @@ BlockContentController.prototype = {
       }
       that.move_block_save(block_id, parent_id, before_block_id, after_block_id);
     }
-    else {
-
-    }
   },
 
   move_block_save: function(block_id, parent_id, before_block_id, after_block_id) {
@@ -298,16 +295,23 @@ BlockContentController.prototype = {
     $('.new_block_link').remove();
     $("[id^='block_']").each(function(k,v) {
 
+      var is_unit = $(v).hasClass('flex-grid-unit');
+      var is_grid = $(v).hasClass('flex-grid-container');
       var bid = $(v).attr('id').replace('block_','');
+      var dropclass = (is_unit && is_unit == true ? 'column-dropper' : 'regular-dropper');
 
-      // empty post, page, column, or text area
+      // empty post, page, column, grid, or text area
       if ( $(v).find('.content_body').length > 0 && $(v).find('.content_body').first().children().length == 0 ) {
+        var msg = (is_grid && is_grid == true ? '<p>Empty grid. Drag a column here.</p>' : '<p>Empty content area. Drag blocks here.</p>');
         var el = $(v).find('.content_body').first();
+        if ( $(v).find('.flexbox').length > 0 && $(v).find('.flexbox').first().children().length == 0 )
+          $(v).addClass('empty');
         var first_parent_block = el.parents("[id^='block_']").first();
         if ( first_parent_block.attr('id') == $(v).attr('id') ) {
           el.html($('<div/>')
-            .addClass('new_block_link np')
-            .append($('<div/>').addClass('new-page line').html('<p>Empty content area. Drag blocks here.</p>').droppable({
+            .addClass('new_block_link np ' + (is_grid && is_grid == true ? 'column-dropper' : 'regular-dropper'))
+            .append($('<div/>').addClass('new-page line').html(msg).droppable({
+              accept: (is_grid && is_grid == true ? '.flex-grid-unit' : ':not(.flex-grid-unit)'),
               hoverClass: "highlight",
               tolerance: "pointer",
               drop: function(event, ui) {
@@ -326,8 +330,9 @@ BlockContentController.prototype = {
         var parent_id = $(v).parents("[id^='block_']").first().attr('id').replace('block_','');
         var is_last_child = $(v).next("[id^='block_']").length == 0 ? true : false;
         $(v).before($('<div/>')          
-          .addClass('new_block_link')
+          .addClass('new_block_link ' + dropclass)
           .append($('<div/>').addClass('line').droppable({
+            accept: (is_unit && is_unit == true ? '.flex-grid-unit' : ':not(.flex-grid-unit)'),
             hoverClass: "highlight",
             tolerance: "pointer",
             drop: function(event, ui) {
@@ -340,8 +345,9 @@ BlockContentController.prototype = {
         );
         if (is_last_child && is_last_child == true) {
           $(v).after($('<div/>')          
-            .addClass('new_block_link')
+            .addClass('new_block_link ' + dropclass).addClass(dropclass)
             .append($('<div/>').addClass('line').droppable({
+              accept: (is_unit && is_unit == true ? ".flex-grid-unit" : ':not(.flex-grid-unit)'),
               hoverClass: "highlight",
               tolerance: "pointer",
               drop: function(event, ui) {
@@ -361,12 +367,17 @@ BlockContentController.prototype = {
           revert: "invalid",
           scroll: false,
           zIndex: 999,
-          start: function(event, ui) { $(".line.ui-droppable").addClass('dropzone'); },
-          stop: function(event, ui) { $(".line.ui-droppable").removeClass('dropzone'); }
+          start: function(event, ui) { $((is_unit && is_unit == true ? '.column-dropper' : '.regular-dropper') + " .line.ui-droppable").addClass('dropzone'); },
+          stop: function(event, ui) { $((is_unit && is_unit == true ? '.column-dropper' : '.regular-dropper') + " .line.ui-droppable").removeClass('dropzone'); }
         });
       }
 
       that.add_handles_to_block(bid);
+
+      $(".flex-grid-container").each(function(k, v) {
+        var h = $(v).outerHeight();
+        $(v).find(".flexbox > .new_block_link .line").css('height',h);
+      });
 
     });
 
@@ -375,23 +386,25 @@ BlockContentController.prototype = {
   add_handles_to_block: function(block_id) {
     var that = this;
     var el = $('#block_' + block_id);
-    if ( el.attr('id').indexOf('_value') >= 0 || el.children('.drag_handle').length > 0 )
-      return true;
-    if ( el.parents('.content_body').length > 0 ) {
-      $('#block_' + block_id + ' *').attr('onclick', '').unbind('click');
-      el.prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_drag'      ).addClass('drag_handle'      ).append($('<span/>').addClass('ui-icon ui-icon-arrow-4'    )).click(function(e) { e.preventDefault(); e.stopPropagation();  }))
-        .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_select'    ).addClass('select_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-check'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.select_block(block_id);    }))
-        .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_duplicate' ).addClass('duplicate_handle' ).append($('<span/>').addClass('ui-icon ui-icon-copy'       )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.duplicate_block(block_id); }))
-        .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_delete'    ).addClass('delete_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-close'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(block_id);    }));
-      el.mouseover(function(el) { $('#block_' + block_id).addClass(   'block_over'); });
-      el.mouseout(function(el)  { $('#block_' + block_id).removeClass('block_over'); });
+    if (el.length > 0) {
+      if ( el.attr('id').indexOf('_value') >= 0 || el.children('.drag_handle').length > 0 )
+        return true;
+      if ( el.parents('.content_body').length > 0 ) {
+        $('#block_' + block_id + ' *').attr('onclick', '').unbind('click');
+        el.prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_drag'      ).addClass('drag_handle'      ).append($('<span/>').addClass('ui-icon ui-icon-arrow-4'    )).click(function(e) { e.preventDefault(); e.stopPropagation();  }))
+          .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_select'    ).addClass('select_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-check'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.select_block(block_id);    }))
+          .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_duplicate' ).addClass('duplicate_handle' ).append($('<span/>').addClass('ui-icon ui-icon-copy'       )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.duplicate_block(block_id); }))
+          .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_delete'    ).addClass('delete_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-close'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(block_id);    }));
+        el.mouseover(function(el) { $('#block_' + block_id).addClass(   'block_over'); });
+        el.mouseout(function(el)  { $('#block_' + block_id).removeClass('block_over'); });
+      }
+      el.attr('onclick','').unbind('click');
+      el.click(function(e) {      
+        e.preventDefault();
+        e.stopPropagation();      
+        that.edit_block(block_id);
+      });
     }
-    el.attr('onclick','').unbind('click');
-    el.click(function(e) {      
-      e.preventDefault();
-      e.stopPropagation();      
-      that.edit_block(block_id);
-    });
   },
   
   /*****************************************************************************

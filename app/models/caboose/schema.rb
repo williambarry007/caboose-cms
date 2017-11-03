@@ -509,13 +509,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :layout                , :string  ],
         [ :sort_order            , :integer , { :default => 0                }],
         [ :custom_sort_children  , :boolean , { :default => false            }],
-        [ :seo_title             , :string  , { :limit => 70                 }],
+        [ :seo_title             , :string  , { :limit => 200                 }],
         [ :meta_keywords         , :text    ], 
-        [ :meta_description      , :string  , { :limit => 156                }],
+        [ :meta_description      , :string  , { :limit => 300                }],
         [ :meta_robots           , :string  , { :default => 'index, follow'  }],
         [ :canonical_url         , :string  ],
-        [ :fb_description        , :string  , { :limit => 156 }],
-        [ :gp_description        , :string  , { :limit => 156 }]
+        [ :fb_description        , :string  , { :limit => 300 }],
+        [ :gp_description        , :string  , { :limit => 300 }]
       ],
       Caboose::PageCache => [
         [ :page_id               , :integer ],

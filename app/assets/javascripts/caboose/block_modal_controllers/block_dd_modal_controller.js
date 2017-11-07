@@ -235,15 +235,6 @@ var BlockModalController = ModalController.extend({
   },
   
   /****************************************************************************/
-
-  //set_editable: function()
-  //{
-  //  var that = this;
-  //  that.set_block_value_editable(that.block);        
-  //  $.each(that.block.children, function(i, b) {
-  //    that.set_block_value_editable(b);                         
-  //  });        
-  //},
   
   set_block_value_editable: function(b)
   {    

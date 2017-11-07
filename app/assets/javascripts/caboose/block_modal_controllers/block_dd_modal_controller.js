@@ -291,7 +291,7 @@ var BlockModalController = ModalController.extend({
       url: that.block_url(block) + '/remove-media',
       type: 'put',
       success: function(html) {
-        $('#the_modal img#block_' + block.id).attr('src','//placehold.it/150x150');
+        $('#the_modal img#block_' + block.id).attr('src','//d9hjv462jiw15.cloudfront.net/assets/blank.png').css('width','200px').css('height','120px');
         $('#the_modal div#block_' + block.id + ' p').html('Empty file.');
         $('#the_modal #block_' + block.id).parent().find('.caboose-btn').remove();
         that.parent_controller.render_blocks();
@@ -328,7 +328,7 @@ var BlockModalController = ModalController.extend({
       $('#the_modal #block_' + b.id).after(btn);
     }
 
-    if ( b.block_type && b.block_type.field_type == 'file' && b.rendered_value.indexOf('Empty file') < 0 ) {
+    if ( b.block_type && b.block_type.field_type == 'file' && b.rendered_value.indexOf('Click to select a file') < 0 ) {
       btn = $('<a href="#" class="caboose-btn">Remove</a>');
       btn.css('margin-bottom','10px').css('font-size','13px');
       btn.on('click', function(e) {

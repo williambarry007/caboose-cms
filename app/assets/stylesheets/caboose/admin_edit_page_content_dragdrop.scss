@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,300i');
 
-#block_sidebar {
+#cb_block_sidebar {
   position: fixed;
   top: 0;
   left: 0;
@@ -294,6 +294,9 @@ body > .container, body > .mm-page > .container {
       font-size: 14px;
       p {
         color: #1d1d1d;
+        font-family: 'Roboto';
+        font-weight: 300;
+        font-size: 14px;
       }
       &.dropzone {
         background: #dbeff7;

@@ -392,7 +392,6 @@ var BlockModalController = ModalController.extend({
     });
     if (bt.use_js_for_modal)    
       that.include_assets('caboose/block_modal_controllers/' + bt.name + '_modal_controller.js');
-    
     var h = {                      
       authenticity_token: that.authenticity_token,
       block_type_id: block_type_id

@@ -584,7 +584,7 @@ module Caboose
           else
             p = parent_id ? Page.find(parent_id) : Page.index_page(@site.id)
           end
-          options = []
+          options = [{ 'value' => ' '      , 'text' => ' '     }]
           if p
             sitemap_helper(p, options)
      	    end

@@ -309,6 +309,26 @@ body > .container, body > .mm-page > .container {
 	}
 }
 
+.flex-grid-container.block_over {
+  .delete_handle, .delete_handle span {
+    z-index: 10;
+  }
+  .duplicate_handle, .duplicate_handle span {
+    z-index: 10;
+  }
+  .select_handle, .select_handle span {
+    z-index: 10;
+  }
+  .drag_handle, .drag_handle span {
+    z-index: 10;
+  }
+  .flexbox {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+
 .flex-grid-container .flexbox > .new_block_link {
   height: 0;
   width: 0;

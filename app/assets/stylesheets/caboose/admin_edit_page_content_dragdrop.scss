@@ -68,9 +68,12 @@
   }
 }
 
-#modal_content table.checkbox_multiple {
+#the_modal #modal_content .mb_container table.checkbox_multiple {
   td {
     padding: 5px 10px 10px 0;
+  }
+  input[type="checkbox"] {
+    top: 0;
   }
 }
 
@@ -82,9 +85,6 @@
     font-weight: 300 !important;
     font-size: 15px !important;
     padding: 8px 6px 6px 6px;
-    &[type="checkbox"] {
-      top: 0;
-    }
   }
   label {
     font-family: 'Roboto' !important;

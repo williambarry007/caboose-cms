@@ -16,6 +16,15 @@
 
 <%= render :partial => 'caboose/posts/admin_footer' %>
 
+<% content_for :caboose_css do %>
+<style>
+  #content2 p input[type="checkbox"] {
+    top: 10px;
+    margin-right: 5px;
+  }
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type='text/javascript'>

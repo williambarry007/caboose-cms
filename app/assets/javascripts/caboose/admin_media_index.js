@@ -200,7 +200,6 @@ MediaController.prototype = {
   check_processing_status: function() 
   {     
     var that = this;
-    console.log("ajax count: " + that.ajax_count + " out of " + that.ajax_limit);
     if (!that.last_upload_processed)
       that.last_upload_processed = new Date();
     if ( that.ajax_count < that.ajax_limit ) {

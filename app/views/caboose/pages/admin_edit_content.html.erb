@@ -30,7 +30,7 @@ var controller = false;
 $(document).ready(function() {
   controller = new BlockContentController({
     page_id: <%= @page.id %>,
-    assets_path: <%= raw Caboose.json(asset_path('loading.gif').gsub('loading.gif', '')) %>,
+    assets_path: <%== Caboose.json(asset_path('loading.gif').gsub('loading.gif', '').gsub('http://','https://')) %>,
     <% if @site && @site.use_dragdrop %>
       included_assets: ['caboose/block_modal_controllers/block_dd_modal_controller.js']
     <% else %>

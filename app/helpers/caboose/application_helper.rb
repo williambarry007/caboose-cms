@@ -26,6 +26,10 @@ tinyMCE.init({
     def parent_categories
       Caboose::Category.find(1).children.where(:status => 'Active')
     end
+
+    def forem_user
+      return @logged_in_user
+    end
           
     def gzip_javascript_include_tag(asset)
       tag = javascript_include_tag asset    

@@ -138,6 +138,10 @@ div.mb_container form.mb_file_form div.mb_placeholder span {
   line-height: 0;  
 }
 
+table.data .mb_container table.data.checkbox_multiple {
+  width: 100%;
+}
+
 .mb_fake_file_input {
   position: relative;
   overflow: hidden;

@@ -23,6 +23,8 @@ BoundCheckboxMultiple = BoundControl.extend({
       .attr('id', this.el + '_container')
       .addClass('mb_container')
       .css('position', 'relative');
+    if (this.attribute.width)
+      div.css('width', '' + this.attribute.width + 'px').css('overflow-x', 'scroll');        
     if (this.attribute.height)
       div.css('height', '' + this.attribute.height + 'px').css('overflow-y', 'scroll');        
     $('#'+this.el).wrap(div);    

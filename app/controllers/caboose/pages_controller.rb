@@ -330,7 +330,7 @@ module Caboose
       elsif site_id.nil?   then resp.error = "Invalid site"
       elsif parent_id.nil? then resp.error = "Invalid parent"
       else
-        resp.new_id = p.duplicate(site_id, parent_id, duplicate_children, block_type_id, child_block_type_id)
+        resp.new_id = p.delay(:priority => 20).duplicate(site_id, parent_id, duplicate_children, block_type_id, child_block_type_id)
         resp.success = true
       end
       

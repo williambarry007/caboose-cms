@@ -19,11 +19,11 @@ module Caboose
       #   if records['eventSource'] == "aws:s3"
       #     msg = JSON.parse(body[:Message])
       #     if msg['Records']
-      if body && body['Records']
-        body['Records'].each do |r|
-          if r['eventName'] && r['eventName'].starts_with?('ObjectCreated')          
-            if r['s3'] && r['s3']['object'] && r['s3']['object']['key']
-              key = URI.decode(r['s3']['object']['key']).gsub('+', ' ')
+      if body && body[:Records]
+        body[:Records].each do |r|
+          if r[:eventName] && r[:eventName].starts_with?('ObjectCreated')          
+            if r[:s3] && r[:s3][:object] && r[:s3][:object][:key]
+              key = URI.decode(r[:s3][:object][:key]).gsub('+', ' ')
               Caboose.log("Processing #{key}")
               arr = key.split('_')
               media_category_id = arr.shift
@@ -31,7 +31,7 @@ module Caboose
               name = Caboose::Media.upload_name(original_name)                                       
               m = Media.where(:media_category_id => media_category_id, :original_name => original_name, :name => name).first
               m = Media.create(:media_category_id => media_category_id, :original_name => original_name, :name => name, :processed => false) if m.nil?                
-              m.delay(:queue => 'caboose_media').process
+              m.delay(:queue => 'caboose_media', :priority => 3).process
             end
           end                  
         end

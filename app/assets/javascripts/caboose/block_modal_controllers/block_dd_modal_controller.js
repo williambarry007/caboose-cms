@@ -163,8 +163,8 @@ var BlockModalController = ModalController.extend({
     
     var b = that.block;    
     $('#modal_content').empty()      
-      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_block_type_id' )))
-      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_parent_id'     )))
+ //     .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_block_type_id' )))
+ //     .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_parent_id'     )))
       .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_constrain'     )))
       .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_full_width'    )))      
     $('#modal_controls').empty()
@@ -185,8 +185,8 @@ var BlockModalController = ModalController.extend({
       update_url: that.block_url(b),      
       authenticity_token: that.authenticity_token,
       attributes: [
-        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/block-types/options' },
-        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/block-options' },
+//        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/block-types/options' },
+//        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/parentblock-options?block_id=' + b.id },
         { name: 'constrain'     , nice_name: 'Constrain'  , type: 'checkbox' , value: b.constrain     ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.constrain     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
         { name: 'full_width'    , nice_name: 'Full Width' , type: 'checkbox' , value: b.full_width    ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.full_width    = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }}
       ]

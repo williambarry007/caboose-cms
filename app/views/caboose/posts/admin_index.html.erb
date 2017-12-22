@@ -1,6 +1,12 @@
 <h1>Posts</h1>
 <div id='posts'></div>
 
+<% content_for :caboose_css do %>
+<style>
+  table.data {margin-right: 30px;}
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/model/all' %>
 <script type='text/javascript'>

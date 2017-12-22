@@ -386,7 +386,7 @@ BlockContentController.prototype = {
   add_handles_to_block: function(block_id) {
     var that = this;
     var el = $('#block_' + block_id);
-    if (el.length > 0) {
+    if (el.length > 0 && block_id.indexOf('constrain') < 0 && block_id.indexOf('full_width') < 0 && block_id.indexOf('_value_') < 0) {
       if ( el.attr('id').indexOf('_value') >= 0 || el.children('.drag_handle').length > 0 )
         return true;
       if ( el.parents('.content_body').length > 0 ) {

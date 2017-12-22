@@ -648,6 +648,12 @@ module Caboose
           Block.where("parent_id is null and page_id = ?", params[:id]).reorder(:sort_order).all.each do |b|
             admin_block_options_helper(options, b, "") 
           end
+        when 'parentblock'
+          options = []
+          this_block = Block.find(params[:block_id])
+          Block.where("parent_id is null and page_id = ?", params[:id]).reorder(:sort_order).all.each do |b|
+            admin_parent_block_options_helper(options, b, "", this_block) 
+          end
       end              
       render :json => options 		
     end
@@ -664,6 +670,15 @@ module Caboose
       b.children.each do |b2|
         admin_block_options_helper(options, b2, "#{prefix} - ")        
       end      
+    end
+
+    def admin_parent_block_options_helper(options, b, prefix, this_block)
+      if b.block_type.allow_child_blocks && (b.block_type.default_child_block_type_id.blank? || b.block_type.default_child_block_type_id == this_block.block_type_id)
+        options << { 'value' => b.id, 'text' => "#{prefix}#{b.title}" }
+      end      
+      b.children.each do |b2|
+        admin_parent_block_options_helper(options, b2, "#{prefix} - ", this_block)        
+      end
     end
 		
   end

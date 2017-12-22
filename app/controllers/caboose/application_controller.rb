@@ -6,7 +6,7 @@ module Caboose
     helper_method :logged_in?
     helper :all
     
-    @find_page = true    
+    @find_page = true
     
     def before_before_action
       
@@ -51,9 +51,13 @@ module Caboose
         @page = Page.page_with_uri(request.host_with_port, request.fullpath)
         @crumb_trail  = Caboose::Page.crumb_trail(@page)		    
       #end
+
+
       
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user  
+
+      @nav = Caboose.plugin_hook('admin_nav', [], @logged_in_user, @page, @site)
       
       # Initialize the card
       init_cart if @site && @site.use_store && !@domain.under_construction

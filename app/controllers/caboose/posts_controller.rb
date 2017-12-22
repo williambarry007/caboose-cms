@@ -53,6 +53,7 @@ module Caboose
           'sort'        => 'created_at',
           'desc'        => true,
           'base_url'    => '/admin/posts',
+          'items_per_page' => 50,
           'use_url_params' => false
       })
       render :json => {

@@ -50,10 +50,32 @@ end
 <body>
 <div id='header'>
   <div id='top_nav'>
-    <div class='caboose_logo'></div>
+    <a href="/admin" class='caboose_logo'></a>
+    <ul class="quick">
+      <% i = 0 %>
+      <% @nav.each do |item| %>
+        <% id = item['id'].nil? ? i.to_s : item['id'] %>
+        <% href = item['href'].nil? ? '#' : item['href'] %>
+        <% modal = item['modal'].nil? ? false : item['modal'] %>
+        <li id='nav_item_<%= id %>'>
+          <% if href != "#" %><a href='<%= href %>'<%= raw (modal ? " rel='modal'" : "") %>><% end %>
+            <span class='icon'></span><span class='text'><%= item['text'] %></span>
+          <% if href != "#" %></a><% end %>
+        <% if (!item['children'].nil? && item['children'].count > 0) %>
+          <ul>
+            <% item['children'].each do |item2| %>
+              <% modal = item2['modal'].nil? ? false : item2['modal'] %>
+              <li><a href='<%= item2['href'] %>'<%= raw (modal ? " rel='modal'" : "") %>><%= item2['text'] %></a></li>
+            <% end %>
+          </ul>
+        <% end %>
+        </li>
+        <% i + 1 %>
+      <% end %>
+    </ul>
     <ul>
-      <li class='back'    ><a href='/' class="caboose-btn"><span><< Back to Site</span></a></li>
-      <li class='cpanel'  ><a href='/station' id='caboose_station' class='caboose_modal caboose-btn'><span>Menu</span></a></li>
+      <li class='back'    ><a href='/' target="_blank" class="caboose-btn"><span>View Site</span></a></li>
+  <!--     <li class='cpanel'  ><a href='/station' id='caboose_station' class='caboose_modal caboose-btn'><span>Menu</span></a></li> -->
     </ul>
   </div>
 </div>

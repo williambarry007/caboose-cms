@@ -85,6 +85,10 @@
     font-weight: 300 !important;
     font-size: 15px !important;
     padding: 8px 6px 6px 6px;
+    &:focus {
+      outline-width: 0;
+      border-color: #28acc1;
+    }
   }
   label {
     font-family: 'Roboto' !important;

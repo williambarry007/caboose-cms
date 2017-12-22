@@ -337,14 +337,20 @@ select.fake option {
   width: 20px;
 }
 
+#new_form p input[type="text"] {
+  padding: 2px 4px 0 8px;
+}
+
 #content .note .label_with_checkbox input[type="checkbox"] {
   position: relative;
-  top: 4px;
+  top: 5px;
   margin-right: 5px;
   height: 20px;
 }
 .note .label_with_checkbox label {
-  font-size: 15px;
+  font-weight: 400;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 #content .search_form {
@@ -543,11 +549,12 @@ Page Bar Generator
 #tabs a {
   display: block;
   margin: 0;
-  padding: 16px 12px 12px 12px;
+  padding: 13px 12px 12px 12px;
   text-decoration: none;
   background: #efefef;
   border-bottom: #ccc 1px solid;
   color: #000;
+  font-size: 15px;
 }
 #tabs a:hover {
   background: #666;

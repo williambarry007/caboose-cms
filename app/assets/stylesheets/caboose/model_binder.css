@@ -1,6 +1,6 @@
 /*    
- *= require caboose/spectrum 
- */
+require caboose/spectrum 
+*/
  
 .mb_container {
   width: 100%;

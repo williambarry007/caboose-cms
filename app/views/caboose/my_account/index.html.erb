@@ -11,6 +11,7 @@ u = @logged_in_user
         <h4 class="title">Account Information</h4>
         <div class="input-holder"><div id='user_<%= @user.id %>_first_name' ></div></div>
         <div class="input-holder"><div id='user_<%= @user.id %>_last_name'  ></div></div>
+        <div class="input-holder"><div id='user_<%= @user.id %>_username'  ></div></div>
         <div class="input-holder"><div id='user_<%= @user.id %>_email'      ></div></div>
         <div class="input-holder"><div id='user_<%= @user.id %>_phone'      ></div></div>
         <div id='message2'></div>
@@ -87,7 +88,8 @@ $(document).ready(function() {
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'first_name' , nice_name: 'First name'   , type: 'text', value: <%= raw Caboose.json(@user.first_name) %>, width: 400 },
-      { name: 'last_name'  , nice_name: 'Last name'    , type: 'text', value: <%= raw Caboose.json(@user.last_name)  %>, width: 400 },      
+      { name: 'last_name'  , nice_name: 'Last name'    , type: 'text', value: <%= raw Caboose.json(@user.last_name)  %>, width: 400 },  
+      { name: 'username'  , nice_name: 'Username'    , type: 'text', value: <%= raw Caboose.json(@user.username)  %>, width: 400 },    
       { name: 'email'      , nice_name: 'Email'        , type: 'text', value: <%= raw Caboose.json(@user.email)      %>, width: 400 },
       { name: 'phone'      , nice_name: 'Phone Number' , type: 'text', value: <%= raw Caboose.json(@user.phone)      %>, width: 400 }
     ],

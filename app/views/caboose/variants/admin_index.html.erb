@@ -58,10 +58,10 @@ sc = @site.store_config
 $(document).ready(function() {
   var that = this;
   
-  add_to_crumbtrail('/admin', 'Admin');
-  add_to_crumbtrail('/admin/products', 'Products');  
-  add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);
-  add_to_crumbtrail('/admin/products/<%= p.id %>/variants', 'Inventory & Variants');
+  // add_to_crumbtrail('/admin', 'Admin');
+  // add_to_crumbtrail('/admin/products', 'Products');  
+  // add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);
+  // add_to_crumbtrail('/admin/products/<%= p.id %>/variants', 'Inventory & Variants');
   
   var table = new IndexTable({    
     form_authenticity_token: '<%= form_authenticity_token %>',

@@ -13,7 +13,10 @@
 <%= javascript_include_tag "caboose/admin_products" %>
 <% end %>
 
-<div id='crumbtrail'></div>
+<ul id='crumbtrail'>
+	<li><a href="/admin"><span>Admin</span></a></li>
+	<li><a href="/admin/products"><span>Products</span></a></li>
+</ul>
 <h1 id="product-title">Edit Product - <%= @product.title %></h1>
 <ul id='tabs'>
 <%

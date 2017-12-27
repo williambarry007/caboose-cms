@@ -98,6 +98,7 @@ $(document).ready(function() {
   // add_to_crumbtrail('/admin/products/<%= p.id %>/variants', 'Inventory & Variants');
   // add_to_crumbtrail('/admin/products/<%= p.id %>/variants/<%= v.id %>', <%= raw Caboose.json(v.options.count > 0 ? v.options.join(', ') : 'Default Variant') %>);
   
+  
   m = new ModelBinder({
     name: 'Variant',
     id: <%= v.id %>,

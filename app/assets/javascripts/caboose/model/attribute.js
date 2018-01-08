@@ -61,26 +61,37 @@ Attribute.prototype = {
 			}
 		});
   },
-  
-  populate_options: function(after, refresh) {
-    if (!this.options_url)
-      return;        
-    if (this.options && !refresh)
+
+  populate_options: function(after, refresh) 
+  {
+    var that = this;
+    if (that.options)
+      that.verify_options();
+    if (!that.options_url || (that.options && !refresh))
     {
       if (after) after();
       return;
-    }
-    var this2 = this;
+    }    
     $.ajax({
-      url: this.options_url,
+      url: that.options_url,
       type: 'get',
-			success: function(resp) {
-        this2.options = resp;
-				if (after) after();
-			},
-			error: function() { 
-			  if (after) after();
-			}
-		});
+      success: function(resp) {
+        that.options = resp;
+        that.verify_options();
+        if (after) after();
+      },
+      error: function() { 
+        if (after) after();
+      }
+    });
+  },
+
+  verify_options: function()
+  {
+    var that = this;
+    if (!that.options) return;
+    var arr = $.map(that.options, function(x) { return (typeof(x) == 'string' ? { value: x, text: x } : x); });    
+    that.options = arr;        
   }
+
 };

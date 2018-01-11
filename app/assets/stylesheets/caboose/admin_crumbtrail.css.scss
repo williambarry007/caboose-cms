@@ -5,6 +5,122 @@ $hover-bg-color: #666;
 $hover-text-color: #fff;
 $current-bg-color: #333;
 $current-text-color: #ccc;
+
+@mixin flexbox() {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+
+@mixin flex($values) {
+  -webkit-box-flex: $values;
+  -moz-box-flex:  $values;
+  -webkit-flex:  $values;
+  -ms-flex:  $values;
+  flex:  $values;
+}
+
+.admin-index-menu#admin-list {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 0 20px 100px 20px;
+	position: relative;
+	right: 15px;
+	& * {
+		-moz-box-sizing: border-box;
+	  -webkit-box-sizing: border-box;
+	  box-sizing: border-box;
+	}
+	.admin-intro {
+		text-align: center;
+		padding: 10px 2%;
+		h4 {
+			font-size: 1.5em;
+			margin-bottom: 8px;
+			margin-top: 0;
+		}
+		p {
+			margin: 0;
+			font-size: 13px;
+			a {
+				color: #6d6db7;
+				text-decoration: none;
+				&:hover {
+					color: #1c1ccc;
+				}
+			}
+		}
+	}
+	& > ul {
+		margin: 0;
+		list-style-type: none;
+		padding: 0;
+		& > li {
+			display: block;
+			margin-bottom: 10px;
+			min-width: 140px;
+			& > a {
+				display: block;
+				text-decoration: none;
+			}
+			span[class^="icon-"] {
+
+			}
+			span.text {
+				display: block;
+			}
+			ul {
+				list-style-type: none;
+				padding: 0;
+				@include flexbox();
+				flex-wrap: wrap;
+				justify-content: flex-start;
+				li {
+					display: inline-block;
+					@include flex(1 1 17%);
+					border: 1px solid #c5c5c5;
+					margin: 0 10px 10px 0;
+					border-radius: 8px;
+					overflow: hidden;
+					&:hover {
+						background-color: #e7e7ff;
+						border-color: #a6a6af;
+					}
+					a {
+						display: block;
+						text-decoration: none;
+						padding: 11px;
+						text-align: center;
+						height: 100%;
+						span[class^="icon3-"] {
+							display: block;
+							height: 35px;
+							width: 40px;
+							color: #2d2d2d;
+							margin: 0 auto;
+							&::before {
+								font-size: 28px;
+							}
+						}
+						span.text {
+							display: block;
+							color: #2d2d2d;
+							font-size: 13px;
+							line-height: 15px;
+						}
+						&:hover {
+							span {
+								color: #39394e;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
   
 ul#crumbtrail {
   position: absolute;

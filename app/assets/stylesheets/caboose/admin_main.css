@@ -8,6 +8,14 @@ body {
   font-weight: 400;
 }
 
+body * {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 #cboxOverlay {
   opacity: 0.85 !important;
   background: url('/assets/caboose/modal_overlay.png') !important;
@@ -86,6 +94,18 @@ body {
   cursor: pointer;
 }
 
+#top_nav ul li.logout {
+  position: relative;
+  right: 20px;
+}
+
+#top_nav ul li.logout a {
+  font-size: 11px;
+  padding: 0 10px;
+  position: relative;
+  bottom: 1px;
+}
+
 #top_nav ul li a > span {
   padding: 0;
 }
@@ -154,7 +174,7 @@ h1,h2,h3,h4,h5,h6 {
   background: #dcdcdc;
   border-bottom: #aaa 1px solid;
   font-size: 25px;
-  line-height: 56px;
+  line-height: 54px;
   overflow: hidden;
   color: #2d2d2d;
 }

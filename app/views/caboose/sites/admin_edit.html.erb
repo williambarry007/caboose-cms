@@ -8,7 +8,9 @@ user_ids = [] if user_ids.nil?
 <%= render :partial => 'caboose/sites/admin_header' %>
 
 <p><div id='site_<%= @site.id %>_logo'                    ></div></p>
-<p><div id='site_<%= @site.id %>_name'                    ></div></p>
+<p>
+  <strong>Name:</strong> <%= @site.name %>
+</p>
 <p><div id='site_<%= @site.id %>_description'             ></div></p>
 <p><div id='site_<%= @site.id %>_under_construction_html' ></div></p>
 <p><div id='site_<%= @site.id %>_use_store'               ></div></p>
@@ -63,6 +65,17 @@ user_ids = [] if user_ids.nil?
 
 <%= render :partial => 'caboose/sites/admin_footer' %>
 
+<% content_for :caboose_css do %>
+<style>
+  textarea {
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 20px;
+    padding: 30px 9px 9px 9px !important;
+  }
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <script type="text/javascript">
 
@@ -74,9 +87,8 @@ $(document).ready(function() {
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'logo'                    , nice_name: 'Logo'                     , type: 'image'    , value: <%= raw Caboose.json(@site.logo ? @site.logo.url(:thumb) : '')     %>, width: 400, update_url: '/admin/sites/<%= @site.id %>/logo' },
-      { name: 'name'                    , nice_name: 'Name'                     , type: 'text'     , value: <%= raw Caboose.json(@site.name)                                   %>, width: 400 },
-      { name: 'description'             , nice_name: 'Description'              , type: 'textarea' , value: <%= raw Caboose.json(@site.description)                            %>, width: 600, height: 75 },
-      { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html)                %>, width: 600, height: 75 },
+      { name: 'description'             , nice_name: 'Description'              , type: 'text' , value: <%= raw Caboose.json(@site.description)                            %>, width: 600  },
+      { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html)                %>, width: 600, height: 220 },
       { name: 'use_store'               , nice_name: 'Enable Store'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_store               ? true : false) %>, width: 400 },
       { name: 'use_fonts'               , nice_name: 'Enable Fonts'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_fonts               ? true : false) %>, width: 400 },
       { name: 'use_dragdrop'               , nice_name: 'Enable Drag & Drop'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_dragdrop              ? true : false) %>, width: 400 },

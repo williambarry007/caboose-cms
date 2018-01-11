@@ -2,6 +2,14 @@
 
 <div id='sites'></div>
 
+<% content_for :caboose_css do %>
+<style>
+  table.data {
+    margin-right: 20px;
+  }
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/model/all' %>
 <script type='text/javascript'>
@@ -13,7 +21,7 @@ $(document).ready(function() {
     container: 'sites',
     base_url: '/admin/sites',            
     fields: [
-      { name: 'name'        , sort: 'name'              , show: true , bulk_edit: false, nice_name: 'Name'        , type: 'text' , value: function(site) { return site.name;        }, width: 400 },
+      { name: 'name'        , sort: 'name'              , show: true , editable: false, bulk_edit: false, nice_name: 'Name'        , type: 'text' , value: function(site) { return site.name;        }, width: 400 },
       { name: 'description' , sort: 'description'       , show: true , bulk_edit: false, nice_name: 'Description' , type: 'text' , value: function(site) { return site.description; }, width: 400 },                              
       { name: 'domains'     , sort: 'name, description' , show: true , bulk_edit: false, nice_name: 'Domains'     , type: 'text' , value: function(site) { return site.domains ? site.domains.map(function(d) { return d.id }) : []; }, text: function(site) { return site.domains ? site.domains.map(function(d) { return d.domain }).join('<br />') : ''; }, width: 400, height: 200, editable: false }      
     ],

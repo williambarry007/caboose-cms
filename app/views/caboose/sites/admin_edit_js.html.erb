@@ -5,6 +5,17 @@
 
 <%= render :partial => 'caboose/sites/admin_footer' %>
 
+<% content_for :caboose_css do %>
+<style>
+  textarea {
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 20px;
+    padding: 30px 9px 9px 9px !important;
+  }
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <script type="text/javascript">
 
@@ -15,7 +26,7 @@ $(document).ready(function() {
     update_url: '/admin/sites/<%= @site.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'custom_js', nice_name: 'Custom Javascript', type: 'textarea' , value: <%= raw Caboose.json(@site.custom_js) %>, width: 600, height: 200 }      
+      { name: 'custom_js', nice_name: 'Custom Javascript', type: 'textarea' , value: <%= raw Caboose.json(@site.custom_js) %>, width: 600, height: 400 }      
     ]    
   });       
 });

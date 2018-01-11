@@ -52,6 +52,8 @@ end
   <div id='top_nav'>
     <a href="/admin" class='caboose_logo'></a>
     <ul class="quick">
+      <li class="logout"><a href="/logout">Logout</a></li>
+      <li><a href="/admin">Admin</a></li>
       <% i = 0 %>
       <% @nav.each do |item| %>
         <% id = item['id'].nil? ? i.to_s : item['id'] %>

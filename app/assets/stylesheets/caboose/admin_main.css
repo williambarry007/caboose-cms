@@ -154,11 +154,9 @@ body * {
     padding: 0 10px;
   }
 }
-
 #content_wrapper {
   position: relative;
 }
-
 #content {
   padding: 0 0 0 30px;
 }

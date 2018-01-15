@@ -1,23 +1,24 @@
 module Caboose
   module PagesHelper
     def pages_list(page)
+      is_admin = @logged_in_user && @logged_in_user.is_allowed('all', 'all')
       str = "<ul>"
-      str << pages_list_helper(page)      
+      str << pages_list_helper(page, is_admin)      
       str << "</ul>"
       return str
     end
     
-    def pages_list_helper(page)
-      can_edit = (@logged_in_user && (@logged_in_user.is_allowed('all', 'all') || Page.permissible_actions(@logged_in_user, page.id).include?('edit'))) ? true : false
-      if can_edit
-        str = "<li><a href='/admin/pages/#{page.id}/content'>#{page.title}</a>"
+    def pages_list_helper(page, is_admin)
+      if is_admin || ((@logged_in_user && Page.permissible_actions(@logged_in_user, page.id).include?('edit')) ? true : false)
+        str = "<li><a class='content' href='/admin/pages/#{page.id}/content'>#{page.title}</a><a class='icon3-settings' href='/admin/pages/#{page.id}'>Settings</a>"
       else
         str = "<li><span class='disabled'>#{page.title}</span>"
       end
-      if page.children && page.children.count > 0
+      pchildren = page.children.select([:id, :title])
+      if pchildren && pchildren.count > 0
         str << "<ul>"
-        page.children.each do |p|
-          str << pages_list_helper(p)
+        pchildren.each do |p|
+          str << pages_list_helper(p, is_admin)
         end
         str << "</ul>"
       end

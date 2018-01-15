@@ -121,6 +121,147 @@ $current-text-color: #ccc;
 		}
 	}
 }
+
+#page-list {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 0 20px 100px 20px;
+	.top {
+		margin-bottom: 20px;
+		p {
+			margin: 0;
+			float: left;
+		}
+		input {
+			border: 1px solid #c5c5c5;
+	    border-radius: 8px;
+	    padding: 8px 8px 8px 8px;
+	    font-size: 14px;
+	    height: 33px;
+	    float: right;
+		}
+	}
+	ul {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+		padding-left: 15px;
+		overflow: hidden;
+		position: relative;
+		&::before {
+			content: " ";
+			display: block;
+			position: absolute;
+			left: 0;
+			top: -21px;
+			width: 1px;
+			height: 100%;
+			background-color: #dadada;
+		}
+		li {
+			display: block;
+			position: relative;
+			a.icon3-settings {
+				position: absolute;
+		    right: 4px;
+		    top: 8px;
+		    font-size: 0;
+		    color: transparent;
+		    width: 23px;
+		    height: 23px;
+		    display: inline-block;
+		    text-decoration: none;
+		    z-index: 2;
+				&::before {
+					font-size: 20px;
+					color: #2d2d2d;
+				}
+				&:hover {
+					&::before {
+						color: #1c1ccc;
+					}
+				}
+			}
+			a.content {
+				text-decoration: none;
+				color: #2d2d2d;
+				display: block;
+				margin-bottom: 5px;
+				border: 1px solid #c5c5c5;
+				border-radius: 8px;
+				padding: 8px 8px 8px 30px;
+				font-size: 14px;
+				&:hover {
+					background-color: #e7e7ff;
+					border-color: #a6a6af;
+				}
+				&::before {
+					content: "\70";
+					font-family: "caboose-admin-menu" !important;
+					font-size: 20px;
+			    position: absolute;
+			    left: 5px;
+			    top: 7px;
+				}
+			}
+			span.disabled {
+				text-decoration: line-through;
+  			color: #888888;
+			}
+			&::before {
+				content: " ";
+				display: block;
+				position: absolute;
+				right: 100%;
+				top: 17px;
+				width: 50px;
+				height: 1px;
+				background-color: #dadada;
+			}
+			&.hidden {
+				& > a.content, & > a.icon3-settings {
+					display: none;
+				}
+				&::before {
+					display: none;
+				}
+			}
+			&.shown {
+				& > a.content {
+					display: block;
+				}
+				& > a.icon3-settings {
+					display: inline-block;
+				}
+			}
+			&.small {
+				&::before {
+					top: 11px;
+				}
+				& > a.content {
+					font-size: 11px;
+					padding: 4px 8px 3px 8px;
+					background-color: #eaeaea;
+					&::before {
+						display: none;
+					}
+				}
+				& > a.icon3-settings {
+					display: none;
+				}
+			}
+		}
+	}
+	& > ul {
+		border-left: 0;
+		padding-left: 0;
+		&::before {
+			top: 10px;
+			height: calc(100% - 31px);
+		}
+	}
+}
+
   
 ul#crumbtrail {
   position: absolute;

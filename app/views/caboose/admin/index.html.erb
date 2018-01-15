@@ -15,10 +15,6 @@ width = 200
     <p>For assistance, please email <a href="mailto:support@nine.is">support@nine.is</a>.</p>
   </div>
 <ul>
-  <!--
-  <li id='nav_item_logout'><a href='/logout'><span class='icon'></span><span class='text'>Logout</span></a>
-  <li id='nav_item_myaccount'><a href='/my-account'><span class='icon'></span><span class='text'>My Account</span></a>
-  -->
   <% i = 0 %>
   <% @nav.each do |item| %>
     <% id = item['id'].nil? ? i.to_s : item['id'] %>

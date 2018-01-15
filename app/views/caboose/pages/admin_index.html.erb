@@ -1,35 +1,58 @@
 <h1>Pages</h1>
 
 <% if @domain %>
-	<% if @user.is_allowed('pages','add') %>
-  <p><a href='/admin/pages/new' class="caboose-btn-white">New Page</a></p>
-  <% end %>
   <div id="page-list">
-  <%= raw pages_list(@home_page) %>
+  	<div class="clearfix top">
+  		<% if @user.is_allowed('pages','add') %>
+			  <p><a href='/admin/pages/new' class="caboose-btn-white">New Page</a></p>
+			<% end %>
+			<input type="text" id="pages-filter" placeholder="Filter" />
+  	</div>
+  	<%= raw pages_list(@home_page) %>
+  	<p id="no-results"></p>
   </div>
 <% else %>
   <p>It doesn't look like this site is configured for the current domain.  Please <a href='/admin/sites'>configure your sites</a>.</p>
-<% end %>  
+<% end %>
 
 <% content_for :caboose_css do %>
-<style>
-	#page-list ul li {
-		line-height: 26px;
+<%= stylesheet_link_tag 'caboose/admin_menu_icons' %>
+<% end %>
+
+<% content_for :caboose_js do %>
+<script>
+	jQuery.expr[":"].Contains = jQuery.expr.createPseudo(function(arg) {
+    return function( elem ) {
+    	return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+    };
+	});
+	function filter_pages() {
+		var results = 0;
+		var q = $("#pages-filter").val().toUpperCase();
+		if ( !q || q == '' || q == 'FILTER' ) {
+			$("#page-list li").removeClass('small').addClass('shown').removeClass('hidden');
+			$("#no-results").text('');
+		}
+		else {
+			$("#page-list li").addClass('hidden').removeClass('small').removeClass('shown');
+			$("#no-results").text('');
+			$.each($("a.content:Contains(" + q + ")"), function(k,v) {
+				$(v).closest('li').addClass('shown').removeClass('hidden');
+				$.each($(v).parents("li"), function(a,b) {
+					var t1 = $(b).children("a.content").text().toUpperCase();
+					if ( $(b).children("a.content").text().toUpperCase().indexOf(q) < 0 )
+						$(b).addClass('small');
+					$(b).addClass('shown').removeClass('hidden');
+				});
+				$(v).closest("li").removeClass('small');
+				results += 1;
+			});
+			if ( results == 0 )
+				$("#no-results").text("Sorry, no matching pages were found.");
+		}
 	}
-	#page-list ul li a {
-		color: #2424b1;
-		text-decoration: none;
-	}
-	#page-list ul li a:visited {
-		color: #824daf;
-	}
-	#page-list ul li a:hover {
-		color: #24b14b;
-		text-decoration: underline;
-	}
-	#page-list ul li span.disabled {
-		text-decoration: line-through;
-    color: #888888;
-	}
-</style>
+	$("#pages-filter").keyup(function() {
+		filter_pages();
+	});
+</script>
 <% end %>

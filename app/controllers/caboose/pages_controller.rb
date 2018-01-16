@@ -209,6 +209,36 @@ module Caboose
         render :layout => 'caboose/admin'
       end
     end
+
+    # @route PUT /admin/pages/:id/show
+    def admin_show_page
+      return unless user_is_allowed('pages', 'edit')  
+      resp = StdClass.new({'attributes' => {}})    
+      @page = Page.find(params[:id])
+      if @page.site_id != @logged_in_user.site_id
+        redirect_to '/admin/pages'
+      else
+        @page.hide = false
+        @page.save
+        resp.success = true
+      end
+      render :json => resp
+    end
+
+    # @route PUT /admin/pages/:id/hide
+    def admin_hide_page
+      return unless user_is_allowed('pages', 'edit')  
+      resp = StdClass.new({'attributes' => {}})    
+      @page = Page.find(params[:id])
+      if @page.site_id != @logged_in_user.site_id
+        redirect_to '/admin/pages'
+      else
+        @page.hide = true
+        @page.save
+        resp.success = true
+      end
+      render :json => resp
+    end
     
     # @route PUT /admin/pages/:id/layout
     def admin_update_layout

@@ -266,3 +266,9 @@
 .icon3-stack:before {
   content: "\2e";
 }
+.icon3-hidden:before {
+  content: "\2f";
+}
+.icon3-visible:before {
+  content: "\3a";
+}

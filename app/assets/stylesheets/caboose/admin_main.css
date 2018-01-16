@@ -495,7 +495,7 @@ Page Bar Generator
   text-decoration: none;
 }
 
-#search_form input[type='text']   { height: 20px; padding: 6px 12px; }
+#search_form input[type='text']   { padding: 6px 12px; }
 #search_form input[type='submit'] { height: 35px; padding: 0 12px; }
 
 

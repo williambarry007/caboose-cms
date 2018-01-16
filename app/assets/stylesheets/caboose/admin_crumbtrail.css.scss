@@ -123,7 +123,7 @@ $current-text-color: #ccc;
 }
 
 #page-list {
-	max-width: 640px;
+	max-width: 660px;
 	margin: 0 auto;
 	padding: 0 20px 100px 20px;
 	.top {
@@ -163,7 +163,7 @@ $current-text-color: #ccc;
 			position: relative;
 			a.icon3-settings {
 				position: absolute;
-		    right: 4px;
+		    right: 30px;
 		    top: 8px;
 		    font-size: 0;
 		    color: transparent;
@@ -182,14 +182,14 @@ $current-text-color: #ccc;
 					}
 				}
 			}
-			a.content {
+			.content {
 				text-decoration: none;
 				color: #2d2d2d;
 				display: block;
 				margin-bottom: 5px;
 				border: 1px solid #c5c5c5;
 				border-radius: 8px;
-				padding: 8px 8px 8px 30px;
+				padding: 8px 60px 8px 30px;
 				font-size: 14px;
 				&:hover {
 					background-color: #e7e7ff;
@@ -204,9 +204,27 @@ $current-text-color: #ccc;
 			    top: 7px;
 				}
 			}
-			span.disabled {
-				text-decoration: line-through;
-  			color: #888888;
+			a.pub {
+				position: absolute;
+		    right: 9px;
+		    top: 10px;
+		    font-size: 0;
+		    color: transparent;
+		    width: 17px;
+		    height: 16px;
+		    display: inline-block;
+		    text-decoration: none;
+		    z-index: 2;
+		    cursor: pointer;
+				&::before {
+					font-size: 17px;
+					color: #2d2d2d;
+				}
+				&:hover {
+					&::before {
+						color: #1c1ccc;
+					}
+				}
 			}
 			&::before {
 				content: " ";
@@ -219,7 +237,7 @@ $current-text-color: #ccc;
 				background-color: #dadada;
 			}
 			&.hidden {
-				& > a.content, & > a.icon3-settings {
+				& > .content, & > a.icon3-settings, & > a.pub {
 					display: none;
 				}
 				&::before {
@@ -227,10 +245,10 @@ $current-text-color: #ccc;
 				}
 			}
 			&.shown {
-				& > a.content {
+				& > .content {
 					display: block;
 				}
-				& > a.icon3-settings {
+				& > a.icon3-settings, & > a.pub {
 					display: inline-block;
 				}
 			}
@@ -238,7 +256,7 @@ $current-text-color: #ccc;
 				&::before {
 					top: 11px;
 				}
-				& > a.content {
+				& > .content {
 					font-size: 11px;
 					padding: 4px 8px 3px 8px;
 					background-color: #eaeaea;
@@ -246,7 +264,22 @@ $current-text-color: #ccc;
 						display: none;
 					}
 				}
-				& > a.icon3-settings {
+				& > a.icon3-settings, & > a.pub {
+					display: none;
+				}
+			}
+			&.disabled {
+				& > .content {
+					background: #d0d0d0;
+			    text-decoration: line-through;
+			    color: #5f5f5f;
+			    font-size: 11px;
+					padding: 4px 8px 3px 8px;
+					&::before {
+						display: none;
+					}
+				}
+				& > a.icon3-settings, & > a.pub {
 					display: none;
 				}
 			}

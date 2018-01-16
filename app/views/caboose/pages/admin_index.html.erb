@@ -36,11 +36,11 @@
 		else {
 			$("#page-list li").addClass('hidden').removeClass('small').removeClass('shown');
 			$("#no-results").text('');
-			$.each($("a.content:Contains(" + q + ")"), function(k,v) {
+			$.each($(".content:Contains(" + q + ")"), function(k,v) {
 				$(v).closest('li').addClass('shown').removeClass('hidden');
 				$.each($(v).parents("li"), function(a,b) {
-					var t1 = $(b).children("a.content").text().toUpperCase();
-					if ( $(b).children("a.content").text().toUpperCase().indexOf(q) < 0 )
+					var t1 = $(b).children(".content").text().toUpperCase();
+					if ( $(b).children(".content").text().toUpperCase().indexOf(q) < 0 )
 						$(b).addClass('small');
 					$(b).addClass('shown').removeClass('hidden');
 				});
@@ -53,6 +53,27 @@
 	}
 	$("#pages-filter").keyup(function() {
 		filter_pages();
+	});
+	$(window).load(function() {
+		filter_pages();
+	});
+	$("a.pub").click(function(e) {
+		e.preventDefault();
+		var anc = $(this);
+		var page_id = anc.data('page');
+		var action = anc.hasClass('icon3-hidden') ? 'show' : 'hide';
+		$.ajax({
+	    url: '/admin/pages/' + page_id + '/' + action,
+	    type: 'put',
+	    success: function(resp) {
+	    	if (resp && resp.success) {
+		    	if ( action == 'show' )
+		    		anc.removeClass('icon3-hidden').addClass('icon3-visible').attr('title','Hide Page');
+		    	if ( action == 'hide' )
+		    		anc.removeClass('icon3-visible').addClass('icon3-hidden').attr('title','Show Page');
+		    }
+	    }
+	  });
 	});
 </script>
 <% end %>

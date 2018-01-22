@@ -579,6 +579,8 @@ namespace :assets do
       prefixes = sitenames.map{ |sn| sn + "/"}
       prefixes << "caboose/"
       prefixes << "tinymce/"
+      prefixes << "col/"
+      prefixes << "shared/"
       prefixes << "ninelite.css"
 
       File.readlines("#{Rails.root.join('public', 'manifest1.yml')}").each do |line|

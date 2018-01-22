@@ -577,6 +577,9 @@ namespace :assets do
       new_string = ""
 
       prefixes = sitenames.map{ |sn| sn + "/"}
+      prefixes << "caboose/"
+      prefixes << "tinymce/"
+      prefixes << "ninelite.css"
 
       File.readlines("#{Rails.root.join('public', 'manifest1.yml')}").each do |line|
         if !line.starts_with?(*prefixes)
@@ -616,7 +619,7 @@ namespace :assets do
       host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)
       host_images = Rails.root.join('app', 'assets', 'images'      , site.name)
       host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name)
-                      
+
       `rm -rf #{host_js     }`
       `rm -rf #{host_css    }`
       `rm -rf #{host_images }` 

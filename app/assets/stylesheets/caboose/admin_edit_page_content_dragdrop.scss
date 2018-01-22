@@ -33,6 +33,8 @@
         font-size: 15px;
         display: block;
         text-transform: uppercase;
+        color: #252525;
+        line-height: 16px;
       }
     }
   	li.blocktype {
@@ -48,7 +50,7 @@
       padding: 6px;
       background-color: #f9f8f6;
       span[class*=" icon-"] {
-        
+        color: #3e3e3e;
       }
   		span.bname {
         margin-top: 3px;
@@ -56,7 +58,9 @@
         font-family: 'Roboto';
         font-weight: 300;
   			font-size: 12px;
+        line-height: 14px;
         border: 0;
+        color: #252525;
   		}
       &.divider {
 

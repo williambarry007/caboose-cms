@@ -529,77 +529,100 @@ end
 namespace :assets do
 
   desc "Precompile assets, upload to S3, then remove locally"
-  task :purl, [:filename] => :environment do |t, args|
-    
-    # PURL a single file
-    if args.filename
-      dest = "#{Rails.root}/tmp/#{args.filename}"
+  task :purl, [:sitename, :sitename2, :sitename3, :sitename4] => :environment do |t, args|
+
+    sitenames = []
+    sitenames << args.sitename if !args.sitename.blank?
+    sitenames << args.sitename2 if !args.sitename2.blank?
+    sitenames << args.sitename3 if !args.sitename3.blank?
+    sitenames << args.sitename4 if !args.sitename4.blank?
+    where = args.sitename.blank? ? "" : "name = '#{args.sitename}'"
+    where += " OR name = '#{args.sitename2}'" if !args.sitename2.blank?
+    where += " OR name = '#{args.sitename3}'" if !args.sitename3.blank?
+    where += " OR name = '#{args.sitename4}'" if !args.sitename4.blank?
+
+    `mv #{Rails.root.join('public', 'assets', 'manifest.yml')} #{Rails.root.join('public', 'manifest1.yml')}`
+  
+    puts "Copying site assets into host assets..."
+    Caboose::Site.where(where).all.each do |site|
+      site_js     = Rails.root.join(Caboose::site_assets_path, site.name, 'js')    
+      site_css    = Rails.root.join(Caboose::site_assets_path, site.name, 'css')   
+      site_images = Rails.root.join(Caboose::site_assets_path, site.name, 'images')
+      site_fonts  = Rails.root.join(Caboose::site_assets_path, site.name, 'fonts') 
+          
+      host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
+      host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)
+      host_images = Rails.root.join('app', 'assets', 'images'      , site.name)
+      host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name)
       
-      # Compile the file
-      puts "Compiling #{args.filename}..."
-      File.write(dest, Uglifier.compile(Rails.application.assets.find_asset(args.filename).to_s))
-      
-      # Copy the file from dest to s3/assets
-      puts "Copying #{args.filename} to s3..."
-      config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))['production']    
-      AWS.config({ :access_key_id => config['access_key_id'], :secret_access_key => config['secret_access_key'] })                     
-      bucket = AWS::S3::Bucket.new(config['bucket'])
-      obj = bucket.objects["assets/#{args.filename}"]
-      obj.write(:file => dest, :acl => :public_read)
-      
-      # Remove the temp file
-      puts "Cleaning up..."
-      `rm -rf #{dest}`      
-    
-    else # Otherwise do a full PURL
-    
-      # Copy any site assets into the host app assets directory first
-      puts "Copying site assets into host assets..."
-      Caboose::Site.all.each do |site|
-        site_js     = Rails.root.join(Caboose::site_assets_path, site.name, 'js')    
-        site_css    = Rails.root.join(Caboose::site_assets_path, site.name, 'css')   
-        site_images = Rails.root.join(Caboose::site_assets_path, site.name, 'images')
-        site_fonts  = Rails.root.join(Caboose::site_assets_path, site.name, 'fonts') 
+      `mkdir -p #{host_js     }` if File.directory?(site_js) 
+      `mkdir -p #{host_css    }` if File.directory?(site_css) 
+      `mkdir -p #{host_images }` if File.directory?(site_images) 
+      `mkdir -p #{host_fonts  }` if File.directory?(site_fonts)
+                             
+      `cp -R #{site_js     } #{host_js     }` if File.directory?(site_js) 
+      `cp -R #{site_css    } #{host_css    }` if File.directory?(site_css) 
+      `cp -R #{site_images } #{host_images }` if File.directory?(site_images) 
+      `cp -R #{site_fonts  } #{host_fonts  }` if File.directory?(site_fonts) 
+    end
             
-        host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
-        host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)
-        host_images = Rails.root.join('app', 'assets', 'images'      , site.name)
-        host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name)
-        
-        `mkdir -p #{host_js     }` if File.directory?(site_js) 
-        `mkdir -p #{host_css    }` if File.directory?(site_css) 
-        `mkdir -p #{host_images }` if File.directory?(site_images) 
-        `mkdir -p #{host_fonts  }` if File.directory?(site_fonts)
-                               
-        `cp -R #{site_js     } #{host_js     }` if File.directory?(site_js) 
-        `cp -R #{site_css    } #{host_css    }` if File.directory?(site_css) 
-        `cp -R #{site_images } #{host_images }` if File.directory?(site_images) 
-        `cp -R #{site_fonts  } #{host_fonts  }` if File.directory?(site_fonts) 
+    puts "Running precompile..."
+    Rake::Task['assets:precompile'].invoke
+
+    if !sitenames.blank?
+
+      puts "Moving manifest.yml to public > manifest2.yml"
+      `mv #{Rails.root.join('public', 'assets', 'manifest.yml')} #{Rails.root.join('public', 'manifest2.yml')}`
+
+      new_string = ""
+
+      prefixes = sitenames.map{ |sn| sn + "/"}
+
+      File.readlines("#{Rails.root.join('public', 'manifest1.yml')}").each do |line|
+        if !line.starts_with?(*prefixes)
+          new_string += (line)
+        end
       end
-              
-      puts "Running precompile..."
-      Rake::Task['assets:precompile'].invoke
-      
-      puts "Removing assets from public/assets, but leaving manifest file..."    
+
+      File.readlines("#{Rails.root.join('public', 'manifest2.yml')}").each do |line|
+        if line.starts_with?(*prefixes)
+          new_string += (line)
+        end
+      end
+
+      puts "Writing to public > manifest3.yml"
+      `touch #{Rails.root.join('public', 'manifest3.yml')}`
+      File.open("#{Rails.root.join('public', 'manifest3.yml')}", "w") { |f| f.write(new_string)}
+
+      puts "Removing assets from public/assets, but leaving manifest file..."  
+      `rm -rf #{Rails.root.join('public', 'assets')}`
+      `rm #{Rails.root.join('public', 'manifest1.yml')}`
+      `rm #{Rails.root.join('public', 'manifest2.yml')}`
+      `mkdir #{Rails.root.join('public', 'assets')}`     
+      `mv #{Rails.root.join('public', 'manifest3.yml')} #{Rails.root.join('public', 'assets', 'manifest.yml')}`
+
+    else
+      puts "Removing assets from public/assets, but leaving manifest file..."
+      `rm #{Rails.root.join('public', 'manifest1.yml')}`
       `mv #{Rails.root.join('public', 'assets', 'manifest.yml')} #{Rails.root.join('public', 'manifest.yml')}`
       `rm -rf #{Rails.root.join('public', 'assets')}`
       `mkdir #{Rails.root.join('public', 'assets')}`     
       `mv #{Rails.root.join('public', 'manifest.yml')} #{Rails.root.join('public', 'assets', 'manifest.yml')}`
-                  
-      # Clean up
-      puts "Removing site assets from host assets..."
-      Caboose::Site.all.each do |site|      
-        host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
-        host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)
-        host_images = Rails.root.join('app', 'assets', 'images'      , site.name)
-        host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name)
-                               
-        `rm -rf #{host_js     }`
-        `rm -rf #{host_css    }`
-        `rm -rf #{host_images }` 
-        `rm -rf #{host_fonts  }`
-      end
     end
+                
+    puts "Removing site assets from host assets..."
+    Caboose::Site.where(where).all.each do |site|      
+      host_js     = Rails.root.join('app', 'assets', 'javascripts' , site.name)
+      host_css    = Rails.root.join('app', 'assets', 'stylesheets' , site.name)
+      host_images = Rails.root.join('app', 'assets', 'images'      , site.name)
+      host_fonts  = Rails.root.join('app', 'assets', 'fonts'       , site.name)
+                      
+      `rm -rf #{host_js     }`
+      `rm -rf #{host_css    }`
+      `rm -rf #{host_images }` 
+      `rm -rf #{host_fonts  }`
+    end
+
   end
    
   desc "Create .gz versions of assets"

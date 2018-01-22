@@ -22,6 +22,7 @@ require caboose/spectrum
 .mb_container .mb_fake option,
 .mb_container option {
   font-size: 15px !important;
+  max-width: 100%;
 }
 
 .mb_container input.mb_dirty,

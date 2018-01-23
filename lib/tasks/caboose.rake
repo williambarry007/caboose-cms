@@ -578,7 +578,6 @@ namespace :assets do
 
       prefixes = sitenames.map{ |sn| sn + "/"}
       prefixes << "caboose/"
-      prefixes << "tinymce/"
       prefixes << "col/"
       prefixes << "shared/"
       prefixes << "ninelite.css"
@@ -599,20 +598,24 @@ namespace :assets do
       `touch #{Rails.root.join('public', 'manifest3.yml')}`
       File.open("#{Rails.root.join('public', 'manifest3.yml')}", "w") { |f| f.write(new_string)}
 
-      puts "Removing assets from public/assets, but leaving manifest file..."  
+      puts "Removing assets from public/assets, but leaving manifest file..."
+      `mv #{Rails.root.join('public', 'assets', 'sources_manifest.yml')} #{Rails.root.join('public', 'sources_manifest.yml')}`
       `rm -rf #{Rails.root.join('public', 'assets')}`
       `rm #{Rails.root.join('public', 'manifest1.yml')}`
       `rm #{Rails.root.join('public', 'manifest2.yml')}`
       `mkdir #{Rails.root.join('public', 'assets')}`     
       `mv #{Rails.root.join('public', 'manifest3.yml')} #{Rails.root.join('public', 'assets', 'manifest.yml')}`
+      `mv #{Rails.root.join('public', 'sources_manifest.yml')} #{Rails.root.join('public', 'assets', 'sources_manifest.yml')}`
 
     else
       puts "Removing assets from public/assets, but leaving manifest file..."
       `rm #{Rails.root.join('public', 'manifest1.yml')}`
       `mv #{Rails.root.join('public', 'assets', 'manifest.yml')} #{Rails.root.join('public', 'manifest.yml')}`
+      `mv #{Rails.root.join('public', 'assets', 'sources_manifest.yml')} #{Rails.root.join('public', 'sources_manifest.yml')}`
       `rm -rf #{Rails.root.join('public', 'assets')}`
       `mkdir #{Rails.root.join('public', 'assets')}`     
       `mv #{Rails.root.join('public', 'manifest.yml')} #{Rails.root.join('public', 'assets', 'manifest.yml')}`
+      `mv #{Rails.root.join('public', 'sources_manifest.yml')} #{Rails.root.join('public', 'assets', 'sources_manifest.yml')}`
     end
                 
     puts "Removing site assets from host assets..."

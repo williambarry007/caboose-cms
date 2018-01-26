@@ -11,7 +11,7 @@
     <input type='button' value='Current Month'    onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= DateTime.now.strftime('%Y-%m-%d')   %>';" />
     <input type='button' value='Next Month >'     onclick="window.location='/admin/calendars/<%= @calendar.id %>?d=<%= (@d + 1.month).strftime('%Y-%m-%d') %>';" />
   </p>    
-  <p><a href='/admin/calendars/<%= @calendar.id %>/events/new' id='new_event'>New Event</a></p>    
+  <p>To add an event to the calendar, click the date below:</p>  
   <table>
     <tr>
       <th>Sun</th>
@@ -59,6 +59,7 @@
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
+<%= javascript_include_tag "caboose/spectrum" %>
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -119,6 +120,7 @@ function delete_calendar(calendar_id, confirm)
 <% end %>
 
 <% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/spectrum' %>
 <style type='text/css'>
       
 #calendar table { border-collapse: collapse; width: 95%; }

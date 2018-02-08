@@ -18,7 +18,7 @@ module Caboose
     def show
       
       # Find the page with an exact URI match 
-      page = Page.page_with_uri(request.host_with_port, request.fullpath, false)            
+      page = Page.page_with_uri(request.host_with_port, request.fullpath, false)
       
       # Make sure we're not under construction or on a forwarded domain
       d = Caboose::Domain.where(:domain => request.host_with_port).first
@@ -43,7 +43,11 @@ module Caboose
           end
           redirect_to url
           return
-        end        
+        end
+      elsif d.primary == false && !d.forward_to_uri.blank? && request.fullpath == '/'
+        url = "#{request.protocol}#{d.domain}#{d.forward_to_uri}"
+        redirect_to url
+        return
       end
       
       if !page

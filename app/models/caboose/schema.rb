@@ -588,6 +588,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :key               , :string  ],
         [ :name              , :string  ],
         [ :field_type        , :string  ],
+        [ :options_url       , :string  ],
         [ :default_value     , :text    ],
         [ :options           , :text    ],
         [ :sort_order        , :integer  , { :default => 0 }]

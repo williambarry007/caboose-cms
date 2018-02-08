@@ -94,7 +94,6 @@ module Caboose
     # @route DELETE /admin/post-custom-fields/:id
     def admin_delete
       return if !user_is_allowed('postcustomfields', 'edit')
-
       if params[:id] == 'bulk'      
         params[:model_ids].each do |fid|
           PostCustomFieldValue.where(:post_custom_field_id => fid).destroy_all

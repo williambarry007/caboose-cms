@@ -16,6 +16,10 @@ body * {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.mce-tinymce.mce-container {
+  display: block !important;
+}
+
 #cboxOverlay {
   opacity: 0.85 !important;
   background: url('/assets/caboose/modal_overlay.png') !important;

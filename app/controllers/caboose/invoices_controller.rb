@@ -5,6 +5,13 @@ module Caboose
     # @route GET /admin/users/:user_id/invoices
     def admin_index
       return if !user_is_allowed('invoices', 'view')
+
+      if !params[:game_id].blank?
+        game = Colonnade::Game.find(params[:game_id])
+        menu = Colonnade::Menu.where(:game_id => game.id).first if game
+        invoice_ids = Colonnade::SuiteMenu.where(:menu_id => menu.id).pluq(:invoice_id) if menu
+        invoice_ids = invoice_ids.to_s.gsub('[','').gsub(']','')
+      end
       
       @pager = Caboose::PageBarGenerator.new(params, {
         'site_id'              => @site.id,
@@ -20,6 +27,7 @@ module Caboose
         'sort'           => 'id',
         'desc'           => 1,
         'base_url'       => params[:user_id] ? "/admin/users/#{params[:user_id]}/invoices" : "/admin/invoices",
+        'additional_where' => [ params[:game_id].blank? ? 'id is not null' : ( invoice_ids.blank? ? "id is null" : "id in (#{invoice_ids})" ) ],
         'use_url_params' => false,
         'items_per_page' => 100
       })
@@ -214,13 +222,44 @@ module Caboose
     
     # @route GET /admin/invoices/print-pending
     def admin_print_pending
-      return if !user_is_allowed('invoices', 'edit')    
-      
-      pdf = PendingInvoicesPdf.new
+      return if !user_is_allowed('invoices', 'edit')
+
+      pdf = @site.store_config.custom_invoice_pdf
+      pdf = "PendingInvoicesPdf" if pdf.blank?                      
+      eval("pdf = #{pdf}.new")
+
+      where = []
+      terms = []
+      where << "(id = ?)" if !params[:id].blank?
+      terms << params[:id] if !params[:id].blank?
+      where << "(invoice_number = ?)" if !params[:invoice_number].blank?
+      terms << params[:invoice_number] if !params[:invoice_number].blank?
+      where << "(customer_id = ?)" if !params[:customer_id].blank?
+      terms << params[:customer_id] if !params[:customer_id].blank?
+      where << "(total_gte = ?)" if !params[:total_gte].blank?
+      terms << params[:total_gte] if !params[:total_gte].blank?
+      where << "(total_lte = ?)" if !params[:total_lte].blank?
+      terms << params[:total_lte] if !params[:total_lte].blank?
+      where << "(status = ?)"
+      terms << 'pending'
+
+
+      if !params[:game_id].blank?
+        game = Colonnade::Game.find(params[:game_id])
+        menu = Colonnade::Menu.where(:game_id => game.id).first if game
+        invoice_ids = Colonnade::SuiteMenu.where(:menu_id => menu.id).pluq(:invoice_id) if menu
+      end
+
+      where << "(id in (?))" if invoice_ids
+      terms << invoice_ids if invoice_ids
+
+
+      where2 = where.join(' AND ')
+
+      pdf.invoices = Invoice.where(where2, *terms).all  
       if params[:print_card_details]
         pdf.print_card_details = params[:print_card_details].to_i == 1
       end
-      pdf.invoices = Invoice.where(:site_id => @site.id, :status => Invoice::STATUS_PENDING).all      
       send_data pdf.to_pdf, :filename => "pending_invoices.pdf", :type => "application/pdf", :disposition => "inline"            
     end
       

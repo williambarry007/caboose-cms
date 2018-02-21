@@ -529,9 +529,10 @@ InvoiceController.prototype = {
           } 
           tr.append($('<td/>')
             .append(that.line_item_link(li))
+            .append(that.line_item_opts(li))
             .append(that.subscription_dates(li))                    
-            .append(that.line_item_weight(li))
-            .append(that.gift_options(li))
+     //       .append(that.line_item_weight(li))
+     //       .append(that.gift_options(li))
             .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
           );                              
           tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
@@ -628,6 +629,23 @@ InvoiceController.prototype = {
         that.line_item_options($(this).data('li_id'), $(this).data('invoice_package_id'));
       });
     return link;    
+  },
+
+  line_item_opts: function(li) {
+    var that = this;
+    var v = li.variant;
+    var div = $('<p />');
+    var opts = [];
+    if ( v && v.option1 )
+      opts.push(v.option1);
+    if ( v && v.option2 )
+      opts.push(v.option2);
+    if ( v && v.option3 )
+      opts.push(v.option3);
+    if ( opts.length > 0 )
+      div.text( opts.join(', '));
+    div.css('margin-bottom',0).css('margin-top','5px');
+    return div;
   },
   
   line_item_weight: function(li)
@@ -726,8 +744,9 @@ InvoiceController.prototype = {
       
       tr.append($('<td/>')
         .append(that.line_item_link(li))
+        .append(that.line_item_opts(li))
         .append(that.subscription_dates(li))                                    
-        .append(that.gift_options(li))
+   //     .append(that.gift_options(li))
         .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
       );
             

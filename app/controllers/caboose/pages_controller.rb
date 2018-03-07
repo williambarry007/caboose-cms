@@ -173,7 +173,7 @@ module Caboose
     def admin_edit_permissions
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -194,7 +194,7 @@ module Caboose
     def admin_edit_content
       @page = Page.find(params[:id])
       redirect_to "/login?return_url=/admin/pages/#{@page.id}/content" and return if @logged_in_user.nil?
-      condition = @logged_in_user && @logged_in_user.site_id == @page.site_id && ( @logged_in_user.is_allowed('all','all') || @logged_in_user.is_allowed('pages','edit') && Page.permissible_actions(@logged_in_user, @page.id).include?('edit'))
+      condition = @logged_in_user && (@logged_in_user.is_super_admin? || (@logged_in_user.site_id == @page.site_id && ( @logged_in_user.is_allowed('all','all') || @logged_in_user.is_allowed('pages','edit') && Page.permissible_actions(@logged_in_user, @page.id).include?('edit'))))
       redirect_to "/admin/pages" and return unless condition
       if @page.block.nil?
         redirect_to "/admin/pages/#{@page.id}/layout"
@@ -207,7 +207,7 @@ module Caboose
     def admin_edit_layout
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -219,7 +219,7 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')  
       resp = StdClass.new({'attributes' => {}})    
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         @page.hide = false
@@ -234,7 +234,7 @@ module Caboose
       return unless user_is_allowed('pages', 'edit')  
       resp = StdClass.new({'attributes' => {}})    
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         @page.hide = true
@@ -309,7 +309,7 @@ module Caboose
     def admin_edit_css
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -320,7 +320,7 @@ module Caboose
     def admin_edit_js
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -331,7 +331,7 @@ module Caboose
     def admin_edit_seo
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -342,7 +342,7 @@ module Caboose
     def admin_edit_child_sort_order
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -368,7 +368,7 @@ module Caboose
     def admin_duplicate_form
       return unless user_is_allowed('pages', 'add')
       @page = Page.find(params[:id])      
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -403,7 +403,7 @@ module Caboose
     def admin_delete_form
       return unless user_is_allowed('pages', 'delete')
       @page = Page.find(params[:id])      
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -421,7 +421,7 @@ module Caboose
     def admin_sitemap
       return unless user_is_allowed('pages', 'delete')
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'
@@ -433,7 +433,7 @@ module Caboose
       return if !user_is_allowed('pages', 'edit')
       #return if !Page.is_allowed(logged_in_user, params[:id], 'edit')            
       @page = Page.find(params[:id])
-      if @page.site_id != @logged_in_user.site_id
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
         render :layout => 'caboose/admin'

@@ -214,12 +214,14 @@
 
 .caboose-btn {
   background: #141516; 
-  color: #f7f7f7;
+  color: #f7f7f7 !important;
   text-align: center; 
   padding: 0 15px;
   height: auto;
   display: inline-block;
   margin: 0 auto;
+  font-family: "Roboto", Arial;
+  font-weight: 400;
   font-size: 15px;
   line-height: 32px;
   cursor: pointer;
@@ -229,7 +231,7 @@
   border-width: 0;
   -webkit-appearance: none;
   border-radius: 5px; 
-  text-decoration: none;
+  text-decoration: none !important;
   margin-right: 8px;
 }
 .caboose-btn:focus {

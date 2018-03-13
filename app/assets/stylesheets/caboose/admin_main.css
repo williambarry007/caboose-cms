@@ -25,6 +25,11 @@ body * {
   background: url('/assets/caboose/modal_overlay.png') !important;
 }
 
+#modal_content div .caboose-btn {
+  color: #fff;
+  text-decoration: none;
+}
+
 #cboxWrapper {
   -webkit-border-radius: 7px !important;
   -moz-border-radius: 7px !important;
@@ -612,7 +617,7 @@ Page Bar Generator
 
 .caboose-btn {
   background: #141516; 
-  color: #f7f7f7;
+  color: #f7f7f7 !important;
   text-align: center; 
   font-family: "Roboto", Arial;
   font-weight: 400;
@@ -629,13 +634,13 @@ Page Bar Generator
   border-width: 0;
   -webkit-appearance: none;
   border-radius: 5px; 
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 .caboose-btn-white, input[type="submit"], input[type="button"] {
   background: #e3e3e3; 
   border: 1px solid #fff;
-  color: #141516;
+  color: #141516 !important;
   text-align: center; 
   font-family: "Roboto", Arial;
   font-weight: 400;
@@ -651,7 +656,7 @@ Page Bar Generator
   -moz-border-radius: 5px;
   border-radius: 5px;
   line-height: 32px;
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 .caboose-btn:focus {

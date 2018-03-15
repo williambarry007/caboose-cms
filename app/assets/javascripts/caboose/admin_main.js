@@ -19,3 +19,14 @@ function add_to_crumbtrail(href, text)
     c.append(' > ');
   c.append($('<a/>').attr('href', href).html(text));
 }
+
+$(window).load(function() {
+  $("#top_nav ul.quick > li").mouseenter(function() {
+    $(this).find("ul").show();
+    $(this).children('a, span').addClass('hovered');
+  });
+  $("#top_nav ul.quick > li").mouseleave(function() {
+    $(this).find("ul").hide();
+    $(this).children('a, span').removeClass('hovered');
+  });
+});

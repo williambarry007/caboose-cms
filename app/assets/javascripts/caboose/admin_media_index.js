@@ -17,6 +17,8 @@ MediaController.prototype = {
   allow_edit: false,
   feather_editor: false,  
   last_upload_processed: false,
+  ajax_count: 0,
+  ajax_limit: 20,
   
   init: function(params) {
     var that = this;
@@ -180,6 +182,7 @@ MediaController.prototype = {
           },          
           UploadComplete: function(up, files) {
             that.refresh();
+            that.ajax_count = 0;
             if (that.uploader)
             {
               $("#the_uploader").slideUp(400, function() {
@@ -199,19 +202,21 @@ MediaController.prototype = {
     var that = this;
     if (!that.last_upload_processed)
       that.last_upload_processed = new Date();
-        
-    $.ajax({
-      url: '/admin/media/last-upload-processed',
-      type: 'get',            
-      success: function(resp) {                
-        var d = Date.parse(resp['last_upload_processed']);        
-        if (d > that.last_upload_processed)          
-          that.refresh_media();          
-        else
-          setTimeout(function() { that.check_processing_status(); }, 2000);          
-        that.last_upload_processed = d;                                                        
-      }        
-    });
+    if ( that.ajax_count < that.ajax_limit ) {
+      $.ajax({
+        url: '/admin/media/last-upload-processed',
+        type: 'get',            
+        success: function(resp) {
+          that.ajax_count += 1;
+          var d = Date.parse(resp['last_upload_processed']);        
+          if (d > that.last_upload_processed)          
+            that.refresh_media();          
+          else
+            setTimeout(function() { that.check_processing_status(); }, 3000);          
+          that.last_upload_processed = d;                                                        
+        }
+      });
+    }
   },
     
   print_categories: function() 
@@ -357,7 +362,7 @@ MediaController.prototype = {
     if (that.refresh_unprocessed_images == true && processing)
     {
       //setTimeout(function() { that.refresh_media(); }, 2000);
-      setTimeout(function() { that.check_processing_status(); }, 2000);
+      setTimeout(function() { that.check_processing_status(); }, 3000);
     }
     
     $.each(that.media, function(i, m) {

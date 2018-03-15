@@ -7,7 +7,8 @@ f = @post_custom_field
 <p><div id='postcustomfield_<%= f.id %>_key'           ></div></p>    
 <p><div id='postcustomfield_<%= f.id %>_name'          ></div></p>    
 <p><div id='postcustomfield_<%= f.id %>_field_type'    ></div></p>    
-<p><div id='postcustomfield_<%= f.id %>_default_value' ></div></p>    
+<p><div id='postcustomfield_<%= f.id %>_default_value' ></div></p>
+<p><div id='postcustomfield_<%= f.id %>_options_url'   ></div></p>  
 <p><div id='postcustomfield_<%= f.id %>_options'       ></div></p>    
          
 <div id='message'></div>
@@ -30,7 +31,8 @@ $(document).ready(function() {
       { name: 'key'           , nice_name: 'Key'           , type: 'text'     , value: <%= raw Caboose.json(f.key           ) %>, width: 800 },           
       { name: 'name'          , nice_name: 'Name'          , type: 'text'     , value: <%= raw Caboose.json(f.name          ) %>, width: 800 },    
       { name: 'field_type'    , nice_name: 'Type'          , type: 'select'   , value: <%= raw Caboose.json(f.field_type    ) %>, width: 800  , options_url: '/admin/post-custom-fields/field-type-options' },    
-      { name: 'default_value' , nice_name: 'Default Value' , type: 'text'     , value: <%= raw Caboose.json(f.default_value ) %>, width: 800 },    
+      { name: 'default_value' , nice_name: 'Default Value' , type: 'text'     , value: <%= raw Caboose.json(f.default_value ) %>, width: 800 },
+      { name: 'options_url' , nice_name: 'Options URL' , type: 'text'     , value: <%= raw Caboose.json(f.options_url ) %>, width: 800 },       
       { name: 'options'       , nice_name: 'Options'       , type: 'textarea' , value: <%= raw Caboose.json(f.options       ) %>, width: 800 , height: 200 }                  
     ]
   });  

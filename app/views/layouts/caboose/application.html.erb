@@ -17,7 +17,7 @@
 <%= gzip_stylesheet_link_tag @site.name == 'application' ? 'application' : "#{@site.name}/css/application" %>
 <% Caboose::stylesheets.each do |css| %><%= gzip_stylesheet_link_tag(css) %><% end %>
 <% @page.linked_resources_map[:css].each do |r| %><%= gzip_stylesheet_link_tag r %><% end %>
-<% if @site.date_css_updated %><link rel='stylesheet' type='text/css' url="<%= raw @site.custom_css_url %>" /><% end %>
+<% if @site.date_css_updated %><link rel='stylesheet' type='text/css' href="<%= raw @site.custom_css_url %>" /><% end %>
 <% if @page.custom_css_files && @page.custom_css_files.strip.length > 0 %>
   <% @page.custom_css_files.split("\n").each do |url| %><link rel="stylesheet" type='text/css' href="<%= raw url %>" /><% end %>
 <% end %>

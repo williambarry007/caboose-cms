@@ -10,6 +10,7 @@ class Caboose::PostCustomField < ActiveRecord::Base
     :field_type        ,
     :default_value     ,
     :options           ,
+    :options_url       ,
     :sort_order
     
   FIELD_TYPE_TEXT = 'text'

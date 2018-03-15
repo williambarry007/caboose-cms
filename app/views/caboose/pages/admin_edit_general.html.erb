@@ -10,23 +10,15 @@
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_redirect_url'          ></div><span class='explanation'>If the redirect URL field is set, then this page will simply redirect to that URL instead of showing the page itself.</span></div>
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_hide'                  ></div><span class='explanation'>Whether or not this page is displayed in the menu.</span></div>
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_custom_sort_children'  ></div><span class='explanation'>Sort child pages alphabetically or <a href='/admin/pages/<%= @page.id %>/child-order'>custom</a>.</span></div>
+<% if false %>
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_content_format'        ></div><span class='explanation'>Specify whether or not you want to embed ruby code in your page.</span></div>
+<% end %>
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_tags'                  ></div><span class='explanation'>Tags to help categorize your page. Use as many as you want, just separate by commas.</span></div>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
 
 <% content_for :caboose_css do %>
 <style type='text/css'>
-
-p.uri {
-  background: #efefef;
-  border: #999 1px solid;
-  padding: 10px;
-  position: absolute;
-  top: 67px;
-  left: 0;
-  height: 16px;
-}
 
 div.field_with_explanation {
   width: 420px;
@@ -67,7 +59,9 @@ $(document).ready(function() {
       { name: 'redirect_url'          , nice_name: 'Redirect URL'         , type: 'text'       , value: <%= raw Caboose.json(@page.redirect_url    ) %> , width: 400 },
       { name: 'hide'                  , nice_name: 'Hide'                 , type: 'checkbox'   , value: <%= raw @page.hide                           %> , width: 400 },      
       { name: 'custom_sort_children'  , nice_name: 'Custom sort children' , type: 'checkbox'   , value: <%= raw @page.custom_sort_children           %> , width: 400 },
-      { name: 'content_format'        , nice_name: 'Content format'       , type: 'select'     , value: <%= raw Caboose.json(@page.content_format  ) %> , width: 400, text: <%= raw Caboose.json(@page.content_format) %>, options_url: '/pages/format-options' },
+    <% if false %>
+      { name: 'content_format'        , nice_name: 'Content format'       , type: 'select'     , value: <%= raw Caboose.json(@page.content_format  ) %> , width: 400, text: <%= raw Caboose.json(@page.content_format) %>, options_url: '/admin/pages/format-options' },
+    <% end %>
       { name: 'tags'                  , nice_name: 'Tags'                 , type: 'text'       , value: <%= raw Caboose.json(tags                  ) %> , width: 400 }
     ]
   });

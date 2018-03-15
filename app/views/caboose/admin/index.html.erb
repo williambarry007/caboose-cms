@@ -8,12 +8,13 @@ width = 200
 %>
 
 <h1>Admin</h1>
-<div id="admin-list">
+<div class="admin-index-menu" id="admin-list">
+
+  <div class="admin-intro">
+    <h4>Welcome to Caboose</h4>
+    <p>For assistance, please email <a href="mailto:support@nine.is">support@nine.is</a>.</p>
+  </div>
 <ul>
-  <!--
-  <li id='nav_item_logout'><a href='/logout'><span class='icon'></span><span class='text'>Logout</span></a>
-  <li id='nav_item_myaccount'><a href='/my-account'><span class='icon'></span><span class='text'>My Account</span></a>
-  -->
   <% i = 0 %>
   <% @nav.each do |item| %>
     <% id = item['id'].nil? ? i.to_s : item['id'] %>
@@ -26,8 +27,15 @@ width = 200
     <% if (!item['children'].nil? && item['children'].count > 0) %>
       <ul>
         <% item['children'].each do |item2| %>
+          <% next if item2['text'].blank? %>
           <% modal = item2['modal'].nil? ? false : item2['modal'] %>
-          <li><a href='<%= item2['href'] %>'<%= raw (modal ? " rel='modal'" : "") %>><%= item2['text'] %></a></li>
+          <% icon = item2['text'].parameterize %>
+          <% icon = 'rets' if item['text'] == 'RETS' %>
+          <% icon = 'store' if item['text'] == 'Store' %>
+          <% icon = item2['icon'] if item2['icon'] %>
+          <li><a href='<%= item2['href'] %>'<%= raw (modal ? " rel='modal'" : "") %>>
+            <span class="icon3-<%= icon %>"></span>
+            <span class="text"><%= item2['text'] %></span></a></li>
         <% end %>
       </ul>
     <% end %>
@@ -49,6 +57,7 @@ $(document).ready(function() {
 </script>
 <% end %>
 <% content_for :caboose_css do %>
+<%= stylesheet_link_tag 'caboose/admin_menu_icons' %>
 <style>
   #admin-list ul li {
     line-height: 26px;

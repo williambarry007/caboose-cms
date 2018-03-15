@@ -1,0 +1,5 @@
+<% if @site && !@site.robots_txt.blank? %><%== @site.robots_txt %>
+<% else %>
+User-agent: *
+Disallow: /admin
+<% end %>

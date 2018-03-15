@@ -18,7 +18,7 @@ module Caboose
     def show
       
       # Find the page with an exact URI match 
-      page = Page.page_with_uri(request.host_with_port, request.fullpath, false)            
+      page = Page.page_with_uri(request.host_with_port, request.fullpath, false)
       
       # Make sure we're not under construction or on a forwarded domain
       d = Caboose::Domain.where(:domain => request.host_with_port).first
@@ -43,7 +43,11 @@ module Caboose
           end
           redirect_to url
           return
-        end        
+        end
+      elsif d.primary == false && !d.forward_to_uri.blank? && request.fullpath == '/'
+        url = "#{request.protocol}#{d.domain}#{d.forward_to_uri}"
+        redirect_to url
+        return
       end
       
       if !page
@@ -190,7 +194,11 @@ module Caboose
     def admin_edit_permissions
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end
     end
     
     # @route PUT /admin/pages/:id/update-child-permissions
@@ -207,7 +215,7 @@ module Caboose
     def admin_edit_content
       @page = Page.find(params[:id])
       redirect_to "/login?return_url=/admin/pages/#{@page.id}/content" and return if @logged_in_user.nil?
-      condition = @logged_in_user && ( @logged_in_user.is_allowed('all','all') || @logged_in_user.is_allowed('pages','edit') && Page.permissible_actions(@logged_in_user, @page.id).include?('edit'))
+      condition = @logged_in_user && (@logged_in_user.is_super_admin? || (@logged_in_user.site_id == @page.site_id && ( @logged_in_user.is_allowed('all','all') || @logged_in_user.is_allowed('pages','edit') && Page.permissible_actions(@logged_in_user, @page.id).include?('edit'))))
       redirect_to "/admin/pages" and return unless condition
       if @page.block.nil?
         redirect_to "/admin/pages/#{@page.id}/layout"
@@ -220,7 +228,41 @@ module Caboose
     def admin_edit_layout
       return unless user_is_allowed('pages', 'edit')      
       @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end
+    end
+
+    # @route PUT /admin/pages/:id/show
+    def admin_show_page
+      return unless user_is_allowed('pages', 'edit')  
+      resp = StdClass.new({'attributes' => {}})    
+      @page = Page.find(params[:id])
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        @page.hide = false
+        @page.save
+        resp.success = true
+      end
+      render :json => resp
+    end
+
+    # @route PUT /admin/pages/:id/hide
+    def admin_hide_page
+      return unless user_is_allowed('pages', 'edit')  
+      resp = StdClass.new({'attributes' => {}})    
+      @page = Page.find(params[:id])
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        @page.hide = true
+        @page.save
+        resp.success = true
+      end
+      render :json => resp
     end
     
     # @route PUT /admin/pages/:id/layout
@@ -288,28 +330,44 @@ module Caboose
     def admin_edit_css
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end
     end
     
     # @route GET /admin/pages/:id/js
     def admin_edit_js
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end
     end
     
     # @route GET /admin/pages/:id/seo
     def admin_edit_seo
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end
     end
     
     # @route GET /admin/pages/:id/child-order
     def admin_edit_child_sort_order
       return unless user_is_allowed('pages', 'edit')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end
     end
     
     # @route PUT /admin/pages/:id/child-order
@@ -331,7 +389,11 @@ module Caboose
     def admin_duplicate_form
       return unless user_is_allowed('pages', 'add')
       @page = Page.find(params[:id])      
-      render :layout => 'caboose/admin'      
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end   
     end
     
     # @route POST /admin/pages/:id/duplicate
@@ -345,13 +407,13 @@ module Caboose
       parent_id            = params[:parent_id]
       block_type_id        = params[:block_type_id]
       child_block_type_id  = params[:child_block_type_id]
-      duplicate_children   = params[:duplicate_children] ? true : false
+      duplicate_children   = params[:duplicate_children] == 'true' ? true : false
       
       if p.nil?            then resp.error = "Invalid page"
       elsif site_id.nil?   then resp.error = "Invalid site"
       elsif parent_id.nil? then resp.error = "Invalid parent"
       else
-        resp.new_id = p.duplicate(site_id, parent_id, duplicate_children, block_type_id, child_block_type_id)
+        resp.new_id = p.delay(:priority => 20).duplicate(site_id, parent_id, duplicate_children, block_type_id, child_block_type_id)
         resp.success = true
       end
       
@@ -362,7 +424,11 @@ module Caboose
     def admin_delete_form
       return unless user_is_allowed('pages', 'delete')
       @page = Page.find(params[:id])      
-      render :layout => 'caboose/admin'      
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end   
     end
     
     # @route GET /admin/pages/:id/uri
@@ -376,7 +442,11 @@ module Caboose
     def admin_sitemap
       return unless user_is_allowed('pages', 'delete')
       @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end
     end
 
     # @route GET /admin/pages/:id
@@ -384,7 +454,11 @@ module Caboose
       return if !user_is_allowed('pages', 'edit')
       #return if !Page.is_allowed(logged_in_user, params[:id], 'edit')            
       @page = Page.find(params[:id])
-      render :layout => 'caboose/admin'
+      if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
+        redirect_to '/admin/pages'
+      else
+        render :layout => 'caboose/admin'
+      end
     end
     
     # @route POST /admin/pages
@@ -578,7 +652,6 @@ module Caboose
       return unless user_is_allowed('pages', 'delete')
       p = Page.find(params[:id])
       p.destroy
-      
       resp = StdClass.new({
         'redirect' => '/admin/pages'
       })
@@ -630,6 +703,12 @@ module Caboose
           Block.where("parent_id is null and page_id = ?", params[:id]).reorder(:sort_order).all.each do |b|
             admin_block_options_helper(options, b, "") 
           end
+        when 'parentblock'
+          options = []
+          this_block = Block.find(params[:block_id])
+          Block.where("parent_id is null and page_id = ?", params[:id]).reorder(:sort_order).all.each do |b|
+            admin_parent_block_options_helper(options, b, "", this_block) 
+          end
       end              
       render :json => options 		
     end
@@ -646,6 +725,15 @@ module Caboose
       b.children.each do |b2|
         admin_block_options_helper(options, b2, "#{prefix} - ")        
       end      
+    end
+
+    def admin_parent_block_options_helper(options, b, prefix, this_block)
+      if b.block_type.allow_child_blocks && (b.block_type.default_child_block_type_id.blank? || b.block_type.default_child_block_type_id == this_block.block_type_id)
+        options << { 'value' => b.id, 'text' => "#{prefix}#{b.title}" }
+      end      
+      b.children.each do |b2|
+        admin_parent_block_options_helper(options, b2, "#{prefix} - ", this_block)        
+      end
     end
 		
   end

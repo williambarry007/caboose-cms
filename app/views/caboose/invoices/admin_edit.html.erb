@@ -1,3 +1,4 @@
+<div style="padding-right:20px;">
 
 <% if @edituser %>
   <%= render :partial => 'caboose/users/admin_header' %>
@@ -5,9 +6,9 @@
   <div id='crumbtrail'>
     <a href='/admin'>Admin</a> >
     <a href='/admin/invoices'>Invoices</a> >
-    Invoice #<%= @invoice.id %>
+    Invoice #<%= @invoice.invoice_number %>
   </div>
-  <h1>Edit Invoice #<%= @invoice.id %></h1>
+  <h1>Edit Invoice #<%= @invoice.invoice_number %></h1>
 <% end %>
 
 <input type='hidden' name='invoice_id'    id='invoice_id'     value='<%= @invoice.id %>' />
@@ -19,6 +20,9 @@
 <% if @edituser %>
   <%= render :partial => 'caboose/users/admin_footer' %>
 <% end %>
+
+</div>
+
 
 <!--
 <p>
@@ -64,6 +68,17 @@ table.billing_address td {
   padding: 0 !important; 
   margin: 0 !important; 
   border: 0 !important; 
+}
+
+td.td-loading {
+  background-image: url("<%= asset_path '/assets/shared/loading.gif' %>") !important;
+  background-size: 20px !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  color: rgba(0,0,0,0.1) !important;
+}
+td.td-loading .mb_container {
+  opacity: 0.1 !important;
 }
 
 </style>

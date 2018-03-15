@@ -52,7 +52,8 @@ $(document).ready(function() {
           type:      <%= raw Caboose.json(f.field_type) %>,
           value:     <%= raw Caboose.json(fv.value) %>,
           width:     600
-          <% if f.field_type == 'select' %>, options_url: '/admin/post-custom-fields/<%= f.id %>/options'<% end %>
+          <% if f.field_type == 'select' && !f.options_url.blank? %>, options_url: '<%= f.options_url %>'<% end %>
+          <% if f.field_type == 'select' && f.options_url.blank? %>, options_url: '/admin/post-custom-fields/<%= f.id %>/options'<% end %>
         }                    
       ]
     });
@@ -70,7 +71,5 @@ function refresh_uri()
   });        
 }
 
-</script>
-<script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>    
-<%= raw caboose_tinymce %>      
+</script> 
 <% end %>

@@ -40,8 +40,13 @@ $(document).ready(function() {
   });        
 });
 
-function get_role_ids(u)   { return $(u.roles).map(function(i, r) { return r.id   }).get(); }
-function get_role_names(u) { return $(u.roles).map(function(i, r) { return r.name }).get(); }
+function get_role_ids(u)   { console.dir(u.roles); return $(u.roles).map(function(i, r) { return r.id   }).get(); }
+function get_role_names(u) { 
+  seen_roles = [];
+  role_names = [];
+  $(u.roles).map(function(i, r) { if (seen_roles.indexOf(r.id) >= 0) { } else { role_names.push(r.name); seen_roles.push(r.id); } }); 
+  return role_names.join(', ');
+}
 
 </script>
 <% end %>

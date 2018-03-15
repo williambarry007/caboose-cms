@@ -5,6 +5,93 @@ logo = logo.gsub('//','https://') if !logo.nil?
 
 <p><img src='<%= logo %>' /></p>
 
-<h1>Order <%= @invoice.invoice_number %> is ready for payment!</h1>
-<p>Please <a href='http://<%= raw @invoice.site.primary_domain.domain %>/my-account/invoices/<%= @invoice.id %>'>review your order</a> and submit payment.</p>
-<p>Thank you!</p>
+<h1>Invoice</h1>
+
+<p>Your invoice number #<%= @invoice.invoice_number %> is ready for payment!</p>
+
+<p>Click <a href="https://<%== @invoice.site.primary_domain.domain %>/my-account">here</a> to login to your account to update billing information.</p>
+
+<% if !@invoice.site.store_config.download_instructions.blank? %>
+	<p><%== @invoice.site.store_config.download_instructions %></p>
+<% end %>
+
+
+<% if Colonnade::SuiteMenu.respond_to?(:to_s) %>
+  <%
+  sm = Colonnade::SuiteMenu.where(:invoice_id => @invoice.id).first
+  game = sm.menu.game if sm && sm.menu
+  %>
+  <% if game %>
+    <p>Game: <%= game.opponent %> on <%= game.date.strftime('%B %-d, %Y') %></p>
+  <% end %> 
+<% end %>
+
+<table border='1' style='border-collapse: collapse;'>
+  <tr>    
+    <th>Line Item</th>
+    <th>Unit Price</th>
+    <th>Quantity</th>
+    <th>Subtotal</th>
+  </tr>
+  <% @invoice.line_items.each do |li| %>    
+    <% v = li.variant %>
+    <% p = v.product %>
+    <tr>            
+      <td>
+        <p><%= p.title %></td></p>
+        <% if li.is_gift %>
+          <p>This item is a gift.</p>
+          <ul>
+            <li><% if li.gift_wrap %>Gift wrap (<%= number_to_currency(p.gift_wrap_price) %>)<% else %>Do not gift wrap<% end %></li>
+            <li><% if li.include_gift_message %>Gift message: <%= li.gift_message %><% else %>No gift message<% end %></li>
+            <li><% if li.hide_prices %>Hide all prices<% else %>Show all prices<% end %></li>
+          </ul>
+        <% end %>
+      </td>
+      <td align='right'><%= number_to_currency(li.unit_price) %></td>
+      <td align='right'><%= li.quantity %></td>
+      <td align='right'><%= number_to_currency(li.subtotal) %></td>
+    </tr>  
+  <% end %>
+  <tr><td colspan="3" align='right'>Subtotal:               </td><td align='right'><%= number_to_currency(@invoice.subtotal) %></td></tr>
+  <tr><td colspan="3" align='right'>Tax:                    </td><td align='right'><%= number_to_currency(@invoice.tax)      %></td></tr>
+  <tr><td colspan="3" align='right'>Shipping and Handling:  </td><td align='right'><%= number_to_currency(@invoice.shipping + @invoice.handling) %></td></tr>
+  <% if @invoice.gift_wrap && @invoice.gift_wrap > 0 %>  
+    <tr><td colspan="3" align='right'>Gift wrap:            </td><td align='right'><%= number_to_currency(@invoice.gift_wrap) %></td></tr>
+  <% end %>
+  <% if @invoice.discounts %>
+    <% @invoice.discounts.each do |d| %>
+      <tr><td colspan="3" align='right'>"<%= d.gift_card.code %>" gift card: </td><td align='right'><%= number_to_currency(d.amount) %></td></tr>
+    <% end %>
+  <% end %>
+  <% if @invoice.custom_discount %>
+    <tr><td colspan="3" align='right'>Discount: </td><td align='right'><%= number_to_currency(@invoice.custom_discount) %></td></tr>
+  <% end %>      
+  <tr><td colspan="3" align='right'>Total:     </td><td align='right'><%= number_to_currency(@invoice.total) %></td></tr>
+</table>
+
+<% if @invoice.shipping_address %>
+  <% sa = @invoice.shipping_address %>
+  <% if !sa.address1.blank? %>
+	  <h2>Shipping Address</h2>
+	  <p>
+	    <%= sa.first_name %> <%= sa.last_name %><br />
+	    <%= sa.address1 %><br />
+	    <% if sa.address2 && sa.address2.strip.length > 0 %><%= sa.address2 %><br /><% end %>
+	    <%= sa.city %>, <%= sa.state %> <%= sa.zip %>
+	  </p>
+	<% end %>
+<% end %>
+
+<% if @invoice.billing_address %>
+  <% ba = @invoice.billing_address %>
+  <% if !ba.address1.blank? %>
+	  <h2>Billing Address</h2>
+	  <p>
+	    <%= ba.first_name %> <%= ba.last_name %><br />
+	    <%= ba.address1 %><br />
+	    <% if ba.address2 && ba.address2.strip.length > 0 %><%= ba.address2 %><br /><% end %>
+	    <%= ba.city %>, <%= ba.state %> <%= ba.zip %>
+	  </p>
+	<% end %>
+<% end %>

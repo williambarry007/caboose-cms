@@ -4,9 +4,9 @@ module Caboose
     helper :application
      
     # @route GET /posts
-    def index
-    	@posts = Post.where(:published => true).limit(5).reorder('created_at DESC')
-    end
+    # def index
+    # 	@posts = Post.where(:published => true, :site_id => @site.id).limit(10).reorder('created_at DESC')
+    # end
     
     # @route GET /posts/:id
     # @route GET /posts/:year/:month/:day/:slug
@@ -53,6 +53,7 @@ module Caboose
           'sort'        => 'created_at',
           'desc'        => true,
           'base_url'    => '/admin/posts',
+          'items_per_page' => 50,
           'use_url_params' => false
       })
       render :json => {

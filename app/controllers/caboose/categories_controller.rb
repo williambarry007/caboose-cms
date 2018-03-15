@@ -11,7 +11,7 @@ module Caboose
       
       @top_cat = Caboose::Category.where("site_id = ? and parent_id is null", @site.id).first      
       if @top_cat.nil?
-        @top_cat = Caboose::Category.create(:site_id => @site.id, :name => 'All Products', :url => '/')
+        @top_cat = Caboose::Category.create(:site_id => @site.id, :name => 'All Products', :url => '/products', :slug => 'products', :status => 'Active')
       end
       render :layout => 'caboose/admin'
     end

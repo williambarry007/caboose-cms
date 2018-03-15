@@ -12,7 +12,7 @@ end
 
 if editing
   if url.nil? || url.starts_with?('http://placehold.it') || url.include?('missing')  
-    %><div id='block_<%= block.id %>'><p>Empty file: <%= block.name %></p></div><%
+    %><div id='block_<%= block.id %>'><p>Click to select a file.</p></div><%
   else
     %><div id='block_<%= block.id %>'><p><span><%= name %></span></p></div><%
   end

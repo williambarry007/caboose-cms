@@ -7,11 +7,17 @@ logo = logo.gsub('//','https://') if !logo.nil?
 
 <h1>Receipt</h1>
 
-<p>
-  Invoice #<%= @invoice.id %><br />
-  Status: <% @invoice.status %><br />
-  Financial status: <% @invoice.financial_status %>
-</p>
+<p>Your invoice number #<%= @invoice.invoice_number %> has been paid.</p>
+
+<% if Colonnade::SuiteMenu.respond_to?(:to_s) %>
+  <%
+  sm = Colonnade::SuiteMenu.where(:invoice_id => @invoice.id).first
+  game = sm.menu.game if sm && sm.menu
+  %>
+  <% if game %>
+    <p>Game: <%= game.opponent %> on <%= game.date.strftime('%B %-d, %Y') %></p>
+  <% end %> 
+<% end %>
 
 <table border='1' style='border-collapse: collapse;'>
   <tr>    
@@ -40,41 +46,45 @@ logo = logo.gsub('//','https://') if !logo.nil?
       <td align='right'><%= number_to_currency(li.subtotal) %></td>
     </tr>  
   <% end %>
-  <tr><td colspan="4" align='right'>Subtotal:               </td><td align='right'><%= number_to_currency(@invoice.subtotal) %></td></tr>
-  <tr><td colspan="4" align='right'>Tax:                    </td><td align='right'><%= number_to_currency(@invoice.tax)      %></td></tr>
-  <tr><td colspan="4" align='right'>Shipping and Handling:  </td><td align='right'><%= number_to_currency(@invoice.shipping + @invoice.handling) %></td></tr>
+  <tr><td colspan="3" align='right'>Subtotal:               </td><td align='right'><%= number_to_currency(@invoice.subtotal) %></td></tr>
+  <tr><td colspan="3" align='right'>Tax:                    </td><td align='right'><%= number_to_currency(@invoice.tax)      %></td></tr>
+  <tr><td colspan="3" align='right'>Shipping and Handling:  </td><td align='right'><%= number_to_currency(@invoice.shipping + @invoice.handling) %></td></tr>
   <% if @invoice.gift_wrap && @invoice.gift_wrap > 0 %>  
-    <tr><td colspan="4" align='right'>Gift wrap:            </td><td align='right'><%= number_to_currency(@invoice.gift_wrap) %></td></tr>
+    <tr><td colspan="3" align='right'>Gift wrap:            </td><td align='right'><%= number_to_currency(@invoice.gift_wrap) %></td></tr>
   <% end %>
   <% if @invoice.discounts %>
     <% @invoice.discounts.each do |d| %>
-      <tr><td colspan="4" align='right'>"<%= d.gift_card.code %>" gift card: </td><td align='right'><%= number_to_currency(d.amount) %></td></tr>
+      <tr><td colspan="3" align='right'>"<%= d.gift_card.code %>" gift card: </td><td align='right'><%= number_to_currency(d.amount) %></td></tr>
     <% end %>
   <% end %>
   <% if @invoice.custom_discount %>
-    <tr><td colspan="4" align='right'>Discount: </td><td align='right'><%= number_to_currency(@invoice.custom_discount) %></td></tr>
+    <tr><td colspan="3" align='right'>Discount: </td><td align='right'><%= number_to_currency(@invoice.custom_discount) %></td></tr>
   <% end %>      
-  <tr><td colspan="4" align='right'>Total:     </td><td align='right'><%= number_to_currency(@invoice.total) %></td></tr>
+  <tr><td colspan="3" align='right'>Total:     </td><td align='right'><%= number_to_currency(@invoice.total) %></td></tr>
 </table>
 
 <% if @invoice.shipping_address %>
   <% sa = @invoice.shipping_address %>
-  <h2>Shipping Address</h2>
-  <p>
-    <%= sa.first_name %> <%= sa.last_name %><br />
-    <%= sa.address1 %><br />
-    <% if sa.address2 && sa.address2.strip.length > 0 %><%= sa.address2 %><br /><% end %>
-    <%= sa.city %>, <%= sa.state %> <%= sa.zip %>
-  </p>
+  <% if !sa.address1.blank? %>
+    <h2>Shipping Address</h2>
+    <p>
+      <%= sa.first_name %> <%= sa.last_name %><br />
+      <%= sa.address1 %><br />
+      <% if sa.address2 && sa.address2.strip.length > 0 %><%= sa.address2 %><br /><% end %>
+      <%= sa.city %>, <%= sa.state %> <%= sa.zip %>
+    </p>
+  <% end %>
 <% end %>
 
 <% if @invoice.billing_address %>
   <% ba = @invoice.billing_address %>
-  <h2>Billing Address</h2>
-  <p>
-    <%= ba.first_name %> <%= ba.last_name %><br />
-    <%= ba.address1 %><br />
-    <% if ba.address2 && ba.address2.strip.length > 0 %><%= ba.address2 %><br /><% end %>
-    <%= ba.city %>, <%= ba.state %> <%= ba.zip %>
-  </p>
+  <% if !ba.address1.blank? %>
+    <h2>Billing Address</h2>
+    <p>
+      <%= ba.first_name %> <%= ba.last_name %><br />
+      <%= ba.address1 %><br />
+      <% if ba.address2 && ba.address2.strip.length > 0 %><%= ba.address2 %><br /><% end %>
+      <%= ba.city %>, <%= ba.state %> <%= ba.zip %>
+    </p>
+  <% end %>
 <% end %>

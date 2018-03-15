@@ -1,5 +1,4 @@
-
-require 'tinymce-rails'
+# require 'tinymce-rails'
 require 'jquery-ui-rails'
 require 'colorbox-rails'
 require 'paperclip'
@@ -115,24 +114,24 @@ module Caboose
         '*/css/application.css', # Site CSS
         
         # PLUpload 
-        'plupload/i18n/*.js',
-        'plupload/jquery.plupload.queue/css/*.css',
-        'plupload/jquery.plupload.queue/img/*.gif',
-        'plupload/jquery.plupload.queue/img/*.png',
-        'plupload/jquery.plupload.queue/*.js',
-        'plupload/jquery.ui.plupload/css/*.css',
-        'plupload/jquery.ui.plupload/img/*.gif',
-        'plupload/jquery.ui.plupload/img/*.png',
-        'plupload/jquery.ui.plupload/*.js',
-        'plupload/*.js',
-        'plupload/*.swf',
-        'plupload/*.xap',        
+        # 'plupload/i18n/*.js',
+        # 'plupload/jquery.plupload.queue/css/*.css',
+        # 'plupload/jquery.plupload.queue/img/*.gif',
+        # 'plupload/jquery.plupload.queue/img/*.png',
+        # 'plupload/jquery.plupload.queue/*.js',
+        # 'plupload/jquery.ui.plupload/css/*.css',
+        # 'plupload/jquery.ui.plupload/img/*.gif',
+        # 'plupload/jquery.ui.plupload/img/*.png',
+        # 'plupload/jquery.ui.plupload/*.js',
+        # 'plupload/*.js',
+        # 'plupload/*.swf',
+        # 'plupload/*.xap',        
 
         # Fonts
-        'caboose/fonts/avenir-medium.eot',
-        'caboose/fonts/avenir-medium.ttf',
-        'caboose/fonts/big_noodle_titling_oblique.ttf',
-        'caboose/fonts/big_noodle_titling.ttf',               
+        # 'caboose/fonts/avenir-medium.eot',
+        # 'caboose/fonts/avenir-medium.ttf',
+        # 'caboose/fonts/big_noodle_titling_oblique.ttf',
+        # 'caboose/fonts/big_noodle_titling.ttf',               
         'caboose/icons.txt'
         
       ]      

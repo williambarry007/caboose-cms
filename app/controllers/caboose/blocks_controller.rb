@@ -21,7 +21,7 @@ module Caboose
     # @route GET /admin/pages/:page_id/blocks
     # @route GET /admin/posts/:post_id/blocks
     def admin_index
-      return if !user_is_allowed('pages', 'view')
+      return if !user_is_allowed("#{page_or_post}s", 'view')
       #h = params[:post_id] ? { :post_id => params[:post_id] } : { :page_id => params[:page_id] }
       #blocks = Block.where(h).reorder(:sort_order)
       #render :json => blocks
@@ -33,7 +33,7 @@ module Caboose
     # @route GET /admin/posts/:post_id/blocks/:id/new
     # @route GET /admin/posts/:post_id/blocks/new
     def admin_new
-      return unless user_is_allowed('pages', 'add')
+      return unless user_is_allowed("#{page_or_post}s", 'add')
 
       if params[:id]
         block_type_id = params[:block_type_id]
@@ -81,7 +81,7 @@ module Caboose
     # @route GET /admin/posts/:post_id/blocks/tree
     # @route GET /admin/posts/:post_id/blocks/:id/tree    
     def admin_tree
-      return unless user_is_allowed('pages', 'edit')      
+      return unless user_is_allowed("#{page_or_post}s", 'edit')      
       
       blocks = []
       if params[:id]
@@ -167,12 +167,23 @@ module Caboose
         }
       end
       return arr
-    end      
+    end     
+
+    # @route PUT /admin/pages/:page_id/blocks/:id/remove-media
+    # @route PUT /admin/posts/:post_id/blocks/:id/remove-media
+    def admin_remove_media
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
+      resp = Caboose::StdClass.new   
+      b = Block.find(params[:id])      
+      b.media = nil
+      resp.success = b.save
+      render :json => resp      
+    end 
       
     # @route GET /admin/pages/:page_id/blocks/:id/render
     # @route GET /admin/posts/:post_id/blocks/:id/render
     def admin_render
-      return unless user_is_allowed('pages', 'edit')      
+      return unless user_is_allowed("#{page_or_post}s", 'edit')      
       b = Block.find(params[:id])      
       bt = b.block_type
       if bt.nil?
@@ -203,7 +214,7 @@ module Caboose
     # @route GET /admin/pages/:page_id/blocks/render
     # @route GET /admin/posts/:post_id/blocks/render
     def admin_render_all
-      return unless user_is_allowed('pages', 'edit')            
+      return unless user_is_allowed("#{page_or_post}s", 'edit')            
       blocks = Block.where("#{page_or_post}_id = ? and parent_id is null", @p.id).reorder(:sort_order).collect do |b|        
         {
           :id => b.id,
@@ -233,7 +244,7 @@ module Caboose
     # @route GET /admin/pages/:page_id/blocks/render-second-level
     # @route GET /admin/posts/:post_id/blocks/render-second-level
     def admin_render_second_level
-      return unless user_is_allowed('pages', 'edit')      
+      return unless user_is_allowed("#{page_or_post}s", 'edit')      
       view = ActionView::Base.new(ActionController::Base.view_paths)      
       blocks = @p.block.children.collect do |b|
         {           
@@ -265,7 +276,7 @@ module Caboose
     # @route GET /admin/pages/:page_id/blocks/:id/edit
     # @route GET /admin/posts/:post_id/blocks/:id/edit
     def admin_edit
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       @page = Page.find(params[:page_id]) if params[:page_id]
       @post = Post.find(params[:post_id]) if params[:post_id]
       @block = Block.find(params[:id])
@@ -295,7 +306,7 @@ module Caboose
     # @route GET /admin/pages/:page_id/blocks/:id/advanced
     # @route GET /admin/posts/:post_id/blocks/:id/advanced
     def admin_edit_advanced
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       @page = Page.find(params[:page_id]) if params[:page_id]
       @post = Post.find(params[:post_id]) if params[:post_id]
       @block = Block.find(params[:id])
@@ -306,7 +317,7 @@ module Caboose
     # @route GET /admin/pages/:page_id/blocks/:id
     # @route GET /admin/posts/:post_id/blocks/:id
     def admin_show
-      return unless user_is_allowed('pages', 'edit')      
+      return unless user_is_allowed("#{page_or_post}s", 'edit')      
       block = Block.find(params[:id])
       render :json => block      
     end
@@ -316,7 +327,7 @@ module Caboose
     # @route POST /admin/posts/:post_id/blocks
     # @route POST /admin/posts/:post_id/blocks/:id
     def admin_create
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
 
       resp = Caboose::StdClass.new
 
@@ -401,7 +412,7 @@ module Caboose
           b1.create_children
           bw = b1.child('width')
           if bw
-            bw.value = (100.0 / params[:child_count].to_f).to_i.to_s + '%'
+            bw.value = 'auto' # (100.0 / params[:child_count].to_f).to_i.to_s + '%'
             bw.save
           end
         end
@@ -424,7 +435,7 @@ module Caboose
     # @route PUT /admin/pages/:page_id/blocks/:id
     # @route PUT /admin/posts/:post_id/blocks/:id
     def admin_update
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       
       resp = StdClass.new({'attributes' => {}})
       b = Block.find(params[:id])
@@ -512,7 +523,7 @@ module Caboose
     # @route POST /admin/pages/:page_id/blocks/:id/image
     # @route POST /admin/posts/:post_id/blocks/:id/image
     def admin_update_image
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       
       resp = StdClass.new({'attributes' => {}})
       b = Block.find(params[:id])
@@ -534,7 +545,7 @@ module Caboose
     # @route POST /admin/pages/:page_id/blocks/:id/file
     # @route POST /admin/posts/:post_id/blocks/:id/file
     def admin_update_file
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       
       resp = StdClass.new({'attributes' => {}})
       b = Block.find(params[:id])
@@ -556,7 +567,7 @@ module Caboose
     # @route DELETE /admin/pages/:page_id/blocks/:id
     # @route DELETE /admin/posts/:post_id/blocks/:id
     def admin_delete
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])
@@ -589,7 +600,7 @@ module Caboose
     # @route PUT /admin/pages/:page_id/blocks/:id/duplicate
     # @route PUT /admin/posts/:post_id/blocks/:id/duplicate
     def admin_duplicate
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       resp = StdClass.new
       b = Block.find(params[:id])
       resp.new_id = b.duplicate_block(@site.id, params[:page_id], params[:post_id], b.block_type_id, b.parent_id)
@@ -614,7 +625,7 @@ module Caboose
     # @route GET /admin/pages/:page_id/blocks/:id/api-info
     # @route GET /admin/posts/:post_id/blocks/:id/api-info
     def admin_block_info
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       resp = StdClass.new
       b = Block.find(params[:id])
       bt = b.block_type if b
@@ -628,7 +639,7 @@ module Caboose
     # @route GET /admin/pages/:page_id/blocks/:id/parent-block
     # @route GET /admin/posts/:post_id/blocks/:id/parent-block
     def admin_parent_block
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       resp = StdClass.new
       b = Block.find(params[:id])
       resp.parent_id = b.parent_id if b && b.parent && b.parent.name.blank?
@@ -639,7 +650,7 @@ module Caboose
     # @route POST /admin/pages/:page_id/blocks/:id/move
     # @route POST /admin/posts/:post_id/blocks/:id/move
     def admin_move
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       resp = StdClass.new
       b = Block.find(params[:id])
       if params[:before_id] && !params[:before_id].blank?
@@ -673,7 +684,7 @@ module Caboose
     # @route PUT /admin/pages/:page_id/blocks/:id/move-up
     # @route PUT /admin/posts/:post_id/blocks/:id/move-up
     def admin_move_up
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])
@@ -689,7 +700,7 @@ module Caboose
     # @route PUT /admin/pages/:page_id/blocks/:id/move-down
     # @route PUT /admin/posts/:post_id/blocks/:id/move-down
     def admin_move_down
-      return unless user_is_allowed('pages', 'edit')
+      return unless user_is_allowed("#{page_or_post}s", 'edit')
       
       resp = StdClass.new
       b = Block.find(params[:id])

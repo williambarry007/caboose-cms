@@ -5,12 +5,19 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 
 <%= render :partial => 'caboose/users/admin_header' %>
 
-<p id='gravatar'><img src='<%= pic %>' /><a href='http://gravatar.com'>Update on gravatar</a></p>
-<p><div id='user_<%= @edituser.id %>_first_name' ></div></p>
-<p><div id='user_<%= @edituser.id %>_last_name'  ></div></p>
-<p><div id='user_<%= @edituser.id %>_username'   ></div></p>
-<p><div id='user_<%= @edituser.id %>_email'      ></div></p>
-<p><div id='user_<%= @edituser.id %>_locked'     ></div></p>
+<div class="user-details-wrapper clearfix">
+  <div class="gravatar-holder">
+    <p id='gravatar'><img src='<%= pic %>' /><a href='http://gravatar.com'>Update on gravatar</a></p>
+  </div>
+  <div class="mb-holder">
+    <p><div id='user_<%= @edituser.id %>_first_name' ></div></p>
+    <p><div id='user_<%= @edituser.id %>_last_name'  ></div></p>
+    <p><div id='user_<%= @edituser.id %>_username'   ></div></p>
+    <p><div id='user_<%= @edituser.id %>_email'      ></div></p>
+    <p><div id='user_<%= @edituser.id %>_locked'     ></div></p>
+  </div>
+</div>
+
 
 <%= render :partial => 'caboose/users/admin_footer' %>
 
@@ -18,6 +25,18 @@ pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/
 <style type='text/css'>
 #content input[type=checkbox] { position: relative; }
 #roles { height: 200px; overflow-y: scroll; margin-bottom: 20px; }
+.user-details-wrapper .gravatar-holder {
+  width: 25%;
+  float: right;
+}
+.user-details-wrapper .mb-holder {
+  width: 72%;
+  float: left;
+  padding-right: 2%;
+}
+#content2 {
+  max-width: 800px;
+}
 </style>
 <% end %>
 <% content_for :caboose_js do %>
@@ -31,11 +50,11 @@ $(document).ready(function() {
     update_url: '/admin/users/<%= @edituser.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'first_name' , nice_name: 'First name', type: 'text'     , value: <%= raw Caboose.json(@edituser.first_name) %>, width: 280 },
-      { name: 'last_name'  , nice_name: 'Last name' , type: 'text'     , value: <%= raw Caboose.json(@edituser.last_name)  %>, width: 280 },
-      { name: 'username'   , nice_name: 'Username'  , type: 'text'     , value: <%= raw Caboose.json(@edituser.username)   %>, width: 280 },
-      { name: 'email'      , nice_name: 'Email'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.email)      %>, width: 280 },
-      { name: 'locked'     , nice_name: 'Locked'    , type: 'checkbox' , value: <%= @edituser.locked ? 1 : 0               %>, width: 280 }
+      { name: 'first_name' , nice_name: 'First name', type: 'text'     , value: <%= raw Caboose.json(@edituser.first_name) %>, width: 350 },
+      { name: 'last_name'  , nice_name: 'Last name' , type: 'text'     , value: <%= raw Caboose.json(@edituser.last_name)  %>, width: 350 },
+      { name: 'username'   , nice_name: 'Username'  , type: 'text'     , value: <%= raw Caboose.json(@edituser.username)   %>, width: 350 },
+      { name: 'email'      , nice_name: 'Email'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.email)      %>, width: 350 },
+      { name: 'locked'     , nice_name: 'Locked'    , type: 'checkbox' , value: <%= @edituser.locked ? 1 : 0               %>, width: 350 }
     ]    
   });  
 });

@@ -33,7 +33,7 @@ p = @product
 
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/admin_media_index' %>
-<%= stylesheet_link_tag 'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css' %>
+<%= stylesheet_link_tag 'https://cdnjs.cloudflare.com/ajax/libs/plupload/2.1.3/jquery.ui.plupload/css/jquery.ui.plupload.css' %>
 <% end %>
 
 <% content_for :caboose_js do %>
@@ -41,25 +41,18 @@ p = @product
 <%= javascript_include_tag 'caboose/admin_media_index.js' %>
 <%= javascript_include_tag 'caboose/jquery-ui.drag-multiple.min.js' %>
 
-<!-- production -->
-<%= javascript_include_tag 'plupload/plupload.full.min.js' %>
-<%= javascript_include_tag 'plupload/jquery.ui.plupload/jquery.ui.plupload.js' %>
-                
-<!-- debug 
-<script type="text/javascript" src="/assets/plupload/moxie.js"></script>
-<script type="text/javascript" src="/assets/plupload/plupload.dev.js"></script>
-<script type="text/javascript" src="/assets/plupload/jquery.ui.plupload/jquery.ui.plupload.js"></script>
--->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/plupload/2.1.3/plupload.full.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/plupload/2.1.3/jquery.ui.plupload/jquery.ui.plupload.min.js"></script>
 
 <script type="text/javascript">
 
 var controller = false;
 $(document).ready(function() {
     
-  add_to_crumbtrail('/admin', 'Admin');
-  add_to_crumbtrail('/admin/products', 'Products');  
-  add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);
-  add_to_crumbtrail('/admin/products/<%= p.id %>/images', 'Images');
+  // add_to_crumbtrail('/admin', 'Admin');
+  // add_to_crumbtrail('/admin/products', 'Products');  
+  // add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);
+  // add_to_crumbtrail('/admin/products/<%= p.id %>/images', 'Images');
   
   controller = new MediaController({
     top_cat_id: <%= raw Caboose.json(@media_category ? @top_media_category.id : false) %>,

@@ -61,7 +61,8 @@ module Caboose
           when 'name'          then f.name           = value
           when 'field_type'    then f.field_type     = value
           when 'default_value' then f.default_value  = value
-          when 'options'       then f.options        = value              
+          when 'options'       then f.options        = value
+          when 'options_url'   then f.options_url    = value             
         end
       end
       resp.success = save && f.save      
@@ -93,7 +94,6 @@ module Caboose
     # @route DELETE /admin/post-custom-fields/:id
     def admin_delete
       return if !user_is_allowed('postcustomfields', 'edit')
-
       if params[:id] == 'bulk'      
         params[:model_ids].each do |fid|
           PostCustomFieldValue.where(:post_custom_field_id => fid).destroy_all

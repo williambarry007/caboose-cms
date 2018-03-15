@@ -5,73 +5,367 @@ $hover-bg-color: #666;
 $hover-text-color: #fff;
 $current-bg-color: #333;
 $current-text-color: #ccc;
+
+@mixin flexbox() {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+
+@mixin flex($values) {
+  -webkit-box-flex: $values;
+  -moz-box-flex:  $values;
+  -webkit-flex:  $values;
+  -ms-flex:  $values;
+  flex:  $values;
+}
+
+.admin-index-menu#admin-list {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 0 20px 100px 20px;
+	position: relative;
+	right: 15px;
+	& * {
+		-moz-box-sizing: border-box;
+	  -webkit-box-sizing: border-box;
+	  box-sizing: border-box;
+	}
+	.admin-intro {
+		text-align: center;
+		padding: 10px 2%;
+		h4 {
+			font-size: 1.5em;
+			margin-bottom: 8px;
+			margin-top: 0;
+		}
+		p {
+			margin: 0;
+			font-size: 13px;
+			a {
+				color: #6d6db7;
+				text-decoration: none;
+				&:hover {
+					color: #1c1ccc;
+				}
+			}
+		}
+	}
+	& > ul {
+		margin: 0;
+		list-style-type: none;
+		padding: 0;
+		& > li {
+			display: block;
+			margin-bottom: 10px;
+			min-width: 140px;
+			& > a {
+				display: block;
+				text-decoration: none;
+			}
+			span[class^="icon-"] {
+
+			}
+			span.text {
+				display: block;
+			}
+			ul {
+				list-style-type: none;
+				padding: 0;
+				@include flexbox();
+				flex-wrap: wrap;
+				justify-content: flex-start;
+				li {
+					display: inline-block;
+					@include flex(1 1 17%);
+					border: 1px solid #c5c5c5;
+					margin: 0 10px 10px 0;
+					border-radius: 8px;
+					overflow: hidden;
+					&:hover {
+						background-color: #e7e7ff;
+						border-color: #a6a6af;
+					}
+					a {
+						display: block;
+						text-decoration: none;
+						padding: 11px;
+						text-align: center;
+						height: 100%;
+						span[class^="icon3-"] {
+							display: block;
+							height: 35px;
+							width: 40px;
+							color: #2d2d2d;
+							margin: 0 auto;
+							&::before {
+								font-size: 28px;
+							}
+						}
+						span.text {
+							display: block;
+							color: #2d2d2d;
+							font-size: 13px;
+							line-height: 15px;
+						}
+						&:hover {
+							span {
+								color: #39394e;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+#page-list {
+	max-width: 660px;
+	margin: 0 auto;
+	padding: 0 20px 100px 20px;
+	.top {
+		margin-bottom: 20px;
+		p {
+			margin: 0;
+			float: left;
+		}
+		input {
+			border: 1px solid #c5c5c5;
+	    border-radius: 8px;
+	    padding: 8px 8px 8px 8px;
+	    font-size: 14px;
+	    height: 33px;
+	    float: right;
+		}
+	}
+	ul {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+		padding-left: 15px;
+		overflow: hidden;
+		position: relative;
+		&::before {
+			content: " ";
+			display: block;
+			position: absolute;
+			left: 0;
+			top: -21px;
+			width: 1px;
+			height: 100%;
+			background-color: #dadada;
+		}
+		li {
+			display: block;
+			position: relative;
+			a.icon3-settings {
+				position: absolute;
+		    right: 30px;
+		    top: 8px;
+		    font-size: 0;
+		    color: transparent;
+		    width: 23px;
+		    height: 23px;
+		    display: inline-block;
+		    text-decoration: none;
+		    z-index: 2;
+				&::before {
+					font-size: 20px;
+					color: #2d2d2d;
+				}
+				&:hover {
+					&::before {
+						color: #1c1ccc;
+					}
+				}
+			}
+			.content {
+				text-decoration: none;
+				color: #2d2d2d;
+				display: block;
+				margin-bottom: 5px;
+				border: 1px solid #c5c5c5;
+				border-radius: 8px;
+				padding: 8px 60px 8px 30px;
+				font-size: 14px;
+				&:hover {
+					background-color: #e7e7ff;
+					border-color: #a6a6af;
+				}
+				&::before {
+					content: "\70";
+					font-family: "caboose-admin-menu" !important;
+					font-size: 20px;
+			    position: absolute;
+			    left: 5px;
+			    top: 7px;
+				}
+			}
+			a.pub {
+				position: absolute;
+		    right: 9px;
+		    top: 10px;
+		    font-size: 0;
+		    color: transparent;
+		    width: 17px;
+		    height: 16px;
+		    display: inline-block;
+		    text-decoration: none;
+		    z-index: 2;
+		    cursor: pointer;
+				&::before {
+					font-size: 17px;
+					color: #2d2d2d;
+				}
+				&:hover {
+					&::before {
+						color: #1c1ccc;
+					}
+				}
+			}
+			&::before {
+				content: " ";
+				display: block;
+				position: absolute;
+				right: 100%;
+				top: 17px;
+				width: 50px;
+				height: 1px;
+				background-color: #dadada;
+			}
+			&.hidden {
+				& > .content, & > a.icon3-settings, & > a.pub {
+					display: none;
+				}
+				&::before {
+					display: none;
+				}
+			}
+			&.shown {
+				& > .content {
+					display: block;
+				}
+				& > a.icon3-settings, & > a.pub {
+					display: inline-block;
+				}
+			}
+			&.small {
+				&::before {
+					top: 11px;
+				}
+				& > .content {
+					font-size: 11px;
+					padding: 4px 8px 3px 8px;
+					background-color: #eaeaea;
+					&::before {
+						display: none;
+					}
+				}
+				& > a.icon3-settings, & > a.pub {
+					display: none;
+				}
+			}
+			&.disabled {
+				& > .content {
+					background: #d0d0d0;
+			    text-decoration: line-through;
+			    color: #5f5f5f;
+			    font-size: 11px;
+					padding: 4px 8px 3px 8px;
+					&::before {
+						display: none;
+					}
+				}
+				& > a.icon3-settings, & > a.pub {
+					display: none;
+				}
+			}
+		}
+	}
+	& > ul {
+		border-left: 0;
+		padding-left: 0;
+		&::before {
+			top: 10px;
+			height: calc(100% - 31px);
+		}
+	}
+}
+
   
 ul#crumbtrail {
   position: absolute;
-  top: -42px;
-  left: 54px;
+  top: -50px;
+  left: 50px;
   color: #fff;
-  
-  margin: 0 0 20px 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   text-align: center;
-  
+  height: 50px;
   li {      
-    margin: 0 5px;
+    margin: 0;
     padding: 0; 
     list-style: none;
     display: inline;
-    
     a {
       white-space: nowrap;
       display: inline-block;
       margin: 0;        
-      position: relative;      
-      height: 32px;
+      position: relative;    
+      padding: 0 5px;  
+      height: 50px;
+      line-height: 50px;
       background: $off-bg-color;
       color: $off-text-color;
       z-index: 20;
-      text-decoration: none !important;              
-      span { display: block; padding: 7px 4px 0 5px; font-size: 10pt;  }
+      text-decoration: none !important;
+      span {
+      	display: block;
+      	padding: 0;
+      	font-size: 12px;
+      }
     }
     a:hover { background: $hover-bg-color; color: $hover-text-color; }
   
-    a:before {
-	    content: ' ';
-	    height: 0;
-	    position: absolute;
-	    top: 0;
-	    left: -6px;
-	    width: 0;
-	    border: 16px solid transparent;
-	    border-width: 16px 6px;
-	    border-top-color:    $off-bg-color;
-	    border-right-color:  transparent;
-	    border-bottom-color: $off-bg-color;
-	    border-left-color:   transparent;
-	    z-index: 19;	    
-	  }	   
-	  a:hover:before { 
-	    border-top-color:    $hover-bg-color; 
-	    border-bottom-color: $hover-bg-color; 
-	  }
+   //  a:before {
+	  //   content: ' ';
+	  //   height: 0;
+	  //   position: absolute;
+	  //   top: 0;
+	  //   left: -6px;
+	  //   width: 0;
+	  //   border: 16px solid transparent;
+	  //   border-width: 16px 6px;
+	  //   border-top-color:    $off-bg-color;
+	  //   border-right-color:  transparent;
+	  //   border-bottom-color: $off-bg-color;
+	  //   border-left-color:   transparent;
+	  //   z-index: 19;	    
+	  // }	   
+	  // a:hover:before { 
+	  //   border-top-color:    $hover-bg-color; 
+	  //   border-bottom-color: $hover-bg-color; 
+	  // }
 
-    a:after {
-	    content: ' ';
-	    height: 0;
-	    position: absolute;
-	    top: 0;
-	    right: -12px;
-	    width: 0;
-	    border: 16px solid transparent;
-	    border-width: 16px 6px;
-	    border-left-color: $off-bg-color;
-	    z-index: 19;
-	  }
-	  a:hover:after { 
-	    border-left-color: $hover-bg-color; 	     
-	  }
+   //  a:after {
+	  //   content: ' ';
+	  //   height: 0;
+	  //   position: absolute;
+	  //   top: 0;
+	  //   right: -12px;
+	  //   width: 0;
+	  //   border: 16px solid transparent;
+	  //   border-width: 16px 6px;
+	  //   border-left-color: $off-bg-color;
+	  //   z-index: 19;
+	  // }
+	  // a:hover:after { 
+	  //   border-left-color: $hover-bg-color; 	     
+	  // }
 	  	  
 	  &.current {                
 	    a { background: $current-bg-color; color: $current-text-color; }    

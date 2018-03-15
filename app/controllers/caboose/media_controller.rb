@@ -73,7 +73,6 @@ module Caboose
     def admin_json
       return if !user_is_allowed('media', 'view')
       render :json => false and return if @site.nil?
-            
       arr = Media.where(:media_category_id => params[:media_category_id]).reorder(:sort_order).all
       render :json => arr.collect{ |m| m.api_hash }                  
     end
@@ -82,7 +81,6 @@ module Caboose
     def admin_json_single
       return if !user_is_allowed('media', 'view')
       render :json => false and return if @site.nil?
-            
       m = Media.where(:id => params[:id]).first
       render :json => m.api_hash      
     end
@@ -133,7 +131,7 @@ module Caboose
           when 'sort_order'   then m.sort_order   = value
           when 'image_url'    then
             m.processed = false
-            m.delay(:queue => 'caboose_media').download_image_from_url(value)
+            m.delay(:queue => 'caboose_media', :priority => 2).download_image_from_url(value)
         end
       end
       

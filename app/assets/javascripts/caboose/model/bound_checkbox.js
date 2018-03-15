@@ -36,7 +36,7 @@ BoundCheckbox = BoundControl.extend({
     var cb = $('<input/>')
       .attr('id', this.el)
       .attr('type', 'checkbox')      
-      .attr('checked', this.attribute.value == 1)
+      .attr('checked', (this.attribute.value == 1 || this.attribute.value == true || this.attribute.value == 'true' || this.attribute.value == '1'))
       .on('change', function() {        
         this2.save(); 
       });    

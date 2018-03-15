@@ -18,11 +18,9 @@ var MediaModalController = BlockModalController.extend({
   
   assets_to_include: function()
   {
-    return [      
-      //'plupload/plupload.full.min.js', 
-      //'plupload/jquery.ui.plupload/jquery.ui.plupload.js',
-      'plupload/plupload_with_jquery.min.js',
-      'plupload/jquery.ui.plupload/css/jquery.ui.plupload.css'
+    return [
+      'https://cabooseit.s3.amazonaws.com/assets/caboose/plupload_with_jquery.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/plupload/2.1.3/jquery.ui.plupload/css/jquery.ui.plupload.css'
     ];   
   },
   

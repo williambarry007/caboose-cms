@@ -41,6 +41,14 @@ class Caboose::User < ActiveRecord::Base
   def is_super_admin?
     return self.username == 'superadmin'    
   end
+
+  def forem_name
+    self.username
+  end
+
+  def forem_email
+    self.email
+  end
   
   def is_allowed(resource, action)          
     elo = Caboose::Role.logged_out_role(self.site_id)
@@ -123,7 +131,7 @@ class Caboose::User < ActiveRecord::Base
     if value.to_i > 0 # Add to role                   
       if role_id == 'all'
         Caboose::RoleMembership.where(:user_id => self.id).destroy_all      
-        Caboose::Role.where(:site_id => self.site_id).reorder(:name).all.each{ |r| RoleMembership.create(:user_id => self.id, :role_id => r.id) }                          
+        Caboose::Role.where(:site_id => self.site_id).reorder(:name).all.each{ |r| Caboose::RoleMembership.create(:user_id => self.id, :role_id => r.id) }                          
       else
         if !Caboose::RoleMembership.where(:user_id => self.id, :role_id => role_id.to_i).exists?
           Caboose::RoleMembership.create( :user_id => self.id, :role_id => role_id.to_i)

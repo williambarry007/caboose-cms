@@ -45,7 +45,7 @@ module Caboose
       #puts self.invoice.customer.card_brand      
       #puts "--------------------------------------------------------------------"
       
-      if self.invoice.customer.card_brand
+      if self.invoice.customer && self.invoice.customer.card_brand
         self.card_type   = self.invoice.customer.card_brand
         self.card_number = self.invoice.customer.card_last4
         return
@@ -85,7 +85,7 @@ module Caboose
     def invoice_info
 
       invoice_info = "Invoice Number: #{invoice.invoice_number}\n"
-      invoice_info << "Invoice Date: #{invoice.date_created.strftime('%d %b %Y %H:%M:%S %p')}\n"
+      invoice_info << "Invoice Date: #{invoice.date_created.strftime('%d %b %Y %H:%M:%S %p')}\n" if !invoice.date_created.blank?
       invoice_info << "Status: #{invoice.status.capitalize}\n"
 
       tbl = []
@@ -107,12 +107,12 @@ module Caboose
       billed_to = [
         [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => ba ? "#{ba.first_name} #{ba.last_name}" : '' , :border_width => 0, :width => 200 }],
         [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => ba ? ba_address                         : '' , :border_width => 0, :width => 200 }],
-        [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                                 , :border_width => 0, :width => 200 }],
-        [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}"           , :border_width => 0, :width => 200 }]
+        [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => (c ? "#{c.email}" : "N/A")                           , :border_width => 0, :width => 200 }],
+        [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => (c ? "#{self.formatted_phone(c.phone)}" : "N/A")          , :border_width => 0, :width => 200 }]
       ]
       
       sa = invoice.shipping_address
-      sa_name = sa && sa.first_name ? "#{sa.first_name} #{sa.last_name}" : "#{c.first_name} #{c.last_name}"
+      sa_name = sa && sa.first_name ? "#{sa.first_name} #{sa.last_name}" : (c ? "#{c.first_name} #{c.last_name}" : "N/A")
       sa_address = sa ? 
         (sa.address1 && sa.address1.length > 0 ? "#{sa.address1}\n" : '') + 
         (sa.address2 && sa.address2.length > 0 ? "#{sa.address2}\n" : '') + 
@@ -122,13 +122,13 @@ module Caboose
         
       shipped_to = []
       if invoice.instore_pickup
-        shipped_to << [{ :content => "Name"            , :border_width => 0, :width =>  55 },{ :content => "#{c.first_name} #{c.last_name}"   , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Name"            , :border_width => 0, :width =>  55 },{ :content => (c ? "#{c.first_name} #{c.last_name}" : "N/A")   , :border_width => 0, :width => 200 }]
         shipped_to << [{ :content => "IN-STORE PICKUP" , :border_width => 0, :width => 255 , :colspan => 2 }]
       else        
         shipped_to << [{ :content => "Name"    , :border_width => 0, :width => 55 },{ :content => sa_name                            , :border_width => 0, :width => 200 }]
         shipped_to << [{ :content => "Address" , :border_width => 0, :width => 55 },{ :content => sa_address                         , :border_width => 0, :width => 200 }]
-        shipped_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => "#{c.email}"                       , :border_width => 0, :width => 200 }]
-        shipped_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => "#{self.formatted_phone(c.phone)}" , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Email"   , :border_width => 0, :width => 55 },{ :content => (c ? "#{c.email}" : "N/A")                    , :border_width => 0, :width => 200 }]
+        shipped_to << [{ :content => "Phone"   , :border_width => 0, :width => 55 },{ :content => (c ? "#{self.formatted_phone(c.phone)}" : "N/A") , :border_width => 0, :width => 200 }]
       end
 
       tbl = []
@@ -161,7 +161,7 @@ module Caboose
         tbl[0] << { :content => "Amount"     , :align => :right , :valign => :bottom }
       end
 
-      invoice.calculate
+      # invoice.calculate
       
       invoice.invoice_packages.all.each do |pk|
 

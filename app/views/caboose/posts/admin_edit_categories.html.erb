@@ -16,6 +16,18 @@
 
 <%= render :partial => 'caboose/posts/admin_footer' %>
 
+<% content_for :caboose_css do %>
+<style>
+  #content2 p input[type="checkbox"] {
+    top: 10px;
+    margin-right: 5px;
+  }
+  #content2 > p {
+    margin: 0 0 5px 0;
+  }
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type='text/javascript'>
@@ -37,6 +49,4 @@ $(window).load(function() {
 });
 
 </script>
-<%= tinymce_assets %>
-<%= tinymce :caboose, 'width'   => '575px', 'height'  => '240px' %>
 <% end %>

@@ -1,6 +1,6 @@
 /*    
- *= require caboose/spectrum 
- */
+require caboose/spectrum 
+*/
  
 .mb_container {
   width: 100%;
@@ -21,12 +21,13 @@
 .mb_container select,
 .mb_container .mb_fake option,
 .mb_container option {
-  font-size: 16px !important;
+  font-size: 15px !important;
+  max-width: 100%;
 }
 
 .mb_container input.mb_dirty,
 .mb_container textarea.mb_dirty {
-  background: #fff799 !important;
+  background: #fffac5 !important;
   color: #000 !important;  
 }
 
@@ -90,8 +91,8 @@ div.mb_container div.mb_placeholder {
   /*height: 34px;*/
   
   position: absolute;
-  top: 8px;
-  left: 10px;
+  top: 10px;
+  left: 9px;
   z-index: 19;  
 }
 
@@ -103,7 +104,9 @@ div.mb_container form.mb_file_form div.mb_placeholder {
 
 .mb_container .mb_placeholder span {
   display: block;
-  font-size: 16px;
+  font-family: "Roboto", Arial;
+  font-weight: 400;
+  font-size: 15px;
   color: #757575;
 }
 
@@ -136,6 +139,10 @@ div.mb_container form.mb_file_form div.mb_placeholder span {
 .mb_container .mb_clear {
   clear: both;
   line-height: 0;  
+}
+
+table.data .mb_container table.data.checkbox_multiple {
+  width: 100%;
 }
 
 .mb_fake_file_input {

@@ -329,6 +329,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_expires      , :datetime ],
         [ :status            , :string   ]                                
       ],      
+      Caboose::LetsencryptPluginSetting => [
+        [ :private_key      , :text ]
+      ],
+      Caboose::LetsencryptPluginChallenge => [
+        [ :response         , :text ]
+      ],
       Caboose::LineItem => [
         [ :invoice_id            , :integer  ],
         [ :invoice_package_id    , :integer  ],
@@ -507,13 +513,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :layout                , :string  ],
         [ :sort_order            , :integer , { :default => 0                }],
         [ :custom_sort_children  , :boolean , { :default => false            }],
-        [ :seo_title             , :string  , { :limit => 70                 }],
+        [ :seo_title             , :string  , { :limit => 200                 }],
         [ :meta_keywords         , :text    ], 
-        [ :meta_description      , :string  , { :limit => 156                }],
+        [ :meta_description      , :string  , { :limit => 300                }],
         [ :meta_robots           , :string  , { :default => 'index, follow'  }],
         [ :canonical_url         , :string  ],
-        [ :fb_description        , :string  , { :limit => 156 }],
-        [ :gp_description        , :string  , { :limit => 156 }],
+        [ :fb_description        , :string  , { :limit => 300 }],
+        [ :gp_description        , :string  , { :limit => 300 }],
         [ :status,                :string  ]
       ],
       Caboose::PageCache => [
@@ -588,6 +594,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :key               , :string  ],
         [ :name              , :string  ],
         [ :field_type        , :string  ],
+        [ :options_url       , :string  ],
         [ :default_value     , :text    ],
         [ :options           , :text    ],
         [ :sort_order        , :integer  , { :default => 0 }]
@@ -745,7 +752,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_js_updated         , :datetime   ],
         [ :date_css_updated        , :datetime   ],
         [ :default_layout_id       , :integer    ],
-        [ :login_fail_lock_count   , :integer     , { :default => 5 }]
+        [ :login_fail_lock_count   , :integer     , { :default => 5 }],
+        [ :sitemap_xml , :text       ],
+        [ :robots_txt , :text        ]
         #[ :custom_css              , :text       ],
         #[ :custom_css_files        , :text       ],
         #[ :custom_js               , :text       ],

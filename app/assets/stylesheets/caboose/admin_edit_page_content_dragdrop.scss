@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,300i');
 
-#block_sidebar {
+#cb_block_sidebar {
   position: fixed;
   top: 0;
   left: 0;
@@ -33,6 +33,8 @@
         font-size: 15px;
         display: block;
         text-transform: uppercase;
+        color: #252525;
+        line-height: 16px;
       }
     }
   	li.blocktype {
@@ -48,7 +50,7 @@
       padding: 6px;
       background-color: #f9f8f6;
       span[class*=" icon-"] {
-        
+        color: #3e3e3e;
       }
   		span.bname {
         margin-top: 3px;
@@ -56,7 +58,9 @@
         font-family: 'Roboto';
         font-weight: 300;
   			font-size: 12px;
+        line-height: 14px;
         border: 0;
+        color: #252525;
   		}
       &.divider {
 
@@ -68,6 +72,15 @@
   }
 }
 
+#the_modal #modal_content .mb_container table.checkbox_multiple {
+  td {
+    padding: 5px 10px 10px 0;
+  }
+  input[type="checkbox"] {
+    top: 0;
+  }
+}
+
 #the_modal #modal_content .mb_container {
   input {
     border: #ccc 1px solid;
@@ -76,6 +89,15 @@
     font-weight: 300 !important;
     font-size: 15px !important;
     padding: 8px 6px 6px 6px;
+    &:focus {
+      outline-width: 0;
+      border-color: #28acc1;
+    }
+  }
+  label {
+    font-family: 'Roboto' !important;
+    font-weight: 300 !important;
+    font-size: 15px !important;
   }
   .mb_placeholder {
     top: 9px;
@@ -246,10 +268,10 @@ body > .container, body > .mm-page > .container {
 .block_over > .delete_handle    span { position: absolute; top: 0; right:  0px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
 .block_over > .duplicate_handle    span { position: absolute; top: 0; right:  36px; width: 18px; height: 18px; background-color: #fff; border: #ccc 1px solid; }
 
-.flex-grid-unit.block_over > .delete_handle span { right: auto; left: 36px; background-color: #f1e9e9; }
-.flex-grid-unit.block_over > .duplicate_handle span { right: auto; left: 0; background-color: #f1e9e9; }
-.flex-grid-unit.block_over > .select_handle span { right: auto; left: 18px; background-color: #f1e9e9; }
-.flex-grid-unit.block_over > .drag_handle span { display: none; }
+.flex-grid-unit.block_over > .delete_handle span { right: auto; left: 54px; background-color: #f1e9e9; }
+.flex-grid-unit.block_over > .duplicate_handle span { right: auto; left: 18px; background-color: #f1e9e9; }
+.flex-grid-unit.block_over > .select_handle span { right: auto; left: 36px; background-color: #f1e9e9; }
+.flex-grid-unit.block_over > .drag_handle span { right: auto; left: 0; background-color: #f1e9e9; }
 
 .unslider-block-wrapper > .delete_handle,
 .unslider-block-wrapper > .drag_handle,
@@ -285,7 +307,7 @@ body > .container, body > .mm-page > .container {
       background: #dbeff7;
     }
     &.highlight {
-      background: #b0d5e4;
+      background: shade(#dbeff7, 15%);
     }
     &.new-page {
       text-align: center;
@@ -301,11 +323,92 @@ body > .container, body > .mm-page > .container {
       font-size: 14px;
       p {
         color: #1d1d1d;
+        font-family: 'Roboto';
+        font-weight: 300;
+        font-size: 14px;
+      }
+      &.dropzone {
+        background: #dbeff7;
       }
       &.highlight {
-        background: #9cb9fb;
+        background: shade(#dbeff7, 15%);
         color: transparent;
       }
     }
 	}
 }
+
+.flex-grid-container.block_over {
+  .delete_handle, .delete_handle span {
+    z-index: 10;
+  }
+  .duplicate_handle, .duplicate_handle span {
+    z-index: 10;
+  }
+  .select_handle, .select_handle span {
+    z-index: 10;
+  }
+  .drag_handle, .drag_handle span {
+    z-index: 10;
+  }
+  .flexbox {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+
+.flex-grid-container .flexbox > .new_block_link {
+  height: 0;
+  width: 0;
+  flex: 0 0 0;
+  .line {
+    background-color: transparent;
+    left: -8px;
+    bottom: auto;
+    top: 0;
+    width: 16px;
+    height: 70px;
+    &.dropzone {
+      background: #c8ffca;
+    }
+    &.highlight {
+      background: shade(#c8ffca, 15%);
+    }
+  }
+}
+
+.flex-grid-container.empty {
+  & > .flexbox > .new_block_link.np, & > .constrain > .flexbox > .new_block_link.np {
+    flex: 1 1 100%;
+    width: auto;
+    height: auto;
+    .new-page.line {
+      width: 100%;
+      bottom: auto;
+      top: auto;
+      background: #ecebe8;
+      left: 0;
+      height: auto;
+      z-index: 2;
+      &.dropzone {
+        background: #c8ffca;
+      }
+      &.highlight {
+        background: shade(#c8ffca, 15%);
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

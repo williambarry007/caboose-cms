@@ -42,10 +42,10 @@ may_delete3 = p.variants.collect{|v| v.option3 }.uniq.count == 1
 var mods_controller = false;
 $(document).ready(function() {
     
-  add_to_crumbtrail('/admin', 'Admin');
-  add_to_crumbtrail('/admin/products', 'Products');  
-  add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);
-  add_to_crumbtrail('/admin/products/<%= p.id %>/options', 'Options');
+  // add_to_crumbtrail('/admin', 'Admin');
+  // add_to_crumbtrail('/admin/products', 'Products');  
+  // add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);
+  // add_to_crumbtrail('/admin/products/<%= p.id %>/options', 'Options');
   
   m = new ModelBinder({
     name: 'Product',

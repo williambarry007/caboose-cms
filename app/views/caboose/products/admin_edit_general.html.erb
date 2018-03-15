@@ -27,9 +27,9 @@ date_available = p.date_available ? p.date_available.strftime('%F') : ''
 %>
 $(document).ready(function() {
 	
-  add_to_crumbtrail('/admin', 'Admin');
-  add_to_crumbtrail('/admin/products', 'Products');  
-  add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);  
+  // add_to_crumbtrail('/admin', 'Admin');
+  // add_to_crumbtrail('/admin/products', 'Products');  
+  // add_to_crumbtrail('/admin/products/<%= p.id %>', <%= raw Caboose.json(p.title) %>);  
   
   m = new ModelBinder({
     name: 'Product',

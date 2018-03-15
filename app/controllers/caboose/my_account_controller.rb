@@ -19,8 +19,24 @@ module Caboose
         case name
     	  	when "first_name" then user.first_name  = value
     	  	when "last_name"  then user.last_name   = value
-    	  	when "username"   then user.username    = value
-    	  	when "email"      then user.email       = value
+    	  	when "username"
+            uname = value.strip.downcase
+            if uname.length < 3
+              resp.error = "Username must be at least three characters."
+            elsif Caboose::User.where(:username => uname, :site_id => @site.id).where('id != ?',user.id).exists?
+              resp.error = "That username is already taken."
+            else
+              user.username    = uname
+            end
+    	  	when "email"
+            email = value.strip.downcase
+            if !email.include?('@')
+              resp.error = "Invalid email address."
+            elsif Caboose::User.where(:email => email, :site_id => @site.id).where('id != ?',user.id).exists?
+              resp.error = "That email address is already in the system."
+            else
+              user.email    = email
+            end
     	  	when "phone"      then user.phone       = value
     	  	when "password"			  
     	  	  confirm = params[:confirm]

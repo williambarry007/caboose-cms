@@ -163,8 +163,8 @@ var BlockModalController = ModalController.extend({
     
     var b = that.block;    
     $('#modal_content').empty()      
-      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_block_type_id' )))
-      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_parent_id'     )))
+ //     .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_block_type_id' )))
+ //     .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_parent_id'     )))
       .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_constrain'     )))
       .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_full_width'    )))      
     $('#modal_controls').empty()
@@ -185,8 +185,8 @@ var BlockModalController = ModalController.extend({
       update_url: that.block_url(b),      
       authenticity_token: that.authenticity_token,
       attributes: [
-        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/block-types/options' },
-        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/block-options' },
+//        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/block-types/options' },
+//        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/parentblock-options?block_id=' + b.id },
         { name: 'constrain'     , nice_name: 'Constrain'  , type: 'checkbox' , value: b.constrain     ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.constrain     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
         { name: 'full_width'    , nice_name: 'Full Width' , type: 'checkbox' , value: b.full_width    ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.full_width    = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }}
       ]
@@ -235,15 +235,6 @@ var BlockModalController = ModalController.extend({
   },
   
   /****************************************************************************/
-
-  //set_editable: function()
-  //{
-  //  var that = this;
-  //  that.set_block_value_editable(that.block);        
-  //  $.each(that.block.children, function(i, b) {
-  //    that.set_block_value_editable(b);                         
-  //  });        
-  //},
   
   set_block_value_editable: function(b)
   {    
@@ -283,6 +274,23 @@ var BlockModalController = ModalController.extend({
       attributes: [h]            
     });
   },
+
+  remove_media: function(block) {
+    var that = this;
+
+    $.ajax({          
+      url: that.block_url(block) + '/remove-media',
+      type: 'put',
+      success: function(html) {
+        $('#the_modal img#block_' + block.id).attr('src','//d9hjv462jiw15.cloudfront.net/assets/blank.png').css('width','200px').css('height','120px');
+        $('#the_modal div#block_' + block.id + ' p').html('Empty file.');
+        $('#the_modal #block_' + block.id).parent().find('.caboose-btn').remove();
+        that.parent_controller.render_blocks();
+        that.autosize();
+      },            
+    });
+
+  },
   
   set_clickable: function(b)
   {        
@@ -299,7 +307,28 @@ var BlockModalController = ModalController.extend({
     $('#the_modal #block_' + b.id).click(function(e) {      
       e.stopPropagation();
       that.parent_controller.edit_block(b.id); 
-    });     
+    });
+
+    if ( b.block_type && b.block_type.field_type == 'image' && b.rendered_value.indexOf('placehold') < 0 ) {
+      btn = $('<a href="#" class="caboose-btn">Remove</a>');
+      btn.css('position','relative').css('left','10px').css('bottom','10px').css('font-size','13px');
+      btn.on('click', function(e) {
+        e.preventDefault();
+        that.remove_media(b);
+      });
+      $('#the_modal #block_' + b.id).after(btn);
+    }
+
+    if ( b.block_type && b.block_type.field_type == 'file' && b.rendered_value.indexOf('Click to select a file') < 0 ) {
+      btn = $('<a href="#" class="caboose-btn">Remove</a>');
+      btn.css('margin-bottom','10px').css('font-size','13px');
+      btn.on('click', function(e) {
+        e.preventDefault();
+        that.remove_media(b);
+      });
+      $('#the_modal #block_' + b.id).after(btn);
+    }
+
     // var show_mouseover = true;
     // if (b.children && b.children.length > 0)
     // {

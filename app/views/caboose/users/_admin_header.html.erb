@@ -9,15 +9,16 @@
 <%
 tabs = {                             
   'General'         => "/admin/users/#{@edituser.id}",
-  'Invoices'        => "/admin/users/#{@edituser.id}/invoices",
   'Login Logs'      => "/admin/login-logs?user_id=#{@edituser.id}",
   'Password'        => "/admin/users/#{@edituser.id}/password",
   'Roles'           => "/admin/users/#{@edituser.id}/roles",
   'Delete'          => "/admin/users/#{@edituser.id}/delete"  
 }
-if @site.use_store
+if @site.use_store || @site.is_master
 	arr = tabs.to_a.insert(1, ['Payment Method', "/admin/users/#{@edituser.id}/payment-method"])
 	tabs = Hash[arr]
+  arr = tabs.to_a.insert(2, ['Invoices', "/admin/users/#{@edituser.id}/invoices"])
+  tabs = Hash[arr]
 	arr = tabs.to_a.insert(5, ['Variant Limits', "/admin/users/#{@edituser.id}/variant-limits"])
   tabs = Hash[arr]
 end

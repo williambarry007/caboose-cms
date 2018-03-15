@@ -53,7 +53,8 @@ InvoiceController.prototype = {
           t.amount_refunded = t.amount_refunded == null || isNaN(t.amount_refunded) ? 0.00 : parseFloat(t.amount_refunded);                    
         });
         that.refresh_numbers();
-        if (after) after();                      
+        if (after) after();
+        that.numbers_loading(false);
       }
     });
   },
@@ -63,11 +64,20 @@ InvoiceController.prototype = {
     var that = this;        
     $('#subtotal').html(curr(that.invoice.subtotal));        
     $('#shipping').html(curr(that.invoice.shipping));                    
-    $('#total'   ).html(curr(that.invoice.total   ));        
+    $('#total'   ).html(curr(that.invoice.total   ));
+    $('#invoice_' + that.invoice.id + '_tax').val( curr(that.invoice.tax) );
     $.each(that.invoice.line_items, function(i, li) {
       $('#li_' + li.id + '_subtotal').html(curr(li.subtotal));
     }); 
-  },  
+  },
+
+  numbers_loading: function(is_loading) {
+    var that = this;
+    if ( is_loading )
+      $('.show-loading').addClass('td-loading');
+    else
+      $('.show-loading').removeClass('td-loading');
+  },
   
   make_editable: function()
   {    
@@ -83,7 +93,7 @@ InvoiceController.prototype = {
           { name: 'status'          , nice_name: 'Status'          , type: 'select'   , value: op.status                                            , width: 300, fixed_placeholder: true , options_url: '/admin/invoice-packages/status-options' },          
           { name: 'package_method'  , nice_name: 'Package/Method'  , type: 'select'   , value: op.shipping_package_id + '_' + op.shipping_method_id , width: 300, fixed_placeholder: false, options_url: '/admin/shipping-packages/package-method-options' },
           { name: 'tracking_number' , nice_name: 'Tracking Number' , type: 'text'     , value: op.tracking_number                                   , width: 300, fixed_placeholder: true, align: 'right' },
-          { name: 'total'           , nice_name: 'Shipping Total'  , type: 'text'     , value: curr(op.total)                                       , width: 300, fixed_placeholder: true, align: 'right' , after_update: function() { that.refresh_invoice(); }}
+          { name: 'total'           , nice_name: 'Shipping Total'  , type: 'text'     , value: curr(op.total)                                       , width: 300, fixed_placeholder: true, align: 'right' , after_update: function() { that.numbers_loading(true); setTimeout(function() { that.refresh_invoice() }, 1000) } }
         ]
       });              
     });    
@@ -91,8 +101,8 @@ InvoiceController.prototype = {
       var arr = [
         { name: 'status'          , nice_name: 'Status'           , type: 'select'  , align: 'left' , value: li.status           , text: li.status, width: 150, fixed_placeholder: false, options_url: '/admin/invoices/line-items/status-options' },
         { name: 'tracking_number' , nice_name: 'Tracking Number'  , type: 'text'    , align: 'left' , value: li.tracking_number  , width: 200, fixed_placeholder: false },
-        { name: 'unit_price'      , nice_name: 'Unit Price'       , type: 'text'    , align: 'right', value: curr(li.unit_price) , width:  75, fixed_placeholder: false, after_update: function() { that.refresh_invoice(); } },
-        { name: 'quantity'        , nice_name: 'Quantity'         , type: 'text'    , align: 'right', value: li.quantity         , width:  75, fixed_placeholder: false, after_update: function() { that.refresh_invoice(); } }
+        { name: 'unit_price'      , nice_name: 'Unit Price'       , type: 'text'    , align: 'right', value: curr(li.unit_price) , width:  75, fixed_placeholder: false, after_update: function() { that.numbers_loading(true); setTimeout(function() { that.refresh_invoice() }, 1000) } },
+        { name: 'quantity'        , nice_name: 'Quantity'         , type: 'text'    , align: 'right', value: li.quantity         , width:  75, fixed_placeholder: false, after_update: function() { that.numbers_loading(true); setTimeout(function() { that.refresh_invoice() }, 1000) } }
       ];
       if (li.subscription_id)
       {
@@ -116,11 +126,11 @@ InvoiceController.prototype = {
         { name: 'status'           , nice_name: 'Status'             , type: 'select'   , value: that.invoice.status                , width: 100, fixed_placeholder: false, options_url: '/admin/invoices/status-options' },
         { name: 'financial_status' , nice_name: 'Status'             , type: 'select'   , value: that.invoice.financial_status      , width: 100, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/financial-status-options' },
         { name: 'payment_terms'    , nice_name: 'Terms'              , type: 'select'   , value: that.invoice.payment_terms         , width: 200, fixed_placeholder: true , width: 200, options_url: '/admin/invoices/payment-terms-options' },
-        { name: 'tax'              , nice_name: 'Tax'                , type: 'text'     , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'handling'         , nice_name: 'Handling'           , type: 'text'     , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'custom_discount'  , nice_name: 'Discount'           , type: 'text'     , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.refresh_invoice(); }},
-        { name: 'notes'            , nice_name: 'Notes (not public)' , type: 'textarea' , value: that.invoice.notes                 , width: 500, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 100 },
-        { name: 'customer_notes'   , nice_name: 'Customer Notes'     , type: 'textarea' , value: that.invoice.notes                 , width: 100, fixed_placeholder: false, align: 'left'  , after_update: function() { that.refresh_invoice(); }, height: 50 }
+        { name: 'tax'              , nice_name: 'Tax'                , type: 'text'     , value: curr(that.invoice.tax)             , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.numbers_loading(true); setTimeout(function() { that.refresh_invoice() }, 1000) } },
+        { name: 'handling'         , nice_name: 'Handling'           , type: 'text'     , value: curr(that.invoice.handling)        , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.numbers_loading(true); setTimeout(function() { that.refresh_invoice() }, 1000) } },
+        { name: 'custom_discount'  , nice_name: 'Discount'           , type: 'text'     , value: curr(that.invoice.custom_discount) , width: 100, fixed_placeholder: false, align: 'right' , after_update: function() { that.numbers_loading(true); setTimeout(function() { that.refresh_invoice() }, 1000) } },
+        { name: 'notes'            , nice_name: 'Notes (not public)' , type: 'textarea' , value: that.invoice.notes                 , width: 500, fixed_placeholder: false, align: 'left'  , after_update: function() { that.numbers_loading(true); setTimeout(function() { that.refresh_invoice() }, 1000) } , height: 100 },
+        { name: 'customer_notes'   , nice_name: 'Customer Notes'     , type: 'textarea' , value: that.invoice.notes                 , width: 100, fixed_placeholder: false, align: 'left'  , after_update: function() { that.numbers_loading(true); setTimeout(function() { that.refresh_invoice() }, 1000) } , height: 50 }
       ]
     });        
   },
@@ -519,16 +529,17 @@ InvoiceController.prototype = {
           } 
           tr.append($('<td/>')
             .append(that.line_item_link(li))
+            .append(that.line_item_opts(li))
             .append(that.subscription_dates(li))                    
-            .append(that.line_item_weight(li))
-            .append(that.gift_options(li))
+     //       .append(that.line_item_weight(li))
+     //       .append(that.gift_options(li))
             .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
           );                              
           tr.append($('<td/>').append($('<div/>').attr('id', 'lineitem_' + li.id + '_status')))      
           //tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
           tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_unit_price')));
           tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
-          tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));        
+          tr.append($('<td/>').addClass('show-loading').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));        
           table.append(tr);
         });
       }
@@ -618,6 +629,23 @@ InvoiceController.prototype = {
         that.line_item_options($(this).data('li_id'), $(this).data('invoice_package_id'));
       });
     return link;    
+  },
+
+  line_item_opts: function(li) {
+    var that = this;
+    var v = li.variant;
+    var div = $('<p />');
+    var opts = [];
+    if ( v && v.option1 )
+      opts.push(v.option1);
+    if ( v && v.option2 )
+      opts.push(v.option2);
+    if ( v && v.option3 )
+      opts.push(v.option3);
+    if ( opts.length > 0 )
+      div.text( opts.join(', '));
+    div.css('margin-bottom',0).css('margin-top','5px');
+    return div;
   },
   
   line_item_weight: function(li)
@@ -716,8 +744,9 @@ InvoiceController.prototype = {
       
       tr.append($('<td/>')
         .append(that.line_item_link(li))
+        .append(that.line_item_opts(li))
         .append(that.subscription_dates(li))                                    
-        .append(that.gift_options(li))
+   //     .append(that.gift_options(li))
         .append($('<div/>').attr('id', 'line_item_' + li.id + '_message'))
       );
             
@@ -725,7 +754,7 @@ InvoiceController.prototype = {
       //tr.append($('<td/>').attr('align', 'right').html(curr(li.unit_price)));    
       tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_unit_price')));
       tr.append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'lineitem_' + li.id + '_quantity')));
-      tr.append($('<td/>').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));
+      tr.append($('<td/>').addClass('show-loading').attr('align', 'right').attr('id', 'li_' + li.id + '_subtotal').html(curr(li.subtotal)));
       table.append(tr);
     });
   },
@@ -758,8 +787,8 @@ InvoiceController.prototype = {
     
     if (that.invoice.line_items.length > 0)
     {
-      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Subtotal'    )).append($('<td/>').attr('align', 'right').attr('id', 'subtotal').html(curr(that.invoice.subtotal))));
-      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').append('Tax '      ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_tax();      }))).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_tax'))));                
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Subtotal'    )).append($('<td/>').addClass('show-loading').attr('align', 'right').attr('id', 'subtotal').html(curr(that.invoice.subtotal))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').append('Tax '      ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_tax();      }))).append($('<td/>').addClass('show-loading').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_tax'))));                
       table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Shipping'    )).append($('<td/>').attr('align', 'right').attr('id', 'shipping').html(curr(that.invoice.shipping))));
       table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').append('Handling ' ).append($('<a/>').attr('href', '#').html('(calculate)').click(function(e) { e.preventDefault(); that.calculate_handling(); }))).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_handling'))));
       if (that.invoice.discounts)
@@ -775,7 +804,7 @@ InvoiceController.prototype = {
         });
       }    
       table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Discount')).append($('<td/>').attr('align', 'right').append($('<div/>').attr('id', 'invoice_' + that.invoice.id + '_custom_discount'))));
-      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Total' )).append($('<td/>').attr('align', 'right').attr('id', 'total').html(curr(that.invoice.total))));
+      table.append($('<tr/>').append($('<td/>').attr('colspan', requires_shipping ? '5' : '4').attr('align', 'right').html('Total' )).append($('<td/>').addClass('show-loading').attr('align', 'right').attr('id', 'total').html(curr(that.invoice.total))));
     }    
     else
     {

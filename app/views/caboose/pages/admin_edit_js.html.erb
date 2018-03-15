@@ -8,6 +8,18 @@
 <p><div id='page_<%= @page.id %>_custom_js'></div></p>
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style>
+  textarea {
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 20px;
+    padding: 5px 15px !important;
+  }
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 

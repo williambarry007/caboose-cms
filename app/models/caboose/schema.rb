@@ -174,7 +174,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :status,            :string ],
         [ :new_parent_id, :integer ],
         [ :new_sort_order, :integer ],
-        [ :new_value, :text ]
+        [ :new_value, :text ],
+        [ :new_media_id              , :integer    ]
       ],
       Caboose::BlockType => [        
         [ :parent_id                       , :integer ],

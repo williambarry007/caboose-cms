@@ -207,6 +207,8 @@ body > .container, body > .mm-page > .container {
   width: 95%;
   width: calc(100vw - 200px);
   float: right;
+  position: relative;
+  top: 40px;
 }
 #colorbox:focus {
   outline-width: 0 !important;
@@ -220,16 +222,16 @@ body > .container, body > .mm-page > .container {
 #tiny_header {
   display: block;  
   color: #fff;
- // background-image: url(/assets/caboose/caboose_logo_small.png);
   background-color: #353535;  
-  // background-repeat: no-repeat;
-  // background-position: right 0;
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   z-index: 100000;
-  box-shadow: 0px 2px 3px rgba(10,10,10,0.3);
-  padding: 8px 10px 9px 10px;
+  width: calc(100% - 200px);
+  height: 40px;
+  padding: 0 2%;
+  line-height: 40px;
+  text-align: right;
   a {
     display: inline-block;
     color: #fff;

@@ -451,7 +451,9 @@ module Caboose
           when 'sort_order'    then b.sort_order    = v
           when 'constrain'     then b.constrain     = v
           when 'full_width'    then b.full_width    = v
-          when 'media_id'      then b.media_id      = v
+          when 'media_id'      then 
+            b.new_media_id      = v
+            b.status = 'edited' if b.status == 'published'
           when 'name'          then b.name          = v
           when 'value'         then
             
@@ -581,7 +583,17 @@ module Caboose
       else
         resp.close = true
       end
+
+      if b.page
+        b.page.status = 'edited'
+        b.page.save
+      elsif b.post
+        b.post.status = 'edited'
+        b.post.save
+      end
+
       b.status = 'deleted'
+      b.children.update_all(:status => 'deleted')
       b.save
      # b.destroy
       
@@ -676,6 +688,13 @@ module Caboose
       end
       b.new_parent_id = params[:parent_id]
       b.status = 'edited' if b.status == 'published'
+      if b.page
+        b.page.status = 'edited'
+        b.page.save
+      elsif b.post
+        b.post.status = 'edited'
+        b.post.save
+      end
       resp.success = true
       b.save
       render :json => resp

@@ -143,7 +143,7 @@ BlockController.prototype = {
     h['value'] = b.value
     if (bt.field_type == 'checkbox')       h['value'] = b.value ? 'true' : 'false';
     if (bt.field_type == 'image')          h['value'] = b.image.tiny_url;
-    if (bt.field_type == 'file')           h['value'] = b.image.url;                
+    if (bt.field_type == 'file')           h['value'] = b.image.url; 
     if (bt.field_type == 'select')         h['text'] = b.value;
     if (bt.height)                         h['height'] = bt.height;
     if (bt.fixed_placeholder)              h['fixed_placeholder'] = bt.fixed_placeholder;      

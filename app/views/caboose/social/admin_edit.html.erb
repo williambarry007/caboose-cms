@@ -31,6 +31,7 @@ Authorized
 <p><div id="socialconfig_<%= sc.id %>_google_analytics_id"  ></div></p>
 <p><div id="socialconfig_<%= sc.id %>_google_analytics_id2" ></div></p>
 <p><div id="socialconfig_<%= sc.id %>_auto_ga_js"           ></div></p>
+<p><div id="socialconfig_<%= sc.id %>_share_image"          ></div></p>
       
 <div id='message'></div>
 
@@ -78,7 +79,8 @@ $(document).ready(function() {
       { name: 'linkedin_url'         , nice_name: 'LinkedIn URL'                           , type: 'text'     , value: <%= raw Caboose.json(sc.linkedin_url) %>, width: 500 },
       { name: 'google_analytics_id'  , nice_name: 'Primary Google Analytics Tracking ID'   , type: 'text'     , value: <%= raw Caboose.json(sc.google_analytics_id) %>, width: 500 },
       { name: 'google_analytics_id2' , nice_name: 'Secondary Google Analytics Tracking ID' , type: 'text'     , value: <%= raw Caboose.json(sc.google_analytics_id2) %>, width: 500 },
-      { name: 'auto_ga_js'           , nice_name: 'Auto Embed Google Analytics JS'         , type: 'checkbox' , value: <%= sc.auto_ga_js ? 1 : 0 %>, width: 500 }
+      { name: 'auto_ga_js'           , nice_name: 'Auto Embed Google Analytics JS'         , type: 'checkbox' , value: <%= sc.auto_ga_js ? 1 : 0 %>, width: 500 },
+      { name: 'share_image'  , nice_name: 'Share Image'   , type: 'image'  , value: <%= raw Caboose.json(sc.share_image ? sc.share_image.url(:large) : 'http://placehold.it?300x300') %>, width: 800, update_url: '/admin/social/image' }
     ]    
   });
       

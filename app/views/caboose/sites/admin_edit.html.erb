@@ -17,6 +17,7 @@ user_ids = [] if user_ids.nil?
 <p><div id='site_<%= @site.id %>_use_fonts'               ></div></p>
 <p><div id='site_<%= @site.id %>_use_dragdrop'            ></div></p>
 <p><div id='site_<%= @site.id %>_allow_self_registration' ></div></p>
+<p><div id='site_<%= @site.id %>_theme_color' ></div></p>
 <p><div id='site_<%= @site.id %>_default_layout_id'       ></div></p>
 
 <h2>Domains</h2>
@@ -28,6 +29,7 @@ user_ids = [] if user_ids.nil?
     <th>Domain</th>
     <th>Primary</th>
     <th>Under Construction</th>
+    <th>Force SSL</th>
     <th>Forward to Primary</th>
     <th>Forward to URI</th>
     <th>Delete</th>
@@ -37,6 +39,7 @@ user_ids = [] if user_ids.nil?
     <td><%= d.domain %></td>
     <td align='center'><input type='radio'    name='primary_domain' <%= d.primary? ? "checked='true'" : '' %> onclick="set_primary_domain(<%= s.id %>, <%= d.id %>);" /></td>
     <td align='center'><input type='checkbox' name='under_construction_<%= d.id %>' <%= d.under_construction ? "checked='true'" : '' %> onclick="set_under_construction(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
+    <td align='center'><input type='checkbox' name='force_ssl_<%= d.id %>' <%= d.force_ssl ? "checked='true'" : '' %> onclick="set_force_ssl(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
     <td align='center'><input type='checkbox' name='forward_to_primary_<%= d.id %>' <%= d.forward_to_primary ? "checked='true'" : '' %> onclick="set_forward_to_primary(<%= s.id %>, <%= d.id %>, $(this).prop('checked'));" /></td>
     <td align='center'><input type='text'     name='forward_to_uri_<%= d.id %>' value="<%= d.forward_to_uri %>" onchange="set_forward_to_uri(<%= s.id %>, <%= d.id %>, $(this).val());" /></td>
     <td align='center'><input type='button'   value='Delete' onclick="delete_domain(<%= @site.id %>, <%= d.id %>);" /></td>    
@@ -73,6 +76,9 @@ user_ids = [] if user_ids.nil?
     line-height: 20px;
     padding: 30px 9px 9px 9px !important;
   }
+  table.data th {
+    padding: 2px 8px !important;
+  }
 </style>
 <% end %>
 
@@ -88,6 +94,7 @@ $(document).ready(function() {
     attributes: [
       { name: 'logo'                    , nice_name: 'Logo'                     , type: 'image'    , value: <%= raw Caboose.json(@site.logo ? @site.logo.url(:thumb) : '')     %>, width: 400, update_url: '/admin/sites/<%= @site.id %>/logo' },
       { name: 'description'             , nice_name: 'Description'              , type: 'text' , value: <%= raw Caboose.json(@site.description)                            %>, width: 600  },
+      { name: 'theme_color'             , nice_name: 'Theme Color'              , type: 'text' , value: <%= raw Caboose.json(@site.theme_color)                            %>, width: 600  },
       { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html)                %>, width: 600, height: 220 },
       { name: 'use_store'               , nice_name: 'Enable Store'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_store               ? true : false) %>, width: 400 },
       { name: 'use_fonts'               , nice_name: 'Enable Fonts'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_fonts               ? true : false) %>, width: 400 },
@@ -113,6 +120,15 @@ function set_forward_to_primary(site_id, domain_id, checked)
     url: '/admin/sites/' + site_id + '/domains/' + domain_id,
     type: 'put',
     data: { forward_to_primary: checked ? 1 : 0 }
+  });
+}
+
+function set_force_ssl(site_id, domain_id, checked)
+{
+  $.ajax({
+    url: '/admin/sites/' + site_id + '/domains/' + domain_id,
+    type: 'put',
+    data: { force_ssl: checked ? 1 : 0 }
   });
 }
 

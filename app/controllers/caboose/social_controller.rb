@@ -93,6 +93,17 @@ module Caboose
       resp.success = true
       render :json => resp
     end
+
+    # @route POST /admin/social/image
+    def admin_update_image
+      return if !user_is_allowed('social', 'edit')
+      resp = Caboose::StdClass.new
+      sc = @site.social_config
+      sc.share_image = params[:share_image]            
+      resp.success = sc.save
+      resp.attributes = { 'share_image' => { 'value' => sc.share_image.url(:large) }}
+      render :text => resp.to_json
+    end
     
   end
 end

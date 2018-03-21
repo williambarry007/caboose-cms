@@ -58,6 +58,7 @@ module Caboose
         asset
         return
       end
+      
 
       user = logged_in_user      
       if !user.is_allowed(page, 'view')                

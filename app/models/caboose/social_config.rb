@@ -19,7 +19,7 @@ class Caboose::SocialConfig < ActiveRecord::Base
     :google_analytics_id
 
     has_attached_file :share_image,      
-      :path => ':share_images/:id_:style.:extension',      
+      :path => 'share_images/:id_:style.:extension',      
       :default_url => 'http://placehold.it/800x500',
       :s3_protocol => :https,
       :styles      => {

@@ -48,12 +48,17 @@ module Caboose
         url = "#{request.protocol}#{d.domain}#{d.forward_to_uri}"
         redirect_to url
         return
+      elsif d.force_ssl == true && request.protocol != 'https://' && Rails.env.production?
+        url = "https://#{d.domain}#{request.fullpath}"
+        redirect_to url
+        return
       end
       
       if !page
         asset
         return
       end
+      
 
       user = logged_in_user      
       if !user.is_allowed(page, 'view')                

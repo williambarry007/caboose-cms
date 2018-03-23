@@ -298,6 +298,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :primary            , :boolean, { :default => false }],
         [ :under_construction , :boolean, { :default => false }],
         [ :forward_to_primary , :boolean, { :default => false }],
+        [ :force_ssl          , :boolean, { :default => false }],
         [ :forward_to_uri     , :string  ]
       ],
       Caboose::Font => [
@@ -755,7 +756,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :default_layout_id       , :integer    ],
         [ :login_fail_lock_count   , :integer     , { :default => 5 }],
         [ :sitemap_xml , :text       ],
-        [ :robots_txt , :text        ]
+        [ :robots_txt , :text        ],
+        [ :theme_color , :string        ]
         #[ :custom_css              , :text       ],
         #[ :custom_css_files        , :text       ],
         #[ :custom_js               , :text       ],
@@ -793,7 +795,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :linkedin_url         , :string ],
         [ :google_analytics_id  , :string ],
         [ :google_analytics_id2 , :string ],
-        [ :auto_ga_js           , :boolean , { :default => false }]
+        [ :auto_ga_js           , :boolean , { :default => false }],
+        [ :share_image , :attachment ]
       ],
       Caboose::StackableGroup => [       
         [ :name           , :string  ],

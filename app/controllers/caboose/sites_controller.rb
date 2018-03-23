@@ -183,6 +183,7 @@ module Caboose
           when 'custom_js'                then site.custom_js               = value
           when 'default_layout_id'        then site.default_layout_id       = value
           when 'allow_self_registration'  then site.allow_self_registration = value
+          when 'theme_color'  then site.theme_color = value
     	  end
     	end
     	

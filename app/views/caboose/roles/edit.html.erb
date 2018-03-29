@@ -28,7 +28,8 @@
 <h3>Permissions</h3>
 <div id='permissions'>
   <table class='data'>
-    <% Caboose::Permission.reorder("resource, action").all.each do |p| %>
+    <% where = @site.is_master ? "(id is not null)" : "(site_id is null OR site_id = #{@site.id})" %>
+    <% Caboose::Permission.where(where).reorder("resource, action").all.each do |p| %>
       <% has_permission = Caboose::RolePermission.where(:role_id => @role.id, :permission_id => p.id).exists? %>
       <tr>
         <td><input type='checkbox' name='perm<%= p.id %>' <%= raw has_permission ? "checked='true'" : '' %> onclick="toggle_permission(<%= p.id %>, <%= @role.id %>, $(this).prop('checked'));" /></td>

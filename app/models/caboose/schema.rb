@@ -558,7 +558,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Permission => [
         [ :resource , :string ],
-        [ :action   , :string ]
+        [ :action   , :string ],
+        [ :site_id   , :integer ]
       ],
       Caboose::Post => [
         [ :site_id              , :integer    ],

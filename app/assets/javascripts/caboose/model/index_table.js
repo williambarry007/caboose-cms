@@ -664,7 +664,7 @@ IndexTable.prototype = {
     {
       var div = $('<div/>').addClass('note')
         .append($('<h2/>').html('Bulk Import File'))
-        .append($('<p/>').attr('id', that.container + '_bulk_import_name'))
+        .append($('<p/>').attr('id', that.container + '_bulk_import_name').html('Select a CSV file to upload.'))
         .append($('<div/>')
           .attr('id', that.container + '_bulk_import_fake_file_input')
           .addClass('mb_fake_file_input')

@@ -130,7 +130,7 @@ class Caboose::Site < ActiveRecord::Base
     config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
     AWS.config(:access_key_id => config['access_key_id'], :secret_access_key => config['secret_access_key'])
     bucket =  AWS::S3.new.buckets[config['bucket']]                         
-    bucket.objects["assets/#{self.name}/js/custom.js"].write(str, :acl => 'public-read')                        
+    bucket.objects["assets/#{self.name}/js/custom.js"].write(str, :acl => 'public-read', :content_type => 'application/javascript')                        
     self.date_js_updated = DateTime.now.utc
     self.save
   end
@@ -139,7 +139,7 @@ class Caboose::Site < ActiveRecord::Base
     config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
     AWS.config(:access_key_id => config['access_key_id'], :secret_access_key => config['secret_access_key'])
     bucket =  AWS::S3.new.buckets[config['bucket']]                         
-    bucket.objects["assets/#{self.name}/css/custom.css"].write(str, :acl => 'public-read')                        
+    bucket.objects["assets/#{self.name}/css/custom.css"].write(str, :acl => 'public-read', :content_type => 'text/css')                        
     self.date_css_updated = DateTime.now.utc
     self.save
   end

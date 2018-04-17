@@ -5,9 +5,9 @@
 <input type='submit' value='Search' />
 </form>
 
-<p><a href='/admin/calendars/new' id='new_calendar' class="caboose-btn-white">New Calendar</a></p>
+<p style="margin:0;"><a href='/admin/calendars/new' id='new_calendar' class="caboose-btn-white">New Calendar</a></p>
 
-<form action='/admin/calendars' method='post' id='new_calendar_form'>
+<form action='/admin/calendars' method='post' id='new_calendar_form' style="display:none;">
   <input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'>  
   <p><input type='text' name='name' id='name' placeholder='Name' style='width: 500px;'></p>  
   <div id='new_message'></div>
@@ -17,17 +17,20 @@
   </p>
 </form>
 
+<br />
+<br />
+
 <% if @calendars.count > 0 %>
   <table class='data'>
     <tr>
       <th>Name</th>
-      <th>Description</th>
+<!--       <th>Description</th> -->
       <th>Color</th>
     </tr>
     <% @calendars.each do |calendar| %>
       <tr onclick="window.location='/admin/calendars/<%= calendar.id %>';">
         <td><%= calendar.name %></td>
-        <td><%= calendar.description %></td>
+<!--         <td><%= calendar.description %></td> -->
         <td><div class="swatch" style="background-color:<%= calendar.color %>"></div></td>
       </tr>
     <% end %>

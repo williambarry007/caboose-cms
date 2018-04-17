@@ -39,9 +39,10 @@ module Caboose
     # @route DELETE /admin/event-groups/:id
     def admin_delete
       return unless user_is_allowed('calendars', 'delete')
+      cal_id = CalendarEvent.where(:calendar_event_group_id => params[:id]).first.calendar_id
       CalendarEvent.where(:calendar_event_group_id => params[:id]).destroy_all
       CalendarEventGroup.find(params[:id]).destroy
-      resp = StdClass.new({ 'redirect' => "/admin/calendars" })                  
+      resp = StdClass.new({ 'redirect' => "/admin/calendars/#{cal_id}" })                  
       render :json => resp
     end
 

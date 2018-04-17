@@ -30,7 +30,11 @@ function add_event()
     data: $('#new_event_form').serialize(),
     success: function(resp) {
       if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
-      if (resp.redirect) window.location = resp.redirect;
+      if (resp.redirect) {
+        modal.close();
+        modal = false;
+        window.location = resp.redirect;
+      }
     }
   });
 }

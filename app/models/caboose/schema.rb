@@ -233,7 +233,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :begin_date               , :datetime ],
         [ :end_date                 , :datetime ],
         [ :all_day                  , :boolean  , { :default => false }],        
-        [ :repeats                  , :boolean  , { :default => false }]
+        [ :repeats                  , :boolean  , { :default => false }],
+        [ :published                , :boolean  , { :default => false }],
+        [ :url                      , :string ],
+        [ :url_label                , :string ],
+        [ :image                    , :attachment ]
       ],
       Caboose::CalendarEventGroup => [
         [ :frequency    , :integer  , { :default => 1 }],

@@ -16,8 +16,8 @@ pg = bl.parent.page if bl && bl.parent
 				<h2 class="post-title"><%= @event.name %></h2>
 				<% if !@event.location.blank? %><h4 class="location"><%= @event.location %></h4><% end %>
 				<% if !@event.begin_date.blank? && !@event.end_date.blank? %>
-				<% bd = @event.begin_date.in_time_zone("Central Time (US & Canada)") %>
-				<% ed = @event.end_date.in_time_zone("Central Time (US & Canada)") %>
+				<% bd = @event.begin_date #.in_time_zone("Central Time (US & Canada)") %>
+				<% ed = @event.end_date #.in_time_zone("Central Time (US & Canada)") %>
 				<% if @event.all_day %>
 					<% if bd.strftime("%B") == ed.strftime("%B") && bd.strftime("%Y") == ed.strftime("%Y") && bd.strftime("%d") == ed.strftime("%d") %>
 					<p class="begin-date"><%= bd.strftime("%B %-d, %Y") %></p>
@@ -63,6 +63,11 @@ pg = bl.parent.page if bl && bl.parent
 	.begin-date, .end-date {
 		font-weight: bold;
 		margin-bottom: 5px;
+	}
+	.post-details-wrapper.event {
+		max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px 2% 50px 2%;
 	}
 </style>
 <% end %>

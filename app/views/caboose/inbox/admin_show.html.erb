@@ -1,0 +1,46 @@
+<h1>Inbox - Message</h1>
+
+<div class="constrain">
+	<div class="inbox-message">
+		<% if !@contact.captcha_valid %>
+			<p class="spam">SPAM</p>
+		<% end %>
+		<table cellspacing="0" cellpadding="0">
+			<tr>
+				<td>Name</td>
+				<td><%= @contact.name %></td>
+			</tr>
+			<tr>
+				<td>Email</td>
+				<td><a href="mailto:<%= @contact.email %>?subject=Re: <%= @contact.subject %>"><%= @contact.email %></a></td>
+			</tr>
+			<tr>
+				<td>Sent To</td>
+				<td><a href="mailto:<%= @contact.sent_to %>?subject=Re: <%= @contact.subject %>"><%= @contact.sent_to %></a></td>
+			</tr>
+			<tr>
+				<td>Date Submitted</td>
+				<td><%= @contact.date_submitted.strftime('%-m/%-d/%Y') %></td>
+			</tr>
+			<tr>
+				<td>Subject</td>
+				<td><%= @contact.subject %></td>
+			</tr>
+			<tr>
+				<td>Message</td>
+				<td><%= @contact.message %></td>
+			</tr>
+		</table>
+		<div class="buttons">
+			<a href="mailto:<%= @contact.email %>?subject=Re: <%= @contact.subject %>" class="caboose-btn">Reply</a>
+			<a href="/admin/inbox/<%= @contact.id %>/delete" class="caboose-btn">Delete</a>
+			<% if @contact.captcha_valid %>
+			<a href="/admin/inbox/<%= @contact.id %>/spam" class="caboose-btn">Mark as Spam</a>
+			<% else %>
+			<a href="/admin/inbox/<%= @contact.id %>/spam" class="caboose-btn">Mark as Not Spam</a>
+			<% end %>
+			<br />
+			<a class="caboose-btn-white" href="/admin/inbox">Back to Inbox</a>
+		</div>
+	</div>
+</div>

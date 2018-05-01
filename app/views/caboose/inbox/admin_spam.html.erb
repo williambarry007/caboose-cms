@@ -1,0 +1,31 @@
+<h1>Inbox - Spam</h1>
+
+<div class="constrain clearfix" style="padding:0 40px 0 10px;">
+	<div class="inbox-btns constrain">
+		<a href="/admin/inbox" class="caboose-btn">View Inbox</a>
+	</div>
+	<table class="inbox-table" cellpadding="0" cellspacing="0">
+		<tr>
+			<th>From</th>
+			<th>Subject</th>
+			<th>Message</th>
+			<th>Date</th>
+		</tr>
+		<% @contacts.each do |c| %>
+			<tr data-id="<%= c.id %>">
+				<td><%= c.name %></td>
+				<td><%= c.subject %></td>
+				<td><%= c.message ? c.message.truncate(60) : '' %></td>
+				<td><%= c.date_submitted.strftime('%-m/%-d/%Y') %></td>
+			</tr>
+		<% end %>
+	</table>
+</div>
+
+<% content_for :caboose_js do %>
+<script>
+	$(".inbox-table tr").click(function() {
+		window.location = "/admin/inbox/" + $(this).data("id");
+	});
+</script>
+<% end %>

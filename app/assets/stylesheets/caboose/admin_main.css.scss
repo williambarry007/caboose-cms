@@ -669,6 +669,84 @@ Page Bar Generator
   text-decoration: none !important;
 }
 
+.inbox-table {
+  width: 100%;
+  max-width: 1200px;
+  padding: 10px 0 20px 0;
+  margin: 0 auto;
+  border: 1px solid gainsboro;
+  tr {
+    cursor: pointer;
+    &:hover {
+      background: #ffffc4;
+    }
+    th, td {
+      padding: 10px;
+      vertical-align: middle;
+      font-size: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ececec;
+    }
+    &:first-of-type:hover {
+      cursor: default;
+      background: transparent;
+    }
+  }
+}
+
+.inbox-btns {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px 10px 0;
+  margin-bottom: 10px;
+}
+
+.inbox-message {
+  width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #d6d6d6;
+  border-radius: 5px;
+  overflow: hidden;
+  p.spam {
+    background: #b33b3b;
+    color: #fff;
+    display: inline-block;
+    font-size: 14px;
+    padding: 5px 10px;
+    margin: 0 0 15px 10px;
+  }
+  table {
+    width: 100%;
+    margin-bottom: 30px;
+    tr {
+      th, td {
+        padding: 10px;
+        vertical-align: middle;
+        font-size: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ececec;
+        a {
+          text-decoration: none;
+          color: #5d5dd0;
+          &:hover {
+            color: #5dd062;
+          }
+        }
+      }
+    }
+  }
+  .buttons {
+    padding-left: 10px;
+    .caboose-btn {
+      margin-right: 10px;
+    }
+    .caboose-btn-white {
+      margin-top: 15px;
+    }
+  }
+}
+
 .caboose-btn:focus {
   outline-width: 0;
 }

@@ -5,12 +5,13 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
         
   #  nav << { 'id' => 'logout'       , 'text' => 'Logout'     , 'href' => '/logout'     , 'modal' => false }    
   #  nav << { 'id' => 'my-account'   , 'text' => 'My Account' , 'href' => '/my-account' , 'modal' => true }
-
+    has_inbox = "Contact".constantize rescue false
     item = { 'id' => 'content', 'text' => 'Content', 'children' => [] }    
     item['children'] << { 'id' => 'media'        , 'text' => 'Media'       , 'href' => '/admin/media'        , 'modal' => false } if user.is_allowed('media'       , 'view')
     item['children'] << { 'id' => 'pages'        , 'text' => 'Pages'       , 'href' => '/admin/pages'        , 'modal' => false } if user.is_allowed('pages'       , 'view')
     item['children'] << { 'id' => 'posts'        , 'text' => 'Posts'       , 'href' => '/admin/posts'        , 'modal' => false } if user.is_allowed('posts'       , 'view')
-    item['children'] << { 'id' => 'calendars'    , 'text' => 'Calendars'   , 'href' => '/admin/calendars'    , 'modal' => false } if user.is_allowed('calendars'   , 'view')  
+    item['children'] << { 'id' => 'calendars'    , 'text' => 'Calendars'   , 'href' => '/admin/calendars'    , 'modal' => false } if user.is_allowed('calendars'   , 'view')
+    item['children'] << { 'icon' => 'box', 'id' => 'inbox'             , 'text' => 'Inbox'               , 'href' => '/admin/inbox'              , 'modal' => false } if user.is_allowed('contacts'             , 'view')   && has_inbox && Contact.where(:site_id => site.id).count > 0
     nav << item if item['children'].count > 0
     
     item = { 'id' => 'core', 'text' => 'Settings', 'children' => [] }                        
@@ -26,7 +27,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'sites'             , 'text' => 'Sites'               , 'href' => '/admin/sites'              , 'modal' => false } if user.is_allowed('sites'             , 'view') && site.is_master == true        
     item['children'] << { 'id' => 'smtp'              , 'text' => 'SMTP (Mail)'         , 'href' => '/admin/smtp'               , 'modal' => false } if user.is_allowed('smtp'              , 'view')
     item['children'] << { 'id' => 'social'            , 'text' => 'Social Media'        , 'href' => '/admin/social'             , 'modal' => false } if user.is_allowed('social'            , 'view')
-    item['children'] << { 'id' => 'users'             , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'             , 'view')    
+    item['children'] << { 'id' => 'users'             , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'             , 'view')
    # item['children'] << { 'id' => 'variables'         , 'text' => 'Variables'           , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'          , 'view')   
     item['children'] << { 'id' => 'my-account'             , 'text' => 'My Account'               , 'href' => '/my-account'              , 'modal' => false } 
     nav << item if item['children'].count > 0

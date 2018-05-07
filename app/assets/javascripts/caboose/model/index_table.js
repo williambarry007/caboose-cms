@@ -249,6 +249,7 @@ IndexTable.prototype = {
             break;
           }                      
         }
+        that.print();
       }      
     });
   },

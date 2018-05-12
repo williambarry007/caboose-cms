@@ -606,6 +606,23 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :value                , :text    ],
         [ :sort_order           , :integer  , { :default => 0 }]
       ],
+      Caboose::EventCustomField => [
+        [ :site_id           , :integer ],
+        [ :key               , :string  ],
+        [ :name              , :string  ],
+        [ :field_type        , :string  ],
+        [ :options_url       , :string  ],
+        [ :default_value     , :text    ],
+        [ :options           , :text    ],
+        [ :sort_order        , :integer  , { :default => 0 }]
+      ],
+      Caboose::EventCustomFieldValue => [
+        [ :calendar_event_id              , :integer ],
+        [ :event_custom_field_id , :integer ],
+        [ :key                  , :string  ],
+        [ :value                , :text    ],
+        [ :sort_order           , :integer  , { :default => 0 }]
+      ],
       Caboose::Product => [
         [ :site_id               , :integer   ],
         [ :alternate_id          , :string    ],

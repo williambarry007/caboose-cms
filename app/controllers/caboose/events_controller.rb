@@ -8,6 +8,7 @@ module Caboose
     def admin_edit
       return unless user_is_allowed('calendars', 'edit')
       @event = CalendarEvent.find(params[:id])
+      @event.verify_custom_field_values_exist
       if @event.calendar_event_group_id.nil?
         g = CalendarEventGroup.create
         @event.calendar_event_group_id = g.id
@@ -18,10 +19,12 @@ module Caboose
 
     # @route GET /calendar-events/:id
     def show
+      return if under_construction_or_forwarding_domain?
       @event = CalendarEvent.where(:id => params[:id], :published => true).first
-      render :file => "caboose/extras/error404" and return if @event.nil?
-      @page.title = @event.name if @event
-      render :layout => 'caboose/application'
+      render :file => "caboose/extras/error404" and return if @event.nil?                 
+      @event = Caboose.plugin_hook('event_content', @event)
+      @page.title = @event.name
+      @editmode = !params['edit'].nil? && user.is_allowed('calendars', 'edit') ? true : false  
     end
     
     # @route_priority 1

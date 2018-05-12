@@ -7,6 +7,10 @@ class Caboose::CaboosePlugin
   def self.post_content(post)
     return post
   end
+
+  def self.event_content(event)
+    return event
+  end
   
   def self.admin_nav(nav, user, page, site)
     return nav

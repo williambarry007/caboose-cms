@@ -2,6 +2,7 @@ module Caboose
   class CalendarEvent < ActiveRecord::Base    
     self.table_name = "calendar_events"
     
+    has_many :event_custom_field_values    
     belongs_to :calendar
     belongs_to :calendar_event_group
     attr_accessible :id        ,
@@ -56,6 +57,23 @@ module Caboose
         :url                     => self.url
       )
       return e
+    end
+
+    def custom_field_value(key)
+      fv = Caboose::EventCustomFieldValue.where(:calendar_event_id => self.id, :key => key).first
+      if fv.nil?
+        f = Caboose::EventCustomField.where(:site_id => self.calendar.site_id, :key => key).first
+        return nil if f.nil?
+        fv = Caboose::EventCustomFieldValue.create(:calendar_event_id => self.id, :event_custom_field_id => f.id, :key => key, :value => f.default_value, :sort_order => f.sort_order)
+      end
+      return fv.value
+    end
+    
+    def verify_custom_field_values_exist
+      Caboose::EventCustomField.where(:site_id => self.calendar.site_id).all.each do |f|
+        fv = Caboose::EventCustomFieldValue.where(:calendar_event_id => self.id, :event_custom_field_id => f.id).first                  
+        Caboose::EventCustomFieldValue.create(:calendar_event_id => self.id, :event_custom_field_id => f.id, :key => f.key, :value => f.default_value, :sort_order => f.sort_order) if fv.nil?
+      end
     end
 
   end

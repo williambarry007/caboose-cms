@@ -1,0 +1,40 @@
+
+<h1>Event Custom Fields</h1>
+
+<div id='eventcustomfields'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'eventcustomfields',
+    base_url: '/admin/event-custom-fields',
+    allow_bulk_edit: true,
+    allow_bulk_delete: true,
+    allow_duplicate: false,
+    allow_advanced_edit: true,
+    allow_bulk_import: false,
+    fields: [            
+      { show: true, name: 'key'           , nice_name: 'Key'           , sort: 'key'           , type: 'text'   , value: function(f) { return f.key           }, width: 150, align: 'left', bulk_edit: true },           
+      { show: true, name: 'name'          , nice_name: 'Name'          , sort: 'name'          , type: 'text'   , value: function(f) { return f.name          }, width: 150, align: 'left', bulk_edit: true },    
+      { show: true, name: 'field_type'    , nice_name: 'Type'          , sort: 'field_type'    , type: 'select' , value: function(f) { return f.field_type    }, width: 150, align: 'left', bulk_edit: true , options_url: '/admin/event-custom-fields/field-type-options' },    
+      { show: true, name: 'default_value' , nice_name: 'Default Value' , sort: 'default_value' , type: 'text'   , value: function(f) { return f.default_value }, width: 150, align: 'left', bulk_edit: true },    
+      { show: true, name: 'options'       , nice_name: 'Options'       , sort: 'options'       , type: 'text'   , value: function(f) { return f.options       }, width: 150, align: 'left', bulk_edit: true }          
+    ],    
+    new_model_text: 'New Custom Field',
+    new_model_fields: [
+      { name: 'key', nice_name: 'Key', type: 'text', width: 400 }            
+    ],        
+    search_fields: [    
+      { name: 'key', nice_name: 'Key', type: 'text', width: 150, align: 'left' }      
+    ],
+    no_models_text: "There are no custom fields right now."
+  });        
+});
+
+</script>
+<% end %>

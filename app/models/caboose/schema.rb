@@ -772,7 +772,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :login_fail_lock_count   , :integer     , { :default => 5 }],
         [ :sitemap_xml , :text       ],
         [ :robots_txt , :text        ],
-        [ :theme_color , :string        ]
+        [ :theme_color , :string        ],
+        [ :assets_url , :string        ]
         #[ :custom_css              , :text       ],
         #[ :custom_css_files        , :text       ],
         #[ :custom_js               , :text       ],

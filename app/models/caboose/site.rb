@@ -37,7 +37,8 @@ class Caboose::Site < ActiveRecord::Base
     :login_fail_lock_count   ,
     :sitemap_xml             ,
     :robots_txt              ,
-    :theme_color             
+    :theme_color             ,
+    :assets_url              
             
   before_save :validate_presence_of_store_config
   

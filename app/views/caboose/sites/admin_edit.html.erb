@@ -18,6 +18,7 @@ user_ids = [] if user_ids.nil?
 <p><div id='site_<%= @site.id %>_use_dragdrop'            ></div></p>
 <p><div id='site_<%= @site.id %>_allow_self_registration' ></div></p>
 <p><div id='site_<%= @site.id %>_theme_color' ></div></p>
+<p><div id='site_<%= @site.id %>_assets_url' ></div></p>
 <p><div id='site_<%= @site.id %>_default_layout_id'       ></div></p>
 
 <h2>Domains</h2>
@@ -95,6 +96,7 @@ $(document).ready(function() {
       { name: 'logo'                    , nice_name: 'Logo'                     , type: 'image'    , value: <%= raw Caboose.json(@site.logo ? @site.logo.url(:thumb) : '')     %>, width: 400, update_url: '/admin/sites/<%= @site.id %>/logo' },
       { name: 'description'             , nice_name: 'Description'              , type: 'text' , value: <%= raw Caboose.json(@site.description)                            %>, width: 600  },
       { name: 'theme_color'             , nice_name: 'Theme Color'              , type: 'text' , value: <%= raw Caboose.json(@site.theme_color)                            %>, width: 600  },
+      { name: 'assets_url'             , nice_name: 'Assets URL'              , type: 'text' , value: <%= raw Caboose.json(@site.assets_url)                            %>, width: 600  },
       { name: 'under_construction_html' , nice_name: 'Under Construction HTML'  , type: 'textarea' , value: <%= raw Caboose.json(@site.under_construction_html)                %>, width: 600, height: 220 },
       { name: 'use_store'               , nice_name: 'Enable Store'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_store               ? true : false) %>, width: 400 },
       { name: 'use_fonts'               , nice_name: 'Enable Fonts'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_fonts               ? true : false) %>, width: 400 },

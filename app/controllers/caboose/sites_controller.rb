@@ -184,6 +184,7 @@ module Caboose
           when 'default_layout_id'        then site.default_layout_id       = value
           when 'allow_self_registration'  then site.allow_self_registration = value
           when 'theme_color'  then site.theme_color = value
+          when 'assets_url'  then site.assets_url = value
     	  end
     	end
     	

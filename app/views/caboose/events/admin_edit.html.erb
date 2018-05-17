@@ -6,6 +6,19 @@ g = @event.calendar_event_group
 <h1>Edit Event</h1> 
 <p><div id='calendarevent_<%= e.id %>_name'        ></div></p>
 <p><div id='calendarevent_<%= e.id %>_location'    ></div></p>
+<p><div id='calendarevent_<%= e.id %>_url'    ></div>
+  <span style="display:block;font-size:13px;margin:3px 0 0 3px;">Use for registration link, more info, or external website.</span>
+</p>
+<p><div id='calendarevent_<%= e.id %>_url_label'    ></div></p>
+<p><div id='calendarevent_<%= e.id %>_published'    ></div>
+  <span style="display:block;font-size:13px;margin:3px 0 0 3px;">Only published events will display on the website.</span>
+</p>
+<% @event.event_custom_field_values.order(:id).each do |fv| %>
+  <% f = fv.event_custom_field %>
+  <% next if f.nil? %>
+  <p><div id='eventcustomfieldvalue_<%= fv.id %>_value'></div></p>
+<% end %>
+<p><div id='calendarevent_<%= e.id %>_image'    ></div></p>
 <p><div id='calendarevent_<%= @event.id %>_description' ></div></p>
 <div id='datetime_container' class='<%= @event.all_day ? 'all_day' : 'non_all_day' %>'>
   <div id='calendarevent_<%= e.id %>_begin_date'  ></div>
@@ -48,19 +61,20 @@ g = @event.calendar_event_group
 
 <div id='message'></div>
 <p>
-<input type='button' value='Close'              onclick="modal.close();" />
+<input type='button' value='Back'              onclick="window.location = '/admin/calendars/<%= @event.calendar_id %>';" />
 <input type='button' value='Delete Event'       onclick="delete_event(<%= @event.id %>);" />
 <input type='button' value='Delete Event Group' onclick="delete_event_group(<%= @event.id %>);" />
 </p>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
+<%= raw caboose_tinymce %>
 <script type="text/javascript">
 
-var modal = false;
-$(window).ready(function() {
-  modal = new CabooseModal(460);
-});
+// var modal = false;
+// $(window).ready(function() {
+//   modal = new CabooseModal(460);
+// });
 
 $(document).ready(function() {
   new ModelBinder({
@@ -69,17 +83,21 @@ $(document).ready(function() {
     update_url: '/admin/calendars/<%= c.id %>/events/<%= e.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'name'        , nice_name: 'Name'         , type: 'text'     , value: <%= raw Caboose.json(e.name        ) %>, width: 430 },        
-      { name: 'description' , nice_name: 'Description'  , type: 'textarea' , value: <%= raw Caboose.json(e.description ) %>, width: 430, height: 100 },
-      { name: 'location'    , nice_name: 'Location'     , type: 'text'     , value: <%= raw Caboose.json(e.location    ) %>, width: 430 },
-      { name: 'begin_date'  , nice_name: 'Begin date'   , type: 'date'     , value: <%= raw Caboose.json(e.begin_date.strftime('%m/%d/%Y') ) %>, width: 200 , align: 'right' },
-      { name: 'begin_time'  , nice_name: 'Begin time'   , type: 'time'     , value: <%= raw Caboose.json(e.begin_date.strftime('%I:%M %P') ) %>, width: 200 , fixed_placeholder: false },
-      { name: 'end_date'    , nice_name: 'End date'     , type: 'date'     , value: <%= raw Caboose.json(e.end_date.strftime('%m/%d/%Y')   ) %>, width: 200 , align: 'right' },
-      { name: 'end_time'    , nice_name: 'End time'     , type: 'time'     , value: <%= raw Caboose.json(e.end_date.strftime('%I:%M %P')   ) %>, width: 200 , fixed_placeholder: false },
+      { name: 'name'        , nice_name: 'Name'         , type: 'text'     , value: <%= raw Caboose.json(e.name        ) %>, width: 600 },        
+      { name: 'description' , nice_name: 'Description'  , type: 'richtext' , value: <%= raw Caboose.json(e.description ) %>, width: 600, height: 300 },
+      { name: 'location'    , nice_name: 'Location'     , type: 'text'     , value: <%= raw Caboose.json(e.location    ) %>, width: 600 },
+      { name: 'url'    , nice_name: 'URL'     , type: 'text'     , value: <%= raw Caboose.json(e.url    ) %>, width: 600 },
+      { name: 'url_label'    , nice_name: 'URL Label'     , type: 'text'     , value: <%= raw Caboose.json(e.url_label    ) %>, width: 600 },
+      { name: 'published'    , nice_name: 'Published'     , type: 'checkbox'     , value: <%= raw Caboose.json(e.published    ) %>, width: 600 },
+      { name: 'image'      , nice_name: 'Image'          , type: 'image'     , value: <%= raw Caboose.json(e.image.url(:thumb))  %>, width: 400, update_url: '/admin/calendars/<%= c.id %>/events/<%= e.id %>/image' },  
+      { name: 'begin_date'  , nice_name: 'Begin date'   , type: 'date'     , value: <%= raw Caboose.json(e.begin_date.strftime('%m/%d/%Y') ) %>, width: 250 , align: 'right' },
+      { name: 'begin_time'  , nice_name: 'Begin time'   , type: 'time'     , value: <%= raw Caboose.json(e.begin_date.strftime('%I:%M %P') ) %>, width: 250 , fixed_placeholder: false },
+      { name: 'end_date'    , nice_name: 'End date'     , type: 'date'     , value: <%= raw Caboose.json(e.end_date.strftime('%m/%d/%Y')   ) %>, width: 250 , align: 'right' },
+      { name: 'end_time'    , nice_name: 'End time'     , type: 'time'     , value: <%= raw Caboose.json(e.end_date.strftime('%I:%M %P')   ) %>, width: 250 , fixed_placeholder: false },
       { name: 'all_day'     , nice_name: 'All day'      , type: 'checkbox' , value: <%= raw e.all_day ? 1 : 0 %>, width: 100, after_update: after_all_day_update },
       { name: 'repeats'     , nice_name: 'Repeats'      , type: 'checkbox' , value: <%= raw e.repeats ? 1 : 0 %>, width: 100, after_update: after_repeats_update }      
     ],
-    on_load: function() { modal.autosize(); console.log('Testing'); }    
+    on_load: function() {  }    
   });  
   new ModelBinder({
     name: 'CalendarEventGroup',
@@ -100,7 +118,7 @@ $(document).ready(function() {
       { name: 'fri'          , nice_name: 'fri'           , type: 'checkbox' , value: <%= raw g.fri ? 1 : 0 %>, width: 21 , fixed_placeholder: false },
       { name: 'sat'          , nice_name: 'sat'           , type: 'checkbox' , value: <%= raw g.sat ? 1 : 0 %>, width: 21 , fixed_placeholder: false }        
     ],
-    on_load: function() { modal.autosize(); }    
+    on_load: function() {  }    
   });  
 });
             
@@ -112,16 +130,16 @@ function delete_event(event_id, confirm)
       .append('Are you sure you want to delete the event? ')
       .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_event(event_id, true); })).append(' ')
       .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));    
-    modal.autosize(p);
+    $("#message").html(p);
     return;
   }
-  modal.autosize("<p class='loading'>Deleting event...</p>");
+  $("#message").html("<p class='loading'>Deleting event...</p>");
   $.ajax({
     url: '/admin/calendars/<%= c.id %>/events/' + event_id,
     type: 'delete',
     success: function(resp) {
-      if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
-      if (resp.redirect) modal.close();
+      if (resp.error) $("#message").html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
     }
   });
 }
@@ -134,16 +152,16 @@ function delete_event_group(event_id, confirm)
       .append('Are you sure you want to delete the event group? ')
       .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_event_group(event_id, true); })).append(' ')
       .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));    
-    modal.autosize(p);
+    $("#message").html(p);
     return;
   }
-  modal.autosize("<p class='loading'>Deleting event group...</p>");
+  $("#message").html("<p class='loading'>Deleting event group...</p>");
   $.ajax({
     url: '/admin/event-groups/<%= g.id %>',
     type: 'delete',
     success: function(resp) {
-      if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
-      if (resp.redirect) modal.close();
+      if (resp.error) $("#message").html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
     }
   });
 }
@@ -155,13 +173,13 @@ function after_all_day_update()
     el.removeClass('all_day').addClass('non_all_day');
   else
     el.removeClass('non_all_day').addClass('all_day');
-  modal.autosize();
+ // modal.autosize();
 }
 
 function after_repeats_update()
 {
   var el = $('#repeat_container');
-  el.slideToggle(function() { modal.autosize(); });  
+  el.slideToggle(function() {  });  
 }
 
 function after_period_update()
@@ -175,10 +193,33 @@ function after_period_update()
     $('#repeat_by_container').show();
   else
     $('#repeat_by_container').hide();
-  modal.autosize();    
+//  modal.autosize();    
 }
 
+  <% @event.event_custom_field_values.each do |fv| %>
+    <% f = fv.event_custom_field %>
+    <% next if f.nil? %>
+    new ModelBinder({
+      name: 'EventCustomFieldValue',
+      id: <%= fv.id %>,
+      update_url: '/admin/event-custom-field-values/<%= fv.id %>',
+      authenticity_token: '<%= form_authenticity_token %>',
+      attributes: [
+        {
+          name:      'value',
+          nice_name: <%= raw Caboose.json(f.name) %>,
+          type:      <%= raw Caboose.json(f.field_type) %>,
+          value:     <%= raw Caboose.json(fv.value) %>,
+          width:     600
+          <% if f.field_type == 'select' && !f.options_url.blank? %>, options_url: '<%= f.options_url %>'<% end %>
+          <% if f.field_type == 'select' && f.options_url.blank? %>, options_url: '/admin/event-custom-fields/<%= f.id %>/options'<% end %>
+        }                    
+      ]
+    });
+  <% end %>
+
 </script>
+
 <% end %>
 
 <% content_for :caboose_css do %>
@@ -190,16 +231,21 @@ function after_period_update()
 #calendarevent_<%= e.id %>_all_day_container  { float: left; width: 130px; }
 #calendarevent_<%= e.id %>_repeats_container  { width: 200px; }
 
-div.all_day #calendarevent_<%= e.id %>_begin_date_container  { float: left; width: 230px; }
+div#datetime_container > div > input {
+  display: block;
+  width: 100% !important;
+}
+
+div.all_day #calendarevent_<%= e.id %>_begin_date_container  { float: left; width: 250px; margin-right: 10px; }
 div.all_day #calendarevent_<%= e.id %>_begin_time_container  { display: none; }
-div.all_day #calendarevent_<%= e.id %>_end_date_container    { width: 230px; }
+div.all_day #calendarevent_<%= e.id %>_end_date_container    { width: 250px; }
 div.all_day #calendarevent_<%= e.id %>_end_time_container    { display: none; }
 div.all_day .spacer { clear: left; }
 
-div.non_all_day #calendarevent_<%= e.id %>_begin_date_container  { float: left; width: 230px; margin-bottom: 10px; }
-div.non_all_day #calendarevent_<%= e.id %>_begin_time_container  {              width: 230px; margin-bottom: 10px; }
-div.non_all_day #calendarevent_<%= e.id %>_end_date_container    { float: left; width: 230px; clear: left; }
-div.non_all_day #calendarevent_<%= e.id %>_end_time_container    { float: left; width: 230px; }
+div.non_all_day #calendarevent_<%= e.id %>_begin_date_container  { float: left; width: 250px; margin-bottom: 10px; margin-right: 10px; }
+div.non_all_day #calendarevent_<%= e.id %>_begin_time_container  {              width: 250px; margin-bottom: 10px; }
+div.non_all_day #calendarevent_<%= e.id %>_end_date_container    { float: left; width: 250px; clear: left; margin-right: 10px; }
+div.non_all_day #calendarevent_<%= e.id %>_end_time_container    { float: left; width: 250px; }
 div.non_all_day .spacer { clear: left; }
 
 #repeat_every { float: left; width: 110px; }
@@ -208,8 +254,8 @@ div.non_all_day .spacer { clear: left; }
 #calendareventgroup_<%= g.id %>_repeat_by           { float: left; width: 100px; }
 
 #repeat_dates_container { clear: left; }
-#calendareventgroup_<%= g.id %>_date_start_container { float: left; width: 230px; }
-#calendareventgroup_<%= g.id %>_date_end_container   { width: 230px; }
+#calendareventgroup_<%= g.id %>_date_start_container { float: left; width: 250px; }
+#calendareventgroup_<%= g.id %>_date_end_container   { width: 250px; }
 
 #week_container { clear: left; padding-top: 10px; }
 

@@ -6,7 +6,60 @@ module Caboose
     
     def before_action
       @page = Page.page_with_uri(request.host_with_port, '/admin')
-    end    
+    end  
+
+    # @route GET /calendar/feed/:id
+    def feed
+      cal = Caboose::Calendar.find(params[:id])
+      if cal
+        query = []                                                                                                                             
+        args = []
+        d1 = Date.parse(params[:start])
+        d2 = Date.parse(params[:end])
+        query << "(( cast(begin_date as date) >= ? and cast(begin_date as date) <= ?) or ( cast(end_date as date) >= ? and cast(end_date as date) <= ? )) or ( cast(begin_date as date) <= ? and cast(end_date as date) >= ? )"
+        args << d1
+        args << d2
+        args << d1
+        args << d2
+        args << d1
+        args << d2
+        where = [query.join(' and ')]
+        where2 = params[:admin] == 'true' && params[:published] == 'false' ? '(published is false)' : '(published is true)'
+        args.each { |arg| where << arg }
+        events = Caboose::CalendarEvent.where(where2).where("calendar_id = ?", cal.id).where(where).reorder(:begin_date).all
+        render :json => events.collect { |e|
+          begin_date = e.all_day ? Date.parse(e.begin_date.strftime("%Y-%m-%d")) : e.begin_date
+          end_date = e.all_day ? Date.parse(e.end_date.strftime("%Y-%m-%d")).next : e.end_date
+          {
+            'id'     => e.id,
+            'title'  => (e.published ? e.name : "#{e.name} (DRAFT)"),
+            'start'  => begin_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'end'    => end_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'url'    => (params[:admin] == 'true' ? "/admin/calendars/#{cal.id}/events/#{e.id}" : "/calendar-events/#{e.id}"),
+            'allDay' => e.all_day
+          }
+        }
+      else
+        return nil
+      end
+    end
+
+    # @route GET /calendar/event/:id/json
+    def json
+      event = Caboose::CalendarEvent.find(params[:id])
+      e = {
+        'id'     => event.id,
+        'name'  => event.name,
+        'begin_date'  => event.begin_date.strftime('%Y-%m-%d %H:%M:%S'),
+        'end_date'    => event.end_date.strftime('%Y-%m-%d %H:%M:%S'),
+        'location'    => event.location,
+        'description' => event.description,
+        'all_day' => event.all_day
+      }
+      if event
+        render :json => e
+      end
+    end
     
     # @route GET /admin/calendars
     def admin_index

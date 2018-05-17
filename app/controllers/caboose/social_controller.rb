@@ -17,7 +17,7 @@ module Caboose
     
     # @route PUT /admin/social
     def admin_update
-      return if !user_is_allowed('sites', 'edit')
+      return if !user_is_allowed('social', 'edit')
 
       resp = StdClass.new     
       sc = @site.social_config

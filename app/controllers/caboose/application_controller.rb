@@ -13,7 +13,7 @@ module Caboose
       # Modify the built-in params array with URL params if necessary
       parse_url_params if Caboose.use_url_params
       
-      @use_page_cache = !request.fullpath.starts_with?('/admin')
+   #   @use_page_cache = !request.fullpath.starts_with?('/admin')
             
       # Get the site we're working with      
       @domain = Domain.where(:domain => request.host_with_port).first      
@@ -49,7 +49,7 @@ module Caboose
       
       #if @find_page
         @page = Page.page_with_uri(request.host_with_port, request.fullpath)
-        @crumb_trail  = Caboose::Page.crumb_trail(@page)		    
+    #    @crumb_trail  = Caboose::Page.crumb_trail(@page)		    
       #end
 
 
@@ -57,7 +57,7 @@ module Caboose
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user  
 
-      @nav = Caboose.plugin_hook('admin_nav', [], @logged_in_user, @page, @site)
+      @nav = Caboose.plugin_hook('admin_nav', [], @logged_in_user, @page, @site) if request.fullpath.include?('/admin')
       
       # Initialize the card
       init_cart if @site && @site.use_store && !@domain.under_construction

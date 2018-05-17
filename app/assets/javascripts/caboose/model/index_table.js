@@ -79,6 +79,7 @@ IndexTable.prototype = {
   allow_bulk_edit: true,
   allow_bulk_delete: true,
   allow_bulk_import: true,
+  allow_bulk_file_import: false,
   allow_duplicate: true,  
   allow_advanced_edit: true,
   bulk_import_fields: false,  
@@ -248,6 +249,7 @@ IndexTable.prototype = {
             break;
           }                      
         }
+        that.print();
       }      
     });
   },
@@ -291,14 +293,15 @@ IndexTable.prototype = {
     else
     {
       var controls = $('<p/>');
-      if (this.allow_add         ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_new'            ).val(that.new_model_text     ).click(function(e) { that.new_form();           })).append(' ');                                   
-                                   controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_columns' ).val('Show/Hide Columns'     ).click(function(e) { that.toggle_columns();     })).append(' ');
-      if (this.search_fields     ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_search'  ).val('Show/Hide Search Form' ).click(function(e) { that.toggle_search_form(); })).append(' ');                                   
-      if (this.allow_bulk_edit   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'      ).val('Bulk Edit'             ).click(function(e) { that.bulk_edit();          })).append(' ');
-      if (this.allow_bulk_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import'    ).val('Import'                ).click(function(e) { that.bulk_import();        })).append(' ');
-      if (this.allow_duplicate   ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'      ).val('Duplicate'             ).click(function(e) { that.duplicate();          })).append(' ');
-      if (this.allow_bulk_delete ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete'    ).val('Delete'                ).click(function(e) { that.bulk_delete();        })).append(' ');
-      if (this.allow_export      ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_export'         ).val('Export'                ).click(function(e) { that.csv_export();         })).append(' ');
+      if (this.allow_add              ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_new'                 ).val(that.new_model_text     ).click(function(e) { that.new_form();           })).append(' ');                                   
+                                        controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_columns'      ).val('Show/Hide Columns'     ).click(function(e) { that.toggle_columns();     })).append(' ');
+      if (this.search_fields          ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_toggle_search'       ).val('Show/Hide Search Form' ).click(function(e) { that.toggle_search_form(); })).append(' ');                                   
+      if (this.allow_bulk_edit        ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_edit'           ).val('Bulk Edit'             ).click(function(e) { that.bulk_edit();          })).append(' ');
+      if (this.allow_bulk_import      ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_import'         ).val('Import'                ).click(function(e) { that.bulk_import();        })).append(' ');
+      if (this.allow_bulk_file_import ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_file_import'    ).val('Import File'           ).click(function(e) { that.bulk_file_import();   })).append(' ');
+      if (this.allow_duplicate        ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_duplicate'           ).val('Duplicate'             ).click(function(e) { that.duplicate();          })).append(' ');
+      if (this.allow_bulk_delete      ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_bulk_delete'         ).val('Delete'                ).click(function(e) { that.bulk_delete();        })).append(' ');
+      if (this.allow_export           ) controls.append($('<input/>').attr('type', 'button').attr('id', this.container + '_export'              ).val('Export'                ).click(function(e) { that.csv_export();         })).append(' ');
                           
       var c = $('#' + that.container);
       c.empty();        
@@ -653,6 +656,63 @@ IndexTable.prototype = {
         }
       }        
     });                      
+  },
+
+  bulk_file_import: function(file)
+  {
+    var that = this;
+    if (!file)
+    {
+      var div = $('<div/>').addClass('note')
+        .append($('<h2/>').html('Bulk Import File'))
+        .append($('<p/>').attr('id', that.container + '_bulk_import_name').html('Select a CSV file to upload.'))
+        .append($('<div/>')
+          .attr('id', that.container + '_bulk_import_fake_file_input')
+          .addClass('mb_fake_file_input')
+          .append($('<input/>')
+            .attr('type', 'button')
+            .attr('id', that.container + '_bulk_import_update_button')
+            .val('Select File')
+            .click(function() { $('#' + that.container + '_bulk_import_file').click(); })
+          )
+          .append($('<input/>')
+            .attr('type', 'file')
+            .attr('id', that.container + '_bulk_import_file')
+            .attr('name', 'file')
+            .change(function() { $('#' + that.container + '_bulk_import_name').html($('#' + that.container + '_bulk_import_file')[0].files[0]['name']); })
+          )
+        )
+        .append($('<input/>')
+          .attr('type', 'submit')
+          .val('Upload')
+          .click(function() { that.bulk_file_import($('#' + that.container + '_bulk_import_file')[0].files[0]); })
+        )
+
+      that.show_message(div, 'bulk_import_form');
+      return;
+    }
+    that.show_message("<p class='loading'>Adding...</p>", 'bulk_import_loading');
+
+    var formData = new FormData();
+    formData.append('file', file);
+
+    $.ajax({
+      url: this.bulk_import_url,
+      type: 'post',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(resp) {
+        if (resp.error)
+          that.show_message("<p class='note error'>" + resp.error + "</p>", 'bulk_file_import_error');
+        else
+        {
+          that.show_message("<p class='note success'>Added successfully.</p>", 'bulk_file_import_success');
+          setTimeout(function() { that.hide_message(); }, 3000);
+          that.refresh();
+        }
+      }
+    });
   },
   
   model_for_id: function(model_id)

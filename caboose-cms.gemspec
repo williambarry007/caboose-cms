@@ -64,7 +64,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'authorize-net'
   s.add_dependency "active_shipping"  
   s.add_dependency "activemerchant"  
-  s.add_dependency 'box_packer'
+  s.add_dependency 'box_packer', '~> 1.2.3'
   s.add_dependency 'tax_cloud'
   
   #s.add_dependency "oauth"

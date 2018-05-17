@@ -1,0 +1,21 @@
+class Caboose::EventCustomField < ActiveRecord::Base
+  self.table_name = "event_custom_fields"
+      
+  belongs_to :site  
+  attr_accessible :id  ,
+    :site_id           ,
+    :key               ,
+    :name              ,
+    :field_type        ,
+    :default_value     ,
+    :options           ,
+    :options_url       ,
+    :sort_order
+    
+  FIELD_TYPE_TEXT = 'text'
+  FIELD_TYPE_SELECT = 'select'
+  FIELD_TYPE_CHECKBOX = 'checkbox'
+  FIELD_TYPE_DATE = 'date'
+  FIELD_TYPE_DATETIME = 'datetime'
+
+end

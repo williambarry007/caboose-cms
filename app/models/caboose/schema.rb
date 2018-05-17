@@ -238,7 +238,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :begin_date               , :datetime ],
         [ :end_date                 , :datetime ],
         [ :all_day                  , :boolean  , { :default => false }],        
-        [ :repeats                  , :boolean  , { :default => false }]
+        [ :repeats                  , :boolean  , { :default => false }],
+        [ :published                , :boolean  , { :default => false }],
+        [ :url                      , :string ],
+        [ :url_label                , :string ],
+        [ :image                    , :attachment ]
       ],
       Caboose::CalendarEventGroup => [
         [ :frequency    , :integer  , { :default => 1 }],
@@ -564,7 +568,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::Permission => [
         [ :resource , :string ],
-        [ :action   , :string ]
+        [ :action   , :string ],
+        [ :site_id   , :integer ]
       ],
       Caboose::Post => [
         [ :site_id              , :integer    ],
@@ -604,6 +609,23 @@ class Caboose::Schema < Caboose::Utilities::Schema
       Caboose::PostCustomFieldValue => [
         [ :post_id              , :integer ],
         [ :post_custom_field_id , :integer ],
+        [ :key                  , :string  ],
+        [ :value                , :text    ],
+        [ :sort_order           , :integer  , { :default => 0 }]
+      ],
+      Caboose::EventCustomField => [
+        [ :site_id           , :integer ],
+        [ :key               , :string  ],
+        [ :name              , :string  ],
+        [ :field_type        , :string  ],
+        [ :options_url       , :string  ],
+        [ :default_value     , :text    ],
+        [ :options           , :text    ],
+        [ :sort_order        , :integer  , { :default => 0 }]
+      ],
+      Caboose::EventCustomFieldValue => [
+        [ :calendar_event_id              , :integer ],
+        [ :event_custom_field_id , :integer ],
         [ :key                  , :string  ],
         [ :value                , :text    ],
         [ :sort_order           , :integer  , { :default => 0 }]
@@ -757,7 +779,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :login_fail_lock_count   , :integer     , { :default => 5 }],
         [ :sitemap_xml , :text       ],
         [ :robots_txt , :text        ],
-        [ :theme_color , :string        ]
+        [ :theme_color , :string        ],
+        [ :assets_url , :string        ]
         #[ :custom_css              , :text       ],
         #[ :custom_css_files        , :text       ],
         #[ :custom_js               , :text       ],

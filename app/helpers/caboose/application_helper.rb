@@ -39,7 +39,7 @@ tinyMCE.init({
     end
     
     def gzip_stylesheet_link_tag(asset)      
-      tag = stylesheet_link_tag asset          
+      tag = stylesheet_link_tag asset, media: "all"     
       tag = tag.gsub(/\.css/i, ".css.gz") if Rails.env.production? && request.accept_encoding =~ /gzip/i
       #tag = tag.gsub(/\.css/i, ".css.gz") if request.accept_encoding =~ /gzip/i
       tag.html_safe

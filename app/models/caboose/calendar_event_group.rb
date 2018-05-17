@@ -40,8 +40,8 @@ module Caboose
         while d <= self.date_end
           if !CalendarEvent.where("calendar_event_group_id = ? and cast(begin_date as date) = ?", self.id, d).exists?
             e.duplicate(d)
-            dates << d.to_date
           end
+          dates << d.to_date
           d = d + 1.day
         end
         
@@ -59,8 +59,8 @@ module Caboose
               Caboose.log("Found a day")
               if !CalendarEvent.where("calendar_event_group_id = ? and cast(begin_date as date) = ?", self.id, d).exists?
                 e.duplicate(d)
-                dates << d.to_date
               end
+              dates << d.to_date
             end
           end
           d = d + (self.frequency-1).weeks
@@ -68,12 +68,12 @@ module Caboose
         
       elsif self.period == 'Month'
         d = self.date_start
-        if self.repeat_by == self::REPEAT_BY_DAY_OF_MONTH          
+        if self.repeat_by == 'Day of month'     
           while d <= self.date_end           
             if !CalendarEvent.where("calendar_event_group_id = ? and cast(begin_date as date) = ?", self.id, d).exists?
               e.duplicate(d)
-              dates << d.to_date
             end
+            dates << d.to_date
             d = d + self.frequency.months  
           end
         elsif self.repeat_by == self::REPEAT_BY_DAY_OF_WEEK
@@ -106,8 +106,8 @@ module Caboose
         while d <= self.date_end
           if !CalendarEvent.where("calendar_event_group_id = ? and cast(begin_date as date) = ?", self.id, d).exists?
             e.duplicate(d)
-            dates << d.to_date
           end
+          dates << d.to_date
           d = d + 1.year
         end
         

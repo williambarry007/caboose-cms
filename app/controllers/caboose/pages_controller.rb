@@ -149,26 +149,17 @@ module Caboose
     # @route GET /admin/pages/:id/publish
     def admin_publish
       return unless user_is_allowed('pages', 'edit')
-   #   resp = StdClass.new({'attributes' => {}})
-      Block.where(:page_id => params[:id]).where('status = ? OR status = ?','edited','added').all.each do |b|
-        b.value = b.new_value if !b.new_value.blank?
-        b.media_id = b.new_media_id if !b.new_media_id.blank?
-        b.sort_order = b.new_sort_order if !b.new_sort_order.blank?
-        b.parent_id = b.new_parent_id if !b.new_parent_id.blank?
-        b.status = 'published'
-        b.new_value = nil
-        b.new_sort_order = nil
-        b.new_parent_id = nil
-        b.save
-      end
-      Block.where(:page_id => params[:id], :status => 'deleted').destroy_all
-      Block.where(:page_id => params[:id], :status => nil).update_all(:status => 'published')
-      page = Page.where(:id => params[:id]).first
-      page.status = 'published'
-      page.save
+      page = Page.find(params[:id])
+      page.publish
       redirect_to "/admin/pages/#{page.id}/content"
-   #   resp.success = true
-   #   render :json => resp
+    end
+
+    # @route GET /admin/pages/:id/revert
+    def admin_revert
+      return unless user_is_allowed('pages', 'edit')
+      page = Page.find(params[:id])
+      page.revert
+      redirect_to "/admin/pages/#{page.id}/content"
     end
     
     # @route GET /admin/pages
@@ -230,7 +221,24 @@ module Caboose
         redirect_to "/admin/pages/#{@page.id}/layout"
         return
       end
+      Caboose::Block.where(:page_id => @page.id, :new_sort_order => nil).update_all('new_sort_order = sort_order')
+    #  Caboose::Block.where(:page_id => @page.id, :new_parent_id => nil).update_all('new_parent_id = parent_id')
       @editing = true
+      @preview = false
+    end
+
+    # @route GET /admin/pages/:id/preview
+    def admin_preview
+      @page = Page.find(params[:id])
+      redirect_to "/login?return_url=/admin/pages/#{@page.id}/preview" and return if @logged_in_user.nil?
+      condition = @logged_in_user && (@logged_in_user.is_super_admin? || (@logged_in_user.site_id == @page.site_id && ( @logged_in_user.is_allowed('all','all') || @logged_in_user.is_allowed('pages','edit') && Page.permissible_actions(@logged_in_user, @page.id).include?('edit'))))
+      redirect_to "/admin/pages" and return unless condition
+      if @page.block.nil?
+        redirect_to "/admin/pages/#{@page.id}/layout"
+        return
+      end
+      @editing = true
+      @preview = true
     end
     
     # @route GET /admin/pages/:id/layout

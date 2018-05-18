@@ -9,7 +9,7 @@ class Caboose::Block < ActiveRecord::Base
   belongs_to :media
   belongs_to :block_type
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
-  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :dependent => :delete_all, :order => 'sort_order'
+  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :order => 'sort_order, id' # :dependent => :delete_all
   has_attached_file :file, :path => ':caboose_prefixuploads/:block_file_upload_name.:extension'
   do_not_validate_attachment_file_type :file  
   has_attached_file :image,
@@ -90,7 +90,8 @@ class Caboose::Block < ActiveRecord::Base
       return b.image
     end
     if b.block_type.field_type == 'image' && editing
-      return Caboose::Media.find(b.new_media_id).image if Caboose::Media.where(:id => b.new_media_id).exists?
+      mid = b.new_media_id.blank? ? b.media_id : b.new_media_id
+      return Caboose::Media.find(mid).image if Caboose::Media.where(:id => mid).exists?
       return b.image
     end
     if b.block_type.field_type == 'file' && !editing
@@ -98,7 +99,8 @@ class Caboose::Block < ActiveRecord::Base
       return b.file
     end
     if b.block_type.field_type == 'file' && editing
-      return Caboose::Media.find(b.new_media_id).file if Caboose::Media.where(:id => b.new_media_id).exists?
+      mid = b.new_media_id.blank? ? b.media_id : b.new_media_id
+      return Caboose::Media.find(mid).file if Caboose::Media.where(:id => mid).exists?
       return b.file
     end
     return (editing && !b.new_value.blank?) ? b.new_value : b.value
@@ -124,19 +126,18 @@ class Caboose::Block < ActiveRecord::Base
     Caboose::Block.where("parent_id = ? and name = ?", self.id, name).first
   end
 
-  def filtered_children(editing)
+  def filtered_children(editing, sort_by_id = false)
     blocks = []
     if editing
-   #   Caboose.log("editing, #{self.id}")
-      blocks = Caboose::Block.where("new_parent_id = ? or (parent_id = ? and new_parent_id is null)", self.id, self.id).order(:new_sort_order)
-  #    Caboose.log(blocks.where(:name => nil).all)
+      sortby = sort_by_id ? 'block_type_id' : 'new_sort_order,id'
+      blocks = Caboose::Block.where("new_parent_id = ? or (parent_id = ? and new_parent_id is null)", self.id, self.id).order(sortby)
     else
-      blocks = Caboose::Block.where(:parent_id => self.id).order(:sort_order)
+      blocks = Caboose::Block.where(:parent_id => self.id).order('sort_order,id')
     end
     return blocks
   end
   
-  def create_children(block_type_override = nil)
+  def create_children(block_type_override: nil, status: 'published')
     bt = block_type_override ? block_type_override : block_type
     bt.children.each do |bt2|
       bt_id = bt2.id      
@@ -150,9 +151,10 @@ class Caboose::Block < ActiveRecord::Base
           :parent_id => self.id, 
           :block_type_id => bt_id,
           :name => bt2.name,
-          :value => bt2.default
+          :value => bt2.default,
+          :status => status
         )
-        b.create_children(bt2)
+        b.create_children(block_type_override: bt2, status: status)
       end
     end
   end
@@ -286,10 +288,12 @@ class Caboose::Block < ActiveRecord::Base
         "caboose/blocks/#{block.block_type.name}",                
         "caboose/blocks/#{block.block_type.field_type}"                
       ]
-      #Caboose.log(arr)
+      
+    #  Caboose.log("editing: " + options2[:editing].to_s)
 
       if options2[:editing] == true
         block.value = block.new_value if !block.new_value.blank?
+        block.media_id = block.new_media_id if !block.new_media_id.nil?
        # block.sort_order = block.new_sort_order if !block.new_sort_order.blank?
        # block.parent_id = block.new_parent_id if !block.new_parent_id.blank?
        # Caboose.log("temp setting #{block.id}")
@@ -305,7 +309,7 @@ class Caboose::Block < ActiveRecord::Base
         #   Caboose.log( block.value )
         # end
 
-        if block.status != 'deleted' # && ( block.new_parent_id.blank? || options2[:is_new] )
+        if block.status != 'deleted'  #&& ( block.new_parent_id.blank? || options2[:is_new] )
           str = self.render_helper(view, options2, block, full_name, arr, 0)
         end
      #   str.gsub('child_value','edited_child_value')
@@ -528,20 +532,27 @@ class Caboose::Block < ActiveRecord::Base
     end
     return current_value.join('|')
   end
+
+  # block siblings (in editing mode)
+  def siblings(min_sort_order=0)
+    Caboose::Block.where(:name => nil).where('new_sort_order >= ?',min_sort_order).where("(new_parent_id is null and parent_id = ? and status != ?) OR (new_parent_id = ? and status != ?)",self.parent_id,'deleted',self.parent_id,'deleted').order(:new_sort_order, :id).all
+  end
   
   # Move a block up
   def move_up    
-    siblings = Caboose::Block.where(:parent_id => self.parent_id).reorder(:sort_order).all        
-    siblings.each_with_index do |b2, i|      
-      b2.sort_order = i
+    sibs = self.siblings
+    sibs.each_with_index do |b2, i|      
+      b2.new_sort_order = i
+      b2.status = 'edited' if b2.status == 'published'
       b2.save
     end
     changed = false
-    siblings.each_with_index do |b2, i|      
+    sibs.each_with_index do |b2, i|      
       if i > 0 && b2.id == self.id                
-        siblings[i-1].sort_order = i
-        siblings[i-1].save        
-        b2.sort_order = i - 1
+        sibs[i-1].new_sort_order = i
+        sibs[i-1].save        
+        b2.new_sort_order = i - 1
+        b2.status = 'edited' if b2.status == 'published'
         b2.save
         changed = true
       end      
@@ -551,22 +562,34 @@ class Caboose::Block < ActiveRecord::Base
   
   # Move a block down
   def move_down
-    siblings = Caboose::Block.where(:parent_id => self.parent_id).reorder(:sort_order).all        
-    siblings.each_with_index do |b2, i|      
-      b2.sort_order = i
+    sibs = self.siblings
+    sibs.each_with_index do |b2, i|      
+      b2.new_sort_order = i
+      b2.status = 'edited' if b2.status == 'published'
       b2.save
     end
     changed = false
-    siblings.each_with_index do |b2, i|      
-      if i < (siblings.count-1) && b2.id == self.id                
-        siblings[i+1].sort_order = i
-        siblings[i+1].save        
-        b2.sort_order = i + 1
+    sibs.each_with_index do |b2, i|      
+      if i < (sibs.count-1) && b2.id == self.id                
+        sibs[i+1].new_sort_order = i
+        sibs[i+1].save        
+        b2.new_sort_order = i + 1
+        b2.status = 'edited' if b2.status == 'published'
         b2.save
         changed = true
       end      
     end
     return changed            
+  end
+
+  # fix sort orders
+  def reorganize
+    sibs = self.siblings
+    sibs.each_with_index do |b2, i|      
+      b2.new_sort_order = i
+      b2.status = 'edited' if b2.status == 'published'
+      b2.save
+    end     
   end
   
   def constrain_all         
@@ -690,15 +713,24 @@ class Caboose::Block < ActiveRecord::Base
       :post_id            => post_id,         
       :parent_id          => new_parent_id,
       :media_id           => self.media_id,
+      :new_media_id       => self.new_media_id,
       :block_type_id      => self.block_type_id,    
-      :sort_order         => (self.new_sort_order.blank? ? (self.sort_order + 1) : (self.new_sort_order + 1)),
+      :sort_order         => (self.new_sort_order.blank? ? (self.sort_order) : (self.new_sort_order)),
+      :new_sort_order     => (self.new_sort_order.blank? ? (self.sort_order) : (self.new_sort_order)),
       :constrain          => self.constrain,
       :full_width         => self.full_width,
       :name               => self.name,
-      :value              => (self.new_value.blank? ? self.value : self.new_value),
+      :value              => self.value,
+      :new_value          => self.new_value,
       :status             => 'added'
     )
-    self.children.each do |b2|
+
+    if b.name.nil?
+ #     Caboose.log("moving block #{b.id} down, parent_id is #{b.parent_id}")
+      b.reorganize
+    end
+
+    self.filtered_children(true).each do |b2|
       if b2.name 
         # The block is part of the block type, so we have to find the corresponding child block in the new block type        
         bt = Caboose::BlockType.where(:parent_id => self.block_type_id, :name => b2.name).first
@@ -718,7 +750,7 @@ class Caboose::Block < ActiveRecord::Base
   def modal_js_block_names
     arr = []
     arr << self.block_type.name if self.block_type.use_js_for_modal
-    self.children.each do |b2|
+    self.filtered_children(true).each do |b2|
       self.modal_js_controllers_helper(b2, arr)
     end
     return arr
@@ -727,7 +759,7 @@ class Caboose::Block < ActiveRecord::Base
   def modal_js_controllers_helper(b, arr)
     bt = b.block_type
     arr << bt.name if bt.use_js_for_modal
-    b.children.each do |b2|
+    b.filtered_children(true).each do |b2|
       self.modal_js_controllers_helper(b2, arr)
     end                          
   end

@@ -39,6 +39,10 @@ BlockContentController.prototype = {
     });
   },
 
+  is_modified: function() {
+    $("#tiny_header").removeClass('published').addClass('unpublished');
+  },
+
   init_inline_editor: function() {
     var that = this;
     $.each(that.inline_classes, function(k1, c) {
@@ -50,6 +54,7 @@ BlockContentController.prototype = {
      //     var block_id = $(b).attr('id').replace('block_','');
           var editor = CKEDITOR.inline( $(b).attr('id') );
           editor.on('change', function(ev) {
+            that.is_modified();
             var html = $(b).html();
             $.ajax({
               url: that.base_url() + '/' + target_id + '/value',
@@ -108,7 +113,9 @@ BlockContentController.prototype = {
 
   render_block: function(block_id) {
     var that = this;
+  //  console.log("rendering block " + block_id + "...");
     var url = that.base_url() + '/' + block_id + '/render';
+    that.is_modified();
     $.ajax({
       url: url,
       type: 'get',
@@ -144,6 +151,7 @@ BlockContentController.prototype = {
   create_block: function(block_type_id, parent_id, before_block_id, after_block_id, child_block_count) {
     var that = this;
     that.is_loading(true, 'Creating block...');
+    that.is_modified();
     var h = {                      
       authenticity_token: that.authenticity_token,
       block_type_id: block_type_id,
@@ -172,6 +180,7 @@ BlockContentController.prototype = {
   move_block: function(block_id, parent_id, before_block_id, after_block_id) {
     var that = this;
     var block_id = block_id.replace('block_','');
+    that.is_modified();
     if ( before_block_id != block_id && after_block_id != block_id && parent_id != block_id ) {
       var original = $('#block_' + block_id);
       original.draggable('destroy');
@@ -257,6 +266,7 @@ BlockContentController.prototype = {
       }
       that.selected_block_ids = [];
       that.add_dropzones();
+      that.is_modified();
     }
   },
 
@@ -278,6 +288,7 @@ BlockContentController.prototype = {
     var fake_id = 'db' + Math.floor((Math.random() * 1000) + 1);
     el.attr('id','new_block_' + fake_id).addClass('duplicated-block');
     $('#block_' + block_id).after(el);
+    that.is_modified();
     that.duplicate_block_save(block_id, fake_id);
   },
 
@@ -300,10 +311,12 @@ BlockContentController.prototype = {
   
   render_parent_blocks: function(block_id) {
     var that = this;
+ //   console.log("rendering parent blocks for " + block_id + "...");
     $.ajax({
       url: that.base_url() + '/' + block_id + '/parent-block',
       type: 'get',
-      success: function(resp) {        
+      success: function(resp) {
+   //     console.log(resp);
         if ( resp && resp.parent_id ) { that.render_block(resp.parent_id) };
         if ( resp && resp.grandparent_id ) { that.render_block(resp.grandparent_id) };
       }
@@ -314,6 +327,7 @@ BlockContentController.prototype = {
   {
     var that = this;
     if ( that.editing_block ) {
+ //     console.log("rendering blocks for " + that.editing_block + "...");
       that.render_block( that.editing_block );
       that.render_parent_blocks( that.editing_block );
     }
@@ -479,6 +493,8 @@ BlockContentController.prototype = {
           .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_delete'    ).addClass('delete_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-close'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.delete_block(block_id);    }));
         el.mouseover(function(el) { $('#block_' + block_id).addClass(   'block_over'); });
         el.mouseout(function(el)  { $('#block_' + block_id).removeClass('block_over'); });
+        if ( el.hasClass('hasrt') )
+          el.prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_settings'    ).addClass('settings_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-gear'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.edit_block(block_id);    }));
       }
       el.attr('onclick','').unbind('click');
       // el.click(function(e) {      
@@ -489,7 +505,7 @@ BlockContentController.prototype = {
       el.click(function(e) {      
         e.preventDefault();
         e.stopPropagation();
-        if ( el.hasClass('rtedit') || el.hasClass('richtext-block') || el.hasClass('heading-block') )
+        if ( el.hasClass('rtedit') || $(e.target).closest(".rtedit").length > 0 || el.hasClass('content_wrapper') )
           return;
         else
           that.edit_block(block_id);

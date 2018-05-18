@@ -247,11 +247,11 @@ var BlockModalController = ModalController.extend({
       type: bt.field_type,      
       nice_name: bt.description ? bt.description : bt.name,
       width: bt.width ? bt.width : 780,      
-      after_update: function() { that.parent_controller.render_blocks(); },
-      after_cancel: function() { that.parent_controller.render_blocks(); }
-    };     
-    h['value'] = b.value
-    if (bt.field_type == 'checkbox')       h['value'] = b.value ? 'true' : 'false';
+      after_update: function() { setTimeout(function(){ that.parent_controller.render_blocks(); }, 800); },
+      after_cancel: function() { setTimeout(function(){ that.parent_controller.render_blocks(); }, 800); }
+    };
+    h['value'] = b.value;
+    if (bt.field_type == 'checkbox')       h['value'] = (b.value == '1' || b.value == 1 || b.value == true || b.value == 'true') ? 'true' : 'false';
     //if (bt.field_type == 'image')          h['value'] = b.image.tiny_url;
     //if (bt.field_type == 'file')           h['value'] = b.file.url;                
     if (bt.field_type == 'select')         h['text'] = b.value;

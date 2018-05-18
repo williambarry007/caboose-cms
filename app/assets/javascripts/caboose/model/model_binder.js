@@ -222,7 +222,9 @@ ModelBinder.prototype = {
       attrib.update_url = this.model.update_url;
     if (attrib.before_update) attrib.before_update(this);
     attrib.save(after);      
-    if (attrib.after_update) attrib.after_update(this);
+    if (attrib.after_update) {
+      attrib.after_update(this);
+    }
   },
 
   repopulate_options_for_control: function(attribute_name) 

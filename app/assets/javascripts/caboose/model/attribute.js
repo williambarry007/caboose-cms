@@ -54,7 +54,7 @@ Attribute.prototype = {
 				  this2.value_clean = this2.value;
 				}				
 				if (after) after(resp);        				
-				//if (this2.after_update) this2.after_update(this2);				
+	//			if (this2.after_update) this2.after_update(this2);				
 			},
 			error: function() { 
 			  if (after) after(false);

@@ -497,19 +497,21 @@ BlockContentController.prototype = {
           el.prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_settings'    ).addClass('settings_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-gear'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.edit_block(block_id);    }));
       }
       el.attr('onclick','').unbind('click');
-      // el.click(function(e) {      
-      //   e.preventDefault();
-      //   e.stopPropagation();      
-      //   that.edit_block(block_id);
-      // });
-      el.click(function(e) {      
-        e.preventDefault();
-        e.stopPropagation();
-        if ( el.hasClass('rtedit') || $(e.target).closest(".rtedit").length > 0 || el.hasClass('content_wrapper') )
-          return;
-        else
-          that.edit_block(block_id);
-      });
+      if ( el.hasClass('footer-wrapper') && el.prev('.content_wrapper.subpage').length > 0 ) {
+        el.css('position','relative');
+        var over = $('<div />').attr('id','footer-msg').text('The footer must be edited on the homepage.').css('position','absolute').css('left','0').css('top','0').css('background','rgba(43, 43, 43, 0.9)').css('color','white').css('width','100%').css('height','100%').css('z-index','14').css('padding','40px 3% 40px 3%').css('text-align','center');
+        if ( el.find('#footer-msg').length == 0 ) { el.append(over); }
+      }
+      else if ( !el.hasClass('container') ) { 
+        el.click(function(e) {      
+          e.preventDefault();
+          e.stopPropagation();
+          if ( el.hasClass('rtedit') || $(e.target).closest(".rtedit").length > 0 || el.hasClass('content_wrapper') )
+            return;
+          else
+            that.edit_block(block_id);
+        });
+      }
     }
 
 

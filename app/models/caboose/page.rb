@@ -76,9 +76,16 @@ class Caboose::Page < ActiveRecord::Base
 
   def publish
     Caboose::Block.where(:page_id => self.id).where('status = ? OR status = ?','edited','added').all.each do |b|
-      b.value = b.new_value if !b.new_value.blank?
-      b.media_id = nil if b.new_media_id == 0
-      b.media_id = b.new_media_id if !b.new_media_id.blank?
+      if b.new_value == 'EMPTY'
+        b.value = nil
+      elsif !b.new_value.blank?
+        b.value = b.new_value
+      end
+      if b.new_media_id == 0
+        b.media_id = nil
+      elsif !b.new_media_id.blank?
+        b.media_id = b.new_media_id
+      end
       b.sort_order = b.new_sort_order if !b.new_sort_order.blank?
       b.parent_id = b.new_parent_id if !b.new_parent_id.blank?
       b.status = 'published'

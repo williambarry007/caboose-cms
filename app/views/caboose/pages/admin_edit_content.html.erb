@@ -52,7 +52,9 @@ $(document).ready(function() {
     .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/revert').html("Revert"))
     .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/preview').attr('target','_blank').html("Preview"))
     .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/publish').html("Publish"))
+  <% if @page.page_custom_field_values.count > 0 %>
     .append($('<a/>').attr('href', '#').html('Custom Fields').click(function(e) { e.preventDefault(); caboose_modal_url('/admin/pages/<%= @page.id %>/custom-fields'); }))
+  <% end %>
     .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>').html("Page Settings"))
     .append($('<a/>').attr('href', '/<%= @page.uri %>').attr('target','_blank').text("View Page"))  
   );

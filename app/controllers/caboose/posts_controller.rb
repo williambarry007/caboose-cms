@@ -106,6 +106,7 @@ module Caboose
         return
       end
       Caboose::Block.where(:post_id => @post.id, :new_sort_order => nil).update_all('new_sort_order = sort_order')
+      Caboose::Block.where(:post_id => @post.id, :status => nil).update_all(:status => 'published')
       @editing = true
       @preview = false
     end

@@ -92,7 +92,7 @@ class Caboose::Block < ActiveRecord::Base
     if b.block_type.field_type == 'image' && editing
       mid = b.new_media_id.blank? ? b.media_id : b.new_media_id
       return Caboose::Media.find(mid).image if Caboose::Media.where(:id => mid).exists?
-      return b.image
+      return (mid != 0 ? b.image : nil)
     end
     if b.block_type.field_type == 'file' && !editing
       return b.media.file if b.media
@@ -101,9 +101,9 @@ class Caboose::Block < ActiveRecord::Base
     if b.block_type.field_type == 'file' && editing
       mid = b.new_media_id.blank? ? b.media_id : b.new_media_id
       return Caboose::Media.find(mid).file if Caboose::Media.where(:id => mid).exists?
-      return b.file
+      return (mid != 0 ? b.file : nil)
     end
-    return (editing && !b.new_value.blank?) ? b.new_value : b.value
+    return (editing && !b.new_value.blank?) ? (b.new_value == 'EMPTY' ? nil : b.new_value) : b.value
   end
   
   def rendered_child_value(name, options)
@@ -292,7 +292,11 @@ class Caboose::Block < ActiveRecord::Base
     #  Caboose.log("editing: " + options2[:editing].to_s)
 
       if options2[:editing] == true
-        block.value = block.new_value if !block.new_value.blank?
+        if !block.new_value.blank? && block.new_value != 'EMPTY'
+          block.value = block.new_value 
+        elsif block.new_value == 'EMPTY'
+          block.value = nil
+        end
         block.media_id = block.new_media_id if !block.new_media_id.nil?
        # block.sort_order = block.new_sort_order if !block.new_sort_order.blank?
        # block.parent_id = block.new_parent_id if !block.new_parent_id.blank?

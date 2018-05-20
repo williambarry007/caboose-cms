@@ -94,7 +94,7 @@ module Caboose
           'page_id'            => b.page_id,          
           'post_id'            => b.post_id,          
           'name'               => b.name,
-          'value'              => (b.new_value.blank? ? b.value : b.new_value),
+          'value'              => (b.new_value.blank? ? b.value : (b.new_value == 'EMPTY' ? nil : b.new_value)),
           'constrain'          => b.constrain,
           'full_width'         => b.full_width,
           'block_type'         => bt,
@@ -115,7 +115,7 @@ module Caboose
             'page_id'            => b.page_id,            
             'post_id'            => b.post_id,                        
             'name'               => b.name, 
-            'value'              => (b.new_value.blank? ? b.value : b.new_value),
+            'value'              => (b.new_value.blank? ? b.value : (b.new_value == 'EMPTY' ? nil : b.new_value)),
             'constrain'          => b.constrain,
             'full_width'         => b.full_width,
             'block_type'         => bt,
@@ -156,7 +156,7 @@ module Caboose
           'page_id'            => b2.page_id,
           'post_id'            => b2.post_id,
           'name'               => b2.name,
-          'value'              => (b2.new_value.blank? ? b2.value : b2.new_value),
+          'value'              => (b2.new_value.blank? ? b2.value : (b2.new_value == 'EMPTY' ? nil : b2.new_value)),
           'constrain'          => b2.constrain,
           'full_width'         => b2.full_width,
           'block_type'         => bt,
@@ -177,6 +177,10 @@ module Caboose
       resp = Caboose::StdClass.new   
       b = Block.find(params[:id])      
       b.new_media_id = 0
+      b.image_file_name = nil
+      b.image_file_size = nil
+      b.image_content_type = nil
+      b.image_updated_at = nil
       b.status = 'edited' if b.status == 'published'
       resp.success = b.save
       render :json => resp      
@@ -482,7 +486,7 @@ module Caboose
                 if b.block_type.field_type == 'checkbox_multiple'
                   b.new_value = Block.parse_checkbox_multiple_value(b, v)
                 else                    
-                  b.new_value = v
+                  b.new_value = (v.blank? ? 'EMPTY' : v)
                   b.status = 'edited' if b.status == 'published'
                 end
               end
@@ -703,7 +707,7 @@ module Caboose
         b.new_sort_order = (b2.new_sort_order.blank? ? b2.sort_order : b2.new_sort_order)
         i = 1
         sibs = b2.siblings(b.new_sort_order)
-        Caboose.log("updating #{sibs.count} siblings")
+    #    Caboose.log("updating #{sibs.count} siblings")
         sibs.each do |b3|
           b3.new_sort_order = b.new_sort_order + i
           b3.status = 'edited' if b3.status == 'published'
@@ -715,7 +719,7 @@ module Caboose
         b.new_sort_order = (b2.new_sort_order.blank? ? (b2.sort_order + 1) : (b2.new_sort_order + 1))
         i = 1
         sibs = b2.siblings(b.new_sort_order)
-        Caboose.log("updating #{sibs.count} siblings")
+    #    Caboose.log("updating #{sibs.count} siblings")
         sibs.each do |b3|
           b3.new_sort_order = b.new_sort_order + i
           b3.status = 'edited' if b3.status == 'published'

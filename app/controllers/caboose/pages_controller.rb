@@ -222,6 +222,7 @@ module Caboose
         return
       end
       Caboose::Block.where(:page_id => @page.id, :new_sort_order => nil).update_all('new_sort_order = sort_order')
+      Caboose::Block.where(:page_id => @page.id, :status => nil).update_all(:status => 'published')
     #  Caboose::Block.where(:page_id => @page.id, :new_parent_id => nil).update_all('new_parent_id = parent_id')
       @editing = true
       @preview = false

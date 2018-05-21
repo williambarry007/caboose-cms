@@ -81,6 +81,10 @@
   }
 }
 
+#cboxTopLeft, #cboxTopRight, #cboxBottomLeft, #cboxBottomRight, #cboxMiddleLeft, #cboxMiddleRight, #cboxTopCenter, #cboxBottomCenter, #cboxClose {
+  background: #fff !important;
+}
+
 #the_modal #modal_content .mb_container {
   input {
     border: #ccc 1px solid;
@@ -149,7 +153,7 @@ p.caboose_note.delete {
   padding: 20px;
   text-align: center;
   position: relative;
-  z-index: 7;
+  z-index: 15;
   font-family: 'Roboto';
   font-weight: 300;
   input[type="button"] {

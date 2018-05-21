@@ -75,6 +75,22 @@ module Caboose
       @post = Post.find(params[:id])      
       render :layout => 'caboose/admin'
     end
+
+    # @route GET /admin/posts/:id/publish
+    def admin_publish
+      return unless user_is_allowed('posts', 'edit')
+      post = Post.find(params[:id])
+      post.publish
+      redirect_to "/admin/posts/#{post.id}/content"
+    end
+
+    # @route GET /admin/posts/:id/revert
+    def admin_revert
+      return unless user_is_allowed('posts', 'edit')
+      post = Post.find(params[:id])
+      post.revert
+      redirect_to "/admin/posts/#{post.id}/content"
+    end
     
     # @route GET /admin/posts/:id/content
     def admin_edit_content
@@ -89,7 +105,18 @@ module Caboose
         redirect_to "/admin/posts/#{@post.id}/layout"
         return
       end
+      Caboose::Block.where(:post_id => @post.id, :new_sort_order => nil).update_all('new_sort_order = sort_order')
+      Caboose::Block.where(:post_id => @post.id, :status => nil).update_all(:status => 'published')
       @editing = true
+      @preview = false
+    end
+
+    # @route GET /admin/posts/:id/preview-post
+    def admin_preview_post
+      return if !user_is_allowed('posts', 'edit')    
+      @post = Post.find(params[:id])
+      @editing = true
+      @preview = true
     end
     
     # @route GET /admin/posts/:id/categories

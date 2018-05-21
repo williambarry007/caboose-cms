@@ -9,7 +9,6 @@
 <%= stylesheet_link_tag "caboose/modal_inline" %>
 <%= stylesheet_link_tag "caboose/icomoon_fonts" %>
 <% end %>
-
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'jquery-ui' %>
 <%= javascript_include_tag 'caboose/model/all' %>
@@ -20,11 +19,18 @@
 <% if @site && @site.use_dragdrop %>
 <%= javascript_include_tag 'caboose/block_content_controller_dragdrop' %>
 <%= javascript_include_tag "caboose/block_modal_controllers/block_dd_modal_controller" %>
+<script>window.CKEDITOR_BASEPATH = '//d9hjv462jiw15.cloudfront.net/ckeditor/';</script>
+<%= javascript_include_tag "//d9hjv462jiw15.cloudfront.net/ckeditor/ckeditor.js" %>
 <% else %>
 <%= javascript_include_tag 'caboose/block_content_controller' %>
 <%= javascript_include_tag "caboose/block_modal_controllers/block_modal_controller" %>
 <% end %>
 <script type='text/javascript'>
+
+function hide_caboose_notice() {
+  $("#caboose-notice").hide();
+  document.cookie = "caboose_post_publish=true; expires=Thu, 18 Dec 2030 12:00:00 UTC; path=/";
+}
 
 var controller = false;
 $(document).ready(function() {  
@@ -39,11 +45,20 @@ $(document).ready(function() {
   });
 
   $('body').append($('<div/>')        
-    .attr('id', 'tiny_header')
+    .attr('id', 'tiny_header')<% if @post.is_published %>.addClass('published')<% else %>.addClass('unpublished')<% end %>
+    .append("<span id='m-pub'>published</span>")
+    .append("<span id='m-unpub'>unpublished changes</span>")
     .append($('<a/>').attr('href', '/admin/posts').html("< Back"))
+    .append($('<a/>').attr('href', '/admin/posts/<%= @post.id %>/revert').html("Revert"))
+    .append($('<a/>').attr('href', '/admin/posts/<%= @post.id %>/preview-post').attr('target','_blank').html("Preview"))
+    .append($('<a/>').attr('href', '/admin/posts/<%= @post.id %>/publish').html("Publish"))
     .append($('<a/>').attr('href', '/admin/posts/<%= @post.id %>').html("Post Settings"))
-    .append($('<a/>').attr('href', '<%= @post.uri %>').attr('target','_blank').html("View Post"))     
+    .append($('<a/>').attr('href', '<%= @post.uri %>').attr('target','_blank').text("View Post"))  
   );
+
+<% if cookies[:caboose_post_publish].blank? %>
+  $('body').append($('<div/>').attr('id','caboose-notice').html("<a href='#' onclick='hide_caboose_notice();return false;'>x</a><p>NEW: Changes aren't saved until you click Publish. Click Preview to preview the edited post, or Revert to discard your changes.</p>"));
+<% end %>
 
 <% if @site && @site.use_dragdrop %>
   var html = "<%== (render :partial => 'caboose/pages/new_block_header').gsub( / *\n+/, '' ) %> ";

@@ -145,6 +145,22 @@ module Caboose
     #===========================================================================
     # Admin actions
     #===========================================================================
+
+    # @route GET /admin/pages/:id/publish
+    def admin_publish
+      return unless user_is_allowed('pages', 'edit')
+      page = Page.find(params[:id])
+      page.publish
+      redirect_to "/admin/pages/#{page.id}/content"
+    end
+
+    # @route GET /admin/pages/:id/revert
+    def admin_revert
+      return unless user_is_allowed('pages', 'edit')
+      page = Page.find(params[:id])
+      page.revert
+      redirect_to "/admin/pages/#{page.id}/content"
+    end
     
     # @route GET /admin/pages
     def admin_index
@@ -205,7 +221,25 @@ module Caboose
         redirect_to "/admin/pages/#{@page.id}/layout"
         return
       end
+      Caboose::Block.where(:page_id => @page.id, :new_sort_order => nil).update_all('new_sort_order = sort_order')
+      Caboose::Block.where(:page_id => @page.id, :status => nil).update_all(:status => 'published')
+    #  Caboose::Block.where(:page_id => @page.id, :new_parent_id => nil).update_all('new_parent_id = parent_id')
       @editing = true
+      @preview = false
+    end
+
+    # @route GET /admin/pages/:id/preview
+    def admin_preview
+      @page = Page.find(params[:id])
+      redirect_to "/login?return_url=/admin/pages/#{@page.id}/preview" and return if @logged_in_user.nil?
+      condition = @logged_in_user && (@logged_in_user.is_super_admin? || (@logged_in_user.site_id == @page.site_id && ( @logged_in_user.is_allowed('all','all') || @logged_in_user.is_allowed('pages','edit') && Page.permissible_actions(@logged_in_user, @page.id).include?('edit'))))
+      redirect_to "/admin/pages" and return unless condition
+      if @page.block.nil?
+        redirect_to "/admin/pages/#{@page.id}/layout"
+        return
+      end
+      @editing = true
+      @preview = true
     end
     
     # @route GET /admin/pages/:id/layout

@@ -57,7 +57,7 @@ module Caboose
       # Sets an instance variable of the logged in user
       @logged_in_user = logged_in_user  
 
-      @nav = Caboose.plugin_hook('admin_nav', [], @logged_in_user, @page, @site) if request.fullpath.include?('/admin')
+   #   @nav = Caboose.plugin_hook('admin_nav', [], @logged_in_user, @page, @site) if request.fullpath.include?('/admin')
       
       # Initialize the card
       init_cart if @site && @site.use_store && !@domain.under_construction

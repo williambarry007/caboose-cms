@@ -35,6 +35,10 @@ BlockContentController.prototype = {
       }
     });    
   },
+
+  is_modified: function() {
+    $("#tiny_header").removeClass('published').addClass('unpublished');
+  },
     
   edit_block: function(block_id)
   {
@@ -142,6 +146,7 @@ BlockContentController.prototype = {
         success: function(resp) {}
       });
     }
+    that.is_modified();
     that.render_blocks();
   },
   
@@ -153,7 +158,8 @@ BlockContentController.prototype = {
       url: that.base_url() + '/' + block_id + '/move-up',
       type: 'put',      
       success: function(resp) {        
-        if (resp.success) that.render_blocks(function() { that.stop_loadify(); });      
+        if (resp.success) that.render_blocks(function() { that.stop_loadify(); }); 
+        that.is_modified();     
       }
     });    
   },
@@ -166,7 +172,8 @@ BlockContentController.prototype = {
       url: that.base_url() + '/' + block_id + '/move-down',
       type: 'put',      
       success: function(resp) {        
-        if (resp.success) that.render_blocks(function() { that.stop_loadify(); });      
+        if (resp.success) that.render_blocks(function() { that.stop_loadify(); });
+        that.is_modified();      
       }
     });    
   },
@@ -179,7 +186,8 @@ BlockContentController.prototype = {
       url: that.base_url() + '/' + block_id + '/duplicate',
       type: 'put',
       success: function(resp) {        
-        if (resp.success) that.render_blocks(function() { that.stop_loadify(); });      
+        if (resp.success) that.render_blocks(function() { that.stop_loadify(); });    
+        that.is_modified();  
       }
     });    
   },

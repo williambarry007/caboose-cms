@@ -256,8 +256,8 @@ var BlockModalController = ModalController.extend({
       type: bt.field_type,      
       nice_name: bt.description ? bt.description : bt.name,
       width: bt.width ? bt.width : 780,      
-      after_update: function() { that.parent_controller.render_blocks(); },
-      after_cancel: function() { that.parent_controller.render_blocks(); }
+      after_update: function() { that.parent_controller.render_blocks(); that.parent_controller.is_modified(); },
+      after_cancel: function() { that.parent_controller.render_blocks(); that.parent_controller.is_modified(); }
     };     
     h['value'] = b.value
     if (bt.field_type == 'checkbox')       h['value'] = b.value ? 'true' : 'false';
@@ -408,7 +408,8 @@ var BlockModalController = ModalController.extend({
         {                    
           that.parent_controller.refresh_blocks(function() {
             that.parent_controller.edit_block(resp.new_id);
-            that.parent_controller.render_blocks();            
+            that.parent_controller.render_blocks();         
+            that.parent_controller.is_modified();   
           });
         }
       }
@@ -437,7 +438,8 @@ var BlockModalController = ModalController.extend({
         if (resp.redirect) 
         {
           that.close();
-          that.parent_controller.render_blocks();          
+          that.parent_controller.render_blocks();  
+          that.parent_controller.is_modified();        
         }
       }
     });
@@ -454,6 +456,7 @@ var BlockModalController = ModalController.extend({
         if (resp.success) {
           that.autosize("<p class='note success'>Duplicated block.</p>");          
           that.parent_controller.render_blocks();
+          that.parent_controller.is_modified();
         }   
       }
     });    
@@ -472,6 +475,7 @@ var BlockModalController = ModalController.extend({
         {
           that.autosize("<p class='note success'>" + resp.success + "</p>");          
           that.parent_controller.render_blocks();
+          that.parent_controller.is_modified();
         }
       }
     });    
@@ -490,6 +494,7 @@ var BlockModalController = ModalController.extend({
         {
           that.autosize("<p class='note success'>" + resp.success + "</p>");          
           that.parent_controller.render_blocks();
+          that.parent_controller.is_modified();
         }
       }
     });    

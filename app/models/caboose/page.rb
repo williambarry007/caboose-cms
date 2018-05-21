@@ -35,7 +35,8 @@ class Caboose::Page < ActiveRecord::Base
     :meta_robots           ,
     :canonical_url         ,
     :fb_description        ,
-    :gp_description
+    :gp_description        ,
+    :status
    
   CONTENT_FORMAT_HTML  = 1 
   CONTENT_FORMAT_TEXT  = 2
@@ -67,6 +68,46 @@ class Caboose::Page < ActiveRecord::Base
 
   def self.index_page(site_id)
     return self.where(:site_id => site_id, :parent_id => -1).first
+  end
+
+  def is_published
+    Caboose::Block.where(:page_id => self.id).where('status != ?','published').count == 0
+  end
+
+  def publish
+    Caboose::Block.where(:page_id => self.id).where('status = ? OR status = ?','edited','added').all.each do |b|
+      if b.new_value == 'EMPTY'
+        b.value = nil
+      elsif !b.new_value.blank?
+        b.value = b.new_value
+      end
+      if b.new_media_id == 0
+        b.media_id = nil
+      elsif !b.new_media_id.blank?
+        b.media_id = b.new_media_id
+      end
+      b.sort_order = b.new_sort_order if !b.new_sort_order.blank?
+      b.parent_id = b.new_parent_id if !b.new_parent_id.blank?
+      b.status = 'published'
+      b.new_value = nil
+      b.new_media_id = nil
+      b.new_sort_order = nil
+      b.new_parent_id = nil
+      b.save
+    end
+    deleted_blocks = Caboose::Block.where(:page_id => self.id, :status => 'deleted').pluck(:id)
+    dids = deleted_blocks.blank? ? 0 : deleted_blocks
+    Caboose::Block.where("id in (?) or parent_id in (?)",dids,dids).destroy_all
+    Caboose::Block.where(:page_id => self.id, :status => nil).update_all(:status => 'published')
+    self.status = 'published'
+    self.save
+  end
+
+  def revert
+    Caboose::Block.where(:page_id => self.id).where(:status => 'added').destroy_all
+    Caboose::Block.where(:page_id => self.id).update_all("status = 'published', new_value = null, new_media_id = null, new_sort_order = sort_order, new_parent_id = null")
+    self.status = 'published'
+    self.save
   end
   
   def self.page_with_uri(host_with_port, uri, get_closest_parent = true)

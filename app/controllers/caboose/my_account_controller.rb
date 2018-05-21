@@ -38,6 +38,17 @@ module Caboose
               user.email    = email
             end
     	  	when "phone"      then user.phone       = value
+
+          when "address"  then user.address   = value
+          when "address2"  then user.address2   = value
+          when "city"  then user.city   = value
+          when "state"  then user.state   = value
+          when "zip"  then user.zip   = value
+          when "customer_profile_id"  then user.customer_profile_id   = value
+          when "payment_profile_id"  then user.payment_profile_id   = value
+          when "stripe_customer_id"  then user.stripe_customer_id   = value
+          when "fax"  then user.fax   = value
+
     	  	when "password"			  
     	  	  confirm = params[:confirm]
     	  		if value != confirm			

@@ -187,7 +187,7 @@ module Caboose
     # Returns the currently logged in user
     def logged_in_user
       if (!logged_in?)
-        return User.logged_out_user(@site.id)
+        return User.logged_out_user(@site.id) if @site
       end
       #return nil if !logged_in?
       return Caboose::User.where(:id => session["app_user"].id).first

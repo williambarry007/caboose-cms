@@ -82,7 +82,6 @@ module Caboose
       @editmode = !params['edit'].nil? && user.is_allowed('pages', 'edit') ? true : false
    #   @crumb_trail = Caboose::Page.crumb_trail(@page)
    #   @subnav = Caboose::Page.subnav(@page, session['use_redirect_urls'], @user)
-
       #@subnav.links = @tasks.collect {|href, task| {'href' => href, 'text' => task, 'is_current' => uri == href}}
   
     end

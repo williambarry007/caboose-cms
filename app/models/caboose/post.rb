@@ -46,43 +46,47 @@ class Caboose::Post < ActiveRecord::Base
   end
 
   def is_published
-    Caboose::Block.where(:post_id => self.id).where('status != ?','published').count == 0
+    Caboose::Block.where(:post_id => self.id).where('status != ?','published').count == 0 if !self.id.nil?
   end
 
   def publish
-    Caboose::Block.where(:post_id => self.id).where('status = ? OR status = ?','edited','added').all.each do |b|
-      if b.new_value == 'EMPTY'
-        b.value = nil
-      elsif !b.new_value.blank?
-        b.value = b.new_value
+    if !self.id.nil?
+      Caboose::Block.where(:post_id => self.id).where('status = ? OR status = ?','edited','added').all.each do |b|
+        if b.new_value == 'EMPTY'
+          b.value = nil
+        elsif !b.new_value.blank?
+          b.value = b.new_value
+        end
+        if b.new_media_id == 0
+          b.media_id = nil
+        elsif !b.new_media_id.blank?
+          b.media_id = b.new_media_id
+        end
+        b.sort_order = b.new_sort_order if !b.new_sort_order.blank?
+        b.parent_id = b.new_parent_id if !b.new_parent_id.blank?
+        b.status = 'published'
+        b.new_value = nil
+        b.new_media_id = nil
+        b.new_sort_order = nil
+        b.new_parent_id = nil
+        b.save
       end
-      if b.new_media_id == 0
-        b.media_id = nil
-      elsif !b.new_media_id.blank?
-        b.media_id = b.new_media_id
-      end
-      b.sort_order = b.new_sort_order if !b.new_sort_order.blank?
-      b.parent_id = b.new_parent_id if !b.new_parent_id.blank?
-      b.status = 'published'
-      b.new_value = nil
-      b.new_media_id = nil
-      b.new_sort_order = nil
-      b.new_parent_id = nil
-      b.save
+      deleted_blocks = Caboose::Block.where(:post_id => self.id, :status => 'deleted').pluck(:id)
+      dids = deleted_blocks.blank? ? 0 : deleted_blocks
+      Caboose::Block.where("id in (?) or parent_id in (?)",dids,dids).destroy_all
+      Caboose::Block.where(:post_id => self.id, :status => nil).update_all(:status => 'published')
+      self.status = 'published'
+      self.save
     end
-    deleted_blocks = Caboose::Block.where(:post_id => self.id, :status => 'deleted').pluck(:id)
-    dids = deleted_blocks.blank? ? 0 : deleted_blocks
-    Caboose::Block.where("id in (?) or parent_id in (?)",dids,dids).destroy_all
-    Caboose::Block.where(:post_id => self.id, :status => nil).update_all(:status => 'published')
-    self.status = 'published'
-    self.save
   end
 
   def revert
-    Caboose::Block.where(:post_id => self.id).where(:status => 'added').destroy_all
-    Caboose::Block.where(:post_id => self.id).update_all("status = 'published', new_value = null, new_media_id = null, new_sort_order = sort_order, new_parent_id = null")
-    self.status = 'published'
-    self.save
+    if !self.id.nil?
+      Caboose::Block.where(:post_id => self.id).where(:status => 'added').destroy_all
+      Caboose::Block.where(:post_id => self.id).update_all("status = 'published', new_value = null, new_media_id = null, new_sort_order = sort_order, new_parent_id = null")
+      self.status = 'published'
+      self.save
+    end
   end
   
   def self.uri(post)

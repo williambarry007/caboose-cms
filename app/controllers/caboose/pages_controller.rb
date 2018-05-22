@@ -221,9 +221,8 @@ module Caboose
         redirect_to "/admin/pages/#{@page.id}/layout"
         return
       end
-      Caboose::Block.where(:page_id => @page.id, :new_sort_order => nil).update_all('new_sort_order = sort_order')
-      Caboose::Block.where(:page_id => @page.id, :status => nil).update_all(:status => 'published')
-    #  Caboose::Block.where(:page_id => @page.id, :new_parent_id => nil).update_all('new_parent_id = parent_id')
+      Caboose::Block.where(:page_id => @page.id, :new_sort_order => nil).update_all('new_sort_order = sort_order') if @page && !@page.id.nil?
+      Caboose::Block.where(:page_id => @page.id, :status => nil).update_all(:status => 'published') if @page && !@page.id.nil?
       @editing = true
       @preview = false
     end

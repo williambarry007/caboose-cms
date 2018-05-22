@@ -53,16 +53,24 @@ BlockContentController.prototype = {
           var target_id = $(b).data('rtid');
      //     var block_id = $(b).attr('id').replace('block_','');
           var editor = CKEDITOR.inline( $(b).attr('id') );
+
           editor.on('change', function(ev) {
             that.is_modified();
+            $(b).css('background-color','#ffffd0').css('color','black');
+          });
+
+          editor.on('blur', function(ev) {
             var html = $(b).html();
             $.ajax({
               url: that.base_url() + '/' + target_id + '/value',
               type: 'put',
               data: { value: html },
-              success: function(resp) { }
+              success: function(resp) { 
+                $(b).css('background-color','').css('color','');
+              }
             });
           });
+
         }
       });
     });

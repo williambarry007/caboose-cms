@@ -82,7 +82,7 @@
 }
 #the_modal {
   #modal_controls {
-    margin-top: 10px;
+    margin-top: 20px;
   }
 }
 
@@ -91,7 +91,7 @@
 }
 
 #the_modal #modal_content .mb_container {
-  input {
+  input, textarea {
     border: #ccc 1px solid;
     border-radius: 0 !important;
     font-family: 'Roboto' !important;
@@ -235,6 +235,12 @@ body > .container, body > .mm-page > .container {
   }
 }
 
+// #modal_content .mb_container textarea {
+//   font-family: 'Roboto';
+//   font-weight: 300;
+//   font-size: 15px;
+// }
+
 #tiny_header {
   display: block;  
   color: #fff;
@@ -242,7 +248,7 @@ body > .container, body > .mm-page > .container {
   position: fixed;
   top: 0;
   right: 0;
-  z-index: 100000;
+  z-index: 999;
   width: calc(100% - 200px);
   height: 40px;
   padding: 0 2%;

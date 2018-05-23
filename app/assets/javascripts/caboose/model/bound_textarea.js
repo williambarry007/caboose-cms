@@ -25,8 +25,8 @@ BoundTextarea = BoundControl.extend({
       $('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('mb_placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));
     if (this.attribute.width)  $('#'+this.el).css('width'  , this.attribute.width);
     if (this.attribute.height) $('#'+this.el).css('height' , this.attribute.height);
-    var h = $('#'+this.el+'_placeholder').outerHeight() + 6;
-    $('#'+this.el).attr('placeholder', 'empty').css('padding-top', '+=' + h).css('height', '-=' + h);
+    var h = $('#'+this.el+'_placeholder').outerHeight() + 8;
+    $('#'+this.el).attr('placeholder', 'empty').css('padding-top',h).css('height', '-=' + h);
     
     var this2 = this;
     $('#'+this.el).on('keyup', function(e) {

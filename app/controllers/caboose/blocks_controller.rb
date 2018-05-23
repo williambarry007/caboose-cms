@@ -82,7 +82,6 @@ module Caboose
     # @route GET /admin/posts/:post_id/blocks/:id/tree    
     def admin_tree
       return unless user_is_allowed("#{page_or_post}s", 'edit')      
-      
       blocks = []
       if params[:id]
         b = Block.find(params[:id])
@@ -98,7 +97,7 @@ module Caboose
           'constrain'          => b.constrain,
           'full_width'         => b.full_width,
           'block_type'         => bt,
-          'children'           => admin_tree_helper(b),
+          'children'           => admin_tree_helper(b,1),
           'crumbtrail'         => self.crumbtrail(b)          
           #'block_type_id'      => bt.id,           
           #'field_type'         => bt.field_type,
@@ -106,7 +105,7 @@ module Caboose
           #'use_js_for_modal'   => bt.use_js_for_modal,                              
         }
       else
-        q = params[:page_id] ? ["parent_id is null and page_id = ?", params[:page_id]] : ["parent_id is null and post_id = ?", params[:post_id]] 
+        q = !params[:page_id].blank? ? ["parent_id is null and page_id = ?", params[:page_id]] : ["parent_id is null and post_id = ?", params[:post_id]] 
         Block.where(q).reorder(:new_sort_order).all.each do |b|
           bt = b.block_type
           blocks << { 
@@ -119,7 +118,7 @@ module Caboose
             'constrain'          => b.constrain,
             'full_width'         => b.full_width,
             'block_type'         => bt,
-            'children'           => admin_tree_helper(b)            
+            'children'           => admin_tree_helper(b,1)            
             #'block_type_id'      => bt.id,
             #'field_type'         => bt.field_type,
             #'allow_child_blocks' => bt.allow_child_blocks,
@@ -127,7 +126,6 @@ module Caboose
           }
         end        
       end
-     # Caboose.log(blocks)
       render :json => blocks
     end
     
@@ -139,33 +137,34 @@ module Caboose
         crumbs << {
           :block_id => b.id,
           :text => bt.description
-       #   :text => b.name && b.name.downcase != bt.description.downcase  ? "#{bt.description} (#{b.name})" : bt.description
         }        
         b = b.parent
       end
       return crumbs.reverse
     end
       
-    def admin_tree_helper(b)
+    def admin_tree_helper(b,level)
       arr = []
-      b.filtered_children(true,true).order(:block_type_id).each do |b2|
-        bt = b2.block_type
-        arr << {
-          'id'                 => b2.id,
-          'parent_id'          => (b2.new_parent_id.blank? ? b2.parent_id : b2.new_parent_id),
-          'page_id'            => b2.page_id,
-          'post_id'            => b2.post_id,
-          'name'               => b2.name,
-          'value'              => (b2.new_value.blank? ? b2.value : (b2.new_value == 'EMPTY' ? nil : b2.new_value)),
-          'constrain'          => b2.constrain,
-          'full_width'         => b2.full_width,
-          'block_type'         => bt,
-          'children'           => admin_tree_helper(b2)          
-          #'block_type_id'      => bt.id,          
-          #'field_type'         => bt.field_type,
-          #'allow_child_blocks' => bt.allow_child_blocks,
-          #'use_js_for_modal'   => bt.use_js_for_modal,          
-        }
+      if level < 3
+        b.filtered_children(true,true).each do |b2|
+          bt = b2.block_type
+          arr << {
+            'id'                 => b2.id,
+            'parent_id'          => (b2.new_parent_id.blank? ? b2.parent_id : b2.new_parent_id),
+            'page_id'            => b2.page_id,
+            'post_id'            => b2.post_id,
+            'name'               => b2.name,
+            'value'              => (b2.new_value.blank? ? b2.value : (b2.new_value == 'EMPTY' ? nil : b2.new_value)),
+            'constrain'          => b2.constrain,
+            'full_width'         => b2.full_width,
+            'block_type'         => bt,
+            'children'           => admin_tree_helper(b2,level+1)          
+            #'block_type_id'      => bt.id,          
+            #'field_type'         => bt.field_type,
+            #'allow_child_blocks' => bt.allow_child_blocks,
+            #'use_js_for_modal'   => bt.use_js_for_modal,          
+          }
+        end
       end
       return arr
     end     
@@ -585,7 +584,7 @@ module Caboose
       resp = StdClass.new
       b = Block.find(params[:id])
     #  sibs = b.siblings
-      parent_id = b.parent_id
+      parent_id = b.new_parent_id.blank? ? b.parent_id : b.new_parent_id
       if b.parent_id
         if params[:page_id]
           resp.redirect = "/admin/pages/#{b.page_id}/blocks/#{b.parent_id}/edit"
@@ -618,6 +617,7 @@ module Caboose
 
       
       if parent_id
+        # Caboose.log("reorganizing blocks under #{parent_id}")
         # i = 0
         # Block.where(:parent_id => parent_id).where('status != ?', 'deleted').order(:new_sort_order).all.each do |b2|
         #   b2.new_sort_order = i
@@ -707,7 +707,7 @@ module Caboose
         b.new_sort_order = (b2.new_sort_order.blank? ? b2.sort_order : b2.new_sort_order)
         i = 1
         sibs = b2.siblings(b.new_sort_order)
-    #    Caboose.log("updating #{sibs.count} siblings")
+        Caboose.log("updating #{sibs.count} siblings")
         sibs.each do |b3|
           b3.new_sort_order = b.new_sort_order + i
           b3.status = 'edited' if b3.status == 'published'
@@ -719,7 +719,7 @@ module Caboose
         b.new_sort_order = (b2.new_sort_order.blank? ? (b2.sort_order + 1) : (b2.new_sort_order + 1))
         i = 1
         sibs = b2.siblings(b.new_sort_order)
-    #    Caboose.log("updating #{sibs.count} siblings")
+        Caboose.log("updating #{sibs.count} siblings")
         sibs.each do |b3|
           b3.new_sort_order = b.new_sort_order + i
           b3.status = 'edited' if b3.status == 'published'

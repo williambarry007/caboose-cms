@@ -539,7 +539,7 @@ class Caboose::Block < ActiveRecord::Base
 
   # block siblings (in editing mode)
   def siblings(min_sort_order=0)
-    Caboose::Block.where(:name => nil).where('new_sort_order >= ?',min_sort_order).where("(new_parent_id is null and parent_id = ? and status != ?) OR (new_parent_id = ? and status != ?)",self.parent_id,'deleted',self.parent_id,'deleted').order(:new_sort_order, :id).all
+    Caboose::Block.where(:name => nil).where('new_sort_order >= ?',min_sort_order).where("(new_parent_id is null and parent_id = ? and status != ?) OR (new_parent_id = ? and status != ?)",(self.new_parent_id.blank? ? self.parent_id : self.new_parent_id),'deleted',(self.new_parent_id.blank? ? self.parent_id : self.new_parent_id),'deleted').order(:new_sort_order, :id).all
   end
   
   # Move a block up

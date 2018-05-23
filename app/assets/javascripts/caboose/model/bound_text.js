@@ -68,11 +68,12 @@ BoundText = BoundControl.extend({
   
   set_placeholder_padding: function() {
     var that = this;
-    var w = $('#'+that.el+'_placeholder').outerWidth();    
-    if (w > 0)
-      $('#'+that.el).css('padding-left', '+=' + w);
-    else    
-      setTimeout(function() { that.set_placeholder_padding(); }, 200);                    
+    var w = $('#'+that.el+'_placeholder').outerWidth() + 10; 
+    if (w > 10)
+      $('#'+that.el).css('padding-left', + w);
+    else {
+      setTimeout(function() { that.set_placeholder_padding(); }, 500);                    
+    }
   },
   
   save: function() 

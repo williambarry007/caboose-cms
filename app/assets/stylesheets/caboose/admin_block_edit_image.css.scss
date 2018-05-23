@@ -216,12 +216,12 @@
   background: #141516; 
   color: #f7f7f7 !important;
   text-align: center; 
-  padding: 0 15px;
+  padding: 1px 15px 0 15px;
   height: auto;
   display: inline-block;
   margin: 0 auto;
   font-family: "Roboto", Arial;
-  font-weight: 400;
+  font-weight: 300;
   font-size: 15px;
   line-height: 32px;
   cursor: pointer;
@@ -239,6 +239,10 @@
 }
 .caboose-btn:hover {
   background: #4f4448;
+}
+
+#modal_controls p .caboose-btn {
+  margin-right: 3px;
 }
 
     

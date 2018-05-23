@@ -50,7 +50,7 @@ $(document).ready(function() {
     .append("<span id='m-unpub'>unpublished changes</span>")
     .append($('<a/>').attr('href', '/admin/pages').html("< Back"))
     .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/revert').html("Revert"))
-    .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/preview').attr('target','_blank').html("Preview"))
+    .append($('<a/>').attr('href', '/pages/preview/<%= @page.id %>').attr('target','_blank').html("Preview"))
     .append($('<a/>').attr('href', '/admin/pages/<%= @page.id %>/publish').html("Publish"))
   <% if @page.page_custom_field_values.count > 0 %>
     .append($('<a/>').attr('href', '#').html('Custom Fields').click(function(e) { e.preventDefault(); caboose_modal_url('/admin/pages/<%= @page.id %>/custom-fields'); }))

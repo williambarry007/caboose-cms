@@ -127,15 +127,15 @@ var BlockModalController = ModalController.extend({
   {    
     var that = this;
     var p = $('<p/>').css('clear', 'both')
-      .append($('<input/>').attr('type', 'button').addClass('btn').val('Close').click(function() { that.close(); that.parent_controller.render_blocks(); })).append(' ');
+      .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Close').click(function() { that.close(); that.parent_controller.render_blocks(); })).append(' ');
     if (!that.block.name)                        
     {
-      p.append($('<input/>').attr('type', 'button').addClass('btn').val('Delete Block').click(function() { that.delete_block(); })).append(' ');
-      p.append($('<input/>').attr('type', 'button').addClass('btn').val('Duplicate Block').click(function() { that.duplicate_block(); })).append(' ');
+      p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Delete Block').click(function() { that.delete_block(); })).append(' ');
+      p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Duplicate Block').click(function() { that.duplicate_block(); })).append(' ');
     }
-    p.append($('<input/>').attr('type', 'button').addClass('btn').val('Move Up'   ).click(function() { that.move_up();         })).append(' ');
-    p.append($('<input/>').attr('type', 'button').addClass('btn').val('Move Down' ).click(function() { that.move_down();       })).append(' ');    
-    p.append($('<input/>').attr('type', 'button').addClass('btn').val('Advanced'  ).attr('id', 'btn_advanced').click(function() { that.print_advanced();  }));
+    p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Move Up'   ).click(function() { that.move_up();         })).append(' ');
+    p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Move Down' ).click(function() { that.move_down();       })).append(' ');    
+    p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Advanced'  ).attr('id', 'btn_advanced').click(function() { that.print_advanced();  }));
     $('#modal_controls').empty().append(p);    
   },
   
@@ -146,11 +146,16 @@ var BlockModalController = ModalController.extend({
     var crumbs = $('<h2/>').css('margin-top', '0').css('padding-top', '0');
     $.each(that.block.crumbtrail, function(i, h) {
       if (i > 0) crumbs.append(' > ');
-      crumbs.append($('<a/>').attr('href', '#').html(h['text']).data('block_id', h['block_id']).click(function(e) { 
-        e.preventDefault();
-        if (that.before_crumbtrail_click) that.before_crumbtrail_click();
-        that.parent_controller.edit_block(parseInt($(this).data('block_id')));
-      }));
+      if ( i == 0 || h['text'] == "Content" ) {
+        crumbs.append($('<span/>').html(h['text']).data('block_id', h['block_id']));
+      }
+      else {
+        crumbs.append($('<a/>').attr('href', '#').html(h['text']).data('block_id', h['block_id']).click(function(e) { 
+          e.preventDefault();
+          if (that.before_crumbtrail_click) that.before_crumbtrail_click();
+          that.parent_controller.edit_block(parseInt($(this).data('block_id')));
+        }));
+      }
     }); 
     $('#modal_crumbtrail').empty().append(crumbs);        
   },
@@ -203,8 +208,7 @@ var BlockModalController = ModalController.extend({
     var that = this;    
     if (that.block.block_type.field_type != 'block' && that.block.children.length == 0)
       return;
-    
-    $.each(that.block.children, function(i, b) { that.render_child_block(b); });        
+    $.each(that.block.children, function(i, b) { if ( b.name != null || that.block.block_type.default_child_block_type_id == b.block_type.id ) { that.render_child_block(b); } });        
   },
   
   render_child_block: function(b)

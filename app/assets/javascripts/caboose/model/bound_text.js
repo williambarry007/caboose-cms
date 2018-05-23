@@ -46,7 +46,7 @@ BoundText = BoundControl.extend({
     // var this2 = this;
     // $('#'+this.el).on('keyup', function(e) {
     //   if (e.keyCode == 27) this2.cancel(); // Escape 
-    //   if (e.keyCode == 13) this2.save();   // Enter
+    //   if (e.keyCode == 13) this2.save();   // E
 
     if (that.attribute.width)  $('#'+that.el).css('width', that.attribute.width);    
     if (that.attribute.fixed_placeholder && that.attribute.align != 'right')

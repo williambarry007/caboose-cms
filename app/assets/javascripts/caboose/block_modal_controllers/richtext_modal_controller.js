@@ -9,7 +9,7 @@ var RichtextModalController = BlockModalController.extend({
   assets_to_include: function()
   {
     return [
-      '//cdn.tinymce.com/4/tinymce.min.js'
+      '//cdnjs.cloudflare.com/ajax/libs/tinymce/4.7.13/tinymce.min.js'
       //'//tinymce.cachefly.net/4.0/tinymce.min.js',
       //'caboose/tinymce_init.js'
     ]
@@ -48,7 +48,7 @@ var RichtextModalController = BlockModalController.extend({
           nice_name: 'Content',
           type: 'richtext',
           value: that.block.value,
-          width: 800,
+          width: 798,
           height: 300,
           fixed_placeholder: false,
           after_update: function() {            
@@ -74,7 +74,7 @@ var RichtextModalController = BlockModalController.extend({
     {
       tinymce.init({
         selector: 'textarea.tinymce',
-        width: '800px',
+        width: '798px',
         height: '300px',
         convert_urls: false,
         plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table contextmenu directionality emoticons template paste textcolor caboose',

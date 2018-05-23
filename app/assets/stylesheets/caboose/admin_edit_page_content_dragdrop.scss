@@ -81,6 +81,12 @@
   }
 }
 
+#the_modal {
+  #modal_controls {
+    margin-top: 10px;
+  }
+}
+
 #cboxTopLeft, #cboxTopRight, #cboxBottomLeft, #cboxBottomRight, #cboxMiddleLeft, #cboxMiddleRight, #cboxTopCenter, #cboxBottomCenter, #cboxClose {
   background: #fff !important;
 }
@@ -125,9 +131,9 @@
 .richtext-block {
   z-index: 6;
 }
-#colorbox, #cboxOverlay, #cboxWrapper {
-  z-index: 10000000;
-}
+// #colorbox, #cboxOverlay, #cboxWrapper {
+//   z-index: 10000000;
+// }
 
 body > .ui-draggable-dragging {
   width: 95px;
@@ -290,7 +296,7 @@ body > .container, body > .mm-page > .container {
   &.published {
     background-color: #353535;
     #m-unpub { display: none; }
-    a[href*="revert"], a[href*="publish"] {
+    a[href*="revert"], a[href*="publish"], a[href*="preview"] {
       display: none;
     }
   }

@@ -48,27 +48,48 @@ BlockContentController.prototype = {
     $.each(that.inline_classes, function(k1, c) {
       $.each($('.' + c), function(k2, b) {
        // var el = $(b).find('.value').first();
-        if ( !$(b).hasClass('cke_editable') ) {
+        if ( !$(b).hasClass('cke_editable') && $(b).closest("#the_modal").length == 0 ) {
+  
           $(b).attr('contenteditable','true');
           var target_id = $(b).data('rtid');
-     //     var block_id = $(b).attr('id').replace('block_','');
           var editor = CKEDITOR.inline( $(b).attr('id') );
+
+          var is_saved = true;
 
           editor.on('change', function(ev) {
             that.is_modified();
             $(b).css('background-color','#ffffd0').css('color','black');
+            is_saved = false;
           });
 
           editor.on('blur', function(ev) {
-            var html = $(b).html();
-            $.ajax({
-              url: that.base_url() + '/' + target_id + '/value',
-              type: 'put',
-              data: { value: html },
-              success: function(resp) { 
-                $(b).css('background-color','').css('color','');
-              }
-            });
+            if ( !is_saved ) {
+              var html = $(b).html();
+              $.ajax({
+                url: that.base_url() + '/' + target_id + '/value',
+                type: 'put',
+                data: { value: html },
+                success: function(resp) { 
+                  $(b).css('background-color','').css('color','');
+                  is_saved = true;
+                }
+              });
+            }
+          });
+
+          $(b).on('mouseleave', function(ev) {
+            if ( !is_saved ) {
+              var html = $(b).html();
+              $.ajax({
+                url: that.base_url() + '/' + target_id + '/value',
+                type: 'put',
+                data: { value: html },
+                success: function(resp) { 
+                  $(b).css('background-color','').css('color','');
+                  is_saved = true;
+                }
+              });
+            }
           });
 
         }

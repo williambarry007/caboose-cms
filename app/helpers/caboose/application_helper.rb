@@ -2,7 +2,7 @@ module Caboose
   module ApplicationHelper
     def caboose_tinymce
       return "
-<script src='https://cdn.tinymce.com/4/tinymce.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.7.13/tinymce.min.js'></script>
 <script type='text/javascript'>
 //<![CDATA[
 tinyMCE.init({

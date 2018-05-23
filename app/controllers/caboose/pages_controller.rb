@@ -229,17 +229,6 @@ module Caboose
     # @route GET /pages/preview/:id
     def preview
       @page = Page.find(params[:id])
-<<<<<<< HEAD
-=======
-      # redirect_to "/login?return_url=/admin/pages/#{@page.id}/preview" and return if @logged_in_user.nil?
-      # condition = @logged_in_user && (@logged_in_user.is_super_admin? || (@logged_in_user.site_id == @page.site_id && ( @logged_in_user.is_allowed('all','all') || @logged_in_user.is_allowed('pages','edit') && Page.permissible_actions(@logged_in_user, @page.id).include?('edit'))))
-      condition = @page.site_id == @site.id
-      redirect_to "/admin/pages" and return unless condition
-      # if @page.block.nil?
-      #   redirect_to "/admin/pages/#{@page.id}/layout"
-      #   return
-      # end
->>>>>>> 97f4d33f3f6719b2f17156cf09d0883ee55a5c65
       @editing = true
       @preview = true
       if @page.nil? || @page.site_id != @site.id

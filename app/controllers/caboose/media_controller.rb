@@ -177,7 +177,8 @@ module Caboose
       return unless user_is_allowed('media', 'view')
       media_category_id = params[:media_category_id]
       original_name = params[:name]
-      name = Caboose::Media.upload_name(original_name)                        
+      name = Caboose::Media.upload_name(original_name)    
+      desc = original_name.blank? ? "Media File" : original_name.gsub(/\.[0-9a-z]+$/i,'')
       file_type = params[:file_type]
       if ['image/gif', 'image/jpeg', 'image/png', 'image/tiff'].include? file_type
         image_content_type = file_type
@@ -187,7 +188,7 @@ module Caboose
       m = Media.where(:media_category_id => media_category_id, :original_name => original_name, :name => name).first
       if m.nil?
         max = Media.where(:media_category_id => media_category_id).maximum(:sort_order)
-        m = Media.create(:media_category_id => media_category_id, :sort_order => (max ? (max + 1) : 0), :original_name => original_name, :name => name, :image_content_type => image_content_type, :file_content_type => file_content_type, :processed => false)
+        m = Media.create(:media_category_id => media_category_id, :description => desc, :sort_order => (max ? (max + 1) : 0), :original_name => original_name, :name => name, :image_content_type => image_content_type, :file_content_type => file_content_type, :processed => false)
       end
       p = Product.where(:media_category_id => media_category_id).last
       if p

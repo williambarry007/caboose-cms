@@ -5,45 +5,100 @@ domain = ms ? (ms.primary_domain ? ms.primary_domain.domain : 'www.caboosecms.co
 %>
 <h1>Social Media Config</h1>
 
+<div class="social-wrap">
 <p>Find your Facebook page ID <a href="http://findmyfbid.com" target="_blank">here</a>.</p>
-<p><div id="socialconfig_<%= sc.id %>_facebook_page_id"     ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_twitter_username"     ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_instagram_username"   ></div>
+<div id="socialconfig_<%= sc.id %>_facebook_page_id"     ></div>
+<% if false %>
+<p style="margin:0 0 15px 0;width:500px;font-size:13px;color:#000;text-align:right;position:relative;bottom:10px;"><a id="fb-login" href="#">Authorize Facebook</a> (you must authorize to show posts on this website)
+<% end %>
+<div id="socialconfig_<%= sc.id %>_twitter_username"     ></div>
+<div id="socialconfig_<%= sc.id %>_instagram_username"   ></div>
 <% if sc.instagram_access_token %>
-<p style="margin-top:4px;width:518px;font-size:14px;color:green;text-align:right;">
+<p style="margin:0 0 15px 0;width:500px;font-size:13px;color:#000;text-align:right;position:relative;bottom:10px;">
 Authorized
 <a href="#" id="deauthorize-instagram" style="color:#949494;font-size:12px;margin-left:6px;">Deauthorize</a>
 </p><% end %>
 </p>
 <% if !sc.instagram_access_token %>
-<p style="margin-top:2px;width:518px;font-size:13px;color:#000;text-align:right;"><a href="https://api.instagram.com/oauth/authorize/?client_id=bac12987b6cb4262a004f3ffc388accc&redirect_uri=http://<%= domain %>/api/instagram&response_type=code&state=<%= @site.id %>">Authorize Instagram</a> (you must authorize to show posts on this website)
+<p style="margin:0 0 15px 0;width:500px;font-size:13px;color:#000;text-align:right;position:relative;bottom:10px;"><a href="https://api.instagram.com/oauth/authorize/?client_id=bac12987b6cb4262a004f3ffc388accc&redirect_uri=http://<%= domain %>/api/instagram&response_type=code&state=<%= @site.id %>">Authorize Instagram</a> (you must authorize to show posts on this website)
 <% if params[:instagram] && params[:instagram] == 'fail' %>
 <br /><span style="color:red;">Instagram login failed. Please try again.</span>
 <% end %>
 </p>
 <% end %>
-<p><div id="socialconfig_<%= sc.id %>_youtube_url"          ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_pinterest_url"        ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_vimeo_url"            ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_rss_url"              ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_google_plus_url"      ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_linkedin_url"         ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_google_analytics_id"  ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_google_analytics_id2" ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_auto_ga_js"           ></div></p>
-<p><div id="socialconfig_<%= sc.id %>_share_image"          ></div></p>
+<div id="socialconfig_<%= sc.id %>_youtube_url"          ></div>
+<div id="socialconfig_<%= sc.id %>_pinterest_url"        ></div>
+<div id="socialconfig_<%= sc.id %>_vimeo_url"            ></div>
+<div id="socialconfig_<%= sc.id %>_rss_url"              ></div>
+<div id="socialconfig_<%= sc.id %>_google_plus_url"      ></div>
+<div id="socialconfig_<%= sc.id %>_linkedin_url"         ></div>
+<div id="socialconfig_<%= sc.id %>_google_analytics_id"  ></div>
+<div id="socialconfig_<%= sc.id %>_google_analytics_id2" ></div>
+<div id="socialconfig_<%= sc.id %>_auto_ga_js"           ></div>
+<div id="socialconfig_<%= sc.id %>_share_image"          ></div>
       
 <div id='message'></div>
+
+</div>
 
 <% content_for :caboose_css do %>
 <style type="text/css">
   #deauthorize-instagram:hover {
     color: red !important;
   }
+  .social-wrap > div {
+    margin-bottom: 15px;
+  }
 </style>
 <% end %>
 
 <% content_for :caboose_js do %>
+
+<% if false %>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : '452544411866077',
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v3.0'
+    });
+  };
+
+  $("#fb-login").click(function(e) {
+    e.preventDefault();
+    FB.login(function(response) {
+        if (response.authResponse) {
+         console.log('Welcome!  Fetching your information.... ');
+         FB.api('/me', function(response) {
+           console.log('Good to see you, ' + response.name + '.');
+           FB.getLoginStatus(function(response) {
+              if (response.status === 'connected') {
+                var accessToken = response.authResponse.accessToken;
+                console.log(accessToken);
+                FB.api('/me/accounts', function(response) {
+                  console.dir(response);
+                });
+              } 
+            });
+         });
+        }
+        else {
+         console.log('User cancelled login or did not fully authorize.');
+        }
+    });
+  });
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+<% end %>
+
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
 

@@ -99,14 +99,15 @@
     request.env['HTTPS']           = 'on'
   end
   
-  css = yield(:css)
+  css = b.partial('ga', options)
+  css << yield(:css)
   css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
   css.gsub!("<link href='//" , "<link href='#{protocol}")
   if protocol == 'https://' 
     css.gsub!("<link href=\"http://", "<link href=\"https://")
     css.gsub!("<link href='http://" , "<link href='https://")
   end
-  
+
   js = yield(:js)
   js.gsub!("<script src=\"//", "<script src=\"#{protocol}")
   js.gsub!("<script src='//" , "<script src='#{protocol}")
@@ -117,8 +118,6 @@
   if @site.use_retargeting
     js << b.partial('retargeting', options)
   end
-      
-  js << b.partial('ga', options)  
   
   str.gsub!('|CABOOSE_CSS|'        , css)
   str.gsub!('|CABOOSE_PROTOCOL|'   , protocol)  

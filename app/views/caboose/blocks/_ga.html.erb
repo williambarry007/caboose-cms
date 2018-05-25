@@ -1,45 +1,14 @@
-<%
-sc = site.social_config
-if sc.auto_ga_js && sc.google_analytics_id 
-%>
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    ga('create', '<%= raw sc.google_analytics_id %>', 'auto');
-    ga('send', 'pageview');
-    <% if ga_events && ga_events.count > 0 %>    
-      <% ga_events.each do |arr| %>
-        <%
-        cat    = arr[0] ? arr[0] : nil 
-        action = arr[1] ? arr[1] : nil 
-        label  = arr[2] ? arr[2] : nil 
-        value  = arr[3] ? arr[3] : nil
-        arr2 = [cat, action]
-        arr2 << (label ? label : '') if label || (label.nil? && value)    
-        arr2 << value if value          
-        %>
-    ga('send', 'event'<% arr2.each do |x| %>, <%= raw Caboose.json(x) %><% end %>);
-      <% end %>    
-    <% end %>
-    <% if sc.google_analytics_id2 && sc.google_analytics_id2.strip.length > 0 %> 
-      ga('create', '<%= raw sc.google_analytics_id2 %>', 'auto', {'name': 'property2'});      
-      ga('property2.send', 'pageview');
-      <% if ga_events && ga_events.count > 0 %>    
-        <% ga_events.each do |arr| %>
-          <%
-          cat    = arr[0] ? arr[0] : nil 
-          action = arr[1] ? arr[1] : nil 
-          label  = arr[2] ? arr[2] : nil 
-          value  = arr[3] ? arr[3] : nil
-          arr2 = [cat, action]
-          arr2 << (label ? label : '') if label || (label.nil? && value)    
-          arr2 << value if value          
-          %>
-      ga('property2.send', 'event'<% arr2.each do |x| %>, <%= raw Caboose.json(x) %><% end %>);
-        <% end %>    
-      <% end %>
-    <% end %>    
-  </script>
+<% sc = site.social_config %>
+
+<% if sc.auto_ga_js && !sc.google_analytics_id.blank? %>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<%== sc.google_analytics_id %>"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '<%== sc.google_analytics_id %>');
+  <% if !sc.google_analytics_id2.blank? %> 
+  gtag('config', '<%== sc.google_analytics_id2 %>');
+  <% end %>
+</script>
 <% end %>

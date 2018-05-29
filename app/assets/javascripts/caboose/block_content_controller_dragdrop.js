@@ -64,6 +64,7 @@ BlockContentController.prototype = {
 
           editor.on('blur', function(ev) {
             if ( !is_saved ) {
+              $(b).find("span > span[contenteditable='false']").remove();
               var html = $(b).html();
               $.ajax({
                 url: that.base_url() + '/' + target_id + '/value',
@@ -79,6 +80,7 @@ BlockContentController.prototype = {
 
           $(b).on('mouseleave', function(ev) {
             if ( !is_saved ) {
+              $(b).find("span > span[contenteditable='false']").remove();
               var html = $(b).html();
               $.ajax({
                 url: that.base_url() + '/' + target_id + '/value',
@@ -268,7 +270,7 @@ BlockContentController.prototype = {
   
   delete_block: function(block_id, confirm)
   {
-    var that = this;      
+    var that = this;
     if (this.selected_block_ids.indexOf(block_id) == -1)
       this.selected_block_ids.push(block_id);
     var other_count = this.selected_block_ids.length - 1;
@@ -288,11 +290,10 @@ BlockContentController.prototype = {
       return;
     }
     else {
-      for (var i in this.selected_block_ids) {
-        var bid = this.selected_block_ids[i];
-        $('#block_' + bid).remove();
-        that.delete_block_save(bid);
-      }
+      $.each( this.selected_block_ids, function(k1,v1) {
+        $('#block_' + v1).remove();
+        that.delete_block_save(v1);
+      });
       that.selected_block_ids = [];
       that.add_dropzones();
       that.is_modified();

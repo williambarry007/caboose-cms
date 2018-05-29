@@ -8,7 +8,7 @@
 #the_modal div.icons a:hover span.icon { color: #000 !important; }
 #the_modal div.icons a:hover span.name { color: #000 !important; }
 
-#the_modal { box-sizing: border-box; }   
+#the_modal { box-sizing: border-box; color: #252525; }   
 #the_modal p { margin-bottom: 10px; }
 #the_modal .mb_container input { border: #ccc 1px solid; }                                                          
 #the_modal div.mb_container div.mb_placeholder { top: 9px; }

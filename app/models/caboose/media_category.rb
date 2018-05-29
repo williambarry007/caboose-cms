@@ -37,17 +37,21 @@ class Caboose::MediaCategory < ActiveRecord::Base
   
   def self.flat_tree_helper(cat, prefix, str)        
     cat.name = "#{str}#{cat.name}"
-    arr = [{
-      :id          => cat.id,
-      :parent_id   => cat.parent_id,
-      :site_id     => cat.site_id,      
-      :name        => cat.name,
-      :media_count => cat.media.count      
-    }]
-    cat.children.each do |cat2|
-      arr += self.flat_tree_helper(cat2, prefix, "#{str}#{prefix}")
+    if cat.name == "-&nbsp;&nbsp;Products"
+      return []
+    else
+      arr = [{
+        :id          => cat.id,
+        :parent_id   => cat.parent_id,
+        :site_id     => cat.site_id,      
+        :name        => cat.name,
+        :media_count => cat.media.count      
+      }]
+      cat.children.each do |cat2|
+        arr += self.flat_tree_helper(cat2, prefix, "#{str}#{prefix}")
+      end
+      return arr
     end
-    return arr
   end
   
   def self.tree_hash(site_id)
@@ -60,7 +64,7 @@ class Caboose::MediaCategory < ActiveRecord::Base
       :id => cat.id,
       :name => cat.name,
       :media_count => cat.media.count,
-      :children => cat.children.collect{ |kid| self.tree_hash_helper(kid) }
+      :children => (cat.name == 'Products' ? [] : cat.children.collect{ |kid| self.tree_hash_helper(kid) })
     }
   end
   

@@ -112,7 +112,7 @@ var BlockModalController = ModalController.extend({
       }
       if (that.block.block_type.allow_child_blocks)
       {        
-        div.append($('<p/>').css('clear', 'both').append($('<a/>').attr('href', '#').html(that.add_child_link_text ? that.add_child_link_text : "Add a child block!").click(function(e) {
+        div.append($('<p/>').css('clear', 'both').append($('<a/>').addClass('caboose-btn').attr('href', '#').html(that.add_child_link_text ? that.add_child_link_text : "Add a child block!").click(function(e) {
           e.preventDefault();
           that.add_block();
         })));                            
@@ -205,7 +205,7 @@ var BlockModalController = ModalController.extend({
 
   render_child_blocks: function()
   {
-    var that = this;    
+    var that = this;
     if (that.block.block_type.field_type != 'block' && that.block.children.length == 0)
       return;
     $.each(that.block.children, function(i, b) { if ( b.name != null || that.block.block_type.default_child_block_type_id == b.block_type.id ) { that.render_child_block(b); } });        
@@ -213,7 +213,7 @@ var BlockModalController = ModalController.extend({
   
   render_child_block: function(b)
   {
-    var that = this;    
+    var that = this;
     if (that.complex_field_types.indexOf(b.block_type.field_type) > -1)
     {
       if (!b.rendered_value)
@@ -223,7 +223,6 @@ var BlockModalController = ModalController.extend({
           type: 'get',
           success: function(html) {
             $('#the_modal #block_' + b.id).replaceWith(html);
-            
             var b2 = that.block_with_id(b.id);            
             b2.rendered_value = html;
             that.set_clickable(b2);                            

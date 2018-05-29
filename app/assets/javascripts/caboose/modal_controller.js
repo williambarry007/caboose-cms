@@ -30,8 +30,8 @@ var ModalController = Class.extend({
       closeButton: false,
       opacity: 0.50,
       onComplete: function() {        
-        var arr = ['TopLeft','TopCenter','TopRight','BottomLeft','BottomCenter','BottomRight','MiddleLeft','MiddleRight'];
-        for (var i in arr) $('#cbox' + arr[i]).css('background-color', '#fff !important');        
+        // var arr = ['TopLeft','TopCenter','TopRight','BottomLeft','BottomCenter','BottomRight','MiddleLeft','MiddleRight'];
+        // for (var i in arr) $('#cbox' + arr[i]).css('background-color', '#fff !important');        
         $("#cboxClose").hide();
         if (callback) callback();        
       }

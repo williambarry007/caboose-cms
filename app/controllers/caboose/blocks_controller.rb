@@ -85,7 +85,7 @@ module Caboose
       blocks = []
       if params[:id]
         b = Block.find(params[:id])
-        b.create_children(status: 'added') if Caboose::Block.where(:parent_id => b.id).count == 0
+        b.create_children(status: 'added') # if Caboose::Block.where(:parent_id => b.id).count == 0
         bt = b.block_type
         blocks << { 
           'id'                 => b.id,
@@ -138,7 +138,7 @@ module Caboose
           :block_id => b.id,
           :text => bt.description
         }        
-        b = b.parent
+        b = (b.new_parent_id.blank? ? b.parent : Caboose::Block.find(b.new_parent_id))
       end
       return crumbs.reverse
     end
@@ -146,7 +146,8 @@ module Caboose
     def admin_tree_helper(b,level)
       arr = []
       if level < 3
-        b.filtered_children(true,true).each do |b2|
+        sort_by_id = b.block_type.default_child_block_type_id.nil? ? true : false
+        b.filtered_children(true,sort_by_id).each do |b2|
           bt = b2.block_type
           arr << {
             'id'                 => b2.id,
@@ -483,7 +484,9 @@ module Caboose
                 b = RichTextBlockParser.parse(b, v, request.host_with_port)
               else
                 if b.block_type.field_type == 'checkbox_multiple'
-                  b.new_value = Block.parse_checkbox_multiple_value(b, v)
+                  pv = Block.parse_checkbox_multiple_value(b, v)
+                  b.new_value = (pv.blank? ? 'EMPTY' : pv)
+                  b.status = 'edited' if b.status == 'published'
                 else                    
                   b.new_value = (v.blank? ? 'EMPTY' : v)
                   b.status = 'edited' if b.status == 'published'
@@ -689,9 +692,9 @@ module Caboose
       return unless user_is_allowed("#{page_or_post}s", 'edit')
       resp = StdClass.new
       b = Block.find(params[:id])
-      par = Block.where(:name => nil).where(:id => (b.new_parent_id.blank? ? b.parent_id : b.new_parent_id)).first
+      par = Block.where("name is null or name like '%column%'").where(:id => (b.new_parent_id.blank? ? b.parent_id : b.new_parent_id)).first
       resp.parent_id = par ? par.id : nil
-      gp = par ? Block.where(:name => nil).where(:id => (par.new_parent_id.blank? ? par.parent_id : par.new_parent_id)).first : nil
+      gp = par ? Block.where("name is null or name like '%column%'").where(:id => (par.new_parent_id.blank? ? par.parent_id : par.new_parent_id)).first : nil
       resp.grandparent_id = gp ? gp.id : nil
       render :json => resp
     end
@@ -707,7 +710,7 @@ module Caboose
         b.new_sort_order = (b2.new_sort_order.blank? ? b2.sort_order : b2.new_sort_order)
         i = 1
         sibs = b2.siblings(b.new_sort_order)
-        Caboose.log("updating #{sibs.count} siblings")
+    #    Caboose.log("updating #{sibs.count} siblings")
         sibs.each do |b3|
           b3.new_sort_order = b.new_sort_order + i
           b3.status = 'edited' if b3.status == 'published'
@@ -719,7 +722,7 @@ module Caboose
         b.new_sort_order = (b2.new_sort_order.blank? ? (b2.sort_order + 1) : (b2.new_sort_order + 1))
         i = 1
         sibs = b2.siblings(b.new_sort_order)
-        Caboose.log("updating #{sibs.count} siblings")
+     #   Caboose.log("updating #{sibs.count} siblings")
         sibs.each do |b3|
           b3.new_sort_order = b.new_sort_order + i
           b3.status = 'edited' if b3.status == 'published'

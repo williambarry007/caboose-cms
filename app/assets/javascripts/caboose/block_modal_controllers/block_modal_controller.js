@@ -112,7 +112,7 @@ var BlockModalController = ModalController.extend({
       }
       if (that.block.block_type.allow_child_blocks)
       {        
-        div.append($('<p/>').css('clear', 'both').append($('<a/>').attr('href', '#').html(that.add_child_link_text ? that.add_child_link_text : "Add a child block!").click(function(e) {
+        div.append($('<p/>').css('clear', 'both').append($('<a/>').addClass('caboose-btn').attr('href', '#').html(that.add_child_link_text ? that.add_child_link_text : "Add a child block!").click(function(e) {
           e.preventDefault();
           that.add_block();
         })));                            

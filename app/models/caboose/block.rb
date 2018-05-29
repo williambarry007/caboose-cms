@@ -130,7 +130,7 @@ class Caboose::Block < ActiveRecord::Base
     blocks = []
     if editing
       sortby = sort_by_id ? 'block_type_id' : 'new_sort_order,id'
-      blocks = Caboose::Block.where("new_parent_id = ? or (parent_id = ? and new_parent_id is null)", self.id, self.id).order(sortby)
+      blocks = Caboose::Block.where("status != ?","deleted").where("new_parent_id = ? or (parent_id = ? and new_parent_id is null)", self.id, self.id).order(sortby)
     else
       blocks = Caboose::Block.where(:parent_id => self.id).order('sort_order,id')
     end
@@ -526,15 +526,24 @@ class Caboose::Block < ActiveRecord::Base
   
   # Parses the value given for a checkbox multiple block
   def self.parse_checkbox_multiple_value(b, arr)
-    current_value = b.value ? b.value.split('|') : []
+    current_value = b.new_value.blank? ? (b.value ? b.value.split('|') : []) : (b.new_value ? b.new_value.split('|') : [])
     v = arr[0]
     checked = arr[1].to_i == 1
-    if checked && !current_value.include?(v)
-      current_value << v      
-    elsif !checked && current_value.include?(v)
-      current_value.delete(v)
+    if v == 'all'
+      if checked && b.block_type && !b.block_type.options.blank?
+        Caboose.log(b.block_type.options)
+        return b.block_type.options.split("\n").join('|')
+      else
+        return ''
+      end
+    else
+      if checked && !current_value.include?(v)
+        current_value << v      
+      elsif !checked && current_value.include?(v)
+        current_value.delete(v)
+      end
+      return current_value.join('|')
     end
-    return current_value.join('|')
   end
 
   # block siblings (in editing mode)

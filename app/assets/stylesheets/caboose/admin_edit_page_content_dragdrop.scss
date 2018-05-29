@@ -273,7 +273,7 @@ body > .container, body > .mm-page > .container {
   a {
     display: inline-block;
     color: #fff;
-    padding: 0 10px;
+    padding: 0 10px 1px 10px;
     font-family: 'Roboto';
     font-weight: 300;
     font-size: 12px;
@@ -282,7 +282,7 @@ body > .container, body > .mm-page > .container {
     margin-left: 8px;
     text-transform: uppercase;
     border-radius: 3px;
-    line-height: 24px;
+    line-height: 28px;
     &[href*="revert"] {
       background: #903b3b;
     }
@@ -372,7 +372,7 @@ body > .container, body > .mm-page > .container {
   a {
     position: absolute;
     top: 1px;
-    right: 5px;
+    left: 5px;
     text-decoration: none;
     color: #fff;
     display: inline-block;

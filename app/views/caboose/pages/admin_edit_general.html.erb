@@ -17,22 +17,7 @@
 
 <%= render :partial => 'caboose/pages/admin_footer' %>
 
-<% content_for :caboose_css do %>
-<style type='text/css'>
 
-div.field_with_explanation {
-  width: 420px;
-  background: #efefef;
-  margin-bottom: 12px;
-}
-
-span.explanation {
-  display: block;
-  padding: 8px;    
-}
-
-</style>
-<% end %>
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
@@ -51,18 +36,18 @@ $(document).ready(function() {
     update_url: '/admin/pages/<%= @page.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'title'                 , nice_name: 'Title'                , type: 'text'       , value: <%= raw Caboose.json(@page.title           ) %> , width: 400 },
-      { name: 'menu_title'            , nice_name: 'Menu title'           , type: 'text'       , value: <%= raw Caboose.json(@page.menu_title      ) %> , width: 400 },
-      { name: 'parent_id'             , nice_name: 'Parent'               , type: 'select'     , value: <%= @page.parent_id                          %> , width: 400, after_update: function() { update_uri(<%= @page.id %>); }, text: <%= raw (@page.parent_id == -1 ? "[No Parent]" : @page.parent.title).to_json %>, options_url: '/admin/pages/sitemap-options' },           
-      { name: 'slug'                  , nice_name: 'Slug'                 , type: 'text'       , value: <%= raw Caboose.json(@page.slug            ) %> , width: 400, after_update: function() { update_uri(<%= @page.id %>); } }, 
-      { name: 'alias'                 , nice_name: 'Alias'                , type: 'text'       , value: <%= raw Caboose.json(@page.alias           ) %> , width: 400, after_update: function() { update_uri(<%= @page.id %>); } }, 
-      { name: 'redirect_url'          , nice_name: 'Redirect URL'         , type: 'text'       , value: <%= raw Caboose.json(@page.redirect_url    ) %> , width: 400 },
-      { name: 'hide'                  , nice_name: 'Hide'                 , type: 'checkbox'   , value: <%= raw @page.hide                           %> , width: 400 },      
-      { name: 'custom_sort_children'  , nice_name: 'Custom sort children' , type: 'checkbox'   , value: <%= raw @page.custom_sort_children           %> , width: 400 },
+      { name: 'title'                 , nice_name: 'Title'                , type: 'text'       , value: <%= raw Caboose.json(@page.title           ) %> , width: 500 },
+      { name: 'menu_title'            , nice_name: 'Menu title'           , type: 'text'       , value: <%= raw Caboose.json(@page.menu_title      ) %> , width: 500 },
+      { name: 'parent_id'             , nice_name: 'Parent'               , type: 'select'     , value: <%= @page.parent_id                          %> , width: 500, after_update: function() { update_uri(<%= @page.id %>); }, text: <%= raw (@page.parent_id == -1 ? "[No Parent]" : @page.parent.title).to_json %>, options_url: '/admin/pages/sitemap-options' },           
+      { name: 'slug'                  , nice_name: 'Slug'                 , type: 'text'       , value: <%= raw Caboose.json(@page.slug            ) %> , width: 500, after_update: function() { update_uri(<%= @page.id %>); } }, 
+      { name: 'alias'                 , nice_name: 'Alias'                , type: 'text'       , value: <%= raw Caboose.json(@page.alias           ) %> , width: 500, after_update: function() { update_uri(<%= @page.id %>); } }, 
+      { name: 'redirect_url'          , nice_name: 'Redirect URL'         , type: 'text'       , value: <%= raw Caboose.json(@page.redirect_url    ) %> , width: 500 },
+      { name: 'hide'                  , nice_name: 'Hide'                 , type: 'checkbox'   , value: <%= raw @page.hide                           %> , width: 500 },      
+      { name: 'custom_sort_children'  , nice_name: 'Custom sort children' , type: 'checkbox'   , value: <%= raw @page.custom_sort_children           %> , width: 500 },
     <% if false %>
-      { name: 'content_format'        , nice_name: 'Content format'       , type: 'select'     , value: <%= raw Caboose.json(@page.content_format  ) %> , width: 400, text: <%= raw Caboose.json(@page.content_format) %>, options_url: '/admin/pages/format-options' },
+      { name: 'content_format'        , nice_name: 'Content format'       , type: 'select'     , value: <%= raw Caboose.json(@page.content_format  ) %> , width: 500, text: <%= raw Caboose.json(@page.content_format) %>, options_url: '/admin/pages/format-options' },
     <% end %>
-      { name: 'tags'                  , nice_name: 'Tags'                 , type: 'text'       , value: <%= raw Caboose.json(tags                  ) %> , width: 400 }
+      { name: 'tags'                  , nice_name: 'Tags'                 , type: 'text'       , value: <%= raw Caboose.json(tags                  ) %> , width: 500 }
     ]
   });
 });

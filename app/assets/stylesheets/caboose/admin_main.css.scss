@@ -178,7 +178,7 @@ h1,h2,h3,h4,h5,h6 {
   margin: 0 0 20px 0;
   width: calc(100% + 30px);
   padding: 0 2% 0 50px;
-  height: 53px;  
+  height: 54px;  
   background: #dcdcdc;
   border-bottom: #aaa 1px solid;
   font-size: 25px;
@@ -255,10 +255,30 @@ input, select, textarea {
   font-family: 'Roboto', arial;
   font-weight: 400;
   border: 1px solid #ccc;
-  padding: 6px 4px 4px 8px;
+  padding: 4px 4px 4px 8px;
   height: 36px;
   font-size: 15px;
   z-index: 20;
+}
+
+span.explanation {
+  display: block;
+  color: #545454;
+  font-size: 13px;
+  padding: 4px 5px 0px 9px;
+  a {
+    color: #5151a9;
+    text-decoration: none;
+    &:hover {
+      color: #69a951;
+    }
+  }
+}
+
+div.field_with_explanation {
+  padding: 13px 5px 10px 5px;
+  border-bottom: 1px solid #e8e8e8;
+  max-width: 800px;
 }
 
 input:focus, textarea:focus {
@@ -582,7 +602,7 @@ Page Bar Generator
 #tabs a {
   display: block;
   margin: 0;
-  padding: 13px 12px 12px 12px;
+  padding: 12px;
   text-decoration: none;
   background: #efefef;
   border-bottom: #ccc 1px solid;
@@ -631,12 +651,12 @@ Page Bar Generator
   text-align: center; 
   font-family: "Roboto", Arial;
   font-weight: 400;
-  padding: 1px 15px 0 15px;
+  padding: 1px 15px 3px 15px;
   height: auto;
   display: inline-block;
   margin: 0 auto;
   font-size: 15px;
-  line-height: 32px;
+  line-height: 30px;
   cursor: pointer;
   border: 1px solid #fff;
   -webkit-border-radius: 5px;
@@ -654,7 +674,7 @@ Page Bar Generator
   text-align: center; 
   font-family: "Roboto", Arial;
   font-weight: 400;
-  padding: 1px 15px 0 15px;
+  padding: 1px 15px 3px 15px;
   height: auto;
   display: inline-block;
   margin: 0 auto;
@@ -665,7 +685,7 @@ Page Bar Generator
   -webkit-appearance: none;
   -moz-border-radius: 5px;
   border-radius: 5px;
-  line-height: 32px;
+  line-height: 30px;
   text-decoration: none !important;
 }
 

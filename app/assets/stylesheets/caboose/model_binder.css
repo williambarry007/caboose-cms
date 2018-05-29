@@ -88,10 +88,8 @@ div.mb_container div.mb_placeholder {
   display: block;
   margin: 0;
   padding: 0 5px 0 0;
-  /*height: 34px;*/
-  
   position: absolute;
-  top: 10px;
+  top: 8px;
   left: 9px;
   z-index: 19;  
 }

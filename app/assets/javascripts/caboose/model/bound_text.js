@@ -70,7 +70,7 @@ BoundText = BoundControl.extend({
     var that = this;
     var w = $('#'+that.el+'_placeholder').outerWidth() + 10; 
     if (w > 10)
-      $('#'+that.el).css('padding-left', + w);
+      $('#'+that.el).css('padding-left', w);
     else {
       setTimeout(function() { that.set_placeholder_padding(); }, 500);                    
     }

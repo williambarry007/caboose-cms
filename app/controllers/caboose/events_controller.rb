@@ -24,7 +24,7 @@ module Caboose
       render :file => "caboose/extras/error404" and return if @event.nil?                 
       @event = Caboose.plugin_hook('event_content', @event)
       @page.title = @event.name
-      @editmode = !params['edit'].nil? && user.is_allowed('calendars', 'edit') ? true : false  
+  #    @editmode = !params['edit'].nil? && user.is_allowed('calendars', 'edit') ? true : false  
     end
     
     # @route_priority 1

@@ -146,7 +146,7 @@ var BlockModalController = ModalController.extend({
     var crumbs = $('<h2/>').css('margin-top', '0').css('padding-top', '0');
     $.each(that.block.crumbtrail, function(i, h) {
       if (i > 0) crumbs.append(' > ');
-      if ( i == 0 || h['text'] == "Content" ) {
+      if ( i == 0 || (i == 1 && h['text'] == "Content" )) {
         crumbs.append($('<span/>').html(h['text']).data('block_id', h['block_id']));
       }
       else {

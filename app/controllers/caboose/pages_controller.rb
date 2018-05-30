@@ -79,7 +79,9 @@ module Caboose
       page = Caboose.plugin_hook('page_content', page)      
       @page = page
       @user = user
-      @editmode = !params['edit'].nil? && user.is_allowed('pages', 'edit') ? true : false
+      @editing = false
+      @preview = false
+   #   @editmode = !params['edit'].nil? && user.is_allowed('pages', 'edit') ? true : false
    #   @crumb_trail = Caboose::Page.crumb_trail(@page)
    #   @subnav = Caboose::Page.subnav(@page, session['use_redirect_urls'], @user)
       #@subnav.links = @tasks.collect {|href, task| {'href' => href, 'text' => task, 'is_current' => uri == href}}

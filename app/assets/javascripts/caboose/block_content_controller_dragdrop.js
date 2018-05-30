@@ -214,7 +214,7 @@ BlockContentController.prototype = {
     that.is_modified();
     if ( before_block_id != block_id && after_block_id != block_id && parent_id != block_id ) {
       var original = $('#block_' + block_id);
-      original.draggable('destroy');
+      if ( original.data('ui-draggable') ) { original.draggable('destroy'); }
       var el = original.detach();
       el.removeClass('ui-draggable-dragging, block_over');
       el.css({'left':'auto','right':'auto','bottom':'auto','top':'auto','height':'auto','width':'auto'});
@@ -232,6 +232,8 @@ BlockContentController.prototype = {
         else
           $('#block_' + parent_id).append(el);
       }
+      if ( el.data('height') ) { el.css('height', el.data('height')); }
+      if ( el.data('width') ) { el.css('width', el.data('width')); }
       that.move_block_save(block_id, parent_id, before_block_id, after_block_id);
     }
   },

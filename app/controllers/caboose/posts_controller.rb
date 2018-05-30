@@ -26,8 +26,10 @@ module Caboose
       end      
       render :file => "caboose/extras/error404" and return if @post.nil?                 
 
+      @editing = false
+      @preview = false
       @post = Caboose.plugin_hook('post_content', @post)
-      @editmode = !params['edit'].nil? && user.is_allowed('posts', 'edit') ? true : false  
+   #   @editmode = !params['edit'].nil? && user.is_allowed('posts', 'edit') ? true : false  
     end
   
     #=============================================================================

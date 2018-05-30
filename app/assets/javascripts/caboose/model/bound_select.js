@@ -142,11 +142,11 @@ BoundSelect = BoundControl.extend({
   
   set_placeholder_padding: function() {
     var that = this;        
-    var w = $('#'+that.placeholder).outerWidth(true);
-    if (w > 0)
-      $('#'+that.el).css('padding-left', '+=' + w);
+    var w = $('#'+that.placeholder).outerWidth(true) + 10;
+    if (w > 10)
+      $('#'+that.el).css('padding-left', w);
     else            
-      setTimeout(function() { that.set_placeholder_padding(); }, 200);                    
+      setTimeout(function() { that.set_placeholder_padding(); }, 500);                    
   },
              
   //update_options: function() {    

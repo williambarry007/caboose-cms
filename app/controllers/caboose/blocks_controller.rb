@@ -514,24 +514,13 @@ module Caboose
     def admin_update_value
       return unless user_is_allowed('pages', 'edit')
       resp = StdClass.new({'attributes' => {}})
+      val = params[:value]
       b = Block.find(params[:id])
-      # if b.block_type_id == 309 # Richtext
-      b.new_value = params[:value]
-      b.status = 'edited' if b.status == 'published'
-      # if b.page
-      #   b.page.status = 'edited'
-      #   b.page.save
-      # elsif b.post
-      #   b.post.status = 'edited'
-      #   b.post.save
-      # end
-
-      # elsif b.block_type_id == 1 # Heading
-      #   b1 = b.child('heading_text')
-      #   b1.value = params[:value]
-      #   b1.save
-      # end
-      resp.success = b.save
+      if b
+        b.new_value = val.blank? ? 'EMPTY' : val.gsub(/<span><span contenteditable="false"([A-z0-9;\-\(\),><#&\/\.\?↵ =":]*)<\/span><\/span>/,'').gsub('<span></span>','').gsub('<span style=""></span>','')
+        b.status = 'edited' if b.status == 'published'
+        resp.success = b.save
+      end
       render :json => resp
     end
     

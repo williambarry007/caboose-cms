@@ -22,6 +22,7 @@ $(document).ready(function() {
     allow_bulk_delete:   false ,
     allow_duplicate:     false ,
     allow_advanced_edit: true ,
+    after_add: 'redirect',
     fields: [
       { show: true , bulk_edit: false , name: 'title'        , nice_name: 'Title'        , sort: 'title'        , type: 'text'     , value: function(p) { return p.title                                     }, width: 300, editable: false },
       { show: true , bulk_edit: false , name: 'published'    , nice_name: 'Published'    , sort: 'published'    , type: 'checkbox' , value: function(p) { return p.published ? 'Yes' : 'No'                  }, width: 100, editable: false },

@@ -64,8 +64,8 @@ BlockContentController.prototype = {
 
           editor.on('blur', function(ev) {
             if ( !is_saved ) {
-              $(b).find("span > span[contenteditable='false']").remove();
-              var html = $(b).html();
+           //   $(b).find("span > span[contenteditable='false']").remove();
+              var html = editor.getData();
               $.ajax({
                 url: that.base_url() + '/' + target_id + '/value',
                 type: 'put',
@@ -80,8 +80,8 @@ BlockContentController.prototype = {
 
           $(b).on('mouseleave', function(ev) {
             if ( !is_saved ) {
-              $(b).find("span > span[contenteditable='false']").remove();
-              var html = $(b).html();
+            //  $(b).find("span > span[contenteditable='false']").remove();
+              var html = editor.getData();
               $.ajax({
                 url: that.base_url() + '/' + target_id + '/value',
                 type: 'put',

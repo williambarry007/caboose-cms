@@ -302,6 +302,12 @@ module Caboose
               saved_blocks << c2.id
               c2.children.each do |c3|
                 saved_blocks << c3.id
+                c3.children.each do |c4|
+                  saved_blocks << c4.id
+                  c4.children.each do |c5|
+                    saved_blocks << c5.id
+                  end
+                end
               end
             end
           end

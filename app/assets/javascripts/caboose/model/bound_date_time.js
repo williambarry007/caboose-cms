@@ -10,6 +10,7 @@ BoundDateTime = BoundControl.extend({
   save_attempts: 0,
  
   init: function(params) {
+    var that = this;
     for (var thing in params)
       this[thing] = params[thing];
     
@@ -32,29 +33,39 @@ BoundDateTime = BoundControl.extend({
     if (this.attribute.fixed_placeholder)      
       $('#'+this.el+'_container').append($('<div/>').attr('id', this.el + '_placeholder').addClass('mb_placeholder').append($('<span/>').html(this.attribute.nice_name + ': ')));    
     if (this.attribute.width)  $('#'+this.el).css('width' , this.attribute.width);
-    if (this.attribute.fixed_placeholder)
-    {
-      var w = $('#'+this.el+'_placeholder').outerWidth();
-      //$('#'+this.el).attr('placeholder', 'empty').css('padding-left', '+=' + w).css('width', '-=' + w);
-    }
+    if (that.attribute.fixed_placeholder && that.attribute.align != 'right')
+      that.set_placeholder_padding();
     
-    var this2 = this;
-    $('#'+this.el).on('keyup', function(e) {
-      if (e.keyCode == 27) this2.cancel(); // Escape 
-      if (e.keyCode == 13) this2.save();   // Enter
+    // var this2 = this;
+    // $('#'+this.el).on('keyup', function(e) {
+    //   if (e.keyCode == 27) this2.cancel(); // Escape 
+    //   if (e.keyCode == 13) this2.save();   // Enter
       
-      if ($('#'+this2.el).val() != this2.attribute.value_clean)
-        $('#'+this2.el).addClass('mb_dirty');
+    //   if ($('#'+this2.el).val() != this2.attribute.value_clean)
+    //     $('#'+this2.el).addClass('mb_dirty');
+    //   else
+    //     $('#'+this2.el).removeClass('mb_dirty');
+    // });                             
+    // $('#'+this.el).on('blur', function() {
+    //   if (this2.save_attempts < 1)
+    //   {
+    //     this2.save_attempts++;
+    //     this2.save();
+    //   }      
+    // });
+
+    $('#'+that.el).on('keyup', function(e) {
+      if (e.keyCode == 27) that.cancel(); // Escape 
+      if (e.keyCode == 13) that.save();   // Enter
+      if ($('#'+that.el).val() != that.attribute.value_clean)
+        $('#'+that.el).addClass('mb_dirty');
       else
-        $('#'+this2.el).removeClass('mb_dirty');
+        $('#'+that.el).removeClass('mb_dirty');
     });                             
-    $('#'+this.el).on('blur', function() {
-      if (this2.save_attempts < 1)
-      {
-        this2.save_attempts++;
-        this2.save();
-      }      
-    });
+    $('#'+that.el).on('blur', function() { that.save(); });
+    $('#'+that.el).on('change', function() { that.save(); });
+
+
     $('#'+this.el).css('z-index', 21);
     $('#'+this.el).css('position', 'relative');
     $('#'+this.el).css('background', 'transparent');    
@@ -63,6 +74,16 @@ BoundDateTime = BoundControl.extend({
       formatTime: 'h:i a', // 12-hour format without leading zeros + lowercase am/pm
       step: 15
     });
+  },
+
+  set_placeholder_padding: function() {
+    var that = this;
+    var w = $('#'+that.el+'_placeholder').outerWidth() + 10; 
+    if (w > 10)
+      $('#'+that.el).css('padding-left', w);
+    else {
+      setTimeout(function() { that.set_placeholder_padding(); }, 500);                    
+    }
   },
   
   save: function() {

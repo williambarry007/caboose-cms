@@ -55,8 +55,6 @@ BoundText = BoundControl.extend({
     $('#'+that.el).on('keyup', function(e) {
       if (e.keyCode == 27) that.cancel(); // Escape 
       if (e.keyCode == 13) that.save();   // Enter
-
-      
       if ($('#'+that.el).val() != that.attribute.value_clean)
         $('#'+that.el).addClass('mb_dirty');
       else

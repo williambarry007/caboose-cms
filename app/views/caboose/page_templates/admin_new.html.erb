@@ -1,0 +1,38 @@
+<h1>New Page Template</h1>
+
+<form action='/admin/templates' method='post' id='new_template_form' onsubmit="add_template();return false;">
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
+<p><input type='text' name='title' placeholder='Title' style="width: 400px;" /></p>
+<p><select name='category_id'>
+  <option value=''>-- Select a category --</option>
+  <% cats = Caboose::PageTemplateCategory.order(:title).all.each do |cat| %>
+    <option <% if params[:category] == cat.id.to_s %>selected<% end %> value="<%= cat.id %>"><%= cat.title %></option>
+  <% end %>
+</select></p>
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/templates';" />
+<input type='submit' value='Add Page Template' />
+</p>
+</form>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+function add_template()
+{
+  $("#message").html("<p class='loading'>Adding page template...</p>");
+  $.ajax({
+    url: '/admin/templates',
+    type: 'post',
+    data: $('#new_template_form').serialize(),    
+    success: function(resp) {
+      if (resp.error) $("#message").html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+
+</script>
+<% end %>

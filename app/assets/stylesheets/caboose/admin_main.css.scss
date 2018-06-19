@@ -207,15 +207,15 @@ p.current_page_editing {
   padding: 10px 10px 10px 30px;
 }
 
-#content p.loading {
-  background-image: url('/assets/caboose/loading_black_on_white.gif');
-  background-position: 0 center;
-  background-repeat: no-repeat;
-  color: #000;  
-  font-weight: normal;
-  font-size: 16pt;
-  padding: 10px 10px 10px 40px;
-}
+// #content p.loading {
+//   background-image: url('/assets/caboose/loading_black_on_white.gif');
+//   background-position: 0 center;
+//   background-repeat: no-repeat;
+//   color: #000;  
+//   font-weight: normal;
+//   font-size: 16pt;
+//   padding: 10px 10px 10px 40px;
+// }
 
 #content div.yesnobox {
   position: absolute;
@@ -529,6 +529,139 @@ Page Bar Generator
 
 #search_form input[type='text']   { padding: 6px 12px; }
 #search_form input[type='submit'] { height: 35px; padding: 0 12px; }
+
+
+.new-page-form-wrapper {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 0 50px 0 20px;
+  section {
+    padding: 20px 10px 20px 20px;
+    border: 1px solid #d6d6d6;
+    margin-bottom: 30px;
+    h4 {
+      margin: 0 0 10px 0;
+      font-size: 17px;
+    }
+    .field {
+      margin-bottom: 15px;
+      &:last-of-type { margin-bottom: 0; }
+      label {
+        display: block;
+        font-size: 15px;
+        margin-bottom: 2px;
+      }
+      input, select {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
+      p.meta {
+        font-size: 13px;
+        margin: 3px 0 0 0;
+      }
+    }
+    &.buttons {
+      .caboose-btn {
+        float: right;
+      }
+    }
+  }
+  #page-message {
+    margin: 30px 0;
+    .note {
+      text-align: center;
+    }
+  }
+}
+
+.page-templates-wrapper {
+  max-width: 912px;
+  margin: 0 auto;
+  padding: 0 20px;
+  .category {
+    border-top: 1px solid #d6d6d6;
+    padding-top: 20px;
+    margin-top: 10px;
+    &:first-of-type {
+      border-top: 0;
+    }
+    h3 {
+      margin: 0 auto 5px 0;
+      font-size: 18px;
+      padding-left: 2px;
+    }
+    p.description {
+      font-size: 14px;
+      margin: 0 0 20px 0;
+      padding-left: 2px;
+    }
+    .cat-templates {
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      flex-wrap: wrap;
+      .template {
+        display: block;
+        text-decoration: none;
+        -webkit-box-flex: 0 0 23%;
+        -moz-box-flex:  0 0 23%;
+        -webkit-flex:  0 0 23%;
+        -ms-flex:  0 0 23%;
+        flex:  0 0 23%;
+        text-align: center;
+        margin: 0 2% 20px 0;
+        color: #2d2d2d;
+        position: relative;
+        img {
+          display: block;
+          width: 100%;
+          height: auto;
+        }
+        .text {
+          background: #2d2d2d;
+          color: #fff;
+          padding: 8px;
+          .title {
+            font-size: 15px;
+            margin-bottom: 0;
+            display: block;
+          }
+          .desc {
+            font-size: 13px;
+            display: block;
+            margin-top: 3px;
+          }
+        }
+        &:hover {
+          img {
+            opacity: 0.6;
+          }
+        }
+        &.selected {
+          &::after {
+            content: " ";
+            background-image: url('https://cabooseit.s3.amazonaws.com/assets/shared/check.png');
+            background-size: 24px;
+            width: 24px;
+            height: 24px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            position: absolute;
+            right: -4px;
+            top: -4px;
+          }
+        }
+      }
+    }
+    .btn-holder {
+      text-align: right;
+      padding-right: 10px;
+    }
+  }
+}
 
 
 /******************************************************************************/

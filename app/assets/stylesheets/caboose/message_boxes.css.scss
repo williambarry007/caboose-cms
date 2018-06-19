@@ -3,26 +3,42 @@
 Message boxes
 *******************************************************************************/
 
-.loading {
-  background-image: url('/assets/caboose/loading_black_on_white.gif');
-  background-position: 0 center;
-  background-repeat: no-repeat;
-  color: #000;  
-  font-weight: normal;
-  font-size: 16pt;
-  padding: 10px 10px 10px 40px;
-}
+// .loading {
+//   background-image: url('/assets/caboose/loading_black_on_white.gif');
+//   background-position: 0 center;
+//   background-repeat: no-repeat;
+//   color: #000;  
+//   font-weight: normal;
+//   font-size: 16pt;
+//   padding: 10px 10px 10px 40px;
+// }
 
 .note {
-  padding: 20px;
-  margin-bottom: 10px;
-  background: #fef49c;
-  color: #000000;
-  font-weight: bold;
-  font-size: 1.4em;
-  border-radius: 3px;
-
-  h2 { margin: 0 0 10px 0; padding: 0; }	
+  padding: 15px 20px 15px 40px;
+  background: #2656ae;
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+  h2 { margin: 0 0 10px 0; padding: 0; }
+  a {
+    color: #fff;
+    &:hover {
+      color: #000;
+    }
+  }
+  &.error {
+    background: #bf4448;
+  }
+  &.success {
+    background: #26ae88;
+  }
+  &.loading {
+    background-image: url('https://cabooseit.s3.amazonaws.com/assets/shared/loading_blue.gif');
+    background-size: 40px;
+    background-position: 0 center;
+    background-repeat: no-repeat;
+    padding-left: 40px;
+  }
 }
 
 .note_small {
@@ -34,16 +50,16 @@ Message boxes
   border-radius: 3px;
 }
 
-.error {
-  background: #9c171b;
-  color: #ffffff;
-  a { color: #fff; }
-  a:hover { color: #000; }
-}
+// .error {
+//   background: #bf4448;
+//   color: #ffffff;
+//   a { color: #fff; }
+//   a:hover { color: #000; }
+// }
 
-.success {
-  background: #009900;
-  color: #ffffff;
-  a { color: #ffffff;	}
-}
+// .success {
+//   background: #26ae88;
+//   color: #ffffff;
+//   a { color: #ffffff;	}
+// }
  

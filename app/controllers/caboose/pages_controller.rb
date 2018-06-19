@@ -178,8 +178,11 @@ module Caboose
     # @route GET /admin/pages/new
     def admin_new
       return unless user_is_allowed('pages', 'add')
-      @parent_id = params[:parent_id] ? params[:parent_id] : Page.where(:site_id => @site.id, :parent_id => -1).first.id
-      @parent = Page.find(@parent_id)
+      @categories = PageTemplateCategory.order(:sort_order).all
+      index_page = Page.index_page(@site.id)
+      options = []
+      sitemap_helper(index_page, options)
+      @sitemap = options
       render :layout => 'caboose/admin'
     end
     
@@ -487,15 +490,18 @@ module Caboose
       return unless user_is_allowed('pages', 'add')
 
       resp = Caboose::StdClass.new({
-          'error' => nil,
-          'redirect' => nil
+        'error' => nil,
+        'redirect' => nil
       })
             
       parent_id = params[:parent_id]
-      title = params[:title]      
+      title = params[:title]
+      layout_id = params[:layout_id]  
 
-      if (title.strip.length == 0)
-        resp.error = "A page title is required."
+      parent = Caboose::Page.find(parent_id)
+
+      if title.blank?
+        resp.error = "Page Title is required."
       elsif (!logged_in_user.is_allowed('all', 'all') && 
         !Page.page_ids_with_permission(logged_in_user, 'edit'   ).include?(parent_id) &&
         !Page.page_ids_with_permission(logged_in_user, 'approve').include?(parent_id))
@@ -505,44 +511,72 @@ module Caboose
         render :json => resp
         return
       end
-      	
-      parent = Caboose::Page.find(parent_id)                  		
-      page = Caboose::Page.new      
       
-      if parent.nil?
-        d = Domain.where(:domain => request.host_with_port).first.site_id
-        page.site_id = d.site_id
-      else      
-        page.site_id = parent.site_id
+      if params[:template_id].blank?
+
+                      
+        page = Caboose::Page.new      
+        
+        if parent.nil?
+          d = Domain.where(:domain => request.host_with_port).first.site_id
+          page.site_id = d.site_id
+        else      
+          page.site_id = parent.site_id
+        end
+        
+        page.title = title
+        page.parent_id = parent_id      
+        page.hide = true
+        page.content_format = Caboose::Page::CONTENT_FORMAT_HTML
+        page.save
+
+        i = 0
+        begin 
+          page.slug = Page.slug(page.title + (i > 0 ? " #{i}" : ""))
+          page.uri = parent.parent_id == -1 ? page.slug : "#{parent.uri}/#{page.slug}"
+          i = i+1
+        end while (Page.where(:uri => page.uri, :site_id => page.site_id).count > 0 && i < 10)
+
+        page.save
+        
+        # Create the top level block for the page
+        bt = BlockType.find(params[:layout_id])
+        Block.create(:page_id => page.id, :block_type_id => bt.id, :name => bt.name)
+        
+        # Set the new page's permissions      
+        viewers = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'view' }).pluck(:role_id)
+        editors = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'edit' }).pluck(:role_id)
+        Caboose::Page.update_authorized_for_action(page.id, 'view', viewers)
+        Caboose::Page.update_authorized_for_action(page.id, 'edit', editors)
+        resp.redirect = "/admin/pages/#{page.id}/content"
+      else
+        template = Caboose::PageTemplate.find(params[:template_id])
+        if template && template.page
+          new_page = template.page.duplicate(@site.id, parent_id, false, layout_id, nil)
+          new_page.title = params[:title]
+          new_page.hide = true
+
+          i = 0
+          begin 
+            new_page.slug = Page.slug(new_page.title + (i > 0 ? " #{i}" : ""))
+            new_page.uri = parent.parent_id == -1 ? new_page.slug : "#{parent.uri}/#{new_page.slug}"
+            i = i+1
+          end while (Page.where(:uri => new_page.uri, :site_id => @site.id).count > 0 && i < 10)
+
+          new_page.save
+
+          # Set the new page's permissions      
+          viewers = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'view' }).pluck(:role_id)
+          editors = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'edit' }).pluck(:role_id)
+          Caboose::Page.update_authorized_for_action(new_page.id, 'view', viewers)
+          Caboose::Page.update_authorized_for_action(new_page.id, 'edit', editors)
+
+          resp.redirect = "/admin/pages/#{new_page.id}/content"
+        else
+          resp.redirect = "/admin/pages/new"
+        end
       end
-      
-      page.title = title
-      page.parent_id = parent_id      
-      page.hide = true
-      page.content_format = Caboose::Page::CONTENT_FORMAT_HTML
-      page.save
 
-      i = 0
-      begin 
-        page.slug = Page.slug(page.title + (i > 0 ? " #{i}" : ""))
-        page.uri = parent.parent_id == -1 ? page.slug : "#{parent.uri}/#{page.slug}"
-        i = i+1
-      end while (Page.where(:uri => page.uri, :site_id => page.site_id).count > 0 && i < 10)
-
-      page.save
-      
-      # Create the top level block for the page
-      bt = BlockType.find(params[:block_type_id])
-      Block.create(:page_id => page.id, :block_type_id => params[:block_type_id], :name => bt.name)
-      
-      # Set the new page's permissions		  
-      viewers = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'view' }).pluck(:role_id)
-      editors = Caboose::PagePermission.where({ :page_id => parent.id, :action => 'edit' }).pluck(:role_id)
-      Caboose::Page.update_authorized_for_action(page.id, 'view', viewers)
-      Caboose::Page.update_authorized_for_action(page.id, 'edit', editors)
-
-      # Send back the response
-      resp.redirect = "/admin/pages/#{page.id}"
       render json: resp
     end
     

@@ -1,46 +1,141 @@
 <h1>New Page</h1>
-<p>Parent: <%= @parent ? @parent.title : "Home" %></p>
 
-<form action='/admin/pages' method='post' id='new_page_form' onsubmit="add_page(); return false;">
-<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
-<input type='hidden' name='parent_id' value='<%= @parent_id %>' />
-<p><input type='text' name='title' placeholder='Title' style="width: 400px;" /></p>
-<p><select name='block_type_id'>
-  <option value=''>-- Select a layout --</option>
-  <% cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id } %>
-  <% Caboose::BlockType.includes(:block_type_site_memberships).where("block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, @site.id).reorder(:description).all.each do |bt| %>    
-    <option value="<%= bt.id %>"><%= bt.description %></option>
-  <% end %>
-</select></p>
-<div id='message'></div>
-<p>
-<input type='button' value='< Back' onclick="window.location='/admin/pages';" />
-<input type='submit' value='Add Page' />
-</p>
-</form>
+<div class="new-page-form-wrapper">
+	<form action="/admin/pages" id="new_page_form" method="POST">
+		<section>
+			<div class="field">
+				<label for="title">Page Title</label>
+				<input type="text" name="title" id="title" />
+				<p class="meta">The page title will display in the main menu and in the browser title bar.</p>
+			</div>
+			<div class="field">
+				<label for="title">Parent Page</label>
+				<select name="parent_id" id="parent_id">
+					<% @sitemap.each do |sm| %>
+						<option value="<%= sm['value'] %>"><%= sm['text'] %></option>
+					<% end %>
+				</select>
+				<p class="meta">The parent page determines where this page will appear in the main menu.</p>
+			</div>
+		</section>
+		<section>
+			<h4>Page Layout</h4>
+			<div class="field">
+				<label for="layout_id">Choose a Layout</label>
+				<select name="layout_id" id="layout_id">
+				  <% cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id } %>
+				  <% Caboose::BlockType.includes(:block_type_site_memberships).where("block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, @site.id).reorder(:description).all.each do |bt| %>    
+				    <option <% if bt.description == 'Subpage' %>selected<% end %> value="<%= bt.id %>"><%= bt.description %></option>
+				  <% end %>
+				</select>
+				<p class="meta">The page layout defines the overall page structure, such as header, footer, and sidebar. Most of the time, this is 'Subpage'.</p>
+			</div>
+		</section>
+		<section class="page-templates-wrapper">
+			<h4>Page Template</h4>
+			<div class="field">
+				<label for="#">Choose a Template</label>
+				<p class="meta">Start from scratch with a blank page, or choose a page template as a starting point.</p>
+			</div>
+			<div class="category">
+				<div class="cat-templates">
+					<a href="#" id="template-blank" class="template selected opt">
+						<img src="//cabooseit.s3.amazonaws.com/assets/shared/template.png" width="200" alt="Blank" />
+						<div class="text">
+							<span class="title">Blank</span>
+							<span class="desc">A completely blank page.</span>
+						</div>
+					</a>
+					<a href="#" id="template-choose" class="template opt">
+						<img src="//cabooseit.s3.amazonaws.com/assets/shared/template.png" width="200" alt="Blank" />
+						<div class="text">
+							<span class="title">Use a Template</span>
+							<span class="desc">Choose a page template.</span>
+						</div>
+					</a>
+				</div>
+			</div>
+			<% @categories.each do |cat| %>
+				<% next if cat.superadmin_only && !@logged_in_user.is_super_admin? %>
+				<div style="display:none;" class="category more">
+					<h3><%= cat.title %></h3>
+					<p class="description"><%= cat.description %></p>
+					<div class="cat-templates">
+						<% cat.page_templates.order(:sort_order).each do |tem| %>
+							<a href="#" data-id="<%= tem.id %>" class="template tem">
+								<img src="<%= tem.screenshot.url(:small) %>" width="200" alt="<%= tem.title %>" srcset="<%= tem.screenshot.url(:medium) %> 2x" />
+								<div class="text">
+									<span class="title"><%= tem.title.blank? ? 'New Template' : tem.title %></span>
+									<% if !tem.description.blank? %><span class="desc"><%= tem.description %></span><% end %>
+								</div>
+							</a>
+						<% end %>
+					</div>
+				</div>
+			<% end %>
+		</section>
+		<div id="page-message"></div>
+		<section class="buttons clearfix">
+			<a href="/admin/pages" class="caboose-btn-white">Cancel</a>
+			<a href="#" id="create_page" class="caboose-btn">Create Page</a>
+		</section>
+		<input type="hidden" id="use_template" name="use_template" value="no" />
+		<input type="hidden" id="template_id" name="template_id" value="" />
+	</form>
+</div>
 
 <% content_for :caboose_js do %>
-<%= javascript_include_tag "caboose/model/all" %>
-<script type='text/javascript'>
-
-var modal = false;
-$(document).ready(function() {
-  modal = new CabooseModal(420);
-});
-
-function add_page()
-{
-  modal.autosize("<p class='loading'>Adding page...</p>");
-  $.ajax({
-    url: '/admin/pages',
-    type: 'post',
-    data: $('#new_page_form').serialize(),    
-    success: function(resp) {
-      if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
-      if (resp.redirect) parent.window.location = resp.redirect
-    }
-  });
-}
-
+<script>
+	function add_page() {
+	  $("#page-message").html("<p class='note loading'>Creating page...</p>");
+	  $.ajax({
+	    url: '/admin/pages',
+	    type: 'post',
+	    data: $('#new_page_form').serialize(),    
+	    success: function(resp) {
+	      if (resp.error) $("#page-message").html("<p class='note error'>" + resp.error + "</p>");
+	      if (resp.redirect) window.location = resp.redirect;
+	    }
+	  });
+	}
+	$(".template.opt").click(function(e) {
+		e.preventDefault();
+		$(".template.opt").removeClass("selected");
+		$(this).addClass("selected");
+		if ( $(this).attr("id") == "template-choose") {
+			$(".category.more").slideDown();
+			$("#use_template").attr("value","yes");
+		}
+		else if ( $(this).attr("id") == "template-blank") {
+			$(".category.more").slideUp();
+			$("#use_template").attr("value","no");
+		}
+	});
+	$(".template.tem").click(function(e) {
+		e.preventDefault();
+		$(".template.tem").removeClass("selected");
+		$(this).addClass("selected");
+		$("#template_id").attr("value", $(this).data("id"));
+	});
+	$("#create_page").click(function(e) {
+		e.preventDefault();
+		var mess = $("#page-message");
+		mess.html('');
+		if ( $("#title").val() == '' ) {
+			mess.html("<p class='note error'>Page Title is required.</p>");
+		}
+		else if ( $("#parent_id").val() == '' ) {
+			mess.html("<p class='note error'>Parent Page is required.</p>");
+		}
+		else if ( $("#layout_id").val() == '' ) {
+			mess.html("<p class='note error'>Page Layout is required.</p>");
+		}
+		else if ( $("#use_template").attr("value") == "yes" && $("#template_id").attr("value") == '' ) {
+			mess.html("<p class='note error'>Please select a template or choose 'Blank'.</p>");
+		}
+		else {
+			add_page();
+		}
+	});
 </script>
 <% end %>

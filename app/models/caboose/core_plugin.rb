@@ -25,6 +25,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'postcustomfields'  , 'text' => 'Post Custom Fields'  , 'href' => '/admin/post-custom-fields' , 'modal' => false } if user.is_allowed('postcustomfields'  , 'view')
     item['children'] << { 'id' => 'roles'             , 'text' => 'Roles'               , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'             , 'view')
     item['children'] << { 'id' => 'sites'             , 'text' => 'Sites'               , 'href' => '/admin/sites'              , 'modal' => false } if user.is_allowed('sites'             , 'view') && site.is_master == true        
+    item['children'] << { 'icon' => 'pages', 'id' => 'templates'             , 'text' => 'Page Templates'               , 'href' => '/admin/templates'              , 'modal' => false } if user.is_allowed('templates'             , 'view') && site.is_master == true  
     item['children'] << { 'id' => 'smtp'              , 'text' => 'SMTP (Mail)'         , 'href' => '/admin/smtp'               , 'modal' => false } if user.is_allowed('smtp'              , 'view')
     item['children'] << { 'id' => 'social'            , 'text' => 'Social Media'        , 'href' => '/admin/social'             , 'modal' => false } if user.is_allowed('social'            , 'view')
     item['children'] << { 'id' => 'users'             , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'             , 'view')

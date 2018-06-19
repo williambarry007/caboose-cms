@@ -1,0 +1,46 @@
+<h1>New Page</h1>
+<p>Parent: <%= @parent ? @parent.title : "Home" %></p>
+
+<form action='/admin/pages' method='post' id='new_page_form' onsubmit="add_page(); return false;">
+<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>' />
+<input type='hidden' name='parent_id' value='<%= @parent_id %>' />
+<p><input type='text' name='title' placeholder='Title' style="width: 400px;" /></p>
+<p><select name='block_type_id'>
+  <option value=''>-- Select a layout --</option>
+  <% cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id } %>
+  <% Caboose::BlockType.includes(:block_type_site_memberships).where("block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, @site.id).reorder(:description).all.each do |bt| %>    
+    <option value="<%= bt.id %>"><%= bt.description %></option>
+  <% end %>
+</select></p>
+<div id='message'></div>
+<p>
+<input type='button' value='< Back' onclick="window.location='/admin/pages';" />
+<input type='submit' value='Add Page' />
+</p>
+</form>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+var modal = false;
+$(document).ready(function() {
+  modal = new CabooseModal(420);
+});
+
+function add_page()
+{
+  modal.autosize("<p class='loading'>Adding page...</p>");
+  $.ajax({
+    url: '/admin/pages',
+    type: 'post',
+    data: $('#new_page_form').serialize(),    
+    success: function(resp) {
+      if (resp.error) modal.autosize("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) parent.window.location = resp.redirect
+    }
+  });
+}
+
+</script>
+<% end %>

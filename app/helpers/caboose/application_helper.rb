@@ -50,6 +50,16 @@ tinyMCE.init({
       str = str.gsub('http://', 'https://') if request.env['HTTPS'] == 'on'
       return str
     end
-    
+
+    def caboose_asset_path(path)
+      str = nil
+      begin
+        str = asset_path(path)
+      rescue Sprockets::Helpers::RailsHelper::AssetPaths::AssetNotPrecompiledError
+        Caboose.log("Precompiled asset not found\n\nAsset: #{path}\nFile: #{caller_locations[1].path}\nLine: #{caller_locations[1].lineno}")
+      end
+      return str
+    end
+
   end
 end

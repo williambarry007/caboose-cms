@@ -51,10 +51,10 @@ tinyMCE.init({
       return str
     end
 
-    def caboose_asset_path(path)
-      str = nil
+    def caboose_asset_path(path, options = {})
+      str = ""
       begin
-        str = asset_path(path)
+        str = asset_path(path, options)
       rescue Sprockets::Helpers::RailsHelper::AssetPaths::AssetNotPrecompiledError
         Caboose.log("Precompiled asset not found\n\nAsset: #{path}\nFile: #{caller_locations[1].path}\nLine: #{caller_locations[1].lineno}")
       end

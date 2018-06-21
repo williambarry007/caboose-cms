@@ -204,7 +204,7 @@ var MediaModalController = BlockModalController.extend({
           var ext = m.original_name.match(/\.[0-9a-z]+$/i);
           li.addClass('empty');
           if (ext && ext.length > 0)
-            li.append($('<img/>').attr('src', '/assets/caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
+            li.append($('<img/>').attr('src', '//assets.caboosecms.com/assets/caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
         }   
 
         //if (that.selected_media.indexOf(m.id) > -1)

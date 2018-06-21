@@ -13,6 +13,7 @@ var MediaModalController = BlockModalController.extend({
 	refresh_unprocessed_images: false,		               
 	selected_media: false,
 	uploader: false,  
+  assets_path: false,
   upload_extensions: "jpg,jpeg,png,gif,tif,tiff,pdf,doc,docx,odt,odp,ods,ppt,pptx,xls,xlsx,zip,tgz,csv,txt",
   file_view: 'thumbnail',
   
@@ -204,7 +205,7 @@ var MediaModalController = BlockModalController.extend({
           var ext = m.original_name.match(/\.[0-9a-z]+$/i);
           li.addClass('empty');
           if (ext && ext.length > 0)
-            li.append($('<img/>').attr('src', '//assets.caboosecms.com/assets/caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
+            li.append($('<img/>').attr('src', that.assets_path + 'caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
         }   
 
         //if (that.selected_media.indexOf(m.id) > -1)

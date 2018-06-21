@@ -35,7 +35,8 @@ $(document).ready(function() {
 	  policy: '<%= raw @policy %>',
 	  signature: '<%= raw @signature %>',
 	  refresh_unprocessed_images: true,
-    allow_edit: true
+    allow_edit: true,
+    assets_path: "<%= Rails.env.production? ? ('https://' + Caboose::cdn_domain + '/assets/') : '/assets/' %>"
   });
 });
 

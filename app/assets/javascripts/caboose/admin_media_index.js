@@ -17,6 +17,7 @@ MediaController.prototype = {
   allow_edit: false,
   feather_editor: false,  
   last_upload_processed: false,
+  assets_path: false,
   ajax_count: 0,
   ajax_limit: 20,
   
@@ -343,7 +344,7 @@ MediaController.prototype = {
           var ext = m.original_name.match(/\.[0-9a-z]+$/i);
           li.addClass('empty');
           if (ext && ext.length > 0)
-            li.append($('<img/>').attr('src', '//assets.caboosecms.com/assets/caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
+            li.append($('<img/>').attr('src', that.assets_path + 'caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
         }                                  
         if (that.selected_media.indexOf(m.id) > -1)
           li.addClass('selected ui-selected');

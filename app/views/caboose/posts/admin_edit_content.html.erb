@@ -35,7 +35,7 @@ var controller = false;
 $(document).ready(function() {  
   controller = new BlockContentController({
     post_id: <%= @post.id %>,
-    assets_path: 'https://assets.caboosecms.com/assets/',
+    assets_path: "<%= Rails.env.production? ? ('https://' + Caboose::cdn_domain + '/assets/') : '/assets/' %>",
     <% if @site && @site.use_dragdrop %>
       included_assets: ['caboose/block_modal_controllers/block_dd_modal_controller.js']
     <% else %>

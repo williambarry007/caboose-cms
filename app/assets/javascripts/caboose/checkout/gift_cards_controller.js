@@ -50,6 +50,7 @@ GiftCardsController.prototype = {
           that.cc.invoice.total = parseFloat(resp.invoice_total);
           that.cc.refresh_cart();
           that.cc.payment_method_controller.print();                      
+          that.cc.print_ready_message();
           $('#gift_card_code').val('');
           $('#gift_card_message').empty();
         }

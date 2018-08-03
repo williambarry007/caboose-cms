@@ -72,7 +72,7 @@ module Caboose
           (var ? var.alternate_id : ''),
           (var ? var.sku : ''),
           (var ? var.price : ''),
-          (var ? var.quantity : '')
+          (var ? var.quantity_in_stock : '')
         ]
         str += CSV.generate_line(arr, :quote_char => '"')
       end

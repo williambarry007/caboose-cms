@@ -36,9 +36,8 @@ module Caboose
         'sort'           => 'title',
         'desc'           => false,
         'base_url'       => '/admin/products',
-        'items_per_page' => 25,
+        'items_per_page' => 10000,
         'use_url_params' => false,
-        
         'abbreviations' => {
           'search_like' => 'store_products.title_concat_vendor_name_like'
         },
@@ -100,6 +99,7 @@ module Caboose
           'model'          => 'Caboose::User',
           'sort'           => 'last_name, first_name',
           'desc'           => false,
+          'items_per_page' => 10000,
           'base_url'       => '/admin/users',
           'use_url_params' => false
       })

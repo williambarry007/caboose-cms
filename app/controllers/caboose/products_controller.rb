@@ -304,6 +304,32 @@ module Caboose
       p = Product.find(params[:id])
       render :json => p      
     end
+
+
+    # @route GET /admin/products/exports/:id/json    
+    def admin_export_single
+      return unless (user_is_allowed_to 'edit', 'products')
+      e = Caboose::Export.where(:id => params[:id]).first      
+      render :json => e
+    end
+
+    # @route POST /admin/products/export
+    def admin_export
+      return unless (user_is_allowed_to 'edit', 'products')      
+      resp = Caboose::StdClass.new
+      e = Caboose::Export.create(
+        :kind => 'products',
+        :date_created => DateTime.now.utc,        
+        :params => params.to_json,
+        :status => 'pending'
+      )
+      e.delay(:queue => 'caboose_general', :priority => 8).product_process if Rails.env.production?
+      e.product_process if Rails.env.development?
+      resp.new_id = e.id
+      resp.success = true
+      render :json => resp
+    end
+
     
     # @route GET /admin/products/:id
     # @route GET /admin/products/:id/general

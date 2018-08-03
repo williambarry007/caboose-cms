@@ -51,6 +51,18 @@ $(document).ready(function() {
     allow_duplicate: false,
     allow_advanced_edit: true,
     after_add: 'redirect',
+    allow_export: true,
+    exports: [
+      {        
+        name: 'All Fields',
+        url: "/admin/products/export",
+        type: 'post',
+        wait_for_processing: true,
+        status_url: function(resp) { return "/admin/products/exports/" + resp.new_id + "/json"; },
+        ready:      function(resp) { return resp.status == 'finished'; },
+        final_url:  function(resp) { return "https://cabooseit.s3.amazonaws.com/assets/product_exports/" + resp.id + ".csv"; }
+      },
+    ],
     fields: [    
       { show: true , name: 'id'                 , nice_name: 'ID'                   , sort: 'id'                  , type: 'text'               , value: function(p) { return p.id                 }, width: 500, editable: false },
       { show: true , name: 'image'              , nice_name: 'Image'                , sort: 'id'                  , type: 'image'              , value: tiny_product_image, width: 500, editable: false },

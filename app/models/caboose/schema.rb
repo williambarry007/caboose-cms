@@ -305,6 +305,14 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :force_ssl          , :boolean, { :default => false }],
         [ :forward_to_uri     , :string  ]
       ],
+      Caboose::Export => [
+        [ :id, :integer ],
+        [ :kind, :string ],
+        [ :date_created, :datetime ],
+        [ :date_processed, :datetime ],
+        [ :params, :text ],
+        [ :status, :string ]
+      ],
       Caboose::Font => [
         [ :site_id            , :integer ],
         [ :name               , :string  ],

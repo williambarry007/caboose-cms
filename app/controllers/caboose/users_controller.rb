@@ -95,6 +95,30 @@ module Caboose
       @all_roles = Role.tree(@site.id)
       @roles = Role.roles_with_user(@edituser.id)
     end
+
+    # @route GET /admin/users/exports/:id/json    
+    def admin_export_single
+      return unless (user_is_allowed_to 'edit', 'users')
+      e = Caboose::Export.where(:id => params[:id]).first      
+      render :json => e
+    end
+
+    # @route POST /admin/users/export
+    def admin_export
+      return unless (user_is_allowed_to 'edit', 'users')      
+      resp = Caboose::StdClass.new
+      e = Caboose::Export.create(
+        :kind => 'users',
+        :date_created => DateTime.now.utc,        
+        :params => params.to_json,
+        :status => 'pending'
+      )
+      e.delay(:queue => 'caboose_general', :priority => 8).user_process if Rails.env.production?
+      e.user_process if Rails.env.development?
+      resp.new_id = e.id
+      resp.success = true
+      render :json => resp
+    end
     
     # @route GET /admin/users/:id/payment-method
     def admin_edit_payment_method

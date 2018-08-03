@@ -16,6 +16,18 @@ $(document).ready(function() {
     allow_bulk_delete: true,
     allow_duplicate: false,
     allow_advanced_edit: true,
+    allow_export: true,
+    exports: [
+      {        
+        name: 'All Fields',
+        url: "/admin/users/export",
+        type: 'post',
+        wait_for_processing: true,
+        status_url: function(resp) { return "/admin/users/exports/" + resp.new_id + "/json"; },
+        ready:      function(resp) { return resp.status == 'finished'; },
+        final_url:  function(resp) { return "https://cabooseit.s3.amazonaws.com/assets/user_exports/" + resp.id + ".csv"; }
+      },
+    ],
     fields: [      
       { show: true  , bulk_edit: true  , name: 'first_name'         , nice_name: 'First name' , sort: 'first_name' , type: 'text'              , value: function(u) { return u.first_name    }, width: 100 },
       { show: true  , bulk_edit: true  , name: 'last_name'          , nice_name: 'Last name'  , sort: 'last_name'  , type: 'text'              , value: function(u) { return u.last_name     }, width: 100 },

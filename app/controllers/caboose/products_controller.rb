@@ -551,6 +551,17 @@ module Caboose
       end
       render :json => resp    
     end
+
+    # @route DELETE /admin/products/bulk
+    def admin_bulk_delete
+      return unless user_is_allowed_to 'delete', 'products'
+      params[:model_ids].each do |product_id|
+        prod = Product.where(:id => product_id).first
+        prod.destroy if prod
+      end
+      resp = Caboose::StdClass.new('success' => true)
+      render :json => resp
+    end
     
     # @route DELETE /admin/products/:id
     def admin_delete

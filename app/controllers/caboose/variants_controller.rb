@@ -214,7 +214,8 @@ module Caboose
     def admin_update_option1_sort_order
       product_id = params[:product_id]
       params[:values].each_with_index do |value, i|
-        Variant.where(:product_id => product_id, :option1 => value).all.each do |v|
+        val = value.gsub('AMPERSAND','&')
+        Variant.where(:product_id => product_id, :option1 => val).all.each do |v|
           v.update_attribute(:option1_sort_order, i)
         end
       end            
@@ -225,7 +226,8 @@ module Caboose
     def admin_update_option2_sort_order            
       product_id = params[:product_id]
       params[:values].each_with_index do |value, i|
-        Variant.where(:product_id => product_id, :option2 => value).all.each do |v|
+        val = value.gsub('AMPERSAND','&')
+        Variant.where(:product_id => product_id, :option2 => val).all.each do |v|
           v.update_attribute(:option2_sort_order, i)
         end
       end            
@@ -236,7 +238,8 @@ module Caboose
     def admin_update_option3_sort_order      
       product_id = params[:product_id]
       params[:values].each_with_index do |value, i|
-        Variant.where(:product_id => product_id, :option3 => value).all.each do |v|
+        val = value.gsub('AMPERSAND','&')
+        Variant.where(:product_id => product_id, :option3 => val).all.each do |v|
           v.update_attribute(:option3_sort_order, i)
         end
       end            
@@ -269,9 +272,9 @@ module Caboose
           when 'length'                               then variants.each { |v| v.length                           = value }
           when 'width'                                then variants.each { |v| v.width                            = value }
           when 'height'                               then variants.each { |v| v.height                           = value }
-          when 'option1'                              then variants.each { |v| v.option1                          = value }
-          when 'option2'                              then variants.each { |v| v.option2                          = value }
-          when 'option3'                              then variants.each { |v| v.option3                          = value }
+          when 'option1'                              then variants.each { |v| v.option1                          = (value.blank? ? nil : value) }
+          when 'option2'                              then variants.each { |v| v.option2                          = (value.blank? ? nil : value) }
+          when 'option3'                              then variants.each { |v| v.option3                          = (value.blank? ? nil : value) }
           when 'option1_media_id'                     then variants.each { |v| v.option1_media_id                 = value }
           when 'option2_media_id'                     then variants.each { |v| v.option2_media_id                 = value }
           when 'option3_media_id'                     then variants.each { |v| v.option3_media_id                 = value }

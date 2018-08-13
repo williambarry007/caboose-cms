@@ -80,13 +80,25 @@ p = @product
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 
+function serial(values) {
+  var str = values.replace(/&values\[\]=/g,'|SPLIT|').replace(/values\[\]=/g,'|SPLIT|');
+  var arr = str.split('|SPLIT|');
+  var new_arr = [];
+  $.each(arr, function(k,v) {
+    if ( v != '' && v != null )
+      new_arr.push( v.replace('&','AMPERSAND') )
+  });
+  var new_str = 'values[]=' + new_arr.join('&values[]=');
+  return new_str;
+}
+
 $(document).ready(function() {  
   $('#option1').sortable({    
     update: function(event, ui) {
       $.ajax({
         url: '/admin/products/<%= p.id %>/variants/option1-sort-order',
         type: 'put',
-        data: $('#option1').sortable('serialize'),
+        data: serial($('#option1').sortable('serialize')),
         success: function(resp) {}
       });        
     }    
@@ -96,7 +108,7 @@ $(document).ready(function() {
       $.ajax({
         url: '/admin/products/<%= p.id %>/variants/option2-sort-order',
         type: 'put',
-        data: $('#option2').sortable('serialize'),
+        data: serial($('#option2').sortable('serialize')),
         success: function(resp) {}
       });        
     }    
@@ -106,7 +118,7 @@ $(document).ready(function() {
       $.ajax({
         url: '/admin/products/<%= p.id %>/variants/option3-sort-order',
         type: 'put',
-        data: $('#option3').sortable('serialize'),
+        data: serial($('#option3').sortable('serialize')),
         success: function(resp) {}
       });        
     }    

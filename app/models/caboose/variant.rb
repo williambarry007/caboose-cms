@@ -144,8 +144,9 @@ module Caboose
     end
     
     def full_title
-      return self.product.title if self.options.count == 0
-      return "#{self.product.title} - #{self.title}"
+      return self.product.title if self.options.count == 0 && self.product
+      return "#{self.product.title} - #{self.title}" if self.product
+      return "#{self.title}"
     end
     
     def options

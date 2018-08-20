@@ -3,7 +3,8 @@ var StripePaymentMethodController = function(params) { this.init(params); };
 
 StripePaymentMethodController.prototype = {
 
-  container: 'payment_method_container',  
+  container: 'payment_method_container',
+  user_id: false,
   stripe_key: false,
   customer_id: false,
   card_brand: false,
@@ -195,7 +196,7 @@ StripePaymentMethodController.prototype = {
     }
     $('#payment_message').html("<p class='loading'>Removing payment method...</p>");
     $.ajax({
-      url: '/checkout/payment-method',
+      url: '/checkout/payment-method/' + that.user_id,
       type: 'delete',          
       success: function(resp) {
         if (resp.error)

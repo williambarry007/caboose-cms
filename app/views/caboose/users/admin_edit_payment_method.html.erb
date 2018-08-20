@@ -42,6 +42,7 @@ $(document).ready(function() {
       invoice: { total: 1.00 },
       print_ready_message: function() {},      
     },
+    user_id: <%= @edituser.id %>,
     refresh_url: '/admin/users/<%= @edituser.id %>/stripe/json',
     after_update_url: '/admin/users/<%= @edituser.id %>'
   });

@@ -163,20 +163,20 @@ module Caboose
         :card_exp_year  => u.card_exp_year
       }      
     end
-        
+    
     # @route DELETE /checkout/payment-method
+    # @route DELETE /checkout/payment-method/:user_id
     def remove_payment_method
       render :json => false and return if !logged_in?
-      
       resp = Caboose::StdClass.new
       sc = @site.store_config      
       if sc.pp_name == 'stripe'
         Stripe.api_key = sc.stripe_secret_key.strip
-        u = logged_in_user        
+        u = params[:user_id].blank? ? logged_in_user : Caboose::User.find(params[:user_id])       
         if u.stripe_customer_id          
           begin
             c = Stripe::Customer.retrieve(u.stripe_customer_id)
-            c.delete
+            c.delete if Rails.env.production?
           rescue Exception => ex
             Caboose.log(ex)
             resp.error = ex.message if !ex.message.starts_with?('No such customer')

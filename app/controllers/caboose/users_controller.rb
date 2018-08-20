@@ -324,6 +324,17 @@ module Caboose
       @edituser = User.find(params[:id])
       @new_value = "Testing"
     end
+
+    # @route DELETE /admin/users/bulk
+    def admin_bulk_delete
+      return unless user_is_allowed_to 'delete', 'users'
+      params[:model_ids].each do |user_id|
+        user = User.where(:id => user_id).first
+        user.destroy if user
+      end
+      resp = Caboose::StdClass.new('success' => true)
+      render :json => resp
+    end
       
     # @route DELETE /admin/users/:id
     def admin_delete

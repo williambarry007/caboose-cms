@@ -7,9 +7,8 @@ module Caboose
       return if !user_is_allowed('invoices', 'view')
 
       if !params[:game_id].blank?
-        game = Colonnade::Game.find(params[:game_id])
-        menu = Colonnade::Menu.where(:game_id => game.id).first if game
-        invoice_ids = Colonnade::SuiteMenu.where(:menu_id => menu.id).pluq(:invoice_id) if menu
+        menu_ids = Colonnade::Menu.where(:game_id => params[:game_id]).pluq(:id)
+        invoice_ids = Colonnade::SuiteMenu.where(:menu_id => menu_ids).pluq(:invoice_id) if !menu_ids.blank?
         invoice_ids = invoice_ids.to_s.gsub('[','').gsub(']','')
       end
       

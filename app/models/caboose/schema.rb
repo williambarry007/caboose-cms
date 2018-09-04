@@ -788,7 +788,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :sitemap_xml , :text       ],
         [ :robots_txt , :text        ],
         [ :theme_color , :string        ],
-        [ :assets_url , :string        ]
+        [ :assets_url , :string        ],
+        [ :rets_office_id, :string ]
         #[ :custom_css              , :text       ],
         #[ :custom_css_files        , :text       ],
         #[ :custom_js               , :text       ],

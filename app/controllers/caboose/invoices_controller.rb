@@ -244,18 +244,16 @@ module Caboose
 
 
       if !params[:game_id].blank?
-        game = Colonnade::Game.find(params[:game_id])
-        menu = Colonnade::Menu.where(:game_id => game.id).first if game
-        invoice_ids = Colonnade::SuiteMenu.where(:menu_id => menu.id).pluq(:invoice_id) if menu
+        menu_ids = Colonnade::Menu.where(:game_id => params[:game_id]).pluq(:id)
+        invoice_ids = Colonnade::SuiteMenu.where(:menu_id => menu_ids).pluq(:invoice_id) if !menu_ids.blank?
+        invoice_ids = invoice_ids.to_s.gsub('[','').gsub(']','')
       end
 
-      where << "(id in (?))" if invoice_ids
-      terms << invoice_ids if invoice_ids
-
+      where3 = params[:game_id].blank? ? 'id is not null' : ( invoice_ids.blank? ? "id is null" : "id in (#{invoice_ids})" )
 
       where2 = where.join(' AND ')
 
-      pdf.invoices = Invoice.where(where2, *terms).all  
+      pdf.invoices = Invoice.where(where2, *terms).where(where3).all  
       if params[:print_card_details]
         pdf.print_card_details = params[:print_card_details].to_i == 1
       end

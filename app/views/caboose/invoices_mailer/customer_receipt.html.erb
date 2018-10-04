@@ -29,6 +29,7 @@ logo = logo.gsub('//','https://') if !logo.nil?
   <% @invoice.line_items.each do |li| %>    
     <% v = li.variant %>
     <% p = v.product %>
+    <% next if p.nil? || v.nil? %>
     <tr>            
       <td>
         <p><%= p.title %></td></p>

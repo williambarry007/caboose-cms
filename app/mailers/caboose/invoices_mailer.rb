@@ -16,6 +16,7 @@ module Caboose
     #  }
     #  default_options[:from] = delivery_options[:user_name]
     #  delivery_method.settings.merge!(delivery_options)
+    
     #end        
     
     # Sends a confirmation email to the customer about a new invoice 

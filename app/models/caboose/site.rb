@@ -10,6 +10,7 @@ class Caboose::Site < ActiveRecord::Base
   has_many :fonts, :class_name => 'Caboose::Font', :dependent => :delete_all
   has_many :post_categories, :class_name => 'Caboose::PostCategory'
   has_one :store_config
+  has_one :theme
   has_attached_file :logo, 
     :path => ':caboose_prefixsite_logos/:id_:style.:extension',    
     :default_url => 'http://placehold.it/300x300',    

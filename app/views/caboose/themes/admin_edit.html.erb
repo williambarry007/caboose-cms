@@ -1,0 +1,29 @@
+
+<h1>Theme</h1>
+
+<p><div id='theme_<%= @theme.id %>_color_main'              ></div></p>  
+<p><div id='theme_<%= @theme.id %>_color_alt'                 ></div></p>
+      
+<div id='message'></div>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+    
+  new ModelBinder({
+    name: 'Theme',
+    id: <%= @theme.id %>,
+    update_url: '/admin/theme',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [      
+      { name: 'color_main'              , nice_name: 'Main Color'                    , type: 'text'     , value: <%= raw Caboose.json(@theme.color_main              ) %>, width: 400 },  
+      { name: 'color_alt'                 , nice_name: 'Alternate Color'                    , type: 'text'     , value: <%= raw Caboose.json(@theme.color_alt                 ) %>, width: 400 }
+    ]    
+  });
+      
+});
+
+</script>
+<% end %>

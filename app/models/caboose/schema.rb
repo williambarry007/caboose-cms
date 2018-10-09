@@ -905,6 +905,12 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :date_started_full, :date    ],
         [ :status           , :string  ]
       ],
+      Caboose::Theme => [      
+        [ :site_id  , :integer ],
+        [ :color_main          , :string ],
+        [ :color_alt     , :string    ],
+        [ :digest,         :text  ]
+      ],
       Caboose::User => [
         [ :site_id                      , :integer    ],
         [ :first_name                   , :string     ],

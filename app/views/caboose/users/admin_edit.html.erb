@@ -1,19 +1,27 @@
 <% 
 gravatar_id = Digest::MD5.hexdigest(@edituser.email.downcase)
-pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150" #&d=/assets/caboose/default_user_pic.png"  
+pic = "http://gravatar.com/avatar/#{gravatar_id}.png?s=150"
+pic = @edituser.image.url(:thumb) if @edituser.image && !@edituser.image.url.include?('placehold')
 %>
 
 <%= render :partial => 'caboose/users/admin_header' %>
 
 <div class="user-details-wrapper clearfix">
   <div class="gravatar-holder">
-    <p id='gravatar'><img src='<%= pic %>' /><a href='http://gravatar.com'>Update on gravatar</a></p>
+    <p id='gravatar'><img src='<%= pic %>' width="150" /></p>
   </div>
   <div class="mb-holder">
     <p><div id='user_<%= @edituser.id %>_first_name' ></div></p>
     <p><div id='user_<%= @edituser.id %>_last_name'  ></div></p>
     <p><div id='user_<%= @edituser.id %>_username'   ></div></p>
     <p><div id='user_<%= @edituser.id %>_email'      ></div></p>
+    <p><div id='user_<%= @edituser.id %>_phone'      ></div></p>
+    <p><div id='user_<%= @edituser.id %>_fax'      ></div></p>
+    <p><div id='user_<%= @edituser.id %>_address'      ></div></p>
+    <p><div id='user_<%= @edituser.id %>_address2'      ></div></p>
+    <p><div id='user_<%= @edituser.id %>_city'      ></div></p>
+    <p><div id='user_<%= @edituser.id %>_state'      ></div></p>
+    <p><div id='user_<%= @edituser.id %>_zip'      ></div></p>
     <p><div id='user_<%= @edituser.id %>_locked'     ></div></p>
   </div>
 </div>
@@ -51,11 +59,18 @@ $(document).ready(function() {
     update_url: '/admin/users/<%= @edituser.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'first_name' , nice_name: 'First name', type: 'text'     , value: <%= raw Caboose.json(@edituser.first_name) %>, width: 350 },
-      { name: 'last_name'  , nice_name: 'Last name' , type: 'text'     , value: <%= raw Caboose.json(@edituser.last_name)  %>, width: 350 },
-      { name: 'username'   , nice_name: 'Username'  , type: 'text'     , value: <%= raw Caboose.json(@edituser.username)   %>, width: 350 },
-      { name: 'email'      , nice_name: 'Email'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.email)      %>, width: 350 },
-      { name: 'locked'     , nice_name: 'Locked'    , type: 'checkbox' , value: <%= @edituser.locked ? 1 : 0               %>, width: 350 }
+      { name: 'first_name' , nice_name: 'First name', type: 'text'     , value: <%= raw Caboose.json(@edituser.first_name) %>, width: 400 },
+      { name: 'last_name'  , nice_name: 'Last name' , type: 'text'     , value: <%= raw Caboose.json(@edituser.last_name)  %>, width: 400 },
+      { name: 'username'   , nice_name: 'Username'  , type: 'text'     , value: <%= raw Caboose.json(@edituser.username)   %>, width: 400 },
+      { name: 'email'      , nice_name: 'Email'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.email)      %>, width: 400 },
+      { name: 'phone'      , nice_name: 'Phone'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.phone)      %>, width: 400 },
+      { name: 'fax'      , nice_name: 'Fax'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.fax)      %>, width: 400 },
+      { name: 'address'      , nice_name: 'Address'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.address)      %>, width: 400 },
+      { name: 'address2'      , nice_name: 'Address 2'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.address2)      %>, width: 400 },
+      { name: 'city'      , nice_name: 'City'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.city)      %>, width: 400 },
+      { name: 'state'      , nice_name: 'State'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.state)      %>, width: 400 },
+      { name: 'zip'      , nice_name: 'Zip'     , type: 'text'     , value: <%= raw Caboose.json(@edituser.zip)      %>, width: 400 },
+      { name: 'locked'     , nice_name: 'Locked'    , type: 'checkbox' , value: <%= @edituser.locked ? 1 : 0               %>, width: 400 }
     ]    
   });  
 });

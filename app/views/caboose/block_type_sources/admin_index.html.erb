@@ -16,7 +16,7 @@
       <th>URL</th>      
     </tr>
   <% @block_type_sources.each do |bts| %>
-    <tr onclick="window.location='/admin/block-types/store/sources/<%= bts.id %>/edit';">
+    <tr onclick="window.location='/admin/block-types/store/sources/<%= bts.id %>';">
       <td><%= bts.name  %></td>
       <td><%= bts.url   %></td>    
     </tr>

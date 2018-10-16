@@ -7,15 +7,15 @@
 
 <p><a href='/admin/block-types/store/sources'>Store Sources</a></p>
 
-<form action='/admin/block-types/store' method='get'>
+<form action='/admin/block-type-store' method='get'>
 <table>
 <tr><td>Source:</td><td>
   <select name='block_type_source_id'>
     <option value=''>-- Any Source --</option>
     <% Caboose::BlockTypeSource.reorder(:name).all.each do |bts| %><option value='<%= bts.id %>'><%= bts.name %></option><% end %>
   </select></td></tr>
-<tr><td><p>Name:        </td><td><input type='name_like' value="<%= @pager.params['name_like'] %>" /></td></tr>
-<tr><td><p>Description: </td><td><input type='name_like' value="<%= @pager.params['name_like'] %>" /></td></tr>
+<tr><td><p>Name:        </td><td><input type="text" name='name_like' value="<%= @pager.params['name_like'] %>" /></td></tr>
+<tr><td><p>Description: </td><td><input type="text" name='description_like' value="<%= @pager.params['description_like'] %>" /></td></tr>
 </table>
 <p><input type='submit' value='Search' /></p>
 </form>

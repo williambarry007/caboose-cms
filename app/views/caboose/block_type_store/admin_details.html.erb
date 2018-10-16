@@ -4,7 +4,7 @@ bts = @block_type_summary
 <div id='crumbtrail'>
   <a href='/admin'>Admin</a> >
   <a href='/admin/block-types'>Block Types</a> >
-  <a href='/admin/block-types/store'>Store</a>
+  <a href='/admin/block-type-store'>Store</a>
 </div>
 
 <h1>Block Type Details</h1>
@@ -13,7 +13,7 @@ bts = @block_type_summary
 <p>Description: <%= bts.description %></p>
 <div id='message'></div> 
 <p>
-<input type='button' value='< Back' onclick="window.location='/admin/block-types/store';" />
+<input type='button' value='< Back' onclick="window.location='/admin/block-type-store';" />
 <input type='button' value='Download from Source' onclick="download_block_type(<%= bts.id %>);" />
 </p>
 

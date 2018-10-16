@@ -1,7 +1,11 @@
 <% if @page && @page.title != 'Access Denied' %>
 <% content_for :js do %>
 <%= gzip_javascript_include_tag "caboose/application" %>
+<% if @site.theme %>
+<%= gzip_javascript_include_tag(@site.theme.js_url) %>
+<% else %>
 <%= gzip_javascript_include_tag @site.name == 'application' ? 'application' : "#{@site.name}/js/application" %>
+<% end %>
 <script>window.loggedIn = <%= logged_in?.to_json %></script>
 <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
 <% @page.linked_resources_map[:js].each do |r| %><%= gzip_javascript_include_tag r %><% end %>
@@ -14,7 +18,11 @@
 <% end %>
 <% content_for :css do %>
 <%= gzip_stylesheet_link_tag 'caboose/application' %>
+<% if @site.theme %>
+<%= gzip_stylesheet_link_tag(@site.theme.asset_url(@site.id)) %>
+<% else %>
 <%= gzip_stylesheet_link_tag @site.name == 'application' ? 'application' : "#{@site.name}/css/application" %>
+<% end %>
 <% Caboose::stylesheets.each do |css| %><%= gzip_stylesheet_link_tag(css) %><% end %>
 <% @page.linked_resources_map[:css].each do |r| %><%= gzip_stylesheet_link_tag r %><% end %>
 <% if @site.date_css_updated %><link rel='stylesheet' type='text/css' href="<%= raw @site.custom_css_url %>" /><% end %>

@@ -637,7 +637,7 @@ IndexTable.prototype = {
       that.show_message(div, 'bulk_import_form');
       return;
     }
-    that.show_message("<p class='loading'>Adding...</p>", 'bulk_import_loading');
+    that.show_message("<p class='note loading'>Adding...</p>", 'bulk_import_loading');
     $.ajax({
       url: this.bulk_import_url,
       type: 'post',
@@ -691,7 +691,7 @@ IndexTable.prototype = {
       that.show_message(div, 'bulk_import_form');
       return;
     }
-    that.show_message("<p class='loading'>Adding...</p>", 'bulk_import_loading');
+    that.show_message("<p class='note loading'>Adding...</p>", 'bulk_import_loading');
 
     var formData = new FormData();
     formData.append('file', file);
@@ -1073,7 +1073,7 @@ IndexTable.prototype = {
   add_model: function() 
   {
     var that = this;
-    $('#' + that.container + '_new_message').html("<p class='loading'>Adding...</p>");
+    $('#' + that.container + '_new_message').html("<p class='note loading'>Adding...</p>");
     $.ajax({
       url: this.add_url,
       type: 'post',

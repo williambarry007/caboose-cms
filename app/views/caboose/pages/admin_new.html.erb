@@ -25,12 +25,14 @@
 				<select name="layout_id" id="layout_id">
 				  <% cat_ids = Caboose::BlockTypeCategory.layouts.collect{ |cat| cat.id } %>
 				  <% Caboose::BlockType.includes(:block_type_site_memberships).where("block_type_category_id in (?) and block_type_site_memberships.site_id = ?", cat_ids, @site.id).reorder(:description).all.each do |bt| %>    
-				    <option <% if bt.description == 'Subpage' %>selected<% end %> value="<%= bt.id %>"><%= bt.description %></option>
+				    <option <% if bt.description == 'Subpage' || bt.description == 'Standard' %>selected<% end %> value="<%= bt.id %>"><%= bt.description %></option>
 				  <% end %>
 				</select>
 				<p class="meta">The page layout defines the overall page structure, such as header, footer, and sidebar. Most of the time, this is 'Subpage'.</p>
 			</div>
 		</section>
+	<%# temporarily only super admins can do templates %>
+	<% if @logged_in_user && @logged_in_user.is_super_admin? %>
 		<section class="page-templates-wrapper">
 			<h4>Page Template</h4>
 			<div class="field">
@@ -74,6 +76,7 @@
 				</div>
 			<% end %>
 		</section>
+	<% end %>
 		<div id="page-message"></div>
 		<section class="buttons clearfix">
 			<a href="/admin/pages" class="caboose-btn-white">Cancel</a>

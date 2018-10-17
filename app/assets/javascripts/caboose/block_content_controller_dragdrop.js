@@ -531,7 +531,7 @@ BlockContentController.prototype = {
       el.attr('onclick','').unbind('click');
       if ( el.hasClass('footer-wrapper') && el.prev('.content_wrapper.subpage').length > 0 ) {
         el.css('position','relative');
-        var over = $('<div />').attr('id','footer-msg').text('The footer must be edited on the homepage.').css('position','absolute').css('left','0').css('top','0').css('background','rgba(43, 43, 43, 0.9)').css('color','white').css('width','100%').css('height','100%').css('z-index','14').css('padding','40px 3% 40px 3%').css('text-align','center');
+        var over = $('<div />').attr('id','footer-msg').text('The footer must be edited on the homepage.');
         if ( el.find('#footer-msg').length == 0 ) { el.append(over); }
       }
       else if ( !el.hasClass('container') ) { 

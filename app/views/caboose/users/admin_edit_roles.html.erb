@@ -1,6 +1,8 @@
 
 <%= render :partial => 'caboose/users/admin_header' %>
 
+<h3 style="margin:0 0 10px 0;">Roles</h3>
+
 <div id='roles'>
 <table class='data'>
 <% Caboose::Role.flat_tree(@site.id).each do |r| %>

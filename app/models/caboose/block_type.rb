@@ -72,6 +72,7 @@ class Caboose::BlockType < ActiveRecord::Base
   end
   
   def parse_api_hash(h)    
+    Caboose.log(h)
     self.name                            = h['name']
     self.description                     = h['description']
     self.block_type_category_id          = h['block_type_category_id']
@@ -87,6 +88,7 @@ class Caboose::BlockType < ActiveRecord::Base
     self.options                         = h['options']
     self.options_function                = h['options_function']
     self.options_url                     = h['options_url']
+    self.icon                            = h['icon']
     self.save
     
     # Remove any named children that don't exist in the given hash

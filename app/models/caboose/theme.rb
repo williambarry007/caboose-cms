@@ -107,7 +107,7 @@ class Caboose::Theme < ActiveRecord::Base
 	      File.open(File.join(Rails.root, 'public', theme.asset_path(asset.digest, for_site_id)), 'w') { |f| f.write(compressed_body) }
 	    end
 	    self.update_digest(asset.digest)
-	# 	rescue Sass::SyntaxError => error
+	# 	rescue Sass::SyntaxError => error 
 	# 		theme.revert
 	# 	end
   end

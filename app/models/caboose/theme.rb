@@ -137,7 +137,7 @@ class Caboose::Theme < ActiveRecord::Base
 	end
 
 	def js_url
-		# TODO - figure out how to do this
+		# TODO - figure out how to do this 
 		"https://cabooseit.s3.amazonaws.com/assets/natureseyenri/js/application.js"
 	end
 

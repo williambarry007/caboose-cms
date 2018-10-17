@@ -1,3 +1,9 @@
+<%
+dt = Caboose::BlockType.where(:name => 'layout_default_theme_standard').first
+header = dt.child('header') if dt
+style = header.child('style') if header
+position = header.child('position') if header
+%>
 
 <h1>Theme</h1>
 
@@ -157,7 +163,6 @@ $("#compile-btn").click(function(e) {
 });
 
 $(document).ready(function() {
-    
   new ModelBinder({
     name: 'Theme',
     id: <%= @theme.id %>,
@@ -216,14 +221,21 @@ $(document).ready(function() {
       { name: 'banner_padding', nice_name: "<%= 'banner_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_padding) %>, width: 400 },
       { name: 'banner_overlay_color', nice_name: "<%= 'banner_overlay_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_overlay_color) %>, width: 400 },
       { name: 'banner_overlay_opacity', nice_name: "<%= 'banner_overlay_opacity'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_overlay_opacity) %>, width: 400 },
+    <% if style %>
+      { name: 'default_header_style', nice_name: "<%= 'default_style'.titleize %>", type: 'select', value: <%== Caboose.json(@theme.default_header_style) %>, options_url: '/admin/block-types/<%= style.id %>/options', width: 400 },
+    <% else %>
       { name: 'default_header_style', nice_name: "<%= 'default_style'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.default_header_style) %>, width: 400 },
+    <% end %>
+    <% if position %>
+      { name: 'default_header_position', nice_name: "<%= 'default_position'.titleize %>", type: 'select', value: <%== Caboose.json(@theme.default_header_position) %>, options_url: '/admin/block-types/<%= position.id %>/options', width: 400 },
+    <% else %>
       { name: 'default_header_position', nice_name: "<%= 'default_position'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.default_header_position) %>, width: 400 },
+    <% end %>
       { name: 'sidebar_width', nice_name: "<%= 'width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.sidebar_width) %>, width: 400 },
       { name: 'sidebar_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.sidebar_bg_color) %>, width: 400 },
       { name: 'default_banner_image'  , nice_name: 'Default Banner Image'   , type: 'image'  , value: <%= raw Caboose.json(@theme.default_banner_image ? @theme.default_banner_image.url(:huge) : 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_300/v1539265856/default_banner.jpg') %>, width: 800, update_url: '/admin/themes/<%= @theme.id %>/default-banner-image' }
     ]    
-  });
-      
+  });  
 });
 
 </script>

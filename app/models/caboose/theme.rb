@@ -2,8 +2,6 @@ class Caboose::Theme < ActiveRecord::Base
 
   self.table_name = "themes"
 
-  #belongs_to :site, :class_name => "Caboose::Site"
-
   has_attached_file :default_banner_image,      
     :path => 'banner_images/:id_:style.:extension',      
     :default_url => 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_1800/v1539265856/default_banner.jpg',
@@ -75,27 +73,21 @@ class Caboose::Theme < ActiveRecord::Base
     :digest
 
   def compile(for_site_id = 0)
-  #	Caboose.log("in compile, for_site_id = #{for_site_id}")
   	theme = self
   	theme_name = 'default'
   	path = Rails.root.join(Caboose::site_assets_path, 'themes', "#{theme_name}.scss.erb")
-  #	Caboose.log("path: #{path}") 
-  	body = ERB.new(File.read(File.join(path))).result(theme.get_binding)
-  #	Caboose.log("body:")
-  #	Caboose.log(body)
+  	body = ERB.new(File.read(File.join(path))).result(theme.get_binding(for_site_id))
   	tmp_themes_path = File.join(Rails.root, 'tmp', 'themes')
   	tmp_asset_name = "theme_#{self.id}_site_#{for_site_id}"
   	FileUtils.mkdir_p(tmp_themes_path) unless File.directory?(tmp_themes_path)
   	File.open(File.join(tmp_themes_path, "#{tmp_asset_name}.scss"), 'w') { |f| f.write(body) }
-#  	begin
+		begin
 	    env = if Rails.application.assets.is_a?(Sprockets::Index)
 	      Rails.application.assets.instance_variable_get('@environment')
 	    else
 	      Rails.application.assets
 	    end
-	 #   Caboose.log("tmp_asset_name: #{tmp_asset_name}")
 	    asset = env.find_asset(tmp_asset_name)
-	  #  Caboose.log(asset)
 	    compressed_body = ::Sass::Engine.new(asset.body, {
 	      :syntax => :scss,
 	      :cache => false,
@@ -103,7 +95,6 @@ class Caboose::Theme < ActiveRecord::Base
 	      :style => :compressed
 	    }).render
 	    str = StringIO.new(compressed_body)
-	#    Caboose.log( compressed_body.to_s )
 	    theme.delete_asset
 	    if Rails.env.production?
 	      config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
@@ -114,22 +105,21 @@ class Caboose::Theme < ActiveRecord::Base
 	      File.open(File.join(Rails.root, 'public', theme.asset_path(asset.digest, for_site_id)), 'w') { |f| f.write(compressed_body) }
 	    end
 	    self.update_digest(asset.digest)
-	#  rescue Sass::SyntaxError => error
-	##    theme.revert
-	#  end
+	 	rescue Sass::SyntaxError => error
+	 		theme.revert
+	 	end
   end
 
   def revert
-  	# revert to previous theme
+ 		Caboose.log("reverting theme")
   end
 
-  def get_binding
+  def get_binding(site_id)
   	binding
   end
 
   def delete_asset
   	return unless digest?
-  	# delete old asset
   end
 
   def asset_path(digest = self.digest, site_id = 0)
@@ -150,7 +140,7 @@ class Caboose::Theme < ActiveRecord::Base
 	end
 
 	def update_digest(digest)
-		self.update_column('digest',digest)
+		self.update_column('digest', digest)
 	end
     
 end

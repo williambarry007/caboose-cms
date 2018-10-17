@@ -8,8 +8,16 @@
 #the_modal div.icons a:hover span.icon { color: #000 !important; }
 #the_modal div.icons a:hover span.name { color: #000 !important; }
 
-#the_modal { box-sizing: border-box; color: #252525; }   
-#the_modal p { margin-bottom: 10px; }
+#the_modal { box-sizing: border-box; color: #252525; font-family: 'Roboto'; font-weight: 300; }   
+#the_modal p { margin-bottom: 10px; font-family: 'Roboto'; font-weight: 300; }
+#the_modal h1,
+#the_modal h2,
+#the_modal h3,
+#the_modal h4,
+#the_modal h5,
+#the_modal h6 {
+	font-family: 'Roboto'; font-weight: 300;
+}
 #the_modal .mb_container input { border: #ccc 1px solid; }                                                          
 #the_modal div.mb_container div.mb_placeholder { top: 9px; }
 #the_modal div.mb_container div.mb_placeholder span { font-size: 16px; }                                                         

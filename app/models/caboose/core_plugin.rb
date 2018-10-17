@@ -28,7 +28,7 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'smtp'              , 'text' => 'SMTP (Mail)'         , 'href' => '/admin/smtp'               , 'modal' => false } if user.is_allowed('smtp'              , 'view')
     item['children'] << { 'id' => 'social'            , 'text' => 'Social Media'        , 'href' => '/admin/social'             , 'modal' => false } if user.is_allowed('social'            , 'view')
     item['children'] << { 'id' => 'users'             , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'             , 'view')
-    item['children'] << { 'id' => 'theme'             , 'text' => 'Theme'               , 'href' => '/admin/theme'              , 'modal' => false } if user.is_allowed('theme'             , 'view') if !site.theme.nil?
+    item['children'] << { 'id' => 'theme'      , 'icon' => 'sites',        'text' => 'Theme'               , 'href' => '/admin/theme'              , 'modal' => false } if user.is_allowed('theme'             , 'view') if !site.theme.nil? && user.is_super_admin?
    # item['children'] << { 'id' => 'variables'         , 'text' => 'Variables'           , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'          , 'view')   
     item['children'] << { 'id' => 'my-account'             , 'text' => 'My Account'               , 'href' => '/my-account'              , 'modal' => false } 
     nav << item if item['children'].count > 0

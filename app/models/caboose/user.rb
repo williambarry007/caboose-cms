@@ -49,24 +49,39 @@ class Caboose::User < ActiveRecord::Base
   def forem_email
     self.email
   end
-  
-  def is_allowed(resource, action)
-    if self.username == 'elo'
-      elo = Caboose::Role.logged_out_role(self.site_id)
-      elo_is_allowed = elo.is_allowed(resource, action)    
-      return true if elo_is_allowed
-      return false if !elo_is_allowed && self.is_logged_out_user?     
-      eli = Caboose::Role.logged_in_role(self.site_id)
-      return true if self.id != elo.id && eli.is_allowed(resource, action)
-    else
-      for role in roles
-        if role.is_allowed(resource, action)
-          return true
-        end
+
+  def is_allowed(resource, action)          
+    elo = Caboose::Role.logged_out_role(self.site_id)
+    elo_is_allowed = elo.is_allowed(resource, action)    
+    return true if elo_is_allowed
+    return false if !elo_is_allowed && self.is_logged_out_user?     
+    eli = Caboose::Role.logged_in_role(self.site_id)
+    return true if self.id != elo.id && eli.is_allowed(resource, action)
+    for role in roles
+      if role.is_allowed(resource, action)
+        return true
       end
     end
     return false
   end
+  
+  # def is_allowed(resource, action)
+  #   if self.username == 'elo'
+  #     elo = Caboose::Role.logged_out_role(self.site_id)
+  #     elo_is_allowed = elo.is_allowed(resource, action)    
+  #     return true if elo_is_allowed
+  #     return false if !elo_is_allowed && self.is_logged_out_user?     
+  #     eli = Caboose::Role.logged_in_role(self.site_id)
+  #     return true if self.id != elo.id && eli.is_allowed(resource, action)
+  #   else
+  #     for role in roles
+  #       if role.is_allowed(resource, action)
+  #         return true
+  #       end
+  #     end
+  #   end
+  #   return false
+  # end
   
   def self.validate_token(token)
     user = self.where('token' => token).first

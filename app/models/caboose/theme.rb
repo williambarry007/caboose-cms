@@ -73,6 +73,7 @@ class Caboose::Theme < ActiveRecord::Base
     :digest
 
   def compile(for_site_id = 0)
+  	Caboose.log("compiling theme for site #{for_site_id}")
   	theme = self
   	theme_name = 'default'
   	path = Rails.root.join('themes', "#{theme_name}.scss.erb")
@@ -81,7 +82,7 @@ class Caboose::Theme < ActiveRecord::Base
   	tmp_asset_name = "theme_#{self.id}_site_#{for_site_id}"
   	FileUtils.mkdir_p(tmp_themes_path) unless File.directory?(tmp_themes_path)
   	File.open(File.join(tmp_themes_path, "#{tmp_asset_name}.scss"), 'w') { |f| f.write(body) }
-		begin
+#		begin
 	    env = if Rails.application.assets.is_a?(Sprockets::Index)
 	      Rails.application.assets.instance_variable_get('@environment')
 	    else
@@ -101,15 +102,14 @@ class Caboose::Theme < ActiveRecord::Base
 		    bucket =  AWS::S3.new.buckets[config['bucket']]                         
 		    bucket.objects[theme.asset_path(asset.digest, for_site_id)].write(str, :acl => 'public-read', :content_type => 'text/css')
 	    else
-	    	Caboose.log("creating themes folder if doesn't exist")
 	    	theme_path = File.join(Rails.root, 'public', 'assets', 'themes')
 				FileUtils.mkdir_p(theme_path) unless File.directory?(theme_path)
 	      File.open(File.join(Rails.root, 'public', theme.asset_path(asset.digest, for_site_id)), 'w') { |f| f.write(compressed_body) }
 	    end
 	    self.update_digest(asset.digest)
-	 	rescue Sass::SyntaxError => error
-	 		theme.revert
-	 	end
+	# 	rescue Sass::SyntaxError => error
+	# 		theme.revert
+	# 	end
   end
 
   def revert

@@ -133,7 +133,8 @@ class Caboose::Theme < ActiveRecord::Base
 	end
 
 	def asset_url(site_id = 0)
-		"#{ActionController::Base.asset_host}/#{asset_path(self.digest,site_id)}"
+		pre = Rails.env.production? ? "https://" : ""
+		"#{pre}#{ActionController::Base.asset_host}/#{asset_path(self.digest,site_id)}"
 	end
 
 	def js_url

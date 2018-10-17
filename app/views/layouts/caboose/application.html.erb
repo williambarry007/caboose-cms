@@ -2,9 +2,9 @@
 <% content_for :js do %>
 <%= gzip_javascript_include_tag "caboose/application" %>
 <% if @site.theme %>
-<%= gzip_javascript_include_tag(@site.theme.js_url) %>
+  <script type='text/javascript' src="<%= @site.theme.js_url %>"></script>
 <% else %>
-<%= gzip_javascript_include_tag @site.name == 'application' ? 'application' : "#{@site.name}/js/application" %>
+  <%= gzip_javascript_include_tag @site.name == 'application' ? 'application' : "#{@site.name}/js/application" %>
 <% end %>
 <script>window.loggedIn = <%= logged_in?.to_json %></script>
 <% Caboose::javascripts.each do |js| %><%= javascript_include_tag(js) %><% end %>
@@ -19,9 +19,9 @@
 <% content_for :css do %>
 <%= gzip_stylesheet_link_tag 'caboose/application' %>
 <% if @site.theme %>
-<%= gzip_stylesheet_link_tag(@site.theme.asset_url(@site.id)) %>
+  <link rel='stylesheet' type='text/css' media='all' href="<%= @site.theme.asset_url(@site.id) %>" />
 <% else %>
-<%= gzip_stylesheet_link_tag @site.name == 'application' ? 'application' : "#{@site.name}/css/application" %>
+  <%= gzip_stylesheet_link_tag @site.name == 'application' ? 'application' : "#{@site.name}/css/application" %>
 <% end %>
 <% Caboose::stylesheets.each do |css| %><%= gzip_stylesheet_link_tag(css) %><% end %>
 <% @page.linked_resources_map[:css].each do |r| %><%= gzip_stylesheet_link_tag r %><% end %>

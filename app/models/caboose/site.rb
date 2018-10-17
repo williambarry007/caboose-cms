@@ -9,7 +9,7 @@ class Caboose::Site < ActiveRecord::Base
   has_many :domains, :class_name => 'Caboose::Domain', :dependent => :delete_all
   has_many :fonts, :class_name => 'Caboose::Font', :dependent => :delete_all
   has_many :post_categories, :class_name => 'Caboose::PostCategory'
-  has_one :store_config
+  has_one  :store_config
   has_attached_file :logo, 
     :path => ':caboose_prefixsite_logos/:id_:style.:extension',    
     :default_url => 'http://placehold.it/300x300',    
@@ -38,9 +38,22 @@ class Caboose::Site < ActiveRecord::Base
     :sitemap_xml             ,
     :robots_txt              ,
     :theme_color             ,
-    :assets_url              
+    :assets_url              ,
+    :theme_id
             
   before_save :validate_presence_of_store_config
+
+  def theme
+    Caboose::Theme.where(:id => self.theme_id).first
+  end
+
+  def build_new_site
+   # if defined?(SuiteBuilder) == 'constant' && SuiteBuilder.class == Class  
+      helper = Caboose::SiteBuilder.new(self.name)
+      helper.create_site_blocks(self.id)
+   # end
+  #  self.init_users_and_roles
+  end
   
   def validate_presence_of_store_config
     if self.use_store && !Caboose::StoreConfig.where(:site_id => self.id).exists?

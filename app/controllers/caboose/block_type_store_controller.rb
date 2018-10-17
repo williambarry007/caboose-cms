@@ -1,8 +1,7 @@
-
 module Caboose
   class BlockTypeStoreController < ApplicationController
         
-    # @route GET /admin/block-types/store
+    # @route GET /admin/block-type-store
     def admin_index
       return unless user_is_allowed('blocktypestore', 'add')
       @pager = PageBarGenerator.new(params, {

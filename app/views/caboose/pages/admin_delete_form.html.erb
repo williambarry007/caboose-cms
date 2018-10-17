@@ -2,9 +2,10 @@
 <%= render :partial => 'caboose/pages/admin_header' %>
 
 <div id='message'>
-<p class='note error'>Are you sure you want to delete the page?  This can't be undone.<br /><br />
-<input type='button' value='Yes' onclick='delete_page(<%= @page.id %>, true);' />
-<input type='button' value='No'  onclick="window.location='/admin/pages/<%= @page.id %>/edit';" />
+<p class='note error'>
+<span style="display:block;margin-bottom:10px;">Are you sure you want to delete the page?  This can't be undone.</span>
+<input style="margin-right:8px;" type='button' value='Yes' onclick='delete_page(<%= @page.id %>, true);' />
+<input type='button' value='No'  onclick="window.location='/admin/pages/<%= @page.id %>';" />
 </p>
 </div>
 
@@ -15,7 +16,7 @@
 
 function delete_page(page_id, confirm)
 {
-  $('#message').html("<p class='loading'>Deleting page...</p>");
+  $('#message').html("<p class='note loading'>Deleting page...</p>");
   $.ajax({
     url: '/admin/pages/' + page_id,
     type: 'delete',

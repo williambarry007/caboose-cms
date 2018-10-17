@@ -281,6 +281,8 @@ class Caboose::Block < ActiveRecord::Base
         "../../app/views/caboose/blocks/#{site.name}/#{full_name}",
         "../../app/views/caboose/blocks/#{site.name}/#{block.block_type.name}",
         "../../app/views/caboose/blocks/#{site.name}/#{block.block_type.field_type}",
+        "../../app/views/caboose/blocks/default_theme/#{full_name}",
+        "../../app/views/caboose/blocks/default_theme/#{block.block_type.name}",
         "../../app/views/caboose/blocks/#{full_name}",
         "../../app/views/caboose/blocks/#{block.block_type.name}",
         "../../app/views/caboose/blocks/#{block.block_type.field_type}",
@@ -288,6 +290,8 @@ class Caboose::Block < ActiveRecord::Base
         "caboose/blocks/#{block.block_type.name}",                
         "caboose/blocks/#{block.block_type.field_type}"                
       ]
+
+    #  Caboose.log("searching #{arr.to_s}")
       
     #  Caboose.log("editing: " + options2[:editing].to_s)
 
@@ -332,12 +336,12 @@ class Caboose::Block < ActiveRecord::Base
     return "<p class='note error'>Could not find block view anywhere.</p>" if i > arr.count
     begin
       str = view.render(:partial => arr[i], :locals => options)
-      #Caboose.log("Level #{i+1} for #{full_name}: Found partial #{arr[i]}")
+   #   Caboose.log("Level #{i+1} for #{full_name}: Found partial #{arr[i]}")
       rescue ActionView::MissingTemplate => ex        
-        #Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")        
+   #     Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")        
         str = render_helper(view, options, block, full_name, arr, i+1)
       rescue Exception => ex 
-        #Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")
+   #     Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")
         str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
     end
     return str      

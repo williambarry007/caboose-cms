@@ -1,5 +1,10 @@
+<% if request && request.url.include?('user_id') %>
+  <%= render :partial => 'caboose/users/admin_header' %>
+<% else %>
+  <h1>Login Logs</h1>
+  <h4><%= request.url %></h4>
+<% end %>
 
-<h1>Login Logs</h1>
 <div id='login_logs'></div>
 
 <% content_for :caboose_js do %>

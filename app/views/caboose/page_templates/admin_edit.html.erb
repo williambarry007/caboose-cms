@@ -1,0 +1,68 @@
+<h1>Edit Page Template</h1>
+
+<div id='pagetemplate_<%= @template.id %>_title' ></div>
+<div id='pagetemplate_<%= @template.id %>_description' ></div>
+<div id='pagetemplate_<%= @template.id %>_category_id' ></div>
+<div id='pagetemplate_<%= @template.id %>_page_id' ></div>
+<div id='pagetemplate_<%= @template.id %>_sort_order' ></div>
+<div id='pagetemplate_<%= @template.id %>_screenshot' ></div>
+
+<div id="message"></div>
+<br />
+<p>
+<input type='button' value='Back' onclick="window.location='/admin/templates';" >
+<input type='button' value='Delete Page Template' onclick="delete_template(<%= @template.id %>);" >
+</p>
+
+<% content_for :caboose_css do %>
+<style>
+	.mb_container {
+		margin-bottom: 15px;
+		clear: both;
+	}
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+function delete_template(rep_id, confirm) 
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append("Are you sure you want to delete the template? ")
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { delete_template(rep_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#message').empty(); }));      
+    $('#message').empty().append(p);
+    return;
+  }  
+  $('#message').empty().html($('<p/>').addClass('loading').html("Deleting template..."));
+  $.ajax({
+    url: '/admin/templates/' + rep_id,
+    type: 'delete',    
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
+  });
+}
+$(document).ready(function() {
+  m = new ModelBinder({
+    name: 'PageTemplate',
+    id: <%= @template.id %>,
+    update_url: '/admin/templates/<%= @template.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'title'                 , nice_name: 'Title'                , type: 'text'       , value: <%= raw Caboose.json(@template.title           ) %> , width: 500 },
+      { name: 'description'                 , nice_name: 'Description'                , type: 'textarea'       , value: <%= raw Caboose.json(@template.description           ) %> , width: 500, height: 250 },
+      { name: 'page_id'                 , nice_name: 'Reference Page ID'                , type: 'text'       , value: <%= raw Caboose.json(@template.page_id           ) %> , width: 500 },
+      { name: 'category_id'                 , nice_name: 'Category'                , type: 'select'       , value: <%= raw Caboose.json(@template.category_id           ) %>, options: <%== Caboose::PageTemplateCategory.all_options(true) %> , width: 500 },
+      { name: 'sort_order'                 , nice_name: 'Sort Order'                , type: 'text'       , value: <%= raw Caboose.json(@template.sort_order           ) %> , width: 500 },
+      { name: 'screenshot'  , nice_name: 'Screenshot (800x800)'   , type: 'image'  , value: <%= raw Caboose.json(@template.screenshot ? @template.screenshot.url(:small) : 'https://cabooseit.s3.amazonaws.com/assets/shared/template.png') %>, width: 300, update_url: '/admin/templates/<%= @template.id %>/screenshot' }
+    ]
+  });
+});
+
+</script>
+<% end %>

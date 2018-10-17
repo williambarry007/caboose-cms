@@ -50,24 +50,22 @@ class Caboose::User < ActiveRecord::Base
     self.email
   end
   
-  def is_allowed(resource, action)          
-    elo = Caboose::Role.logged_out_role(self.site_id)
-    elo_is_allowed = elo.is_allowed(resource, action)    
-    return true if elo_is_allowed
-    return false if !elo_is_allowed && self.is_logged_out_user?     
-    eli = Caboose::Role.logged_in_role(self.site_id)
-    return true if self.id != elo.id && eli.is_allowed(resource, action)
-    for role in roles
-      #Caboose.log("Checking permissions for #{role.name} role")
-      if role.is_allowed(resource, action)
-        #Caboose.log("Role #{role.name} is allowed to view page")
-        return true
-      else
-        #Caboose.log("Role #{role.name} is not allowed to view page")
+  def is_allowed(resource, action)
+    if self.username == 'elo'
+      elo = Caboose::Role.logged_out_role(self.site_id)
+      elo_is_allowed = elo.is_allowed(resource, action)    
+      return true if elo_is_allowed
+      return false if !elo_is_allowed && self.is_logged_out_user?     
+      eli = Caboose::Role.logged_in_role(self.site_id)
+      return true if self.id != elo.id && eli.is_allowed(resource, action)
+    else
+      for role in roles
+        if role.is_allowed(resource, action)
+          return true
+        end
       end
-      #return true if role.is_allowed(resource, action)
     end
-    return false;
+    return false
   end
   
   def self.validate_token(token)

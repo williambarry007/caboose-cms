@@ -27,10 +27,6 @@
 <% end %>
 <script type='text/javascript'>
 
-function hide_caboose_notice() {
-  $("#caboose-notice").hide();
-  document.cookie = "caboose_post_publish=true; expires=Thu, 18 Dec 2030 12:00:00 UTC; path=/";
-}
 var controller = false;
 $(document).ready(function() {  
   controller = new BlockContentController({
@@ -54,10 +50,6 @@ $(document).ready(function() {
     .append($('<a/>').attr('href', '/admin/posts/<%= @post.id %>').html("Post Settings"))
     .append($('<a/>').attr('href', '<%= @post.uri %>').attr('target','_blank').text("View Post"))  
   );
-
-<% if cookies[:caboose_post_publish].blank? %>
-  $('body').append($('<div/>').attr('id','caboose-notice').html("<a href='#' onclick='hide_caboose_notice();return false;'>x</a><p>NEW: Changes aren't saved until you click Publish. Click Preview to preview the edited post, or Revert to discard your changes.</p>"));
-<% end %>
 
 <% if @site && @site.use_dragdrop %>
   var html = "<%== (render :partial => 'caboose/pages/new_block_header').gsub( / *\n+/, '' ) %> ";

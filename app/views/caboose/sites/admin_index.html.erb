@@ -19,7 +19,8 @@ $(document).ready(function() {
   var table = new IndexTable({    
     form_authenticity_token: '<%= form_authenticity_token %>',
     container: 'sites',
-    base_url: '/admin/sites',            
+    base_url: '/admin/sites',
+    after_add: 'redirect',      
     fields: [
       { name: 'name'        , sort: 'name'              , show: true , editable: false, bulk_edit: false, nice_name: 'Name'        , type: 'text' , value: function(site) { return site.name;        }, width: 400 },
       { name: 'description' , sort: 'description'       , show: true , bulk_edit: false, nice_name: 'Description' , type: 'text' , value: function(site) { return site.description; }, width: 400 },                              

@@ -6,11 +6,19 @@ module Caboose
     def before_action
       @page = Page.page_with_uri(request.host_with_port, '/admin')
     end
+
+    # @route GET /admin/login-logs/user/:userid
+    def admin_index_for_user
+      return if !user_is_allowed_to 'view', 'loginlogs'
+      @pager = self.login_logs_pager
+      @edituser = Caboose::User.find(params[:userid]) if !params[:userid].blank?
+      render :layout => 'caboose/admin'    
+    end
     
     # @route GET /admin/login-logs
     def admin_index
       return if !user_is_allowed_to 'view', 'loginlogs'
-      @pager = self.login_logs_pager    
+      @pager = self.login_logs_pager
       render :layout => 'caboose/admin'    
     end
     

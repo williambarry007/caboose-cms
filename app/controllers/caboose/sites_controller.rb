@@ -144,20 +144,29 @@ module Caboose
     def admin_add
       return if !user_is_allowed('sites', 'add')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
-              
       resp = StdClass.new      
-      site = Site.new
-      site.name = params[:name].strip
-      
-      if site.name.length == 0
-        resp.error = "Please enter a valid domain."      
-      else        
+      site_name = params[:name].strip
+      if site_name.blank?
+        resp.error = "Please enter a valid site name."
+      elsif Site.where(:name => site_name.downcase.gsub(" ","").gsub("'","").gsub("-","")).exists?
+        resp.error = "That site name is taken."    
+      else
+        site = Caboose::Site.new
+        site.name = site_name.downcase.gsub(" ","").gsub("'","").gsub("-","") 
+        site.description = site_name
+        site.use_fonts = true
+        site.use_dragdrop = true
+        site.theme_color = '#141414'
+        site.allow_self_registration = false
+        site.use_store = false
         site.save
-        StoreConfig.create(:site_id => site.id)
-        SmtpConfig.create( :site_id => site.id)
         resp.redirect = "/admin/sites/#{site.id}"
-      end      
-      site.init_users_and_roles            
+        if Rails.env.development?
+          site.build_new_site
+        elsif Rails.env.production?
+          site.delay(:queue => 'general', :priority => 11).build_new_site
+        end
+      end         
       render :json => resp
     end
         

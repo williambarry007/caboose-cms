@@ -1,0 +1,242 @@
+<%
+dt = Caboose::BlockType.where(:name => 'layout_default_theme_standard').first
+header = dt.child('header') if dt
+style = header.child('style') if header
+position = header.child('position') if header
+%>
+
+<h1>Theme</h1>
+
+<div class="grid-row">
+  <div class="unit1of2 left">
+    <section>
+      <h5>Compile</h5>
+      <a href="#" id="compile-btn" class="caboose-btn">Compile Theme</a>
+      <div style="margin-top:20px;" id='message'></div>
+    </section>
+    <section>
+      <h5>Colors</h5>
+      <div id='theme_<%= @theme.id %>_color_main'></div>
+      <div id='theme_<%= @theme.id %>_color_alt'></div>
+      <div id="theme_<%= @theme.id %>_color_dark"></div>
+      <div id="theme_<%= @theme.id %>_color_light"></div>
+    </section>
+    <section>
+      <h5>Body</h5>
+      <div id="theme_<%= @theme.id %>_max_width"></div>
+      <div id="theme_<%= @theme.id %>_body_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_font_size"></div>
+      <div id="theme_<%= @theme.id %>_body_line_height"></div>
+      <div id="theme_<%= @theme.id %>_body_font_color"></div>
+      <div id="theme_<%= @theme.id %>_heading_line_height"></div>
+    </section>
+    <section>
+      <h5>Header</h5>
+      <div id="theme_<%= @theme.id %>_header_height"></div>
+      <div id="theme_<%= @theme.id %>_header_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_header_font_color"></div>
+      <div id="theme_<%= @theme.id %>_dropdown_color"></div>
+      <div id="theme_<%= @theme.id %>_mobile_menu_icon_color"></div>
+      <div id="theme_<%= @theme.id %>_mobile_menu_icon_top"></div>
+      <div id="theme_<%= @theme.id %>_header_font_size"></div>
+      <div id="theme_<%= @theme.id %>_header_nav_spacing"></div>
+      <div id="theme_<%= @theme.id %>_logo_width"></div>
+      <div id="theme_<%= @theme.id %>_logo_height"></div>
+      <div id="theme_<%= @theme.id %>_logo_top_padding"></div>
+      <div id="theme_<%= @theme.id %>_default_header_style"></div>
+      <div id="theme_<%= @theme.id %>_default_header_position"></div>
+    </section>
+    <section>
+      <h5>Footer</h5>
+      <div id="theme_<%= @theme.id %>_footer_height"></div>
+      <div id="theme_<%= @theme.id %>_footer_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_footer_font_color"></div>
+      <div id="theme_<%= @theme.id %>_footer_padding"></div>
+      <div id="theme_<%= @theme.id %>_footer_font_size"></div>
+    </section>
+  </div>
+  <div class="unit1of2 right">
+    <section>
+      <h5>Buttons</h5>
+      <div id="theme_<%= @theme.id %>_btn_border_radius"></div>
+      <div id="theme_<%= @theme.id %>_btn_border_width"></div>
+      <div id="theme_<%= @theme.id %>_btn_border_color"></div>
+      <div id="theme_<%= @theme.id %>_btn_font_color"></div>
+      <div id="theme_<%= @theme.id %>_btn_font_size"></div>
+      <div id="theme_<%= @theme.id %>_btn_font_weight"></div>
+      <div id="theme_<%= @theme.id %>_btn_font_case"></div>
+      <div id="theme_<%= @theme.id %>_btn_border_side"></div>
+      <div id="theme_<%= @theme.id %>_button_padding"></div>
+      <div id="theme_<%= @theme.id %>_button_line_height"></div>
+    </section>
+
+    <section>
+      <h5>Inputs</h5>
+      <div id="theme_<%= @theme.id %>_input_border_radius"></div>
+      <div id="theme_<%= @theme.id %>_input_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_input_border_color"></div>
+      <div id="theme_<%= @theme.id %>_input_border_width"></div>
+      <div id="theme_<%= @theme.id %>_input_font_color"></div>
+      <div id="theme_<%= @theme.id %>_input_font_size"></div>
+      <div id="theme_<%= @theme.id %>_input_padding"></div>
+      <div id="theme_<%= @theme.id %>_note_padding"></div>
+    </section>
+
+    <section>
+      <h5>Subpage Banner</h5>
+      <div id="theme_<%= @theme.id %>_banner_padding"></div>
+      <div id="theme_<%= @theme.id %>_banner_overlay_color"></div>
+      <div id="theme_<%= @theme.id %>_banner_overlay_opacity"></div>
+      <div id="theme_<%= @theme.id %>_default_banner_image"></div>
+    </section>
+    <section>
+      <h5>Mobile Menu</h5>
+      <div id="theme_<%= @theme.id %>_mobile_menu_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_mobile_menu_font_color"></div>
+      <div id="theme_<%= @theme.id %>_mobile_menu_border_color"></div>
+      <div id="theme_<%= @theme.id %>_mobile_menu_nav_padding"></div>
+      <div id="theme_<%= @theme.id %>_mobile_menu_font_size"></div>
+    </section>
+
+    <section>
+      <h5>Sidebar</h5>
+      <div id="theme_<%= @theme.id %>_sidebar_width"></div>
+      <div id="theme_<%= @theme.id %>_sidebar_bg_color"></div>
+    </section>
+    
+  </div>
+</div>
+      
+
+
+
+<% content_for :caboose_css do %>
+<style>
+  .grid-row::after {
+    content: "."; 
+    visibility: hidden; 
+    display: block; 
+    height: 0; 
+    clear: both;
+  }
+  section {
+    margin-bottom: 20px;
+  }
+  section h5 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+  }
+  .unit1of2 {
+    width: 48%;
+    float: left;
+    padding: 0 2% 0 0;
+  }
+  section > div {
+    margin-bottom: 10px;
+  }
+  #message .note {
+    font-size: 16px !important;
+  }
+  #message p.note.loading {
+    background-color: #b7b7ff !important;
+  }
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+$("#compile-btn").click(function(e) {
+  $('#message').html("<p class='note loading'>Compiling theme...</p>").fadeIn();
+  e.preventDefault();
+  $.ajax({
+    url: '/admin/themes/<%= @theme.id %>/compile',
+    type: 'get',    
+    success: function(resp) {
+      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>").fadeIn();
+      if (resp.success && resp.message) {
+        $('#message').html("<p class='note success'>" + resp.message + "</p>").fadeIn().delay(2000).fadeOut();
+      }
+    }
+  });
+});
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'Theme',
+    id: <%= @theme.id %>,
+    update_url: '/admin/theme',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [      
+      { name: 'color_main'              , nice_name: 'Main'                    , type: 'text'     , value: <%= raw Caboose.json(@theme.color_main              ) %>, width: 400 },  
+      { name: 'color_alt'                 , nice_name: 'Alternate'                    , type: 'text'     , value: <%= raw Caboose.json(@theme.color_alt                 ) %>, width: 400 },
+      { name: 'color_dark', nice_name: "<%= 'dark'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.color_dark) %>, width: 400 },
+      { name: 'color_light', nice_name: "<%= 'light'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.color_light) %>, width: 400 },
+      { name: 'max_width', nice_name: "<%= 'max_width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.max_width) %>, width: 400 },
+      { name: 'body_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.body_bg_color) %>, width: 400 },
+      { name: 'font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.font_size) %>, width: 400 },
+      { name: 'header_height', nice_name: "<%= 'height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_height) %>, width: 400 },
+      { name: 'header_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_bg_color) %>, width: 400 },
+      { name: 'header_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_font_color) %>, width: 400 },
+      { name: 'dropdown_color', nice_name: "<%= 'dropdown_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.dropdown_color) %>, width: 400 },
+      { name: 'mobile_menu_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_bg_color) %>, width: 400 },
+      { name: 'mobile_menu_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_font_color) %>, width: 400 },
+      { name: 'mobile_menu_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_border_color) %>, width: 400 },
+      { name: 'mobile_menu_icon_color', nice_name: "<%= 'icon_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_icon_color) %>, width: 400 },
+      { name: 'mobile_menu_icon_top', nice_name: "<%= 'icon_top'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_icon_top) %>, width: 400 },
+      { name: 'footer_height', nice_name: "<%= 'height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_height) %>, width: 400 },
+      { name: 'footer_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_bg_color) %>, width: 400 },
+      { name: 'footer_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_font_color) %>, width: 400 },
+      { name: 'btn_border_radius', nice_name: "<%= 'border_radius'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_radius) %>, width: 400 },
+      { name: 'btn_border_width', nice_name: "<%= 'border_width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_width) %>, width: 400 },
+      { name: 'btn_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_color) %>, width: 400 },
+      { name: 'btn_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_color) %>, width: 400 },
+      { name: 'btn_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_size) %>, width: 400 },
+      { name: 'btn_font_weight', nice_name: "<%= 'font_weight'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_weight) %>, width: 400 },
+      { name: 'btn_font_case', nice_name: "<%= 'font_case'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_case) %>, width: 400 },
+      { name: 'btn_border_side', nice_name: "<%= 'border_side'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_side) %>, width: 400 },
+      { name: 'input_border_radius', nice_name: "<%= 'border_radius'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_border_radius) %>, width: 400 },
+      { name: 'input_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_bg_color) %>, width: 400 },
+      { name: 'input_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_border_color) %>, width: 400 },
+      { name: 'input_border_width', nice_name: "<%= 'border_width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_border_width) %>, width: 400 },
+      { name: 'input_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_font_color) %>, width: 400 },
+      { name: 'input_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_font_size) %>, width: 400 },
+      { name: 'input_padding', nice_name: "<%= 'padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_padding) %>, width: 400 },
+      { name: 'body_line_height', nice_name: "<%= 'line_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.body_line_height) %>, width: 400 },
+      { name: 'body_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.body_font_color) %>, width: 400 },
+      { name: 'button_padding', nice_name: "<%= 'padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.button_padding) %>, width: 400 },
+      { name: 'button_line_height', nice_name: "<%= 'line_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.button_line_height) %>, width: 400 },
+      { name: 'footer_padding', nice_name: "<%= 'padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_padding) %>, width: 400 },
+      { name: 'footer_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_font_size) %>, width: 400 },
+      { name: 'header_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_font_size) %>, width: 400 },
+      { name: 'note_padding', nice_name: "<%= 'note_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.note_padding) %>, width: 400 },
+      { name: 'header_nav_spacing', nice_name: "<%= 'nav_spacing'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_nav_spacing) %>, width: 400 },
+      { name: 'logo_width', nice_name: "<%= 'logo_width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.logo_width) %>, width: 400 },
+      { name: 'logo_height', nice_name: "<%= 'logo_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.logo_height) %>, width: 400 },
+      { name: 'logo_top_padding', nice_name: "<%= 'logo_top_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.logo_top_padding) %>, width: 400 },
+      { name: 'heading_line_height', nice_name: "<%= 'heading_line_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.heading_line_height) %>, width: 400 },
+      { name: 'mobile_menu_nav_padding', nice_name: "<%= 'nav_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_nav_padding) %>, width: 400 },
+      { name: 'mobile_menu_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_font_size) %>, width: 400 },
+      { name: 'banner_padding', nice_name: "<%= 'banner_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_padding) %>, width: 400 },
+      { name: 'banner_overlay_color', nice_name: "<%= 'banner_overlay_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_overlay_color) %>, width: 400 },
+      { name: 'banner_overlay_opacity', nice_name: "<%= 'banner_overlay_opacity'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_overlay_opacity) %>, width: 400 },
+    <% if style %>
+      { name: 'default_header_style', nice_name: "<%= 'default_style'.titleize %>", type: 'select', value: <%== Caboose.json(@theme.default_header_style) %>, options_url: '/admin/block-types/<%= style.id %>/options', width: 400 },
+    <% else %>
+      { name: 'default_header_style', nice_name: "<%= 'default_style'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.default_header_style) %>, width: 400 },
+    <% end %>
+    <% if position %>
+      { name: 'default_header_position', nice_name: "<%= 'default_position'.titleize %>", type: 'select', value: <%== Caboose.json(@theme.default_header_position) %>, options_url: '/admin/block-types/<%= position.id %>/options', width: 400 },
+    <% else %>
+      { name: 'default_header_position', nice_name: "<%= 'default_position'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.default_header_position) %>, width: 400 },
+    <% end %>
+      { name: 'sidebar_width', nice_name: "<%= 'width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.sidebar_width) %>, width: 400 },
+      { name: 'sidebar_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.sidebar_bg_color) %>, width: 400 },
+      { name: 'default_banner_image'  , nice_name: 'Default Banner Image'   , type: 'image'  , value: <%= raw Caboose.json(@theme.default_banner_image ? @theme.default_banner_image.url(:huge) : 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_300/v1539265856/default_banner.jpg') %>, width: 800, update_url: '/admin/themes/<%= @theme.id %>/default-banner-image' }
+    ]    
+  });  
+});
+
+</script>
+<% end %>

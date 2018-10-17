@@ -85,7 +85,7 @@ module Caboose
 		  		  		  
 		  LoginMailer.configure_for_site(@site.id).forgot_password_email(bob).deliver		  
 		  		  
-		  resp.success = "We just sent you an email.  The reset link inside is good for 3 days."
+		  resp.success = "We just sent you an email. The reset link inside is good for 3 days."
 		  render :json => resp
 		end
 	

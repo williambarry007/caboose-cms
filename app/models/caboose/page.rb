@@ -501,6 +501,7 @@ class Caboose::Page < ActiveRecord::Base
         p2.duplicate(site_id, p.id, duplicate_children, child_block_type_id, child_block_type_id)
       end
     end
+    return p
   end
   
 end

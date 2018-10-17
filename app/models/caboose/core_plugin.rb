@@ -25,9 +25,11 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'id' => 'postcustomfields'  , 'text' => 'Post Custom Fields'  , 'href' => '/admin/post-custom-fields' , 'modal' => false } if user.is_allowed('postcustomfields'  , 'view')
     item['children'] << { 'id' => 'roles'             , 'text' => 'Roles'               , 'href' => '/admin/roles'              , 'modal' => false } if user.is_allowed('roles'             , 'view')
     item['children'] << { 'id' => 'sites'             , 'text' => 'Sites'               , 'href' => '/admin/sites'              , 'modal' => false } if user.is_allowed('sites'             , 'view') && site.is_master == true        
+    item['children'] << { 'icon' => 'pages', 'id' => 'templates'             , 'text' => 'Page Templates'               , 'href' => '/admin/templates'              , 'modal' => false } if user.is_allowed('templates'             , 'view') && site.is_master == true  
     item['children'] << { 'id' => 'smtp'              , 'text' => 'SMTP (Mail)'         , 'href' => '/admin/smtp'               , 'modal' => false } if user.is_allowed('smtp'              , 'view')
     item['children'] << { 'id' => 'social'            , 'text' => 'Social Media'        , 'href' => '/admin/social'             , 'modal' => false } if user.is_allowed('social'            , 'view')
     item['children'] << { 'id' => 'users'             , 'text' => 'Users'               , 'href' => '/admin/users'              , 'modal' => false } if user.is_allowed('users'             , 'view')
+    item['children'] << { 'id' => 'theme'      , 'icon' => 'sites',        'text' => 'Theme'               , 'href' => '/admin/theme'              , 'modal' => false } if user.is_allowed('theme'             , 'view') if !site.theme.nil? && user.is_super_admin?
    # item['children'] << { 'id' => 'variables'         , 'text' => 'Variables'           , 'href' => '/admin/settings'           , 'modal' => false } if user.is_allowed('settings'          , 'view')   
     item['children'] << { 'id' => 'my-account'             , 'text' => 'My Account'               , 'href' => '/my-account'              , 'modal' => false } 
     nav << item if item['children'].count > 0

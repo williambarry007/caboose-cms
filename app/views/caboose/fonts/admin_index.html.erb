@@ -75,6 +75,13 @@
 	</div>
 </div>
 
+<% if @site.theme %>
+	<div style="text-align:center;">
+		<a href="#" id="compile-btn" class="caboose-btn">Compile Theme</a>
+		<div id="cmessage"></div>
+	</div>
+<% end %>
+
 <% content_for :caboose_css do %>
 	<style>
 		#font-form {
@@ -248,6 +255,22 @@
 
 <% content_for :caboose_js do %>
 	<script>
+
+		$("#compile-btn").click(function(e) {
+		  $('#cmessage').html("<p class='note loading'>Compiling theme...</p>").fadeIn();
+		  e.preventDefault();
+		  $.ajax({
+		    url: '/admin/themes/<%= @site.theme_id %>/compile',
+		    type: 'get',    
+		    success: function(resp) {
+		      if (resp.error) $('#cmessage').html("<p class='note error'>" + resp.error + "</p>").fadeIn();
+		      if (resp.success && resp.message) {
+		        $('#cmessage').html("<p class='note success'>" + resp.message + "</p>").fadeIn().delay(2000).fadeOut();
+		      }
+		    }
+		  });
+		});
+
 		window.google_fonts = [];
 
 		$(".page-link#next").click(function(event) {

@@ -567,6 +567,23 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :page_id , :integer  ],
         [ :tag     , :string   ]
       ],
+      Caboose::PageTemplate => [        
+        [ :page_id, :integer ],
+        [ :site_id, :integer ],
+        [ :title, :string ],
+        [ :description, :text ],
+        [ :created_at, :datetime ],
+        [ :updated_at, :datetime ],
+        [ :category_id, :integer ],
+        [ :sort_order, :integer ],
+        [ :screenshot, :attachment ]
+      ],
+      Caboose::PageTemplateCategory => [        
+        [ :title, :string ],
+        [ :description, :text ],
+        [ :sort_order, :integer ],
+        [ :superadmin_only, :boolean , { :default => false }]
+      ],
       Caboose::PermanentRedirect => [
         [ :site_id  , :integer ],
         [ :priority , :integer , { :default => 0 }],

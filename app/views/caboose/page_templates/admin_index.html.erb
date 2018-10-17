@@ -1,0 +1,24 @@
+<h1>Page Templates</h1>
+
+<div class="page-templates-wrapper">
+	<% @categories.each do |cat| %>
+		<div class="category clearfix">
+			<h3><%= cat.title %></h3>
+			<p class="description"><%= cat.description %></p>
+			<div class="cat-templates">
+				<% cat.page_templates.order(:sort_order).each do |tem| %>
+					<a href="/admin/templates/<%= tem.id %>" class="template">
+						<img src="<%= tem.screenshot.url(:small) %>" width="200" height="200" alt="<%= tem.title %>" srcset="<%= tem.screenshot.url(:medium) %> 2x" />
+						<div class="text">
+							<span class="title"><%= tem.title.blank? ? 'New Template' : tem.title %></span>
+							<% if !tem.description.blank? %><span class="desc"><%= tem.description %></span><% end %>
+						</div>
+					</a>
+				<% end %>
+			</div>
+			<div class="btn-holder">
+				<a href="/admin/templates/new?category=<%= cat.id %>" class="caboose-btn-white">New Page Template</a>
+			</div>
+		</div>
+	<% end %>
+</div>

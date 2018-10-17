@@ -6,6 +6,8 @@ pic = @edituser.image.url(:thumb) if @edituser.image && !@edituser.image.url.inc
 
 <%= render :partial => 'caboose/users/admin_header' %>
 
+<h3 style="margin:0;">General Information</h3>
+
 <div class="user-details-wrapper clearfix">
   <div class="gravatar-holder">
     <p id='gravatar'><img src='<%= pic %>' width="150" /></p>

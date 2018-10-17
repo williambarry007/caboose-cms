@@ -75,7 +75,7 @@ class Caboose::Theme < ActiveRecord::Base
   def compile(for_site_id = 0)
   	theme = self
   	theme_name = 'default'
-  	path = Rails.root.join(Caboose::site_assets_path, 'themes', "#{theme_name}.scss.erb")
+  	path = Rails.root.join('themes', "#{theme_name}.scss.erb")
   	body = ERB.new(File.read(File.join(path))).result(theme.get_binding(for_site_id))
   	tmp_themes_path = File.join(Rails.root, 'tmp', 'themes')
   	tmp_asset_name = "theme_#{self.id}_site_#{for_site_id}"
@@ -95,13 +95,15 @@ class Caboose::Theme < ActiveRecord::Base
 	      :style => :compressed
 	    }).render
 	    str = StringIO.new(compressed_body)
-	    theme.delete_asset
 	    if Rails.env.production?
 	      config = YAML.load(File.read(Rails.root.join('config', 'aws.yml')))[Rails.env]
 		    AWS.config(:access_key_id => config['access_key_id'], :secret_access_key => config['secret_access_key'])
 		    bucket =  AWS::S3.new.buckets[config['bucket']]                         
 		    bucket.objects[theme.asset_path(asset.digest, for_site_id)].write(str, :acl => 'public-read', :content_type => 'text/css')
 	    else
+	    	Caboose.log("creating themes folder if doesn't exist")
+	    	theme_path = File.join(Rails.root, 'public', 'assets', 'themes')
+				FileUtils.mkdir_p(theme_path) unless File.directory?(theme_path)
 	      File.open(File.join(Rails.root, 'public', theme.asset_path(asset.digest, for_site_id)), 'w') { |f| f.write(compressed_body) }
 	    end
 	    self.update_digest(asset.digest)
@@ -119,7 +121,7 @@ class Caboose::Theme < ActiveRecord::Base
   end
 
   def delete_asset
-  	return unless digest?
+  	Caboose.log("deleting asset")
   end
 
   def asset_path(digest = self.digest, site_id = 0)

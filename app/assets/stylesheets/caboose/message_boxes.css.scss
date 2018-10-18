@@ -16,9 +16,7 @@ Message boxes
 .note {
   padding: 15px;
   background: #fff3ac;
-  //color: #fff;
   font-size: 15px;
-  //text-align: center;
   h2 { margin: 0 0 10px 0; padding: 0; }
   a {
     color: #fff;
@@ -28,9 +26,11 @@ Message boxes
   }
   &.error {
     background: #bf4448;
+    color: #fff;
   }
   &.success {
     background: #26ae88;
+    color: #fff;
   }
   &.loading {
     background-image: url('https://cabooseit.s3.amazonaws.com/assets/shared/loading_blue.gif');
@@ -38,6 +38,8 @@ Message boxes
     background-position: 0 center;
     background-repeat: no-repeat;
     padding-left: 40px;
+    background-color: #1a5aac;
+    color: white;
   }
 }
 

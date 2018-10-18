@@ -1,8 +1,13 @@
+#media .img-wrap {
+  background-image:url('/assets/caboose/grid.png');
+  background-size: 15px;
+  display: inline-block;
+}
 
 #detail_image {
-  float: right;
-  margin: 0;  
-  width: 370px;
+  display: block;
+  max-height: 300px;
+  max-width: 100%;
 }
   
 // #left_content {

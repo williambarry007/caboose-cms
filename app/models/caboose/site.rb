@@ -10,6 +10,7 @@ class Caboose::Site < ActiveRecord::Base
   has_many :fonts, :class_name => 'Caboose::Font', :dependent => :delete_all
   has_many :post_categories, :class_name => 'Caboose::PostCategory'
   has_one  :store_config
+
   has_attached_file :logo, 
     :path => ':caboose_prefixsite_logos/:id_:style.:extension',    
     :default_url => 'http://placehold.it/300x300',    
@@ -19,6 +20,16 @@ class Caboose::Site < ActiveRecord::Base
       :large => '600x800>'
     }
   do_not_validate_attachment_file_type :logo
+
+  has_attached_file :favicon, 
+    :path => ':caboose_prefixfavicons/:id_:style.:extension',    
+    :default_url => 'https://assets.caboosecms.com/site_logos/ninefavicon.png',    
+    :styles => {
+      :tiny  => '100x100>',
+      :thumb => '300x300>'
+    }
+  do_not_validate_attachment_file_type :favicon
+
   attr_accessible :id        ,         
     :name                    ,
     :description             ,
@@ -39,12 +50,30 @@ class Caboose::Site < ActiveRecord::Base
     :robots_txt              ,
     :theme_color             ,
     :assets_url              ,
-    :theme_id
+    :theme_id                ,
+    :cl_logo_version         ,
+    :cl_favicon_version      
             
   before_save :validate_presence_of_store_config
 
   def theme
     Caboose::Theme.where(:id => self.theme_id).first
+  end
+
+  def update_cloudinary_logo
+    if Caboose::use_cloudinary
+      result = Cloudinary::Uploader.upload("https:#{self.logo.url(:large)}" , :public_id => "caboose/site_logos/#{self.id}_large", :overwrite => true)
+      self.cl_logo_version = result['version'] if result && result['version']
+      self.save
+    end
+  end
+
+  def update_cloudinary_favicon
+    if Caboose::use_cloudinary
+      result = Cloudinary::Uploader.upload("https:#{self.favicon.url(:thumb)}" , :public_id => "caboose/favicons/#{self.id}_thumb", :overwrite => true)
+      self.cl_favicon_version = result['version'] if result && result['version']
+      self.save
+    end
   end
 
   def build_new_site

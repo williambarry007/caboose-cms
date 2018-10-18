@@ -75,6 +75,12 @@ module Caboose
           when 'sidebar_width' then theme.sidebar_width = value
           when 'sidebar_bg_color' then theme.sidebar_bg_color = value
 
+          when 'banner_font_size' then theme.banner_font_size = value
+          when 'footer_hover_color' then theme.footer_hover_color = value
+          when 'actual_footer_height' then theme.actual_footer_height = value
+          when 'actual_banner_height' then theme.actual_banner_height = value
+          when 'dropdown_nav_padding' then theme.dropdown_nav_padding = value
+
     	  end
     	end
     	resp.success = save && theme.save

@@ -5,10 +5,18 @@ if block.media
 elsif block.image
   url = block.image.url(:tiny)
 end
- 
-if editing && url.nil?
-  %><p id='block_<%= block.id %>'>Please upload an image.</p><%
-else
-  %><img src='<%= raw url %>' id='block_<%= block.id %>' /><%
-end
-%>
+if editing && url.include?('placehold') %>
+<div class="img-wrap" style="position:relative;display:inline-block;">
+	<div class="img-holder" style="background-image:url(https://cabooseit.s3.amazonaws.com/assets/caboose/grid.png);background-size:15px;display:inline-block;position:relative;" id='block_<%= block.id %>'>
+		<img src='https://cabooseit.s3.amazonaws.com/assets/select_image.png' width="150" style="max-width:100%;display:block;" />
+	</div>
+</div>
+<% elsif editing %>
+<div class="img-wrap" style="position:relative;display:inline-block;">
+	<div class="img-holder" style="background-image:url(https://cabooseit.s3.amazonaws.com/assets/caboose/grid.png);background-size:15px;display:inline-block;position:relative;" id='block_<%= block.id %>'>
+		<img src='<%== url %>' width="200" style="max-width:100%;display:block;" />
+	</div>
+</div>
+<% else %>
+	<img src='<%== url %>' width="200" id='block_<%= block.id %>' />
+<% end %>

@@ -14,8 +14,8 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     item['children'] << { 'icon' => 'box', 'id' => 'inbox'             , 'text' => 'Inbox'               , 'href' => '/admin/inbox'              , 'modal' => false } if user.is_allowed('contacts'             , 'view')   && has_inbox && Contact.where(:site_id => site.id).count > 0
     nav << item if item['children'].count > 0
     
-    item = { 'id' => 'core', 'text' => 'Settings', 'children' => [] }                        
- #   item['children'] << { 'id' => 'blocktypes'        , 'text' => 'AB Test Variants'    , 'href' => '/admin/ab-variants'        , 'modal' => false } if user.is_allowed('abvariants'        , 'view')    
+    item = { 'id' => 'core', 'text' => 'Settings', 'children' => [] }   
+    item['children'] << { 'id' => 'settings'      , 'icon' => 'settings',        'text' => 'Site Settings'               , 'href' => "/admin/sites/#{site.id}"              , 'modal' => false } if user.is_super_admin?                   
     item['children'] << { 'id' => 'blocktypes'        , 'text' => 'Block Types'         , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'        , 'view') && site.is_master == true
     item['children'] << { 'icon' => 'star', 'id' => 'fonts'             , 'text' => 'Fonts'               , 'href' => '/admin/fonts'              , 'modal' => false } if user.is_allowed('fonts'             , 'view') && site.use_fonts == true
     item['children'] << { 'id' => 'redirects'         , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'         , 'view')

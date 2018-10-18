@@ -236,31 +236,31 @@ var MediaModalController = BlockModalController.extend({
     var that = this;            
     var m = that.media_with_id(media_id);
          
-    var image_urls = $('<div/>').attr('id', 'image_urls').css('margin-bottom', '20px');
-    if (m.image_urls)
-    {
-      image_urls.append($('<h2/>').append('Image URLs'));
-      for (var size in m.image_urls)
-      {
-        var s = size.replace('_url', '');
-        s = s[0].toUpperCase() + s.slice(1);
-        var url = m.image_urls[size];
-        image_urls.append($('<div/>')
-          .append($('<span/>').addClass('size').append(s))
-          .append($('<input/>').attr('type', 'text').attr('id', 'size_' + s).addClass('url').val(url))
-          .append($('<button/>').addClass('clippy').data('clipboard-target', '#size_' + s).append('Copy'))                
-        );                        
-      }
-    }
+    // var image_urls = $('<div/>').attr('id', 'image_urls').css('margin-bottom', '20px');
+    // if (m.image_urls)
+    // {
+    //   image_urls.append($('<h2/>').append('Image URLs'));
+    //   for (var size in m.image_urls)
+    //   {
+    //     var s = size.replace('_url', '');
+    //     s = s[0].toUpperCase() + s.slice(1);
+    //     var url = m.image_urls[size];
+    //     image_urls.append($('<div/>')
+    //       .append($('<span/>').addClass('size').append(s))
+    //       .append($('<input/>').attr('type', 'text').attr('id', 'size_' + s).addClass('url').val(url))
+    //       .append($('<button/>').addClass('clippy').data('clipboard-target', '#size_' + s).append('Copy'))                
+    //     );                        
+    //   }
+    // }
     
     $('#top_controls').empty();
-    var img_tag = m.media_type == 'image' ? ($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls ? m.image_urls.thumb_url : '//placehold.it/250x250')) : ( $('<p/>').text(m.original_name) );
+    var img_tag = m.media_type == 'image' ? ($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls ? m.image_urls.thumb_url : 'https://cabooseit.s3.amazonaws.com/assets/select_image.png')) : ( $('<p/>').text(m.original_name) );
     $('#the_modal #media').empty()
-      .append(img_tag)      
-      .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_media_category_id' ))) 
-      .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_name'              )))
-      .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_description'       )))      
-      .append(image_urls);
+      .append( $("<div />").addClass("img-wrap").append(img_tag) );
+      // .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_media_category_id' ))) 
+      // .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_name'              )))
+      // .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_description'       )))      
+      // .append(image_urls);
     var select_text = m.media_type == 'image' ? 'Select this Image' : 'Select this File';
     $('#modal_controls').empty()
       .append($('<p/>').css('clear', 'both')
@@ -273,24 +273,24 @@ var MediaModalController = BlockModalController.extend({
         .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Close'             ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
       );
     
-    var m = new ModelBinder({
-      name: 'Media',
-      id: m.id,
-      update_url: '/admin/media/' + m.id,      
-      authenticity_token: that.authenticity_token,
-      attributes: [                                                                                                                                             
-        { name: 'media_category_id' , nice_name: 'Category'    , type: 'select' , value: m.media_category_id  , fixed_placeholder: true, width: 400, after_update: function() { m.media_category_id = this.value; }, on_load: function() { that.autosize(); }, options_url: '/admin/media-categories/options' },
-        { name: 'name'              , nice_name: 'Name'        , type: 'text'   , value: m.name               , fixed_placeholder: true, width: 400, after_update: function() { m.name              = this.value; }, on_load: function() { that.autosize(); }},
-        { name: 'description'       , nice_name: 'Description' , type: 'text'   , value: m.description        , fixed_placeholder: true, width: 400, after_update: function() { m.description       = this.value; }, on_load: function() { that.autosize(); }},        
-      ]
-    });
-    $('#media_' + media_id + '_media_category_id' + '_container').css('width', '400px');
-    $('#media_' + media_id + '_name'              + '_container').css('width', '400px');
-    $('#media_' + media_id + '_description'       + '_container').css('width', '400px');
+    // var m = new ModelBinder({
+    //   name: 'Media',
+    //   id: m.id,
+    //   update_url: '/admin/media/' + m.id,      
+    //   authenticity_token: that.authenticity_token,
+    //   attributes: [                                                                                                                                             
+    //     { name: 'media_category_id' , nice_name: 'Category'    , type: 'select' , value: m.media_category_id  , fixed_placeholder: true, width: 400, after_update: function() { m.media_category_id = this.value; }, on_load: function() { that.autosize(); }, options_url: '/admin/media-categories/options' },
+    //     { name: 'name'              , nice_name: 'Name'        , type: 'text'   , value: m.name               , fixed_placeholder: true, width: 400, after_update: function() { m.name              = this.value; }, on_load: function() { that.autosize(); }},
+    //     { name: 'description'       , nice_name: 'Description' , type: 'text'   , value: m.description        , fixed_placeholder: true, width: 400, after_update: function() { m.description       = this.value; }, on_load: function() { that.autosize(); }},        
+    //   ]
+    // });
+    // $('#media_' + media_id + '_media_category_id' + '_container').css('width', '400px');
+    // $('#media_' + media_id + '_name'              + '_container').css('width', '400px');
+    // $('#media_' + media_id + '_description'       + '_container').css('width', '400px');
        
-    $('#image_urls span.size' ).css('width', '70px').css('display', 'inline-block');
-    $('#image_urls input.url' ).css('width', '270px').css('border', '#ccc 1px solid');
-    $('#image_urls button'    ).css('width', '60px');
+    // $('#image_urls span.size' ).css('width', '70px').css('display', 'inline-block');
+    // $('#image_urls input.url' ).css('width', '270px').css('border', '#ccc 1px solid');
+    // $('#image_urls button'    ).css('width', '60px');
     
     //c = new Clipboard('.clippy');
     //c.on('success', function(e) {

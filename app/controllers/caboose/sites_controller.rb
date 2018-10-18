@@ -30,7 +30,6 @@ module Caboose
         @error = "You are not allowed to manage sites."
         render :file => 'caboose/extras/error' and return
       end
-      
       @pager = PageBarGenerator.new(params, {
     		  'name_like' => '',    		  
     		},{
@@ -76,52 +75,48 @@ module Caboose
     # @route GET /admin/sites/new
     def admin_new
       return if !user_is_allowed('sites', 'add')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
       end
-      
       @site = Site.new
     end
-        
-    
             
     # @route GET /admin/sites/:id/block-types
     def admin_edit_block_types
       return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
       end
-      
       @site = Site.find(params[:id])      
     end
             
     # @route GET /admin/sites/:id/css
     def admin_edit_css
       return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
-      end      
+      end    
       @site = Site.find(params[:id])      
     end
             
     # @route GET /admin/sites/:id/js
     def admin_edit_js
       return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
-      end      
+      end   
       @site = Site.find(params[:id])      
     end
             
     # @route GET /admin/sites/:id/delete
     def admin_delete_form
       return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
       end
       @site = Site.find(params[:id])      
@@ -130,14 +125,11 @@ module Caboose
     # @route GET /admin/sites/:id
     def admin_edit
       return if !user_is_allowed('sites', 'edit')
-      if !@site.is_master
-        @error = "You are not allowed to manage sites."
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
       end
-      
       @site = Site.find(params[:id])            
-      @site.init_users_and_roles
-            
     end
         
     # @route POST /admin/sites
@@ -173,11 +165,11 @@ module Caboose
     # @route PUT /admin/sites/:id
     def admin_update
       return if !user_is_allowed('sites', 'edit')
-      render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
-
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        render :json => { :error => "You are not allowed to manage sites." } and return
+      end
       resp = StdClass.new     
       site = Site.find(params[:id])
-    
       save = true
       params.each do |name,value|
         case name
@@ -196,7 +188,6 @@ module Caboose
           when 'assets_url'  then site.assets_url = value
     	  end
     	end
-    	
     	resp.success = save && site.save
     	render :json => resp
     end
@@ -204,15 +195,38 @@ module Caboose
     # @route POST /admin/sites/:id/logo
     def admin_update_logo
       return if !user_is_allowed('sites', 'edit')
-      render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
-      
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        render :json => { :error => "You are not allowed to manage sites." } and return
+      end
       site = Site.find(params[:id])       
       site.logo = params[:logo]
       site.save
-      
       resp = StdClass.new
       resp.success = true
-      resp.attributes = { :image => { :value => site.logo.url(:thumb) }}
+      resp.attributes = { :logo => { :value => site.logo.url(:thumb) }}
+      if Caboose::use_cloudinary
+        site.update_cloudinary_logo if Rails.env.development?
+        site.delay(:queue => 'general', :priority => 12).update_cloudinary_logo if Rails.env.production?
+      end
+      render :json => resp
+    end
+
+    # @route POST /admin/sites/:id/favicon
+    def admin_update_favicon
+      return if !user_is_allowed('sites', 'edit')
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        render :json => { :error => "You are not allowed to manage sites." } and return
+      end
+      site = Site.find(params[:id])       
+      site.favicon = params[:favicon]
+      site.save
+      resp = StdClass.new
+      resp.success = true
+      resp.attributes = { :favicon => { :value => site.favicon.url(:tiny) }}
+      if Caboose::use_cloudinary
+        site.update_cloudinary_favicon if Rails.env.development?
+        site.delay(:queue => 'general', :priority => 12).update_cloudinary_favicon if Rails.env.production?
+      end
       render :json => resp
     end
           
@@ -220,10 +234,8 @@ module Caboose
     def admin_delete
       return if !user_is_allowed('sites', 'delete')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
-      
       site = Site.find(params[:id])
       site.destroy
-      
       resp = StdClass.new({
         'redirect' => '/admin/sites'
       })
@@ -234,7 +246,6 @@ module Caboose
     def admin_add_member
       return if !user_is_allowed('sites', 'edit')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
-      
       sm = SiteMembership.where(:site_id => params[:id], :user_id => params[:user_id]).first
       sm = SiteMembership.create(:site_id => params[:id], :user_id => params[:user_id]) if sm.nil?
       sm.role = params[:role]
@@ -246,7 +257,6 @@ module Caboose
     def admin_remove_member
       return if !user_is_allowed('sites', 'edit')
       render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
-      
       SiteMembership.where(:site_id => params[:id], :user_id => params[:user_id]).destroy_all        
       render :json => true
     end
@@ -257,7 +267,6 @@ module Caboose
     # @route GET /admin/sites/:id/:field-options    
     def options
       return if !user_is_allowed('sites', 'view')
-      
       case params[:field]
         when nil
           options = logged_in_user.is_super_admin? ? Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }} : []

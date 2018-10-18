@@ -43,6 +43,10 @@ module Caboose
   # Whether or not to use AB Testing
   mattr_accessor :use_ab_testing
   @@use_ab_testing = true
+
+  # Whether or not to use Cloudinary for site logo and favicon
+  mattr_accessor :use_cloudinary
+  @@use_cloudinary = false
   
   # Website name
   mattr_accessor :website_name

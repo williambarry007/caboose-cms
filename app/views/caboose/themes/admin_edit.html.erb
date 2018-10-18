@@ -36,6 +36,7 @@ position = header.child('position') if header
       <div id="theme_<%= @theme.id %>_header_bg_color"></div>
       <div id="theme_<%= @theme.id %>_header_font_color"></div>
       <div id="theme_<%= @theme.id %>_dropdown_color"></div>
+      <div id="theme_<%= @theme.id %>_dropdown_nav_padding"></div>
       <div id="theme_<%= @theme.id %>_mobile_menu_icon_color"></div>
       <div id="theme_<%= @theme.id %>_mobile_menu_icon_top"></div>
       <div id="theme_<%= @theme.id %>_header_font_size"></div>
@@ -50,9 +51,11 @@ position = header.child('position') if header
       <h5>Footer</h5>
       <div id="theme_<%= @theme.id %>_footer_height"></div>
       <div id="theme_<%= @theme.id %>_footer_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_footer_hover_color"></div>
       <div id="theme_<%= @theme.id %>_footer_font_color"></div>
       <div id="theme_<%= @theme.id %>_footer_padding"></div>
       <div id="theme_<%= @theme.id %>_footer_font_size"></div>
+      <div id="theme_<%= @theme.id %>_actual_footer_height"></div>
     </section>
   </div>
   <div class="unit1of2 right">
@@ -85,8 +88,10 @@ position = header.child('position') if header
     <section>
       <h5>Subpage Banner</h5>
       <div id="theme_<%= @theme.id %>_banner_padding"></div>
+      <div id="theme_<%= @theme.id %>_banner_font_size"></div>
       <div id="theme_<%= @theme.id %>_banner_overlay_color"></div>
       <div id="theme_<%= @theme.id %>_banner_overlay_opacity"></div>
+      <div id="theme_<%= @theme.id %>_actual_banner_height"></div>
       <div id="theme_<%= @theme.id %>_default_banner_image"></div>
     </section>
     <section>
@@ -133,12 +138,6 @@ position = header.child('position') if header
   }
   section > div {
     margin-bottom: 10px;
-  }
-  #message .note {
-    font-size: 16px !important;
-  }
-  #message p.note.loading {
-    background-color: #b7b7ff !important;
   }
 </style>
 <% end %>
@@ -233,7 +232,12 @@ $(document).ready(function() {
     <% end %>
       { name: 'sidebar_width', nice_name: "<%= 'width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.sidebar_width) %>, width: 400 },
       { name: 'sidebar_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.sidebar_bg_color) %>, width: 400 },
-      { name: 'default_banner_image'  , nice_name: 'Default Banner Image'   , type: 'image'  , value: <%= raw Caboose.json(@theme.default_banner_image ? @theme.default_banner_image.url(:huge) : 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_300/v1539265856/default_banner.jpg') %>, width: 800, update_url: '/admin/themes/<%= @theme.id %>/default-banner-image' }
+      { name: 'default_banner_image'  , nice_name: 'Default Banner Image'   , type: 'image'  , value: <%= raw Caboose.json(@theme.default_banner_image ? @theme.default_banner_image.url(:huge) : 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_300/v1539265856/default_banner.jpg') %>, width: 800, update_url: '/admin/themes/<%= @theme.id %>/default-banner-image' },
+      { name: 'banner_font_size', nice_name: "<%= 'banner_font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_font_size) %>, width: 400 },
+      { name: 'footer_hover_color', nice_name: "<%= 'footer_hover_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_hover_color) %>, width: 400 },
+      { name: 'actual_footer_height', nice_name: "<%= 'actual_footer_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.actual_footer_height) %>, width: 400 },
+      { name: 'actual_banner_height', nice_name: "<%= 'actual_banner_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.actual_banner_height) %>, width: 400 },
+      { name: 'dropdown_nav_padding', nice_name: "<%= 'dropdown_nav_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.dropdown_nav_padding) %>, width: 400 }
     ]    
   });  
 });

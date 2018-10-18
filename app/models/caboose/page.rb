@@ -460,9 +460,7 @@ class Caboose::Page < ActiveRecord::Base
 
     p.title                = "Copy of " + self.title                 
     p.menu_title           = self.menu_title            
-    p.slug                 = self.slug                  
-    p.alias                = self.alias                 
-    p.uri                  = self.uri                   
+    p.alias                = self.alias                               
     p.redirect_url         = self.redirect_url          
     p.hide                 = self.hide                  
     p.content_format       = self.content_format        
@@ -478,7 +476,16 @@ class Caboose::Page < ActiveRecord::Base
     p.meta_robots          = self.meta_robots           
     p.canonical_url        = self.canonical_url         
     p.fb_description       = self.fb_description        
-    p.gp_description       = self.gp_description       
+    p.gp_description       = self.gp_description 
+
+    i = 0
+    begin
+      par = Caboose::Page.where(:id => parent_id).first
+      p.slug = Caboose::Page.slug(p.title + (i > 0 ? " #{i}" : ""))
+      p.uri = par.parent_id == -1 ? p.slug : "#{par.uri}/#{p.slug}"
+      i = i+1
+    end while (Caboose::Page.where(:uri => p.uri, :site_id => site_id).count > 0 && i < 10)
+
     p.save
     
     self.page_tags.each{ |tag| Caboose::PageTag.create(:page_id => p.id, :tag => tag.tag) }

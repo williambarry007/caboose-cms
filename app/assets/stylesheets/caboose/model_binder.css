@@ -17,6 +17,11 @@ require caboose/spectrum
   color: #000;
 }
 
+.mb_container.model-image .img-holder {
+  background-image: url('/assets/caboose/grid.png');
+  background-size: 15px;
+}
+
 .mb_container input[type=text],
 .mb_container select,
 .mb_container .mb_fake option,

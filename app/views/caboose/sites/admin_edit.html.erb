@@ -17,9 +17,12 @@ user_ids = [] if user_ids.nil?
 <p><div id='site_<%= @site.id %>_use_fonts'               ></div></p>
 <p><div id='site_<%= @site.id %>_use_dragdrop'            ></div></p>
 <p><div id='site_<%= @site.id %>_allow_self_registration' ></div></p>
+<% if @site.theme.nil? %>
 <p><div id='site_<%= @site.id %>_theme_color' ></div></p>
+<% end %>
 <p><div id='site_<%= @site.id %>_assets_url' ></div></p>
 <p><div id='site_<%= @site.id %>_default_layout_id'       ></div></p>
+<p><div id='site_<%= @site.id %>_favicon'                    ></div></p>
 
 <h2>Domains</h2>
 <p><a href='#' onclick="add_domain(<%= @site.id %>);">New Domain</a></p>
@@ -93,7 +96,8 @@ $(document).ready(function() {
     update_url: '/admin/sites/<%= @site.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'logo'                    , nice_name: 'Logo'                     , type: 'image'    , value: <%= raw Caboose.json(@site.logo ? @site.logo.url(:thumb) : '')     %>, width: 400, update_url: '/admin/sites/<%= @site.id %>/logo' },
+      { name: 'logo'                    , nice_name: 'Logo'                     , type: 'image'    , value: <%= raw Caboose.json(@site.logo ? @site.logo.url(:thumb) : '')     %>, width: 300, update_url: '/admin/sites/<%= @site.id %>/logo' },
+      { name: 'favicon'                    , nice_name: 'Favicon'                     , type: 'image'    , value: <%= raw Caboose.json(@site.favicon ? @site.favicon.url(:tiny) : '')     %>, width: 80, update_url: '/admin/sites/<%= @site.id %>/favicon' },
       { name: 'description'             , nice_name: 'Description'              , type: 'text' , value: <%= raw Caboose.json(@site.description)                            %>, width: 600  },
       { name: 'theme_color'             , nice_name: 'Theme Color'              , type: 'text' , value: <%= raw Caboose.json(@site.theme_color)                            %>, width: 600  },
       { name: 'assets_url'             , nice_name: 'Assets URL'              , type: 'text' , value: <%= raw Caboose.json(@site.assets_url)                            %>, width: 600  },

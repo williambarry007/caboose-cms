@@ -285,7 +285,7 @@ var BlockModalController = ModalController.extend({
       url: that.block_url(block) + '/remove-media',
       type: 'put',
       success: function(html) {
-        $('#the_modal img#block_' + block.id).attr('src','//d9hjv462jiw15.cloudfront.net/assets/blank.png').css('width','200px').css('height','120px');
+        $('#the_modal .img-holder#block_' + block.id).find("img").attr('src','https://cabooseit.s3.amazonaws.com/assets/select_image.png');
         $('#the_modal div#block_' + block.id + ' p').html('Empty file.');
         $('#the_modal #block_' + block.id).parent().find('.caboose-btn').remove();
         that.parent_controller.render_blocks();
@@ -312,14 +312,14 @@ var BlockModalController = ModalController.extend({
       that.parent_controller.edit_block(b.id); 
     });
 
-    if ( b.block_type && b.block_type.field_type == 'image' && b.rendered_value.indexOf('placehold') < 0 ) {
+    if ( b.block_type && b.block_type.field_type == 'image' && b.rendered_value.indexOf('select_image.png') < 0 ) {
       btn = $('<a href="#" class="caboose-btn">Remove</a>');
-      btn.css('position','relative').css('left','10px').css('bottom','10px').css('font-size','13px');
+      btn.css('position','absolute').css('left','100%').css('left','calc(100% + 10px)').css('bottom','0').css('font-size','13px');
       btn.on('click', function(e) {
         e.preventDefault();
         that.remove_media(b);
       });
-      $('#the_modal #block_' + b.id).after(btn);
+      $('#the_modal #block_' + b.id).closest(".img-wrap").append(btn);
     }
 
     if ( b.block_type && b.block_type.field_type == 'file' && b.rendered_value.indexOf('Click to select a file') < 0 ) {

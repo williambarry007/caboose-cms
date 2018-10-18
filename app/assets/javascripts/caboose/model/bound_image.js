@@ -18,21 +18,20 @@ BoundImage = BoundControl.extend({
     
     if (!this.attribute.update_url)
       this.attribute.update_url = this.model.update_url;
+
+    var awidth = this.attribute.width ? this.attribute.width : this.width;
          
     var this2 = this;
     $('#'+this.el).wrap($('<div/>')
       .attr('id', this.el + '_container')
-      .addClass('mb_container')
+      .addClass('mb_container model-image')
       .css('position', 'relative')
     );
     $('#'+this.el+'_container').empty();
     
-    $('#'+this.el+'_container').append($('<img/>')
-      .attr('src', this.attribute.value)
-      .css('width', this.width)
-      .css('float', 'left')
-      .css('margin-right', 10)
-    );    
+    $('#'+this.el+'_container').append( $("<div/>").addClass('img-holder').css('float','left').css('width',awidth).css('margin-right',10).append($('<img/>')
+      .attr('src', this.attribute.value).css('display','block').css('max-width','100%')
+    ));    
     $('#'+this.el+'_container')
       .append($('<form target="' + this.el + '_iframe"></form>')
         .attr('id', this.el + '_form')

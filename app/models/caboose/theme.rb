@@ -2,6 +2,9 @@ class Caboose::Theme < ActiveRecord::Base
 
   self.table_name = "themes"
 
+  has_many :theme_file_memberships
+  has_many :theme_files, :through => :theme_file_memberships    
+
   has_attached_file :default_banner_image,      
     :path => 'banner_images/:id_:style.:extension',      
     :default_url => 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_1800/v1539265856/default_banner.jpg',
@@ -70,6 +73,12 @@ class Caboose::Theme < ActiveRecord::Base
 		:sidebar_width,
 		:sidebar_bg_color,
 
+		:banner_font_size,
+		:footer_hover_color,
+		:actual_footer_height,
+		:actual_banner_height,
+		:dropdown_nav_padding,
+
     :digest
 
   def compile(for_site_id = 0)
@@ -82,7 +91,7 @@ class Caboose::Theme < ActiveRecord::Base
   	tmp_asset_name = "theme_#{self.id}_site_#{for_site_id}"
   	FileUtils.mkdir_p(tmp_themes_path) unless File.directory?(tmp_themes_path)
   	File.open(File.join(tmp_themes_path, "#{tmp_asset_name}.scss"), 'w') { |f| f.write(body) }
-#		begin
+		begin
 	    env = if Rails.application.assets.is_a?(Sprockets::Index)
 	      Rails.application.assets.instance_variable_get('@environment')
 	    else
@@ -107,9 +116,12 @@ class Caboose::Theme < ActiveRecord::Base
 	      File.open(File.join(Rails.root, 'public', theme.asset_path(asset.digest, for_site_id)), 'w') { |f| f.write(compressed_body) }
 	    end
 	    self.update_digest(asset.digest)
-	# 	rescue Sass::SyntaxError => error 
-	# 		theme.revert
-	# 	end
+		rescue Sass::SyntaxError => error
+			if Rails.env.development?
+				raise error
+			end
+			theme.revert
+		end
   end
 
   def revert
@@ -133,8 +145,16 @@ class Caboose::Theme < ActiveRecord::Base
 	end
 
 	def asset_url(site_id = 0)
-		pre = Rails.env.production? ? "https://" : ""
-		"#{pre}#{ActionController::Base.asset_host}/#{asset_path(self.digest,site_id)}"
+		if Rails.env.production?
+			return "https://#{ActionController::Base.asset_host}/#{asset_path(self.digest,site_id)}"
+		else
+			path = File.join(Rails.root, 'public', "#{asset_path(self.digest,site_id)}")
+			if File.file?(path)
+				return "#{ActionController::Base.asset_host}/#{asset_path(self.digest,site_id)}"
+			else
+				return "https://#{Caboose::cdn_domain}/#{asset_path(self.digest,site_id)}"
+			end
+		end
 	end
 
 	def js_url

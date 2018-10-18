@@ -1,6 +1,6 @@
 <form action="/login" method="post" id="login-form">
 	<div class="header">
-	  <% if @site.logo %>
+	  <% if @site.logo && !@site.logo.url.include?('placehold') %>
 	    <img src='<%= @site.logo.url(:thumb) %>' alt="<%= @site.description %>" />
 	  <% else %>
 		  <img src="/assets/caboose/caboose_logo.png" alt="Caboose">

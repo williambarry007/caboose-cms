@@ -1,3 +1,8 @@
+<%
+temp = Caboose::PageTemplate.where('screenshot_file_name is not null').first
+tempimg = temp ? temp.screenshot.url(:small) : '//cabooseit.s3.amazonaws.com/assets/shared/template.png'
+%>
+
 <h1>New Page</h1>
 
 <div class="new-page-form-wrapper">
@@ -28,11 +33,11 @@
 				    <option <% if bt.description == 'Subpage' || bt.description == 'Standard' %>selected<% end %> value="<%= bt.id %>"><%= bt.description %></option>
 				  <% end %>
 				</select>
-				<p class="meta">The page layout defines the overall page structure, such as header, footer, and sidebar. Most of the time, this is 'Subpage'.</p>
+				<p class="meta">The page layout defines the overall page structure, such as header, footer, and sidebar.</p>
 			</div>
 		</section>
 	<%# temporarily only super admins can do templates %>
-	<% if @logged_in_user && @logged_in_user.is_super_admin? %>
+	
 		<section class="page-templates-wrapper">
 			<h4>Page Template</h4>
 			<div class="field">
@@ -42,17 +47,26 @@
 			<div class="category">
 				<div class="cat-templates">
 					<a href="#" id="template-blank" class="template selected opt">
-						<img src="//cabooseit.s3.amazonaws.com/assets/shared/template.png" width="200" alt="Blank" />
+						<img src="https://cabooseit.s3.amazonaws.com/assets/blank_template.png" width="200" alt="Blank" />
 						<div class="text">
 							<span class="title">Blank</span>
 							<span class="desc">A completely blank page.</span>
 						</div>
 					</a>
+				<% if @logged_in_user && @logged_in_user.is_super_admin? %>
 					<a href="#" id="template-choose" class="template opt">
-						<img src="//cabooseit.s3.amazonaws.com/assets/shared/template.png" width="200" alt="Blank" />
+						<img src="<%= tempimg %>" width="200" alt="Blank" />
 						<div class="text">
 							<span class="title">Use a Template</span>
 							<span class="desc">Choose a page template.</span>
+						</div>
+					</a>
+				<% end %>
+					<a href="#" id="template-copy" class="template opt">
+						<img src="https://cabooseit.s3.amazonaws.com/assets/copy_page.png" width="200" alt="Blank" />
+						<div class="text">
+							<span class="title">Existing page</span>
+							<span class="desc">Copy an existing page.</span>
 						</div>
 					</a>
 				</div>
@@ -75,14 +89,25 @@
 					</div>
 				</div>
 			<% end %>
+			<div class="copy-options" style="display:none;">
+				<div class="field">
+					<label for="copy_from_id">Choose a page to copy</label>
+					<select name="copy_from_id" id="copy_from_id">
+						<% @sitemap.each do |sm| %>
+							<option value="<%= sm['value'] %>"><%= sm['text'] %></option>
+						<% end %>
+					</select>
+				</div>
+			</div>
 		</section>
-	<% end %>
+
 		<div id="page-message"></div>
 		<section class="buttons clearfix">
 			<a href="/admin/pages" class="caboose-btn-white">Cancel</a>
 			<a href="#" id="create_page" class="caboose-btn">Create Page</a>
 		</section>
 		<input type="hidden" id="use_template" name="use_template" value="no" />
+		<input type="hidden" id="use_copy" name="use_copy" value="no" />
 		<input type="hidden" id="template_id" name="template_id" value="" />
 	</form>
 </div>
@@ -107,11 +132,21 @@
 		$(this).addClass("selected");
 		if ( $(this).attr("id") == "template-choose") {
 			$(".category.more").slideDown();
+			$(".copy-options").slideUp();
 			$("#use_template").attr("value","yes");
+			$("#use_copy").attr("value","no");
 		}
 		else if ( $(this).attr("id") == "template-blank") {
 			$(".category.more").slideUp();
+			$(".copy-options").slideUp();
 			$("#use_template").attr("value","no");
+			$("#use_copy").attr("value","no");
+		}
+		else if ( $(this).attr("id") == "template-copy") {
+			$(".category.more").slideUp();
+			$(".copy-options").slideDown();
+			$("#use_template").attr("value","no");
+			$("#use_copy").attr("value","yes");
 		}
 	});
 	$(".template.tem").click(function(e) {

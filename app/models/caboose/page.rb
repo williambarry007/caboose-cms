@@ -461,8 +461,8 @@ class Caboose::Page < ActiveRecord::Base
     p.title                = "Copy of " + self.title                 
     p.menu_title           = self.menu_title            
     p.alias                = self.alias                               
-    p.redirect_url         = self.redirect_url          
-    p.hide                 = self.hide                  
+    p.redirect_url         = self.redirect_url
+    p.hide                 = true               
     p.content_format       = self.content_format        
     p.custom_css           = self.custom_css            
     p.custom_js            = self.custom_js             

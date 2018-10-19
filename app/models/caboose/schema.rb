@@ -988,7 +988,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :dropdown_nav_padding, :string ]
       ],
       Caboose::ThemeFile => [
-        [ :filename, :string ]
+        [ :filename, :string ],
+        [ :nice_name, :string ],
+        [ :default_included, :boolean     , { :default => false }]
       ],
       Caboose::ThemeFileMembership => [
         [ :theme_file_id                      , :integer    ],

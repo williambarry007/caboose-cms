@@ -17,6 +17,27 @@ require caboose/spectrum
   color: #000;
 }
 
+.mb_container.color {
+  border: 1px solid #ccc;
+  height: 36px;
+}
+
+.mb_container.color .sp-replacer {
+  background-color: transparent;
+  border: 0;
+  position: relative;
+  bottom: 1px;
+}
+.admin-theme .mb_container.color input[type="text"] {
+  display: inline-block !important;
+  width: 80px;
+  border: 0;
+  padding-top: 0px;
+}
+div.mb_container.color div.mb_placeholder {
+  top: 7px;
+}
+
 .mb_container.model-image .img-holder {
   background-image: url('/assets/caboose/grid.png');
   background-size: 15px;

@@ -478,6 +478,7 @@ module Caboose
       return if !user_is_allowed('pages', 'edit')
       #return if !Page.is_allowed(logged_in_user, params[:id], 'edit')            
       @page = Page.find(params[:id])
+      @can_edit_home = user_is_allowed_to('edit', Caboose::Page.index_page(@site.id))
       if @page.site_id != @logged_in_user.site_id && !@logged_in_user.is_super_admin?
         redirect_to '/admin/pages'
       else
@@ -544,7 +545,7 @@ module Caboose
         resp.redirect = "/admin/pages/#{page.id}/content"
 
       # Copy from an existing page
-      elsif !params[:copy_from_id].blank?
+      elsif !params[:copy_from_id].blank? && params[:use_copy] == 'yes'
         source = Caboose::Page.find(params[:copy_from_id])
         if source
           Caboose.log("copying from source page: #{source.id}")
@@ -726,6 +727,53 @@ module Caboose
       resp = StdClass.new({
         'redirect' => '/admin/pages'
       })
+      render json: resp
+    end
+
+    # @route PUT /admin/pages/:id/promote
+    def admin_promote
+      resp = StdClass.new
+      return unless user_is_allowed('pages', 'edit')
+      old_home = Caboose::Page.index_page(@site.id)
+      return unless user_is_allowed_to('edit', old_home)
+      new_home = Caboose::Page.find(params[:id])
+      if new_home && (old_home.site_id == new_home.site_id && new_home.site_id == @site.id) && (@site.id == @logged_in_user.site_id || @logged_in_user.is_super_admin?)
+        old_layout = Caboose::Block.where(:parent_id => nil, :page_id => old_home.id).first
+        old_footer = old_layout.child('footer') if old_layout
+        new_home.parent_id = -1
+        new_home.title = 'Home'
+        new_home.slug = nil
+        new_home.alias = nil
+        new_home.uri = nil
+        new_home.redirect_url = nil
+        new_home.hide = false
+        new_home.save
+        new_layout = Caboose::Block.where(:parent_id => nil, :page_id => new_home.id).first
+        new_footer = new_layout.child('footer') if new_layout
+        if new_footer && new_footer.children.count > 0
+          new_footer.children.each do |nc|
+            nc.destroy
+          end
+        end
+        if old_footer && old_footer.children.count > 0
+          old_footer.children.each do |oc|
+            oc.parent_id = new_footer.id
+            oc.page_id = new_home.id
+            oc.save
+          end
+        end
+        old_home.title = 'OLD Home'
+        old_home.parent_id = new_home.id
+        old_home.slug = "old-home-#{old_home.id}"
+        old_home.uri = "old-home-#{old_home.id}"
+        old_home.hide = true
+        old_home.save
+        resp.success = true
+        resp.redirect = "/admin/pages/#{new_home.id}"
+      else
+        resp.success = false
+        resp.error = "You don't have permission to do this."
+      end
       render json: resp
     end
         

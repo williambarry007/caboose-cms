@@ -34,7 +34,7 @@ $(document).ready(function() {
       { name: 'author'     , nice_name: 'Author'         , type: 'text'      , value: <%= raw Caboose.json(@post.author     )        %>, width: 600 },    
       { name: 'created_at' , nice_name: 'Date Published' , type: 'date'      , value: <%= raw Caboose.json(@post.created_at.strftime('%m/%d/%Y')     )        %>, width: 600 },     
       { name: 'published'  , nice_name: 'Published'      , type: 'checkbox'  , value: <%= raw @post.published ? true : false         %>, width: 600 },
-      { name: 'image'      , nice_name: 'Image'          , type: 'image'     , value: <%= raw Caboose.json(@post.image.url(:thumb))  %>, width: 600, update_url: '/admin/posts/<%= @post.id %>/image' }            
+      { name: 'image'      , nice_name: 'Image'          , type: 'image'     , value: <%= raw Caboose.json(@post.image.url(:thumb))  %>, width: 200, update_url: '/admin/posts/<%= @post.id %>/image' }            
     ]
   });
   <% @post.post_custom_field_values.each do |fv| %>

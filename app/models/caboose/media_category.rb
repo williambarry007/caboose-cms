@@ -56,7 +56,8 @@ class Caboose::MediaCategory < ActiveRecord::Base
   
   def self.tree_hash(site_id)
     top_cat = self.where(:parent_id => nil, :site_id => site_id).first
-    return self.tree_hash_helper(top_cat)        
+    top_cat = Caboose::MediaCategory.create(:parent_id => nil, :site_id => site_id, :name => 'Media') if top_cat.nil?
+    return self.tree_hash_helper(top_cat)
   end
   
   def self.tree_hash_helper(cat)

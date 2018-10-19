@@ -82,7 +82,6 @@ class Caboose::Theme < ActiveRecord::Base
     :digest
 
   def compile(for_site_id = 0)
-  	Caboose.log("compiling theme for site #{for_site_id}")
   	theme = self
   	theme_name = 'default'
   	path = Rails.root.join('themes', "#{theme_name}.scss.erb")

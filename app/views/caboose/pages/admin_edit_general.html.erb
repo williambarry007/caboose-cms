@@ -15,8 +15,29 @@
 <% end %>
 <div class='field_with_explanation'><div id='page_<%= @page.id %>_tags'                  ></div><span class='explanation'>Tags to help categorize your page. Use as many as you want, just separate by commas.</span></div>
 
+<% if @can_edit_home %>
+<div class='field_with_explanation'>
+  <a href="#" onclick="promote_page(<%= @page.id %>, false);return false;" id="promote">Make this page my homepage</a>
+  <div id="pmessage"></div>
+</div>
+<% end %>
+
 <%= render :partial => 'caboose/pages/admin_footer' %>
 
+<% content_for :caboose_css do %>
+  <style>
+    a#promote {
+      color: #565daa;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 7px;
+    }
+    a#promote:hover {
+      text-decoration: underline;
+    }
+  </style>
+<% end %>
 
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
@@ -57,6 +78,28 @@ function update_uri(page_id)
   $.ajax({
     url: '/admin/pages/' + page_id + '/uri',
     success: function(resp) { $('#uri').html(resp.uri); }
+  });
+}
+
+function promote_page(page_id, confirm) 
+{
+  if (!confirm)
+  {
+    var p = $('<p/>').addClass('note warning')
+      .append("Are you sure you want to do this? This page will replace the existing homepage. The existing homepage will be hidden but not deleted.")
+      .append($('<input/>').attr('type','button').val('Yes').click(function() { promote_page(page_id, true); })).append(' ')
+      .append($('<input/>').attr('type','button').val('No').click(function() { $('#pmessage').empty(); }));      
+    $('#pmessage').empty().append(p);
+    return;
+  }  
+  $('#pmessage').empty().html($('<p/>').addClass('loading').html("Promoting page..."));
+  $.ajax({
+    url: '/admin/pages/' + page_id + '/promote',
+    type: 'put',    
+    success: function(resp) {
+      if (resp.error) $('#pmessage').html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect) window.location = resp.redirect;
+    }
   });
 }
 

@@ -7,7 +7,7 @@ position = header.child('position') if header
 
 <h1>Theme</h1>
 
-<div class="grid-row">
+<div class="admin-theme grid-row">
   <div class="unit1of2 left">
     <section>
       <h5>Compile</h5>
@@ -57,6 +57,18 @@ position = header.child('position') if header
       <div id="theme_<%= @theme.id %>_footer_font_size"></div>
       <div id="theme_<%= @theme.id %>_actual_footer_height"></div>
     </section>
+
+    <section>
+      <h5>Theme Files</h5>
+      <% Caboose::ThemeFile.order(:nice_name).all.each do |tf| %>
+        <% tfm = Caboose::ThemeFileMembership.where(:theme_file_id => tf.id, :theme_id => @theme.id).exists? %>
+        <div class="field cb">
+          <input class="file-toggle" <% if tfm %>checked<% end %> type="checkbox" value="<%= tf.id %>" name="tf_<%= tf.id %>" id="<%= tf.id %>" />
+          <label for="<%= tf.id %>"><%= tf.nice_name %></label>
+        </div>
+      <% end %>
+    </section>
+
   </div>
   <div class="unit1of2 right">
     <section>
@@ -116,6 +128,7 @@ position = header.child('position') if header
 
 
 <% content_for :caboose_css do %>
+<%= stylesheet_link_tag "caboose/spectrum" %>
 <style>
   .grid-row::after {
     content: "."; 
@@ -139,12 +152,46 @@ position = header.child('position') if header
   section > div {
     margin-bottom: 10px;
   }
+  input[type="text"]:disabled {
+    color: #969696;
+  }
+  .field.cb {
+    height: 26px;
+  }
+  .field.cb input {
+    height: auto;
+  }
+  .field.cb label {
+    font-size: 14px;
+    position: relative;
+    top: 1px;
+  }
 </style>
 <% end %>
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/spectrum" %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
+
+function toggle_file(file_id, checked) {
+  var status = checked;
+  $.ajax({
+    url: '/admin/themes/<%= @theme.id %>/files/' + file_id + '/toggle',
+    type: 'put',
+    data: {
+      checked: status
+    },
+    success: function(resp) {
+
+    }
+  });
+}
+$(window).load(function() {
+  $(".file-toggle").change(function() {
+    toggle_file($(this).attr("id"), $(this).is(':checked'));
+  });
+});
 
 $("#compile-btn").click(function(e) {
   $('#message').html("<p class='note loading'>Compiling theme...</p>").fadeIn();
@@ -168,42 +215,42 @@ $(document).ready(function() {
     update_url: '/admin/theme',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [      
-      { name: 'color_main'              , nice_name: 'Main'                    , type: 'text'     , value: <%= raw Caboose.json(@theme.color_main              ) %>, width: 400 },  
-      { name: 'color_alt'                 , nice_name: 'Alternate'                    , type: 'text'     , value: <%= raw Caboose.json(@theme.color_alt                 ) %>, width: 400 },
-      { name: 'color_dark', nice_name: "<%= 'dark'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.color_dark) %>, width: 400 },
-      { name: 'color_light', nice_name: "<%= 'light'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.color_light) %>, width: 400 },
+      { name: 'color_main'              , nice_name: 'Main'                    , type: 'color'     , value: <%= raw Caboose.json(@theme.color_main              ) %>, width: 400 },  
+      { name: 'color_alt'                 , nice_name: 'Alternate'                    , type: 'color'     , value: <%= raw Caboose.json(@theme.color_alt                 ) %>, width: 400 },
+      { name: 'color_dark', nice_name: "<%= 'dark'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.color_dark) %>, width: 400 },
+      { name: 'color_light', nice_name: "<%= 'light'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.color_light) %>, width: 400 },
       { name: 'max_width', nice_name: "<%= 'max_width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.max_width) %>, width: 400 },
-      { name: 'body_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.body_bg_color) %>, width: 400 },
+      { name: 'body_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.body_bg_color) %>, width: 400 },
       { name: 'font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.font_size) %>, width: 400 },
       { name: 'header_height', nice_name: "<%= 'height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_height) %>, width: 400 },
-      { name: 'header_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_bg_color) %>, width: 400 },
-      { name: 'header_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_font_color) %>, width: 400 },
-      { name: 'dropdown_color', nice_name: "<%= 'dropdown_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.dropdown_color) %>, width: 400 },
-      { name: 'mobile_menu_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_bg_color) %>, width: 400 },
-      { name: 'mobile_menu_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_font_color) %>, width: 400 },
-      { name: 'mobile_menu_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_border_color) %>, width: 400 },
-      { name: 'mobile_menu_icon_color', nice_name: "<%= 'icon_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_icon_color) %>, width: 400 },
+      { name: 'header_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.header_bg_color) %>, width: 400 },
+      { name: 'header_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.header_font_color) %>, width: 400 },
+      { name: 'dropdown_color', nice_name: "<%= 'dropdown_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.dropdown_color) %>, width: 400 },
+      { name: 'mobile_menu_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.mobile_menu_bg_color) %>, width: 400 },
+      { name: 'mobile_menu_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.mobile_menu_font_color) %>, width: 400 },
+      { name: 'mobile_menu_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.mobile_menu_border_color) %>, width: 400 },
+      { name: 'mobile_menu_icon_color', nice_name: "<%= 'icon_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.mobile_menu_icon_color) %>, width: 400 },
       { name: 'mobile_menu_icon_top', nice_name: "<%= 'icon_top'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_icon_top) %>, width: 400 },
       { name: 'footer_height', nice_name: "<%= 'height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_height) %>, width: 400 },
-      { name: 'footer_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_bg_color) %>, width: 400 },
-      { name: 'footer_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_font_color) %>, width: 400 },
+      { name: 'footer_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.footer_bg_color) %>, width: 400 },
+      { name: 'footer_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.footer_font_color) %>, width: 400 },
       { name: 'btn_border_radius', nice_name: "<%= 'border_radius'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_radius) %>, width: 400 },
       { name: 'btn_border_width', nice_name: "<%= 'border_width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_width) %>, width: 400 },
-      { name: 'btn_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_color) %>, width: 400 },
-      { name: 'btn_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_color) %>, width: 400 },
+      { name: 'btn_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.btn_border_color) %>, width: 400 },
+      { name: 'btn_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.btn_font_color) %>, width: 400 },
       { name: 'btn_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_size) %>, width: 400 },
       { name: 'btn_font_weight', nice_name: "<%= 'font_weight'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_weight) %>, width: 400 },
       { name: 'btn_font_case', nice_name: "<%= 'font_case'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_case) %>, width: 400 },
       { name: 'btn_border_side', nice_name: "<%= 'border_side'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_side) %>, width: 400 },
       { name: 'input_border_radius', nice_name: "<%= 'border_radius'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_border_radius) %>, width: 400 },
-      { name: 'input_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_bg_color) %>, width: 400 },
-      { name: 'input_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_border_color) %>, width: 400 },
+      { name: 'input_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.input_bg_color) %>, width: 400 },
+      { name: 'input_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.input_border_color) %>, width: 400 },
       { name: 'input_border_width', nice_name: "<%= 'border_width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_border_width) %>, width: 400 },
-      { name: 'input_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_font_color) %>, width: 400 },
+      { name: 'input_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.input_font_color) %>, width: 400 },
       { name: 'input_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_font_size) %>, width: 400 },
       { name: 'input_padding', nice_name: "<%= 'padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_padding) %>, width: 400 },
       { name: 'body_line_height', nice_name: "<%= 'line_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.body_line_height) %>, width: 400 },
-      { name: 'body_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.body_font_color) %>, width: 400 },
+      { name: 'body_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.body_font_color) %>, width: 400 },
       { name: 'button_padding', nice_name: "<%= 'padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.button_padding) %>, width: 400 },
       { name: 'button_line_height', nice_name: "<%= 'line_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.button_line_height) %>, width: 400 },
       { name: 'footer_padding', nice_name: "<%= 'padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_padding) %>, width: 400 },
@@ -218,7 +265,7 @@ $(document).ready(function() {
       { name: 'mobile_menu_nav_padding', nice_name: "<%= 'nav_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_nav_padding) %>, width: 400 },
       { name: 'mobile_menu_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.mobile_menu_font_size) %>, width: 400 },
       { name: 'banner_padding', nice_name: "<%= 'banner_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_padding) %>, width: 400 },
-      { name: 'banner_overlay_color', nice_name: "<%= 'banner_overlay_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_overlay_color) %>, width: 400 },
+      { name: 'banner_overlay_color', nice_name: "<%= 'banner_overlay_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.banner_overlay_color) %>, width: 400 },
       { name: 'banner_overlay_opacity', nice_name: "<%= 'banner_overlay_opacity'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_overlay_opacity) %>, width: 400 },
     <% if style %>
       { name: 'default_header_style', nice_name: "<%= 'default_style'.titleize %>", type: 'select', value: <%== Caboose.json(@theme.default_header_style) %>, options_url: '/admin/block-types/<%= style.id %>/options', width: 400 },
@@ -231,15 +278,111 @@ $(document).ready(function() {
       { name: 'default_header_position', nice_name: "<%= 'default_position'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.default_header_position) %>, width: 400 },
     <% end %>
       { name: 'sidebar_width', nice_name: "<%= 'width'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.sidebar_width) %>, width: 400 },
-      { name: 'sidebar_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.sidebar_bg_color) %>, width: 400 },
-      { name: 'default_banner_image'  , nice_name: 'Default Banner Image'   , type: 'image'  , value: <%= raw Caboose.json(@theme.default_banner_image ? @theme.default_banner_image.url(:huge) : 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_300/v1539265856/default_banner.jpg') %>, width: 800, update_url: '/admin/themes/<%= @theme.id %>/default-banner-image' },
+      { name: 'sidebar_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.sidebar_bg_color) %>, width: 400 },
+      { name: 'default_banner_image'  , nice_name: 'Default Banner Image'   , type: 'image'  , value: <%= raw Caboose.json(@theme.default_banner_image ? @theme.default_banner_image.url(:huge) : 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_300/v1539265856/default_banner.jpg') %>, width: 150, update_url: '/admin/themes/<%= @theme.id %>/default-banner-image' },
       { name: 'banner_font_size', nice_name: "<%= 'banner_font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_font_size) %>, width: 400 },
-      { name: 'footer_hover_color', nice_name: "<%= 'footer_hover_color'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.footer_hover_color) %>, width: 400 },
+      { name: 'footer_hover_color', nice_name: "<%= 'footer_hover_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.footer_hover_color) %>, width: 400 },
       { name: 'actual_footer_height', nice_name: "<%= 'actual_footer_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.actual_footer_height) %>, width: 400 },
       { name: 'actual_banner_height', nice_name: "<%= 'actual_banner_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.actual_banner_height) %>, width: 400 },
       { name: 'dropdown_nav_padding', nice_name: "<%= 'dropdown_nav_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.dropdown_nav_padding) %>, width: 400 }
     ]    
   });  
+});
+
+$(window).load(function() {
+  var color_main = "<%= @theme.color_main %>";
+  var color_alt = "<%= @theme.color_alt %>";
+  var color_dark = "<%= @theme.color_dark %>";
+  var color_light = "<%= @theme.color_light %>";
+  $("#theme_<%= @theme.id %>_color_main").prop('disabled',true);
+  $("#theme_<%= @theme.id %>_color_alt").prop('disabled',true);
+  $("#theme_<%= @theme.id %>_color_light").prop('disabled',true);
+  $("#theme_<%= @theme.id %>_color_dark").prop('disabled',true);
+  $.each($(".mb_container.color"), function(k,v) {
+    var inp = $(v).find("input[type='text']").first();
+    inp.spectrum("option","showPalette",false);
+    inp.spectrum("option","showSelectionPalette",false);
+    if ( inp.val() == 'main' ) {
+      inp.spectrum("set",color_main);
+      inp.val('main');
+    }
+    else if ( inp.val() == 'alt' || inp.val() == 'alternate' ) {
+      inp.spectrum("set",color_alt);
+      inp.val('alt');
+    }
+    else if ( inp.val() == 'light' ) {
+      inp.spectrum("set",color_light);
+      inp.val('light');
+    }
+    else if ( inp.val() == 'dark' ) {
+      inp.spectrum("set",color_dark);
+      inp.val('dark');
+    }
+    inp.on("change.spectrum", function(e, color) {
+      console.log("input changed to " + color);
+      console.log("input v: " + inp.val());
+      if ( inp.val() == 'main' ) {
+        inp.spectrum("set",color_main);
+        inp.val('main');
+      }
+      else if ( inp.val() == 'alt' || inp.val() == 'alternate' ) {
+        inp.spectrum("set",color_alt);
+        inp.val('alt');
+      }
+      else if ( inp.val() == 'light' ) {
+        inp.spectrum("set",color_light);
+        inp.val('light');
+      }
+      else if ( inp.val() == 'dark' ) {
+        inp.spectrum("set",color_dark);
+        inp.val('dark');
+      }
+      else {
+        inp.spectrum("set", inp.val());
+   //     inp.val(color);
+      }
+    });
+  });
+  $("#theme_<%= @theme.id %>_color_main").on("change.spectrum", function(e, color) {
+    $.each($(".mb_container.color"), function(k,v) {
+      var inp = $(v).find("input[type='text']").first();
+      if ( inp.val() == 'main' ) {
+        inp.spectrum("set",color);
+        inp.val('main');
+      }
+    });
+    color_main = color;
+  });
+  $("#theme_<%= @theme.id %>_color_alt").on("change.spectrum", function(e, color) {
+    $.each($(".mb_container.color"), function(k,v) {
+      var inp = $(v).find("input[type='text']").first();
+      if ( inp.val() == 'alt' ) {
+        inp.spectrum("set",color);
+        inp.val('alt');
+      }
+    });
+    color_alt = color;
+  });
+  $("#theme_<%= @theme.id %>_color_dark").on("change.spectrum", function(e, color) {
+    $.each($(".mb_container.color"), function(k,v) {
+      var inp = $(v).find("input[type='text']").first();
+      if ( inp.val() == 'dark' ) {
+        inp.spectrum("set",color);
+        inp.val('dark');
+      }
+    });
+    color_dark = color;
+  });
+  $("#theme_<%= @theme.id %>_color_light").on("change.spectrum", function(e, color) {
+    $.each($(".mb_container.color"), function(k,v) {
+      var inp = $(v).find("input[type='text']").first();
+      if ( inp.val() == 'light' ) {
+        inp.spectrum("set",color);
+        inp.val('light');
+      }
+    });
+    color_light = color;
+  });
 });
 
 </script>

@@ -109,6 +109,25 @@ module Caboose
       resp.attributes = { 'default_banner_image' => { 'value' => theme.default_banner_image.url(:huge) }}
       render :text => resp.to_json
     end
+
+    # @route PUT /admin/themes/:id/files/:file_id/toggle
+    def admin_toggle_file
+      resp = Caboose::StdClass.new
+      checked = params[:checked]
+      theme_id = params[:id]
+      file_id = params[:file_id]
+      if checked && checked != false && checked != 'false'
+        am = Caboose::ThemeFileMembership.where(:theme_id => theme_id, :theme_file_id => file_id).first
+        am = am ? am : Caboose::ThemeFileMembership.new
+        am.theme_id = theme_id
+        am.theme_file_id = file_id
+        am.save
+      else
+        Caboose::ThemeFileMembership.delete_all(:theme_id => theme_id, :theme_file_id => file_id)
+      end
+      resp.success = "Success"
+      render :json => resp
+    end
     
   end
 end

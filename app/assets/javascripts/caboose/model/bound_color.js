@@ -73,7 +73,7 @@ BoundColor = BoundControl.extend({
     });
             
     $('.' + this.el + '_bound_color').css('text-align', this.attribute.align);
-    //if (this.attribute.width) $('.' + this.el + '_bound_color').css('width', this.attribute.width);
+    //if (this.attribute.width) $('.' + this.el + '_bound_color').css('width', this.attribute.width)
     if (this.attribute.fixed_placeholder && this.attribute.align != 'right')
     {
       var w = $('#'+this.el+'_placeholder').outerWidth(true);        

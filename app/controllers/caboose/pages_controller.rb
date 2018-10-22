@@ -534,7 +534,7 @@ module Caboose
           i = i+1
         end while (Page.where(:uri => page.uri, :site_id => page.site_id).count > 0 && i < 10)
         page.save
-        # Create the top level block for the page 
+        # Create the top level block for the page  
         bt = BlockType.find(params[:layout_id])
         Block.create(:page_id => page.id, :block_type_id => bt.id, :name => bt.name)
         # Set the new page's permissions      

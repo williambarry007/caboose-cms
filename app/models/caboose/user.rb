@@ -50,7 +50,8 @@ class Caboose::User < ActiveRecord::Base
     self.email
   end
 
-  def is_allowed(resource, action)          
+  def is_allowed(resource, action)
+    return true if self.is_super_admin?       
     elo = Caboose::Role.logged_out_role(self.site_id)
     elo_is_allowed = elo.is_allowed(resource, action)    
     return true if elo_is_allowed

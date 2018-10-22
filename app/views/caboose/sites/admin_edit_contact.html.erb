@@ -1,0 +1,41 @@
+<%= render :partial => 'caboose/sites/admin_header' %>
+
+<h5 style="margin:0;font-size:18px;">Contact Info</h5>
+
+<p><div id='site_<%= @site.id %>_main_phone'></div></p>
+<p><div id='site_<%= @site.id %>_alt_phone'></div></p>
+<p><div id='site_<%= @site.id %>_address1'></div></p>
+<p><div id='site_<%= @site.id %>_address2'></div></p>
+<p><div id='site_<%= @site.id %>_city'></div></p>
+<p><div id='site_<%= @site.id %>_state'></div></p>
+<p><div id='site_<%= @site.id %>_zip'></div></p>
+<p><div id='site_<%= @site.id %>_fax'></div></p>
+<p><div id='site_<%= @site.id %>_contact_email'></div></p>
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'Site',
+    id: <%= @site.id %>,
+    update_url: '/admin/sites/<%= @site.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'main_phone', nice_name: 'Main Phone', type: 'text', value: <%== Caboose.json(@site.main_phone) %>, width: 400 },
+      { name: 'alt_phone', nice_name: 'Alternate Phone', type: 'text', value: <%== Caboose.json(@site.alt_phone) %>, width: 400 },
+      { name: 'address1', nice_name: 'Address', type: 'text', value: <%== Caboose.json(@site.address1) %>, width: 400 },
+      { name: 'address2', nice_name: 'Address 2', type: 'text', value: <%== Caboose.json(@site.address2) %>, width: 400 },
+      { name: 'city', nice_name: 'City', type: 'text', value: <%== Caboose.json(@site.city) %>, width: 400 },
+      { name: 'state', nice_name: 'State', type: 'text', value: <%== Caboose.json(@site.state) %>, width: 400 },
+      { name: 'zip', nice_name: 'ZIP', type: 'text', value: <%== Caboose.json(@site.zip) %>, width: 400 },
+      { name: 'fax', nice_name: 'Fax', type: 'text', value: <%== Caboose.json(@site.fax) %>, width: 400 },
+      { name: 'contact_email', nice_name: 'Email', type: 'text', value: <%== Caboose.json(@site.contact_email) %>, width: 400 }   
+    ]    
+  });       
+});
+</script>
+<% end %>

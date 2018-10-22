@@ -1,0 +1,9 @@
+<h1>Error Log</h1>
+
+<a href="/admin/block-types/<%= @block_type.id %>/render-function" class="caboose-btn">Back</a>
+
+<% if !@block_type.latest_error.blank? %>
+<div class="error" style="font-size:13px;line-height:18px;font-family:monospace;margin-top:10px;">
+	<%== @block_type.latest_error.gsub("\n","<br />") %>
+</div>
+<% end %>

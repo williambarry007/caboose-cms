@@ -84,6 +84,52 @@ module Caboose
       @block_type = BlockType.find(params[:id])
       render :layout => 'caboose/admin'
     end
+
+    # @route GET /admin/block-types/:id/render-function
+    def admin_edit_render_function
+      return unless user_is_allowed('sites', 'edit')      
+      @block_type = BlockType.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+
+    # @route PUT /admin/block-types/:id/render-function
+    def admin_update_render_function
+      return if !user_is_allowed('sites', 'edit')
+      resp = StdClass.new  
+      @block_type = BlockType.find(params[:id])
+      code = params['code'].blank? ? '' : params['code'].gsub('<%==','<%= raw')
+      @block_type.render_function = code
+      @block_type.save
+      resp.success = true
+      resp.message = "Render function has been saved!"
+      render :json => resp
+    end
+
+    # @route GET /admin/block-types/:id/sass
+    def admin_edit_sass
+      return unless user_is_allowed('sites', 'edit')      
+      @block_type = BlockType.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+
+    # @route PUT /admin/block-types/:id/sass
+    def admin_update_sass
+      return if !user_is_allowed('sites', 'edit')
+      resp = StdClass.new  
+      @block_type = BlockType.find(params[:id])
+      @block_type.custom_sass = params['code']
+      @block_type.save
+      resp.success = true
+      resp.message = "Code has been saved!"
+      render :json => resp
+    end
+
+    # @route GET /admin/block-types/:id/errors
+    def admin_error_log
+      return unless user_is_allowed('sites', 'edit')      
+      @block_type = BlockType.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
     
     # @route POST /admin/block-types
     def admin_create
@@ -98,8 +144,9 @@ module Caboose
         :parent_id           => params[:parent_id] ? params[:parent_id] : nil,
         :name                => params[:name].downcase.gsub(' ', '_'),
         :description         => params[:name],                                                                
-        :field_type          => params[:field_type],
-        :allow_child_blocks  => true        
+        :field_type          => params[:parent_id] ? 'text' : 'block',
+        :allow_child_blocks  => false,
+        :icon => 'checkbox-unchecked'        
       )       
       bt.save      
       
@@ -141,7 +188,7 @@ module Caboose
           when 'options_url'                     then bt.options_url                    = v
           when 'default_constrain'               then bt.default_constrain              = v
           when 'default_full_width'              then bt.default_full_width             = v
-          when 'site_id'                         then bt.toggle_site(v[0], v[1])
+          when 'site_id'                         then resp.btsm_id = bt.toggle_site(v[0], v[1])
         end
       end
       
@@ -242,7 +289,53 @@ module Caboose
       bt.children.each do |bt2|
         admin_tree_options_helper(options, bt2, " - #{prefix}")
       end      
-    end        
+    end  
+
+    # @route GET /admin/block-type-site-memberships/:id/html
+    def admin_edit_btsm_html
+      return if !user_is_allowed_to('edit', 'sites')
+      @btsm = BlockTypeSiteMembership.find(params[:id])
+      if (@site.id != @btsm.site_id && !@site.is_master)
+        @error = "You are not allowed to edit this site."
+        render :file => 'caboose/extras/error' and return
+      end
+      render :layout => 'caboose/admin'  
+    end
+
+    # @route PUT /admin/block-type-site-memberships/:id/html
+    def admin_update_btsm_html
+      return if !user_is_allowed_to('edit', 'sites')
+      resp = StdClass.new  
+      @btsm = BlockTypeSiteMembership.find(params[:id])
+      @btsm.custom_html = params['code']
+      @btsm.save
+      resp.success = true
+      resp.message = "Code has been saved!"
+      render :json => resp
+    end   
+
+    # @route GET /admin/block-type-site-memberships/:id/css
+    def admin_edit_btsm_css
+      return if !user_is_allowed_to('edit', 'sites')
+      @btsm = BlockTypeSiteMembership.find(params[:id])  
+      if (@site.id != @btsm.site_id && !@site.is_master)
+        @error = "You are not allowed to edit this site."
+        render :file => 'caboose/extras/error' and return
+      end
+      render :layout => 'caboose/admin'  
+    end
+
+    # @route PUT /admin/block-type-site-memberships/:id/css
+    def admin_update_btsm_css
+      return if !user_is_allowed_to('edit', 'sites')
+      resp = StdClass.new  
+      @btsm = BlockTypeSiteMembership.find(params[:id])
+      @btsm.custom_css = params['code']
+      @btsm.save
+      resp.success = true
+      resp.message = "Code has been saved!"
+      render :json => resp
+    end   
             
     #===========================================================================
     # Public Repo Actions

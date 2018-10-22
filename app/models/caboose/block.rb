@@ -213,13 +213,17 @@ class Caboose::Block < ActiveRecord::Base
     view = options2[:view]     
     view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?
       
-    if block.block_type.use_render_function && block.block_type.render_function
+    if (block.block_type.use_render_function && block.block_type.render_function) || Caboose::BlockTypeSiteMembership.where(:site_id => options2[:site].id, :block_type_id => block.block_type.id).where('custom_html IS NOT NULL and custom_html != ?', '').exists?
       begin
         str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
       rescue Exception => ex
         msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
         Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
         str = "<p class='note error'>#{msg}</p>"
+        if block && block.block_type
+          block.block_type.latest_error = "#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}"
+          block.block_type.save
+        end
       end            
     else
       

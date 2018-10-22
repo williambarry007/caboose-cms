@@ -1,0 +1,44 @@
+<%= raw @crumbtrail.print({
+  '/admin' => 'Admin',
+  '/admin/theme-files' => 'Theme Files'  
+}) %>
+
+<h1>Theme Files</h1>
+
+
+<div id='theme-files'></div>
+
+<br /><br />
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'caboose/model/all' %>
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  var that = this;
+  var table = new IndexTable({    
+    form_authenticity_token: '<%= form_authenticity_token %>',
+    container: 'theme-files',
+    base_url: '/admin/theme-files',
+    allow_bulk_edit: false,
+    allow_bulk_delete: true,
+    allow_duplicate: false,
+    allow_advanced_edit: true,
+    allow_bulk_import: false,
+    allow_export: false,
+    fields: [
+      { show: true  , editable: true, bulk_edit: false, name: 'nice_name'        , nice_name: 'Nice Name'        , sort: 'nice_name'        , type: 'text'   , value: function(r) { return r.nice_name    }, width: 200 },
+      { show: true  , editable: true, bulk_edit: false, name: 'filename'        , nice_name: 'File Path'        , sort: 'filename'        , type: 'text'   , value: function(r) { return r.filename    }, width: 200 },
+      { show: true  , editable: true, bulk_edit: false, name: 'default_included'        , nice_name: 'Included by Default'        , sort: 'default_included'        , type: 'checkbox'   , value: function(r) { return r.default_included    }, text: function(r) { return r.default_included ? 'Yes' : 'No' }, width: 200 }
+    ],
+    new_model_text: 'New Theme File',
+    new_model_fields: [
+      { name: 'nice_name', nice_name: 'Nice Name', type: 'text', width: 400 }
+    ],
+    search_fields: [                                                           
+      { name: 'nice_name_like'      , nice_name: 'Nice Name'  , type: 'text'  }
+    ]
+  });
+});
+</script>
+<% end %>

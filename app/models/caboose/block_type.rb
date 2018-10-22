@@ -29,6 +29,8 @@ class Caboose::BlockType < ActiveRecord::Base
     :options_url,
     :icon,
     :default_constrain,
+    :custom_sass,
+    :latest_error,
     :share,      # Whether or not to share the block type in the existing block store.
     :downloaded  # Whether the full block type has been download or just the name and description.
     
@@ -112,9 +114,9 @@ class Caboose::BlockType < ActiveRecord::Base
     
   def toggle_site(site_id, value)          
     if value.to_i > 0
-      self.add_to_site(site_id)
+      return self.add_to_site(site_id)
     else
-      self.remove_from_site(site_id)
+      return self.remove_from_site(site_id)
     end
   end
     
@@ -126,7 +128,11 @@ class Caboose::BlockType < ActiveRecord::Base
       end                          
     else
       if !Caboose::BlockTypeSiteMembership.where(:block_type_id => self.id, :site_id => site_id.to_i).exists?
-        Caboose::BlockTypeSiteMembership.create(:block_type_id => self.id, :site_id => site_id.to_i)
+        btsm = Caboose::BlockTypeSiteMembership.new 
+        btsm.block_type_id = self.id
+        btsm.site_id = site_id.to_i
+        btsm.save
+        return btsm.id
       end      
     end
   end

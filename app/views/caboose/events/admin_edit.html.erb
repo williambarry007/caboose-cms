@@ -89,7 +89,7 @@ $(document).ready(function() {
       { name: 'url'    , nice_name: 'URL'     , type: 'text'     , value: <%= raw Caboose.json(e.url    ) %>, width: 600 },
       { name: 'url_label'    , nice_name: 'URL Label'     , type: 'text'     , value: <%= raw Caboose.json(e.url_label    ) %>, width: 600 },
       { name: 'published'    , nice_name: 'Published'     , type: 'checkbox'     , value: <%= raw Caboose.json(e.published    ) %>, width: 600 },
-      { name: 'image'      , nice_name: 'Image'          , type: 'image'     , value: <%= raw Caboose.json(e.image.url(:thumb))  %>, width: 400, update_url: '/admin/calendars/<%= c.id %>/events/<%= e.id %>/image' },  
+      { name: 'image'      , nice_name: 'Image'          , type: 'image'     , value: <%= raw Caboose.json(e.image.url(:thumb))  %>, width: 150, update_url: '/admin/calendars/<%= c.id %>/events/<%= e.id %>/image' },  
       { name: 'begin_date'  , nice_name: 'Begin date'   , type: 'date'     , value: <%= raw Caboose.json(e.begin_date.strftime('%m/%d/%Y') ) %>, width: 250 , align: 'right' },
       { name: 'begin_time'  , nice_name: 'Begin time'   , type: 'time'     , value: <%= raw Caboose.json(e.begin_date.strftime('%I:%M %P') ) %>, width: 250 , fixed_placeholder: false },
       { name: 'end_date'    , nice_name: 'End date'     , type: 'date'     , value: <%= raw Caboose.json(e.end_date.strftime('%m/%d/%Y')   ) %>, width: 250 , align: 'right' },

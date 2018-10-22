@@ -15,7 +15,8 @@ class Caboose::CorePlugin < Caboose::CaboosePlugin
     nav << item if item['children'].count > 0
     
     item = { 'id' => 'core', 'text' => 'Settings', 'children' => [] }   
-    item['children'] << { 'id' => 'settings'      , 'icon' => 'settings',        'text' => 'Site Settings'               , 'href' => "/admin/sites/#{site.id}"              , 'modal' => false } if user.is_super_admin?                   
+    item['children'] << { 'id' => 'settings'      , 'icon' => 'settings',        'text' => 'Site Settings'               , 'href' => "/admin/sites/#{site.id}"              , 'modal' => false } if user.is_super_admin?         
+    item['children'] << { 'id' => 'theme-files'             , 'icon' => 'custom', 'text' => 'Theme Files'               , 'href' => '/admin/theme-files'              , 'modal' => false } if user.is_super_admin? && site.is_master == true                  
     item['children'] << { 'id' => 'blocktypes'        , 'text' => 'Block Types'         , 'href' => '/admin/block-types'        , 'modal' => false } if user.is_allowed('blocktypes'        , 'view') && site.is_master == true
     item['children'] << { 'icon' => 'star', 'id' => 'fonts'             , 'text' => 'Fonts'               , 'href' => '/admin/fonts'              , 'modal' => false } if user.is_allowed('fonts'             , 'view') && site.use_fonts == true
     item['children'] << { 'id' => 'redirects'         , 'text' => 'Permanent Redirects' , 'href' => '/admin/redirects'          , 'modal' => false } if user.is_allowed('redirects'         , 'view')

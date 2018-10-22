@@ -87,15 +87,41 @@ module Caboose
     	render :json => resp
     end
 
-    # @route GET /admin/themes/:id/compile
+    # @route PUT /admin/themes/:id/compile
     def admin_compile
       return if !user_is_allowed('theme', 'edit')
       resp = StdClass.new     
       theme = @site.theme
+      if params['code']
+        theme.custom_sass = params['code']
+        theme.save
+      elsif params['btsm_id']
+        btsm = Caboose::BlockTypeSiteMembership.find(params['btsm_id'])
+        btsm.custom_css = params['custom_css']
+        btsm.save
+      end
       theme.compile(@site.id) if Rails.env.development?
       theme.delay(:queue => 'general', :priority => 5).compile(@site.id) if Rails.env.production?
       resp.success = true
       resp.message = Rails.env.development? ? "Theme has been compiled!" : "Theme has been queued for compilation!"
+      render :json => resp
+    end
+
+    # @route GET /admin/theme/sass
+    def admin_sass
+      return if !user_is_allowed('theme', 'edit')
+      @theme = @site.theme
+    end
+
+    # @route PUT /admin/theme/sass
+    def admin_update_sass
+      return if !user_is_allowed('theme', 'edit')
+      resp = StdClass.new  
+      @theme = @site.theme
+      @theme.custom_sass = params['code']
+      @theme.save
+      resp.success = true
+      resp.message = "Theme has been saved!"
       render :json => resp
     end
 

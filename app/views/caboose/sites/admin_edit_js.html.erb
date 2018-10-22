@@ -1,35 +1,122 @@
 
 <%= render :partial => 'caboose/sites/admin_header' %>
 
-<p><div id='site_<%= @site.id %>_custom_js'        ></div></p>
+<div class="editor-wrapper">
 
-<%= render :partial => 'caboose/sites/admin_footer' %>
+  <div class="holder">
+    <div class="clearfix buttons">
+      <a href="#" onclick="save();return false;" class="caboose-btn green">Save</a>
+      <span id="modified">Modified</span>
+      <div id="message"></div>
+      <p id="tips">
+        <span>Command+S = Save</span>
+      </p>
+    </div>
+    <div id="editor"><%= @site.custom_js %></div>
+  </div>
+  
+</div>
 
 <% content_for :caboose_css do %>
 <style>
-  textarea {
-    font-family: monospace;
-    font-size: 13px;
-    line-height: 20px;
-    padding: 30px 9px 9px 9px !important;
+p#tips {
+  display: inline-block;
+  float: right;
+  font-size: 13px;
+  color: gray;
+  margin: 0;
+  padding-top: 15px;
+  padding-right: 2px;
+}
+p#tips span {
+  display: inline-block;
+  margin-left: 12px;
+}
+span#modified {
+  font-size: 13px;
+  color: gray;
+  margin: 0 10px;
+  opacity: 0;
+  transition: opacity 100ms ease;
+}
+.buttons {
+  margin-bottom: 10px;
+}
+.buttons .caboose-btn {
+  margin-right: 5px;
+}
+  .editor-wrapper {
+
+  padding-right: 30px;
+  }
+
+  .holder {
+
+  }
+  #editor {
+  height: 800px;
+  width: 100%;
+  opacity: 0;
+  }
+  #editor.ace_editor {
+    opacity: 1;
+  }
+  #message {
+    display: inline-block;
+  }
+  #message p.note {
+    padding: 1px 15px 2px 15px;
+    font-size: 15px;
+    line-height: 30px;
+    border-radius: 5px;
+  }
+  #message p.note.loading {
+    padding-left: 40px;
   }
 </style>
 <% end %>
 
 <% content_for :caboose_js do %>
-<script type="text/javascript">
+<%= javascript_include_tag 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js' %>
+<script>
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/monokai");
+  editor.session.setMode("ace/mode/javascript");
+  editor.session.setOptions({
+      tabSize: 2
+  });
 
-$(document).ready(function() {
-  new ModelBinder({
-    name: 'Site',
-    id: <%= @site.id %>,
-    update_url: '/admin/sites/<%= @site.id %>',
-    authenticity_token: '<%= form_authenticity_token %>',
-    attributes: [
-      { name: 'custom_js', nice_name: 'Custom Javascript', type: 'textarea' , value: <%= raw Caboose.json(@site.custom_js) %>, width: 600, height: 400 }      
-    ]    
-  });       
-});
+  editor.on("change", function() {
+    $("span#modified").css('opacity',1);
+  });
+
+  editor.commands.addCommand({
+    name: 'save',
+    bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
+    exec: function(editor) { save(); }
+  });
+
+  function save() {
+    $('#message').html("<p class='note loading'>Saving code...</p>").fadeIn();
+    $.ajax({
+      url: '/admin/sites/<%= @site.id %>',
+      type: 'put',
+      data: {
+        custom_js: editor.getValue()
+      },
+      success: function(resp) {
+        if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>").fadeIn();
+        if (resp.success) {
+          $("span#modified").css('opacity',0);
+          $('#message').html("<p class='note success'>JS saved!</p>").fadeIn().delay(2000).fadeOut();
+        }
+      }
+    });
+  }
 
 </script>
 <% end %>
+
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+

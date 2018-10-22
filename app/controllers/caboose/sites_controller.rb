@@ -111,6 +111,16 @@ module Caboose
       end   
       @site = Site.find(params[:id])      
     end
+
+    # @route GET /admin/sites/:id/contact
+    def admin_edit_contact
+      return if !user_is_allowed('sites', 'edit')
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        @error = "You are not allowed to edit this site."
+        render :file => 'caboose/extras/error' and return
+      end   
+      @site = Site.find(params[:id])      
+    end
             
     # @route GET /admin/sites/:id/delete
     def admin_delete_form
@@ -186,6 +196,15 @@ module Caboose
           when 'allow_self_registration'  then site.allow_self_registration = value
           when 'theme_color'  then site.theme_color = value
           when 'assets_url'  then site.assets_url = value
+          when 'main_phone' then site.main_phone = value
+          when 'alt_phone' then site.alt_phone = value
+          when 'address1' then site.address1 = value
+          when 'address2' then site.address2 = value
+          when 'city' then site.city = value
+          when 'state' then site.state = value
+          when 'zip' then site.zip = value
+          when 'fax' then site.fax = value
+          when 'contact_email' then site.contact_email = value
     	  end
     	end
     	resp.success = save && site.save

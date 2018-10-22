@@ -3,16 +3,25 @@ s = @site
 %>
 <%= render :partial => 'caboose/sites/admin_header' %>
 
-<h2>Block Types</h2>
+<h5 style="margin:0 0 10px 0;font-size:18px;">Block Types</h5>
 <div id='block_types'>
 <table class='data'>
-<tr><th>&nbsp;</th><th>Name</th><th>Description</th></tr>
+<tr><th>&nbsp;</th><th>Name</th><th>Description</th><th></th></tr>
 <% bt_ids = @site.block_type_site_memberships.collect{ |bt| bt.block_type_id } %>
 <% Caboose::BlockType.where("parent_id is null").reorder('name').all.each do |bt| %>
-  <tr>
+  <tr id="bt_<%= bt.id %>">
     <td align='center'><input type='checkbox' name='block_type_id_<%= bt.id %>' <%= bt_ids.include?(bt.id) ? "checked='true'" : '' %> onclick="toggle_block_type_site_membership(<%= @site.id %>, <%= bt.id %>, $(this).prop('checked'));" /></td>
     <td><%= bt.name %></td>
     <td><%= bt.description %></td>
+    <td>
+      <% if bt_ids.include?(bt.id) %>
+        <% btsm = @site.block_type_site_memberships.where(:block_type_id => bt.id).first %>
+        <a style="margin-right:5px;" href="/admin/block-type-site-memberships/<%= btsm.id %>/html" class="caboose-btn">Custom Render Function</a>
+        <% if @site.theme %>
+          <a href="/admin/block-type-site-memberships/<%= btsm.id %>/css" class="caboose-btn">Custom SCSS</a>
+        <% end %>
+      <% end %>
+    </td>
   </tr>
 <% end %>
 </table><br/>
@@ -22,12 +31,17 @@ s = @site
 
 <%= render :partial => 'caboose/sites/admin_footer' %>
 
+<% content_for :caboose_css do %>
+<style>
+  td .caboose-btn {
+    font-size: 12px;
+    padding: 0 8px;
+  }
+</style>
+<% end %>
+
 <% content_for :caboose_js do %>
 <script type="text/javascript">
-
-$(document).ready(function() {
-      
-});
 
 function toggle_block_type_site_membership(site_id, block_type_id, checked)
 {
@@ -37,7 +51,20 @@ function toggle_block_type_site_membership(site_id, block_type_id, checked)
     data: {
       site_id: [site_id, checked ? 1 : 0]
     },        
-    succes: function(resp) {}
+    success: function(resp) {
+      if ( checked && resp.btsm_id ) {
+        var btn1 = '<a style="margin-right:5px;" href="/admin/block-type-site-memberships/' + resp.btsm_id + '/html" class="caboose-btn">Custom Render Function</a>';
+       <% if @site.theme %>
+        var btn2 = '<a href="/admin/block-type-site-memberships/' + resp.btsm_id + '/css" class="caboose-btn">Custom SCSS</a>';
+      <% else %>
+        var btn2 = '';
+      <% end %>
+        $("#bt_" + block_type_id + " td:nth-of-type(4)").html(btn1 + btn2);
+      }
+      else {
+        $("#bt_" + block_type_id + " td:nth-of-type(4)").html('');
+      }
+    }
   });
 }
 

@@ -197,7 +197,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :fixed_placeholder               , :boolean ],
         [ :options                         , :text    ],
         [ :options_function                , :text    ],
+        [ :custom_sass                     , :text    ],
         [ :options_url                     , :string  ],
+        [ :latest_error                    , :text    ],
         [ :default_constrain               , :boolean , { :default => false }],
         [ :default_full_width              , :boolean , { :default => false }],
         [ :share                           , :boolean , { :default => true  }],
@@ -205,7 +207,9 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],
       Caboose::BlockTypeSiteMembership => [
         [ :site_id        , :integer ],
-        [ :block_type_id  , :integer ]
+        [ :block_type_id  , :integer ],
+        [ :custom_css, :text ],
+        [ :custom_html, :text ]
       ],      
       Caboose::BlockTypeCategory => [
         [ :parent_id  , :integer ],
@@ -810,7 +814,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :theme_id, :integer ],
         [ :favicon, :attachment ],
         [ :cl_logo_version         , :string ],
-        [ :cl_favicon_version      , :string ]
+        [ :cl_favicon_version      , :string ],
+        [ :main_phone, :string ],
+        [ :alt_phone, :string ],
+        [ :address1, :string ],
+        [ :address2, :string ],
+        [ :city, :string ],
+        [ :state, :string ],
+        [ :zip, :string ],
+        [ :fax, :string ],
+        [ :contact_email, :string ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
@@ -985,11 +998,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :footer_hover_color, :string ],
         [ :actual_footer_height, :string ],
         [ :actual_banner_height, :string ],
-        [ :dropdown_nav_padding, :string ]
+        [ :dropdown_nav_padding, :string ],
+        [ :custom_sass, :text ]
       ],
       Caboose::ThemeFile => [
         [ :filename, :string ],
         [ :nice_name, :string ],
+        [ :code, :text ],
         [ :default_included, :boolean     , { :default => false }]
       ],
       Caboose::ThemeFileMembership => [

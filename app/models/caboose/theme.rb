@@ -79,7 +79,8 @@ class Caboose::Theme < ActiveRecord::Base
 		:actual_banner_height,
 		:dropdown_nav_padding,
 
-    :digest
+    :digest,
+    :custom_sass
 
   def compile(for_site_id = 0)
   	theme = self

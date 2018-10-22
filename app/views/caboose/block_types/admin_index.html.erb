@@ -8,7 +8,7 @@
 <!--
 <p><a href='/admin/block-types/store'>Block Type Store</a></p>
 -->
-<p><a href='/admin/block-types/parse'>Block Type Parser</a></p>
+<!-- <p><a href='/admin/block-types/parse'>Block Type Parser</a></p> -->
 
 <div id='block_types'></div>
 <% (0..100).each do |i| %><p>&nbsp;</p><% end %>
@@ -22,6 +22,8 @@ $(document).ready(function() {
   var table = new IndexTable({    
     form_authenticity_token: '<%= form_authenticity_token %>',
     container: 'block_types',
+    after_add: 'redirect',
+    allow_bulk_import: false,
     base_url: '/admin/block-types',            
     fields: [
       { name: 'name'                           , sort: 'name'                           , show: true  , bulk_edit: false, nice_name: 'Name'                           , type: 'text'              , value: function(bt) { return bt.name;                                         }, width: 400 },

@@ -8,15 +8,19 @@ bt = @block_type
 
 <h1>Edit Block Type</h1>
 
+  <a href="/admin/block-types/<%= bt.id %>/render-function" class="caboose-btn">Edit Render Function</a>
+  <a href="/admin/block-types/<%= bt.id %>/sass" class="caboose-btn">Edit Custom SCSS</a>
+  
+<div id='message'></div>
 <p><div id='blocktype_<%= bt.id %>_name'                            ></div></p>
 <p><div id='blocktype_<%= bt.id %>_description'                     ></div></p>
 
 <h2>Children</h2>
 <div id='block_types'></div>
 
+
+    
 <h2>Advanced</h2>
-<p><div id='blocktype_<%= bt.id %>_site_id'                         ></div></p>
-<!-- <p><div id='blocktype_<%= bt.id %>_parent_id'                       ></div></p> -->
 <p><div id='blocktype_<%= bt.id %>_block_type_category_id'          ></div></p>
 <p><div id='blocktype_<%= bt.id %>_field_type'                      ></div></p>
 <p><div id='blocktype_<%= bt.id %>_default'                         ></div></p>
@@ -33,10 +37,13 @@ bt = @block_type
 <p><div id='blocktype_<%= bt.id %>_default_child_block_type_id'     ></div></p>
 <p><div id='blocktype_<%= bt.id %>_default_constrain'               ></div></p>
 <p><div id='blocktype_<%= bt.id %>_default_full_width'              ></div></p>
-<p><div id='blocktype_<%= bt.id %>_render_function'                 ></div></p>
+<p>
+
+</p>
 <p><div id='blocktype_<%= bt.id %>_options_function'                ></div></p>
 
-<div id='message'></div>
+  
+
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}" : '' %>';" />
 <input type='button' value='Edit Icon' onclick="caboose_modal_url('/admin/block-types/<%= @block_type.id %>/icon');" />

@@ -1,1 +1,5 @@
-<%= raw ERB.new(block.block_type.render_function).result(self.instance_eval { binding }) %>
+<%
+btsm = Caboose::BlockTypeSiteMembership.where(:site_id => site.id, :block_type_id => block.block_type.id).where('custom_html IS NOT NULL and custom_html != ?', '').first
+rf = btsm ? btsm.custom_html : block.block_type.render_function
+%>
+<%= raw ERB.new(rf).result(self.instance_eval { binding }) %>

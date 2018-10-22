@@ -1,0 +1,240 @@
+<h1>Edit Custom SCSS</h1>
+
+<div class="editor-wrapper">
+	<aside>
+		<h5>Config</h5>
+<span>$color-main: <%= @theme.color_main %></span>
+<span>$color-alt: <%= @theme.color_alt %></span>
+<span>$color-light: <%= @theme.color_light %></span>
+<span>$color-dark: <%= @theme.color_dark %></span>
+<span>$max-width: <%= @theme.max_width %></span>
+<span>$body-bg-color: <%= @theme.body_bg_color %></span>
+<span>$break-small: 550px</span>
+<span>$break-medium: 800px</span>
+<span>$break-large: <%= @theme.max_width %></span>
+<span>$font-size: <%= @theme.font_size %></span>
+<span>$font-main: body-font</span>
+<span>$font-alt: heading-font</span>
+<span>$font-btn: button-font</span>
+<span>$heading-font: heading-font</span>
+<span>$header-height: <%= @theme.header_height %></span>
+<span>$header-bg-color: <%= @theme.header_bg_color %></span>
+<span>$header-font-color: <%= @theme.header_font_color %></span>
+<span>$dropdown-color: <%= @theme.dropdown_color %></span>
+<span>$mobile-bg-color: <%= @theme.mobile_menu_bg_color %></span>
+<span>$sidebar-font-color: <%= @theme.mobile_menu_font_color %></span>
+<span>$sidebar-border-color: <%= @theme.mobile_menu_border_color %></span>
+<span>$sidebar-icon-color: <%= @theme.mobile_menu_icon_color %></span>
+<span>$sidebar-icon-top: <%= @theme.mobile_menu_icon_top %></span>
+<span>$footer-height: <%= @theme.footer_height %></span>
+<span>$footer-bg-color: <%= @theme.footer_bg_color %></span>
+<span>$footer-font-color: <%= @theme.footer_font_color %></span>
+<span>$btn-border-radius: <%= @theme.btn_border_radius %></span>
+<span>$btn-border-width: <%= @theme.btn_border_width %></span>
+<span>$btn-border-color: <%= @theme.btn_border_color %></span>
+<span>$btn-bg-color: $color-main</span>
+<span>$btn-font-color: <%= @theme.btn_font_color %></span>
+<span>$btn-font: button-font</span>
+<span>$btn-font-size: <%= @theme.btn_font_size %></span>
+<span>$btn-font-weight: <%= @theme.btn_font_weight %></span>
+<span>$btn-font-case: <%= @theme.btn_font_case %></span>
+<span>$btn-border-side: <%= @theme.btn_border_side %></span>
+<span>$input-border-radius: <%= @theme.input_border_radius %></span>
+<span>$input-bg-color: <%= @theme.input_bg_color %></span>
+<span>$input-border-color: <%= @theme.input_border_color %></span>
+<span>$input-border-width: <%= @theme.input_border_width %></span>
+<span>$input-font: body-font</span>
+<span>$input-font-color: <%= @theme.input_font_color %></span>
+<span>$input-font-size: <%= @theme.input_font_size %></span>
+<span>$input-padding: <%= @theme.input_padding %></span>
+<span>$body_line_height: <%= @theme.body_line_height %></span>
+<span>$body_font_color: <%= @theme.body_font_color %></span>
+<span>$button_padding: <%= @theme.button_padding %></span>
+<span>$button_line_height: <%= @theme.button_line_height %></span>
+<span>$footer_padding: <%= @theme.footer_padding %></span>
+<span>$footer_font_size: <%= @theme.footer_font_size %></span>
+<span>$header_font_size: <%= @theme.header_font_size %></span>
+<span>$note_padding: <%= @theme.note_padding %></span>
+<span>$header_nav_spacing: <%= @theme.header_nav_spacing %></span>
+<span>$logo_width: <%= @theme.logo_width %></span>
+<span>$logo_height: <%= @theme.logo_height %></span>
+<span>$logo_top_padding: <%= @theme.logo_top_padding %></span>
+<span>$heading_line_height: <%= @theme.heading_line_height %></span>
+<span>$mobile_menu_nav_padding: <%= @theme.mobile_menu_nav_padding %></span>
+<span>$mobile_menu_font_size: <%= @theme.mobile_menu_font_size %></span>
+<span>$banner_padding: <%= @theme.banner_padding %></span>
+<span>$banner_overlay_color: <%= @theme.banner_overlay_color %></span>
+<span>$banner_overlay_opacity: <%= @theme.banner_overlay_opacity %></span>
+<span>$sidebar_width: <%= @theme.sidebar_width %></span>
+<span>$sidebar_bg_color: <%= @theme.sidebar_bg_color %></span>
+<span>$banner_font_size: <%= @theme.banner_font_size %></span>
+<span>$footer_hover_color: <%= @theme.footer_hover_color %></span>
+<span>$actual_footer_height: <%= @theme.actual_footer_height %></span>
+<span>$actual_banner_height: <%= @theme.actual_banner_height %></span>
+<span>$dropdown_nav_padding: <%= @theme.dropdown_nav_padding %></span>
+
+	</aside>
+	<div class="holder">
+		<div class="clearfix buttons">
+			<a href="/admin/theme" class="caboose-btn">Back</a>
+			<a href="#" onclick="save();return false;" class="caboose-btn green">Save</a>
+			<a href="#" onclick="compile();return false;" class="caboose-btn blue">Compile Theme</a>
+			<span id="modified">Modified</span>
+			<div id="message"></div>
+			<p id="tips">
+				<span>Command+S = Save</span>
+				<span>Command+E = Compile</span>
+			</p>
+		</div>
+		<div id="editor"><%= @theme.custom_sass %></div>
+	</div>
+	
+</div>
+
+<% content_for :caboose_css do %>
+<style>
+p#tips {
+	display: inline-block;
+	float: right;
+	font-size: 13px;
+	color: gray;
+	margin: 0;
+	padding-top: 15px;
+	padding-right: 2px;
+}
+p#tips span {
+	display: inline-block;
+	margin-left: 12px;
+}
+span#modified {
+	font-size: 13px;
+	color: gray;
+	margin: 0 10px;
+	opacity: 0;
+	transition: opacity 100ms ease;
+}
+.buttons {
+	margin-bottom: 10px;
+}
+.buttons .caboose-btn {
+	margin-right: 5px;
+}
+	.editor-wrapper {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  padding-right: 30px;
+	}
+	aside {
+	-webkit-box-flex: 0 0 280px;
+  -moz-box-flex:  0 0 280px;
+  -webkit-flex:  0 0 280px;
+  -ms-flex:  0 0 280px;
+  flex:  0 0 280px;
+  padding-right: 15px;
+	}
+	aside h5 {
+		margin: 0 0 10px 0;
+	}
+	aside span {
+		display: block;
+		font-size: 12px;
+		margin-bottom: 3px;
+		font-family: monospace;
+	}
+	.holder {
+		-webkit-box-flex:1 1 80%;
+  -moz-box-flex: 1 1 80%;
+  -webkit-flex: 1 1 80%;
+  -ms-flex: 1 1 80%;
+  flex: 1 1 80%;	
+	}
+	#editor {
+  height: 1160px;
+  width: 100%;
+  opacity: 0;
+	}
+	#editor.ace_editor {
+		opacity: 1;
+	}
+	#message {
+		display: inline-block;
+	}
+	#message p.note {
+		padding: 1px 15px 2px 15px;
+    font-size: 15px;
+    line-height: 30px;
+    border-radius: 5px;
+	}
+	#message p.note.loading {
+		padding-left: 40px;
+	}
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js' %>
+<script>
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/monokai");
+  editor.session.setMode("ace/mode/scss");
+  editor.session.setOptions({
+	    tabSize: 2
+	});
+
+  editor.on("change", function() {
+  	$("span#modified").css('opacity',1);
+  });
+
+  editor.commands.addCommand({
+    name: 'save',
+    bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
+    exec: function(editor) { save(); }
+	});
+
+	editor.commands.addCommand({
+    name: 'compile',
+    bindKey: {win: "Ctrl-E", "mac": "Cmd-E"},
+    exec: function(editor) { compile(); }
+	});
+
+	function compile() {
+	  $('#message').html("<p class='note loading'>Compiling theme...</p>").fadeIn();
+	  $.ajax({
+	    url: '/admin/themes/<%= @theme.id %>/compile',
+	    type: 'put',
+	    data: {
+	    	code: editor.getValue()
+	    },
+	    success: function(resp) {
+	      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>").fadeIn();
+	      if (resp.success && resp.message) {
+	      	$("span#modified").css('opacity',0);
+	        $('#message').html("<p class='note success'>" + resp.message + "</p>").fadeIn().delay(2000).fadeOut();
+	      }
+	    }
+	  });
+	}
+
+	function save() {
+	  $('#message').html("<p class='note loading'>Saving code...</p>").fadeIn();
+	  $.ajax({
+	    url: '/admin/theme/sass',
+	    type: 'put',
+	    data: {
+	    	code: editor.getValue()
+	    },
+	    success: function(resp) {
+	      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>").fadeIn();
+	      if (resp.success && resp.message) {
+	      	$("span#modified").css('opacity',0);
+	        $('#message').html("<p class='note success'>" + resp.message + "</p>").fadeIn().delay(2000).fadeOut();
+	      }
+	    }
+	  });
+	}
+
+</script>
+<% end %>

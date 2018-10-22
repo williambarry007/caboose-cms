@@ -25,6 +25,7 @@
 <%
 tabs = {
   'General'           => "/admin/sites/#{@site.id}",  
+  'Contact Info'      => "/admin/sites/#{@site.id}/contact",  
   'Block Types'       => "/admin/sites/#{@site.id}/block-types",
   'Custom CSS'        => "/admin/sites/#{@site.id}/css",
   'Custom JS'         => "/admin/sites/#{@site.id}/js",
@@ -36,6 +37,10 @@ tabs = {
 <% tabs.each do |text, href| %>
 <li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
 <% end %>
-<li class='back'><input type='button' value='< Back' onclick="window.location='/admin/sites';" /></li>
+<% if @site.is_master %>
+<li class="back"><input type="button" onclick="window.location='/admin/sites';" value="< Back" />
+<% else %>
+<li class="back"><input type="button" onclick="window.location='/admin';" value="< Back" />
+<% end %>
 </ul>
 <div id='content2'>

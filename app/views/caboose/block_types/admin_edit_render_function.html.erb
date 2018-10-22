@@ -1,0 +1,119 @@
+<h1>Edit Render Function</h1>
+
+<div class="editor-wrapper">
+
+	<div class="holder">
+		<div class="clearfix buttons">
+			<a href="/admin/block-types/<%= @block_type.id %>" class="caboose-btn">Back</a>
+			<a href="/admin/block-types/<%= @block_type.id %>/errors" class="caboose-btn">Error Log</a>
+			<a href="#" onclick="save();return false;" class="caboose-btn green">Save</a>
+			<span id="modified">Modified</span>
+			<div id="message"></div>
+			<p id="tips">
+				<span>Command+S = Save</span>
+			</p>
+		</div>
+		<div id="editor"><%= @block_type.render_function %></div>
+	</div>
+	
+</div>
+
+<% content_for :caboose_css do %>
+<style>
+p#tips {
+	display: inline-block;
+	float: right;
+	font-size: 13px;
+	color: gray;
+	margin: 0;
+	padding-top: 15px;
+	padding-right: 2px;
+}
+p#tips span {
+	display: inline-block;
+	margin-left: 12px;
+}
+span#modified {
+	font-size: 13px;
+	color: gray;
+	margin: 0 10px;
+	opacity: 0;
+	transition: opacity 100ms ease;
+}
+.buttons {
+	margin-bottom: 10px;
+}
+.buttons .caboose-btn {
+	margin-right: 5px;
+}
+	.editor-wrapper {
+
+  padding-right: 30px;
+	}
+
+	.holder {
+
+	}
+	#editor {
+  height: 800px;
+  width: 100%;
+  opacity: 0;
+	}
+	#editor.ace_editor {
+		opacity: 1;
+	}
+	#message {
+		display: inline-block;
+	}
+	#message p.note {
+		padding: 1px 15px 2px 15px;
+    font-size: 15px;
+    line-height: 30px;
+    border-radius: 5px;
+	}
+	#message p.note.loading {
+		padding-left: 40px;
+	}
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js' %>
+<script>
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/monokai");
+  editor.session.setMode("ace/mode/html_ruby");
+  editor.session.setOptions({
+	    tabSize: 2
+	});
+
+  editor.on("change", function() {
+  	$("span#modified").css('opacity',1);
+  });
+
+  editor.commands.addCommand({
+    name: 'save',
+    bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
+    exec: function(editor) { save(); }
+	});
+
+	function save() {
+	  $('#message').html("<p class='note loading'>Saving code...</p>").fadeIn();
+	  $.ajax({
+	    url: '/admin/block-types/<%= @block_type.id %>/render-function',
+	    type: 'put',
+	    data: {
+	    	code: editor.getValue()
+	    },
+	    success: function(resp) {
+	      if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>").fadeIn();
+	      if (resp.success && resp.message) {
+	      	$("span#modified").css('opacity',0);
+	        $('#message').html("<p class='note success'>" + resp.message + "</p>").fadeIn().delay(2000).fadeOut();
+	      }
+	    }
+	  });
+	}
+
+</script>
+<% end %>

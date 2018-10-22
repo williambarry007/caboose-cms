@@ -11,7 +11,11 @@ position = header.child('position') if header
   <div class="unit1of2 left">
     <section>
       <h5>Compile</h5>
-      <a href="#" id="compile-btn" class="caboose-btn">Compile Theme</a>
+      <div class="buttons">
+        <a style="margin-right:5px;" href="#" id="compile-btn" class="caboose-btn">Compile Theme</a>
+        <a href="/admin/theme/sass" class="caboose-btn">Edit Custom SCSS</a>
+      </div>
+      
       <div style="margin-top:20px;" id='message'></div>
     </section>
     <section>
@@ -198,7 +202,7 @@ $("#compile-btn").click(function(e) {
   e.preventDefault();
   $.ajax({
     url: '/admin/themes/<%= @theme.id %>/compile',
-    type: 'get',    
+    type: 'put',    
     success: function(resp) {
       if (resp.error) $('#message').html("<p class='note error'>" + resp.error + "</p>").fadeIn();
       if (resp.success && resp.message) {

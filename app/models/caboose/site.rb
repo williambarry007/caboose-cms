@@ -52,7 +52,16 @@ class Caboose::Site < ActiveRecord::Base
     :assets_url              ,
     :theme_id                ,
     :cl_logo_version         ,
-    :cl_favicon_version      
+    :cl_favicon_version      ,
+    :main_phone,
+    :alt_phone,
+    :address1,
+    :address2,
+    :city,
+    :state,
+    :zip,
+    :fax,
+    :contact_email
             
   before_save :validate_presence_of_store_config
 

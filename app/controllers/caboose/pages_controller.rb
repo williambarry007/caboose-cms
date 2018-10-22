@@ -514,7 +514,7 @@ module Caboose
       end
       
       # Blank page
-      if params[:template_id].blank? && params[:copy_from_id].blank?      
+      if params[:use_template] == 'no' && params[:use_copy] == 'no' 
         page = Caboose::Page.new
         if parent.nil?
           d = Domain.where(:domain => request.host_with_port).first.site_id
@@ -570,7 +570,7 @@ module Caboose
         end
 
       # Use a page template
-      else
+      elsif !params[:template_id].blank? && params[:use_template] == 'yes'
         template = Caboose::PageTemplate.find(params[:template_id])
         if template && template.page
           new_page = template.page.duplicate(@site.id, parent_id, false, layout_id, nil)

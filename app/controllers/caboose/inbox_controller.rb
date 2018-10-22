@@ -6,7 +6,8 @@ module Caboose
     def admin_index
       has_inbox = "Contact".constantize rescue false
       if has_inbox
-        @contacts = Contact.where(:site_id => @site.id, :captcha_valid => true, :deleted => false).order('date_submitted desc').all
+        where = params[:exclude].blank? ? "(id is not null)" : "(sent_to != '#{params[:exclude]}')"
+        @contacts = Contact.where(where).where(:site_id => @site.id, :captcha_valid => true, :deleted => false).order('date_submitted desc').all
       end
     end
 

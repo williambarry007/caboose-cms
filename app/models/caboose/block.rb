@@ -237,7 +237,7 @@ class Caboose::Block < ActiveRecord::Base
       end
               
       #begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{full_name}", :locals => options2) 
-      #rescue ActionView::MissingTemplate => ex        
+      #rescue ActionView::MissingTemplate => ex
       #  begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.name}", :locals => options2) 
       #  rescue ActionView::MissingTemplate => ex          
       #    begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.field_type}", :locals => options2) 

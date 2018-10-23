@@ -37,6 +37,7 @@ bt = @block_type
 <p><div id='blocktype_<%= bt.id %>_default_child_block_type_id'     ></div></p>
 <p><div id='blocktype_<%= bt.id %>_default_constrain'               ></div></p>
 <p><div id='blocktype_<%= bt.id %>_default_full_width'              ></div></p>
+<p><div id='blocktype_<%= bt.id %>_default_included'              ></div></p>
 <p>
 
 </p>
@@ -54,7 +55,6 @@ bt = @block_type
 <% content_for :caboose_css do %>
 <%= stylesheet_link_tag 'caboose/icomoon_fonts' %>
 <style type='text/css'>
-#blocktype_<%= bt.id %>_render_function  { font-family: Courier; font-size: 80%; width: 100%; }
 #blocktype_<%= bt.id %>_options_function { font-family: Courier; font-size: 80%; width: 100%; }
 </style>
 <% end %>
@@ -106,8 +106,7 @@ $(document).ready(function() {
       { name: 'use_render_function_for_layout' , sort: 'use_render_function_for_layout' , show: true  , bulk_edit: false, nice_name: 'Use Render Function for Modal'  , type: 'checkbox'          , value: function(bt) { return bt.use_render_function_for_layout;  }, text: function(bt) { return bt.use_render_function_for_layout ? 'Yes' : 'No' }, width: 400 },
       { name: 'use_js_for_modal'               , sort: 'use_js_for_modal'               , show: true  , bulk_edit: false, nice_name: 'Use JS for Modal'               , type: 'checkbox'          , value: function(bt) { return bt.use_js_for_modal;                }, text: function(bt) { return bt.use_js_for_modal               ? 'Yes' : 'No' }, width: 400 },
       { name: 'allow_child_blocks'             , sort: 'allow_child_blocks'             , show: true  , bulk_edit: false, nice_name: 'Allow Child Blocks'             , type: 'checkbox'          , value: function(bt) { return bt.allow_child_blocks;              }, text: function(bt) { return bt.allow_child_blocks             ? 'Yes' : 'No' }, width: 400 },
-      { name: 'default_child_block_type_id'    , sort: 'default_child_block_type_id'    , show: false , bulk_edit: false, nice_name: 'Default Child Block Type ID'       , type: 'text'            , value: function(bt) { return bt.default_child_block_type_id;     }, width: 400 },
-      { name: 'render_function'                , sort: 'render_function'                , show: false , bulk_edit: false, nice_name: 'Render Function'                , type: 'textarea'          , value: function(bt) { return bt.render_function;                 }, width: 800, height: 200 },            
+      { name: 'default_child_block_type_id'    , sort: 'default_child_block_type_id'    , show: false , bulk_edit: false, nice_name: 'Default Child Block Type ID'       , type: 'text'            , value: function(bt) { return bt.default_child_block_type_id;     }, width: 400 },          
       { name: 'default'                        , sort: 'default'                        , show: false , bulk_edit: false, nice_name: 'Default value'                  , type: 'text'              , value: function(bt) { return bt.default;                         }, width: 400 },
       { name: 'width'                          , sort: 'width'                          , show: false , bulk_edit: false, nice_name: 'Width'                          , type: 'text'              , value: function(bt) { return bt.width;                           }, width: 400 },
       { name: 'height'                         , sort: 'height'                         , show: false , bulk_edit: false, nice_name: 'Height'                         , type: 'text'              , value: function(bt) { return bt.height;                          }, width: 400 },
@@ -139,8 +138,7 @@ $(document).ready(function() {
       { name: 'use_render_function_for_layout' , nice_name: 'Use Render Function for Modal'  , type: 'checkbox' , value: <%= bt.use_render_function_for_layout ? 'true' : 'false' %>, width: 400 },
       { name: 'use_js_for_modal'               , nice_name: 'Use JS for Modal'               , type: 'checkbox' , value: <%= bt.use_js_for_modal               ? 'true' : 'false' %>, width: 400 },
       { name: 'allow_child_blocks'             , nice_name: 'Allow Child Blocks'             , type: 'checkbox' , value: <%= bt.allow_child_blocks             ? 'true' : 'false' %>, width: 400 },
-      { name: 'default_child_block_type_id'    , nice_name: 'Default Child Block Type ID'       , type: 'text'   , value: <%= raw Caboose.json(bt.default_child_block_type_id)     %>,  width: 400 },
-      { name: 'render_function'                , nice_name: 'Render Function'                , type: 'textarea' , value: <%= raw Caboose.json(bt.render_function)                 %>, width: 800, height: 200 },      
+      { name: 'default_child_block_type_id'    , nice_name: 'Default Child Block Type ID'       , type: 'text'   , value: <%= raw Caboose.json(bt.default_child_block_type_id)     %>,  width: 400 },   
       { name: 'field_type'                     , nice_name: 'Field type'                     , type: 'select'   , value: <%= raw Caboose.json(bt.field_type)                      %>, text: <%= raw Caboose.json(bt.field_type) %>, width: 400, options_url: '/admin/block-types/field-type-options' },
       { name: 'default'                        , nice_name: 'Default value'                  , type: 'text'     , value: <%= raw Caboose.json(bt.default)                         %>, width: 400 },
       { name: 'width'                          , nice_name: 'Width'                          , type: 'text'     , value: <%= raw Caboose.json(bt.width)                           %>, width: 400 },
@@ -148,7 +146,8 @@ $(document).ready(function() {
       { name: 'fixed_placeholder'              , nice_name: 'Fixed placeholder'              , type: 'checkbox' , value: <%= raw Caboose.json(bt.fixed_placeholder)               %>, width: 400 },
       { name: 'options_url'                    , nice_name: 'Options URL'                    , type: 'text'     , value: <%= raw Caboose.json(bt.options_url)                     %>, width: 400 },
       { name: 'options_function'               , nice_name: 'Options Function'               , type: 'textarea' , value: <%= raw Caboose.json(bt.options_function)                %>, width: 400, height: 100 },
-      { name: 'options'                        , nice_name: 'Options'                        , type: 'textarea' , value: <%= raw Caboose.json(bt.options)                         %>, width: 400, height: 100 }      
+      { name: 'options'                        , nice_name: 'Options'                        , type: 'textarea' , value: <%= raw Caboose.json(bt.options)                         %>, width: 400, height: 100 }, 
+      { name: 'default_included'             , sort: 'default_included'             ,  nice_name: 'Include on New Sites'          , type: 'checkbox'          , value: <%= bt.default_included ? 'true' : 'false' %> , width: 400 }
     ]
   });
 });

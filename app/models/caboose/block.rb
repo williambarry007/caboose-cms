@@ -212,8 +212,17 @@ class Caboose::Block < ActiveRecord::Base
 
     view = options2[:view]     
     view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?
+
+    btsm_rf = Caboose::BlockTypeSiteMembership.where(:site_id => options2[:site].id, :block_type_id => block.block_type.id).where('custom_html IS NOT NULL and custom_html != ?', '').first
+    bt_rf = btsm_rf.nil? ? (block.block_type.use_render_function && block.block_type.render_function ? block.block_type.render_function : nil) : btsm_rf
+    rf = btsm_rf.nil? ? bt_rf : btsm_rf.custom_html
       
-    if (block.block_type.use_render_function && block.block_type.render_function) || Caboose::BlockTypeSiteMembership.where(:site_id => options2[:site].id, :block_type_id => block.block_type.id).where('custom_html IS NOT NULL and custom_html != ?', '').exists?
+    if !rf.blank?
+      options2[:caboose_js] = rf.match(/<% content_for :js do %>(.*?)<% end %>/m)
+      options2[:caboose_css] = rf.match(/<% content_for :css do %>(.*?)<% end %>/m)
+      rf = rf.gsub(/<% content_for :js do %>(.*?)<% end %>/m, '')
+      rf = rf.gsub(/<% content_for :css do %>(.*?)<% end %>/m, '')
+      options2[:render_function] = rf
       begin
         str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
       rescue Exception => ex

@@ -201,6 +201,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :options_url                     , :string  ],
         [ :latest_error                    , :text    ],
         [ :default_constrain               , :boolean , { :default => false }],
+        [ :default_included                , :boolean , { :default => false }],
         [ :default_full_width              , :boolean , { :default => false }],
         [ :share                           , :boolean , { :default => true  }],
         [ :downloaded                      , :boolean , { :default => false }]

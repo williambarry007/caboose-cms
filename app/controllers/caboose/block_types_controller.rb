@@ -188,6 +188,7 @@ module Caboose
           when 'options_url'                     then bt.options_url                    = v
           when 'default_constrain'               then bt.default_constrain              = v
           when 'default_full_width'              then bt.default_full_width             = v
+          when 'default_included'                 then bt.default_included             = v
           when 'site_id'                         then resp.btsm_id = bt.toggle_site(v[0], v[1])
         end
       end
@@ -307,7 +308,8 @@ module Caboose
       return if !user_is_allowed_to('edit', 'sites')
       resp = StdClass.new  
       @btsm = BlockTypeSiteMembership.find(params[:id])
-      @btsm.custom_html = params['code']
+      code = params['code'].blank? ? '' : params['code'].gsub('<%==','<%= raw')
+      @btsm.custom_html = code
       @btsm.save
       resp.success = true
       resp.message = "Code has been saved!"

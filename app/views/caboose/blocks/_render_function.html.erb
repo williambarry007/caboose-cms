@@ -1,5 +1,20 @@
-<%
-btsm = Caboose::BlockTypeSiteMembership.where(:site_id => site.id, :block_type_id => block.block_type.id).where('custom_html IS NOT NULL and custom_html != ?', '').first
-rf = btsm ? btsm.custom_html : block.block_type.render_function
-%>
-<%= raw ERB.new(rf).result(self.instance_eval { binding }) %>
+<%= raw ERB.new(render_function).result(self.instance_eval { binding }) %>
+
+<% if caboose_js && caboose_js.length > 1 %>
+	<% caboose_js.to_a.each_with_index do |js, ind| %>
+		<% next if ind == 0 %>
+		<% content_for :js do %>
+			<% erb = ERB.new(js).result(self.instance_eval { binding }) %>
+			<%== erb %>
+		<% end %>
+	<% end %>
+<% end %>
+<% if caboose_css && caboose_css.length > 1 %>
+	<% caboose_css.to_a.each_with_index do |css, ind| %>
+		<% next if ind == 0 %>
+		<% content_for :css do %>
+			<% erb = ERB.new(css).result(self.instance_eval { binding }) %>
+			<%== erb %>
+		<% end %>
+	<% end %>
+<% end %>

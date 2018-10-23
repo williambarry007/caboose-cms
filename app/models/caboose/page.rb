@@ -130,7 +130,8 @@ class Caboose::Page < ActiveRecord::Base
     parts = uri.split('/')
       
     # See where to start looking
-    page_ids = self.where(:site_id => site_id, :alias => parts[0]).limit(1).pluck(:id)
+    pagealias = parts[0].blank? ? '' : parts[0].downcase
+    page_ids = self.where(:site_id => site_id, :alias => pagealias).limit(1).pluck(:id)
     page_id = !page_ids.nil? && page_ids.count > 0 ? page_ids[0] : false
     
     # Search for the page
@@ -146,14 +147,14 @@ class Caboose::Page < ActiveRecord::Base
     page = self.find(page_id)
     
     if (!get_closest_parent) # // Look for an exact match
-      return false if page.uri != uri
+      return false if (page.uri.blank? ? '' : page.uri.downcase) != (uri.blank? ? '' : uri.downcase)
     end
     return page   
   end
   
   def self.page_with_uri_helper(parts, level, parent_id)
     return parent_id if level >= parts.count
-    slug = parts[level]   
+    slug = parts[level].downcase
     page_ids = self.where(:parent_id => parent_id, :slug => slug).limit(1).pluck(:id)
     return parent_id if page_ids.nil? || page_ids.count == 0    
     return self.page_with_uri_helper(parts, level+1, page_ids[0])       

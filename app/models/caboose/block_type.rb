@@ -29,6 +29,7 @@ class Caboose::BlockType < ActiveRecord::Base
     :options_url,
     :icon,
     :default_constrain,
+    :default_included,
     :custom_sass,
     :latest_error,
     :share,      # Whether or not to share the block type in the existing block store.

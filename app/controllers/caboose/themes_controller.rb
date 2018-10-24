@@ -133,6 +133,10 @@ module Caboose
       theme.default_banner_image = params[:default_banner_image]            
       resp.success = theme.save
       resp.attributes = { 'default_banner_image' => { 'value' => theme.default_banner_image.url(:huge) }}
+      if Caboose::use_cloudinary
+        theme.update_cloudinary_banner if Rails.env.development?
+        theme.delay(:queue => 'general', :priority => 12).update_cloudinary_banner if Rails.env.production?
+      end
       render :text => resp.to_json
     end
 

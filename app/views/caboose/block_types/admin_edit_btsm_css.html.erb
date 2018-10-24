@@ -16,7 +16,7 @@
 				<span>Command+E = Compile</span>
 			</p>
 		</div>
-		<div id="editor"><%= @btsm.custom_css %></div>
+		<div id="editor"><%= @btsm.custom_css.blank? ? @btsm.block_type.custom_sass : @btsm.custom_css %></div>
 	</div>
 	
 </div>

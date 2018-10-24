@@ -80,7 +80,8 @@ class Caboose::Theme < ActiveRecord::Base
 		:dropdown_nav_padding,
 
     :digest,
-    :custom_sass
+    :custom_sass,
+    :cl_banner_version
 
   def compile(for_site_id = 0)
   	theme = self
@@ -164,6 +165,18 @@ class Caboose::Theme < ActiveRecord::Base
 
 	def update_digest(digest)
 		self.update_column('digest', digest)
+	end
+
+	def update_cloudinary_banner
+		if Caboose::use_cloudinary
+			url = self.default_banner_image.url(:huge)
+			url = "https:#{url}" if !url.include?('https')
+			if !url.include?('res.cloudinary')
+	      result = Cloudinary::Uploader.upload(url , :public_id => "banner_images/#{self.id}_huge", :overwrite => true)
+	      self.cl_banner_version = result['version'] if result && result['version']
+	      self.save
+	    end
+    end
 	end
     
 end

@@ -11,7 +11,6 @@ bt = @block_type
   <a href="/admin/block-types/<%= bt.id %>/render-function" class="caboose-btn">Edit Render Function</a>
   <a href="/admin/block-types/<%= bt.id %>/sass" class="caboose-btn">Edit Custom SCSS</a>
   
-<div id='message'></div>
 <p><div id='blocktype_<%= bt.id %>_name'                            ></div></p>
 <p><div id='blocktype_<%= bt.id %>_description'                     ></div></p>
 
@@ -43,7 +42,7 @@ bt = @block_type
 </p>
 <p><div id='blocktype_<%= bt.id %>_options_function'                ></div></p>
 
-  
+<div id='message'></div>
 
 <p>
 <input type='button' value='< Back' onclick="window.location='/admin/block-types<%= bt.parent_id && bt.parent_id > 0 ? "/#{bt.parent_id}" : '' %>';" />

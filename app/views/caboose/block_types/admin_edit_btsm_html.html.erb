@@ -13,7 +13,7 @@
 				<span>Command+S = Save</span>
 			</p>
 		</div>
-		<div id="editor"><%= @btsm.custom_html %></div>
+		<div id="editor"><%= @btsm.custom_html.blank? ? @btsm.block_type.render_function : @btsm.custom_html %></div>
 	</div>
 	
 </div>

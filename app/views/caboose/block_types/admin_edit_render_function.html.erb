@@ -4,6 +4,7 @@
 
 	<div class="holder">
 		<div class="clearfix buttons">
+			<p class="warning">WARNING: This code is used on multiple sites. Edit with caution.</p>
 			<a href="/admin/block-types/<%= @block_type.id %>" class="caboose-btn">Back</a>
 			<a href="/admin/block-types/<%= @block_type.id %>/errors" class="caboose-btn">Error Log</a>
 			<a href="#" onclick="save();return false;" class="caboose-btn green">Save</a>
@@ -20,6 +21,12 @@
 
 <% content_for :caboose_css do %>
 <style>
+p.warning {
+	color: #d43030;
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0 0 8px 0;
+}
 p#tips {
 	display: inline-block;
 	float: right;

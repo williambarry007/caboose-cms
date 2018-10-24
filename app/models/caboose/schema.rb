@@ -1000,7 +1000,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :actual_footer_height, :string ],
         [ :actual_banner_height, :string ],
         [ :dropdown_nav_padding, :string ],
-        [ :custom_sass, :text ]
+        [ :custom_sass, :text ],
+        [ :cl_banner_version, :string ]
       ],
       Caboose::ThemeFile => [
         [ :filename, :string ],

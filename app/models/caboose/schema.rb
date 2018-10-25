@@ -1001,7 +1001,20 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :actual_banner_height, :string ],
         [ :dropdown_nav_padding, :string ],
         [ :custom_sass, :text ],
-        [ :cl_banner_version, :string ]
+        [ :cl_banner_version, :string ],
+        [ :btn_main_bg_color, :string ],
+        [ :btn_alt_bg_color, :string ],
+        [ :header_text_transform, :string ],
+        [ :ninebar_show, :string ],
+        [ :ninebar_bg_color, :string ],
+        [ :ninebar_text, :string ],
+        [ :header_hover_bg_color, :string ],
+        [ :header_hover_font_color, :string ],
+        [ :header_border_bottom, :string ],
+        [ :note_error_bg, :string ],
+        [ :note_loading_bg, :string ],
+        [ :note_success_bg, :string ],
+        [ :nav_lineheight_offset, :string ]
       ],
       Caboose::ThemeFile => [
         [ :filename, :string ],

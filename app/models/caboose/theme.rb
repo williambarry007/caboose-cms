@@ -79,6 +79,20 @@ class Caboose::Theme < ActiveRecord::Base
 		:actual_banner_height,
 		:dropdown_nav_padding,
 
+		:btn_main_bg_color,
+		:btn_alt_bg_color,
+		:header_text_transform,
+		:ninebar_show,
+		:ninebar_bg_color,
+		:ninebar_text,
+		:header_hover_bg_color,
+		:header_hover_font_color,
+		:header_border_bottom,
+		:note_error_bg,
+		:note_loading_bg,
+		:note_success_bg,
+		:nav_lineheight_offset,
+
     :digest,
     :custom_sass,
     :cl_banner_version

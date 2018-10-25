@@ -81,6 +81,20 @@ module Caboose
           when 'actual_banner_height' then theme.actual_banner_height = value
           when 'dropdown_nav_padding' then theme.dropdown_nav_padding = value
 
+          when 'btn_main_bg_color' then theme.btn_main_bg_color = value
+          when 'btn_alt_bg_color' then theme.btn_alt_bg_color = value
+          when 'header_text_transform' then theme.header_text_transform = value
+          when 'ninebar_show' then theme.ninebar_show = value
+          when 'ninebar_bg_color' then theme.ninebar_bg_color = value
+          when 'ninebar_text' then theme.ninebar_text = value
+          when 'header_hover_bg_color' then theme.header_hover_bg_color = value
+          when 'header_hover_font_color' then theme.header_hover_font_color = value
+          when 'header_border_bottom' then theme.header_border_bottom = value
+          when 'note_error_bg' then theme.note_error_bg = value
+          when 'note_loading_bg' then theme.note_loading_bg = value
+          when 'note_success_bg' then theme.note_success_bg = value
+          when 'nav_lineheight_offset' then theme.nav_lineheight_offset = value
+
     	  end
     	end
     	resp.success = save && theme.save

@@ -48,6 +48,11 @@ position = header.child('position') if header
       <div id="theme_<%= @theme.id %>_logo_width"></div>
       <div id="theme_<%= @theme.id %>_logo_height"></div>
       <div id="theme_<%= @theme.id %>_logo_top_padding"></div>
+      <div id="theme_<%= @theme.id %>_header_text_transform"></div>
+      <div id="theme_<%= @theme.id %>_header_hover_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_header_hover_font_color"></div>
+      <div id="theme_<%= @theme.id %>_header_border_bottom"></div>
+      <div id="theme_<%= @theme.id %>_nav_lineheight_offset"></div>
       <div id="theme_<%= @theme.id %>_default_header_style"></div>
       <div id="theme_<%= @theme.id %>_default_header_position"></div>
     </section>
@@ -60,6 +65,9 @@ position = header.child('position') if header
       <div id="theme_<%= @theme.id %>_footer_padding"></div>
       <div id="theme_<%= @theme.id %>_footer_font_size"></div>
       <div id="theme_<%= @theme.id %>_actual_footer_height"></div>
+      <div id="theme_<%= @theme.id %>_ninebar_show"></div>
+      <div id="theme_<%= @theme.id %>_ninebar_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_ninebar_text"></div>
     </section>
 
     <section>
@@ -77,6 +85,8 @@ position = header.child('position') if header
   <div class="unit1of2 right">
     <section>
       <h5>Buttons</h5>
+      <div id="theme_<%= @theme.id %>_btn_main_bg_color"></div>
+      <div id="theme_<%= @theme.id %>_btn_alt_bg_color"></div>
       <div id="theme_<%= @theme.id %>_btn_border_radius"></div>
       <div id="theme_<%= @theme.id %>_btn_border_width"></div>
       <div id="theme_<%= @theme.id %>_btn_border_color"></div>
@@ -90,7 +100,7 @@ position = header.child('position') if header
     </section>
 
     <section>
-      <h5>Inputs</h5>
+      <h5>Forms &amp; Inputs</h5>
       <div id="theme_<%= @theme.id %>_input_border_radius"></div>
       <div id="theme_<%= @theme.id %>_input_bg_color"></div>
       <div id="theme_<%= @theme.id %>_input_border_color"></div>
@@ -99,6 +109,9 @@ position = header.child('position') if header
       <div id="theme_<%= @theme.id %>_input_font_size"></div>
       <div id="theme_<%= @theme.id %>_input_padding"></div>
       <div id="theme_<%= @theme.id %>_note_padding"></div>
+      <div id="theme_<%= @theme.id %>_note_error_bg"></div>
+      <div id="theme_<%= @theme.id %>_note_loading_bg"></div>
+      <div id="theme_<%= @theme.id %>_note_success_bg"></div>
     </section>
 
     <section>
@@ -244,8 +257,8 @@ $(document).ready(function() {
       { name: 'btn_font_color', nice_name: "<%= 'font_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.btn_font_color) %>, width: 400 },
       { name: 'btn_font_size', nice_name: "<%= 'font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_size) %>, width: 400 },
       { name: 'btn_font_weight', nice_name: "<%= 'font_weight'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_weight) %>, width: 400 },
-      { name: 'btn_font_case', nice_name: "<%= 'font_case'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_font_case) %>, width: 400 },
-      { name: 'btn_border_side', nice_name: "<%= 'border_side'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.btn_border_side) %>, width: 400 },
+      { name: 'btn_font_case', nice_name: "<%= 'font_case'.titleize %>", type: 'select', value: <%== Caboose.json(@theme.btn_font_case) %>, options: [{'text':'none','value':'none'},{'text':'uppercase','value':'uppercase'},{'text':'lowercase','value':'lowercase'}], width: 400 },
+      { name: 'btn_border_side', nice_name: "<%= 'border_side'.titleize %>", type: 'select', options: [{'text':'none','value':'none'},{'text':'all','value':'all'},{'text':'bottom','value':'bottom'}], value: <%== Caboose.json(@theme.btn_border_side) %>, width: 400 },
       { name: 'input_border_radius', nice_name: "<%= 'border_radius'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.input_border_radius) %>, width: 400 },
       { name: 'input_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.input_bg_color) %>, width: 400 },
       { name: 'input_border_color', nice_name: "<%= 'border_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.input_border_color) %>, width: 400 },
@@ -286,10 +299,23 @@ $(document).ready(function() {
       { name: 'sidebar_bg_color', nice_name: "<%= 'background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.sidebar_bg_color) %>, width: 400 },
       { name: 'default_banner_image'  , nice_name: 'Default Banner Image'   , type: 'image'  , value: <%= raw Caboose.json(@theme.default_banner_image ? @theme.default_banner_image.url(:huge) : 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_300/v1539265856/default_banner.jpg') %>, width: 150, update_url: '/admin/themes/<%= @theme.id %>/default-banner-image' },
       { name: 'banner_font_size', nice_name: "<%= 'banner_font_size'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.banner_font_size) %>, width: 400 },
-      { name: 'footer_hover_color', nice_name: "<%= 'footer_hover_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.footer_hover_color) %>, width: 400 },
-      { name: 'actual_footer_height', nice_name: "<%= 'actual_footer_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.actual_footer_height) %>, width: 400 },
-      { name: 'actual_banner_height', nice_name: "<%= 'actual_banner_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.actual_banner_height) %>, width: 400 },
-      { name: 'dropdown_nav_padding', nice_name: "<%= 'dropdown_nav_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.dropdown_nav_padding) %>, width: 400 }
+      { name: 'footer_hover_color', nice_name: "<%= 'hover_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.footer_hover_color) %>, width: 400 },
+      { name: 'actual_footer_height', nice_name: "<%= 'actual_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.actual_footer_height) %>, width: 400 },
+      { name: 'actual_banner_height', nice_name: "<%= 'actual_height'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.actual_banner_height) %>, width: 400 },
+      { name: 'dropdown_nav_padding', nice_name: "<%= 'dropdown_nav_padding'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.dropdown_nav_padding) %>, width: 400 },
+      { name: 'btn_main_bg_color', nice_name: "<%= 'main background color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.btn_main_bg_color) %>, width: 400 },
+      { name: 'btn_alt_bg_color', nice_name: "<%= 'alternate_background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.btn_alt_bg_color) %>, width: 400 },
+      { name: 'header_text_transform', nice_name: "<%= 'font_case'.titleize %>", type: 'select', value: <%== Caboose.json(@theme.header_text_transform) %>, options: [{'text':'none','value':'none'},{'text':'uppercase','value':'uppercase'},{'text':'lowercase','value':'lowercase'}], width: 400 },
+      { name: 'ninebar_show', nice_name: "Show Nine Bar", type: 'select', value: <%== Caboose.json(@theme.ninebar_show) %>, options: [{'text':'Yes','value':'Yes'},{'text':'No','value':'No'}], width: 400 },
+      { name: 'ninebar_bg_color', nice_name: "Nine Bar Background Color", type: 'color', value: <%== Caboose.json(@theme.ninebar_bg_color) %>, width: 400 },
+      { name: 'ninebar_text', nice_name: "Nine Bar Text", type: 'text', value: <%== Caboose.json(@theme.ninebar_text) %>, width: 400 },
+      { name: 'header_hover_bg_color', nice_name: "<%= 'hover_background_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.header_hover_bg_color) %>, width: 400 },
+      { name: 'header_hover_font_color', nice_name: "<%= 'hover_font_color'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.header_hover_font_color) %>, width: 400 },
+      { name: 'header_border_bottom', nice_name: "<%= 'border_bottom'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.header_border_bottom) %>, width: 400 },
+      { name: 'note_error_bg', nice_name: "<%= 'note_error_background'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.note_error_bg) %>, width: 400 },
+      { name: 'note_loading_bg', nice_name: "<%= 'note_loading_background'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.note_loading_bg) %>, width: 400 },
+      { name: 'note_success_bg', nice_name: "<%= 'note_success_background'.titleize %>", type: 'color', value: <%== Caboose.json(@theme.note_success_bg) %>, width: 400 },
+      { name: 'nav_lineheight_offset', nice_name: "<%= 'nav_line_height_offset'.titleize %>", type: 'text', value: <%== Caboose.json(@theme.nav_lineheight_offset) %>, width: 400 }
     ]    
   });  
 });

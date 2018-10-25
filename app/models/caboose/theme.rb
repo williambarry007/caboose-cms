@@ -92,6 +92,7 @@ class Caboose::Theme < ActiveRecord::Base
 		:note_loading_bg,
 		:note_success_bg,
 		:nav_lineheight_offset,
+		
 
     :digest,
     :custom_sass,

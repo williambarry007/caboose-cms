@@ -219,7 +219,7 @@ class Caboose::Site < ActiveRecord::Base
     rp = Caboose::RolePermission.where(:role_id => admin_role.id, :permission_id => admin_perm.id).first
     rp = Caboose::RolePermission.create(:role_id => admin_role.id, :permission_id => admin_perm.id) if rp.nil?
     
-    # Make sure the admin user is a member of the admin role
+    # Make sure the admin user is a member of the admin role 
     rm = Caboose::RoleMembership.where(:role_id => admin_role.id, :user_id => admin_user.id).first
     rm = Caboose::RoleMembership.create(:role_id => admin_role.id, :user_id => admin_user.id) if rm.nil?
     

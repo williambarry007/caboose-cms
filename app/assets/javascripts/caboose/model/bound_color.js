@@ -121,10 +121,6 @@ BoundColor = BoundControl.extend({
     this.attribute.value = this.attribute.value_clean;
     $('#'+this.el).val(this.attribute.value);
     $('#'+this.el).removeClass('mb_dirty');
-    
-    //if ($('#'+this.el+'_check').length)
-    //  this.hide_check();
-    
     if (this.attribute.after_cancel) this.attribute.after_cancel();
   },
     

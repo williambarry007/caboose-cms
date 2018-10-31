@@ -332,6 +332,7 @@ $(window).load(function() {
   $.each($(".mb_container.color"), function(k,v) {
     var inp = $(v).find("input[type='text']").first();
     inp.spectrum("option","showPalette",false);
+    inp.spectrum("option","showAlpha",true);
     inp.spectrum("option","showSelectionPalette",false);
     if ( inp.val() == 'main' ) {
       inp.spectrum("set",color_main);
@@ -350,8 +351,8 @@ $(window).load(function() {
       inp.val('dark');
     }
     inp.on("change.spectrum", function(e, color) {
-      console.log("input changed to " + color);
-      console.log("input v: " + inp.val());
+      // console.log("input changed to " + color);
+      // console.log("input v: " + inp.val());
       if ( inp.val() == 'main' ) {
         inp.spectrum("set",color_main);
         inp.val('main');
@@ -368,10 +369,12 @@ $(window).load(function() {
         inp.spectrum("set",color_dark);
         inp.val('dark');
       }
-      else {
-        inp.spectrum("set", inp.val());
-   //     inp.val(color);
+      else if ( inp.val() == 'transparent' ) {
+        inp.spectrum("set","rgba(0,0,0,0)");
+        inp.val('transparent');
       }
+      else
+        inp.spectrum("set", inp.val());
     });
   });
   $("#theme_<%= @theme.id %>_color_main").on("change.spectrum", function(e, color) {

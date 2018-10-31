@@ -25,7 +25,7 @@ user_ids = [] if user_ids.nil?
 <p><div id='site_<%= @site.id %>_favicon'                    ></div></p>
 
 <h2>Domains</h2>
-<p><a href='#' onclick="add_domain(<%= @site.id %>);">New Domain</a></p>
+<p><a href='#' onclick="add_domain(<%= @site.id %>);return false;">New Domain</a></p>
 <div id='new_domain_container'></div>
 <% if @site.domains && @site.domains.count > 0 %>
   <table class='data'>

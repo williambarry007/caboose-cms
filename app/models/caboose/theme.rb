@@ -6,7 +6,7 @@ class Caboose::Theme < ActiveRecord::Base
   has_many :theme_files, :through => :theme_file_memberships    
 
   has_attached_file :default_banner_image,      
-    :path => 'banner_images/:id_:style.:extension',      
+    :path => ':caboose_prefixbanner_images/:id_:style.:extension',      
     :default_url => 'https://res.cloudinary.com/caboose/image/upload/c_scale,f_auto,q_auto:good,w_1800/v1539265856/default_banner.jpg',
     :s3_protocol => :https,
     :styles      => {
@@ -187,7 +187,7 @@ class Caboose::Theme < ActiveRecord::Base
 			url = self.default_banner_image.url(:huge)
 			url = "https:#{url}" if !url.include?('https')
 			if !url.include?('res.cloudinary')
-	      result = Cloudinary::Uploader.upload(url , :public_id => "banner_images/#{self.id}_huge", :overwrite => true)
+	      result = Cloudinary::Uploader.upload(url, :public_id => "caboose/banner_images/#{self.id}_huge", :overwrite => true)
 	      self.cl_banner_version = result['version'] if result && result['version']
 	      self.save
 	    end

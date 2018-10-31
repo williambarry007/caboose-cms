@@ -121,6 +121,16 @@ module Caboose
       end   
       @site = Site.find(params[:id])      
     end
+
+    # @route GET /admin/sites/:id/codes
+    def admin_edit_codes
+      return if !user_is_allowed('sites', 'edit')
+      if (@site.id.to_s != params[:id] && !@site.is_master)
+        @error = "You are not allowed to edit this site."
+        render :file => 'caboose/extras/error' and return
+      end   
+      @site = Site.find(params[:id])      
+    end
             
     # @route GET /admin/sites/:id/delete
     def admin_delete_form
@@ -205,6 +215,9 @@ module Caboose
           when 'zip' then site.zip = value
           when 'fax' then site.fax = value
           when 'contact_email' then site.contact_email = value
+          when 'head_code' then site.head_code = value
+          when 'body_open_code' then site.body_open_code = value
+          when 'body_close_code' then site.body_close_code = value
     	  end
     	end
     	resp.success = save && site.save

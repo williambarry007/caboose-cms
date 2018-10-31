@@ -1,0 +1,38 @@
+<%= render :partial => 'caboose/sites/admin_header' %>
+
+<h5 style="margin:0;font-size:18px;">Embedded HTML</h5>
+
+<p><div id='site_<%= @site.id %>_head_code'></div></p>
+<p><div id='site_<%= @site.id %>_body_open_code'></div></p>
+<p><div id='site_<%= @site.id %>_body_close_code'></div></p>
+
+<%= render :partial => 'caboose/sites/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style>
+  textarea {
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 18px;
+  }
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'Site',
+    id: <%= @site.id %>,
+    update_url: '/admin/sites/<%= @site.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'head_code', nice_name: 'Code for &lt;head&gt;', type: 'textarea', value: <%== Caboose.json(@site.head_code) %>, width: 600, height: 300 },
+      { name: 'body_open_code', nice_name: 'Code for after &lt;body&gt;', type: 'textarea', value: <%== Caboose.json(@site.body_open_code) %>, width: 600, height: 300 },
+      { name: 'body_close_code', nice_name: 'Code for before &lt;/body&gt;', type: 'textarea', value: <%== Caboose.json(@site.body_close_code) %>, width: 600, height: 300 }
+    ]    
+  });       
+});
+</script>
+<% end %>

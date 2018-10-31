@@ -824,7 +824,10 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :state, :string ],
         [ :zip, :string ],
         [ :fax, :string ],
-        [ :contact_email, :string ]
+        [ :contact_email, :string ],
+        [ :head_code, :text ],
+        [ :body_open_code, :text ],
+        [ :body_close_code, :text ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],

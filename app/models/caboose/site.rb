@@ -61,7 +61,10 @@ class Caboose::Site < ActiveRecord::Base
     :state,
     :zip,
     :fax,
-    :contact_email
+    :contact_email,
+    :head_code,
+    :body_open_code,
+    :body_close_code
             
   before_save :validate_presence_of_store_config
 

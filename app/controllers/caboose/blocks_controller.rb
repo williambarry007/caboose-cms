@@ -145,7 +145,7 @@ module Caboose
       
     def admin_tree_helper(b,level)
       arr = []
-      if level < 3
+      if level < 3 && b.block_type
         sort_by_id = b.block_type.default_child_block_type_id.nil? ? true : false
         b.filtered_children(true,sort_by_id).each do |b2|
           bt = b2.block_type

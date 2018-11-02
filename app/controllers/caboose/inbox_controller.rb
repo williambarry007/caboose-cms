@@ -23,6 +23,7 @@ module Caboose
       @contact = Caboose::FormSubmission.where(:site_id => @site.id, :id => params[:id]).first
       @contact.is_deleted = true
       @contact.save
+      
       redirect_to '/admin/inbox'
     end
 

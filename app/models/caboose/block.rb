@@ -1,3 +1,4 @@
+require 'timeout'
 
 class Caboose::Block < ActiveRecord::Base
   self.table_name = "blocks"
@@ -224,7 +225,7 @@ class Caboose::Block < ActiveRecord::Base
       rf = rf.gsub(/<% content_for :css do %>(.*?)<% end %>/m, '')
       options2[:render_function] = rf
       begin
-        str = view.render(:partial => "caboose/blocks/render_function", :locals => options2)
+        str = Timeout::timeout(3) { view.render(:partial => "caboose/blocks/render_function", :locals => options2) }
       rescue Exception => ex
         msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
         Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")

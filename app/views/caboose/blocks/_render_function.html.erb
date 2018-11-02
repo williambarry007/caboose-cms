@@ -1,11 +1,15 @@
-<%= raw ERB.new(render_function).result(self.instance_eval { binding }) %>
+<%== ERB.new(render_function).result(self.instance_eval { binding }) %>
 
 <% if caboose_js && caboose_js.length > 1 %>
 	<% caboose_js.to_a.each_with_index do |js, ind| %>
 		<% next if ind == 0 %>
 		<% content_for :js do %>
-			<% erb = ERB.new(js).result(self.instance_eval { binding }) %>
-			<%== erb %>
+			<% begin %>
+				<% erb = ERB.new(js).result(self.instance_eval { binding }) %>
+				<%== erb %>
+			<% rescue %>
+				<% Caboose.log("JS ERROR for block #{block.id}") %>
+			<% end %>
 		<% end %>
 	<% end %>
 <% end %>
@@ -13,8 +17,12 @@
 	<% caboose_css.to_a.each_with_index do |css, ind| %>
 		<% next if ind == 0 %>
 		<% content_for :css do %>
-			<% erb = ERB.new(css).result(self.instance_eval { binding }) %>
-			<%== erb %>
+			<% begin %>
+				<% erb = ERB.new(css).result(self.instance_eval { binding }) %>
+				<%== erb %>
+			<% rescue %>
+				<% Caboose.log("CSS ERROR for block #{block.id}") %>
+			<% end %>
 		<% end %>
 	<% end %>
 <% end %>

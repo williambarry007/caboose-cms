@@ -1,40 +1,52 @@
+<%
+email = nil
+subject = 'Inquiry'
+%>
+
 <h1>Inbox - Message</h1>
 
 <div class="constrain">
 	<div class="inbox-message">
-		<% if !@contact.captcha_valid %>
+		<% if @contact.is_spam %>
 			<p class="spam">SPAM</p>
 		<% end %>
 		<table cellspacing="0" cellpadding="0">
 			<tr>
-				<td>Name</td>
-				<td><%= @contact.name %></td>
-			</tr>
-			<tr>
-				<td>Email</td>
-				<td><a href="mailto:<%= @contact.email %>?subject=Re: <%= @contact.subject %>"><%= @contact.email %></a></td>
-			</tr>
-			<tr>
-				<td>Sent To</td>
-				<td><a href="mailto:<%= @contact.sent_to %>?subject=Re: <%= @contact.subject %>"><%= @contact.sent_to %></a></td>
-			</tr>
-			<tr>
 				<td>Date Submitted</td>
 				<td><%= @contact.date_submitted.strftime('%-m/%-d/%Y') %></td>
 			</tr>
+			<% (1..20).each do |ind| %>
+				<% 
+					field_name = "field#{ind}_name".to_s
+		      field_desc = "field#{ind}_description".to_s
+		      field_value = "field#{ind}_value".to_s
+		      next if @contact[field_desc].nil?
+		      if ['email','email_required','email_address','email_address_required'].include?(@contact[field_name])
+		      	email = @contact[field_value]
+		      elsif ['subject','subject_required'].include?(@contact[field_name])
+		      	email = @contact[field_value]
+		      end
+	      %>
+	      <tr>
+	      	<td><%= @contact[field_desc] %></td>
+	      	<td><%= @contact[field_value] %></td>
+	      </tr>
+			<% end %>
 			<tr>
-				<td>Subject</td>
-				<td><%= @contact.subject %></td>
+				<td>Sent To</td>
+				<td><a href="mailto:<%= @contact.sent_to %>?subject=Re: <%= subject %>"><%= @contact.sent_to %></a></td>
 			</tr>
+			<% if !@contact.bcc_to.blank? %>
 			<tr>
-				<td>Message</td>
-				<td><%= @contact.message %></td>
+				<td>BCC To</td>
+				<td><a href="mailto:<%= @contact.bcc_to %>?subject=Re: <%= subject %>"><%= @contact.bcc_to %></a></td>
 			</tr>
+			<% end %>
 		</table>
 		<div class="buttons">
-			<a href="mailto:<%= @contact.email %>?subject=Re: <%= @contact.subject %>" class="caboose-btn">Reply</a>
+			<a href="mailto:<%= email %>?subject=Re: <%= subject %>" class="caboose-btn">Reply</a>
 			<a href="/admin/inbox/<%= @contact.id %>/delete" class="caboose-btn">Delete</a>
-			<% if @contact.captcha_valid %>
+			<% if !@contact.is_spam %>
 			<a href="/admin/inbox/<%= @contact.id %>/spam" class="caboose-btn">Mark as Spam</a>
 			<% else %>
 			<a href="/admin/inbox/<%= @contact.id %>/spam" class="caboose-btn">Mark as Not Spam</a>

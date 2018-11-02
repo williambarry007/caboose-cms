@@ -1,3 +1,39 @@
+<%
+def get_name(fs)
+	(1..20).each do |ind|
+		field = "field#{ind}_name".to_sym
+		value = "field#{ind}_value".to_sym
+		if fs[field] == 'name' || fs[field] == 'name_required'
+			return fs[value]
+			break
+		end
+	end
+	return 
+end
+def get_subject(fs)
+	(1..20).each do |ind|
+		field = "field#{ind}_name".to_sym
+		value = "field#{ind}_value".to_sym
+		if fs[field] == 'subject' || fs[field] == 'subject_required'
+			return fs[value]
+			break
+		end
+	end
+	return ''
+end
+def get_message(fs)
+	(1..20).each do |ind|
+		field = "field#{ind}_name".to_sym
+		value = "field#{ind}_value".to_sym
+		if fs[field] == 'message' || fs[field] == 'message_required'
+			return fs[value]
+			break
+		end
+	end
+	return ''
+end
+%>
+
 <h1>Inbox - Spam</h1>
 
 <div class="constrain clearfix" style="padding:0 40px 0 10px;">
@@ -11,12 +47,12 @@
 			<th>Message</th>
 			<th>Date</th>
 		</tr>
-		<% @contacts.each do |c| %>
-			<tr data-id="<%= c.id %>">
-				<td><%= c.name %></td>
-				<td><%= c.subject %></td>
-				<td><%= c.message ? c.message.truncate(60) : '' %></td>
-				<td><%= c.date_submitted.strftime('%-m/%-d/%Y') %></td>
+		<% @contacts.each do |fs| %>
+			<tr data-id="<%= fs.id %>">
+				<td><%= get_name(fs) %></td>
+				<td><%= get_subject(fs) %></td>
+				<td><%= get_message(fs).truncate(60) %></td>
+				<td><%= fs.date_submitted.strftime('%-m/%-d/%Y') %></td>
 			</tr>
 		<% end %>
 	</table>

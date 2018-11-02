@@ -28,9 +28,9 @@ $(document).ready(function() {
     update_url: '/admin/sites/<%= @site.id %>',
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
-      { name: 'head_code', nice_name: 'Code for &lt;head&gt;', type: 'textarea', value: <%== Caboose.json(@site.head_code) %>, width: 600, height: 300 },
-      { name: 'body_open_code', nice_name: 'Code for after &lt;body&gt;', type: 'textarea', value: <%== Caboose.json(@site.body_open_code) %>, width: 600, height: 300 },
-      { name: 'body_close_code', nice_name: 'Code for before &lt;/body&gt;', type: 'textarea', value: <%== Caboose.json(@site.body_close_code) %>, width: 600, height: 300 }
+      { name: 'head_code', nice_name: 'Code for &lt;head&gt;', type: 'textarea', value: <%== Caboose.json(@site.head_code.blank? ? '' : @site.head_code.gsub('</script>','<end/script>')) %>, width: 600, height: 300 },
+      { name: 'body_open_code', nice_name: 'Code for after &lt;body&gt;', type: 'textarea', value: <%== Caboose.json(@site.body_open_code.blank? ? '' : @site.body_open_code.gsub('</script>','<end/script>')) %>, width: 600, height: 300 },
+      { name: 'body_close_code', nice_name: 'Code for before &lt;/body&gt;', type: 'textarea', value: <%== Caboose.json(@site.body_close_code.blank? ? '' : @site.body_close_code.gsub('</script>','<end/script>')) %>, width: 600, height: 300 }
     ]    
   });       
 });

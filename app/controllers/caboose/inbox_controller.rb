@@ -4,49 +4,34 @@ module Caboose
     
     # @route GET /admin/inbox
     def admin_index
-      has_inbox = "Contact".constantize rescue false
-      if has_inbox
-        where = params[:exclude].blank? ? "(id is not null)" : "(sent_to != '#{params[:exclude]}')"
-        @contacts = Contact.where(where).where(:site_id => @site.id, :captcha_valid => true, :deleted => false).order('date_submitted desc').all
-      end
+      where = params[:exclude].blank? ? "(id is not null)" : "(sent_to != '#{params[:exclude]}')"
+      @contacts = Caboose::FormSubmission.where(where).where(:site_id => @site.id, :is_spam => false, :is_deleted => false).order('date_submitted desc').all
     end
 
     # @route GET /admin/inbox/spam
     def admin_spam
-      has_inbox = "Contact".constantize rescue false
-      if has_inbox
-        @contacts = Contact.where(:site_id => @site.id, :captcha_valid => false, :deleted => false).order('date_submitted desc').all
-      end
+      @contacts = Caboose::FormSubmission.where(:site_id => @site.id, :is_spam => true, :is_deleted => false).order('date_submitted desc').all
     end
 
     # @route GET /admin/inbox/:id
     def admin_show
-      has_inbox = "Contact".constantize rescue false
-      if has_inbox
-        @contact = Contact.where(:site_id => @site.id, :id => params[:id], :deleted => false).first
-      end
+      @contact = Caboose::FormSubmission.where(:site_id => @site.id, :id => params[:id], :is_deleted => false).first
     end
 
     # @route GET /admin/inbox/:id/delete
     def admin_delete
-      has_inbox = "Contact".constantize rescue false
-      if has_inbox
-        @contact = Contact.where(:site_id => @site.id, :id => params[:id]).first
-        @contact.deleted = true
-        @contact.save
-        redirect_to '/admin/inbox'
-      end
+      @contact = Caboose::FormSubmission.where(:site_id => @site.id, :id => params[:id]).first
+      @contact.is_deleted = true
+      @contact.save
+      redirect_to '/admin/inbox'
     end
 
     # @route GET /admin/inbox/:id/spam
     def admin_update
-      has_inbox = "Contact".constantize rescue false
-      if has_inbox
-        @contact = Contact.where(:site_id => @site.id, :id => params[:id]).first
-        @contact.captcha_valid = !@contact.captcha_valid
-        @contact.save
-        redirect_to '/admin/inbox/' + params[:id]
-      end
+      @contact = Caboose::FormSubmission.where(:site_id => @site.id, :id => params[:id]).first
+      @contact.is_spam = !@contact.is_spam
+      @contact.save
+      redirect_to '/admin/inbox/' + params[:id]
     end
             
   end

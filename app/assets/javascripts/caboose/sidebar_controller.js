@@ -1,4 +1,4 @@
-var ModalController = Class.extend({
+var SidebarController = Class.extend({
     
   modal_width: false,
   modal_height: false,

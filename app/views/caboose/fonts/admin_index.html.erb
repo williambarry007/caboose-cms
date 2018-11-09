@@ -261,7 +261,7 @@
 		  e.preventDefault();
 		  $.ajax({
 		    url: '/admin/themes/<%= @site.theme_id %>/compile',
-		    type: 'get',    
+		    type: 'put',    
 		    success: function(resp) {
 		      if (resp.error) $('#cmessage').html("<p class='note error'>" + resp.error + "</p>").fadeIn();
 		      if (resp.success && resp.message) {

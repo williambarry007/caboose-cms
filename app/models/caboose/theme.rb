@@ -92,7 +92,13 @@ class Caboose::Theme < ActiveRecord::Base
 		:note_loading_bg,
 		:note_success_bg,
 		:nav_lineheight_offset,
-		
+
+		:mobile_header_height,
+		:mobile_logo_width,
+		:mobile_logo_height,
+		:mobile_logo_top_padding,
+		:constrain_footer,
+		:heading_base_font_size,
 
     :digest,
     :custom_sass,

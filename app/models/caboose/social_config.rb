@@ -16,7 +16,8 @@ class Caboose::SocialConfig < ActiveRecord::Base
     :rss_url              ,
     :google_plus_url      ,
     :linkedin_url         , 
-    :google_analytics_id
+    :google_analytics_id  ,
+    :facebook_pixel
 
     has_attached_file :share_image,      
       :path => 'share_images/:id_:style.:extension',      

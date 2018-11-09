@@ -12,6 +12,7 @@ module Caboose
     def admin_options
     	btc = BlockTypeCategory.find(params[:id])
       options = params[:default] == 'yes' ? [{:text => 'Default', :value => 'Default'}] : []
+      options << { 'value' => 'none', 'text' => "No Header" } if params[:none] == 'yes'
     	BlockType.joins(:block_type_site_memberships).where("block_type_site_memberships.site_id = ?",@site.id).where("block_type_site_memberships.block_type_id = block_types.id").where("block_types.block_type_category_id = ?",btc.id).reorder('block_types.description').all.each do |s|
         options << { 'value' => s.id, 'text' => s.description }
       end

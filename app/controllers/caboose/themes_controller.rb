@@ -95,6 +95,13 @@ module Caboose
           when 'note_success_bg' then theme.note_success_bg = value
           when 'nav_lineheight_offset' then theme.nav_lineheight_offset = value
 
+          when 'mobile_header_height' then theme.mobile_header_height = value
+          when 'mobile_logo_width' then theme.mobile_logo_width = value
+          when 'mobile_logo_height' then theme.mobile_logo_height = value
+          when 'mobile_logo_top_padding' then theme.mobile_logo_top_padding = value
+          when 'constrain_footer' then theme.constrain_footer = value
+          when 'heading_base_font_size' then theme.heading_base_font_size = value
+
     	  end
     	end
     	resp.success = save && theme.save

@@ -933,7 +933,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :google_analytics_id  , :string ],
         [ :google_analytics_id2 , :string ],
         [ :auto_ga_js           , :boolean , { :default => false }],
-        [ :share_image , :attachment ]
+        [ :share_image , :attachment ],
+        [ :facebook_pixel, :text ]
       ],
       Caboose::StackableGroup => [       
         [ :name           , :string  ],
@@ -1088,7 +1089,13 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :note_error_bg, :string ],
         [ :note_loading_bg, :string ],
         [ :note_success_bg, :string ],
-        [ :nav_lineheight_offset, :string ]
+        [ :nav_lineheight_offset, :string ],
+        [ :mobile_header_height, :string ],
+        [ :mobile_logo_width, :string ],
+        [ :mobile_logo_height, :string ],
+        [ :mobile_logo_top_padding, :string ],
+        [ :constrain_footer, :string ],
+        [ :heading_base_font_size, :string ]
       ],
       Caboose::ThemeFile => [
         [ :filename, :string ],

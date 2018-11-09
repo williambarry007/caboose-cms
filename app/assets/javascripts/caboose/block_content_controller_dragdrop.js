@@ -401,7 +401,7 @@ BlockContentController.prototype = {
       }
 
       // child block of content area
-      if ( $(v).closest('.content_body').length > 0 ) {
+      if ( $(v).closest('.content_body').length > 0 && !$(v).parent().hasClass('nodrag') ) {
         var parent_id = $(v).parents("[id^='block_']").first().attr('id').replace('block_','');
         var is_last_child = $(v).next("[id^='block_']").length == 0 ? true : false;
         $(v).before($('<div/>')          
@@ -517,7 +517,7 @@ BlockContentController.prototype = {
     if (el.length > 0 && block_id.indexOf('constrain') < 0 && block_id.indexOf('full_width') < 0 && block_id.indexOf('_value_') < 0) {
       if ( el.attr('id').indexOf('_value') >= 0 || el.children('.drag_handle').length > 0 )
         return true;
-      if ( el.parents('.content_body').length > 0 ) {
+      if ( el.parents('.content_body').length > 0 && el.parents('.nodrag').length == 0 ) {
         $('#block_' + block_id + ' *').attr('onclick', '').unbind('click');
         el.prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_drag'      ).addClass('drag_handle'      ).append($('<span/>').addClass('ui-icon ui-icon-arrow-4'    )).click(function(e) { e.preventDefault(); e.stopPropagation();  }))
           .prepend($('<a/>').attr('id', 'handle_block_' + block_id + '_select'    ).addClass('select_handle'    ).append($('<span/>').addClass('ui-icon ui-icon-check'      )).click(function(e) { e.preventDefault(); e.stopPropagation(); that.select_block(block_id);    }))

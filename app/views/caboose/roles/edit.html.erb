@@ -3,12 +3,12 @@
 
 <p><input type='button' value='< Back' onclick="window.location='/admin/roles';" /></p>
 
-<div id="role_<%= @role.id %>_name"></div>
-<div id="role_<%= @role.id %>_parent_id"></div>
-<div id="role_<%= @role.id %>_description"></div>
+<p><div id="role_<%= @role.id %>_name"></div></p>
+<p><div id="role_<%= @role.id %>_parent_id"></div></p>
+<p><div id="role_<%= @role.id %>_description"></div></p>
 
 <h3>Members</h3>
-<% users = Caboose::User.where(:site_id => @site.id).reorder("last_name, first_name").all %>
+<% users = Caboose::User.where(:site_id => @site.id).reorder("last_name, first_name").limit(100) %>
 <% if users && users.count > 0 %>
   <div id='members'>
     <table class='data'>

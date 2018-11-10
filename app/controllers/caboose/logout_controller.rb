@@ -4,7 +4,6 @@ module Caboose
     # @route GET /logout
     def index
       Caboose.plugin_hook('before_logout')
-      
       logout_user
       elo = User.logged_out_user(@site.id)        
       login_user(elo)      

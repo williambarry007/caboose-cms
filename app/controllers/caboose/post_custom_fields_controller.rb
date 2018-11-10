@@ -50,10 +50,8 @@ module Caboose
     # @route PUT /admin/post-custom-fields/:id
     def admin_update      
       return if !user_is_allowed('postcustomfields', 'edit')
-      
       resp = Caboose::StdClass.new
       f = PostCustomField.find(params[:id])
-      
       save = true
       params.each do |name, value|    
         case name          

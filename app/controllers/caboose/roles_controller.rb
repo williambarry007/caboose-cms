@@ -24,7 +24,7 @@ module Caboose
     # @route GET /admin/roles/:id
     def edit
       return unless user_is_allowed('roles', 'edit')
-      @role = Role.find(params[:id])
+      @role = get_edit_role(params[:id], @site.id)
     end
     
     # @route POST /admin/roles
@@ -56,7 +56,7 @@ module Caboose
       return unless user_is_allowed('roles', 'edit')
       
       resp = StdClass.new     
-      role = Role.find(params[:id])
+      role = get_edit_role(params[:id], @site.id)
       
       save = true
       params.each do |name,value|
@@ -99,7 +99,7 @@ module Caboose
     # @route DELETE /admin/roles/:id
     def destroy
       return unless user_is_allowed('roles', 'delete')
-      @role = Role.find(params[:id])
+      @role = get_edit_role(params[:id], @site.id)
       @role.destroy
       render json: { 'redirect' => '/admin/roles' }
     end
@@ -107,8 +107,9 @@ module Caboose
     # @route POST /admin/roles/:id/permissions/:permission_id
     def add_permission
       return if !user_is_allowed('roles', 'edit')
-      if !RolePermission.where(:role_id => params[:id], :permission_id => params[:permission_id], ).exists?
-        RolePermission.create(:role_id => params[:id], :permission_id => params[:permission_id])
+      role = get_edit_role(params[:id], @site.id)
+      if role && !RolePermission.where(:role_id => role.id, :permission_id => params[:permission_id], ).exists?
+        RolePermission.create(:role_id => role.id, :permission_id => params[:permission_id])
       end
       render :json => true
     end
@@ -116,7 +117,8 @@ module Caboose
     # @route DELETE /admin/roles/:id/permissions/:permission_id
     def remove_permission
       return if !user_is_allowed('roles', 'edit')
-      RolePermission.where(:role_id => params[:id], :permission_id => params[:permission_id]).destroy_all        
+      role = get_edit_role(params[:id], @site.id)
+      RolePermission.where(:role_id => role.id, :permission_id => params[:permission_id]).destroy_all if role      
       render :json => true
     end
     
@@ -143,5 +145,16 @@ module Caboose
       end
       return arr
     end
+
+
+    private
+
+    def get_edit_role(role_id, site_id)
+      role = Role.find(role_id)
+      return role if role && (role.site_id == site_id || logged_in_user.is_super_admin?)
+      return nil
+    end
+
+
   end
 end

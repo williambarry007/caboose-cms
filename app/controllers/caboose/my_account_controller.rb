@@ -25,8 +25,10 @@ module Caboose
               resp.error = "Username must be at least three characters."
             elsif Caboose::User.where(:username => uname, :site_id => @site.id).where('id != ?',user.id).exists?
               resp.error = "That username is already taken."
+            elsif uname == 'superadmin'
+              resp.error = "Choose a different username."
             else
-              user.username    = uname
+              user.username = uname
             end
     	  	when "email"
             email = value.strip.downcase
@@ -35,9 +37,9 @@ module Caboose
             elsif Caboose::User.where(:email => email, :site_id => @site.id).where('id != ?',user.id).exists?
               resp.error = "That email address is already in the system."
             else
-              user.email    = email
+              user.email = email
             end
-    	  	when "phone"      then user.phone       = value
+    	  	when "phone"      then user.phone = value
 
           when "address"  then user.address   = value
           when "address2"  then user.address2   = value

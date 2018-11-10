@@ -37,7 +37,8 @@ module Caboose
     	    'sort'			     => 'last_name, first_name',
     		  'desc'			     => false,
     		  'base_url'		   => '/admin/users',
-    		  'use_url_params' => false
+    		  'use_url_params' => false,
+          'additional_where' => [ "(site_id = #{@site.id})" ]
     	})    	    	      
     	render :json => {
     	  :pager => pager,
@@ -253,6 +254,8 @@ module Caboose
               resp.error = "Username must be at least three characters."
             elsif Caboose::User.where(:username => uname, :site_id => @site.id).where('id != ?',user.id).exists?
               resp.error = "That username is already taken."
+            elsif uname == 'superadmin'
+              resp.error = "Choose a different username."
             else
               user.username    = uname
             end

@@ -11,16 +11,15 @@ module Caboose
     # @route POST /admin/sites/:site_id/domains
     def admin_add
       return if !user_is_allowed('domains', 'edit')
-      
-      resp = Caboose::StdClass.new      
+      return if params[:site_id] != @site.id.to_s && !@site.is_master
+      resp = Caboose::StdClass.new
       d = Domain.where(:domain => params[:domain]).first
-            
       if d && d.site_id != params[:site_id]
         resp.error = "That domain is already associated with another site."
       elsif d && d.site_id == params[:site_id]
         resp.refresh = true
       elsif d.nil?
-        primary = Domain.where(:site_id => params[:site_id]).count == 0        
+        primary = Domain.where(:site_id => params[:site_id]).count == 0
         d = Domain.create(:site_id => params[:site_id], :domain => params[:domain], :primary => primary)
         resp.refresh = true
       end
@@ -30,10 +29,9 @@ module Caboose
     # @route PUT /admin/sites/:site_id/domains/:id
     def admin_update
       return if !user_is_allowed('domains', 'edit')
-
+      return if params[:site_id] != @site.id.to_s && !@site.is_master
       resp = StdClass.new     
-      d = Domain.find(params[:id])
-    
+      d = get_edit_domain(params[:id], @site.id)
       save = true
       params.each do |name,value|
         case name
@@ -51,7 +49,6 @@ module Caboose
             end
     	  end
     	end
-    	
     	resp.success = save && d.save
     	render :json => resp
     end        
@@ -59,17 +56,19 @@ module Caboose
     # @route DELETE /admin/sites/:site_id/domains/:id
     def admin_delete
       return if !user_is_allowed('sites', 'delete')
-      Domain.find(params[:id]).destroy
+      return if params[:site_id] != @site.id.to_s && !@site.is_master
+      domain = get_edit_domain(params[:id], @site.id)
+      domain.destroy if domain
       render :json => { 'refresh' => "/admin/sites/#{params[:site_id]}" }
     end
 
     # @route PUT /admin/sites/:site_id/domains/:id/set-primary
     def admin_set_primary
       return if !user_is_allowed('domains', 'edit')
+      return if params[:site_id] != @site.id.to_s && !@site.is_master
       resp = StdClass.new     
-      d = Domain.find(params[:id])
+      d = get_edit_domain(params[:id], @site.id)
       save = true
-      #d.primary = value
       Domain.where(:site_id => params[:site_id]).all.each do |d2|
         d2.primary = d2.id == d.id ? true : false
         d2.save
@@ -77,6 +76,14 @@ module Caboose
       resp.success = save && d.save
       render :json => resp
     end 
+
+    private
+
+    def get_edit_domain(domain_id, site_id)
+      domain = Domain.find(domain_id)
+      return domain if domain && (domain.site_id == site_id || logged_in_user.is_super_admin?)
+      return nil
+    end
             
   end
 end

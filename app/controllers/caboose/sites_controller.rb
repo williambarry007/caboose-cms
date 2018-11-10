@@ -46,6 +46,10 @@ module Caboose
     # @route GET /admin/sites/json
     def admin_json
       return if !user_is_allowed('sites', 'view')
+      if !@site.is_master
+        @error = "You are not allowed to view sites."
+        render :file => 'caboose/extras/error' and return
+      end
       h = {        
         'name'              => '',
         'description'       => '',
@@ -68,14 +72,14 @@ module Caboose
     # @route GET /admin/sites/:id/json
     def admin_json_single
       return if !user_is_allowed('sites', 'view')
-      site = Site.find(params[:id])
+      site = get_edit_site(params[:id], @site.id)
       render :json => site.as_json(:include => :domains)      
     end
     
     # @route GET /admin/sites/new
     def admin_new
       return if !user_is_allowed('sites', 'add')
-      if (@site.id.to_s != params[:id] && !@site.is_master)
+      if !@site.is_master
         @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
       end
@@ -299,6 +303,7 @@ module Caboose
     # @route GET /admin/sites/:id/:field-options    
     def options
       return if !user_is_allowed('sites', 'view')
+      render :json => { :error => "You are not allowed to manage sites." } and return if !@site.is_master
       case params[:field]
         when nil
           options = logged_in_user.is_super_admin? ? Site.reorder('name').all.collect { |s| { 'value' => s.id, 'text' => s.name }} : []
@@ -310,6 +315,15 @@ module Caboose
           end
       end
       render :json => options
+    end
+
+
+    private
+
+    def get_edit_site(s_id, site_id)
+      site = Site.find(s_id)
+      return site if site && (site.id == site_id || logged_in_user.is_super_admin?)
+      return nil
     end
 
   end

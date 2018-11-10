@@ -12,13 +12,6 @@ module Caboose
     def admin_add
       body = JSON.parse(request.raw_post, {symbolize_names: true})
       Caboose.log(body)
-      # if body[:Records]
-      #   records = body[:Records]
-      #   # if body[:Type] && body[:Type] == "SubscriptionConfirmation"
-      #   #   Caboose.log("SNS Subscription SubscribeURL\n#{body[:SubscribeURL]}")
-      #   if records['eventSource'] == "aws:s3"
-      #     msg = JSON.parse(body[:Message])
-      #     if msg['Records']
       if body && body[:Records]
         body[:Records].each do |r|
           if r[:eventName] && r[:eventName].starts_with?('ObjectCreated')          
@@ -36,9 +29,6 @@ module Caboose
           end                  
         end
       end
-      #     end
-      #   end
-      # end
       render :json => true
     end
     

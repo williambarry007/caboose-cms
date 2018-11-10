@@ -3,11 +3,6 @@ module Caboose
     
     helper :application
      
-    # @route GET /posts
-    # def index
-    # 	@posts = Post.where(:published => true, :site_id => @site.id).limit(10).reorder('created_at DESC')
-    # end
-    
     # @route GET /posts/:id
     # @route GET /posts/:year/:month/:day/:slug
     def show
@@ -29,7 +24,6 @@ module Caboose
       @editing = false
       @preview = false
       @post = Caboose.plugin_hook('post_content', @post)
-   #   @editmode = !params['edit'].nil? && user.is_allowed('posts', 'edit') ? true : false  
     end
   
     #=============================================================================
@@ -46,17 +40,18 @@ module Caboose
     # @route GET /admin/posts/json
     def admin_json
       return if !user_is_allowed('posts', 'view')
-        
       pager = PageBarGenerator.new(params, {
           'site_id'     => @site.id,
           'title_like'  => '',
-      },{
+      },
+      {
           'model'       => 'Caboose::Post',
           'sort'        => 'created_at',
           'desc'        => true,
           'base_url'    => '/admin/posts',
           'items_per_page' => 50,
-          'use_url_params' => false
+          'use_url_params' => false,
+          'additional_where' => [ "(site_id = #{@site.id})" ]
       })
       render :json => {
         :pager => pager,
@@ -67,21 +62,21 @@ module Caboose
     # @route GET /admin/posts/:id/json
     def admin_json_single
       return if !user_is_allowed('posts', 'edit')    
-      @post = Post.find(params[:id])
+      @post = get_edit_post(params[:id], @site.id)
       render :json => @post
     end
     
     # @route GET /admin/posts/:id/preview
     def admin_edit_preview
       return if !user_is_allowed('posts', 'edit')    
-      @post = Post.find(params[:id])      
+      @post = get_edit_post(params[:id], @site.id)     
       render :layout => 'caboose/admin'
     end
 
     # @route GET /admin/posts/:id/publish
     def admin_publish
       return unless user_is_allowed('posts', 'edit')
-      post = Post.find(params[:id])
+      post = get_edit_post(params[:id], @site.id)
       post.publish
       redirect_to "/admin/posts/#{post.id}/content"
     end
@@ -89,7 +84,7 @@ module Caboose
     # @route GET /admin/posts/:id/revert
     def admin_revert
       return unless user_is_allowed('posts', 'edit')
-      post = Post.find(params[:id])
+      post = get_edit_post(params[:id], @site.id)
       post.revert
       redirect_to "/admin/posts/#{post.id}/content"
     end
@@ -97,7 +92,7 @@ module Caboose
     # @route GET /admin/posts/:id/content
     def admin_edit_content
       return if !user_is_allowed('posts', 'edit')    
-      @post = Post.find(params[:id])
+      @post = get_edit_post(params[:id], @site.id)
       if @post.body
         @post.preview = @post.body
         @post.body = nil
@@ -116,7 +111,7 @@ module Caboose
     # @route GET /admin/posts/:id/preview-post
     def admin_preview_post
       return if !user_is_allowed('posts', 'edit')    
-      @post = Post.find(params[:id])
+      @post = get_edit_post(params[:id], @site.id)
       @editing = true
       @preview = true
     end
@@ -124,7 +119,7 @@ module Caboose
     # @route GET /admin/posts/:id/categories
     def admin_edit_categories
       return if !user_is_allowed('posts', 'edit')    
-      @post = Post.find(params[:id])
+      @post = get_edit_post(params[:id], @site.id)
       @categories = PostCategory.where(:site_id => @site.id).reorder(:name).all
       if @categories.nil? || @categories.count == 0
         PostCategory.create(:site_id => @site.id, :name => 'General News')
@@ -136,14 +131,14 @@ module Caboose
     # @route GET /admin/posts/:id/layout
     def admin_edit_layout
       return unless user_is_allowed('posts', 'edit')      
-      @post = Post.find(params[:id])
+      @post = get_edit_post(params[:id], @site.id)
       render :layout => 'caboose/admin'
     end
     
     # @route GET /admin/posts/:id/delete
     def admin_delete_form
       return if !user_is_allowed('posts', 'delete')
-      @post = Post.find(params[:id])
+      @post = get_edit_post(params[:id], @site.id)
       render :layout => 'caboose/admin'
     end
     
@@ -151,7 +146,7 @@ module Caboose
     # @route GET /admin/posts/:id/edit
     def admin_edit_general
       return if !user_is_allowed('posts', 'edit')    
-      @post = Post.find(params[:id])
+      @post = get_edit_post(params[:id], @site.id)
       @post.verify_custom_field_values_exist
       render :layout => 'caboose/admin'
     end
@@ -160,8 +155,9 @@ module Caboose
     def admin_update_layout
       return unless user_is_allowed('posts', 'edit')      
       bt = BlockType.find(params[:block_type_id])
-      Block.where(:post_id => params[:id]).destroy_all
-      Block.create(:post_id => params[:id], :block_type_id => params[:block_type_id], :name => bt.name)
+      post = get_edit_post(params[:id], @site.id)
+      Block.where(:post_id => post.id).destroy_all if post
+      Block.create(:post_id => post.id, :block_type_id => params[:block_type_id], :name => bt.name) if post
       resp = Caboose::StdClass.new({
         'redirect' => "/admin/posts/#{params[:id]}/content"
       })
@@ -171,10 +167,8 @@ module Caboose
     # @route PUT /admin/posts/:id
     def admin_update      
       return if !user_is_allowed('posts', 'edit')
-      
       resp = Caboose::StdClass.new({'attributes' => {}})
-      post = Post.find(params[:id])
-      
+      post = get_edit_post(params[:id], @site.id)
       save = true
       params.each do |name, value|    
         case name                      
@@ -198,14 +192,12 @@ module Caboose
     
     # @route POST /admin/posts/:id/image
     def admin_update_image
-      return if !user_is_allowed('posts', 'edit')
-                 
+      return if !user_is_allowed('posts', 'edit')  
       resp = Caboose::StdClass.new
-      post = Post.find(params[:id])
+      post = get_edit_post(params[:id], @site.id)
       post.image = params[:image]            
       resp.success = post.save
       resp.attributes = { 'image' => { 'value' => post.image.url(:thumb) }}
-      
       render :text => resp.to_json
     end
     
@@ -220,65 +212,61 @@ module Caboose
     # @route POST /admin/posts
     def admin_add
       return if !user_is_allowed('posts', 'add')
-  
       resp = Caboose::StdClass.new({
         'error' => nil,
         'redirect' => nil
       })
-    
       post = Post.new
       post.site_id = @site.id
       post.title = params[:title]                  
       post.published = false
-  
-      if post.title == nil || post.title.length == 0
+      if post.title.blank?
         resp.error = 'A title is required.'      
       else
         post.save        
         post.set_slug_and_uri(post.title)                
         resp.redirect = "/admin/posts/#{post.id}"
       end
-      
       render :json => resp
     end
     
     # @route GET /admin/posts/:id/add-to-category
     def admin_add_to_category
       return if !user_is_allowed('posts', 'edit')
-      
-      post_id = params[:id]
+      post = get_edit_post(params[:id], @site.id)
       cat_id = params[:post_category_id]
-      
-      if !PostCategoryMembership.exists?(:post_id => post_id, :post_category_id => cat_id)
-        PostCategoryMembership.create(:post_id => post_id, :post_category_id => cat_id)
+      if post && !PostCategoryMembership.exists?(:post_id => post.id, :post_category_id => cat_id)
+        PostCategoryMembership.create(:post_id => post.id, :post_category_id => cat_id)
       end
-  
       render :json => true      
     end
     
     # @route GET /admin/posts/:id/remove-from-category
     def admin_remove_from_category
       return if !user_is_allowed('posts', 'edit')
-      
-      post_id = params[:id]
+      post = get_edit_post(params[:id], @site.id)
       cat_id = params[:post_category_id]
-      
-      if PostCategoryMembership.exists?(:post_id => post_id, :post_category_id => cat_id)
-        PostCategoryMembership.where(:post_id => post_id, :post_category_id => cat_id).destroy_all
+      if post && PostCategoryMembership.exists?(:post_id => post.id, :post_category_id => cat_id)
+        PostCategoryMembership.where(:post_id => post.id, :post_category_id => cat_id).destroy_all
       end
-  
       render :json => true      
     end
     
     # @route DELETE /admin/posts/:id
     def admin_delete
       return if !user_is_allowed('posts', 'edit')
-      
-      post_id = params[:id]
-      PostCategoryMembership.where(:post_id => post_id).destroy_all
-      Post.where(:id => post_id).destroy_all
-  
+      post = get_edit_post(params[:id], @site.id)
+      PostCategoryMembership.where(:post_id => post.id).destroy_all if post
+      Post.where(:id => post.id).destroy_all if post
       render :json => { 'redirect' => '/admin/posts' }      
+    end
+
+    private
+
+    def get_edit_post(post_id, site_id)
+      post = Post.find(post_id)
+      return post if post && (post.site_id == site_id || logged_in_user.is_super_admin?)
+      return nil
     end
     
   end

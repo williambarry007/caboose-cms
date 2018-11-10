@@ -11,37 +11,34 @@ module Caboose
       end      
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       @modal = params[:modal].nil? ? false : params[:modal]
+      @page.title = "Login" if @page
       redirect_to @return_url and return if logged_in?
-      render :layout => Caboose::login_layout
+      render :layout => "caboose/application"
     end
     
     # @route POST /login
     def login      
       resp = StdClass.new('error' => '', 'redirect' => '')
       return_url = params[:return_url].nil? ? "/" : params[:return_url]
-      
       if logged_in?
         resp.redirect = return_url
+      elsif params[:username].blank?
+        resp.error = "Please provide a username."
+      elsif params[:password].blank?
+        resp.error = "Please provide a password."
       else
         username = params[:username].downcase
         password = params[:password]
-                           
-        if username.nil? || password.nil? || password.strip.length == 0
-          resp.error = "Invalid credentials"
-        else          
-          bouncer_class = Caboose::authenticator_class.constantize
-          bouncer = bouncer_class.new
-          login_resp = bouncer.authenticate(username, password, @site, request)
-          
-          if login_resp.error
-            resp.error = login_resp.error
-          else
-            remember = params[:remember] && (params[:remember] == 1 || params[:remember] == "1")            
-            login_user(login_resp.user, remember)            
-            #resp.redirect = return_url
-            resp.redirect = Caboose.plugin_hook('login_success', return_url, login_resp.user)
-            resp.modal = false                        
-          end
+        bouncer_class = Caboose::authenticator_class.constantize
+        bouncer = bouncer_class.new
+        login_resp = bouncer.authenticate(username, password, @site, request)
+        if login_resp.error
+          resp.error = login_resp.error
+        else
+          remember = params[:remember] && (params[:remember] == 1 || params[:remember] == "1")            
+          login_user(login_resp.user, remember)
+          resp.redirect = Caboose.plugin_hook('login_success', return_url, login_resp.user)
+          resp.modal = false                        
         end
       end
       render :json => resp      
@@ -51,29 +48,28 @@ module Caboose
     def forgot_password_form
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       @modal = params[:modal].nil? ? false : params[:modal]
-      redirect_to @return_url if logged_in?
-      render :layout => Caboose::login_layout
+      redirect_to @return_url and return if logged_in?
+      @page.title = "Forgot Password" if @page
+      render :layout => "caboose/application"
     end
         
     # @route POST /login/forgot-password
     def send_reset_email
       @return_url = params[:return_url].nil? ? "/" : params[:return_url]
       redirect_to @return_url if logged_in?
-    
       resp = Caboose::StdClass.new		      		
       username = params[:username]
-      
-		  if username.nil? || username.strip.length == 0       
-		  	resp.error = "You must enter a username."
+		  if username.blank?
+		  	resp.error = "You must enter a username or email address."
         render :json => resp		  	
 		  	return
 		  end
 		  
-		  bob = Caboose::User.where(:site_id => @site.id, :username => username).first
-		  bob = Caboose::User.where(:site_id => @site.id, :email    => username).first if bob.nil?		  
+		  bob = Caboose::User.where(:site_id => @site.id, :username => username.strip.downcase).first
+		  bob = Caboose::User.where(:site_id => @site.id, :email    => username.strip.downcase).first if bob.nil?		  
 		  
 		  if bob.nil?		
-			  resp.error = "The given email or username is not in our system."
+			  resp.error = "The given username or email address does not exist."
 			  render :json => resp
 			  return
 			end
@@ -85,7 +81,7 @@ module Caboose
 		  		  		  
 		  LoginMailer.configure_for_site(@site.id).forgot_password_email(bob).deliver		  
 		  		  
-		  resp.success = "We just sent you an email. The reset link inside is good for 3 days."
+		  resp.success = "Please check your email for a link to reset your password. This link is good for 3 days."
 		  render :json => resp
 		end
 	
@@ -98,7 +94,8 @@ module Caboose
 		  end
       @reset_id = params[:reset_id]      
       @user = Caboose::User.user_for_reset_id(@reset_id)
-      render :layout => Caboose::login_layout
+      @page.title = "Reset Password" if @page
+      render :layout => "caboose/application"
     end
     
     # @route POST /login/reset-password
@@ -112,17 +109,16 @@ module Caboose
 	    pass1    = params[:pass1]
 	    pass2    = params[:pass2]
 	    
-	    if reset_id.nil? || reset_id.strip.length == 0
-	      resp.error = "No reset ID was given."
+	    if reset_id.blank?
+	      resp.error = "This password reset link is invalid."
 	    else
 	      user = Caboose::User.user_for_reset_id(reset_id)
-	    	
 	    	if user.nil?
-	    	  resp.error = "The given reset ID is invalid."
-	    	elsif pass1 != pass2
-	    		resp.error = "Passwords don't match."
+	    	  resp.error = "This password reset link is invalid."
 	    	elsif pass1.length < 8
-	    	  resp.error = "Passwords must be at least 8 characters"
+	    	  resp.error = "Passwords must be at least 8 characters."
+        elsif pass1 != pass2
+          resp.error = "Your passwords don't match."
 	    	else          
 	    	  user.password = Digest::SHA1.hexdigest(Caboose::salt + pass1)
 	    	  user.password_reset_id = ''

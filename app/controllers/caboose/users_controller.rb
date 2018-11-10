@@ -12,7 +12,6 @@ module Caboose
     # Non-admin actions
     #===========================================================================
     
-    
   
     #===========================================================================
     # Admin actions
@@ -27,7 +26,6 @@ module Caboose
     # @route GET /admin/users/json
     def admin_json
       return if !user_is_allowed('users', 'view')
-      
       pager = PageBarGenerator.new(params, {
           'site_id'         => @site.id,
     		  'first_name_like' => '',
@@ -50,7 +48,7 @@ module Caboose
     # @route GET /admin/users/:id/json
     def admin_json_single
       return if !user_is_allowed('users', 'view')    
-      u = User.find(params[:id])      
+      u = get_edit_user(params[:id], @site.id)
       render :json => u.as_json(:include => :roles)
     end
     
@@ -58,7 +56,7 @@ module Caboose
     def admin_stripe_json_single
       return if !user_is_allowed('users', 'view')
       sc = @site.store_config
-      u = User.find(params[:id])
+      u = get_edit_user(params[:id], @site.id)
       render :json => {
         :stripe_key     => sc.stripe_publishable_key.strip,        
         :customer_id    => u.stripe_customer_id,                   
@@ -83,17 +81,19 @@ module Caboose
     # @route GET /admin/users/:id
     def admin_edit
       return if !user_is_allowed('users', 'edit')
-      @edituser = User.find(params[:id])    
+      @edituser = get_edit_user(params[:id], @site.id)
       @all_roles = Role.tree(@site.id)
-      @roles = Role.roles_with_user(@edituser.id)
+      @roles = Role.roles_with_user(@edituser.id) if @edituser
+      redirect_to '/admin/users' if @edituser.nil?
     end
     
     # @route GET /admin/users/:id/roles
     def admin_edit_roles
       return if !user_is_allowed('users', 'edit')
-      @edituser = User.find(params[:id])    
+      @edituser = get_edit_user(params[:id], @site.id)
       @all_roles = Role.tree(@site.id)
-      @roles = Role.roles_with_user(@edituser.id)
+      @roles = Role.roles_with_user(@edituser.id) if @edituser
+      redirect_to '/admin/users' if @edituser.nil?
     end
 
     # @route GET /admin/users/exports/:id/json    
@@ -123,13 +123,14 @@ module Caboose
     # @route GET /admin/users/:id/payment-method
     def admin_edit_payment_method
       return if !user_is_allowed('users', 'edit')
-      @edituser = User.find(params[:id])          
+      @edituser = get_edit_user(params[:id], @site.id)
     end
     
     # @route GET /admin/users/:id/password
     def admin_edit_password
       return if !user_is_allowed('users', 'edit')
-      @edituser = User.find(params[:id])
+      @edituser = get_edit_user(params[:id], @site.id)
+      redirect_to '/admin/users' if @edituser.nil?
     end
             
     def random_string(length)
@@ -140,7 +141,8 @@ module Caboose
     # @route GET /admin/users/:id/delete
     def admin_delete_form
       return if !user_is_allowed('users', 'edit')
-      @edituser = User.find(params[:id])
+      @edituser = get_edit_user(params[:id], @site.id)
+      redirect_to '/admin/users' if @edituser.nil?
     end
           
     # @route POST /admin/users/import
@@ -237,7 +239,7 @@ module Caboose
       return if !user_is_allowed('users', 'edit')
 
       resp = StdClass.new     
-      user = User.find(params[:id])
+      user = get_edit_user(params[:id], @site.id)
     
       save = true
       params.each do |name,value|
@@ -318,18 +320,12 @@ module Caboose
     	resp.success = save && user.save
     	render json: resp
     end
-    
-    # @route POST /admin/users/:id/update-pic
-    def admin_update_pic
-      @edituser = User.find(params[:id])
-      @new_value = "Testing"
-    end
 
     # @route DELETE /admin/users/bulk
     def admin_bulk_delete
       return unless user_is_allowed_to 'delete', 'users'
       params[:model_ids].each do |user_id|
-        user = User.where(:id => user_id).first
+        user = get_edit_user(user_id, @site.id)
         user.destroy if user
       end
       resp = Caboose::StdClass.new('success' => true)
@@ -339,9 +335,8 @@ module Caboose
     # @route DELETE /admin/users/:id
     def admin_delete
       return if !user_is_allowed('users', 'delete')
-      user = User.find(params[:id])
+      user = get_edit_user(params[:id], @site.id)
       user.destroy
-      
       resp = StdClass.new({
         'redirect' => '/admin/users'
       })
@@ -351,8 +346,10 @@ module Caboose
     # @route POST /admin/users/:id/roles/:role_id
     def admin_add_to_role
       return if !user_is_allowed('users', 'edit')
-      if !RoleMembership.where(:user_id => params[:id], :role_id => params[:role_id]).exists?
-        RoleMembership.create(:user_id => params[:id], :role_id => params[:role_id])
+      user = get_edit_user(params[:id], @site.id)
+      role = Role.where(:id => params[:role_id], :site_id => @site.id).first
+      if user && role && !RoleMembership.where(:user_id => user.id, :role_id => role.id).exists?
+        RoleMembership.create(:user_id => user.id, :role_id => role.id)
       end
       render :json => true
     end
@@ -360,7 +357,11 @@ module Caboose
     # @route DELETE /admin/users/:id/roles/:role_id
     def admin_remove_from_role
       return if !user_is_allowed('users', 'edit')
-      RoleMembership.where(:user_id => params[:id], :role_id => params[:role_id]).destroy_all        
+      user = get_edit_user(params[:id], @site.id)
+      role = Role.where(:id => params[:role_id], :site_id => @site.id).first
+      if user && role
+        RoleMembership.where(:user_id => user.id, :role_id => role.id).destroy_all
+      end
       render :json => true
     end
     
@@ -377,33 +378,18 @@ module Caboose
     # @route GET /admin/users/:id/su
     def admin_su
       return if !user_is_allowed('users', 'sudo')
-      user = User.find(params[:id])
-                                  
-      ## See if we're on the default domain               
-      #d = Caboose::Domain.where(:domain => request.host_with_port).first      
-      #      
-      #if d.primary == true
-      #  logout_user
-      #  login_user(user, false) # Login the new user      
-      #  redirect_to "/"
-      #end
-      #         
-      ## Set a random token for the user
-      #user.token = (0...20).map { ('a'..'z').to_a[rand(26)] }.join
-      #user.save
-      #      
-      #redirect_to "http://#{d.site.primary_domain.domain}/admin/users/#{params[:id]}/su/#{user.token}"
-                                          
-      logout_user
-      login_user(user, false) # Login the new user      
-      redirect_to "/"                           
+      user = get_edit_user(params[:id], @site.id)
+      if user                               
+        logout_user
+        login_user(user, false)   
+        redirect_to "/"
+      end                        
     end
     
     # @route GET /admin/users/:id/su/:token
     def admin_su_token
       return if params[:token].nil?
-      user = User.find(params[:id])
-      
+      user = get_edit_user(params[:id], @site.id)
       token = params[:token]      
       if user.token == params[:token]
         if logged_in? || logged_in_user.id == User::LOGGED_OUT_USER_ID
@@ -419,6 +405,14 @@ module Caboose
       else
         render :json => false     
       end                    
+    end
+
+    private
+
+    def get_edit_user(user_id, site_id)
+      user = User.find(user_id)
+      return user if user && (user.site_id == site_id || logged_in_user.is_super_admin?)
+      return nil
     end
     
   end

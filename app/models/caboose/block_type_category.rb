@@ -3,11 +3,13 @@ class Caboose::BlockTypeCategory < ActiveRecord::Base
   self.table_name = "block_type_categories"
 
   belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockTypeCategory'  
-  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockTypeCategory', :dependent => :destroy, :order => :name
+  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockTypeCategory', :dependent => :destroy, :order => :sort_order
   has_many :block_types
   attr_accessible :id,
     :parent_id,
-    :name 
+    :name,
+    :sort_order,
+    :show_in_sidebar
     
   def self.layouts
     self.where("name = ? and parent_id is null", 'Layouts').reorder(:name).all

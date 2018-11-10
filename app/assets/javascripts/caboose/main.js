@@ -12,20 +12,20 @@ var Caboose = function() {
 	self.initialize = function() {
 		self.loggedIn = window.loggedIn || false;
 		
-		$('a[href="/register"], [caboose=register]').click(function(event) {
-			event.preventDefault();
-			self.register( $(window).width() < 1024 );
-		});
+		// $('a[href="/register"], [caboose=register]').click(function(event) {
+		// 	event.preventDefault();
+		// 	self.register( $(window).width() < 1024 );
+		// });
 		
-		$('a[href="/login"], [caboose=login]').click(function(event) {
-			event.preventDefault();
-			self.login( $(window).width() < 1024 );
-		});
+		// $('a[href="/login"], [caboose=login]').click(function(event) {
+		// 	event.preventDefault();
+		// 	self.login( $(window).width() < 1024 );
+		// });
 		
-		$('a[href="/logout"], [caboose=logout]').click(function(event) {
-			event.preventDefault();
-			self.logout( $(window).width() < 1024 );
-		});
+		// $('a[href="/logout"], [caboose=logout]').click(function(event) {
+		// 	event.preventDefault();
+		// 	self.logout( $(window).width() < 1024 );
+		// });
 	};
 	
 	//
@@ -69,18 +69,19 @@ var Caboose = function() {
 	//
 	
 	self.login = function() {
-		if ($.browser.mobile) window.location.href = '/login?return_url=' + window.location.pathname;
+		window.location = '/login?return_url=' + window.location.pathname;
+		// if ($.browser.mobile) window.location.href = '/login?return_url=' + window.location.pathname;
 		
-		$.colorbox({
-			href: '/login?return_url=' + window.location.pathname,
-			iframe: true,
-			innerWidth: 200,
-			innerHeight: 50,
-			scrolling: false,
-			transition: 'fade',
-			closeButton: false,
-			opacity: 0.50
-		});
+		// $.colorbox({
+		// 	href: '/login?return_url=' + window.location.pathname,
+		// 	iframe: true,
+		// 	innerWidth: 200,
+		// 	innerHeight: 50,
+		// 	scrolling: false,
+		// 	transition: 'fade',
+		// 	closeButton: false,
+		// 	opacity: 0.50
+		// });
 	};
 	
 	//
@@ -96,18 +97,18 @@ var Caboose = function() {
 	//
 	
 	self.register = function(callback) {
-		if ($.browser.mobile) window.location.href = '/register?return_url=' + window.location.pathname;
+		window.location = '/register?return_url=' + window.location.pathname;
 		
-		$.colorbox({
-			href: '/register?return_url=' + window.location.pathname,
-			iframe: true,
-			innerWidth: 200,
-			innerHeight: 50,
-			scrolling: false,
-			transition: 'fade',
-			closeButton: false,
-			opacity: 0.50
-		});
+		// $.colorbox({
+		// 	href: '/register?return_url=' + window.location.pathname,
+		// 	iframe: true,
+		// 	innerWidth: 200,
+		// 	innerHeight: 50,
+		// 	scrolling: false,
+		// 	transition: 'fade',
+		// 	closeButton: false,
+		// 	opacity: 0.50
+		// });
 	};
 	
 	// Init and return

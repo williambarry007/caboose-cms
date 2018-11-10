@@ -1,0 +1,43 @@
+<h1>Edit Block Type Category</h1>
+
+<p><div id='blocktypecategory_<%= @btc.id %>_name' ></div></p>
+<p><div id='blocktypecategory_<%= @btc.id %>_parent_id' ></div></p>
+<p><div id='blocktypecategory_<%= @btc.id %>_sort_order' ></div></p>
+<p><div id='blocktypecategory_<%= @btc.id %>_show_in_sidebar' ></div></p>
+
+<h5>Blocks</h5>
+<ul>
+<% Caboose::BlockType.where(:block_type_category_id => @btc.id).order(:id).all.each do |bt| %>
+<li><a href="/admin/block-types/<%= bt.id %>"><%= bt.description %></a></li>
+<% end %>
+</ul>
+<br />
+
+<a href="/admin/block-type-categories" class="caboose-btn">< Back</a>
+
+<% content_for :caboose_css do %>
+<style type='text/css'>
+
+</style>
+<% end %>
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'BlockTypeCategory',
+    id: <%= @btc.id %>,
+    update_url: '/admin/block-type-categories/<%= @btc.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'name' , nice_name: 'Name', type: 'text'     , value: <%= raw Caboose.json(@btc.name) %>, width: 400 },
+      { name: 'parent_id' , nice_name: 'Parent', type: 'text'     , value: <%= raw Caboose.json(@btc.parent_id) %>, width: 400 },
+      { name: 'sort_order' , nice_name: 'Sort Order', type: 'text'     , value: <%= raw Caboose.json(@btc.sort_order) %>, width: 400 },
+      { name: 'show_in_sidebar' , nice_name: 'Show in Sidebar', type: 'checkbox'     , value: <%= raw Caboose.json(@btc.show_in_sidebar) %>, width: 400 }
+    ]    
+  });  
+});
+
+</script>
+<% end %>

@@ -1,0 +1,23 @@
+<h1>Block Type Categories</h1>
+
+<ul>
+	<% @btc.each do |btc| %>
+		<li>
+			<a href="/admin/block-type-categories/<%= btc.id %>"><%= btc.name %></a>
+			<ul>
+				<% btc.children.each do |btc2| %>
+					<li>
+						<a href="/admin/block-type-categories/<%= btc2.id %>"><%= btc2.name %></a>
+						<ul>
+							<% btc2.children.each do |btc3| %>
+								<li>
+									<a href="/admin/block-type-categories/<%= btc3.id %>"><%= btc3.name %></a>
+								</li>
+							<% end %>
+						</ul>
+					</li>
+				<% end %>
+			</ul>
+		</li>
+	<% end %>
+</ul>

@@ -58,12 +58,11 @@ module Caboose
         asset
         return
       end
-      
 
       user = logged_in_user      
       if !user.is_allowed(page, 'view')                
         if user.id == User.logged_out_user_id(@site.id)
-          redirect_to "/modal/login?return_url=" + URI.encode(request.fullpath)		  		
+          redirect_to "/login?return_url=" + URI.encode(request.fullpath)		  		
           return
         else
           # go to 404 page
@@ -81,11 +80,7 @@ module Caboose
       @user = user
       @editing = false
       @preview = false
-   #   @editmode = !params['edit'].nil? && user.is_allowed('pages', 'edit') ? true : false
-   #   @crumb_trail = Caboose::Page.crumb_trail(@page)
-   #   @subnav = Caboose::Page.subnav(@page, session['use_redirect_urls'], @user)
-      #@subnav.links = @tasks.collect {|href, task| {'href' => href, 'text' => task, 'is_current' => uri == href}}
-  
+
     end
     
     def asset   

@@ -1,11 +1,34 @@
-
 module Caboose
   class BlockTypeCategoriesController < ApplicationController
-    
+
+    # @route GET /admin/block-type-categories
+    def admin_index
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?
+      @btc = BlockTypeCategory.where(:parent_id => nil).order(:sort_order).all
+      render :layout => 'caboose/admin'
+    end
+
     # @route GET /admin/block-type-categories/tree-options
     def admin_tree_options
       return unless user_is_allowed('pages', 'edit')
       render :json => BlockTypeCategory.tree
+    end
+
+    # @route GET /admin/block-type-categories/:id
+    def admin_edit
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?
+      @btc = BlockTypeCategory.find(params[:id])
+      render :layout => 'caboose/admin'
+    end
+
+    # @route PUT /admin/block-type-categories/:id
+    def admin_update
+      render :json => false and return if !logged_in_user.is_super_admin?
+    end
+
+    # @route DELETE /admin/block-type-categories/:id
+    def admin_delete
+      render :json => false and return if !logged_in_user.is_super_admin?
     end
 
     # @route GET /admin/block-type-categories/:id/options

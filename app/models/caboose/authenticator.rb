@@ -51,12 +51,12 @@ module Caboose
           resp.user = user
           ll.success = true
         else
-          resp.error = "Invalid credentials"
+          resp.error = "Your username or password is incorrect."
           ll.success = false
         end
         
       else
-        resp.error = "Invalid credentials"
+        resp.error = "Your username or password is incorrect."
         ll.success = false
       end
       

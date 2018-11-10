@@ -1,49 +1,56 @@
+<div class="caboose-login-wrapper">
+  <div class="caboose-login-form-wrapper">
+    <h5>Create an Account</h5>
+    <form action="/register" method="POST" id="caboose-register-form">
+      <div class="field">
+        <label for="caboose-register-firstname">First Name</label>
+        <input type="text" name="first_name" id="caboose-register-firstname" />
+      </div>
+      <div class="field">
+        <label for="caboose-register-lastname">Last Name</label>
+        <input type="text" name="last_name" id="caboose-register-lastname" />
+      </div>
+      <div class="field">
+        <label for="caboose-register-email">Email Address</label>
+        <input type="email" name="email" id="caboose-register-email" />
+      </div>
+      <div class="field">
+        <label for="caboose-register-password1">Password</label>
+        <input type="password" name="pass1" id="caboose-register-password1" />
+      </div>
+      <div class="field">
+        <label for="caboose-register-password2">Confirm Password</label>
+        <input type="password" name="pass2" id="caboose-register-password2" />
+      </div>
+      <input type="hidden" name="return_url" value="<%= @return_url %>" />
+      <div class="caboose-links">
+        <a href="/login?return_url=<%= @return_url %>">Login to an existing account</a>
+        <a href="/login/forgot-password?return_url=<%= @return_url %>">Forgot your password?</a>
+      </div>
+      <input type="submit" class="btn" id="caboose-login-btn" value="Register" onclick="caboose_user_register();return false;" />
+    </form>
+    <div id="caboose-login-message"></div>
+  </div>
+</div>
 
-<h1>Register</h1>
+<% content_for :css do %>
+  <%= stylesheet_link_tag 'caboose/login' %>
+<% end %>
 
-<form action='/register' method='post' id='register_form'>
-<p class='other_options'>
-<a href='/login?return_url=<%= @return_url %>'>Already a member?</a>
-</p>
-<input type='hidden'    name='return_url' value='<%= @return_url %>' />
-<input type='text'      name='first_name' id='first_name' placeholder='First name' />
-<input type='text'      name='last_name'  id='last_name'  placeholder='Last name' />
-<input type='text'      name='email'      id='email'      placeholder='Email address' />
-<input type='text'      name='phone'      id='phone'      placeholder='Phone number' />
-<input type='password'  name='pass1'      id='pass1'      placeholder='Password' />
-<input type='password'  name='pass2'      id='pass2'      placeholder='Confirm password' />
-<div id='message'></div>
-<p>
-  <input type='button' id='btn_cancel'   value='Cancel'   onclick="parent.$.fn.colorbox.close();" />
-	<input type='submit' id='btn_register' value='Register' onclick='register(); return false;' />
-</p>
-</form>
-
-<% content_for :caboose_js do %>
-<script type='text/javascript'>
-var modal = new CabooseModal(400);
-function register()
+<% content_for :js do %>
+<script type="text/javascript">
+function caboose_user_register() 
 {
-  modal.autosize("<p class='loading'>Registering...</p>");
-	$.ajax({
-		url: '/register',
-		type: 'post',
-		data: $('#register_form').serialize(),
-		success: function(resp) {
-		  if (resp.error)
-		    modal.autosize("<p class='note error'>" + resp.error + "</p>");
-			else if (resp.redirect != false)
-			  <%= @modal ? "" : "parent." %>window.location = resp.redirect;			  
-			else
-			  parent.location.reload(true);
-		},
-		error: function() {	
-		  modal.autosize("<p class='note error'>Error</p>"); 
-		}
-	});
+  $('#caboose-login-message').html("<p class='note loading'>Registering...</p>");
+  $.ajax({
+    url: '/register',
+    type: 'post',
+    data: $('#caboose-register-form').serialize(),
+    success: function(resp) {
+      if (resp.error) $('#caboose-login-message').html("<p class='note error'>" + resp.error + "</p>");     
+      else if (resp.redirect != false) window.location = resp.redirect;
+    }   
+  });
 }
 </script>
-<% end %>
-<%= content_for :caboose_css do %>
-<%= stylesheet_link_tag "caboose/register", :media => "all" %>
 <% end %>

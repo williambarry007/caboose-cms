@@ -8,8 +8,9 @@ module Caboose
 
     def locked_account(user)
       @user = user
-      mail(:to => user.email, :subject => "#{user.site.description} Locked Account")
-    end    
+      admin_email = user.site.contact_email
+      mail(:to => admin_email, :subject => "#{user.site.description} Locked Account") if !admin_email.blank?
+    end
 
   end
 end

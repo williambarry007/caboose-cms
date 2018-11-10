@@ -8,13 +8,14 @@ module Caboose
     
     # @route GET /admin/block-types
     def admin_index
-      return if !user_is_allowed('pages', 'view')
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?
       @block_types = BlockType.where("parent_id is null or parent_id = 0").reorder(:name).all
       render :layout => 'caboose/admin'      
     end
     
     # @route GET /admin/block-types/json
     def admin_json
+      render :json => false and return if !logged_in_user.is_super_admin?
       h = {        
         'name'              => '',
         'description'       => '',
@@ -43,20 +44,20 @@ module Caboose
     
     # @route GET /admin/block-types/:id/json
     def admin_json_single
-      return if !user_is_allowed('pages', 'view')
+      render :json => false and return if !logged_in_user.is_super_admin?
       block_type = BlockType.find(params[:id])
       render :json => block_type.as_json(:include => :sites)      
     end
     
     # @route GET /admin/block-types/parse
     def admin_parse_form
-      return if !user_is_allowed('blocktypeparser', 'view')      
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?  
       render :layout => 'caboose/admin'      
     end
     
     # @route POST /admin/block-types/parse-tags
     def admin_parse_tags
-      return if !user_is_allowed('blocktypeparser', 'view')      
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?   
       children = params[:children] && params[:children] != 'false' ? params[:children] : nil
       resp = BlockTypeParser.parse_html(params[:html], params[:tags], children)
       render :json => resp
@@ -65,7 +66,7 @@ module Caboose
     # @route GET /admin/block-types/new
     # @route GET /admin/block-types/:id/new
     def admin_new
-      return unless user_is_allowed('pages', 'add')      
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin? 
       @block_type = BlockType.new
       @parent_id = params[:id]
       render :layout => 'caboose/admin'
@@ -73,28 +74,28 @@ module Caboose
     
     # @route GET /admin/block-types/:id/icon
     def admin_edit_icon
-      return unless user_is_allowed('pages', 'edit')      
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?    
       @block_type = BlockType.find(params[:id])
       render :layout => 'caboose/modal'
     end
     
     # @route GET /admin/block-types/:id
     def admin_edit
-      return unless user_is_allowed('pages', 'edit')      
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?   
       @block_type = BlockType.find(params[:id])
       render :layout => 'caboose/admin'
     end
 
     # @route GET /admin/block-types/:id/render-function
     def admin_edit_render_function
-      return unless user_is_allowed('sites', 'edit')      
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?  
       @block_type = BlockType.find(params[:id])
       render :layout => 'caboose/admin'
     end
 
     # @route PUT /admin/block-types/:id/render-function
     def admin_update_render_function
-      return if !user_is_allowed('sites', 'edit')
+      render :json => false and return if !logged_in_user.is_super_admin?
       resp = StdClass.new  
       @block_type = BlockType.find(params[:id])
       code = params['code'].blank? ? '' : params['code'].gsub('<%==','<%= raw')
@@ -107,14 +108,14 @@ module Caboose
 
     # @route GET /admin/block-types/:id/sass
     def admin_edit_sass
-      return unless user_is_allowed('sites', 'edit')      
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin? 
       @block_type = BlockType.find(params[:id])
       render :layout => 'caboose/admin'
     end
 
     # @route PUT /admin/block-types/:id/sass
     def admin_update_sass
-      return if !user_is_allowed('sites', 'edit')
+      render :json => false and return if !logged_in_user.is_super_admin?
       resp = StdClass.new  
       @block_type = BlockType.find(params[:id])
       @block_type.custom_sass = params['code']
@@ -126,20 +127,18 @@ module Caboose
 
     # @route GET /admin/block-types/:id/errors
     def admin_error_log
-      return unless user_is_allowed('sites', 'edit')      
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?   
       @block_type = BlockType.find(params[:id])
       render :layout => 'caboose/admin'
     end
     
     # @route POST /admin/block-types
     def admin_create
-      return unless user_is_allowed('pages', 'add')
-
+      render :json => false and return if !logged_in_user.is_super_admin?
       resp = Caboose::StdClass.new({
           'error' => nil,
           'redirect' => nil
       })
-
       bt = BlockType.new(
         :parent_id           => params[:parent_id] ? params[:parent_id] : nil,
         :name                => params[:name].downcase.gsub(' ', '_'),
@@ -148,8 +147,7 @@ module Caboose
         :allow_child_blocks  => false,
         :icon => 'checkbox-unchecked'        
       )       
-      bt.save      
-      
+      bt.save
       # Send back the response
       resp.redirect = "/admin/block-types/#{bt.id}"
       render :json => resp
@@ -157,7 +155,7 @@ module Caboose
     
     # @route PUT /admin/block-types/:id
     def admin_update
-      return unless user_is_allowed('pages', 'edit')
+      render :json => false and return if !logged_in_user.is_super_admin?
       
       resp = StdClass.new({'attributes' => {}})
       bt = BlockType.find(params[:id])
@@ -193,18 +191,24 @@ module Caboose
         end
       end
       
-      # Trigger the page cache to be updated      
- #     query = ["update page_cache set refresh = true where page_id in (select distinct(page_id) from blocks where block_type_id = ?)", bt.id]
- #     ActiveRecord::Base.connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, query))      
-  #    PageCacher.delay(:queue => 'caboose_cache').refresh
-    
       resp.success = save && bt.save
+      render :json => resp
+    end
+
+    # @route DELETE /admin/block-types/bulk
+    def admin_bulk_delete
+      render :json => false and return if !logged_in_user.is_super_admin?     
+      params[:model_ids].each do |bt_id|
+        block_type = BlockType.where(:id => bt_id).first
+        block_type.destroy if block_type
+      end
+      resp = Caboose::StdClass.new('success' => true)
       render :json => resp
     end
     
     # @route DELETE /admin/block-types/:id
     def admin_delete
-      return unless user_is_allowed('pages', 'delete')                  
+      render :json => false and return if !logged_in_user.is_super_admin?             
       BlockType.find(params[:id]).destroy            
       resp = StdClass.new({
         'redirect' => "/admin/block-types"
@@ -215,12 +219,7 @@ module Caboose
     # @route_priority 1
     # @route GET /admin/block-types/new-options    
     def admin_options_for_new_block
-      return unless user_is_allowed('blocktypes', 'edit')
-      #cats = BlockTypeCategory.where("parent_id is not null and name != ?", 'Layouts').all.collect{ |cat| {
-      #  :block_type_category => cat,
-      #  :block_types => Caboose::BlockType.includes(:block_type_site_memberships).where(:parent_id => nil, :block_type_category_id => cat.id).where("block_type_site_memberships.site_id = ?", @site.id).reorder(:description).all
-      #}}
-      
+      return unless user_is_allowed('pages', 'edit')      
       cats = BlockTypeCategory.where("name != ?", 'Layouts').all.collect{ |cat| {
         :block_type_category => cat,
         :block_types => Caboose::BlockType.includes(:block_type_site_memberships)
@@ -285,7 +284,7 @@ module Caboose
       render :json => options
     end
     
-    def admin_tree_options_helper(options, bt, prefix)      
+    def admin_tree_options_helper(options, bt, prefix)
       options << { 'value' => bt.id, 'text' => "#{prefix}#{bt.description}" }
       bt.children.each do |bt2|
         admin_tree_options_helper(options, bt2, " - #{prefix}")
@@ -294,7 +293,7 @@ module Caboose
 
     # @route GET /admin/block-type-site-memberships/:id/html
     def admin_edit_btsm_html
-      return if !user_is_allowed_to('edit', 'sites')
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?
       @btsm = BlockTypeSiteMembership.find(params[:id])
       if (@site.id != @btsm.site_id && !@site.is_master)
         @error = "You are not allowed to edit this site."
@@ -305,7 +304,7 @@ module Caboose
 
     # @route PUT /admin/block-type-site-memberships/:id/html
     def admin_update_btsm_html
-      return if !user_is_allowed_to('edit', 'sites')
+      render :json => false and return if !logged_in_user.is_super_admin?      
       resp = StdClass.new  
       @btsm = BlockTypeSiteMembership.find(params[:id])
       code = params['code'].blank? ? '' : params['code'].gsub('<%==','<%= raw')
@@ -318,7 +317,7 @@ module Caboose
 
     # @route GET /admin/block-type-site-memberships/:id/css
     def admin_edit_btsm_css
-      return if !user_is_allowed_to('edit', 'sites')
+      redirect_to '/admin' and return if !logged_in_user.is_super_admin?
       @btsm = BlockTypeSiteMembership.find(params[:id])  
       if (@site.id != @btsm.site_id && !@site.is_master)
         @error = "You are not allowed to edit this site."
@@ -329,7 +328,7 @@ module Caboose
 
     # @route PUT /admin/block-type-site-memberships/:id/css
     def admin_update_btsm_css
-      return if !user_is_allowed_to('edit', 'sites')
+      render :json => false and return if !logged_in_user.is_super_admin?      
       resp = StdClass.new  
       @btsm = BlockTypeSiteMembership.find(params[:id])
       @btsm.custom_css = params['code']

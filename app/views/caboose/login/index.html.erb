@@ -1,70 +1,47 @@
-<form action="/login" method="post" id="login-form">
-	<div class="header">
-	  <% if @site.logo && !@site.logo.url.include?('placehold') %>
-	    <img src='<%= @site.logo.url(:thumb) %>' alt="<%= @site.description %>" />
-	  <% else %>
-		  <img src="/assets/caboose/caboose_logo.png" alt="Caboose">
-		  <h1>caboose</h1>
-		  <p>Coo Coo Ca Choo</p>
-		<% end %>		
-	</div>
-	
-	<input type="hidden"   name="return_url" value="<%= @return_url %>" />
-	<input type="text"     name="username" id="username" placeholder="Login or email" />
-	<input type="password" name="password" id="password" placeholder="Password" />
-	
-	<label>
-		<input type="checkbox" name="remember" id="remember" value="1" checked="true" /> Remember me
-	</label>
-	
-	<ul id="login-options">
-	  <% if @site.allow_self_registration %><li><a href="/register?return_url=<%= @return_url %>" class='register'>Need to register?</a></li><% end %>
-		<li><a href="/login/forgot-password?return_url=<%= @return_url %>" class='forgot'>Forgot your password?</a></li>
-	</ul>	
-	<div style='clear: both;' id="message"></div>	
-	<p class="buttons">
-	  <input type="button" class="btn" value="Cancel" onclick="parent.$.fn.colorbox.close();" />
-		<input type="submit" class="btn" value="Login" onclick='login(); return false;' />
-	</p>
-</form>
+<div class="caboose-login-wrapper">
+  <div class="caboose-login-form-wrapper">
+    <h5>User Login</h5>
+    <form action="/login" method="POST" id="caboose-login-form">
+      <div class="field">
+        <label for="caboose-login-username">Username or Email Address</label>
+        <input type="text" name="username" id="caboose-login-username" />
+      </div>
+      <div class="field">
+        <label for="caboose-login-password">Password</label>
+        <input type="password" name="password" id="caboose-login-password" />
+      </div>
+      <input type="hidden" name="return_url" value="<%= @return_url %>" />
+      <div class="caboose-links">
+        <% if @site.allow_self_registration %>
+          <a href="/register?return_url=<%= @return_url %>">Create an account</a>
+        <% end %>
+        <a href="/login/forgot-password?return_url=<%= @return_url %>">Forgot your password?</a>
+      </div>
+      <input type="submit" class="btn" id="caboose-login-btn" value="Login" onclick="caboose_user_login();return false;" />
+    </form>
+    <div id="caboose-login-message"></div>
+  </div>
+</div>
 
-<%= content_for :caboose_css do %>
-<%= stylesheet_link_tag "caboose/login", media: "all" %>		
-<style type="text/css">
-#modal_content input[type=checkbox] { position: relative; }
-</style>
+<% content_for :css do %>
+  <%= stylesheet_link_tag 'caboose/login' %>
 <% end %>
 
-<% content_for :caboose_js do %>
+<% content_for :js do %>
 <script type="text/javascript">
-var modal = false;
-	
-$(window).load(function() {
-  modal = new CabooseModal(400);
-});
-	
-function login() {
-  modal.autosize("<p class='loading'>Logging in...</p>");
-
-	$.ajax({
-		url: '/login',
-		type: 'post',
-		data: $('#login-form').serialize(),
-		success: function(response) {
-			if (response.error) modal.autosize("<p class='note error'>" + response.error + "</p>");			
-			else if (response.redirect != false)
-			{
-			  if (response.modal)
-			    window.location = response.redirect;
-			  else
-			    parent.window.location = response.redirect;
-			}
-			else parent.location.reload(true);
-		},
-		error: function() {	
-			modal.autosize("<p class='note error'>Error</p>");			
-		}
-	});
+function caboose_user_login() 
+{
+  $('#caboose-login-message').html("<p class='note loading'>Logging in...</p>");
+  $.ajax({
+    url: '/login',
+    type: 'post',
+    data: $('#caboose-login-form').serialize(),
+    success: function(resp) {
+      if (resp.error) $('#caboose-login-message').html("<p class='note error'>" + resp.error + "</p>");     
+      else if (resp.redirect != false) window.location = resp.redirect;
+      else window.location.reload(true);
+    }   
+  });
 }
 </script>
 <% end %>

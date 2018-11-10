@@ -1,0 +1,95 @@
+.caboose-login-wrapper {
+  padding: 40px 2%;
+  text-align: center;
+  background-color: rgba(255,255,255,0.5);
+  display: block;
+  width: 100%;
+  margin: 0;
+  .caboose-login-form-wrapper {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 30px;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    h5 {
+      margin: 0 0 20px 0;
+      color: #282828;
+      text-align: center;
+    }
+    & > p {
+      font-family: "Roboto";
+      font-weight: 300;
+      font-size: 15px;
+      margin-bottom: 20px;
+      text-align: left;
+      line-height: 20px;
+    }
+    & > form {
+      text-align: right;
+      &#caboose-register-form {
+        .field {
+          margin-bottom: 15px;
+        }
+      }
+      .field {
+        margin-bottom: 25px;
+        text-align: left;
+        label {
+          text-align: left;
+          margin-bottom: 4px;
+          display: block;
+          font-family: "Roboto";
+          font-weight: 300;
+          font-size: 13px;
+          font-style: normal;
+          color: #282828;
+        }
+      }
+      input[type="text"], input[type="password"], input[type="email"] {
+        display: block;
+        width: 100%;
+        font-family: "Roboto";
+        font-weight: 300;
+        font-size: 16px;
+        border: 1px solid #d8d8d8;
+        height: 36px;
+        padding: 6px;
+        font-style: normal;
+        background-color: transprent;
+        -webkit-appearance: none;
+        border-radius: 0;
+        line-height: 36px;
+        text-align: left;
+        &:focus {
+          outline-width: 0;
+          border-color: #b1d9f5;
+        }
+      }
+      .caboose-links {
+        margin-bottom: 15px;
+      }
+      .caboose-links > a {
+        font-size: 14px;
+        color: #282828;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 8px;
+        font-family: "Roboto";
+        font-weight: 300;
+        font-size: 14px;
+        &:hover {
+          color: #bf4e4e;
+        }
+        &:focus {
+          outline-width: 0;
+        }
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+  #caboose-login-message {
+    clear: both;
+  }
+}

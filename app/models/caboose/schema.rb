@@ -214,14 +214,16 @@ class Caboose::Schema < Caboose::Utilities::Schema
       ],      
       Caboose::BlockTypeCategory => [
         [ :parent_id  , :integer ],
-        [ :name       , :string  ]
+        [ :name       , :string  ],
+        [ :sort_order, :integer ],
+        [ :show_in_sidebar, :boolean, { :default => true }]
       ],
       Caboose::BlockTypeSource => [
         [ :name       , :string ],
         [ :url        , :string ],
         [ :token      , :string ],
         [ :priority   , :integer, { :default => 0 }],
-        [ :active     , :boolean, { :default => true }],
+        [ :active     , :boolean, { :default => true }]
       ],
       Caboose::BlockTypeSummary => [
         [ :block_type_source_id , :integer ],

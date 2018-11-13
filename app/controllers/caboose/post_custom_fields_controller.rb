@@ -96,7 +96,7 @@ module Caboose
         params[:model_ids].each do |fid|
           PostCustomFieldValue.where(:post_custom_field_id => fid).destroy_all
           PostCustomField.where(:id => fid).destroy_all                                    
-        end
+        end 
       else
         fid = params[:id]
         PostCustomFieldValue.where(:post_custom_field_id => fid).destroy_all

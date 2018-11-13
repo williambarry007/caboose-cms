@@ -344,6 +344,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :form_name, :string ],
         [ :sent_to, :string ],
         [ :date_submitted, :datetime ],
+        [ :ip_address, :string ],
         [ :bcc_to, :string ],
         [ :category, :string ],
         [ :is_spam, :boolean   , { :default => false }],

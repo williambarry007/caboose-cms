@@ -12,6 +12,7 @@ class Caboose::FormSubmission < ActiveRecord::Base
   	:bcc_to,
   	:category,
   	:date_submitted,
+    :ip_address,
   	:is_spam,
   	:is_deleted,
   	:field1_name,

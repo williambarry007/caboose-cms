@@ -11,6 +11,7 @@ class Caboose::FormSubmission < ActiveRecord::Base
   	:sent_to,
   	:bcc_to,
   	:category,
+    :recaptcha_score,
   	:date_submitted,
     :ip_address,
   	:is_spam,

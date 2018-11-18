@@ -64,7 +64,8 @@ class Caboose::Site < ActiveRecord::Base
     :contact_email,
     :head_code,
     :body_open_code,
-    :body_close_code
+    :body_close_code,
+    :recaptcha_threshold
             
   before_save :validate_presence_of_store_config
 
@@ -141,6 +142,10 @@ class Caboose::Site < ActiveRecord::Base
     d = Caboose::Domain.where(:domain => domain).first
     return nil if d.nil?
     return d.site_id
+  end
+
+  def valid_domains
+    self.domains.map{ |d| d.domain.blank? ? "" : d.domain.gsub(":3000","") }
   end
   
   def self.sanitize_name(name)

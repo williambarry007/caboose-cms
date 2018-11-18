@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
   s.add_dependency "pg"
   s.add_dependency "rails", "~> 3.2.22"
   s.add_dependency "underscore-rails"
-  s.add_dependency "jquery-rails", "~> 3.1.1"
+  s.add_dependency "jquery-rails", "2.2.1"
   s.add_dependency "jquery-ui-rails", "~> 5.0.0"
   s.add_dependency "trollop"
   s.add_dependency "colorbox-rails", "~> 0.1.2"

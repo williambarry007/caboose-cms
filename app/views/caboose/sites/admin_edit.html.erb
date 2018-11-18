@@ -23,6 +23,7 @@ user_ids = [] if user_ids.nil?
 <p><div id='site_<%= @site.id %>_assets_url' ></div></p>
 <p><div id='site_<%= @site.id %>_default_layout_id'       ></div></p>
 <p><div id='site_<%= @site.id %>_favicon'                    ></div></p>
+<p><div id='site_<%= @site.id %>_recaptcha_threshold'       ></div></p>
 
 <h2>Domains</h2>
 <p><a href='#' onclick="add_domain(<%= @site.id %>);return false;">New Domain</a></p>
@@ -106,7 +107,8 @@ $(document).ready(function() {
       { name: 'use_fonts'               , nice_name: 'Enable Fonts'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_fonts               ? true : false) %>, width: 400 },
       { name: 'use_dragdrop'               , nice_name: 'Enable Drag & Drop'             , type: 'checkbox' , value: <%= raw Caboose.json(@site.use_dragdrop              ? true : false) %>, width: 400 },
       { name: 'allow_self_registration' , nice_name: 'Allow Self Registration'  , type: 'checkbox' , value: <%= raw Caboose.json(@site.allow_self_registration ? true : false) %>, width: 400 },
-      { name: 'default_layout_id'       , nice_name: 'Default Layout'           , type: 'select'   , value: <%= raw Caboose.json(@site.default_layout_id)                      %>, width: 600, options_url: "/admin/sites/<%= @site.id %>/default-layout-options" }      
+      { name: 'default_layout_id'       , nice_name: 'Default Layout'           , type: 'select'   , value: <%= raw Caboose.json(@site.default_layout_id)                      %>, width: 600, options_url: "/admin/sites/<%= @site.id %>/default-layout-options" },
+      { name: 'recaptcha_threshold'               , nice_name: 'Recaptcha Threshold'             , type: 'text' , value: <%= raw Caboose.json(@site.recaptcha_threshold)  %>, width: 250 }    
     ]    
   });       
 });

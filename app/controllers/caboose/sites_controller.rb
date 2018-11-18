@@ -219,6 +219,7 @@ module Caboose
           when 'zip' then site.zip = value
           when 'fax' then site.fax = value
           when 'contact_email' then site.contact_email = value
+          when 'recaptcha_threshold' then site.recaptcha_threshold = value
           when 'head_code' then site.head_code = (value.blank? ? nil : value.gsub('<end/script>','</script>'))
           when 'body_open_code' then site.body_open_code = (value.blank? ? nil : value.gsub('<end/script>','</script>'))
           when 'body_close_code' then site.body_close_code = (value.blank? ? nil : value.gsub('<end/script>','</script>'))

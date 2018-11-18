@@ -343,6 +343,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :block_id, :integer ],
         [ :form_name, :string ],
         [ :sent_to, :string ],
+        [ :recaptcha_score, :float ],
         [ :date_submitted, :datetime ],
         [ :ip_address, :string ],
         [ :bcc_to, :string ],
@@ -901,7 +902,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :contact_email, :string ],
         [ :head_code, :text ],
         [ :body_open_code, :text ],
-        [ :body_close_code, :text ]
+        [ :body_close_code, :text ],
+        [ :recaptcha_threshold, :float, { :default => 0.5 } ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],

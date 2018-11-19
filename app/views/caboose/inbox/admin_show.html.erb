@@ -20,11 +20,11 @@ subject = 'Inquiry'
 					field_name = "field#{ind}_name".to_s
 		      field_desc = "field#{ind}_description".to_s
 		      field_value = "field#{ind}_value".to_s
-		      next if @contact[field_desc].nil?
+		      next if @contact[field_name].nil?
 		      if ['email','email_required','email_address','email_address_required'].include?(@contact[field_name])
 		      	email = @contact[field_value]
 		      elsif ['subject','subject_required'].include?(@contact[field_name])
-		      	email = @contact[field_value]
+		      	subject = @contact[field_value]
 		      end
 	      %>
 	      <tr>

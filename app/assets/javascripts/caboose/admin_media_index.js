@@ -176,7 +176,7 @@ MediaController.prototype = {
               success: function(resp) {},
               async: false          
             });
-          //  controller.refresh();
+          //  controller.refresh(); 
           },
           FileUploaded: function(ip, file)
           {

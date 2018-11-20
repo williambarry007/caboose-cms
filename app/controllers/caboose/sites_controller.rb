@@ -9,7 +9,8 @@ module Caboose
     end
 
     def sitemap
-      @protocol = request && request.protocol ? request.protocol : 'http'
+      @protocol = request && request.protocol ? request.protocol : 'http://'
+      @protocol = 'https://' if request && request.env['HTTPS'] == 'on'
       begin
         view = ActionView::Base.new(ActionController::Base.view_paths)
         str = view.render(:partial => "../../app/views/caboose/blocks/#{@site.name}/sitemap", :locals => {:site => @site, :protocol => @protocol})

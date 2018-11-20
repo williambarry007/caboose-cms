@@ -24,8 +24,7 @@ MediaController.prototype = {
   init: function(params) {
     var that = this;
     for (var i in params)
-      this[i] = params[i];
-            
+      this[i] = params[i];      
     $("#uploader")
       .empty()
       .append($('<p/>')
@@ -39,6 +38,7 @@ MediaController.prototype = {
   
   refresh: function()
   {
+    //console.log("REFRESHING EVERYTHING");
     var that = this;
     that.refresh_categories();
     that.refresh_media();
@@ -64,6 +64,7 @@ MediaController.prototype = {
   
   refresh_media: function() 
   {
+    //console.log("REFRESHING MEDIA");
     var that = this;
     $.ajax({
       url: '/admin/media/json',
@@ -80,7 +81,6 @@ MediaController.prototype = {
 
   change_sort_order: function(list) {
     var that = this;
-   // console.log(list.toString());
     $.ajax({
       url: '/admin/media-categories/' + that.cat_id + '/sort-order',
       type: 'put',
@@ -162,7 +162,8 @@ MediaController.prototype = {
 		    flash_swf_url: '../../js/Moxie.swf', // Flash settings		
 		    silverlight_xap_url: '../../js/Moxie.xap', // Silverlight settings
         init: {
-          BeforeUpload: function(up, file) {        
+          BeforeUpload: function(up, file) {
+            //console.log("BeforeUpload");   
             //up.settings.multipart_params["Content-Type"] = file.type;
             $.ajax({
               url: '/admin/media/pre-upload',
@@ -175,14 +176,16 @@ MediaController.prototype = {
               success: function(resp) {},
               async: false          
             });
-            controller.refresh();
+          //  controller.refresh();
           },
           FileUploaded: function(ip, file)
           {
-            that.refresh();            
+            //console.log("FileUploaded"); 
+           // that.refresh();            
           },          
           UploadComplete: function(up, files) {
-            that.refresh();
+            //console.log("UploadComplete"); 
+            that.refresh_media();
             that.ajax_count = 0;
             if (that.uploader)
             {

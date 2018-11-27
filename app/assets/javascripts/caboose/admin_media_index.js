@@ -186,6 +186,7 @@ MediaController.prototype = {
           UploadComplete: function(up, files) {
             //console.log("UploadComplete"); 
             that.refresh_media();
+            that.refresh_categories();
             that.ajax_count = 0;
             if (that.uploader)
             {

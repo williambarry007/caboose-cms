@@ -144,7 +144,7 @@ BlockContentController.prototype = {
 
   render_block: function(block_id) {
     var that = this;
-  //  console.log("rendering block " + block_id + "...");
+  //  console.log("rendering block " + block_id + "..."); 
     var url = that.base_url() + '/' + block_id + '/render';
     that.is_modified();
     $.ajax({

@@ -1,5 +1,5 @@
 #media .img-wrap {
-  background-image:url('/assets/caboose/grid.png');
+  background-image: url("/assets/caboose/grid.png");
   background-size: 15px;
   display: inline-block;
 }
@@ -134,13 +134,11 @@
     list-style: none; 
     margin: 0; 
     padding: 0; 
-    
     li { 
       position: relative;
       list-style: none; 
       margin: 4px; 
       padding: 4px 6px; 
-      background-color: #e2e2e2;
       background-position: center;
       background-size: contain; 
       background-repeat: no-repeat;
@@ -153,7 +151,9 @@
       span.name { 
         display: block;                
         color: #292929;
-        font-size: 15px;
+        font-family: Roboto;
+        font-weight: 300;
+        font-size: 13px;
         text-decoration: none !important;                                   
       }
       &:hover {

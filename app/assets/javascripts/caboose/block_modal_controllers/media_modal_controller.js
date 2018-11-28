@@ -10,12 +10,15 @@ var MediaModalController = BlockModalController.extend({
 	aws_access_key_id: false,		
 	policy: false,
 	signature: false,
-	refresh_unprocessed_images: false,		               
+	refresh_unprocessed_images: false,
+  last_upload_processed: false,       
 	selected_media: false,
 	uploader: false,  
   assets_path: false,
   upload_extensions: "jpg,jpeg,png,gif,tif,tiff,pdf,doc,docx,odt,odp,ods,ppt,pptx,xls,xlsx,zip,tgz,csv,txt",
   file_view: 'thumbnail',
+  ajax_count: 0,
+  ajax_limit: 20,
   
   assets_to_include: function()
   {
@@ -127,10 +130,10 @@ var MediaModalController = BlockModalController.extend({
     var div = $('<div/>').attr('id', 'top_controls')
       .append($('<p/>')
         //.append(select).append(' | ')
-        .append($('<select/>').attr('id', 'categories')).append(' | ')        
-        .append($('<a/>').attr('href', '#').html('New Category'                                                 ).click(function(e) { e.preventDefault(); that.add_category();     })).append(' | ')              
-        .append($('<a/>').attr('href', '#').html('Upload to this Category'                                      ).click(function(e) { e.preventDefault(); that.toggle_uploader();  })).append(' | ')
-        .append($('<a/>').attr('href', '#').html(that.file_view == 'list' ? 'Thumbnail View' : 'List View' ).click(function(e) { e.preventDefault(); that.toggle_file_view(); $(this).html( that.file_view == 'thumbnail' ? 'List View' : 'Thumbnail View'  ); })).append(' | ')
+        .append($('<select/>').attr('id', 'categories'))//.append(' | ')        
+        //.append($('<a/>').attr('href', '#').html('New Category'                                                 ).click(function(e) { e.preventDefault(); that.add_category();     }))// .append(' | ')              
+        .append($('<a/>').attr('href', '#').html('Upload'                                      ).click(function(e) { e.preventDefault(); that.toggle_uploader();  }))// .append(' | ')
+        .append($('<a/>').attr('href', '#').html(that.file_view == 'list' ? 'Thumbnails' : 'List' ).click(function(e) { e.preventDefault(); that.toggle_file_view(); $(this).html( that.file_view == 'thumbnail' ? 'List' : 'Thumbnails'  ); }))// .append(' | ')
         .append($('<a/>').attr('href', '#').html('Alphabetize'                                      ).click(function(e) { e.preventDefault(); that.alphabetize_media();  }))
       )
       .append($('<div/>').attr('id', 'new_cat_message'))              
@@ -200,7 +203,7 @@ var MediaModalController = BlockModalController.extend({
           li.addClass("png");
         }
         if (m.image_urls && m.image_urls != undefined)
-          li.append($("<div/>").addClass("table").append($("<div/>").addClass("table-cell").append($('<img/>').attr('src', m.image_urls.tiny_url + '?' + d).attr("id","image-" + m.id))));  
+          li.append($('<img/>').attr('src', m.image_urls.tiny_url + '?' + d).attr("id","image-" + m.id));
         else if (m.original_name) {
           var ext = m.original_name.match(/\.[0-9a-z]+$/i);
           li.addClass('empty');
@@ -218,17 +221,46 @@ var MediaModalController = BlockModalController.extend({
     else
       ul = $('<p/>').html("This category is empty.");
     $('#the_modal #media').empty().append(ul);
-    if (that.refresh_unprocessed_images == true && processing)
-      setTimeout(function() { that.refresh(); }, 2000);
+    if (that.refresh_unprocessed_images == true && processing) {
+      // setTimeout(function() { that.refresh(); }, 2000);
+      setTimeout(function() { that.check_processing_status(); }, 3000);
+    }
     that.autosize();
           
-    $.each(that.media, function(i, m) {
-      $('li.media').draggable({
-        multiple: true,
-        revert: 'invalid',
-        start: function() { $(this).data("origPosition", $(this).position()); }
+    // $.each(that.media, function(i, m) {
+    //   $('li.media').draggable({
+    //     multiple: true,
+    //     revert: 'invalid',
+    //     start: function() { $(this).data("origPosition", $(this).position()); }
+    //   });
+    // });
+  },
+
+  check_processing_status: function() 
+  {     
+    console.log("checking processing status");
+    var that = this;
+    if (!that.last_upload_processed)
+      that.last_upload_processed = new Date();
+    if ( that.ajax_count < that.ajax_limit ) {
+      $.ajax({
+        url: '/admin/media/last-upload-processed',
+        type: 'get',            
+        success: function(resp) {
+          that.ajax_count += 1;
+          var d = Date.parse(resp['last_upload_processed']);        
+          if (d > that.last_upload_processed) {
+            console.log("new processed image, refreshing");
+            that.refresh_media();      
+          }      
+          else {
+            console.log("no new processed images, waiting");
+            setTimeout(function() { that.check_processing_status(); }, 3000);          
+          }
+          that.last_upload_processed = d;                                                        
+        }
       });
-    });
+    }
   },
   
   print_media_detail: function(media_id)
@@ -264,12 +296,12 @@ var MediaModalController = BlockModalController.extend({
     var select_text = m.media_type == 'image' ? 'Select this Image' : 'Select this File';
     $('#modal_controls').empty()
       .append($('<p/>').css('clear', 'both')
-        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('< Back'            ).click(function(e) { 
+        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val(select_text ).click(function(e) { that.select_media(media_id)                           }))     
+        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Back'            ).click(function(e) { 
           that.print_top_controls();
           that.print_media();
           that.print_controls();
-        }))
-        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val(select_text ).click(function(e) { that.select_media(media_id)                           }))        
+        }))   
         .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Close'             ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
       );
     
@@ -355,11 +387,11 @@ var MediaModalController = BlockModalController.extend({
               success: function(resp) {},
               async: false          
             });
-            that.refresh_media(function() { that.refresh_categories(function() { that.print_categories(); that.print_media(); }); });
+            //that.refresh_media(function() { that.refresh_categories(function() { that.print_categories(); that.print_media(); }); });
           },   
           FileUploaded: function(ip, file)
           {
-            that.refresh_media(function() { that.print_media(); });            
+            //that.refresh_media(function() { that.print_media(); });            
           },          
           UploadComplete: function(up, files) {            
             if (that.uploader)
@@ -369,6 +401,7 @@ var MediaModalController = BlockModalController.extend({
                 that.uploader = false;                
               });
             }
+            that.refresh_unprocessed_images = true;
             that.refresh_media(function() { that.print_media(); });            
           }
         }
@@ -451,7 +484,6 @@ var MediaModalController = BlockModalController.extend({
   {
     var that = this;
     that.file_view = (that.file_view == 'thumbnail' ? 'list' : 'thumbnail');
-
     that.print_media();
   },  
   

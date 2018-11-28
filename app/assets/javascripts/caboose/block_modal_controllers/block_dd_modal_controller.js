@@ -92,7 +92,7 @@ var BlockModalController = ModalController.extend({
         $.each(that.block.children, function(i, b) {
           if (separate_children && b.block_type.id == separate_child_id) return;                    
           var div_id = 'block_' + b.id + (that.complex_field_types.indexOf(b.block_type.field_type) == -1 ? '_value' : '');
-          div.append($('<div/>').css('margin-bottom', '10px').append($('<div/>').attr('id', div_id)));                                
+          div.append($('<div/>').append($('<div/>').attr('id', div_id)));                                
         });
         if (separate_children)
         {
@@ -101,7 +101,7 @@ var BlockModalController = ModalController.extend({
             if (b.block_type.id == separate_child_id)
             {
               var div_id = 'block_' + b.id + (that.complex_field_types.indexOf(b.block_type.field_type) == -1 ? '_value' : '');
-              div.append($('<div/>').css('margin-bottom', '10px').append($('<div/>').attr('id', div_id)));
+              div.append($('<div/>').append($('<div/>').attr('id', div_id)));
             }             
           });
         }    
@@ -110,7 +110,7 @@ var BlockModalController = ModalController.extend({
       {
         div.append($('<p/>').append("This block doesn't have any content yet."));
       }
-      if (that.block.block_type.allow_child_blocks)
+      if (that.block.block_type.allow_child_blocks && that.block.block_type.default_child_block_type_id)
       {        
         div.append($('<p/>').css('clear', 'both').append($('<a/>').addClass('caboose-btn').attr('href', '#').html(that.add_child_link_text ? that.add_child_link_text : "Add a child block!").click(function(e) {
           e.preventDefault();
@@ -120,7 +120,7 @@ var BlockModalController = ModalController.extend({
     }
     $('#modal_content').replaceWith(div);
     that.render_child_blocks();
-    that.autosize();
+    //that.autosize();
   },
   
   print_controls: function()
@@ -135,7 +135,7 @@ var BlockModalController = ModalController.extend({
     }
     p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Move Up'   ).click(function() { that.move_up();         })).append(' ');
     p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Move Down' ).click(function() { that.move_down();       })).append(' ');    
-    p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Advanced'  ).attr('id', 'btn_advanced').click(function() { that.print_advanced();  }));
+    //p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Advanced'  ).attr('id', 'btn_advanced').click(function() { that.print_advanced();  }));
     $('#modal_controls').empty().append(p);    
   },
   
@@ -163,40 +163,40 @@ var BlockModalController = ModalController.extend({
   before_print_advanced: false,
   print_advanced: function()
   {
-    var that = this;        
-    if (that.before_print_advanced) that.before_print_advanced();
+//     var that = this;        
+//     if (that.before_print_advanced) that.before_print_advanced();
     
-    var b = that.block;    
-    $('#modal_content').empty()      
- //     .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_block_type_id' )))
- //     .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_parent_id'     )))
-      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_constrain'     )))
-      .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_full_width'    )))      
-    $('#modal_controls').empty()
-      .append($('<p/>')
-        .append($('<input/>').attr('type', 'button').addClass('btn').val('Close').click(function() { 
-          that.close();
-          that.parent_controller.render_blocks(); 
-        })).append(' ')                              
-        .append($('<input/>').attr('type', 'button').addClass('btn').val('Back' ).click(function() { 
-          that.print_content();
-          that.print_controls();          
-        }))
-      );
+//     var b = that.block;    
+//     $('#modal_content').empty()      
+//  //     .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_block_type_id' )))
+//  //     .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_parent_id'     )))
+//       .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_constrain'     )))
+//       .append($('<p/>').append($('<div/>').attr('id', 'block_' + b.id + '_full_width'    )))      
+//     $('#modal_controls').empty()
+//       .append($('<p/>')
+//         .append($('<input/>').attr('type', 'button').addClass('btn').val('Close').click(function() { 
+//           that.close();
+//           that.parent_controller.render_blocks(); 
+//         })).append(' ')                              
+//         .append($('<input/>').attr('type', 'button').addClass('btn').val('Back' ).click(function() { 
+//           that.print_content();
+//           that.print_controls();          
+//         }))
+//       );
               
-    var m = new ModelBinder({
-      name: 'Block',
-      id: b.id,
-      update_url: that.block_url(b),      
-      authenticity_token: that.authenticity_token,
-      attributes: [
-//        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/block-types/options' },
-//        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/parentblock-options?block_id=' + b.id },
-        { name: 'constrain'     , nice_name: 'Constrain'  , type: 'checkbox' , value: b.constrain     ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.constrain     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
-        { name: 'full_width'    , nice_name: 'Full Width' , type: 'checkbox' , value: b.full_width    ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.full_width    = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }}
-      ]
-    });
-    that.autosize();
+//     var m = new ModelBinder({
+//       name: 'Block',
+//       id: b.id,
+//       update_url: that.block_url(b),      
+//       authenticity_token: that.authenticity_token,
+//       attributes: [
+// //        { name: 'block_type_id' , nice_name: 'Block type' , type: 'select'   , value: b.block_type.id         , text: b.block_type.name              , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.block_type.id = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/block-types/options' },
+// //        { name: 'parent_id'     , nice_name: 'Parent ID'  , type: 'select'   , value: b.parent_id             , text: b.parent ? b.parent.title : '' , width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.parent_id     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }, options_url: '/admin/' + (that.page_id ? 'pages/' + that.page_id : 'posts/' + that.post_id) + '/parentblock-options?block_id=' + b.id },
+//         { name: 'constrain'     , nice_name: 'Constrain'  , type: 'checkbox' , value: b.constrain     ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.constrain     = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }},
+//         { name: 'full_width'    , nice_name: 'Full Width' , type: 'checkbox' , value: b.full_width    ? 1 : 0 ,                                        width: 400, fixed_placeholder: true, after_update: function() { that.parent_controller.render_blocks(); that.block.full_width    = this.value; }, after_cancel: function() { that.parent_controller.render_blocks(); }, on_load: function() { that.modal.autosize(); }}
+//       ]
+//     });
+//     that.autosize();
   },
   
   /*****************************************************************************
@@ -214,7 +214,13 @@ var BlockModalController = ModalController.extend({
   render_child_block: function(b)
   {
     var that = this;
-    if (that.complex_field_types.indexOf(b.block_type.field_type) > -1)
+    if ( b.block_type.field_type == 'richtext' ) {
+      var html = "<span id='block_" + b.id + "' class='caboose-btn'>Edit " + b.block_type.description + "</span>";
+      $('#the_modal #block_' + b.id).replaceWith(html);
+      var b2 = that.block_with_id(b.id);
+      that.set_clickable(b2);
+    }
+    else if (that.complex_field_types.indexOf(b.block_type.field_type) > -1)
     {
       if (!b.rendered_value)
       {
@@ -226,7 +232,7 @@ var BlockModalController = ModalController.extend({
             var b2 = that.block_with_id(b.id);            
             b2.rendered_value = html;
             that.set_clickable(b2);                            
-            that.autosize();
+            //that.autosize();
           },            
         });
       }
@@ -280,7 +286,6 @@ var BlockModalController = ModalController.extend({
 
   remove_media: function(block) {
     var that = this;
-
     $.ajax({          
       url: that.block_url(block) + '/remove-media',
       type: 'put',
@@ -292,7 +297,6 @@ var BlockModalController = ModalController.extend({
         that.autosize();
       },            
     });
-
   },
   
   set_clickable: function(b)
@@ -307,14 +311,14 @@ var BlockModalController = ModalController.extend({
     }
 
     $('#the_modal #block_' + b.id).attr('onclick','').unbind('click');
-    $('#the_modal #block_' + b.id).click(function(e) {      
+    $('#the_modal #block_' + b.id).click(function(e) {    
       e.stopPropagation();
       that.parent_controller.edit_block(b.id); 
     });
 
     if ( b.block_type && b.block_type.field_type == 'image' && b.rendered_value.indexOf('select_image.png') < 0 ) {
-      btn = $('<a href="#" class="caboose-btn">Remove</a>');
-      btn.css('position','absolute').css('left','100%').css('left','calc(100% + 10px)').css('bottom','0').css('font-size','13px');
+      btn = $('<a href="#" class="caboose-btn remove">Remove Image</a>');
+      //btn.css('position','absolute').css('left','100%').css('left','calc(100% + 10px)').css('bottom','0').css('font-size','13px');
       btn.on('click', function(e) {
         e.preventDefault();
         that.remove_media(b);
@@ -323,8 +327,8 @@ var BlockModalController = ModalController.extend({
     }
 
     if ( b.block_type && b.block_type.field_type == 'file' && b.rendered_value.indexOf('Click to select a file') < 0 ) {
-      btn = $('<a href="#" class="caboose-btn">Remove</a>');
-      btn.css('margin-bottom','10px').css('font-size','13px');
+      btn = $('<a href="#" class="caboose-btn remove">Remove File</a>');
+      //btn.css('margin-bottom','10px').css('font-size','13px');
       btn.on('click', function(e) {
         e.preventDefault();
         that.remove_media(b);

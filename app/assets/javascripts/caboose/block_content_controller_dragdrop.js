@@ -151,7 +151,7 @@ BlockContentController.prototype = {
       url: url,
       type: 'get',
       success: function(html) {
-        $('#block_' + block_id).replaceWith(html);
+        $('body .container #block_' + block_id).replaceWith(html);
         that.is_loading(false, 'Loading...');
         that.add_dropzones();
         that.init_inline_editor();
@@ -299,6 +299,7 @@ BlockContentController.prototype = {
       that.selected_block_ids = [];
       that.add_dropzones();
       that.is_modified();
+      that.mc.close();
     }
   },
 
@@ -436,7 +437,7 @@ BlockContentController.prototype = {
         }
       }
 
-      if ( !$(v).hasClass('header') && !$(v).hasClass('content_wrapper') && !$(v).hasClass('footer') && !$(v).hasClass('header-wrapper') && !$(v).hasClass('footer-wrapper') ) {
+      if ( !$(v).hasClass('header') && !$(v).parent().hasClass('header-wrapper') && $(v).closest("#modal_content").length == 0 && !$(v).hasClass('content_wrapper') && !$(v).hasClass('footer') && !$(v).hasClass('header-wrapper') && !$(v).hasClass('footer-wrapper') ) {
         $(v).draggable( {
           handle: ".drag_handle",
           revert: "invalid",

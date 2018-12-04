@@ -179,6 +179,7 @@ body.editing .footer-wrapper #footer-msg {
         display: block;
         width: 100%;
         text-align: center;
+        padding: 10px;
       }
     }
     h1, h2, h3, h4, h5, h6 {
@@ -187,6 +188,12 @@ body.editing .footer-wrapper #footer-msg {
       margin-bottom: 5px;
       color: #252525;
     }
+    h6 { font-size: 14px; }
+    h5 { font-size: 15px; }
+    h4 { font-size: 16px; }
+    h3 { font-size: 17px; }
+    h2 { font-size: 18px; }
+    h1 { font-size: 19px; }
     #modal_content {
       & > div {
         margin-bottom: 8px;
@@ -232,6 +239,21 @@ body.editing .footer-wrapper #footer-msg {
             }
           }
         }
+        .caboose-btn.remove {
+          background-size: 11px;
+          background-repeat: no-repeat;
+          background-position: 8px 7px;
+          background-image: url('/assets/caboose/icons/delete.png');
+          background-color: #6f3030;
+          &:hover { background-color: shade(#6f3030, 20%);  }
+        }
+        .filename {
+          background: #ecebe8;
+          margin: 0;
+          padding: 5px;
+          width: 190px;
+          display: block;
+        }
       }
       .mb_container {
         padding-top: 18px;
@@ -266,22 +288,30 @@ body.editing .footer-wrapper #footer-msg {
           min-height: 80px;
         }
         .mb_bound_textarea_controls {
-          top: 18px !important;
+          top: 0 !important;
           left: auto !important;
-          right: 0;
-          width: 148px;
+          right: -2px;
+          width: 128px !important;
+          & > div {
+            width: 128px !important;
+          }
           a {
-            height: 30px;
+            height: 22px;
             background: #ecebe8;
             border: 1px solid #c5c5c5;
-            padding: 6px 0 0 0;
+            padding: 0;
             margin: 0 0 0 3px;
-            width: 70px;
+            width: 60px !important;
+            font-size: 12px;
+            line-height: 20px;
+            &:hover {
+              background: #d8d7d6;
+            }
           }
         }
         select.mb_fake {
           top: 18px;
-          height: 30px !important;
+          height: 27px !important;
           border: 0;
           width: 100% !important;
           font-family: 'Roboto' !important;
@@ -350,6 +380,11 @@ body.editing .footer-wrapper #footer-msg {
             }
             &:hover span.name {
               opacity: 1;
+            }
+            &.pdf, &.doc, &.docx {
+              span.name {
+                opacity: 1;
+              }
             }
           }
         }
@@ -435,6 +470,44 @@ body.editing .footer-wrapper #footer-msg {
       p {
         .caboose-btn {
           margin: 0 0 4px 0;
+          background-size: 11px;
+          background-repeat: no-repeat;
+          background-position: 8px 7px;
+          &.select {
+            background-image: url('/assets/caboose/icons/right.png');
+            background-color: #2f562f;
+            &:hover { background-color: shade(#2f562f, 20%);  }
+          }
+          &.back {
+            background-image: url('/assets/caboose/icons/left.png');
+            background-color: #484848;
+            &:hover { background-color: shade(#484848, 20%);  }
+          }
+          &.close {
+            background-image: url('/assets/caboose/icons/left.png');
+            background-color: #3e3e71;
+            &:hover { background-color: shade(#3e3e71, 20%);  }
+          }
+          &.delete {
+            background-image: url('/assets/caboose/icons/delete.png');
+            background-color: #6f3030;
+            &:hover { background-color: shade(#6f3030, 20%);  }
+          }
+          &.duplicate {
+            background-image: url('/assets/caboose/icons/copy.png');
+            background-color: #2f562f;
+            &:hover { background-color: shade(#2f562f, 20%);  }
+          }
+          &.moveup {
+            background-image: url('/assets/caboose/icons/up.png');
+            background-color: #7d673d;
+            &:hover { background-color: shade(#7d673d, 20%);  }
+          }
+          &.movedown {
+            background-image: url('/assets/caboose/icons/down.png');
+            background-color: #7d673d;
+            &:hover { background-color: shade(#7d673d, 20%);  }
+          } 
         }
       }
     }

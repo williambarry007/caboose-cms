@@ -130,8 +130,8 @@
       display: block;
       overflow: hidden;
       text-align: center;
-    //  padding: 8px;
       border: 1px solid #dadada;
+      opacity: 1;
       &.png {
         background-image: url('/assets/caboose/grid.png');
         background-size: 16px;

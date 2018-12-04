@@ -1,0 +1,32 @@
+
+<h1>New Block Type Category</h1>
+
+<p><input type='text' id='name' name='name' placeholder='Name' style="width: 400px;" /></p>
+<div id='message'></div>
+<p><input type='submit' value='Add Block Type Category' onclick='add_btc();' /></p>
+
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<script type='text/javascript'>
+
+function add_btc()
+{
+  $("#message").html("<p class='note loading'>Adding block type category...</p>");
+  $.ajax({
+    url: '/admin/block-type-categories',
+    type: 'post',
+    data: {
+      authenticity_token: "<%= form_authenticity_token %>",
+      name: $('#name').val(),
+    },
+    success: function(resp) {
+      if (resp.error)
+        $("#message").html("<p class='note error'>" + resp.error + "</p>");
+      if (resp.redirect)
+        window.location = resp.redirect
+    }
+  });
+}
+
+</script>
+<% end %>

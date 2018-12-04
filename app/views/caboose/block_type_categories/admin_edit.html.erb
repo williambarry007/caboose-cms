@@ -32,7 +32,7 @@ $(document).ready(function() {
     authenticity_token: '<%= form_authenticity_token %>',
     attributes: [
       { name: 'name' , nice_name: 'Name', type: 'text'     , value: <%= raw Caboose.json(@btc.name) %>, width: 400 },
-      { name: 'parent_id' , nice_name: 'Parent', type: 'text'     , value: <%= raw Caboose.json(@btc.parent_id) %>, width: 400 },
+      { name: 'parent_id' , nice_name: 'Parent', type: 'select'     , value: <%= raw Caboose.json(@btc.parent_id) %>, options_url: '/admin/block-type-categories/tree-options', width: 400 },
       { name: 'sort_order' , nice_name: 'Sort Order', type: 'text'     , value: <%= raw Caboose.json(@btc.sort_order) %>, width: 400 },
       { name: 'show_in_sidebar' , nice_name: 'Show in Sidebar', type: 'checkbox'     , value: <%= raw Caboose.json(@btc.show_in_sidebar) %>, width: 400 }
     ]    

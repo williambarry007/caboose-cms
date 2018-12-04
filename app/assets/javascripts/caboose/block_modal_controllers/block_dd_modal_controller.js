@@ -88,7 +88,6 @@ var BlockModalController = ModalController.extend({
       {        
         var separate_children = that.block.block_type.allow_child_blocks && that.block.block_type.default_child_block_type_id;
         var separate_child_id = separate_children ? that.block.block_type.default_child_block_type_id : false;
-    
         $.each(that.block.children, function(i, b) {
           if (separate_children && b.block_type.id == separate_child_id) return;                    
           var div_id = 'block_' + b.id + (that.complex_field_types.indexOf(b.block_type.field_type) == -1 ? '_value' : '');
@@ -127,14 +126,14 @@ var BlockModalController = ModalController.extend({
   {    
     var that = this;
     var p = $('<p/>').css('clear', 'both')
-      .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Close').click(function() { that.close(); that.parent_controller.render_blocks(); })).append(' ');
-    if (!that.block.name)                        
+      .append($('<input/>').attr('type', 'button').addClass('caboose-btn').addClass('close').val('Close').click(function() { that.close(); /* that.parent_controller.render_blocks(); */ })).append(' ');
+    if (!that.block.name && that.block.block_type.name.indexOf('_header') < 0)                        
     {
-      p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Delete Block').click(function() { that.delete_block(); })).append(' ');
-      p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Duplicate Block').click(function() { that.duplicate_block(); })).append(' ');
-    }
-    p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Move Up'   ).click(function() { that.move_up();         })).append(' ');
-    p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Move Down' ).click(function() { that.move_down();       })).append(' ');    
+      p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').addClass('delete').val('Delete Block').click(function() { that.delete_block(); })).append(' ');
+      p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').addClass('duplicate').val('Duplicate Block').click(function() { that.duplicate_block(); })).append(' ');
+      p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').addClass('moveup').val('Move Up'   ).click(function() { that.move_up();         })).append(' ');
+      p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').addClass('movedown').val('Move Down' ).click(function() { that.move_down();       })).append(' '); 
+    }   
     //p.append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Advanced'  ).attr('id', 'btn_advanced').click(function() { that.print_advanced();  }));
     $('#modal_controls').empty().append(p);    
   },
@@ -208,7 +207,12 @@ var BlockModalController = ModalController.extend({
     var that = this;
     if (that.block.block_type.field_type != 'block' && that.block.children.length == 0)
       return;
-    $.each(that.block.children, function(i, b) { if ( b.name != null || that.block.block_type.default_child_block_type_id == b.block_type.id ) { that.render_child_block(b); } });        
+    $.each(that.block.children, function(i, b) { 
+      if ( b.name != null || that.block.block_type.default_child_block_type_id == b.block_type.id )
+        that.render_child_block(b);
+      else
+        $("#modal_content #block_" + b.id).remove();
+    });        
   },
   
   render_child_block: function(b)
@@ -417,7 +421,7 @@ var BlockModalController = ModalController.extend({
       that.modal(div, 780);
       return;
     }    
-    that.autosize("<p class='loading'>Adding block...</p>");
+    that.autosize("<p class='note loading'>Adding block...</p>");
     
     bt = false;
     $.ajax({      
@@ -463,7 +467,7 @@ var BlockModalController = ModalController.extend({
       that.autosize(p);
       return;
     }
-    that.autosize("<p class='loading'>Deleting block...</p>");
+    that.autosize("<p class='note loading'>Deleting block...</p>");
     that.parent_controller.delete_block(that.block.id, true);
     that.close();
   },
@@ -471,7 +475,7 @@ var BlockModalController = ModalController.extend({
   duplicate_block: function()
   {
     var that = this;
-    that.autosize("<p class='loading'>Duplicating...</p>");
+    that.autosize("<p class='note loading'>Duplicating...</p>");
     that.parent_controller.duplicate_block(that.block.id);
     that.autosize("<p class='note success'>Duplicated block.</p>");
   },
@@ -479,7 +483,7 @@ var BlockModalController = ModalController.extend({
   move_up: function()
   {
     var that = this;
-    that.autosize("<p class='loading'>Moving up...</p>");
+    that.autosize("<p class='note loading'>Moving up...</p>");
     $.ajax({
       url: that.block_url(that.block) + '/move-up',
       type: 'put',    
@@ -497,7 +501,7 @@ var BlockModalController = ModalController.extend({
   move_down: function()
   {
     var that = this;
-    that.autosize("<p class='loading'>Moving down...</p>");
+    that.autosize("<p class='note loading'>Moving down...</p>");
     $.ajax({
       url: that.block_url(that.block) + '/move-down',
       type: 'put',    

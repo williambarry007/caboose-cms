@@ -14,6 +14,30 @@ module Caboose
       render :json => BlockTypeCategory.tree
     end
 
+    # @route GET /admin/block-type-categories/new
+    def admin_new
+      render :layout => 'caboose/admin'
+    end
+
+    # @route POST /admin/block-type-categories
+    def admin_create
+      render :json => false and return if !logged_in_user.is_super_admin?
+      resp = StdClass.new
+      if params[:name].blank?   
+        resp.error = "Name is required."
+      else
+        par = BlockTypeCategory.where(:name => 'Content').first
+        max = BlockTypeCategory.where(:parent_id => par.id).maximum(:sort_order) if par
+        btc = BlockTypeCategory.new
+        btc.name = params[:name]
+        btc.parent_id = par.id if par
+        btc.sort_order = max + 1 if max
+        btc.save
+        resp.redirect = "/admin/block-type-categories/#{btc.id}"
+      end
+      render :json => resp
+    end
+
     # @route GET /admin/block-type-categories/:id
     def admin_edit
       redirect_to '/admin' and return if !logged_in_user.is_super_admin?

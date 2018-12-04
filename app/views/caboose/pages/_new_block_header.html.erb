@@ -1,7 +1,7 @@
 <%
-btsm = Caboose::BlockTypeSiteMembership.where(:site_id => @site.id).pluq(:block_type_id)
+cats = Caboose::BlockTypeCategory.where(:show_in_sidebar => true).order(:sort_order).all
 grid = Caboose::BlockType.where(:name => 'flex_grid').first
-@block_types = Caboose::BlockType.where(:parent_id => nil, :block_type_category_id => 2).where(:id => btsm).order(:description)
+seen_btids = [0]
 %>
 
 <div class='icons' id='new_blocks_container2'>
@@ -27,12 +27,27 @@ grid = Caboose::BlockType.where(:name => 'flex_grid').first
     		<span class='bname'>5 Column Row</span>
     	</li>
     <% end %>
-  	<li class='title'><span>Content</span></li>
-    <% @block_types.each do |block_type| %>
-    	<li class='blocktype bt' id='new_block_<%= block_type.id %>' data-btid='<%= block_type.id %>'>
-    		<span class='icon icon-<%= block_type.icon %>'></span>
-    		<span class='bname'><%= block_type.description %></span>
-    	</li>
+  	<% cats.each do |cat| %>
+        <% block_types = Caboose::BlockType.joins(:sites).where(:parent_id => nil, :block_type_category_id => cat.id).where("sites.id = ?", @site.id).order(:description) %>
+        <% next if block_types.count == 0 %>
+        <li class='title'><span><%= cat.name %></span></li>
+        <% block_types.each do |block_type| %>
+            <li class='blocktype bt' id='new_block_<%= block_type.id %>' data-btid='<%= block_type.id %>'>
+                <span class='icon icon-<%= block_type.icon %>'></span>
+                <span class='bname'><%= block_type.description %></span>
+            </li>
+            <% seen_btids << block_type.id %>
+        <% end %>
+    <% end %>
+    <% all_bts = Caboose::BlockType.joins(:sites).where(:parent_id => nil, :block_type_category_id => 2).where("sites.id = ?", @site.id).where("block_types.id not in (?)", seen_btids).order(:description) %>
+    <% if all_bts.count > 0 %>
+      <li class='title'><span>All Blocks</span></li>
+      <% all_bts.each do |block_type| %>
+         <li class='blocktype bt' id='new_block_<%= block_type.id %>' data-btid='<%= block_type.id %>'>
+            <span class='icon icon-<%= block_type.icon %>'></span>
+            <span class='bname'><%= block_type.description %></span>
+        </li>
+      <% end %>
     <% end %>
   </ul>
 </div>

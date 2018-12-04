@@ -207,8 +207,10 @@ var MediaModalController = BlockModalController.extend({
         else if (m.original_name) {
           var ext = m.original_name.match(/\.[0-9a-z]+$/i);
           li.addClass('empty');
-          if (ext && ext.length > 0)
+          if (ext && ext.length > 0) {
+            li.addClass(ext[0].replace(".","").toLowerCase());
             li.append($('<img/>').attr('src', that.assets_path + 'caboose/file_types/' + ext[0].replace(".","").toLowerCase() + '.png').addClass('file-icon').attr("width","80").attr("height","80"));
+          }
         }   
 
         //if (that.selected_media.indexOf(m.id) > -1)
@@ -251,7 +253,7 @@ var MediaModalController = BlockModalController.extend({
           var d = Date.parse(resp['last_upload_processed']);        
           if (d > that.last_upload_processed) {
             console.log("new processed image, refreshing");
-            that.refresh_media();      
+            that.refresh_media(function() { that.print_media(); });          
           }      
           else {
             console.log("no new processed images, waiting");
@@ -286,7 +288,7 @@ var MediaModalController = BlockModalController.extend({
     // }
     
     $('#top_controls').empty();
-    var img_tag = m.media_type == 'image' ? ($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls ? m.image_urls.thumb_url : 'https://cabooseit.s3.amazonaws.com/assets/select_image.png')) : ( $('<p/>').text(m.original_name) );
+    var img_tag = m.media_type == 'image' ? ($('<img/>').attr('id', 'detail_image').attr('src', m.image_urls ? m.image_urls.thumb_url : 'https://cabooseit.s3.amazonaws.com/assets/select_image.png')) : ( $('<p/>').addClass("filename").text(m.original_name) );
     $('#the_modal #media').empty()
       .append( $("<div />").addClass("img-wrap").append(img_tag) );
       // .append($('<p/>').append($('<div/>').attr('id', 'media_' + media_id + '_media_category_id' ))) 
@@ -296,13 +298,13 @@ var MediaModalController = BlockModalController.extend({
     var select_text = m.media_type == 'image' ? 'Select this Image' : 'Select this File';
     $('#modal_controls').empty()
       .append($('<p/>').css('clear', 'both')
-        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val(select_text ).click(function(e) { that.select_media(media_id)                           }))     
-        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Back'            ).click(function(e) { 
+        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').addClass('select').val(select_text ).click(function(e) { that.select_media(media_id)                           }))     
+        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').addClass('back').val('Back'            ).click(function(e) { 
           that.print_top_controls();
           that.print_media();
           that.print_controls();
         }))   
-        .append($('<input/>').attr('type', 'button').addClass('caboose-btn').val('Close'             ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
+  //      .append($('<input/>').attr('type', 'button').addClass('caboose-btn').addClass('close').val('Close'             ).click(function(e) { that.parent_controller.render_blocks(); that.close(); }))
       );
     
     // var m = new ModelBinder({

@@ -36,7 +36,7 @@ var ModalController = Class.extend({
     var that = this;
     if (that.before_close) that.before_close();
     $("#caboose_sidebar_holder").removeClass("visible");
-    setTimeout(function(){ $("#caboose_sidebar_holder").html("") }, 500); 
+    setTimeout(function(){ $("#caboose_sidebar_holder").html("") }, 500);
   },
 
   /*****************************************************************************

@@ -381,7 +381,7 @@ var BlockModalController = ModalController.extend({
       that.modal(div, 780);
       return;
     }    
-    that.autosize("<p class='loading'>Adding block...</p>");
+    that.autosize("<p class='note loading'>Adding block...</p>");
     
     bt = false;
     $.ajax({      
@@ -429,7 +429,7 @@ var BlockModalController = ModalController.extend({
       that.autosize(p);
       return;
     }
-    that.autosize("<p class='loading'>Deleting block...</p>");
+    that.autosize("<p class='note loading'>Deleting block...</p>");
     $.ajax({
       url: that.block_url(that.block),
       type: 'delete',    
@@ -448,7 +448,7 @@ var BlockModalController = ModalController.extend({
   duplicate_block: function()
   {
     var that = this;
-    that.autosize("<p class='loading'>Duplicating...</p>");
+    that.autosize("<p class='note loading'>Duplicating...</p>");
     $.ajax({
       url: that.block_url(that.block) + '/duplicate',
       type: 'put',
@@ -465,7 +465,7 @@ var BlockModalController = ModalController.extend({
   move_up: function()
   {
     var that = this;
-    that.autosize("<p class='loading'>Moving up...</p>");
+    that.autosize("<p class='note loading'>Moving up...</p>");
     $.ajax({
       url: that.block_url(that.block) + '/move-up',
       type: 'put',    
@@ -484,7 +484,7 @@ var BlockModalController = ModalController.extend({
   move_down: function()
   {
     var that = this;
-    that.autosize("<p class='loading'>Moving down...</p>");
+    that.autosize("<p class='note loading'>Moving down...</p>");
     $.ajax({
       url: that.block_url(that.block) + '/move-down',
       type: 'put',    

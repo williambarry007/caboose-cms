@@ -67,7 +67,6 @@ namespace :caboose do
     puts Rails.application.assets.file_digest(temp_file)    
     #puts Rails.application.config.assets.digests['benttree/images/icons/loading.gif']
     
-    #resp = Caboose::AssetManifest.save_asset('assets/william/test1.js', 'var x = 32;')
     #puts resp
   end
   
@@ -342,16 +341,6 @@ namespace :caboose do
     end
     Caboose::BlockType.where(:id => 19).update_all('name' => 'image2')    
     Caboose::Block.where(:block_type_id => 19).update_all('name' => 'image2')
-  end
-        
-  desc "Update expired caches and cache pages that aren't cached"
-  task :cache_pages => :environment do    
- #   Caboose::PageCacher.delay(:queue => 'caboose_cache').refresh    
-  end
-  
-  desc "Cache all pages"
-  task :cache_all_pages => :environment do    
-#    Caboose::PageCacher.delay(:queue => 'caboose_cache').cache_all    
   end
   
   desc "Run rspec tests on Caboose"

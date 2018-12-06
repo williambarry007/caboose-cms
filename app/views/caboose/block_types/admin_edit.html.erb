@@ -33,6 +33,7 @@ bt = @block_type
 <p><div id='blocktype_<%= bt.id %>_use_render_function_for_layout'  ></div></p>
 <p><div id='blocktype_<%= bt.id %>_use_js_for_modal'                ></div></p>
 <p><div id='blocktype_<%= bt.id %>_allow_child_blocks'              ></div></p>
+<p><div id='blocktype_<%= bt.id %>_use_cache'                       ></div></p>
 <p><div id='blocktype_<%= bt.id %>_default_child_block_type_id'     ></div></p>
 <!-- <p><div id='blocktype_<%= bt.id %>_default_constrain'               ></div></p>
 <p><div id='blocktype_<%= bt.id %>_default_full_width'              ></div></p> -->
@@ -137,6 +138,7 @@ $(document).ready(function() {
       { name: 'use_render_function_for_layout' , nice_name: 'Use Render Function for Modal'  , type: 'checkbox' , value: <%= bt.use_render_function_for_layout ? 'true' : 'false' %>, width: 400 },
       { name: 'use_js_for_modal'               , nice_name: 'Use JS for Modal'               , type: 'checkbox' , value: <%= bt.use_js_for_modal               ? 'true' : 'false' %>, width: 400 },
       { name: 'allow_child_blocks'             , nice_name: 'Allow Child Blocks'             , type: 'checkbox' , value: <%= bt.allow_child_blocks             ? 'true' : 'false' %>, width: 400 },
+      { name: 'use_cache'             , nice_name: 'Use Caching'             , type: 'checkbox' , value: <%= bt.use_cache             ? 'true' : 'false' %>, width: 400 },
       { name: 'default_child_block_type_id'    , nice_name: 'Default Child Block Type ID'       , type: 'text'   , value: <%= raw Caboose.json(bt.default_child_block_type_id)     %>,  width: 400 },   
       { name: 'field_type'                     , nice_name: 'Field type'                     , type: 'select'   , value: <%= raw Caboose.json(bt.field_type)                      %>, text: <%= raw Caboose.json(bt.field_type) %>, width: 400, options_url: '/admin/block-types/field-type-options' },
       { name: 'default'                        , nice_name: 'Default value'                  , type: 'text'     , value: <%= raw Caboose.json(bt.default)                         %>, width: 400 },

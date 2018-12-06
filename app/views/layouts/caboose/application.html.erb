@@ -67,48 +67,25 @@
   }
   @block_options.each{ |k,v| options[k] = v } if @block_options  
     
-  str = nil    
-  #if @use_page_cache
-  #  pc = Caboose::PageCache.where(:page_id => @page.id).first  
-  #  if pc # If the page is cached, send it to the user    
-  #         
-  #    require_dependency "#{Caboose.root}/app/models/caboose/block_cache.rb"
-  #    require_dependency "#{Caboose.root}/app/models/caboose/block_cache_file.rb"
-  #    require_dependency "#{Caboose.root}/app/models/caboose/block_cache_image.rb"
-  #  
-  #    @block = Marshal.load(pc.block)    
-  #    @view                    = options[:view                    ]
-  #    @controller_view_content = options[:controller_view_content ]
-  #    @modal                   = options[:modal                   ]
-  #    @empty_text              = options[:empty_text              ]
-  #    @editing                 = options[:editing                 ]
-  #    @css                     = options[:css                     ]
-  #    @js                      = options[:js                      ]
-  #    @csrf_meta_tags          = options[:csrf_meta_tags          ]
-  #    @csrf_meta_tags2         = options[:csrf_meta_tags2         ]
-  #    
-  #    str = render(:inline => pc.render_function)            
-  #  end
-  #end
-  
-  # Render the blocks if we don't have it cached    
+  # str = nil
   str = b.render(b, options) if str.nil?
         
   protocol = request.protocol
   #protocol = Caboose.plugin_hook('request_protocol', protocol, request)
   
   # See if we're using cloudflare
-  if request.env['HTTP_CF_VISITOR'] && request.env['HTTP_CF_VISITOR'].include?('https')
-    protocol = 'https://'
-    request.env['REQUEST_URI']     = "https://#{request.env['REQUEST_URI'][7..-1]}" if (request.env['REQUEST_URI'] =~ %r"http://") == 0    
-    request.env['SERVER_PORT']     = '443' if request.env['SERVER_PORT'] == '80'
-    request.env['HTTP_REFERER']    = "https://#{request.env['HTTP_REFERER'][7..-1]}" if (request.env['HTTP_REFERER'] =~ %r"http://") == 0    
-    request.env['rack.url_scheme'] = 'https'
-    request.env['HTTPS']           = 'on'
-  end
+  # if request.env['HTTP_CF_VISITOR'] && request.env['HTTP_CF_VISITOR'].include?('https')
+  #   protocol = 'https://'
+  #   request.env['REQUEST_URI']     = "https://#{request.env['REQUEST_URI'][7..-1]}" if (request.env['REQUEST_URI'] =~ %r"http://") == 0    
+  #   request.env['SERVER_PORT']     = '443' if request.env['SERVER_PORT'] == '80'
+  #   request.env['HTTP_REFERER']    = "https://#{request.env['HTTP_REFERER'][7..-1]}" if (request.env['HTTP_REFERER'] =~ %r"http://") == 0    
+  #   request.env['rack.url_scheme'] = 'https'
+  #   request.env['HTTPS']           = 'on'
+  # end
   
   css = b.partial('ga', options)
   css << yield(:css)
+  css << raw(@page.cached_css)
   css.gsub!("<link href=\"//", "<link href=\"#{protocol}")
   css.gsub!("<link href='//" , "<link href='#{protocol}")
   if protocol == 'https://' 
@@ -117,6 +94,7 @@
   end
 
   js = yield(:js)
+  js << raw(@page.cached_js)
   js.gsub!("<script src=\"//", "<script src=\"#{protocol}")
   js.gsub!("<script src='//" , "<script src='#{protocol}")
   if protocol == 'https://' 

@@ -90,7 +90,6 @@ class Caboose::Schema < Caboose::Utilities::Schema
         :decremented           ,
         :user_subscription_id
       ],        
-      #Caboose::PageCache => [:block],
       #Caboose::RetargetingConfig => [:fb_pixels_function],
       Caboose::ShippingPackage => [:price, :carrier, :service_code, :service_name, :shipping_method_id, :length, :width, :height],
       Caboose::Site => [:shipping_cost_function],
@@ -175,7 +174,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :new_parent_id, :integer ],
         [ :new_sort_order, :integer ],
         [ :new_value, :text ],
-        [ :new_media_id              , :integer    ]
+        [ :new_media_id              , :integer    ],
+        [ :cached_value, :text ],
+        [ :cached_css, :text ],
+        [ :cached_js, :text ],
+        [ :use_cache, :boolean     , { :default => false }]
       ],
       Caboose::BlockType => [        
         [ :parent_id                       , :integer ],
@@ -204,7 +207,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :default_included                , :boolean , { :default => false }],
         [ :default_full_width              , :boolean , { :default => false }],
         [ :share                           , :boolean , { :default => true  }],
-        [ :downloaded                      , :boolean , { :default => false }]
+        [ :downloaded                      , :boolean , { :default => false }],
+        [ :use_cache, :boolean     , { :default => false }]
       ],
       Caboose::BlockTypeSiteMembership => [
         [ :site_id        , :integer ],
@@ -615,12 +619,6 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :fb_description        , :string  , { :limit => 300 }],
         [ :gp_description        , :string  , { :limit => 300 }],
         [ :status,                :string  ]
-      ],
-      Caboose::PageCache => [
-        [ :page_id               , :integer ],
-        [ :render_function       , :text    ],
-        [ :block                 , :binary  ],
-        [ :refresh               , :boolean , { :default => false }]        
       ],
       Caboose::PageCustomField => [
         [ :site_id           , :integer ],

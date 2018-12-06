@@ -39,7 +39,11 @@ class Caboose::Block < ActiveRecord::Base
     :new_parent_id,
     :new_sort_order,
     :new_value,
-    :new_media_id
+    :new_media_id,
+    :cached_value,
+    :cached_css,
+    :cached_js,
+    :use_cache
         
   after_initialize :caste_value
   before_save :caste_value
@@ -58,6 +62,29 @@ class Caboose::Block < ActiveRecord::Base
     return self.name if parent_id.nil?
     return "#{parent.full_name}_#{self.name}"
   end
+
+  def update_cache
+    par = self.parent
+    if par && self.block_type && self.block_type.use_cache
+      opts = {
+        :view => nil,
+        :controller_view_content => nil,
+        :modal => false,
+        :empty_text => '',
+        :editing => false,
+        :css => nil,
+        :js => nil,
+        :csrf_meta_tags => nil,
+        :csrf_meta_tags2 => nil,    
+        :logged_in_user => nil,
+        :site => self.page.site,
+        :is_cache => true
+      }
+      self.cached_value = par.render(self, opts)
+      self.use_cache = true
+      self.save
+    end
+  end
   
   def child_value(name)
     b = self.child(name)
@@ -70,8 +97,6 @@ class Caboose::Block < ActiveRecord::Base
       return b.media.file if b.media
       return b.file
     end
-    #return b.image if b.block_type.field_type == 'image'
-    #return b.file  if b.block_type.field_type == 'file'
     return b.value
   end
 
@@ -153,11 +178,8 @@ class Caboose::Block < ActiveRecord::Base
     end
   end
                                             
-  def render(block, options)
-    #Caboose.log("block.full_name = #{block.full_name}")
-    #Caboose.log("block.render\nself.id = #{self.id}\nblock = #{block}\nblock.full_name = #{block.full_name}\noptions.class = #{options.class}\noptions = #{options}")                
+  def render(block, options)             
     if block && block.is_a?(String)
-      #Caboose.log("Block #{block} is a string, finding block object... self.id = #{self.id}")                                          
       b = self.child(block)        
       if b.nil?
         self.create_children
@@ -181,14 +203,14 @@ class Caboose::Block < ActiveRecord::Base
       :js => nil,
       :csrf_meta_tags => nil,
       :csrf_meta_tags2 => nil,    
-      :logged_in_user => nil
+      :logged_in_user => nil,
+      :is_cache => false
     }    
-    #defaults = { :modal => false, :empty_text => '', :editing => false, :css => nil, :js => nil, :block => block }
+
     options2 = nil
     if options.is_a?(Hash)
       options2 = defaults.merge(options)
     else
-      #options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }
       options2 = {
         :view                    => options.view                    ? options.view                    : nil,
         :controller_view_content => options.controller_view_content ? options.controller_view_content : nil,
@@ -204,6 +226,8 @@ class Caboose::Block < ActiveRecord::Base
     end
     options2[:block] = block
 
+    return block.cached_value if block && block.use_cache && !block.cached_value.blank? && block.block_type && block.block_type.use_cache && options2[:editing] == false && !options2[:is_cache]
+
     view = options2[:view]     
     view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?
 
@@ -218,7 +242,11 @@ class Caboose::Block < ActiveRecord::Base
       rf = rf.gsub(/<% content_for :css do %>(.*?)<% end %>/m, '')
       options2[:render_function] = rf
       begin
-        str = Timeout::timeout(3) { view.render(:partial => "caboose/blocks/render_function", :locals => options2) }
+        if options2[:is_cache]
+          str = Timeout::timeout(5) { view.render(:partial => "caboose/blocks/cached_block", :locals => options2) }
+        else
+          str = Timeout::timeout(3) { view.render(:partial => "caboose/blocks/render_function", :locals => options2) }
+        end
       rescue Exception => ex
         msg = block ? (block.block_type ? "Error with #{block.block_type.name} block (block_type_id #{block.block_type.id}, block_id #{block.id})\n" : "Error with block (block_id #{block.id})\n") : ''             
         Caboose.log("#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}")
@@ -227,7 +255,7 @@ class Caboose::Block < ActiveRecord::Base
           block.block_type.latest_error = "#{msg}#{ex.message}\n#{ex.backtrace.join("\n")}"
           block.block_type.save
         end
-      end            
+      end         
     else
       
       full_name = block.block_type.full_name
@@ -277,12 +305,9 @@ class Caboose::Block < ActiveRecord::Base
     return "<p class='note error'>Could not find block view anywhere.</p>" if i > arr.count
     begin
       str = view.render(:partial => arr[i], :locals => options)
-   #   Caboose.log("Level #{i+1} for #{full_name}: Found partial #{arr[i]}") 
-      rescue ActionView::MissingTemplate => ex        
-   #     Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")        
+      rescue ActionView::MissingTemplate => ex     
         str = render_helper(view, options, block, full_name, arr, i+1)
-      rescue Exception => ex 
-   #     Caboose.log("Level #{i+1} for #{full_name}: #{ex.message}")
+      rescue Exception => ex
         str = "<p class='note error'>#{self.block_message(block, ex)}</p>"
     end
     return str      
@@ -299,8 +324,7 @@ class Caboose::Block < ActiveRecord::Base
   end
                   
   def render_from_function(options)
-    self.create_children    
-    #locals = OpenStruct.new(:block => self, :empty_text => empty_text, :editing => editing)
+    self.create_children
     locals = OpenStruct.new(options)
     erb = ERB.new(block_type.render_function)
     return erb.result(locals.instance_eval { binding })
@@ -323,7 +347,6 @@ class Caboose::Block < ActiveRecord::Base
     if options.is_a?(Hash)
       options2 = defaults.merge(options)
     else
-      #options2 = { :modal => options.modal, :empty_text => options.empty_text, :editing => options.editing, :css => options.css, :js => options.js }
       options2 = {
         :view                    => options.view                    ? options.view                    : nil,
         :controller_view_content => options.controller_view_content ? options.controller_view_content : nil,

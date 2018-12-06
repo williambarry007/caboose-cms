@@ -74,6 +74,34 @@ class Caboose::Page < ActiveRecord::Base
     Caboose::Block.where(:page_id => self.id).where('status != ?','published').count == 0 if !self.id.nil?
   end
 
+  def updated_cached_blocks
+    blocks = Caboose::Block.includes(:block_type).where(:page_id => self.id).where("block_types.use_cache = true").all
+    blocks.each do |b|
+      Caboose.log("updating cache for block #{b.id}")
+      b.use_cache = false
+      b.save
+      b.update_cache # delay
+    end
+  end
+
+  def cached_css
+    str = ''
+    blocks = Caboose::Block.includes(:block_type).where(:page_id => self.id, :use_cache => true).where("cached_css IS NOT NULL").where("block_types.use_cache = true").all
+    blocks.each do |b|
+      str << b.cached_css
+    end
+    return str
+  end
+
+  def cached_js
+    str = ''
+    blocks = Caboose::Block.includes(:block_type).where(:page_id => self.id, :use_cache => true).where("cached_js IS NOT NULL").where("block_types.use_cache = true").all
+    blocks.each do |b|
+      str << b.cached_js
+    end
+    return str
+  end
+
   def publish
     if !self.id.nil?
       Caboose::Block.where(:page_id => self.id).where('status = ? OR status = ?','edited','added').all.each do |b|
@@ -102,6 +130,7 @@ class Caboose::Page < ActiveRecord::Base
       Caboose::Block.where(:page_id => self.id, :status => nil).update_all(:status => 'published')
       self.status = 'published'
       self.save
+      self.updated_cached_blocks
     end
   end
 

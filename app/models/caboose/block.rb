@@ -52,13 +52,6 @@ class Caboose::Block < ActiveRecord::Base
       end      
       self.block_type_id = bt.id
     end
-    #if self.block_type_id.field_type.nil?
-    #  self.block_type.field_type = 'text'      
-    #end        
-    #if self.block_type.field_type == 'checkbox'
-    #  v = self.value
-    #  self.value = v ? (v == 1 || v == '1' || v == true ? 1 : 0) : 0        
-    #end
   end
   
   def full_name    
@@ -245,53 +238,8 @@ class Caboose::Block < ActiveRecord::Base
       if site.nil?
         self.block_message(block, "Error: site variable is nil.")
       end
-              
-      #begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{full_name}", :locals => options2) 
-      #rescue ActionView::MissingTemplate => ex 
-      #  begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.name}", :locals => options2) 
-      #  rescue ActionView::MissingTemplate => ex          
-      #    begin str = view.render(:partial => "../../sites/#{site.name}/blocks/#{block.block_type.field_type}", :locals => options2) 
-      #    rescue ActionView::MissingTemplate => ex            
-      #      begin str = view.render(:partial => "../../app/views/caboose/blocks/#{full_name}", :locals => options2) 
-      #      rescue ActionView::MissingTemplate => ex                                          
-      #        begin str = view.render(:partial => "../../app/views/caboose/blocks/#{block.block_type.name}", :locals => options2) 
-      #        rescue ActionView::MissingTemplate => ex                
-      #          begin str = view.render(:partial => "../../app/views/caboose/blocks/#{block.block_type.field_type}", :locals => options2) 
-      #          rescue ActionView::MissingTemplate => ex                  
-      #          begin str = view.render(:partial => "caboose/blocks/#{full_name}", :locals => options2)  
-      #          rescue ActionView::MissingTemplate => ex                  
-      #            begin str = view.render(:partial => "caboose/blocks/#{block.block_type.name}", :locals => options2) 
-      #            rescue ActionView::MissingTemplate => ex                    
-      #              begin str = view.render(:partial => "caboose/blocks/#{block.block_type.field_type}", :locals => options2) 
-      #              rescue Exception => ex 
-      #                str = "<p class='note error'>#{self.block_message(block, ex)}</p>" 
-      #              end
-      #            rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
-      #            end
-      #          rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
-      #          end
-      #        rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
-      #        end                              
-      #      rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
-      #      end
-      #    rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
-      #    end
-      #  rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
-      #  end
-      #rescue Exception => ex { str = "<p class='note error'>#{self.block_message(block, ex)}</p>" } 
-      #end
       
       arr = [
-        #"../../sites/#{site.name}/blocks/#{full_name}",
-        #"../../sites/#{site.name}/blocks/#{block.block_type.name}",
-        #"../../sites/#{site.name}/blocks/#{block.block_type.field_type}",
-        #"../../app/views/caboose/blocks/#{full_name}",
-        #"../../app/views/caboose/blocks/#{block.block_type.name}",
-        #"../../app/views/caboose/blocks/#{block.block_type.field_type}",
-        #"caboose/blocks/#{full_name}",                
-        #"caboose/blocks/#{block.block_type.name}",                
-        #"caboose/blocks/#{block.block_type.field_type}"
-        
         "../../app/views/caboose/blocks/#{site.name}/#{full_name}",
         "../../app/views/caboose/blocks/#{site.name}/#{block.block_type.name}",
         "../../app/views/caboose/blocks/#{site.name}/#{block.block_type.field_type}",
@@ -305,10 +253,6 @@ class Caboose::Block < ActiveRecord::Base
         "caboose/blocks/#{block.block_type.field_type}"                
       ]
 
-    #  Caboose.log("searching #{arr.to_s}")
-      
-    #  Caboose.log("editing: " + options2[:editing].to_s)
-
       if options2[:editing] == true
         if !block.new_value.blank? && block.new_value != 'EMPTY'
           block.value = block.new_value 
@@ -316,31 +260,14 @@ class Caboose::Block < ActiveRecord::Base
           block.value = nil
         end
         block.media_id = block.new_media_id if !block.new_media_id.nil?
-       # block.sort_order = block.new_sort_order if !block.new_sort_order.blank?
-       # block.parent_id = block.new_parent_id if !block.new_parent_id.blank?
-       # Caboose.log("temp setting #{block.id}")
-        # block.children.each do |bc|
-        #   Caboose.log("temp setting #{bc.id}")
-        #   bc.value = bc.new_value if !bc.new_value.blank?
-        #   bc.sort_order = bc.new_sort_order if !bc.new_sort_order.blank?
-        #   bc.parent_id = bc.new_parent_id if !bc.new_parent_id.blank?
-        #   Caboose.log("bc value: #{bc.value}")
-        # end
-
-        # if block && block.id == 430363
-        #   Caboose.log( block.value )
-        # end
-
-        if block.status != 'deleted'  #&& ( block.new_parent_id.blank? || options2[:is_new] )
+        if block.status != 'deleted'
           str = self.render_helper(view, options2, block, full_name, arr, 0)
         end
-     #   str.gsub('child_value','edited_child_value')
       else
         if block.status != 'added'
           str = self.render_helper(view, options2, block, full_name, arr, 0)
         end
       end
-
 
     end    
     return str
@@ -415,17 +342,20 @@ class Caboose::Block < ActiveRecord::Base
     view = options2[:view]     
     view = ActionView::Base.new(ActionController::Base.view_paths) if view.nil?        
     site = options[:site]
-    
+
     begin
-      #str = view.render(:partial => "../../sites/#{site.name}/blocks/#{name}", :locals => options2)
       str = view.render(:partial => "../../app/views/caboose/blocks/#{site.name}/#{name}", :locals => options2)
     rescue ActionView::MissingTemplate => ex      
       begin
-        str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)      
-      rescue Exception => ex
-        Caboose.log("Partial caboose/blocks/#{name} doesn't exist.")
-        str = "<p class='note error'>#{self.partial_message(name, ex)}</p>"
-      end      
+        str = view.render(:partial => "../../app/views/caboose/blocks/default_theme/#{name}", :locals => options2)
+      rescue ActionView::MissingTemplate => ex      
+        begin
+          str = view.render(:partial => "caboose/blocks/#{name}", :locals => options2)  
+        rescue Exception => ex      
+          Caboose.log("Partial caboose/blocks/#{name} doesn't exist.")
+          str = "<p class='note error'>#{self.partial_message(name, ex)}</p>"
+        end
+      end
     end
       
     return str
@@ -440,16 +370,6 @@ class Caboose::Block < ActiveRecord::Base
     end
     return msg
   end
-  
-  #def child_block_link        
-  #  return "<div class='new_block' id='new_block_#{self.id}'>New Block</div>"    
-  #end  
-  #def new_block_before_link        
-  #  return "<div class='new_block_before' id='new_block_before_#{self.id}'>New Block</div>"    
-  #end  
-  #def new_block_after_link        
-  #  return "<div class='new_block_after' id='new_block_after_#{self.id}'>New Block</div>"    
-  #end
   
   def title    
     str = "#{self.block_type.name}"
@@ -549,7 +469,7 @@ class Caboose::Block < ActiveRecord::Base
     checked = arr[1].to_i == 1
     if v == 'all'
       if checked && b.block_type && !b.block_type.options.blank?
-        Caboose.log(b.block_type.options)
+        # Caboose.log(b.block_type.options)
         return b.block_type.options.split("\n").join('|')
       else
         return ''

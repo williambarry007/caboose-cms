@@ -200,6 +200,19 @@ module Caboose
       resp.attributes = { 'image' => { 'value' => post.image.url(:thumb) }}
       render :text => resp.to_json
     end
+
+    # @route POST /admin/posts/:id/remove-image
+    def admin_remove_image
+      return unless user_is_allowed("posts", 'edit')
+      resp = Caboose::StdClass.new   
+      b = Post.find(params[:id])
+      b.image_file_name = nil
+      b.image_file_size = nil
+      b.image_content_type = nil
+      b.image_updated_at = nil
+      resp.success = b.save
+      render :json => resp    
+    end
     
     # @route_priority 1
     # @route GET /admin/posts/new
@@ -224,7 +237,9 @@ module Caboose
         resp.error = 'A title is required.'      
       else
         post.save        
-        post.set_slug_and_uri(post.title)                
+        post.set_slug_and_uri(post.title)
+        bt = BlockType.where(:id => @site.default_layout_id).first
+        Block.create(:post_id => post.id, :block_type_id => bt.id, :name => bt.name) if post && bt
         resp.redirect = "/admin/posts/#{post.id}"
       end
       render :json => resp

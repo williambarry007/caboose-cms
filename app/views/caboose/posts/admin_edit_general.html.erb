@@ -1,7 +1,7 @@
 
 <%= render :partial => 'caboose/posts/admin_header' %>
     
-<p>URI: <span id='uri'><a href="<%= raw @post.uri %>"><%= raw @post.uri %></a></span></p>
+<p>Post URL: <span id='uri'><a target="_blank" href="<%= raw @post.uri %>"><%= raw @post.uri %></a></span></p>
 <p><div id='post_<%= @post.id %>_slug'     ></div></p>
 <p><div id='post_<%= @post.id %>_title'     ></div></p>
 <p><div id='post_<%= @post.id %>_subtitle'  ></div></p>
@@ -13,13 +13,37 @@
 <% end %>
 <p><div id='post_<%= @post.id %>_created_at'></div></p>
 <p><div id='post_<%= @post.id %>_published' ></div></p>
-<p><div id='post_<%= @post.id %>_image'     ></div></p>
+<p><div id='post_<%= @post.id %>_image'     ></div>
+<a href="#" onclick="remove_image();return false;" class="caboose-btn remove">Remove Image</a>
+</p>
+
 
 <%= render :partial => 'caboose/posts/admin_footer' %>
+
+<% content_for :caboose_css do %>
+<style>
+  .caboose-btn.remove {
+    margin-top: 10px;
+    font-size: 13px;
+    padding: 1px 10px;
+    line-height: 25px;
+  }
+</style>
+<% end %>
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag "caboose/model/all" %>
 <script type='text/javascript'>
+
+  function remove_image() {
+    $.ajax({
+      url: '/admin/posts/<%= @post.id %>/remove-image',
+      type: 'POST',
+      success: function(post) {
+        $(".img-holder img").attr('src','https://placehold.it/300x300');
+      }
+    });
+  }
 
 $(document).ready(function() {
   m = new ModelBinder({
@@ -66,7 +90,7 @@ function refresh_uri()
     url: '/admin/posts/<%= @post.id %>/json',
     type: 'get',
     success: function(post) {
-      $('#uri').empty().append($('<a/>').attr('href', post.uri).html(post.uri));
+      $('#uri').empty().append($('<a/>').attr('target','_blank').attr('href', post.uri).html(post.uri));
     }
   });        
 }

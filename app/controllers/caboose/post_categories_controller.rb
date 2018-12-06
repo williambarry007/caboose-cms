@@ -99,12 +99,13 @@ module Caboose
         render :json => false
         return
       end
-      
-      top_cat = PostCategory.where("site_id = ?", @site.id).first       
-      top_cat = PostCategory.create(:site_id => @site.id, :name => 'General News')
+      top_cat = PostCategory.where(:site_id => @site.id, :name => 'General News').first       
+      top_cat = PostCategory.create(:site_id => @site.id, :name => 'General News') if top_cat.nil?
       arr = PostCategory.where(:site_id => @site.id).reorder(:name).all
-      
-      options = arr.collect{ |pc| { 'value' => pc.id, 'text' => pc.name }}                    
+      options = [ {'value'=>'','text'=>'All'} ]
+      arr.collect{ |pc| { 'value' => pc.id, 'text' => pc.name }}.each do |c|
+        options << c
+      end
       render :json => options 		
     end
 

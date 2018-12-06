@@ -61,7 +61,6 @@
     statuses.each do |status|
       all_checked = false if !@pager.params['status'].include?(status)
     end
-    Caboose.log(@pager.params['status'])
     %>    
     Status: 
     <% statuses.each do |status| %>
@@ -118,6 +117,14 @@
   <%= render :partial => 'caboose/users/admin_footer' %>
 <% end %>
 
+<% content_for :caboose_css do %>
+<style>
+  #search_form > p {
+    margin: 0;
+    padding: 0 0 10px 0;
+  }
+</style>
+<% end %>
 <% content_for :caboose_js do %>
 <script type='text/javascript'>
 var modal = false;

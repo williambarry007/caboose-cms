@@ -47,6 +47,20 @@
           font-style: normal;
           color: #282828;
         }
+        &.cb {
+          margin-top: 15px;
+          text-align: right;
+          label {
+            display: inline-block;
+            font-size: 14px;
+            margin: 0 5px 0 0;
+          }
+          input[type="checkbox"] {
+            width: auto;
+            display: inline-block;
+            margin: 0;
+          }
+        }
       }
       input[type="text"], input[type="password"], input[type="email"] {
         display: block;

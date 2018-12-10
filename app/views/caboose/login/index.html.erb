@@ -16,6 +16,10 @@
           <a href="/register?return_url=<%= @return_url %>">Create an account</a>
         <% end %>
         <a href="/login/forgot-password?return_url=<%= @return_url %>">Forgot your password?</a>
+        <div class="field cb">
+          <label for="remember">Remember me</label>
+          <input type="checkbox" checked="true" id="remember" name="remember" />
+        </div>
       </div>
       <input type="submit" class="btn" id="caboose-login-btn" value="Login" onclick="caboose_user_login();return false;" />
     </form>

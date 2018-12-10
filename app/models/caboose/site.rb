@@ -171,7 +171,6 @@ class Caboose::Site < ActiveRecord::Base
   def custom_js
     resp = HTTParty.get('https:' + self.custom_js_url)
     if resp.nil? || resp.code.to_i == 403
-      self.custom_js = ""
       return ""            
     end
     return resp.body    
@@ -180,7 +179,6 @@ class Caboose::Site < ActiveRecord::Base
   def custom_css    
     resp = HTTParty.get('https:' + self.custom_css_url)
     if resp.nil? || resp.code.to_i == 403
-      self.custom_css = ""
       return ""            
     end
     return resp.body    

@@ -1,0 +1,64 @@
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<% end %>
+
+<h1 id='page_title'>Edit Code</h1>
+<ul id='tabs'>
+<%
+tabs = {
+  'Custom CSS'        => "/admin/custom-css",
+  'Custom JS'         => "/admin/custom-js",
+  'Embedded HTML'     => "/admin/code"
+}
+
+%>
+<% tabs.each do |text, href| %>
+<li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
+<% end %>
+<% if @site.is_master %>
+<li class="back"><input type="button" onclick="window.location='/admin/sites';" value="< Back" />
+<% else %>
+<li class="back"><input type="button" onclick="window.location='/admin';" value="< Back" />
+<% end %>
+</ul>
+<div id='content2'>
+
+
+
+<h5 style="margin:0;font-size:18px;">Embedded HTML</h5>
+
+<p><div id='site_<%= @site.id %>_head_code'></div></p>
+<p><div id='site_<%= @site.id %>_body_open_code'></div></p>
+<p><div id='site_<%= @site.id %>_body_close_code'></div></p>
+
+<br style='clear: left; line-height: 0;' />
+</div>
+
+<% content_for :caboose_css do %>
+<style>
+  textarea {
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 18px;
+  }
+</style>
+<% end %>
+
+<% content_for :caboose_js do %>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  new ModelBinder({
+    name: 'Site',
+    id: <%= @site.id %>,
+    update_url: '/admin/sites/<%= @site.id %>',
+    authenticity_token: '<%= form_authenticity_token %>',
+    attributes: [
+      { name: 'head_code', nice_name: 'Code for &lt;head&gt;', type: 'textarea', value: <%== Caboose.json(@site.head_code.blank? ? '' : @site.head_code.gsub('</script>','<end/script>')) %>, width: 600, height: 300 },
+      { name: 'body_open_code', nice_name: 'Code for after &lt;body&gt;', type: 'textarea', value: <%== Caboose.json(@site.body_open_code.blank? ? '' : @site.body_open_code.gsub('</script>','<end/script>')) %>, width: 600, height: 300 },
+      { name: 'body_close_code', nice_name: 'Code for before &lt;/body&gt;', type: 'textarea', value: <%== Caboose.json(@site.body_close_code.blank? ? '' : @site.body_close_code.gsub('</script>','<end/script>')) %>, width: 600, height: 300 }
+    ]    
+  });       
+});
+</script>
+<% end %>

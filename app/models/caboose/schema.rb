@@ -903,7 +903,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :head_code, :text ],
         [ :body_open_code, :text ],
         [ :body_close_code, :text ],
-        [ :recaptcha_threshold, :float, { :default => 0.5 } ]
+        [ :recaptcha_threshold, :float, { :default => 0.05 } ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
@@ -1010,6 +1010,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :custom_invoice_pdf                , :string  ]
       ],  
       Caboose::Subscription => [      
+        [ :site_id                           , :integer ], 
         [ :variant_id  , :integer ],
         [ :user_id          , :integer ],
         [ :date_started     , :date    ],

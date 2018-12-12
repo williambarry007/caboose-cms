@@ -15,11 +15,7 @@ tabs = {
 <% tabs.each do |text, href| %>
 <li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
 <% end %>
-<% if @site.is_master %>
-<li class="back"><input type="button" onclick="window.location='/admin/sites';" value="< Back" />
-<% else %>
 <li class="back"><input type="button" onclick="window.location='/admin';" value="< Back" />
-<% end %>
 </ul>
 <div id='content2'>
 

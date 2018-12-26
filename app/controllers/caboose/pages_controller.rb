@@ -17,7 +17,7 @@ module Caboose
     # @route GET /pages/:id
     def show
       
-      # Find the page with an exact URI match 
+      # Find the page with an exact URI match  
       page = Page.page_with_uri(request.host_with_port, request.fullpath, false)
       
       # Make sure we're not under construction or on a forwarded domain

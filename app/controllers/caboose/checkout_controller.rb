@@ -274,7 +274,7 @@ module Caboose
       @invoice.invoice_number = @site.store_config.next_invoice_number
 
 
-      # Update variant limits to reflect this purchase
+      # Update variant limits to reflect this purchase 
       @invoice.line_items.each do |li|
         vl = VariantLimit.where(:user_id => @invoice.customer_id, :variant_id => li.variant_id).first
         if vl

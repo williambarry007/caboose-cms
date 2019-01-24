@@ -48,7 +48,8 @@ module Caboose
       :download_instructions,
       :weight_unit,
       :allow_instore_pickup,
-      :custom_invoice_pdf
+      :custom_invoice_pdf,
+      :auto_capture
       
     WEIGHT_UNIT_METRIC   = 'g'
     WEIGHT_UNIT_IMPERIAL = 'oz'

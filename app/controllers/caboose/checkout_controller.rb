@@ -242,7 +242,7 @@ module Caboose
                 :amount => (@invoice.total * 100).to_i,
                 :currency => 'usd',
                 :customer => logged_in_user.stripe_customer_id,
-                :capture => false,
+                :capture => sc.auto_capture,
                 :metadata => { :invoice_id => @invoice.id },
                 :statement_descriptor => "Invoice ##{@invoice.id}"
               )
@@ -265,13 +265,14 @@ module Caboose
           render :json => { :error => error }
           return        
         else        
-          @invoice.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED                                                   
+          @invoice.financial_status = sc.auto_capture ? Invoice::FINANCIAL_STATUS_CAPTURED : Invoice::FINANCIAL_STATUS_AUTHORIZED                                                   
           @invoice.take_gift_card_funds
         end
       end
       
-      @invoice.status = Invoice::STATUS_PENDING
+      @invoice.status = sc.auto_capture ? Invoice::STATUS_PROCESSED : Invoice::STATUS_PENDING
       @invoice.invoice_number = @site.store_config.next_invoice_number
+
 
       # Update variant limits to reflect this purchase
       @invoice.line_items.each do |li|
@@ -297,6 +298,7 @@ module Caboose
       
       # Save the invoice
       @invoice.save
+      @invoice.refresh_transactions if sc.auto_capture
       
       # Decrement quantities of variants
       @invoice.decrement_quantities

@@ -1007,7 +1007,8 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :default_taxable                   , :boolean ],
         [ :allow_instore_pickup              , :boolean  , { :default => false }],
         [ :instore_tax_rate                  , :decimal  , { :precision => 8, :scale => 2 }],
-        [ :custom_invoice_pdf                , :string  ]
+        [ :custom_invoice_pdf                , :string  ],
+        [ :auto_capture                      , :boolean  , { :default => false }]
       ],  
       Caboose::Subscription => [      
         [ :site_id                           , :integer ], 

@@ -211,7 +211,7 @@ module Caboose
 
       @invoice.customer.create_variant_limits if @invoice.customer
       
-      # Make sure all the variants still exist      
+      # Make sure all the variants still exist       
       @invoice.line_items.each do |li|
         v = Variant.where(:id => li.variant_id).first
         vl = VariantLimit.where(:variant_id => v.id, :user_id => @invoice.customer_id).first

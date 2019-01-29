@@ -211,7 +211,7 @@ module Caboose
 
       @invoice.customer.create_variant_limits if @invoice.customer
       
-      # Make sure all the variants still exist      
+      # Make sure all the variants still exist       
       @invoice.line_items.each do |li|
         v = Variant.where(:id => li.variant_id).first
         vl = VariantLimit.where(:variant_id => v.id, :user_id => @invoice.customer_id).first
@@ -242,9 +242,9 @@ module Caboose
                 :amount => (@invoice.total * 100).to_i,
                 :currency => 'usd',
                 :customer => logged_in_user.stripe_customer_id,
-                :capture => false,
+                :capture => sc.auto_capture,
                 :metadata => { :invoice_id => @invoice.id },
-                :statement_descriptor => "Invoice ##{@invoice.id}"
+                :statement_descriptor => "#{@site.description.truncate(22)}"
               )
             rescue Exception => ex
               render :json => { :error => ex.message }
@@ -265,15 +265,16 @@ module Caboose
           render :json => { :error => error }
           return        
         else        
-          @invoice.financial_status = Invoice::FINANCIAL_STATUS_AUTHORIZED                                                   
+          @invoice.financial_status = sc.auto_capture ? Invoice::FINANCIAL_STATUS_CAPTURED : Invoice::FINANCIAL_STATUS_AUTHORIZED                                                   
           @invoice.take_gift_card_funds
         end
       end
       
-      @invoice.status = Invoice::STATUS_PENDING
+      @invoice.status = sc.auto_capture ? Invoice::STATUS_PROCESSED : Invoice::STATUS_PENDING
       @invoice.invoice_number = @site.store_config.next_invoice_number
 
-      # Update variant limits to reflect this purchase
+
+      # Update variant limits to reflect this purchase 
       @invoice.line_items.each do |li|
         vl = VariantLimit.where(:user_id => @invoice.customer_id, :variant_id => li.variant_id).first
         if vl
@@ -297,6 +298,7 @@ module Caboose
       
       # Save the invoice
       @invoice.save
+      @invoice.refresh_transactions if sc.auto_capture
       
       # Decrement quantities of variants
       @invoice.decrement_quantities

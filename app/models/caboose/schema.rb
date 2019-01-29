@@ -901,7 +901,7 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :head_code, :text ],
         [ :body_open_code, :text ],
         [ :body_close_code, :text ],
-        [ :recaptcha_threshold, :float, { :default => 0.5 } ]
+        [ :recaptcha_threshold, :float, { :default => 0.05 } ]
       ],
       Caboose::SiteMembership => [
         [ :site_id     , :integer ],
@@ -1005,9 +1005,11 @@ class Caboose::Schema < Caboose::Utilities::Schema
         [ :default_taxable                   , :boolean ],
         [ :allow_instore_pickup              , :boolean  , { :default => false }],
         [ :instore_tax_rate                  , :decimal  , { :precision => 8, :scale => 2 }],
-        [ :custom_invoice_pdf                , :string  ]
+        [ :custom_invoice_pdf                , :string  ],
+        [ :auto_capture                      , :boolean  , { :default => false }]
       ],  
       Caboose::Subscription => [      
+        [ :site_id                           , :integer ], 
         [ :variant_id  , :integer ],
         [ :user_id          , :integer ],
         [ :date_started     , :date    ],

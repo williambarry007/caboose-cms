@@ -3,11 +3,6 @@
 <% if @edituser %>
   <%= render :partial => 'caboose/users/admin_header' %>
 <% else %>
-  <div id='crumbtrail'>
-    <a href='/admin'>Admin</a> >
-    <a href='/admin/invoices'>Invoices</a> >
-    Invoice #<%= @invoice.invoice_number %>
-  </div>
   <h1>Edit Invoice #<%= @invoice.invoice_number %></h1>
 <% end %>
 
@@ -22,26 +17,6 @@
 <% end %>
 
 </div>
-
-
-<!--
-<p>
-<input type='button' value='< Back' onclick="window.location='/admin/invoices';" />
-<% if @invoice.financial_status == Caboose::Invoice::FINANCIAL_STATUS_AUTHORIZED && @invoice.total > 0.00 %>
-  <input type='button' value='Capture Funds' onclick="controller.capture_funds();" />
-  <input type='button' value='Void'          onclick="controller.void_invoice();" />
-<% end %>
-<% if @invoice.financial_status == Caboose::Invoice::FINANCIAL_STATUS_CAPTURED && @invoice.total > 0.00 %>
-  <input type='button' value='Refund' onclick="refund_invoice(<%= @invoice.id %>);" />
-<% end %>
-<input type='button' value='Resend Confirmation' onclick="resend_confirmation(<%= @invoice.id %>)" />
-<input type='button' value='Add Item'            onclick="controller.add_variant();" />
-<input type='button' value='Print Invoice'         onclick="controller.print_invoice(<%= @invoice.id %>);" />
-
-<% str = Caboose.plugin_hook('admin_edit_invoice_buttons', "", @invoice) %>
-<% if str %><%= raw str %><% end %>
-</p>
--->
 
 <% content_for :caboose_js do %>
 <%= javascript_include_tag 'caboose/model/all' %>

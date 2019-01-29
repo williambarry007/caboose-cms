@@ -299,7 +299,7 @@ module Caboose
                 :customer => self.customer.stripe_customer_id,
                 :capture => true,
                 :metadata => { :invoice_id => self.id },
-                :statement_descriptor => "Invoice ##{self.id}"
+                :statement_descriptor => "#{self.site.description.truncate(22)}"
               )                        
             rescue Exception => ex
               resp.error = "Error during capture process\n#{ex.message}"                

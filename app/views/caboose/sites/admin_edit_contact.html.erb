@@ -1,6 +1,6 @@
-<%= render :partial => 'caboose/sites/admin_header' %>
 
-<h5 style="margin:0;font-size:18px;">Contact Info</h5>
+
+<h1>Contact Information</h1>
 
 <p><div id='site_<%= @site.id %>_main_phone'></div></p>
 <p><div id='site_<%= @site.id %>_alt_phone'></div></p>
@@ -12,10 +12,11 @@
 <p><div id='site_<%= @site.id %>_fax'></div></p>
 <p><div id='site_<%= @site.id %>_contact_email'></div></p>
 
-<%= render :partial => 'caboose/sites/admin_footer' %>
+<a href="/admin" class="caboose-btn">Back</a>
 
 
 <% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
 <script type="text/javascript">
 
 $(document).ready(function() {

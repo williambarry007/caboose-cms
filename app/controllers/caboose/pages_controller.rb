@@ -17,7 +17,7 @@ module Caboose
     # @route GET /pages/:id
     def show
       
-      # Find the page with an exact URI match 
+      # Find the page with an exact URI match  
       page = Page.page_with_uri(request.host_with_port, request.fullpath, false)
       
       # Make sure we're not under construction or on a forwarded domain
@@ -742,6 +742,7 @@ module Caboose
         new_home.uri = nil
         new_home.redirect_url = nil
         new_home.hide = false
+        new_home.custom_sort_children = old_home.custom_sort_children
         new_home.save
         new_layout = Caboose::Block.where(:parent_id => nil, :page_id => new_home.id).first
         new_footer = new_layout.child('footer') if new_layout
@@ -763,6 +764,7 @@ module Caboose
         old_home.uri = "old-home-#{old_home.id}"
         old_home.hide = true
         old_home.save
+        Caboose::Page.where(:parent_id => old_home.id).update_all(parent_id: new_home.id)
         resp.success = true
         resp.redirect = "/admin/pages/#{new_home.id}"
       else

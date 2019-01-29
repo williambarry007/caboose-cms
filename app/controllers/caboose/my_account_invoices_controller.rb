@@ -92,7 +92,7 @@ module Caboose
             :customer => logged_in_user.stripe_customer_id,
             :capture => false,
             :metadata => { :invoice_id => @invoice.id },
-            :statement_descriptor => "Invoice ##{@invoice.id}"
+            :statement_descriptor => "#{@site.description.truncate(22)}"
           )
         rescue Exception => ex
           render :json => { :error => ex.message }

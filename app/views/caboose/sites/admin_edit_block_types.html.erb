@@ -1,5 +1,6 @@
 <%
 s = @site
+seen_btids = [0]
 %>
 <%= render :partial => 'caboose/sites/admin_header' %>
 
@@ -7,23 +8,36 @@ s = @site
 <div id='block_types'>
 <table class='data'>
 <tr><th>&nbsp;</th><th>Name</th><th>Description</th><th></th></tr>
-<% bt_ids = @site.block_type_site_memberships.collect{ |bt| bt.block_type_id } %>
-<% Caboose::BlockType.where("parent_id is null").reorder('name').all.each do |bt| %>
-  <tr id="bt_<%= bt.id %>">
-    <td align='center'><input type='checkbox' name='block_type_id_<%= bt.id %>' <%= bt_ids.include?(bt.id) ? "checked='true'" : '' %> onclick="toggle_block_type_site_membership(<%= @site.id %>, <%= bt.id %>, $(this).prop('checked'));" /></td>
+<%# bt_ids = @site.block_type_site_memberships.collect{ |bt| bt.block_type_id } %>
+
+<% Caboose::BlockType.joins(:sites).where(:parent_id => nil).where("sites.id = ?", @site.id).order(:name).all.each do |bt| %>
+   <tr id="bt_<%= bt.id %>">
+    <td align='center'><input type='checkbox' name='block_type_id_<%= bt.id %>' checked='true' onclick="toggle_block_type_site_membership(<%= @site.id %>, <%= bt.id %>, $(this).prop('checked'));" /></td>
     <td><%= bt.name %></td>
     <td><%= bt.description %></td>
     <td>
-      <% if bt_ids.include?(bt.id) %>
+
         <% btsm = @site.block_type_site_memberships.where(:block_type_id => bt.id).first %>
         <a style="margin-right:5px;" href="/admin/block-type-site-memberships/<%= btsm.id %>/html" class="caboose-btn">Custom Render Function</a>
         <% if @site.theme %>
           <a href="/admin/block-type-site-memberships/<%= btsm.id %>/css" class="caboose-btn">Custom SCSS</a>
         <% end %>
-      <% end %>
+ 
     </td>
   </tr>
+  <% seen_btids << bt.id %>
 <% end %>
+
+<% Caboose::BlockType.where(:parent_id => nil).where("id not in (?)", seen_btids).order(:name).all.each do |bt| %>
+  <tr id="bt_<%= bt.id %>">
+    <td align='center'><input type='checkbox' name='block_type_id_<%= bt.id %>' onclick="toggle_block_type_site_membership(<%= @site.id %>, <%= bt.id %>, $(this).prop('checked'));" /></td>
+    <td><%= bt.name %></td>
+    <td><%= bt.description %></td>
+    <td>&nbsp;</td>
+  </tr>
+<% end %>
+
+
 </table><br/>
 </div>
       

@@ -11,11 +11,14 @@ module Caboose
         invoice_ids = Colonnade::SuiteMenu.where(:menu_id => menu_ids).pluq(:invoice_id) if !menu_ids.blank?
         invoice_ids = invoice_ids.to_s.gsub('[','').gsub(']','')
       end
+
+      status = request.fullpath == '/admin/invoices' ? Caboose::Invoice::STATUS_PENDING : ''
       
       @pager = Caboose::PageBarGenerator.new(params, {
         'site_id'              => @site.id,
-        'customer_id'          => params[:user_id] ? params[:user_id] : '', 
-        'status'               => Invoice::STATUS_PENDING,      
+        'customer_id'          => params[:user_id] ? params[:user_id] : '',  
+        'status'               => status,      
+        'financial_status'     => '',   
         'shipping_method_code' => '',
         'id'                   => '',
         'invoice_number'       => '',

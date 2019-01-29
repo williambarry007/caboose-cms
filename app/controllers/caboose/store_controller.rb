@@ -128,7 +128,8 @@ module Caboose
           when 'starting_invoice_number'          then sc.starting_invoice_number          = value
           when 'default_payment_terms'            then sc.default_payment_terms            = value
           when 'allow_instore_pickup'             then sc.allow_instore_pickup             = value
-                                
+          when 'auto_capture'             then sc.auto_capture             = value
+
           when 'product_vendor_id'                      then pd.vendor_id                      = value   
           when 'product_option1'                        then pd.option1                        = value
           when 'product_option2'                        then pd.option2                        = value

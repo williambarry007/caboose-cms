@@ -90,36 +90,26 @@ module Caboose
     # @route GET /admin/sites/:id/block-types
     def admin_edit_block_types
       return if !user_is_allowed('sites', 'edit')
-      if (@site.id.to_s != params[:id] && !@site.is_master)
+      if (!logged_in_user.is_super_admin?)
         @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
       end
       @site = Site.find(params[:id])      
     end
             
-    # @route GET /admin/sites/:id/css
+    # @route GET /admin/custom-css
     def admin_edit_css
-      return if !user_is_allowed('sites', 'edit')
-      if (@site.id.to_s != params[:id] && !@site.is_master)
-        @error = "You are not allowed to edit this site."
-        render :file => 'caboose/extras/error' and return
-      end    
-      @site = Site.find(params[:id])      
+      return if !user_is_allowed('code', 'edit')
     end
             
-    # @route GET /admin/sites/:id/js
+    # @route GET /admin/custom-js
     def admin_edit_js
-      return if !user_is_allowed('sites', 'edit')
-      if (@site.id.to_s != params[:id] && !@site.is_master)
-        @error = "You are not allowed to edit this site."
-        render :file => 'caboose/extras/error' and return
-      end   
-      @site = Site.find(params[:id])      
+      return if !user_is_allowed('code', 'edit')
     end
 
     # @route GET /admin/sites/:id/contact
     def admin_edit_contact
-      return if !user_is_allowed('sites', 'edit')
+      return if !user_is_allowed('contactinfo', 'edit')
       if (@site.id.to_s != params[:id] && !@site.is_master)
         @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
@@ -127,20 +117,20 @@ module Caboose
       @site = Site.find(params[:id])      
     end
 
-    # @route GET /admin/sites/:id/codes
-    def admin_edit_codes
-      return if !user_is_allowed('sites', 'edit')
-      if (@site.id.to_s != params[:id] && !@site.is_master)
-        @error = "You are not allowed to edit this site."
-        render :file => 'caboose/extras/error' and return
-      end   
-      @site = Site.find(params[:id])      
-    end
+    # # @route GET /admin/sites/:id/codes
+    # def admin_edit_codes
+    #   return if !user_is_allowed('sites', 'edit')
+    #   if (@site.id.to_s != params[:id] && !@site.is_master)
+    #     @error = "You are not allowed to edit this site."
+    #     render :file => 'caboose/extras/error' and return
+    #   end   
+    #   @site = Site.find(params[:id])      
+    # end
             
     # @route GET /admin/sites/:id/delete
     def admin_delete_form
-      return if !user_is_allowed('sites', 'edit')
-      if (@site.id.to_s != params[:id] && !@site.is_master)
+      return if !user_is_allowed('sites', 'delete')
+      if (!logged_in_user.is_super_admin?)
         @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
       end
@@ -150,11 +140,16 @@ module Caboose
     # @route GET /admin/sites/:id
     def admin_edit
       return if !user_is_allowed('sites', 'edit')
-      if (@site.id.to_s != params[:id] && !@site.is_master)
+      if (!logged_in_user.is_super_admin?)
         @error = "You are not allowed to edit this site."
         render :file => 'caboose/extras/error' and return
       end
       @site = Site.find(params[:id])            
+    end
+
+    # @route GET /admin/code
+    def admin_edit_code
+      return if !user_is_allowed('code', 'edit')
     end
         
     # @route POST /admin/sites

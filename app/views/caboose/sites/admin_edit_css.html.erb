@@ -1,10 +1,29 @@
+<% content_for :caboose_js do %>
+<%= javascript_include_tag "caboose/model/all" %>
+<% end %>
 
-<%= render :partial => 'caboose/sites/admin_header' %>
+<h1 id='page_title'>Edit Code</h1>
+<ul id='tabs'>
+<%
+tabs = {
+  'Custom CSS'        => "/admin/custom-css",
+  'Custom JS'         => "/admin/custom-js",
+  'Embedded HTML'     => "/admin/code"
+}
+
+%>
+<% tabs.each do |text, href| %>
+<li<%= raw request.fullpath == href ? " class='selected'" : '' %>><a href='<%= href %>'><%= raw text %></a></li>
+<% end %> 
+<li class="back"><input type="button" onclick="window.location='/admin';" value="< Back" />
+</ul>
+<div id='content2'>
 
 <div class="editor-wrapper">
 
   <div class="holder">
     <div class="clearfix buttons">
+      <p class="warning">WARNING: This code will apply to the entire website. Edit with caution.</p>
       <a href="#" onclick="save();return false;" class="caboose-btn green">Save</a>
       <span id="modified">Modified</span>
       <div id="message"></div>
@@ -19,6 +38,12 @@
 
 <% content_for :caboose_css do %>
 <style>
+p.warning {
+  color: #d43030;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
 p#tips {
   display: inline-block;
   float: right;
@@ -118,4 +143,5 @@ span#modified {
 <% end %>
 
 
-<%= render :partial => 'caboose/sites/admin_footer' %>
+<br style='clear: left; line-height: 0;' />
+</div><!-- modal_content2 -->

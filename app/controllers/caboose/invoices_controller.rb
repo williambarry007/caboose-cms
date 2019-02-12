@@ -37,7 +37,7 @@ module Caboose
       @edituser = params[:user_id] ? User.find(params[:user_id]) : nil
       @invoices  = @pager.items
       @customers = Caboose::User.where(:site_id => @site.id).order('last_name, first_name').all
-      
+       
       render :layout => 'caboose/admin'
     end
     

@@ -94,7 +94,7 @@ module Caboose
   		return m if @options['includes'].nil?
   		
   		associations = []
-  		# See if any fields that we know have includes have values  		
+  		# See if any fields that we know have includes have values 
   		@params.each do |k,v|
         next if v.nil? || (v.kind_of?(String) && k.length == 0)
         k.split('_concat_').each do |k2|

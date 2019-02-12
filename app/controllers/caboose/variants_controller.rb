@@ -184,18 +184,7 @@ module Caboose
       img.save
       render :json => true
     end
-  
-    # @route DELETE /admin/products/:product_id/variants/:id
-    def admin_delete
-      return if !user_is_allowed('variants', 'delete')
-      v = Variant.find(params[:id])
-      v.status = 'Deleted'
-      v.save
-      render :json => Caboose::StdClass.new({
-        :redirect => "/admin/products/#{v.product_id}/variants"
-      })
-    end
-    
+
     # @route DELETE /admin/products/:product_id/variants/bulk
     def admin_bulk_delete
       return if !user_is_allowed('variants', 'delete')
@@ -208,7 +197,18 @@ module Caboose
       end
       resp.success = true
       render :json => resp
-    end    
+    end
+  
+    # @route DELETE /admin/products/:product_id/variants/:id
+    def admin_delete
+      return if !user_is_allowed('variants', 'delete')
+      v = Variant.find(params[:id])
+      v.status = 'Deleted'
+      v.save
+      render :json => Caboose::StdClass.new({
+        :redirect => "/admin/products/#{v.product_id}/variants"
+      })
+    end
     
     # @route PUT /admin/products/:product_id/variants/option1-sort-order
     def admin_update_option1_sort_order

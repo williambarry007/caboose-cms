@@ -1,0 +1,81 @@
+/****************************************/
+/* Heading Froala editor
+/****************************************/
+
+.fr-box.fr-basic .fr-wrapper {
+  background: transparent !important;
+}
+.fr-box.fr-basic.fr-top .fr-wrapper {
+  box-shadow        : none !important;
+  -webkit-box-shadow: none !important;
+}
+
+.heading-froala > .fr-toolbar.fr-desktop.fr-top {
+  position: absolute;
+  top: -40px;
+  width: 500px;
+}
+
+.fr-box.fr-basic .fr-wrapper {
+  text-align: center;
+}
+
+.fr-box.fr-basic .fr-element {
+  padding: 0 !important;
+  overflow-x: hidden !important;
+  height: 100% !important;
+}
+
+.fr-element.fr-viewer {
+  margin: 0;
+}
+
+/* Fake highlighting */
+.sp-text-selected, .sp-text-selected span{
+  /* color: #000 !important; */
+  background-color: #ACCEF7;
+}
+
+/* Selection show text color */
+.fr-element > h1::selection {
+  color: inherit;
+}
+
+.fr-element > h1::-moz-selection {
+  color: inherit;
+}
+
+.fr-element > h1 > span::selection {
+  color: inherit;
+}
+
+.fr-element > h1 > span::-moz-selection {
+  color: inherit;
+}
+
+/****************************************/
+/* Richtext Froala editor
+/****************************************/
+
+.richtext-froala > .fr-toolbar.fr-desktop.fr-top {
+  position: absolute;
+  top: -80px;
+  width: 600px;
+}
+
+/* Selection show text color */
+.fr-element::selection {
+  color: inherit;
+}
+
+.fr-element::-moz-selection {
+  color: inherit;
+}
+
+.fr-element > span::selection {
+  color: inherit;
+}
+
+.fr-element > span::-moz-selection {
+  color: inherit;
+}

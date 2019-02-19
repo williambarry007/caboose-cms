@@ -1,3 +1,4 @@
+# Caboose
 # Copyright 2013 William Barry
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -29,7 +30,7 @@ Gem::Specification.new do |s|
   s.name        = "caboose-cms"
   s.version     = Caboose::VERSION
   s.authors     = ["William Barry"]
-  s.email       = ["william@nine.is"]
+  s.email       = ["william@birdbean.co"]
   s.homepage    = "http://github.com/williambarry007/caboose-cms"
   s.summary     = "CMS built on rails."
   s.description = "CMS built on rails with love."
@@ -40,23 +41,26 @@ Gem::Specification.new do |s|
 
   # Production  
   s.add_dependency "pg"
-  s.add_dependency "rails", "~> 3.2.22"
+  s.add_dependency "rails", "~> 4.2.7"
+  s.add_dependency "protected_attributes"
   s.add_dependency "underscore-rails"
-  s.add_dependency "jquery-rails", "2.2.1"
-  s.add_dependency "jquery-ui-rails", "~> 5.0.0"
+  s.add_dependency "jquery-rails"
+  s.add_dependency "jquery-ui-rails"
   s.add_dependency "trollop"
   s.add_dependency "colorbox-rails", "~> 0.1.2"
   s.add_dependency "paperclip"
   s.add_dependency "awesome_print"
   s.add_dependency "ejs"
   s.add_dependency "httparty"
-  s.add_dependency "prawn"
-  s.add_dependency "prawn-table"
+  #s.add_dependency "prawn"
+  #s.add_dependency "prawn-table"
+  s.add_dependency "prawn-rails"
   s.add_dependency "nokogiri"
   s.add_dependency "nokogiri-styles"
   s.add_dependency 'delayed_job_active_record'  
-  s.add_dependency 'aws-sdk', '< 2.0'
-  s.add_dependency 'asset_sync', '~> 1.3.0'
+  s.add_dependency 'aws-sdk' #, '< 2.0'
+  s.add_dependency 'asset_sync' #, '~> 1.3.0'
+  s.add_dependency 'fog-aws'
   s.add_dependency 'unf'
   s.add_dependency 'highline'
   
@@ -66,20 +70,29 @@ Gem::Specification.new do |s|
   s.add_dependency "activemerchant"  
   s.add_dependency 'box_packer', '~> 1.2.3'
   s.add_dependency 'tax_cloud'
+  s.add_dependency 'activerecord-session_store'
+  s.add_dependency 'left_join'
+  
+  s.add_dependency 'sass-rails'
+  s.add_dependency 'compass-rails'
+  s.add_dependency 'uglifier'
+  s.add_dependency 'gibbon'
+	s.add_dependency 'braintree'
   
   #s.add_dependency "oauth"
   #s.add_dependency "roxml"
   #s.add_dependency "spreadsheet"
   #s.add_dependency "thin"
     
-  # Development
-  s.add_development_dependency 'rspec-rails'
-  s.add_development_dependency 'factory_girl_rails'
+  # Development  
+  s.add_development_dependency 'launchy'  
   
-  # Testing  
-  s.add_development_dependency 'faker'
+  # Testing
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec-rails', '~> 3.5.2'
+  s.add_development_dependency 'rspec-wait'
   s.add_development_dependency 'capybara'
-  s.add_development_dependency 'guard-rspec'
-  s.add_development_dependency 'launchy'
+  s.add_development_dependency 'capybara-webkit'
+  #s.add_development_dependency 'selenium-webdriver'
 
 end

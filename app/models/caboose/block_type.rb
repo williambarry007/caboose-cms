@@ -4,8 +4,8 @@ class Caboose::BlockType < ActiveRecord::Base
   
   belongs_to :default_child_block_type, :foreign_key => 'default_child_block_type_id', :class_name => 'Caboose::BlockType'
   belongs_to :block_type_category
-  belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType'
-  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType', :dependent => :destroy
+  belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType'  
+  has_many :children, -> { order(:sort_order) }, :foreign_key => 'parent_id', :class_name => 'Caboose::BlockType', :dependent => :destroy
   has_many :sites, :through => :block_type_site_memberships
   has_many :block_type_site_memberships
   attr_accessible :id,    

@@ -17,14 +17,14 @@ module Caboose
       end
           
       classes = {'zzz_all_domains' => []}       
-      controller_paths.each do |controller_path|                
+      controller_paths.each do |controller_path|                        
         #files = Dir.glob(Rails.root.join(controller_path, '*.rb'))        
         #files = controller ? Dir.glob(Rails.root.join(controller_path, "#{controller}_controller.rb")) : Dir.glob(Rails.root.join(controller_path, '**/*.rb'))
         #files = controller ? Dir.glob(Rails.root.join(controller_path, "#{controller}_controller.rb")) : Dir.glob(Rails.root.join(controller_path, '*.rb'))        
         #files = controller ? Dir.glob("#{controller_path}/#{controller}_controller.rb") : Dir.glob("#{controller_path}/*.rb")                          
         files = controller ? Dir.glob("#{controller_path}/**/#{controller.gsub(/(.*?)::(.*?)/, '\2')}_controller.rb") : Dir.glob("#{controller_path}/**/*_controller.rb")
         #files = Dir.glob("#{controller_path}/**/*_controller.rb")        
-        for file in files
+        for file in files          
           f2 = File.open(file, "r")
                   
           domains = []
@@ -39,15 +39,16 @@ module Caboose
           f2.each_line do |line|      
             line = line.strip        
             if line =~ /^module (.*?)$/
-              module_name = line.gsub(/^module (.*?)$/, '\1').gsub(/([A-Z])/, '_\1').downcase
-              module_name[0] = '' if module_name[0] == '_'
+              this_module_name = line.gsub(/^module (.*?)$/, '\1').gsub(/([A-Z])/, '_\1').downcase
+              this_module_name[0] = '' if this_module_name[0] == '_'              
+              module_name = module_name ? "#{module_name}/#{this_module_name}" : this_module_name              
             elsif line =~ /^(.*?)class (.*?)Controller(.*?)$/
               class_name = line.gsub(/^(.*?)class (.*?)Controller(.*?)$/, '\2').gsub(/([A-Z])/, '_\1').downcase
               class_name[0] = '' if class_name[0] == '_'
-              class_name = "#{module_name}::#{class_name}" if module_name
-            elsif line =~ /# @route_domain (.*?)$/
+              class_name = "#{module_name}/#{class_name}" if module_name
+            elsif line =~ /# @route_domain (.*?)$/              
               # Ignore if we have a domain constrainer
-              if domains.is_a?(Array)
+              if domains.is_a?(Array)                
                 domain = line.gsub(/# @route_domain (.*?)$/, '\1')
                 domains << domain if !domains.include?(domain)
               end

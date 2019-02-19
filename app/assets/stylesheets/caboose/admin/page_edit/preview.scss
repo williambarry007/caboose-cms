@@ -1,0 +1,25 @@
+#preview_confirm {
+  position: absolute;
+  top: 48px;
+  right: 10px;
+  z-index: 1000;
+  width: 300px;
+  padding: 10px;
+  border-radius: 6px 6px 6px 6px;
+  border-color: #EDEEF0;
+  border-width: 0 2px 2px 2px;
+  border-style: solid;
+  background: #3893e5;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+  p { margin-bottom: 8px; }
+  
+  select, input[type=text] {
+    margin: 0;
+    padding: 4px 8px;
+    border: #ccc 1px solid;
+    font-size: 14px;
+    width: 250px;
+  }
+}

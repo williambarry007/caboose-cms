@@ -1,0 +1,102 @@
+// Color
+$color-main:          #2475A5;
+$color-alt:           #24A55E;
+
+$color-light:         #E4E4E4;
+$color-dark:          #505050;
+
+// Size
+$max-width:           1000px;
+$body-bg-color:       #fff;
+
+$break-small:         550px;
+$break-medium:        800px;
+$break-large:         1100px;
+
+// Typography
+$font-size:           16px;
+
+$font-main:          	normal 1em "body-font", sans-serif;
+$font-alt:           	normal 1em "heading-font", sans-serif;
+$font-btn:            normal 1em "button-font", sans-serif;
+
+// Headings
+$heading-font:        $font-alt;
+
+// Header
+$header-height:       64px;
+$header-bg-color:     $color-light;
+$header-font-color:   $color-dark;
+$dropdown-color: 			$color-main;
+
+// Sidebar 
+$sidebar-bg-color:    	$color-dark;
+$sidebar-font-color:  	#fff;
+$sidebar-border-color:  rgba(255, 255, 255, 0.3);
+$sidebar-icon-color:  	$color-dark;
+
+// Footer
+$footer-height:       auto;
+$footer-bg-color:     $color-dark;
+$footer-font-color:   #fff;
+
+// Buttons
+$btn-border-radius:   5px;
+$btn-border-width:    0;    // 0 for no border
+$btn-border-color:    #999; // shade(#d0d0d0, 20%);
+$btn-bg-color:        #d0d0d0;
+$btn-font-color:      #000;
+$btn-font:            $font-btn;
+$btn-font-size:       14px;
+$btn-font-weight:     normal; // bold || normal
+$btn-font-case:       uppercase;   // none || uppercase || lowercase || capitalize
+$btn-border-side:     "all"; // "all" || "bottom"
+
+// Inputs
+$input-border-radius:   2px;
+$input-bg-color:        #fff;
+$input-border-color:    $color-main;
+$input-border-width:    1px; // 0 for no border
+$input-font:            $font-main;
+$input-font-color:      $color-dark;
+$input-font-size:       1em;
+
+@mixin mini() { @media all and (max-width: $break-small) { @content }}
+@mixin small() { @media all and (max-width: $break-medium) { @content }}
+@mixin medium() { @media all and (min-width: $break-medium) and (max-width: $break-large) { @content }}
+@mixin big()   { @media all and (min-width: $break-medium) { @content }}
+@mixin breakpx( $min, $max ) {
+  @media all and (min-width: $min) and (max-width: $max) { @content }
+}
+
+@mixin bgcover( $url ) {
+  background-image: url('#{$url}');
+  -ms-behavior: url('/bg.htc');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+@mixin flexbox() {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+
+@mixin flex($values) {
+  -webkit-box-flex: $values;
+  -moz-box-flex:  $values;
+  -webkit-flex:  $values;
+  -ms-flex:  $values;
+  flex:  $values;
+}
+
+@mixin order($val) {
+  -webkit-box-ordinal-group: $val;  
+  -moz-box-ordinal-group: $val;     
+  -ms-flex-order: $val;     
+  -webkit-order: $val;  
+  order: $val;
+}

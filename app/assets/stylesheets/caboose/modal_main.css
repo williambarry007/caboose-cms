@@ -7,10 +7,10 @@ html { width: 100%; }
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i');
 
 body {
-  background: #111111;
+  background: #fff;
   margin: 0;
   padding: 0;
-  color: #fff;
+  color: #000;
   width: 100%;  
   font-family: "Roboto", Arial;
   font-weight: 400;
@@ -30,8 +30,7 @@ body {
 #modal_content h1 {
   margin: 0 0 12px 0;
   padding: 0;
-  font-weight: normal;
-  background: #111111;   
+  font-weight: normal;     
 }
 
 #modal_content a {
@@ -41,7 +40,7 @@ body {
 }
 
 #modal_content p.loading {
-  background-image: url('/assets/caboose/loading_white_on_black.gif');
+  background-image: url('/assets/caboose/loading.gif');
   background-position: 0 center;
   background-repeat: no-repeat;
   color: #ccc;  
@@ -87,9 +86,9 @@ div.model_attribute_text {
 input, select, textarea {
   font-family: "Roboto", Arial;
   font-weight: 400;
-  border: 2px solid #ccc;
-  background: #000;
-  color: #fff;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #000;
   /*
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
@@ -211,9 +210,9 @@ select.fake option {
 }
   
 #modal_content table.data th {
-  background: #000;
+  background: #666;
   border: #333 1px solid;  
-  color: #efefef;
+  color: #fff;
   margin: 0;
   padding: 0;
 }
@@ -231,8 +230,7 @@ select.fake option {
   background: #333;
 }
 
-#modal_content table.data td {
-  background: #111111;
+#modal_content table.data td {  
   border: #333 1px solid;
   color: #fff;
   margin: 0;
@@ -240,7 +238,7 @@ select.fake option {
 }
 
 #modal_content table.data tr:nth-child(even) td {
-  background-color: #000;
+  background-color: #efefef;
 }
 
 
@@ -251,8 +249,8 @@ select.fake option {
 #modal_content table.data tr:hover td,
 #modal_content table.data tr:nth-child(even):hover td,
 #modal_content table.data tr:nth-child(odd):hover td {
-  background: #333;
-  color: #fff;
+  background: #fff;
+  color: #000;
 }
 
 /*******************************************************************************
@@ -260,14 +258,14 @@ Modeljs
 *******************************************************************************/
 
 #modal_content div.model_attribute_text {
-    color: #fff;
+  color: #000;
 }
 
 #modal_content .model_attribute {
-    background: none repeat scroll 0 0 transparent;
-    display: block;
-    padding: 2px 4px;
-    text-decoration: none;
+  background: none repeat scroll 0 0 transparent;
+  display: block;
+  padding: 2px 4px;
+  text-decoration: none;
 }
 
 #modal_content .clear {
@@ -325,7 +323,7 @@ Message boxes
 #cboxMiddleRight,
 #cboxTopCenter,
 #cboxBottomCenter,
-#cboxClose { background: #111 !important; }
+#cboxClose { background: #fff !important; }
 
 /*******************************************************************************
 Page Bar Generator

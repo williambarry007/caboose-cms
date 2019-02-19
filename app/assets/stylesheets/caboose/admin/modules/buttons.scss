@@ -1,0 +1,120 @@
+@import "caboose/admin/config";
+
+.btn, 
+.admin_container input[type=button], 
+.admin_container input[type=submit], 
+.page_links a {
+  border: 0;
+  border-radius: $btn-border-radius;
+  background-color: $btn-bg-color;
+  color: $btn-font-color;
+  font: $btn-font;
+  display: inline-block;
+  font-weight: $btn-font-weight; 
+  padding: 5px 10px;
+  font-size: $btn-font-size;
+  text-decoration: none;
+  text-transform: $btn-font-case;
+  -webkit-appearance: none;
+  text-align: center;
+  cursor: pointer;
+  border-width: $btn-border-width;
+  @if $btn-border-side == "bottom" {
+    border-bottom: $btn-border-width solid $btn-border-color;
+  }
+  @else if $btn-border-side == "all" {
+    border: $btn-border-width solid $btn-border-color;
+  }
+  &:focus {
+    outline-width: 0;
+  }
+  &:hover {
+    background: shade($btn-bg-color, 10%); 
+    text-decoration: none; 
+    border-color: shade($btn-border-color, 10%); 
+  }
+  &.red {
+    background-color: #d07f7f;
+    color: #fff;
+  }
+  &.duplicate {
+    background-color: #505e72;
+    color: #fff;
+  }
+  &.white {
+    background: #fff;
+    color: $color-main;
+    &:hover {
+      background: $color-main;
+      color: #fff;
+    }
+  }
+  &.white-outline {
+    border: 1px solid #fff;
+    background: none;
+    color: #fff;
+    &:hover {
+      background: $btn-border-color;
+    }
+  }
+  &.color-outline {
+    border: 1px solid $btn-border-color;
+    background: none;
+    color: $btn-border-color;
+    &:hover {
+      background: #fff;
+    }
+  }
+  &.Alternate, &.alternate {
+    background: $color-alt;
+    border-color: shade($color-alt, 20%);
+    &:hover {
+      background: shade($color-alt, 10%);
+      border-color: shade($color-alt, 30%);
+    }
+  }
+}
+
+.mrg-r-10{
+  margin-right: 10px;
+}.mrg-t-10{
+  margin-top: 10px;
+}.mrg-b-10{
+  margin-bottom: 10px;
+}
+
+
+[class^="icon-"] {
+  text-decoration: none;
+  font-size: 40px;
+  &.white {
+    color: #fff; 
+    &:hover {
+      color: $color-alt;
+    }
+  }
+  &.colored {
+    color: $color-main;
+    &:hover {
+      color: shade($color-main, 10%); 
+    }
+  }
+}
+
+a[class^="icon-"] {
+  cursor: pointer; 
+  text-decoration: none;
+}
+
+ul.social-links {
+  list-style-type: none;
+  padding: 0; 
+  margin: 0; 
+  li {
+    display: inline-block;
+    margin-right: 8px;
+    &:last-of-type {
+      margin-right: 0;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+<div class="delay-show">
+  <div id="mmenu">
+    <ul>
+      <li class='home'><a href="/" title="Home"><span class='icon'></span><span class='text'>Home</span></a></li>
+      <% @nav = Caboose.plugin_hook('admin_nav', [], @user, @page, @site) %>
+      <% @nav.each do |item| %>
+        <% href = item['href'] || '#' %>
+        <li class="<%= item['id'] %><% if @request.fullpath.starts_with?(href) %> selected <% end %>">
+          <a href='<%= href %>'><span class='icon'></span><span class='text'><%= item['text'] %></span></a>                  
+          <% if item['children'] && item['children'].count > 0 %>
+            <ul class="submenu">
+              <% item['children'].each do |item2| %>
+                <% href2 = item2['href'] || '#' %>
+                <li><a href='<%= href2 %>'><span><%= item2['text'] %></span></a></li>
+              <% end %>
+            </ul>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

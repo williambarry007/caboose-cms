@@ -1,0 +1,108 @@
+@import "caboose/admin/config";
+
+.flexbox {
+  @include flexbox();
+  @include small {
+    flex-direction: column;
+    -webkit-flex-direction: column;
+  }
+}
+
+.flex-grid-container {
+  .empty {
+    cursor: pointer;
+    &:hover {
+      background: #ffffd7;
+    }
+  }
+  & > .constrain {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .flexbox {
+    @include flexbox();
+    .new_block_link, .new_block_link_over {
+      flex-basis: 0;
+    }
+  }
+  .flex-grid-unit {    
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    -ms-behavior: url('/bg.htc');
+  }
+}
+
+.grid-row {
+  width: 100%;
+  &::after {
+    content: "."; 
+    visibility: hidden; 
+    display: block; 
+    height: 0; 
+    clear: both;
+  }
+  @include big {
+    .unit1of1 {
+      width: 100%; 
+      float: left;
+      text-align: left; 
+    }
+    .unit1of2 {
+      width: 50%;
+      float: left;
+      text-align: left; 
+    }
+    .unit1of3 {
+      width: 33.3333333%; 
+      float: left;
+      text-align: left; 
+    }
+    .unit2of3 {
+      width: 66.6666666%;
+      float: left;
+      text-align: left; 
+    }
+    .unit1of4 {
+      width: 25%;
+      float: left;
+      text-align: left; 
+    }
+    .unit3of4 {
+      width: 75%;
+      float: left;
+      text-align: left; 
+    }
+    .unit1of5 {
+      width: 20%; 
+      float: left;
+      text-align: left; 
+    }
+    .unit2of5 {
+      width: 40%; 
+      float: left;
+      text-align: left; 
+    }
+    .unit4of5 {
+      width: 80%;
+      float: left;
+      text-align: left; 
+    }
+  }
+
+  @include small {
+    .unit1of1, 
+    .unit1of2,
+    .unit1of3,
+    .unit1of4,
+    .unit2of3,
+    .unit3of4,
+    .unit1of5,
+    .unit2of5,
+    .unit4of5  {
+      float: none;
+      text-align: center; 
+      width: 100%;
+    }
+  }
+}

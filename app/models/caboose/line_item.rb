@@ -37,10 +37,10 @@ module Caboose
 
     #
     # Scopes
-    #    
-    scope :pending     , where('status = ?', 'pending')
-    scope :fulfilled   , where('status = ?', 'shipped')
-    scope :unfulfilled , where('status != ?', 'shipped')
+    #
+    scope :pending     , -> { where('status = ?' , 'pending') }
+    scope :fulfilled   , -> { where('status = ?' , 'shipped') }
+    scope :unfulfilled , -> { where('status != ?', 'shipped') }
     
     #validates :quantity, :numericality => { :greater_than_or_equal_to => 0 }    
     #validate :quantity_in_stock

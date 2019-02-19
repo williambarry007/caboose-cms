@@ -1,0 +1,73 @@
+#admin_nav {  
+  height: 100vh;
+  width: 80px;
+  z-index: 100;
+  background: #1d2531;
+  padding: 20px 0 20px 0;  
+  border: none;
+  flex: none;
+        
+  ul {
+    border: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;    
+    
+    li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      
+      a {
+        display: block;
+        text-decoration: none;        
+        width: auto;
+        height: 80px;
+        position: relative;
+                        
+        span.icon {
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: block;
+          width: 80px;
+          height: 60px;
+          background-image: url('/assets/caboose/admin/admin_left_nav.gif');         
+        }
+        span.text {
+          display: block;
+          position: absolute;
+          top: 54px;
+          left: 0;
+          width: 80px;
+          height: 26px;
+          color: #4F5E73 !important;            
+          text-transform: uppercase;
+          font-size: 10px;
+          text-align: center;
+        }
+        &:hover {                     
+          span.text { color: #999 !important; }
+        }      
+      }  
+      &.selected {
+        a, a:hover {
+          span.text { color: #d07f7f !important; }          
+        }        
+      }
+      
+      &.pages     { a { span.icon { background-position: 0px    0px; } &:hover { span.icon { background-position: -160px    0px; }}} &.selected { a, a:hover { span.icon { background-position: -80px    0px; }}}}
+      &.media     { a { span.icon { background-position: 0px  -80px; } &:hover { span.icon { background-position: -160px  -80px; }}} &.selected { a, a:hover { span.icon { background-position: -80px  -80px; }}}}
+      &.posts     { a { span.icon { background-position: 0px -160px; } &:hover { span.icon { background-position: -160px -160px; }}} &.selected { a, a:hover { span.icon { background-position: -80px -160px; }}}}      
+      &.calendars { a { span.icon { background-position: 0px -240px; } &:hover { span.icon { background-position: -160px -240px; }}} &.selected { a, a:hover { span.icon { background-position: -80px -240px; }}}}
+      &.settings  { a { span.icon { background-position: 0px -320px; } &:hover { span.icon { background-position: -162px -320px; }}} &.selected { a, a:hover { span.icon { background-position: -80px -320px; }}}}
+      &.analytics { a { span.icon { background-position: 0px -400px; } &:hover { span.icon { background-position: -160px -400px; }}} &.selected { a, a:hover { span.icon { background-position: -80px -400px; }}}}
+      &.leads     { a { span.icon { background-position: 0px -480px; } &:hover { span.icon { background-position: -160px -480px; }}} &.selected { a, a:hover { span.icon { background-position: -80px -480px; }}}}
+      &.store     { a { span.icon { background-position: 0px -560px; } &:hover { span.icon { background-position: -160px -560px; }}} &.selected { a, a:hover { span.icon { background-position: -80px -560px; }}}}
+      &.eyesight  { a { span.icon { background-position: 0px -640px; } &:hover { span.icon { background-position: -160px -640px; }}} &.selected { a, a:hover { span.icon { background-position: -80px -640px; }}}}            
+    }
+  }
+}
+#admin_sub_nav {
+  z-index : 50;
+}

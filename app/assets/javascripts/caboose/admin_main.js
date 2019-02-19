@@ -15,8 +15,6 @@ function curr(x)
 function add_to_crumbtrail(href, text)
 {
   var c = $('#crumbtrail');
-  if (!c.is(':empty'))
-    c.append(' > ');
   c.append($('<a/>').attr('href', href).html(text));
 }
 

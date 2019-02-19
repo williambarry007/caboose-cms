@@ -1,0 +1,21 @@
+.countdown {
+  text-align: center;
+}
+.countdown ul {
+  width: 100%;
+  height: 100%;
+}
+.countdown ul li {
+  display: inline-block;
+  font-weight: bold;
+  position: relative;
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.countdown ul li.date_part span {
+  display: block;
+  justify-content: center;
+  align-content: center;
+}

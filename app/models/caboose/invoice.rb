@@ -11,8 +11,8 @@ module Caboose
     belongs_to :customer, :class_name => 'Caboose::User'
     belongs_to :shipping_address, :class_name => 'Caboose::Address'
     belongs_to :billing_address, :class_name => 'Caboose::Address'
-    has_many :discounts    
-    has_many :line_items, :order => :id
+    has_many :discounts        
+    has_many :line_items, -> { order(:id) }
     has_many :invoice_packages, :class_name => 'Caboose::InvoicePackage'
     has_many :invoice_transactions
     
@@ -86,18 +86,18 @@ module Caboose
         
     #
     # Scopes
-    #    
-    scope :cart       , where('status = ?', 'cart')
-    scope :pending    , where('status = ?', 'pending')    
-    scope :canceled   , where('status = ?', 'canceled')
-    scope :shipped    , where('status = ?', 'shipped')
-    scope :paid       , where('status = ?', 'paid')
-    scope :test       , where('status = ?', 'testing')
+    #
+    scope :cart       , -> { where('status = ?', 'cart')     }
+    scope :pending    , -> { where('status = ?', 'pending')  }  
+    scope :canceled   , -> { where('status = ?', 'canceled') }
+    scope :shipped    , -> { where('status = ?', 'shipped')  }
+    scope :paid       , -> { where('status = ?', 'paid')     }
+    scope :test       , -> { where('status = ?', 'testing')  }
     
-    scope :authorized , where('financial_status = ?', 'authorized')
-    scope :captured   , where('financial_status = ?', 'captured')
-    scope :refunded   , where('financial_status = ?', 'refunded')
-    scope :voided     , where('financial_status = ?', 'voided')        
+    scope :authorized , -> { where('financial_status = ?', 'authorized') }
+    scope :captured   , -> { where('financial_status = ?', 'captured')   }
+    scope :refunded   , -> { where('financial_status = ?', 'refunded')   }
+    scope :voided     , -> { where('financial_status = ?', 'voided')     }
         
     after_initialize :check_nil_fields
     

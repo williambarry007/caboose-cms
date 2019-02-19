@@ -1,0 +1,109 @@
+
+#admin_header #admin_page_top_nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+      
+  & > ul {
+    & > li {
+      position: absolute;
+      top: 0;
+      right: 0;      
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+      vertical-align: top;
+      
+      a {
+        margin: 0;
+        padding: 0;
+        display: inline-block;
+        text-decoration: none;
+        font-size: 12px;
+        text-transform: uppercase;
+        text-align: center;
+        position: relative;        
+        background-repeat: no-repeat;
+        border: transparent 1px solid;
+        color: #fff;
+      }
+      a:hover {
+        border: #2d76b7 1px solid;        
+      }
+
+      &.select-device  {
+        top: 13px;
+        right: 243px;
+
+        #select_device_wrapper {
+          display: none;
+        }
+      }
+      
+      &.stack           { top: 13px; right: 244px; }
+      &.undo            { top: 13px; right: 204px; }
+      &.redo            { top: 13px; right: 174px; }
+      &.revisions       { top: 26px; right: 174px; }
+      &.preview         { top: 13px; right:  93px; }
+      &.publish         { top: 13px; right:  12px; }
+            
+      &.select-device   a { background-color: #3893e5; width: 75px; height: 30px; border-radius: 6px; padding: 5px 10px 0 10px; }
+      &.undo            a { background-color: #3893e5; width: 29px; height: 18px; border-radius: 6px 0px 0px 0px; background-image: url('/assets/caboose/admin/undo_arrow.png'); background-position:  6px 1px; }
+      &.redo            a { background-color: #3893e5; width: 29px; height: 18px; border-radius: 0px 6px 0px 0px; background-image: url('/assets/caboose/admin/redo_arrow.png'); background-position:  6px 1px; }
+      &.revisions       a { background-color: #3893e5; width: 59px; height: 11px; border-radius: 0px 0px 6px 6px; background-image: url('/assets/caboose/admin/down_arrow.png'); background-position: 22px 0px; }
+      &.preview         a { background-color: #3893e5; width: 71px; height: 30px; border-radius: 6px; padding: 5px 10px 0 10px; }
+      &.publish         a { background-color: #6cb049; width: 71px; height: 30px; border-radius: 6px; padding: 5px 10px 0 10px; }
+
+      &.stack           a { background-color: #3893e5; width: 71px; height: 30px; border-radius: 6px; padding: 5px 10px 0 10px; text-align: center; }
+      &.undo            a { background-color: #3893e5; width: 29px; height: 18px; border-radius: 6px 0px 0px 0px; background-image: url('/assets/caboose/admin/undo_arrow.png'); background-position:  6px 1px; }
+      &.redo            a { background-color: #3893e5; width: 29px; height: 18px; border-radius: 0px 6px 0px 0px; background-image: url('/assets/caboose/admin/redo_arrow.png'); background-position:  6px 1px; }
+      &.revisions       a { background-color: #3893e5; width: 59px; height: 11px; border-radius: 0px 0px 6px 6px; background-image: url('/assets/caboose/admin/down_arrow.png'); background-position: 22px 0px; }
+      &.preview         a { background-color: #3893e5; width: 71px; height: 30px; border-radius: 6px; padding: 5px 10px 0 10px; text-align: center; }
+      &.publish         a { background-color: #6cb049; width: 71px; height: 30px; border-radius: 6px; padding: 5px 10px 0 10px; text-align: center; }
+
+      &.revisions.open         { top: 31px; }
+      &.revisions.open a       { height: 16px; border-radius: 0;           border-color: transparent !important; }
+      &.revisions.open a:hover { height: 16px; border-radius: 0;           border-color: transparent !important; }
+
+      &.preview.open   a       { height: 35px; border-radius: 6px 6px 0 0; border-color: transparent !important; }
+      &.preview.open   a:hover { border-color: #72a761 1px solid; }
+
+      &.publish.open   a       { height: 35px; border-radius: 6px 6px 0 0; border-color: transparent !important; }
+      &.publish.open   a:hover { border-color: #72a761 1px solid; }
+
+      &.stack     a span { }
+      &.undo      a span { display: none; }
+      &.redo      a span { display: none; }
+      &.revisions a span { display: none; }
+      &.preview   a span { }
+      &.publish   a span { }
+      
+
+      &.select-device.open {
+        #select_device_wrapper {
+          display: block;
+          position: absolute;
+          top: 35px;
+          right: -110px;
+          z-index: 1000;
+          width: 250px;
+          padding: 10px;
+          border-radius: 6px 6px 6px 6px;
+          border-color: #EDEEF0;
+          border-width: 0 2px 2px 2px;
+          border-style: solid;
+          background: #3893e5;
+          color: #fff;
+          text-align: center;
+        }
+        /*
+        a {
+          height: 35px;
+          border-radius: 6px 6px 0 0;
+          border-color: transparent !important;
+        }
+        */
+      }
+    }
+  }
+}

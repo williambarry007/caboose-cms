@@ -1,0 +1,72 @@
+@import "caboose/admin/config";
+
+input[type="email"],
+input[type="text"],
+input[type="password"],
+textarea {
+  background: #F9F9FB; 
+  border-radius: 2px; 
+  border-style: solid;
+  color: #505050;
+  font: $input-font;
+  font-size: 16px;
+  border-width: 1px;
+  border-color: #ccc;
+  -webkit-appearance: none; 
+  font-size: $input-font-size;
+  padding: 9px 6px;
+  &:focus {
+    outline-width: 0;
+  }
+}
+
+p.note {
+  background: $color-main;
+  display: inline-block;
+  padding: 6px 20px 8px 20px;
+  border-radius: 2px;
+  color: #fff;
+  font-weight: 300;
+  font-size: 14px;
+  margin-top: 15px;
+  a {
+    color: #fff;
+  }
+  &.success {
+    background: #24A55E;
+  }
+  &.error {
+    background: #A5242A; 
+  }
+  &.loading {
+    background: #2475A5; 
+  }
+}
+
+.cognito [class^="icon-"]::before, .cognito[class*=" icon-"]::before {
+  font-family: FontAwesome !important;
+}
+
+.cognito [class^="icon-"], .cognito[class*=" icon-"] {
+  font-size: 1em;
+}
+
+.cognito {
+  min-height: 300px;
+  background-image: url('/assets/shared/loading.gif');
+  background-size: 36px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  .c-forms-heading .c-forms-form-title, .c-forms-form .c-forms-description, .c-forms-form .c-forms-heading {
+    margin-bottom: 0;
+  }
+  &.c-med, &.c-sml, &.c-lrg {
+    background-image: none;
+  }
+  .c-forms-form {
+    margin: 0 auto;
+  }
+  & > div:last-of-type {
+    visibility: hidden !important;
+  }
+}

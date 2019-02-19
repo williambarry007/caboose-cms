@@ -2,8 +2,8 @@ require 'httparty'
 
 class Caboose::BlockTypeSource < ActiveRecord::Base
   self.table_name = "block_type_sources"
-  
-  has_many :block_types, :class_name => 'Caboose::BlockType', :order => 'name'    
+    
+  has_many :block_types, -> { order(:name) }, :class_name => 'Caboose::BlockType'
   attr_accessible :id,
     :name, 
     :url,

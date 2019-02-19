@@ -1,0 +1,21 @@
+
+.product_images {  
+  .large_image img { width: 400px; }
+  .thumbnails img { width: 100px; }  
+  .spacer { line-height: 0; clear: left; }    
+}
+
+.product_images_edit_thumbs {
+  div {
+    width: 72px;
+    height: 72px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    margin: 0 4px 4px 0;
+    float: left;
+  }  
+  .selected {
+    border: #ff0000 2px solid; 
+  }          
+}

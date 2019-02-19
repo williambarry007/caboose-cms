@@ -10,8 +10,8 @@ module Caboose
 
     belongs_to :site    
     belongs_to :parent, :class_name => 'Category', :foreign_key => 'parent_id'
-    has_many :children, :class_name => 'Category', :foreign_key => 'parent_id', :order => 'name'
-    has_many :products, :through => :category_memberships, :order => 'title'
+    has_many :children, -> { order(:name) }, :class_name => 'Category', :foreign_key => 'parent_id'
+    has_many :products, -> { order(:title) }, :through => :category_memberships
     has_many :category_memberships
     
     has_attached_file :image,    

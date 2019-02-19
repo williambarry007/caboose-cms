@@ -1,0 +1,67 @@
+html.lt-ie9 {
+  .overlay {
+    display: none;
+  }
+  .conceal {
+    display: none !important;
+  }
+  .reveal {
+    display: inherit;
+  }
+  .reveal-m {
+    display: inherit;
+  }
+  .contact-form-block {
+    height: 350px;
+    textarea {
+      margin-bottom: 10px;
+    }
+  }
+  .grid-row {
+    .unit1of1 {
+      width: 100%; 
+      float: left;
+      text-align: left; 
+    }
+    .unit1of2 {
+      width: 50%;
+      float: left;
+      text-align: left; 
+    }
+    .unit1of3 {
+      width: 33.3333333%; 
+      float: left;
+      text-align: left; 
+    }
+    .unit2of3 {
+      width: 66.6666666%;
+      float: left;
+      text-align: left; 
+    }
+    .unit1of4 {
+      width: 25%;
+      float: left;
+      text-align: left; 
+    }
+    .unit3of4 {
+      width: 75%;
+      float: left;
+      text-align: left; 
+    }
+    .unit1of5 {
+      width: 20%; 
+      float: left;
+      text-align: left; 
+    }
+    .unit2of5 {
+      width: 40%; 
+      float: left;
+      text-align: left; 
+    }
+    .unit4of5 {
+      width: 80%;
+      float: left;
+      text-align: left; 
+    }
+  }
+}

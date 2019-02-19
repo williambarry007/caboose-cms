@@ -1,0 +1,44 @@
+<div id="admin_flex_wrapper">
+  <!--
+  <div id='admin_nav'>
+    <ul>
+      <% @nav = Caboose.plugin_hook('admin_nav', [], @logged_in_user, @page, @site) %>
+      <% @nav.each do |item| %>
+        <% href = item['href'] || '#' %>
+        <li id="<%= item['id'] %>" class="top-li <%= item['id'] %><% if @request.fullpath.starts_with?(href) %> selected<% end %>">
+          <a title="<%= item['text'] %>" href="<%= href %>">
+            <span class='icon'></span><span class='text'><%= item['text'] %></span>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+  -->
+  <div id="admin_sub_nav">
+    <% @nav.each do |item| %>
+      <% if item['children'] && item['children'].count > 0 %>
+        <ul class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-<%= item['id'] %>">
+          <li><a class="close" data-id="<%= item['id'] %>">&times;</a></li>
+          <% item['children'].each do |item2| %>
+            <% if item2['href'] != '#' %>
+              <li><a href='<%= item2['href'] %>'><%= item2['text'] %></a></li>
+            <% end %>
+          <% end %>
+        </ul>
+      <% end %>
+    <% end %>
+  </div>
+  <% subnav = yield :admin_subnav %>  
+  <% if subnav && subnav.strip.length > 0 
+    %><%= raw subnav %><%
+    subnav = true
+  else
+    subnav = false
+  end %>
+  <div id='admin_content_wrapper'<% if subnav %> class='with_subnav'<% end %>>
+    <div id='admin_content_body'> 
+      <%= yield %>
+    </div>
+  </div>
+</div>
+</div>

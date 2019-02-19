@@ -1,0 +1,115 @@
+.group_overlay {
+  border: #0000ff 1px dotted;    
+  position: absolute;
+  
+  .caboose_note {        
+    width: 100%;
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    padding: 10px 20px;
+    background: #d07f7f;
+    color: #fff;
+    font-size: 16px; 
+  }
+  
+  .group_controls {
+    position: absolute;
+    top: -20px;    
+    height: 20px;
+    a {
+      float: right;
+      width: 20px;
+      &.hover { background: #ff0000; }    
+    }
+    #align_top     {}
+    #align_bottom  {}
+    #align_left    {}
+    #align_right   {}
+    #evenly_dist_h {}
+    #evenly_dist_v {}
+    #create_group  {}
+    #clear_group   {}
+  }
+  
+  .overlay_controls {
+    position: absolute;
+    left: -1px;
+    top: -2px; 
+    box-sizing: border-box;
+    display: block;
+    a {
+      position: absolute;
+      top: -25px;
+      display: block;
+      width: 26px;
+      height: 26px;
+      background-image: url('/assets/caboose/admin/overlay_nav.png');
+      background-repeat: no-repeat;
+      background-position: top left;
+      background-color: #ff0000;
+      border: #10151b 1px solid;
+      color: #fff;
+      
+      /*
+      &.layers              { right: 74px; background-position: -250px 0; background-color: #3c4c62; border-width: 1px 0px 1px 1px; }
+      &.duplicate           { right: 49px; background-position: -275px 0; background-color: #3c4c62; border-width: 1px 0px 1px 1px; }
+      */
+      
+      span {
+        display: block;
+        color: #fff;
+        padding-top: 4px;         
+        background: #4f5e72;
+        font-size: 12px;
+      }
+      &.align                     { left:   0px; background: #4f5e72;           border-width: 1px 0px 1px 1px; width: 50px; height: 27px; text-align: center; }
+      &.distribute                { left:  50px; background: #4f5e72;           border-width: 1px 0px 1px 1px; width: 75px; height: 27px; text-align: center; }
+      &.save                      { left: 125px; background-position: -300px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.delete                    { left: 151px; background-position: -325px 0; border-width: 1px 1px 1px 1px; width: 27px; height: 27px; }
+       
+      &.align_top_edges           { top: 0; left:   0px; background-position:    0px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.align_vertical_centers    { top: 0; left:  25px; background-position:  -25px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.align_bottom_edges        { top: 0; left:  50px; background-position:  -50px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }        
+      &.align_left_edges          { top: 0; left:  75px; background-position:  -75px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.align_horizontal_centers  { top: 0; left: 100px; background-position: -100px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.align_right_edges         { top: 0; left: 125px; background-position: -125px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+
+      &.dist_top_edges            { top: 0; left:   0px; background-position: -150px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.dist_vertical_centers     { top: 0; left:  25px; background-position: -175px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.dist_bottom_edges         { top: 0; left:  50px; background-position: -200px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.dist_left_edges           { top: 0; left:  75px; background-position: -225px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.dist_horizontal_centers   { top: 0; left: 100px; background-position: -250px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.dist_right_edges          { top: 0; left: 125px; background-position: -275px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.dist_padding_vertically   { top: 0; left: 150px; background-position: -300px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+      &.dist_padding_horizontally { top: 0; left: 175px; background-position: -325px 0; border-width: 1px 0px 1px 1px; width: 26px; height: 27px; }
+    }
+    #align_controls {
+      position: absolute;
+      top: -25px;      
+      left: 50px;
+      width: 0;
+      height: 27px;
+      overflow: hidden;
+      background: #ff0000;
+    }
+    #distribute_controls {
+      position: absolute;
+      top: -25px;      
+      left: 125px;
+      width: 0;
+      height: 27px;
+      overflow: hidden;
+      background: #ff0000;
+    }
+  }
+}
+
+#multiselect {
+  position:absolute;
+  z-index: 9000;  
+  background-color:rgba(73, 144, 225, 0.3);
+  border: 1px solid #4990E1;  
+  cursor: default !important;
+}

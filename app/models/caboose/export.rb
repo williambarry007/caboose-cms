@@ -1,4 +1,4 @@
-require 'aws'
+#require 'aws'
 
 module Caboose
 	class Export < ActiveRecord::Base

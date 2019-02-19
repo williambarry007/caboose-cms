@@ -1,0 +1,38 @@
+@import "caboose/admin/config";
+
+h1,h2,h3,h4,h5,h6 {
+  font: $heading-font;
+  line-height: 1em;
+  margin-bottom: $font-size * 0.8;
+  &.heading-block {
+    color: $color-main;
+    clear: both;
+  }
+}
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.8em;
+}
+h3 {
+  font-size: 1.6em;
+}
+h4 {
+  font-size: 1.4em;
+}
+h5 {
+  font-size: 1.2em;
+}
+h6 {
+  font-size: 1em;
+}
+em, i {
+  font-style: italic;
+}
+b, strong {
+  font-weight: bold;
+}
+span.bold {
+  font-weight: bold; 
+}

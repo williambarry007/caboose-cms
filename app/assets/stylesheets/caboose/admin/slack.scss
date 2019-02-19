@@ -1,0 +1,51 @@
+#admin_content_wrapper {
+  margin-left: 80px;
+  width: initial;
+}
+
+.slack_communicator {
+  width: 100%;
+  .conversation {
+    border: #ccc 1px solid;    
+    max-height: 400px;
+    overflow-y: scroll;
+  
+    .conversation_message {
+      margin: 0;
+      padding: 8px;      
+      border-bottom: #ccc 1px solid;
+      
+      .icon {
+        float: left;
+        img { margin-right: 4px; border-radius: 5px; }        
+      }      
+      .name {
+        display: none; /* inline-block; */
+        font-weight: strong;        
+      }
+      .timestamp {        
+        font-size: 0.7em;                        
+      }
+      .body {
+        font-weight: normal;
+      }
+    }  
+  }
+  .new_message_container {
+    width: 100%;
+    input {
+      width: 100%;
+      border-color: #ccc;
+      border-width: 0 1px 1px 1px;
+      border-style: solid;      
+      padding: 10px;
+      font-size: 1.2em;
+    }
+  }
+  .presence {
+    padding: 10px 0;
+    .icon { width: 20px; height: 20px; float: left; border-radius: 10px; margin-right: 4px; }
+    .active { .icon { background: #00a651; color: #fff; } }      
+    .away   { .icon { background: #ed1c24; color: #fff; } }    
+  }
+}

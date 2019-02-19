@@ -1,0 +1,48 @@
+
+.block_overlay {
+
+  .block_anchors {
+    display: none;
+  }
+  
+  &.over,
+  &.anchor_drag {
+  
+    .block_anchors {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      
+      a {
+        position: absolute;
+        display: block;
+        width: 25px;
+        height: 25px;
+        background-image: url('/assets/caboose/admin/overlay_nav.png');
+        background-repeat: no-repeat;
+        background-position: -450px 0;
+        border: #10151b 1px solid;
+        &.set { background-position: -325px 0; }
+        
+        &.top    { top:    0; left:  50%; /* transform: translateY(10px); */ }
+        &.right  { top:  50%; right:   0; /* transform: translateY(10px); */ }
+        &.bottom { top: 100%; left:  50%; /* transform: translateY(10px); */ }
+        &.left   { top:  50%; left:    0; /* transform: translateY(10px); */ }
+        
+        span {
+          display: none;                
+        }
+      }
+      
+      .anchor_line {              
+        position: absolute;
+        z-index: 1000000;
+        height: 3px;
+        background: #ff0000;
+      }
+    }
+  }
+}

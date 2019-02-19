@@ -3,11 +3,11 @@ class Caboose::Page < ActiveRecord::Base
   self.table_name = "pages"
   
   belongs_to :site, :class_name => 'Caboose::Site'
-  belongs_to :parent, :class_name => 'Caboose::Page'
-  has_many :children, :class_name => 'Caboose::Page', :foreign_key => 'parent_id', :order => 'sort_order, title'
-  has_many :page_permissions  
-  has_many :blocks, :order => 'sort_order'
-  has_many :page_tags, :class_name => 'Caboose::PageTag', :dependent => :delete_all, :order => 'tag'  
+  belongs_to :parent, :class_name => 'Caboose::Page'  
+  has_many :children, -> { order('sort_order, title') }, :class_name => 'Caboose::Page', :foreign_key => 'parent_id'
+  has_many :page_permissions    
+  has_many :blocks, -> { order(:sort_order) }  
+  has_many :page_tags, -> { order(:tag) }, :class_name => 'Caboose::PageTag', :dependent => :delete_all
   has_one :page_cache
   has_many :page_custom_field_values
   attr_accessible :id      ,        
@@ -135,15 +135,15 @@ class Caboose::Page < ActiveRecord::Base
     page_id = !page_ids.nil? && page_ids.count > 0 ? page_ids[0] : false
     
     # Search for the page
-    if page_id
+    if page_id      
       page_id = self.page_with_uri_helper(parts, 1, page_id)
-    else
-      parent_id = self.index_page(site_id)
+    else      
+      parent_id = self.index_page(site_id).id
       page_id = self.page_with_uri_helper(parts, 0, parent_id)
     end
     
     return false if page_id.nil?
-        
+       
     page = self.find(page_id)
     
     if (!get_closest_parent) # // Look for an exact match

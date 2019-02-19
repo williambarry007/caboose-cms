@@ -1,0 +1,47 @@
+<%
+hf   = nil #Caboose::Font.where(:site_id => @site.id, :name => "heading-font"          ).last
+bf   = nil #Caboose::Font.where(:site_id => @site.id, :name => "body-font"             ).last
+bfb  = nil #Caboose::Font.where(:site_id => @site.id, :name => "body-font-bold"        ).last
+bfi  = nil #Caboose::Font.where(:site_id => @site.id, :name => "body-font-italic"      ).last
+bfbi = nil #Caboose::Font.where(:site_id => @site.id, :name => "body-font-bold-italic" ).last
+btn  = nil #Caboose::Font.where(:site_id => @site.id, :name => "button-font"           ).last
+default = '//fonts.gstatic.com/s/opensans/v13/MTP_ySUJH_bn48VBG8sNSi3USBnSvpkopQaUR-2r7iU.ttf'
+%>
+<style>
+	@font-face {
+		font-family: "heading-font";
+		src: url('<%= hf && !hf.blank? ? hf.url.gsub("http://","//") : default %>') format('truetype');
+		font-weight: normal;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: "body-font";
+		src: url('<%= bf && !bf.blank? ? bf.url.gsub("http://","//") : default %>') format('truetype');
+		font-weight: normal;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: "body-font";
+		src: url('<%= bfb && !bfb.blank? ? bfb.url.gsub("http://","//") : default %>') format('truetype');
+		font-weight: bold;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: "body-font";
+		src: url('<%= bfi && !bfi.blank? ? bfi.url.gsub("http://","//") : default %>') format('truetype');
+		font-weight: normal;
+		font-style: italic;
+	}
+	@font-face {
+		font-family: "body-font";
+		src: url('<%= bfbi && !bfbi.blank? ? bfbi.url.gsub("http://","//") : default %>') format('truetype');
+		font-weight: bold;
+		font-style: italic;
+	}
+	@font-face {
+		font-family: "button-font";
+		src: url('<%= btn && !btn.blank? ? btn.url.gsub("http://","//") : default %>') format('truetype');
+		font-weight: normal;
+		font-style: normal;
+	}
+</style>

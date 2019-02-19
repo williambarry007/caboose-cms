@@ -35,7 +35,7 @@ module Caboose
     do_not_validate_attachment_file_type :image
     #validates_attachment_content_type :image, :content_type => ["image/jpg", "image/jpeg", "image/png"]
     
-    default_scope order('position ASC')
+    default_scope { order('position ASC') }
             
     def process
       config = AssetSync.config

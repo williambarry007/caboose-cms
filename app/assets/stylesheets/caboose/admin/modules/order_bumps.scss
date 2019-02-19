@@ -1,0 +1,57 @@
+@import "caboose/admin/config";
+
+.order_bumps {
+
+  .current_order_bumps {
+    table {
+      border-collapse: collapse;
+      margin-bottom: 10px;
+      
+      th {
+        margin: 0;
+        padding: 4px 8px;
+        border: #ccc 1px solid;
+        font-weight: bold;
+        text-align: center;
+      }
+      td {
+        margin: 0;
+        padding: 4px 8px;
+        border: #ccc 1px solid;
+        
+        &.product {}        
+        &.quantity {
+          text-align: right;
+          input {
+            width: 60px;
+            text-align: right;
+          }
+        }        
+        &.price {
+          text-align: right;
+          input {
+            width: 60px;
+            text-align: right;
+          }
+        }
+      }    
+    }
+  }
+  
+  .order_bumps_general table,
+  .order_bumps_display table,
+  .order_bumps_shipping table,
+  .order_bumps_tax table {        
+    margin-bottom: 10px;        
+    td {
+      margin: 0;
+      padding: 4px 8px;                  
+    }    
+  }
+  
+}
+
+ul.modal_subtabs {
+  float: left;
+
+}

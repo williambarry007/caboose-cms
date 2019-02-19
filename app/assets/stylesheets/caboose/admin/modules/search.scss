@@ -1,0 +1,49 @@
+@import "caboose/admin/config";
+
+.search-results-container {
+	max-width: $max-width;
+	margin: 0 auto;
+	padding: 20px 2%;
+	.intro {
+		font-size: 1.1em;
+		margin-bottom: 20px;
+	}
+	.results {
+		list-style-type: none;
+		li {
+			display: block;
+			padding: 10px 2%;
+			color: $color-dark;
+			&:nth-of-type(odd) {
+				background: rgb(240, 240, 240);
+			}
+			a, .event-title {
+				color: $color-main;
+			}
+			.post-meta {
+        font-size: 0.95em;
+        margin-top: 2px;
+        padding-left: 18px;
+        color: #5A5A5A;
+        .author {
+          font-style: italic;
+          font-size: 14px;
+        }
+      }
+			.result-text {
+				margin-top: 4px;
+				font-size: 0.9em;
+			}
+			.date {
+				margin-top: 3px;
+				font-size: 0.85em;
+				color: rgb(121, 121, 121);
+			}
+			.highlight {
+				background: rgb(249, 249, 176);
+				display: inline-block;
+				padding: 1px;
+			}
+		}
+	}
+}

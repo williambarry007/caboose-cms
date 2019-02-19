@@ -1,0 +1,65 @@
+
+#select_device_wrapper {
+  
+  table {
+    margin: 0 auto;  
+    width: 100%;
+    
+    td {
+      text-align: center;      
+    }
+    
+    tr#device_selector {      
+      td {    
+        margin: 0;
+        padding: 0;        
+
+        a {
+          display: block;
+          text-decoration: none;        
+          width: 74px;
+          height: 54px !important;
+          margin: 0 auto;
+          padding: 0;
+          position: relative;          
+                                                 
+          span.icon {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            display: block;
+            width: 74px;
+            height: 54px;
+            background-image: url('/assets/caboose/admin/admin_device_icons.gif');
+            background-position: center center;
+          }
+          span.text {
+            display: block;
+            position: absolute;
+            top: 36px;
+            left: 0;
+            width: 74px;
+            height: 16px;
+            color: #333 !important;
+            text-transform: uppercase;
+            font-size: 10px;
+            text-align: center;
+          }
+          &:hover {                             
+            span.text { color: white !important; }
+          }      
+        }  
+        &.selected {
+          border-bottom: none;
+          a, a:hover {        
+            span.text { color: white !important; }
+          }        
+        }
+        
+        &.breakpoint3 /* Mobile  */ { a { span.icon { background-position: -74px    0px; } &:hover { span.icon { background-position: -148px    0px; }}} &.selected { a, a:hover { span.icon { background-position: 0    0px; }}}}
+        &.breakpoint2 /* Tablet  */ { a { span.icon { background-position: -74px  -54px; } &:hover { span.icon { background-position: -148px  -54px; }}} &.selected { a, a:hover { span.icon { background-position: 0  -54px; }}}}
+        &.breakpoint1 /* Desktop */ { a { span.icon { background-position: -74px -108px; } &:hover { span.icon { background-position: -148px -108px; }}} &.selected { a, a:hover { span.icon { background-position: 0 -108px; }}}}
+      }
+    }
+  }
+}

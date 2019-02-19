@@ -9,8 +9,8 @@ class Caboose::Block < ActiveRecord::Base
   belongs_to :page
   belongs_to :media
   belongs_to :block_type
-  belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'   
-  has_many :children, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :order => 'sort_order, id' # :dependent => :delete_all
+  belongs_to :parent, :foreign_key => 'parent_id', :class_name => 'Caboose::Block'
+  has_many :children, -> { order(:sort_order) }, :foreign_key => 'parent_id', :class_name => 'Caboose::Block', :dependent => :delete_all  
   has_attached_file :file, :path => ':caboose_prefixuploads/:block_file_upload_name.:extension'
   do_not_validate_attachment_file_type :file  
   has_attached_file :image,

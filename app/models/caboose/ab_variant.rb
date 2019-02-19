@@ -5,7 +5,7 @@
 class Caboose::AbVariant < ActiveRecord::Base
   self.table_name = "ab_variants"
   
-  has_many :ab_options, :order => 'id', :dependent => :destroy
+  has_many :ab_options, -> { order(:id) }, :dependent => :destroy
   has_many :ab_values, :dependent => :destroy
   attr_accessible :name, :analytics_name
   
